@@ -3,15 +3,15 @@ module.exports = function(config) {
     config.set({
         basePath: '../../../..',
         files: [
-            'main/resources/js/app/**/*.js',
-            'test/resources/js/app/**/*.js'
+            'main/js/app/**/*.js',
+            'test/js/app/**/*.js'
         ],
         autoWatch: true,
         frameworks: ['jasmine'],
         browsers: ['PhantomJS'],
         reporters: ['dots', 'junit', 'coverage'],
         preprocessors: {
-            'src/main/resources/js/app/**/*.js': ['coverage']
+            'src/main/js/app/**/*.js': ['coverage']
         },
         logLevel: config.LOG_INFO,
         singleRun: true,
