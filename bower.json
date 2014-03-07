@@ -1,0 +1,12 @@
+{
+    "name": "DHIS2-Chrome-App",
+    "version": "0.0.1",
+    "private": true,
+    "keywords": ["dhis2"],
+    "dependencies": {
+        "angular": null,
+        "angular-resource": null,
+        "angular-route": null,
+        "lodash": null
+    }
+}

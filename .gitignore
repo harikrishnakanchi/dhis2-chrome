@@ -1,0 +1,4 @@
+node_modules/
+src/main/resources/js/lib/
+src/test/coverage/
+src/coverage

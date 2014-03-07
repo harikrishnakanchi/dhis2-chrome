@@ -1,0 +1,15 @@
+{
+    "dependencies": {
+        "bower": "*"
+    },
+    "description": "Web interface for the Coop openhouse polling application",
+    "devDependencies": {
+        "gulp": "*",
+        "gulp-karma": "*",
+        "karma-junit-reporter": "*",
+        "karma-phantomjs-launcher": "*",
+        "karma-coverage": "*"
+    },
+    "name": "DHIS2-Chrome-App",
+    "version": "0.0.1"
+}
