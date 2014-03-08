@@ -1,5 +1,4 @@
 require.config({
-    baseUrl: "js/",
     paths: {
         "angular": "lib/angular/angular",
         "Q": "lib/q/q",

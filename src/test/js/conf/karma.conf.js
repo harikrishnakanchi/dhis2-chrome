@@ -1,20 +1,30 @@
 'use strict';
 module.exports = function(config) {
     config.set({
-        basePath: '../../../..',
+        basePath: '../../../',
         files: [
-            'main/js/app/**/*.js',
-            'test/js/app/**/*.js'
+            'test/js/test.main.js', {
+                pattern: 'test/js/test.config.js',
+                included: false
+            }, {
+                pattern: 'main/js/app/**/*.js',
+                included: false
+            }, {
+                pattern: 'test/js/app/**/*.js',
+                included: false
+            }
+        ],
+        exclude: [
+            'main/js/app/background.js'
         ],
         autoWatch: true,
-        frameworks: ['jasmine'],
-        browsers: ['PhantomJS'],
+        frameworks: ['jasmine', 'requirejs'],
         reporters: ['dots', 'junit', 'coverage'],
         preprocessors: {
             'src/main/js/app/**/*.js': ['coverage']
         },
+        browsers: ['PhantomJS'],
         logLevel: config.LOG_INFO,
-        singleRun: true,
         junitReporter: {
             outputFile: 'test/coverage/test-results.xml'
         },
