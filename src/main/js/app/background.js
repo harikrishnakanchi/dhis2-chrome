@@ -1,6 +1,7 @@
 chrome.app.runtime.onLaunched.addListener(function(launchData) {
-    chrome.app.window.create('../../templates/index.html', {
-        id: 'DHIS2'
+    chrome.app.window.create('../../index.html', {
+        id: 'DHIS2',
+        state: 'fullscreen'
     });
 });
 

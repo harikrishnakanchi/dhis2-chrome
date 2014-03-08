@@ -4,9 +4,12 @@
     "private": true,
     "keywords": ["dhis2"],
     "dependencies": {
+        "requirejs": null,
+        "q": null,
         "angular": null,
         "angular-resource": null,
         "angular-route": null,
+        "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
         "lodash": null
     }
 }
