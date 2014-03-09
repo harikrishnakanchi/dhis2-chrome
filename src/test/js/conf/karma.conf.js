@@ -10,11 +10,15 @@ module.exports = function(config) {
                 pattern: 'main/js/app/**/*.js',
                 included: false
             }, {
+                pattern: 'main/js/lib/**/*.js',
+                included: false
+            }, {
                 pattern: 'test/js/app/**/*.js',
                 included: false
             }
         ],
         exclude: [
+            'main/js/lib/**/*spec.js',
             'main/js/app/background.js'
         ],
         autoWatch: true,

@@ -9,7 +9,7 @@ require.config({
 
         //Controllers
         "controllers": "app/controller/controllers",
-        "dashboardController": "app/controller/dashboard-controller",
+        "dashboardController": "app/controller/dashboard.controller",
 
         //Directives
         "directives": "app/directive/directives",

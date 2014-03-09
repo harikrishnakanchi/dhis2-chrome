@@ -8,7 +8,20 @@ for (var file in window.__karma__.files) {
 }
 
 require.config({
-    baseUrl: '/base/main/js'
+    baseUrl: '/base/main/js',
+    paths: {
+        angular: 'lib/angular/angular',
+        angularMocks: 'lib/angular-mocks/angular-mocks'
+    },
+    shim: {
+        'angular': {
+            'exports': 'angular'
+        },
+        'angularMocks': {
+            deps: ['angular'],
+            'exports': 'angular.mock'
+        }
+    }
 });
 
 console.log("load complete");

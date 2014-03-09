@@ -11,5 +11,8 @@
         "angular-route": null,
         "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
         "lodash": null
+    },
+    "devDependencies": {
+        "angular-mocks": null
     }
 }
