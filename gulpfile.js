@@ -8,3 +8,11 @@ gulp.task('test', function() {
             action: 'run'
         }));
 });
+
+gulp.task('devtest', function() {
+    return gulp.src('_')
+        .pipe(karma({
+            configFile: 'src/test/js/conf/karma.conf.js',
+            action: 'watch'
+        }));
+});
