@@ -2,7 +2,7 @@
     "dependencies": {
         "bower": "*"
     },
-    "description": "Web interface for the Coop openhouse polling application",
+    "description": "DHIS2-Chrome-App",
     "devDependencies": {
         "gulp": "*",
         "gulp-karma": "*",
