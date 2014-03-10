@@ -9,7 +9,7 @@
     },
     "app": {
         "background": {
-            "scripts": ["js/app/background.js"]
+            "page": "background.html"
         }
     }
 }
