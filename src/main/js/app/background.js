@@ -18,9 +18,9 @@ chrome.runtime.onInstalled.addListener(function() {
     request.onupgradeneeded = function(e) {
         console.log("upgrading");
         var db = e.target.result;
-        for (var i = db.version - 1; i < migrations.length; i++) {
+        for (var i = 0; i < migrations.length; i++) {
             console.log("running migration " + i);
-            migration.call(this, db);
+            migrations[i].call(this, db);
         }
         console.log("upgraded");
     };

@@ -6,7 +6,7 @@ var add_object_store = function(db) {
 };
 
 var add_organization = function(db) {
-    var transaction = db.transaction(["organization"], "readwrite");
+    var transaction = this.transaction;
     var store = transaction.objectStore("organization");
     store.add({
         "name": "Msf",
