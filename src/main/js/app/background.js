@@ -18,10 +18,10 @@ chrome.runtime.onInstalled.addListener(function() {
     request.onupgradeneeded = function(e) {
         console.log("upgrading");
         var db = e.target.result;
-        migrations.forEach(function(migration, i) {
+        for (var i = db.version - 1; i < migrations.length; i++) {
             console.log("running migration " + i);
             migration.call(this, db);
-        });
+        }
         console.log("upgraded");
     };
     console.log('DHIS2 Chrome extension installed successfully.');
