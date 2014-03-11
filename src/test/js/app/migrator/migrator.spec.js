@@ -13,7 +13,7 @@ define(["migrator"], function(migrator) {
 
             migrator.run("somedb", migrations).then(function(db) {
                 console.log("blah");
-                expect(db.objectStoreNames.length).toBe(1);
+                expect(db.objectStoreNames.length).toBe(2);
                 done();
             });
         });
