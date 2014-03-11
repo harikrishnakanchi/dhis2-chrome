@@ -5,24 +5,6 @@ chrome.app.runtime.onLaunched.addListener(function(launchData) {
     });
 });
 
-console.log(migrations);
-
 chrome.runtime.onInstalled.addListener(function() {
-    var request = indexedDB.open("msf", migrations.length);
-    request.onsuccess = function(e) {
-        console.log("success");
-    };
-    request.onerror = function() {
-        console.log("error");
-    };
-    request.onupgradeneeded = function(e) {
-        console.log("upgrading");
-        var db = e.target.result;
-        for (var i = 0; i < migrations.length; i++) {
-            console.log("running migration " + i);
-            migrations[i].call(this, db);
-        }
-        console.log("upgraded");
-    };
-    console.log('DHIS2 Chrome extension installed successfully.');
+    console.log('Installed');
 });

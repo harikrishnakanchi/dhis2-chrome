@@ -27,7 +27,7 @@ module.exports = function(config) {
         preprocessors: {
             'src/main/js/app/**/*.js': ['coverage']
         },
-        browsers: ['PhantomJS'],
+        browsers: ['Chrome'],
         logLevel: config.LOG_INFO,
         junitReporter: {
             outputFile: 'test/coverage/test-results.xml'
