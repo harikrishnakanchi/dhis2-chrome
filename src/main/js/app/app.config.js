@@ -8,6 +8,7 @@ require.config({
         "angular-resource": "lib/angular-resource/angular-resource",
         "migrations": "../db/migrations",
         "migrator": "app/migrator/migrator",
+        "properties": "app/conf/properties",
 
         //Controllers
         "controllers": "app/controller/controllers",
@@ -17,7 +18,7 @@ require.config({
         "directives": "app/directive/directives",
 
         //Services
-        "services": "app/service/services",
+        "services": "app/service/services"
     },
     shim: {
         "ng-i18n": {

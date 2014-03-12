@@ -4,9 +4,12 @@ require.config({
 
 require(["app/app.config"], function(config) {
     require(["migrator", "migrations"], function(migrator, migrations) {
-        migrator.run("msf", migrations);
-        require(["app/app"], function(app) {
-            app.bootstrap(app.init());
+        var dbPromise = migrator.run("msf", migrations);
+        dbPromise.then(function(db) {
+            require(["app/app", "properties"], function(app, properties) {
+                console.log(properties);
+                app.bootstrap(app.init(db));
+            });
         });
     });
 });

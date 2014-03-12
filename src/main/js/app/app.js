@@ -1,10 +1,11 @@
 define(["angular", "Q", "services", "directives", "controllers", "angular-route", "ng-i18n"],
     function(angular, Q, services, directives, controllers) {
-        var init = function() {
+        var init = function(db) {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute"]);
             services.init(app);
             directives.init(app);
             controllers.init(app);
+            app.value('db', db);
             app.config(['$routeProvider',
                 function($routeProvider) {
                     $routeProvider.
