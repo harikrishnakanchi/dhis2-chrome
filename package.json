@@ -7,7 +7,7 @@
         "gulp": "*",
         "gulp-karma": "*",
         "karma-junit-reporter": "*",
-        "karma-jasmine": "*",
+        "karma-jasmine": "0.2.0",
         "karma-requirejs": "*",
         "karma-chrome-launcher": "*",
         "karma-coverage": "*"
