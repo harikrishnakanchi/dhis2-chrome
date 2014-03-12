@@ -7,7 +7,9 @@
         "gulp": "*",
         "gulp-karma": "*",
         "karma-junit-reporter": "*",
-        "karma-phantomjs-launcher": "*",
+        "karma-jasmine": "*",
+        "karma-requirejs": "*",
+        "karma-chrome-launcher": "*",
         "karma-coverage": "*"
     },
     "name": "DHIS2-Chrome-App",
