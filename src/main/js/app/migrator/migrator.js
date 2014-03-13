@@ -1,4 +1,4 @@
-define(["Q", "underscore"], function(q, _) {
+define(["Q", "lodash"], function(q, _) {
     var run = function(db, migrations) {
         var deferred = q.defer();
         var migrationFunctions = _.values(migrations);

@@ -11,8 +11,7 @@ require.config({
     baseUrl: '/base/main/js',
     paths: {
         angular: 'lib/angular/angular',
-        angularMocks: 'lib/angular-mocks/angular-mocks',
-        underscore: 'lib/underscore/underscore'
+        angularMocks: 'lib/angular-mocks/angular-mocks'
     },
     shim: {
         'angular': {
