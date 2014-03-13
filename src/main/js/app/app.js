@@ -30,7 +30,6 @@ define(["angular", "Q", "services", "directives", "controllers", "angular-route"
             var deferred = Q.defer();
             var injector = angular.bootstrap(angular.element(document.querySelector('#dhis2')), ['DHIS2']);
             deferred.resolve([injector, app]);
-
             return deferred.promise;
         };
 

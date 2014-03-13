@@ -4,7 +4,7 @@ var karma = require('gulp-karma');
 gulp.task('test', function() {
     return gulp.src('_')
         .pipe(karma({
-            configFile: 'src/test/js/conf/karma.conf.js',
+            configFile: 'src/test/conf/karma.conf.js',
             action: 'run'
         }));
 });
@@ -12,7 +12,7 @@ gulp.task('test', function() {
 gulp.task('devtest', function() {
     return gulp.src('_')
         .pipe(karma({
-            configFile: 'src/test/js/conf/karma.conf.js',
+            configFile: 'src/test/conf/karma.conf.js',
             action: 'watch'
         }));
 });

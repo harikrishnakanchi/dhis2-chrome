@@ -1,10 +1,10 @@
 'use strict';
 module.exports = function(config) {
     config.set({
-        basePath: '../../../',
+        basePath: '../../',
         files: [
-            'test/js/test.main.js', {
-                pattern: 'test/js/test.config.js',
+            'test/test.main.js', {
+                pattern: 'test/test.config.js',
                 included: false
             }, {
                 pattern: 'main/js/app/**/*.js',
@@ -14,6 +14,12 @@ module.exports = function(config) {
                 included: false
             }, {
                 pattern: 'test/js/app/**/*.js',
+                included: false
+            }, {
+                pattern: 'main/db/*.js',
+                included: false
+            }, {
+                pattern: 'test/db/*.js',
                 included: false
             }
         ],
