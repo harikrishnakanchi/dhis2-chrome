@@ -19,5 +19,8 @@ define([], function() {
     };
 
 
-    return [add_object_store, add_organization];
+    return {
+        'add_object_store': add_object_store,
+        'add_organization': add_organization
+    };
 });

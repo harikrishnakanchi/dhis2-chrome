@@ -1,7 +1,8 @@
-define(["Q"], function(q) {
+define(["Q", "underscore"], function(q, _) {
     var run = function(db, migrations) {
         var deferred = q.defer();
-        var request = indexedDB.open(db, migrations.length);
+        var migrationFunctions = _.values(migrations);
+        var request = indexedDB.open(db, migrationFunctions.length);
         request.onsuccess = function(e) {
             console.log("success");
             deferred.resolve(e.target.result);
@@ -13,9 +14,9 @@ define(["Q"], function(q) {
         request.onupgradeneeded = function(e) {
             console.log("upgrading");
             var db = e.target.result;
-            for (var i = e.oldVersion; i < migrations.length; i++) {
+            for (var i = e.oldVersion; i < migrationFunctions.length; i++) {
                 console.log("running migration " + i);
-                migrations[i].call(this, db);
+                migrationFunctions[i].call(this, db);
             }
             console.log("upgraded");
         };

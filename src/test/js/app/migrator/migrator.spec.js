@@ -4,12 +4,11 @@ define(["migrator"], function(migrator) {
 
         it("should run migrations if db version is greater", function(done) {
             console.log(done);
-            var migrations = [
-
-                function(db) {
+            var migrations = {
+                first: function(db) {
                     db.createObjectStore("someStore");
                 }
-            ];
+            };
 
             migrator.run("somedb", migrations).then(function(db) {
                 expect(db.objectStoreNames.length).toBe(1);
