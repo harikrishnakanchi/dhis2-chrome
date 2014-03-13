@@ -8,7 +8,7 @@ define(["Q", "underscore"], function(q, _) {
             deferred.resolve(e.target.result);
         };
         request.onerror = function(e) {
-            console.log("error");
+            console.log("error " + e);
             deferred.reject(e);
         };
         request.onupgradeneeded = function(e) {

@@ -6,7 +6,7 @@ define(["migrations"], function(migrations) {
             var req = indexedDB.open("msf", 1);
             req.onupgradeneeded = function(e) {
                 var db = req.result;
-                migrations.add_object_store(db);
+                migrations.add_object_stores(db);
                 expect(db.objectStoreNames.length).toBe(1);
                 expect(db.objectStoreNames[0]).toBe("organization");
             };
