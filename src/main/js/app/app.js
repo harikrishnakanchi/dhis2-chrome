@@ -12,6 +12,10 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
                         templateUrl: '/templates/dashboard.html',
                         controller: 'dashboardController'
                     }).
+                    when('/data_entry', {
+                        templateUrl: '/templates/data_entry.html',
+                        controller: 'dataEntryController'
+                    }).
                     otherwise({
                         redirectTo: '/dashboard'
                     });

@@ -16,8 +16,8 @@ define(["metadataSyncService", "properties", "angularMocks"], function(MetadataS
             spyOn(mockStore, 'upsert');
 
             httpBackend = $injector.get('$httpBackend');
-            httpBackend.expectGET(properties.metadata_url, {
-                "Authorization": "Basic YWRtaW46ZGlzdHJpY3Q=",
+            httpBackend.expectGET(properties.metadata.url, {
+                "Authorization": properties.metadata.auth_header,
                 "Accept": "application/json, text/plain, */*"
             }).respond(200, {
                 categories: [category1]

@@ -14,6 +14,7 @@ require.config({
         //Controllers
         "controllers": "app/controller/controllers",
         "dashboardController": "app/controller/dashboard.controller",
+        "dataEntryController": "app/controller/data.entry.controller",
 
         //Directives
         "directives": "app/directive/directives",

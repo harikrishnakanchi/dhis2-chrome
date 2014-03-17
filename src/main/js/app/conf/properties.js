@@ -1,6 +1,9 @@
 define([], function() {
     return {
-        "metadata_url": "http://localhost:8080/some.json",
-        "metadata_auth_header": "Basic YWRtaW46ZGlzdHJpY3Q="
+        "metadata": {
+            "url": "http://localhost:8080/some.json",
+            "auth_header": "Basic YWRtaW46ZGlzdHJpY3Q="
+        },
+        "syncable_types": ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections"]
     };
 });
