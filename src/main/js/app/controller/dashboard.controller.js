@@ -1,6 +1,5 @@
 define([], function() {
-    return function($scope, db) {
-        var store = db.objectStore("dataSets");
+    return function($scope) {
         $scope.headline = "DHIS2 Dashboard";
     };
 });

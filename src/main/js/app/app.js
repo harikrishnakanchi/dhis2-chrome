@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "some", "angular-route", "ng-i18n", "angular-indexedDB"],
-    function(angular, Q, services, directives, controllers, migrator, migrations, some) {
+define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "angular-route", "ng-i18n", "angular-indexedDB"],
+    function(angular, Q, services, directives, controllers, migrator, migrations) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB"]);
             services.init(app);
@@ -29,7 +29,7 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
             });
             app.run(['metadataSyncService',
                 function(metadataSyncService) {
-                    metadataSyncService.sync(some.some);
+                    metadataSyncService.sync();
                 }
             ]);
             return app;
