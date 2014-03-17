@@ -8,6 +8,7 @@
         "q": null,
         "angular": null,
         "angular-resource": null,
+        "angular-indexedDB": "https://github.com/webcss/angular-indexedDB.git",
         "angular-route": null,
         "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
         "lodash": null

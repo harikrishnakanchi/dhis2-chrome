@@ -1,13 +1,12 @@
-define(["angular", "Q", "services", "directives", "controllers", "angular-route", "ng-i18n"],
-    function(angular, Q, services, directives, controllers) {
-        var init = function(db) {
-            var app = angular.module('DHIS2', ["ngI18n", "ngRoute"]);
+define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "some", "angular-route", "ng-i18n", "angular-indexedDB"],
+    function(angular, Q, services, directives, controllers, migrator, migrations, some) {
+        var init = function() {
+            var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB"]);
             services.init(app);
             directives.init(app);
             controllers.init(app);
-            app.value('db', db);
-            app.config(['$routeProvider',
-                function($routeProvider) {
+            app.config(['$routeProvider', '$indexedDBProvider',
+                function($routeProvider, $indexedDBProvider) {
                     $routeProvider.
                     when('/dashboard', {
                         templateUrl: '/templates/dashboard.html',
@@ -16,6 +15,11 @@ define(["angular", "Q", "services", "directives", "controllers", "angular-route"
                     otherwise({
                         redirectTo: '/dashboard'
                     });
+
+                    $indexedDBProvider.connection('msf')
+                        .upgradeDatabase(migrations.length, function(event, db, tx) {
+                            migrator.run(event.oldVersion, db, tx, migrations);
+                        });
                 }
             ]);
             app.value('ngI18nConfig', {
@@ -23,6 +27,11 @@ define(["angular", "Q", "services", "directives", "controllers", "angular-route"
                 supportedLocales: ['en', 'es'],
                 basePath: "/js/app/i18n"
             });
+            app.run(['metadataSyncService',
+                function(metadataSyncService) {
+                    metadataSyncService.sync(some.some);
+                }
+            ]);
             return app;
         };
 

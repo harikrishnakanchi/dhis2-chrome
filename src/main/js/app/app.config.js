@@ -6,6 +6,7 @@ require.config({
         "ng-i18n": "lib/ng-i18n/src/js/ng-i18n",
         "angular-route": "lib/angular-route/angular-route",
         "angular-resource": "lib/angular-resource/angular-resource",
+        "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
         "migrations": "../db/migrations",
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
@@ -18,7 +19,9 @@ require.config({
         "directives": "app/directive/directives",
 
         //Services
-        "services": "app/service/services"
+        "services": "app/service/services",
+        "metadataSyncService": "app/service/metadata.sync.service",
+        "some": "app/data/some"
     },
     shim: {
         "ng-i18n": {
@@ -31,6 +34,10 @@ require.config({
         'angular-route': {
             deps: ["angular"],
             exports: 'angular_route'
+        },
+        'angular-indexedDB': {
+            deps: ["angular"],
+            exports: 'angular_indexedDB'
         },
         'angular-resource': {
             deps: ["angular"],
