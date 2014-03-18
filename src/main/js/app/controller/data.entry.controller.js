@@ -15,25 +15,25 @@ define(["lodash"], function(_) {
             }).name;
         };
 
-        var getCategoryCombinations = function(categories) {
-            var totalNumberOfRows = _.reduce(categories, function(numberOfRows, category) {
-                return numberOfRows * category.categoryOptions.length;
+        var getListCombinations = function(lists) {
+            var totalNumberOfRows = _.reduce(lists, function(numberOfRows, list) {
+                return numberOfRows * list.length;
             }, 1);
 
-            var newCategories = _.map(categories, function() {
+            var listCombinations = _.map(lists, function() {
                 return [];
             });
 
             _.times(totalNumberOfRows, function(i) {
                 var j = 1;
-                _.each(categories, function(category, index) {
-                    var len = category.categoryOptions.length;
-                    newCategories[index].push(category.categoryOptions[Math.floor(i / j) % len]);
+                _.each(lists, function(list, index) {
+                    var len = list.length;
+                    listCombinations[index].push(list[Math.floor(i / j) % len]);
                     j = j * len;
                 });
             });
 
-            return newCategories;
+            return listCombinations;
         };
 
         var getAll = function(storeName) {
@@ -72,8 +72,8 @@ define(["lodash"], function(_) {
                     var detailedCategoryCombo = _.find(categoryCombos, function(c) {
                         return c.id === detailedDataElement.categoryCombo.id;
                     });
-
-                    dataElement.categories = getCategoryCombinations(_.map(detailedCategoryCombo.categories, getDetailedCategory));
+                    var detailedCategories = _.map(detailedCategoryCombo.categories, getDetailedCategory);
+                    dataElement.categories = getListCombinations(_.pluck(detailedCategories, "categoryOptions"));
                     return dataElement;
                 };
 

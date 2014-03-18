@@ -21,8 +21,7 @@ require.config({
 
         //Services
         "services": "app/service/services",
-        "metadataSyncService": "app/service/metadata.sync.service",
-        "some": "app/data/some"
+        "metadataSyncService": "app/service/metadata.sync.service"
     },
     shim: {
         "ng-i18n": {
