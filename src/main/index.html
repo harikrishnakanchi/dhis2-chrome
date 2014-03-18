@@ -1,13 +1,14 @@
-<html>
+<html style="overflow:scroll">
 <head>
-  <title>DHIS2</title>
+  	<title>DHIS2</title>
+  	<link rel="stylesheet" type="text/css" href="js/lib/angular/angular-csp.css">
     <script src="js/lib/requirejs/require.js" data-main="js/app/bootstrap.js"></script>
 </head>
 
 <body>
 <div class="body">
 		<h1>DHIS2</h1>
-        <div id="dhis2" name="dhis2">
+        <div id="dhis2" name="dhis2" ng-csp>
 	          <div ng-view="ng-view">
 	          </div>
         </div>
