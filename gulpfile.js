@@ -25,3 +25,8 @@ gulp.task('less', function () {
     .pipe(less())
     .pipe(gulp.dest('./src/main/css'));
 });
+
+gulp.task('watch', function() {
+    gulp.watch('./src/main/less/main.less', ['less']);
+});
+

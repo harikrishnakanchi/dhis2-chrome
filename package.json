@@ -12,7 +12,8 @@
     "karma-chrome-launcher": "*",
     "karma-coverage": "*",
     "gulp-less": "~1.2.3",
-    "path": "~0.4.9"
+    "path": "~0.4.9",
+    "watch": "~0.9.0"
   },
   "name": "DHIS2-Chrome-App",
   "version": "0.0.1"

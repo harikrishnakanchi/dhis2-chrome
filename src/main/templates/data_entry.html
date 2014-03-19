@@ -1,8 +1,9 @@
+<section class="panel tab-panel">
 <tabset>
 <tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
 	<div ng-repeat="section in sections">
 		<h4>{{ section.name }}</h4>
-			<table border="1">
+			<table class="table">
 				<tr ng-repeat="categoryOptions in section.dataElements[0].categories">
 					<th></th>
 					<th ng-repeat="option in categoryOptions track by $index">
