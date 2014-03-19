@@ -7,6 +7,7 @@ require.config({
         "angular-route": "lib/angular-route/angular-route",
         "angular-resource": "lib/angular-resource/angular-resource",
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
+        "angular-ui-tabs": "lib/custom/angular-ui-tabs/tabs",
         "migrations": "../db/migrations",
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
@@ -42,6 +43,10 @@ require.config({
         'angular-resource': {
             deps: ["angular"],
             exports: 'angular_resource'
+        },
+        'angular-ui-tabs': {
+            deps: ["angular"],
+            exports: 'angular_ui_tabs'
         }
     }
 });

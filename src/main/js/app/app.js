@@ -1,7 +1,7 @@
-define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "angular-route", "ng-i18n", "angular-indexedDB"],
+define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "angular-route", "ng-i18n", "angular-indexedDB", "angular-ui-tabs"],
     function(angular, Q, services, directives, controllers, migrator, migrations) {
         var init = function() {
-            var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB"]);
+            var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs"]);
             services.init(app);
             directives.init(app);
             controllers.init(app);

@@ -1,6 +1,8 @@
 node_modules/
-src/main/js/lib/
+src/main/js/lib/*
 src/test/coverage/
 src/coverage
 src/main/css
 .DS_Store
+
+!src/main/js/lib/custom

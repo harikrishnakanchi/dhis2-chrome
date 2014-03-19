@@ -1,5 +1,5 @@
-<div ng-repeat="(dataSetId, sections) in groupedSections">
-	<h3>{{ getDataSetName(dataSetId) }}</h3>
+<tabset>
+<tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
 	<div ng-repeat="section in sections">
 		<h4>{{ section.name }}</h4>
 			<table border="1">
@@ -21,4 +21,5 @@
 				</tr>
 			</table>
 	</div>
-</div>
+</tab>
+</tabset>
