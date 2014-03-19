@@ -1,17 +1,19 @@
 {
-    "dependencies": {
-        "bower": "*"
-    },
-    "description": "DHIS2-Chrome-App",
-    "devDependencies": {
-        "gulp": "*",
-        "gulp-karma": "*",
-        "karma-junit-reporter": "*",
-        "karma-jasmine": "0.2.0",
-        "karma-requirejs": "*",
-        "karma-chrome-launcher": "*",
-        "karma-coverage": "*"
-    },
-    "name": "DHIS2-Chrome-App",
-    "version": "0.0.1"
+  "dependencies": {
+    "bower": "*"
+  },
+  "description": "DHIS2-Chrome-App",
+  "devDependencies": {
+    "gulp": "*",
+    "gulp-karma": "*",
+    "karma-junit-reporter": "*",
+    "karma-jasmine": "0.2.0",
+    "karma-requirejs": "*",
+    "karma-chrome-launcher": "*",
+    "karma-coverage": "*",
+    "gulp-less": "~1.2.3",
+    "path": "~0.4.9"
+  },
+  "name": "DHIS2-Chrome-App",
+  "version": "0.0.1"
 }

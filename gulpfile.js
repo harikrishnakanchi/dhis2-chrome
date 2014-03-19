@@ -16,3 +16,12 @@ gulp.task('devtest', function() {
             action: 'watch'
         }));
 });
+
+gulp.task('less', function () {
+    var less = require('gulp-less');
+    var path = require('path');
+
+    gulp.src('./src/main/less/main.less')
+    .pipe(less())
+    .pipe(gulp.dest('./src/main/css'));
+});
