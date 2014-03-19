@@ -15,25 +15,34 @@ define(["lodash"], function(_) {
             }).name;
         };
 
-        var getListCombinations = function(lists) {
+        $scope.getDataEntryCells = function(category) {
+            return new Array(category.repeat * category.span * category.options.length);
+        };
+
+        $scope.getRepeated = function(data, num) {
+            var repeatedList = [];
+            while (num != 0) {
+                repeatedList = repeatedList.concat(data);
+                num--;
+            }
+            return repeatedList;
+        };
+
+        var getCategories = function(lists) {
             var totalNumberOfRows = _.reduce(lists, function(numberOfRows, list) {
                 return numberOfRows * list.length;
             }, 1);
 
-            var listCombinations = _.map(lists, function() {
-                return [];
+            var prevLength = 1;
+            return _.map(lists, function(list) {
+                var cat = {
+                    span: totalNumberOfRows / (prevLength * list.length),
+                    repeat: prevLength,
+                    options: list
+                };
+                prevLength = prevLength * list.length;
+                return cat;
             });
-
-            _.times(totalNumberOfRows, function(i) {
-                var j = 1;
-                _.each(lists, function(list, index) {
-                    var len = list.length;
-                    listCombinations[index].push(list[Math.floor(i / j) % len]);
-                    j = j * len;
-                });
-            });
-
-            return listCombinations;
         };
 
         var getAll = function(storeName) {
@@ -73,7 +82,7 @@ define(["lodash"], function(_) {
                         return c.id === detailedDataElement.categoryCombo.id;
                     });
                     var detailedCategories = _.map(detailedCategoryCombo.categories, getDetailedCategory);
-                    dataElement.categories = getListCombinations(_.pluck(detailedCategories, "categoryOptions"));
+                    dataElement.categories = getCategories(_.pluck(detailedCategories, "categoryOptions"));
                     return dataElement;
                 };
 

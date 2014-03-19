@@ -4,9 +4,9 @@
 	<div ng-repeat="section in sections">
 		<h4>{{ section.name }}</h4>
 			<table class="table">
-				<tr ng-repeat="categoryOptions in section.dataElements[0].categories">
+				<tr ng-repeat="category in section.dataElements[0].categories">
 					<th></th>
-					<th ng-repeat="option in categoryOptions track by $index">
+					<th ng-repeat="option in getRepeated(category.options, category.repeat)  track by $index" colspan="{{category.span}}">
 						{{option.name}}
 					</th>
 					<th ng-show="$last">
@@ -15,7 +15,7 @@
 				</tr>
 				<tr ng-repeat="dataElement in section.dataElements">
 	 				<td>{{ dataElement.name }}</td>
- 					<td ng-repeat="option in section.dataElements[0].categories[0] track by $index">
+ 					<td ng-repeat="option in getDataEntryCells(section.dataElements[0].categories[0]) track by $index">
 						<input type="number" ng-model="sectionValues[section.id][dataElement.id][$index]"/>
 					</td>
 					<td>{{sum(sectionValues[section.id][dataElement.id])}}</td>
