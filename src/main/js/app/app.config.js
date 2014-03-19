@@ -8,6 +8,9 @@ require.config({
         "angular-resource": "lib/angular-resource/angular-resource",
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
         "angular-ui-tabs": "lib/custom/angular-ui-tabs/tabs",
+        "angular-ui-accordion": "lib/custom/angular-ui-accordion/accordion",
+        "angular-ui-collapse": "lib/custom/angular-ui-collapse/collapse",
+        "angular-ui-transition": "lib/custom/angular-ui-transition/transition",
         "migrations": "../db/migrations",
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
@@ -47,6 +50,18 @@ require.config({
         'angular-ui-tabs': {
             deps: ["angular"],
             exports: 'angular_ui_tabs'
+        },
+        'angular-ui-transition': {
+            deps: ["angular"],
+            exports: 'angular_ui_transition'
+        },
+        'angular-ui-collapse': {
+            deps: ["angular", "angular-ui-transition"],
+            exports: 'angular_ui_collapse'
+        },
+        'angular-ui-accordion': {
+            deps: ["angular", "angular-ui-collapse"],
+            exports: 'angular_ui_accordion'
         }
     }
 });
