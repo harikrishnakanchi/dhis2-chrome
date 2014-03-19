@@ -19,13 +19,10 @@ define(["lodash"], function(_) {
             return new Array(category.repeat * category.span * category.options.length);
         };
 
-        $scope.getRepeated = function(data, num) {
-            var repeatedList = [];
-            while (num != 0) {
-                repeatedList = repeatedList.concat(data);
-                num--;
-            }
-            return repeatedList;
+        $scope.getRepeated = function(list, num) {
+            return _.flatten(_.times(num, function() {
+                return list;
+            }));
         };
 
         var getCategories = function(lists) {

@@ -99,11 +99,14 @@ define(["dataEntryController", "testData", "angularMocks", "lodash"], function(D
             var category2Options = categories[1];
             var allCatOptions = testData.categoryOptions;
 
-            expect(category1Options.length).toBe(4);
-            expect(category1Options.length).toBe(4);
+            expect(category1Options.repeat).toBe(1);
+            expect(category2Options.repeat).toBe(2);
 
-            expect(category1Options).toEqual([allCatOptions[0], allCatOptions[1], allCatOptions[0], allCatOptions[1]]);
-            expect(category2Options).toEqual([allCatOptions[2], allCatOptions[2], allCatOptions[3], allCatOptions[3]]);
+            expect(category1Options.span).toBe(2);
+            expect(category2Options.span).toBe(1);
+
+            expect(category1Options.options).toEqual([allCatOptions[0], allCatOptions[1]]);
+            expect(category2Options.options).toEqual([allCatOptions[2], allCatOptions[3]]);
         });
 
         it("should return the data set name given the id", function() {
@@ -123,6 +126,26 @@ define(["dataEntryController", "testData", "angularMocks", "lodash"], function(D
             _.each(testData.sections, function(testDataSection) {
                 expect(_.keys(scope.sectionValues[testDataSection.id]).length).toBe(testDataSection.dataElements.length);
             });
+        });
+
+        it("should repeat a list for given number of times", function() {
+            var dataEntryController = new DataEntryController(scope, q, db);
+            var list = ["blah", "some"];
+
+            var repeatedList = scope.getRepeated(list, 2)
+
+            expect(repeatedList).toEqual(list.concat(list));
+        });
+
+        it("should get the data entry cells given the category", function() {
+            var dataEntryController = new DataEntryController(scope, q, db);
+            var category = {
+                span: 2,
+                repeat: 3,
+                options: [{}, {}]
+            };
+
+            expect(scope.getDataEntryCells(category).length).toBe(12);
         });
     });
 });
