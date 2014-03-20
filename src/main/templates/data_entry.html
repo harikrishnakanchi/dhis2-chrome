@@ -1,16 +1,17 @@
 <div class="container">
-	
+
 <section class="panel tab-panel">
 <tabset>
 <tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
 
+<div class="exp-coll-group">
 	<accordion close-others="false">
 		<accordion-group ng-repeat="section in sections" is-open="isopen[section]">
 				<accordion-heading>
 					{{section.name}} <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
 				</accordion-heading>
 
-				<table class="table">
+				<table class="table table-bordered">
 					<tr ng-repeat="category in section.dataElements[0].categories">
 						<th></th>
 						<th ng-repeat="option in getRepeated(category.options, category.repeat)  track by $index" colspan="{{category.span}}">
@@ -30,6 +31,7 @@
 				</table>
 		</accordion-group>
 	</accordion>
+	</div>
 </tab>
 </tabset>
 </div>
