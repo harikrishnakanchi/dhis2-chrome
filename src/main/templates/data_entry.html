@@ -6,9 +6,9 @@
 
 <div class="exp-coll-group">
 	<accordion close-others="false">
-		<accordion-group ng-repeat="section in sections" is-open="isopen[section]">
+		<accordion-group ng-repeat="section in sections" is-open="isopen[section.id]">
 				<accordion-heading>
-					{{section.name}} <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
+					{{section.name}} <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
 				</accordion-heading>
 
 				<table class="table table-bordered">

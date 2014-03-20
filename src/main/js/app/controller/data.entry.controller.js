@@ -2,6 +2,7 @@ define(["lodash"], function(_) {
     return function($scope, $q, db) {
         var dataSets;
         $scope.sectionValues = {};
+        $scope.isopen = {};
 
         $scope.sum = function(iterable) {
             return _.reduce(iterable, function(sum, currentValue) {
