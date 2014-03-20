@@ -1,6 +1,9 @@
+<div class="container">
+	
 <section class="panel tab-panel">
 <tabset>
 <tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
+
 	<accordion close-others="false">
 		<accordion-group ng-repeat="section in sections" is-open="isopen[section]">
 				<accordion-heading>
@@ -29,3 +32,4 @@
 	</accordion>
 </tab>
 </tabset>
+</div>
