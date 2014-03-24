@@ -59,7 +59,7 @@ define(["metadataSyncService", "properties", "utils", "angularMocks"], function(
             metadataSyncService.sync();
             httpBackend.flush();
 
-            expect(mockStore.upsert).toHaveBeenCalledWith({"type":"metaData", "lastUpdatedTime":"2014-03-25T09:02:49.870Z"});
+            expect(mockStore.upsert).toHaveBeenCalledWith({"type":"metaData", "lastUpdatedTime":"2014-03-24T09:02:49.870Z"});
         });        
 
         it("should fetch all metadata the first time", function() {
@@ -92,7 +92,6 @@ define(["metadataSyncService", "properties", "utils", "angularMocks"], function(
             httpBackend.flush();
 
             expect(mockStore.upsert.calls.count()).toEqual(1);
-            expect(mockStore.upsert).toHaveBeenCalledWith({"type":"metaData", "lastUpdatedTime":"2014-03-25T09:02:49.870Z"});
         });
     });
 });

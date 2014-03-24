@@ -14,8 +14,7 @@ define(["properties"], function(properties) {
         var updateChangeLog = function(data) {
             var store = db.objectStore("changeLog");
             var createdDate = new Date(data.created);
-            createdDate.setDate(createdDate.getDate() + 1);
-            
+
             store.upsert({
                 type: 'metaData',
                 lastUpdatedTime: createdDate.toISOString()
@@ -30,7 +29,7 @@ define(["properties"], function(properties) {
         var loadMetaData = function(metadataChangeLog) {
             var url = properties.metadata.url
             if (metadataChangeLog)
-            url += "?lastUpdated=" + metadataChangeLog.lastUpdatedTime;
+                url += "?lastUpdated=" + metadataChangeLog.lastUpdatedTime;
             $http.get(url, {
                 headers: {
                     'Authorization': properties.metadata.auth_header
