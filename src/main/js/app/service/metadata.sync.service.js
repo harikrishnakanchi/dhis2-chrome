@@ -1,22 +1,45 @@
 define(["properties"], function(properties) {
     return function(db, $http) {
-
+        var syncableTypes = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "organisationUnits", "organisationUnitLevels"];
         var upsertMetadata = function(data) {
-            _.each(properties.syncable_types, function(type) {
+            _.each(syncableTypes, function(type) {
                 var entities = data[type];
                 var store = db.objectStore(type);
-                _.each(entities, function(entity) {
-                    store.upsert(entity);
-                });
+                if (entities)
+                    store.upsert(entities);
+            });
+            updateChangeLog(data);
+        };
+
+        var updateChangeLog = function(data) {
+            var store = db.objectStore("changeLog");
+            var createdDate = new Date(data.created);
+            createdDate.setDate(createdDate.getDate() + 1);
+            
+            store.upsert({
+                type: 'metaData',
+                lastUpdatedTime: createdDate.toISOString()
             });
         };
 
-        this.sync = function() {
-            $http.get(properties.metadata.url, {
+        var getLastUpdatedTime = function() {
+            var store = db.objectStore("changeLog")
+            return store.find('metaData');
+        };
+
+        var loadMetaData = function(metadataChangeLog) {
+            var url = properties.metadata.url
+            if (metadataChangeLog)
+            url += "?lastUpdated=" + metadataChangeLog.lastUpdatedTime;
+            $http.get(url, {
                 headers: {
                     'Authorization': properties.metadata.auth_header
                 }
-            }).success(upsertMetadata);
+            }).success(upsertMetadata)
+        };
+
+        this.sync = function() {
+            getLastUpdatedTime().then(loadMetaData);
         };
     };
 });

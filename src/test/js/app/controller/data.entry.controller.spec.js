@@ -1,13 +1,6 @@
-define(["dataEntryController", "testData", "angularMocks", "lodash"], function(DataEntryController, testData, mocks, _) {
+define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], function(DataEntryController, testData, mocks, _, utils) {
     describe("dataEntryController ", function() {
         var scope, db, mockStore, q;
-
-        var getPromise = function(response) {
-            response = response || '';
-            var deferred = q.defer();
-            deferred.resolve(response);
-            return deferred.promise;
-        };
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             q = $q;
@@ -16,7 +9,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash"], function(D
             };
             mockStore = function(data) {
                 var getAll = function() {
-                    return getPromise(data);
+                    return utils.getPromise(q, data);
                 };
 
                 return {
