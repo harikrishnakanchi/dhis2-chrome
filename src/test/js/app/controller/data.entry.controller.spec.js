@@ -25,7 +25,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
 
         it("should return the sum of the list ", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
-            var list = [1, 2, 3, 4];
+            var list = ["1", "2", "3", "4"];
 
             expect(scope.sum(list)).toBe(10);
         });
@@ -33,10 +33,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
         it("should return the sum of the map ", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             var list = {
-                a: 1,
-                b: 2,
-                c: 3,
-                d: 4
+                a: "1",
+                b: "2",
+                c: "3",
+                d: "4"
             };
             expect(scope.sum(list)).toBe(10);
         });
