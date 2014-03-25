@@ -1,12 +1,15 @@
 var gulp = require('gulp');
 var karma = require('gulp-karma');
+var gutil = require('gulp-util');
 
 gulp.task('test', function() {
     return gulp.src('_')
         .pipe(karma({
             configFile: 'src/test/conf/karma.conf.js',
             action: 'run'
-        }));
+        })).on('error', function(err) {
+            throw err;
+        });
 });
 
 gulp.task('devtest', function() {
