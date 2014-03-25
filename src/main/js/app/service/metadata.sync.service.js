@@ -44,7 +44,8 @@ define(["properties", "lodash"], function(properties, _) {
         var loadMetaDataFromFile = function(metadataChangeLog) {
             return $http.get("/data/metadata.json").then(function(response) {
                 var data = response.data;
-                if (!(metadataChangeLog && metadataChangeLog.lastUpdatedTime) || (getTime(metadataChangeLog.lastUpdatedTime) < getTime(data.created)))
+                if (!(metadataChangeLog && metadataChangeLog.lastUpdatedTime) ||
+                    (getTime(metadataChangeLog.lastUpdatedTime) < getTime(data.created)))
                     return upsertMetadata(data);
                 return metadataChangeLog;
             });
