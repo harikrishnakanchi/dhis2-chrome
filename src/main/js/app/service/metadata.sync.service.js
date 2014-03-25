@@ -37,10 +37,14 @@ define(["properties", "lodash"], function(properties, _) {
             }).success(upsertMetadata)
         };
 
+        var getTime = function(dateString) {
+            return new Date(dateString).getTime();
+        };
+
         var loadMetaDataFromFile = function(metadataChangeLog) {
             return $http.get("/data/metadata.json").then(function(response) {
                 var data = response.data;
-                if (!(metadataChangeLog && metadataChangeLog.lastUpdatedTime) || (new Date(metadataChangeLog.lastUpdatedTime).getTime() < new Date(data.created).getTime()))
+                if (!(metadataChangeLog && metadataChangeLog.lastUpdatedTime) || (getTime(metadataChangeLog.lastUpdatedTime) < getTime(data.created)))
                     return upsertMetadata(data);
                 return metadataChangeLog;
             });
