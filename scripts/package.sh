@@ -10,6 +10,10 @@ function usage
 	echo "usage: ./package.sh username:password url destinationFilePath"
 }
 
+function package_chrome_app
+{
+	 google-chrome --pack-extension=src/main
+}
 
 ##### Main
 if [ "$1" == "" ]; then
@@ -22,13 +26,10 @@ if [ "$2" == "" ]; then
 	exit 1
 fi
 
-if [ "$3" == "" ]; then
-	usage
-	exit 1
-fi
 
 authorization=$1
 url=$2"/api/metadata.json"
-destination=$3"/metadata.json"
+destination="src/main/data/metadata.json"
 
 do_curl
+package_chrome_app
