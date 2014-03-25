@@ -30,6 +30,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(scope.sum(list)).toBe(10);
         });
 
+        it("should return the sum of valid expressions ", function() {
+            var dataEntryController = new DataEntryController(scope, q, db);
+            var list = ["1+3", "2", "3", "4"];
+
+            expect(scope.sum(list)).toBe(13);
+        });
+
         it("should return the sum of the map ", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             var list = {
