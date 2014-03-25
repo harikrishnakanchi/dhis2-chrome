@@ -6,9 +6,20 @@ define(["lodash"], function(_) {
 
         $scope.sum = function(iterable) {
             return _.reduce(iterable, function(sum, currentValue) {
-                return sum + currentValue;
+                return sum + cellSum(currentValue);
             }, 0);
         };
+
+        var cellSum = function(currentValue) {
+            var exp = currentValue.split("+").filter(function(e) {
+                return e
+            });
+            var sum = 0;
+            _.each(exp, function(exp) {
+                sum = sum + parseInt(exp);
+            })
+            return sum;
+        }
 
         $scope.getDataSetName = function(id) {
             return _.find(dataSets, function(dataSet) {

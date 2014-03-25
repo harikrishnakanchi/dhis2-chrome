@@ -24,7 +24,7 @@
 					<tr ng-repeat="dataElement in section.dataElements">
 		 				<td>{{ dataElement.name }}</td>
 	 					<td ng-repeat="option in getDataEntryCells(section.dataElements[0].categories[0]) track by $index">
-							<input type="number" ng-model="sectionValues[section.id][dataElement.id][$index]"/>
+							<input type="text" ng-model="sectionValues[section.id][dataElement.id][$index]"/>
 						</td>
 						<td>{{sum(sectionValues[section.id][dataElement.id])}}</td>
 					</tr>
