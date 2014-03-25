@@ -1,21 +1,21 @@
-define(["properties"], function(properties) {
+define(["properties", "lodash"], function(properties, _) {
     return function(db, $http) {
         var syncableTypes = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "organisationUnits", "organisationUnitLevels"];
         var upsertMetadata = function(data) {
             _.each(syncableTypes, function(type) {
                 var entities = data[type];
                 var store = db.objectStore(type);
-                if (entities)
+                if (!_.isEmpty(entities))
                     store.upsert(entities);
             });
-            updateChangeLog(data);
+            return updateChangeLog(data);
         };
 
         var updateChangeLog = function(data) {
             var store = db.objectStore("changeLog");
             var createdDate = new Date(data.created);
 
-            store.upsert({
+            return store.upsert({
                 type: 'metaData',
                 lastUpdatedTime: createdDate.toISOString()
             });
@@ -26,8 +26,8 @@ define(["properties"], function(properties) {
             return store.find('metaData');
         };
 
-        var loadMetaData = function(metadataChangeLog) {
-            var url = properties.metadata.url
+        var loadMetaDataFromServer = function(metadataChangeLog) {
+            var url = properties.metadata.url;
             if (metadataChangeLog)
                 url += "?lastUpdated=" + metadataChangeLog.lastUpdatedTime;
             $http.get(url, {
@@ -37,8 +37,17 @@ define(["properties"], function(properties) {
             }).success(upsertMetadata)
         };
 
+        var loadMetaDataFromFile = function(metadataChangeLog) {
+            return $http.get("/data/metadata.json").then(function(response) {
+                var data = response.data;
+                if (!(metadataChangeLog && metadataChangeLog.lastUpdatedTime) || (new Date(metadataChangeLog.lastUpdatedTime).getTime() < new Date(data.created).getTime()))
+                    return upsertMetadata(data);
+                return metadataChangeLog;
+            });
+        };
+
         this.sync = function() {
-            getLastUpdatedTime().then(loadMetaData);
+            getLastUpdatedTime().then(loadMetaDataFromFile).then(loadMetaDataFromServer);
         };
     };
 });

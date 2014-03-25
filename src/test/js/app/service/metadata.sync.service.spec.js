@@ -1,6 +1,9 @@
 define(["metadataSyncService", "properties", "utils", "angularMocks"], function(MetadataSyncService, properties, utils) {
     describe("Metadata sync service", function() {
         var httpBackend, http, db, q, mockStore, category1;
+        var today = "2014-03-24T09:02:49.870Z";
+        var yesterday = "2014-03-24T09:02:49.870Z";
+        var tomorrow = "2014-03-25T09:02:49.870Z";
 
         beforeEach(inject(function($injector, $q) {
             q = $q;
@@ -15,7 +18,9 @@ define(["metadataSyncService", "properties", "utils", "angularMocks"], function(
                 find: function() {}
             };
             spyOn(db, 'objectStore').and.returnValue(mockStore);
-            spyOn(mockStore, 'upsert');
+            spyOn(mockStore, 'upsert').and.returnValue(utils.getPromise(q, {
+                lastUpdatedTime: today
+            }));
 
             httpBackend = $injector.get('$httpBackend');
             http = $injector.get('$http');
@@ -26,15 +31,28 @@ define(["metadataSyncService", "properties", "utils", "angularMocks"], function(
             httpBackend.verifyNoOutstandingRequest();
         });
 
-        it("should upsert data to object stores", function() {
-            httpBackend.expectGET(properties.metadata.url + "?lastUpdated=2014-03-24T09:02:49.870+0000", {
+        var setupLocalFileHttpRequest = function() {
+            httpBackend.expectGET("/data/metadata.json").respond(200, {
+                "created": today
+            });
+        };
+
+        var setupMetadataHttpRequest = function(lastUpdatedTime, createdTime, categories) {
+            httpBackend.expectGET(properties.metadata.url + "?lastUpdated=" + lastUpdatedTime, {
                 "Authorization": properties.metadata.auth_header,
                 "Accept": "application/json, text/plain, */*"
             }).respond(200, {
-                categories: [category1],
-                created: "2014-03-24T09:02:49.870+0000"
+                categories: categories,
+                created: createdTime
             });
-            spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, {lastUpdatedTime: "2014-03-24T09:02:49.870+0000"}));
+        };
+
+        it("should upsert data to object stores", function() {
+            setupLocalFileHttpRequest();
+            setupMetadataHttpRequest(today, today, [category1]);
+            spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, {
+                lastUpdatedTime: today
+            }));
             var metadataSyncService = new MetadataSyncService(db, http);
 
             metadataSyncService.sync();
@@ -45,32 +63,40 @@ define(["metadataSyncService", "properties", "utils", "angularMocks"], function(
         });
 
         it("should update lastUpdatedTime to 1 day after createdDate", function() {
-            var time = "2014-03-24T09:02:49.870+0000";
-            httpBackend.expectGET(properties.metadata.url + "?lastUpdated="+time, {
-                "Authorization": properties.metadata.auth_header,
-                "Accept": "application/json, text/plain, */*"
-            }).respond(200, {
-                categories: [category1],
-                created: time
-            });
-            spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, {lastUpdatedTime: time}));
+            setupLocalFileHttpRequest();
+            setupMetadataHttpRequest(today, today, [category1]);
+            spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, {
+                lastUpdatedTime: today
+            }));
             var metadataSyncService = new MetadataSyncService(db, http);
 
             metadataSyncService.sync();
             httpBackend.flush();
 
-            expect(mockStore.upsert).toHaveBeenCalledWith({"type":"metaData", "lastUpdatedTime":"2014-03-24T09:02:49.870Z"});
-        });        
+            expect(mockStore.upsert).toHaveBeenCalledWith({
+                "type": "metaData",
+                "lastUpdatedTime": today
+            });
+        });
 
-        it("should fetch all metadata the first time", function() {
-            httpBackend.expectGET(properties.metadata.url, {
-                "Authorization": properties.metadata.auth_header,
+        it("should fetch all metadata from file the first time", function() {
+            var findCall = 0;
+            httpBackend.expectGET("/data/metadata.json", {
                 "Accept": "application/json, text/plain, */*"
             }).respond(200, {
                 categories: [category1],
-                created: "2014-03-24T09:02:49.870+0000"
+                created: yesterday
             });
-            spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, undefined));
+            setupMetadataHttpRequest(yesterday, today, [category1]);
+            spyOn(mockStore, 'find').and.callFake(function() {
+                if (findCall === 0) {
+                    findCall = 1;
+                    return utils.getPromise(q, undefined);
+                }
+                return utils.getPromise(q, {
+                    lastUpdatedTime: yesterday
+                });
+            });
             var metadataSyncService = new MetadataSyncService(db, http);
 
             metadataSyncService.sync();
@@ -78,14 +104,11 @@ define(["metadataSyncService", "properties", "utils", "angularMocks"], function(
         });
 
         it("should not upsert metaData if last updated time is greater than createdDate", function() {
-            var time = "2014-03-25T09:02:49.870+0000";
-            httpBackend.expectGET(properties.metadata.url + "?lastUpdated="+time, {
-                "Authorization": properties.metadata.auth_header,
-                "Accept": "application/json, text/plain, */*"
-            }).respond(200, {
-                created: "2014-03-24T09:02:49.870Z"
-            });
-            spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, {lastUpdatedTime: time}));
+            setupLocalFileHttpRequest();
+            setupMetadataHttpRequest(tomorrow, today);
+            spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, {
+                lastUpdatedTime: tomorrow
+            }));
             var metadataSyncService = new MetadataSyncService(db, http);
 
             metadataSyncService.sync();
@@ -93,5 +116,6 @@ define(["metadataSyncService", "properties", "utils", "angularMocks"], function(
 
             expect(mockStore.upsert.calls.count()).toEqual(1);
         });
+
     });
 });

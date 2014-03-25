@@ -11,7 +11,7 @@ require.config({
         "angular-ui-accordion": "lib/custom/angular-ui-accordion/accordion",
         "angular-ui-collapse": "lib/custom/angular-ui-collapse/collapse",
         "angular-ui-transition": "lib/custom/angular-ui-transition/transition",
-        "migrations": "../db/migrations",
+        "migrations": "../data/migrations",
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
 
