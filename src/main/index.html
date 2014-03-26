@@ -2,12 +2,14 @@
 <html>
 <head>
   	<title>DHIS2</title>
+
   	<link rel="stylesheet" type="text/css" href="js/lib/angular/angular-csp.css">
   	<link rel="stylesheet" type="text/css" href="css/main.css">
     <script src="js/lib/requirejs/require.js" data-main="js/app/bootstrap.js"></script>
 </head>
 
 <body >
+
 <div class="body">
 <header>
 	<div class="container-fluid">
@@ -20,6 +22,8 @@
 
 		<h1>DHIS2</h1>
         <div id="dhis2" name="dhis2" ng-csp>
+            <div ng-controller="mainController">
+            </div>
 	          <div ng-view="ng-view">
 	          </div>
         </div>
