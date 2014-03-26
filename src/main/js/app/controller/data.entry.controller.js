@@ -8,14 +8,18 @@ define(["lodash"], function(_) {
             return _.reduce(iterable, function(sum, currentValue) {
                 return sum + evaluateNumber(currentValue);
             }, 0);
+
         };
 
         var evaluateNumber = function(expression) {
-            try {
-                return $scope.$eval(expression);
-            } catch (err) {
-                return 0;
-            }
+            var expression = expression.split("+").filter(function(e) {
+                return e;
+            });
+            var sum = 0;
+            _.each(expression, function(exp) {
+                sum = sum + parseInt(exp);
+            })
+            return sum;
         };
 
         $scope.getDataSetName = function(id) {
