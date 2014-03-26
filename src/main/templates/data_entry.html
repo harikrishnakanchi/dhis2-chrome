@@ -5,7 +5,13 @@
 <tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
 <div class="exp-coll-group">
 	<accordion close-others="false">
-		<accordion-group ng-repeat="section in sections" is-open="isopen[section.id]">
+		<accordion-group ng-repeat="section in sections" is-open="isopen[section.id]" ng-form="sectionForm">
+				<div>
+					<ul>
+						<li  class='alert alert-danger' ng-show='sectionForm.$error.pattern'>Must be a valid expression containing digits and '+' </li>
+					</ul>
+				</div>
+
 				<accordion-heading>
 					{{section.name}} <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
 				</accordion-heading>
@@ -20,12 +26,13 @@
 							Total
 						</th>
 					</tr>
-					<tr ng-repeat="dataElement in section.dataElements">
+					<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
 		 				<td>{{ dataElement.name }}</td>
 	 					<td ng-repeat="option in getDataEntryCells(section.dataElements[0].categories[0]) track by $index">
 							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="sectionValues[section.id][dataElement.id][$index]"/>
 						</td>
-						<td>{{sum(sectionValues[section.id][dataElement.id])}}</td>
+						<td ng-hide='dataElementForm.$error.pattern'>{{sum(sectionValues[section.id][dataElement.id])}}</td>
+						<td ng-show='dataElementForm.$error.pattern'>0</td>
 					</tr>
 				</table>
 		</accordion-group>
