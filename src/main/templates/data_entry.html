@@ -32,8 +32,7 @@
 	 					<td ng-repeat="option in getDataEntryCells(section.dataElements[0].categories[0]) track by $index">
 							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="sectionValues[section.id][dataElement.id][$index]"/>
 						</td>
-						<td ng-hide='dataElementForm.$error.pattern'>{{sum(sectionValues[section.id][dataElement.id])}}</td>
-						<td ng-show='dataElementForm.$error.pattern'>0</td>
+						<td>{{sum(sectionValues[section.id][dataElement.id])}}</td>
 					</tr>
 				</table>
 		</accordion-group>

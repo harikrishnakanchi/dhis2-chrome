@@ -12,7 +12,8 @@ define(["lodash"], function(_) {
 
         var evaluateNumber = function(expression) {
             try {
-                return $scope.$eval(expression);
+                var x = $scope.$eval(expression);
+                return _.isNumber(x) ? x : 0;
             } catch (err) {
                 return 0;
             }
