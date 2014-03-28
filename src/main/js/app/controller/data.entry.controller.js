@@ -6,7 +6,8 @@ define(["lodash"], function(_) {
 
         $scope.sum = function(iterable) {
             return _.reduce(iterable, function(sum, currentValue) {
-                return sum + evaluateNumber(currentValue);
+                exp = (currentValue == undefined) ? "0" : currentValue
+                return sum + evaluateNumber(exp);
             }, 0);
 
         };
