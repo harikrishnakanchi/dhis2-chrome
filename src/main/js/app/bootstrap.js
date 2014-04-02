@@ -3,7 +3,7 @@ require.config({
 });
 
 require(["app/app.config"], function(config) {
-    require(["app/app", "properties"], function(app, properties) {
+    require(["app/app"], function(app) {
         app.bootstrap(app.init());
     });
 });

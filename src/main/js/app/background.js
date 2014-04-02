@@ -6,5 +6,7 @@ chrome.app.runtime.onLaunched.addListener(function(launchData) {
 });
 
 chrome.runtime.onInstalled.addListener(function() {
-    console.log('Installed');
+    chrome.alarms.create('metadataSyncAlarm', {
+        periodInMinutes: properties.metadata.sync.intervalInMinutes
+    });
 });

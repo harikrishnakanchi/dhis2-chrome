@@ -26,7 +26,7 @@ require.config({
 
         //Services
         "services": "app/service/services",
-        "metadataSyncService": "app/service/metadata.sync.service"
+        "metadataService": "app/service/metadata.service"
     },
     shim: {
         "ng-i18n": {
@@ -63,7 +63,10 @@ require.config({
         'angular-ui-accordion': {
             deps: ["angular", "angular-ui-collapse"],
             exports: 'angular_ui_accordion'
-        }
+        },
+        'properties': {
+            exports: 'properties'
+        },
     }
 });
 console.log("Config is complete");

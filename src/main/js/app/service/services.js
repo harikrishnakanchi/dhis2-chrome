@@ -1,6 +1,6 @@
-define(["metadataSyncService"], function(metadataSyncService) {
+define(["metadataService"], function(metadataService) {
     var init = function(app) {
-        app.service('metadataSyncService', ['$indexedDB', '$http', metadataSyncService]);
+        app.service('metadataService', ['$indexedDB', '$http', metadataService]);
     };
     return {
         init: init

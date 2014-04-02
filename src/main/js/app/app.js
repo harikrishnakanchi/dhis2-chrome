@@ -33,9 +33,9 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
                 supportedLocales: ['en', 'es'],
                 basePath: "/js/app/i18n"
             });
-            app.run(['metadataSyncService',
-                function(metadataSyncService) {
-                    metadataSyncService.sync();
+            app.run(['metadataService',
+                function(metadataService) {
+                    metadataService.loadMetadata();
                 }
             ]);
             return app;

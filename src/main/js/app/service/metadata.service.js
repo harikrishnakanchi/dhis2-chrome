@@ -26,17 +26,6 @@ define(["properties", "lodash"], function(properties, _) {
             return store.find('metaData');
         };
 
-        var loadMetaDataFromServer = function(metadataChangeLog) {
-            var url = properties.metadata.url;
-            if (metadataChangeLog)
-                url += "?lastUpdated=" + metadataChangeLog.lastUpdatedTime;
-            $http.get(url, {
-                headers: {
-                    'Authorization': properties.metadata.auth_header
-                }
-            }).success(upsertMetadata)
-        };
-
         var getTime = function(dateString) {
             return new Date(dateString).getTime();
         };
@@ -51,8 +40,8 @@ define(["properties", "lodash"], function(properties, _) {
             });
         };
 
-        this.sync = function() {
-            getLastUpdatedTime().then(loadMetaDataFromFile).then(loadMetaDataFromServer);
+        this.loadMetadata = function() {
+            getLastUpdatedTime().then(loadMetaDataFromFile);
         };
     };
 });
