@@ -1,49 +1,59 @@
-define(["metadataSync", "properties", "utils", "angularMocks"], function(metadataSync, properties, utils) {
-    describe("Metadata service", function() {
-        var httpBackend, http, db, q, mockStore, category1;
+define(["metadataSync", "Q", "utils", "properties"], function(metadataSync, q, utils, properties) {
+    describe("Metadata sync service", function() {
+        var db, mockStore, category1, data;
         var today = "2014-03-24T09:02:49.870Z";
         var yesterday = "2014-03-23T09:02:49.870Z";
         var tomorrow = "2014-03-25T09:02:49.870Z";
 
-        beforeEach(inject(function($injector, $q) {
-            q = $q;
+        beforeEach(function() {
             category1 = {
                 id: "blah"
             };
-            db = {
-                objectStore: function() {}
+            Q = q;
+            data = {
+                categories: [category1],
+                created: tomorrow
             };
-            mockStore = {
-                upsert: function() {},
-                find: function() {}
-            };
-            spyOn(db, 'objectStore').and.returnValue(mockStore);
-            spyOn(mockStore, 'upsert').and.returnValue(utils.getPromise(q, {
-                lastUpdatedTime: today
-            }));
 
-            httpBackend = $injector.get('$httpBackend');
-            http = $injector.get('$http');
-        }));
+            idb = {
+                "openDb": function() {},
+                "get": function() {},
+                "put": function() {},
+                "usingTransaction": function() {},
+            };
+
+            httpWrapper = {
+                "get": function() {}
+            };
+
+            spyOn(idb, "openDb").and.returnValue(utils.getPromise(q, {}));
+        });
 
         afterEach(function() {
-            httpBackend.verifyNoOutstandingExpectation();
-            httpBackend.verifyNoOutstandingRequest();
+
         });
 
-        var setupLocalFileHttpRequest = function(lastUpdatedTime) {
-            httpBackend.expectGET("/data/metadata.json", {
-                "Accept": "application/json, text/plain, */*"
-            }).respond(200, {
-                categories: [category1],
-                created: lastUpdatedTime
+        it("should fetch all metadata from file the first time", function(done) {
+            spyOn(httpWrapper, "get").and.returnValue(utils.getPromise(q, data));
+            spyOn(idb, "get").and.returnValue(utils.getPromise(q, {
+                "lastUpdatedTime": today
+            }));
+            spyOn(idb, "usingTransaction").and.callFake(function(stores, fn) {
+                return fn();
             });
-        };
+            spyOn(idb, "put").and.returnValue(utils.getPromise(q, {}));
 
-        it("should fetch all metadata from file the first time", function() {
-            console.log(metadataSync);
+            metadataSync.sync().then(function() {
+                expect(httpWrapper.get.calls.argsFor(0)[0]).toEqual(properties.metadata.url + '?lastUpdated=' + today);
+                expect(idb.put.calls.allArgs()).toEqual([
+                    ['categories', category1, undefined],
+                    ['changeLog', {
+                        type: 'metaData',
+                        lastUpdatedTime: tomorrow
+                    }]
+                ]);
+                done();
+            });
         });
-
-
     });
 });

@@ -3,6 +3,8 @@ module.exports = function(config) {
     config.set({
         basePath: '../../',
         files: [
+            'main/js/lib/custom/jquery-ajax/jquery.js',
+            'main/js/app/conf/properties.js',
             'test/test.main.js', {
                 pattern: 'test/test.config.js',
                 included: false
@@ -24,7 +26,7 @@ module.exports = function(config) {
             }, {
                 pattern: 'test/db/*.js',
                 included: false
-            }
+            },
         ],
         exclude: [
             'main/js/lib/**/*spec.js',

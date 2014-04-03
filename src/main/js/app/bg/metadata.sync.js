@@ -1,86 +1,48 @@
 var msf = function() {
     var sync = function() {
-        var db;
-
-        $.ajaxPrefilter(function(options) {
-            if (!options.beforeSend) {
-                options.beforeSend = function(xhr) {
-                    xhr.setRequestHeader('Authorization', properties.metadata.auth_header);
-                };
-            }
-        });
+        var openDb = function() {
+            return idb.openDb("msf");
+        };
 
         var getLastUpdatedTime = function() {
-            var changeLogStore = db.transaction("changeLog", "readonly").objectStore("changeLog");
-            var request = changeLogStore.get("metaData");
-            var defer = Q.defer();
-            request.onsuccess = function(e) {
-                defer.resolve(e.target.result);
-            };
-            request.onerror = function(e) {
-                defer.reject(e);
-            };
-            return defer.promise;
+            return idb.get("changeLog", "metaData");
         };
 
-        var openDb = function() {
-            var request = window.indexedDB.open("msf");
-            var defer = Q.defer();
-            request.onsuccess = function(e) {
-                db = e.target.result;
-                defer.resolve(db);
-            };
-            request.onerror = function(e) {
-                defer.reject(e);
-            };
-            return defer.promise;
-        };
-
-        var syncableTypes = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "organisationUnits", "organisationUnitLevels"];
-        var upsertMetadata = function(data) {
-            var transaction = db.transaction(syncableTypes, "readwrite");
-            _.each(syncableTypes, function(type) {
-                var store = transaction.objectStore(type);
-                var entities = data[type];
-                _.each(entities, function(entity) {
-                    store.put(entity);
-                });
-            });
-        };
-
-        var loadMetadata = function(metadataChangeLog) {
+        var getMetadata = function(metadataChangeLog) {
             var lastUpdatedTimeQueryString = metadataChangeLog ? "?lastUpdated=" + metadataChangeLog.lastUpdatedTime : "";
             var url = properties.metadata.url + lastUpdatedTimeQueryString;
 
-            return httpGet(url, upsertMetadata);
+            return httpWrapper.get(url);
         };
 
-        var httpGet = function(url, onSuccess, onError) {
-            var deferred = Q.defer();
-            $.get(url).done(function(data) {
-                onSuccess(data);
-                deferred.resolve(data);
-            }).fail(function(data) {
-                console.log("Failed to fetch url: " + url);
-                console.log(data);
-                if (onError)
-                    onError(data);
-                deferred.reject(data);
-            });
+        var upsertMetadata = function(data) {
+            var syncableTypes = properties.metadata.types;
+            var putData = function(transaction) {
+                var putRequests = [];
+                _.each(syncableTypes, function(type) {
+                    var entities = data[type];
+                    _.each(entities, function(entity) {
+                        var putRequest = idb.put(type, entity, transaction);
+                        putRequests.push(putRequest);
+                    });
+                });
+                return Q.all(putRequests).then(function() {
+                    return data;
+                });
+            };
 
-            return deferred.promise;
+            return idb.usingTransaction(syncableTypes, putData);
         };
 
         var updateChangeLog = function(data) {
-            var store = db.transaction("changeLog", "readwrite").objectStore("changeLog");
             var createdDate = new Date(data.created);
-            store.put({
+            return idb.put("changeLog", {
                 type: 'metaData',
                 lastUpdatedTime: createdDate.toISOString()
             });
         };
 
-        return openDb().then(getLastUpdatedTime).then(loadMetadata).then(updateChangeLog).then(function() {
+        return openDb().then(getLastUpdatedTime).then(getMetadata).then(upsertMetadata).then(updateChangeLog).then(function() {
             console.log("Metadata sync complete");
         });
     };
@@ -95,7 +57,7 @@ var registerCallback = function(alarmName, callback) {
         if (alarm.name === alarmName)
             callback();
     };
-}
+};
 
 if (chrome.alarms)
     chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", msf.sync));

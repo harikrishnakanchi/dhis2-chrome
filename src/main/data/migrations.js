@@ -4,13 +4,6 @@ define([], function() {
         create_data_store(syncable_types, db);
     };
 
-    var add_index_on_datasets_for_sections = function(db, tx) {
-        var store = tx.objectStore("sections");
-        store.createIndex("dataSet.id", "dataSet.id", {
-            unique: false
-        });
-    };
-
     var change_log_stores = function(db, tx) {
         var type = "changeLog";
         db.createObjectStore(type, {
@@ -31,5 +24,5 @@ define([], function() {
         create_data_store(syncable_types, db);
     };
 
-    return [add_object_stores, add_index_on_datasets_for_sections, change_log_stores, add_organisation_units_and_level_store];
+    return [add_object_stores, change_log_stores, add_organisation_units_and_level_store];
 });
