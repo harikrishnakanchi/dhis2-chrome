@@ -1,3 +1,5 @@
+configureIndexeddbLogger("msfLogs");
+
 window.addEventListener('online', function(e) {
     console.log("starting sync");
     msf.metadata.sync();

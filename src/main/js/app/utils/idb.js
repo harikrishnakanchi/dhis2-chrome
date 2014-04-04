@@ -15,7 +15,7 @@ var idb = function() {
     };
 
     var get = function(storeName, key, transaction) {
-        transaction = transaction || db.transaction(storeName, "readwrite");
+        transaction = transaction || db.transaction(storeName, "readonly");
         var store = db.transaction(storeName, "readonly").objectStore(storeName);
         return promisify(store.get(key));
     };
