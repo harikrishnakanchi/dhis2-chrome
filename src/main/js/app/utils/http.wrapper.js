@@ -1,4 +1,4 @@
-var httpWrapper = function() {
+define(["jquery", "properties", "Q"], function($, properties, Q) {
     $.ajaxPrefilter(function(options) {
         if (!options.beforeSend) {
             options.beforeSend = function(xhr) {
@@ -21,4 +21,4 @@ var httpWrapper = function() {
     return {
         "get": get
     };
-}();
+});

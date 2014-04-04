@@ -1,6 +1,6 @@
-define(["metadataSync", "Q", "utils", "properties"], function(metadataSync, q, utils, properties) {
+define(["metadataSyncService", "Q", "utils", "properties", "idb", "httpWrapper"], function(metadataSyncService, q, utils, properties, idb, httpWrapper) {
     describe("Metadata sync service", function() {
-        var db, mockStore, category1, data;
+        var category1, data;
         var today = "2014-03-24T09:02:49.870Z";
         var yesterday = "2014-03-23T09:02:49.870Z";
         var tomorrow = "2014-03-25T09:02:49.870Z";
@@ -9,21 +9,9 @@ define(["metadataSync", "Q", "utils", "properties"], function(metadataSync, q, u
             category1 = {
                 id: "blah"
             };
-            Q = q;
             data = {
                 categories: [category1],
                 created: tomorrow
-            };
-
-            idb = {
-                "openDb": function() {},
-                "get": function() {},
-                "put": function() {},
-                "usingTransaction": function() {},
-            };
-
-            httpWrapper = {
-                "get": function() {}
             };
 
             spyOn(idb, "openDb").and.returnValue(utils.getPromise(q, {}));
@@ -43,7 +31,7 @@ define(["metadataSync", "Q", "utils", "properties"], function(metadataSync, q, u
             });
             spyOn(idb, "put").and.returnValue(utils.getPromise(q, {}));
 
-            metadataSync.sync().then(function() {
+            metadataSyncService.sync().then(function() {
                 expect(httpWrapper.get.calls.argsFor(0)[0]).toEqual(properties.metadata.url + '?lastUpdated=' + today);
                 expect(idb.put.calls.allArgs()).toEqual([
                     ['categories', category1, undefined],
@@ -64,7 +52,7 @@ define(["metadataSync", "Q", "utils", "properties"], function(metadataSync, q, u
             });
             spyOn(idb, "put").and.returnValue(utils.getPromise(q, {}));
 
-            metadataSync.sync().then(function() {
+            metadataSyncService.sync().then(function() {
                 expect(httpWrapper.get.calls.argsFor(0)[0]).toEqual(properties.metadata.url);
                 expect(idb.put.calls.allArgs()).toEqual([
                     ['categories', category1, undefined],

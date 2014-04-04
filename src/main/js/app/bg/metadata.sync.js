@@ -1,5 +1,4 @@
-var msf = msf || {};
-msf.metadata = function() {
+define(["idb", "httpWrapper", "Q", "lodash", "properties"], function(idb, httpWrapper, Q, _, properties) {
     var sync = function() {
         var openDb = function() {
             return idb.openDb("msf");
@@ -54,16 +53,4 @@ msf.metadata = function() {
     return {
         "sync": sync
     };
-}();
-
-(function() {
-    var registerCallback = function(alarmName, callback) {
-        return function(alarm) {
-            if (alarm.name === alarmName)
-                callback();
-        };
-    };
-
-    if (chrome.alarms)
-        chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", msf.metadata.sync));
-})();
+});

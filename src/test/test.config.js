@@ -14,7 +14,6 @@ require.config({
         angularMocks: 'lib/angular-mocks/angular-mocks',
         testData: '../../test/js/data/test.data',
         utils: '../../test/js/app/utils/utils',
-        metadataSync: 'app/bg/metadata.sync',
     },
     shim: {
         'angular': {
@@ -23,9 +22,6 @@ require.config({
         'angularMocks': {
             deps: ['angular'],
             'exports': 'angular.mock'
-        },
-        'metadataSync': {
-            'exports': 'msf.metadata',
         },
     }
 });

@@ -1,4 +1,4 @@
-var idb = function() {
+define(["Q"], function(Q) {
     var db;
 
     var openDb = function(dbName) {
@@ -48,4 +48,4 @@ var idb = function() {
         "put": put,
         "usingTransaction": usingTransaction,
     };
-}();
+});

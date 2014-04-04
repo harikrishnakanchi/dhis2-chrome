@@ -64,9 +64,6 @@ require.config({
             deps: ["angular", "angular-ui-collapse"],
             exports: 'angular_ui_accordion'
         },
-        'properties': {
-            exports: 'properties'
-        },
     }
 });
 console.log("Config is complete");
