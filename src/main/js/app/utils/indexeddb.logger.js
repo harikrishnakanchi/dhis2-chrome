@@ -10,8 +10,14 @@ var configureIndexeddbLogger = function(dbName) {
     var request = indexedDB.open(dbName, 1);
     request.onupgradeneeded = function(e) {
         var db = e.target.result;
-        db.createObjectStore(storeName, {
+        var store = db.createObjectStore(storeName, {
             autoIncrement: true
+        });
+        store.createIndex("method", "method", {
+            unique: false
+        });
+        store.createIndex("time", "time", {
+            unique: false
         });
     };
 
