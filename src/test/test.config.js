@@ -25,7 +25,7 @@ require.config({
             'exports': 'angular.mock'
         },
         'metadataSync': {
-            'exports': 'msf',
+            'exports': 'msf.metadata',
         },
     }
 });

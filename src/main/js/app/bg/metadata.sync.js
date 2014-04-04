@@ -1,4 +1,5 @@
-var msf = function() {
+var msf = msf || {};
+msf.metadata = function() {
     var sync = function() {
         var openDb = function() {
             return idb.openDb("msf");
@@ -60,4 +61,4 @@ var registerCallback = function(alarmName, callback) {
 };
 
 if (chrome.alarms)
-    chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", msf.sync));
+    chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", msf.metadata.sync));
