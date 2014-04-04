@@ -13,15 +13,18 @@ msf.metadata = function() {
             var lastUpdatedTimeQueryString = metadataChangeLog ? "?lastUpdated=" + metadataChangeLog.lastUpdatedTime : "";
             var url = properties.metadata.url + lastUpdatedTimeQueryString;
 
+            console.debug("Fetching " + url);
             return httpWrapper.get(url);
         };
 
         var upsertMetadata = function(data) {
+            console.debug("Processing metadata ", data);
             var syncableTypes = properties.metadata.types;
             var putData = function(transaction) {
                 var putRequests = [];
                 _.each(syncableTypes, function(type) {
-                    var entities = data[type];
+                    var entities = data[type] || [];
+                    console.debug("Storing ", type, entities.length);
                     _.each(entities, function(entity) {
                         var putRequest = idb.put(type, entity, transaction);
                         putRequests.push(putRequest);
