@@ -1,6 +1,8 @@
 var gulp = require('gulp');
 var karma = require('gulp-karma');
 var gutil = require('gulp-util');
+var jshint = require('gulp-jshint');
+var stylish = require('jshint-stylish');
 
 gulp.task('test', function() {
     return gulp.src('_')
@@ -18,6 +20,13 @@ gulp.task('devtest', function() {
             configFile: 'src/test/conf/karma.conf.js',
             action: 'watch'
         }));
+});
+
+gulp.task('lint', function() {
+    gulp.src(['./src/main/js/app/**/*.js', './src/test/js/app/**/*.js'])
+        .pipe(jshint())
+        .pipe(jshint.reporter(stylish))
+        .pipe(jshint.reporter('fail'));
 });
 
 gulp.task('less', function() {

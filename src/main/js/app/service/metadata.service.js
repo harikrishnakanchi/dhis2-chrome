@@ -21,7 +21,7 @@ define(["properties", "lodash"], function(properties, _) {
         };
 
         var getLastUpdatedTime = function() {
-            var store = db.objectStore("changeLog")
+            var store = db.objectStore("changeLog");
             return store.find('metaData');
         };
 
