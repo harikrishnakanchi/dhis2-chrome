@@ -1,7 +1,50 @@
-<div class="container">
+<section class="module-select">
+	<ul class="form">
+		<li class="form-group">
+			<label for="module" class="control-label">Select module</label>
+			<select name="" id="module" class="input-sm">
+				<option value="">Module name</option>
+				<option value="">Module name</option>
+			</select>
+		</li>
+		<li class="form-group">
+			<label for="year">Year</label>
+			<select name="" id="year"  class="input-sm">
+				<option value="">2014</option>
+				<option value="">2013</option>
+				<option value="">2012</option>
+			</select>
+		</li>
+				<li class="form-group">
+			<label for="month">Month</label>
+			<select name="" id="month"  class="input-sm">
+				<option value="">Jan</option>
+				<option value="">Feb</option>
+				<option value="">Mar</option>
+				<option value="">Apr</option>
+				<option value="">May</option>
+				<option value="">Jun</option>
+				<option value="">Jul</option>
+				<option value="">Aug</option>
+				<option value="">Sep</option>
+				<option value="">Oct</option>
+				<option value="">Nov</option>
+				<option value="">Dec</option>
+			</select>
+		</li>
+		<li class="form-group">
+			<label for="week">Week</label>
+			<select name="" id="week"  class="input-sm">
+				<option value="">W1 01/01/2014 - 07/01/2014</option>
+				<option value="">W2 08/01/2014 - 014/01/2014</option>
+				<option value="">W3 15/01/2014 - 21/01/2014</option>
+				<option value="">W4 22/01/2014 - 27/01/2014</option>
+			</select>
+		</li>
+	</ul>
+</section>
 
 <section class="panel tab-panel">
-
 <tabset>
 <tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
 <div class="exp-coll-group">
@@ -40,4 +83,3 @@
 	</div>
 </tab>
 </tabset>
-</div>

@@ -3,12 +3,17 @@ html{
 }
 
 body{
-	background:#E6E9EE;
+	 background:url(../img/bg.png);
 	padding:0 1%;
 }
 header{
-	background: #fff;
 	margin:0 -1%;
+	.container{
+		background: rgb(240, 240, 240);
+	}
+}
+.container{
+	background: #fff;
 }
 .tab-panel{
 	padding:20px;
@@ -23,14 +28,19 @@ header{
 .exp-coll-group{
 	margin-top: 20px;
 	.panel-default > .panel-heading {
-color: #FFFFFF;
-background-color: #645353;
-border-color: #645353;
+color: #000;
+background-color: #afe6ee;
+border:0;
+border-radius:0;
+}
+.glyphicon{
+	font-size: 11px;
 }
 .panel-heading{
 	padding:0;
 }
 .panel-title{
+	font-weight: 300;
 	a{
 		display:block;
 		padding: 10px 15px;
@@ -43,4 +53,54 @@ border-color: #645353;
 		text-decoration: none;
 	}
 }
+.panel-group .panel {
+	border-radius: 0px;
+}
+.panel-default {
+ border:0;
+ .collapse{
+ 	border:1px solid #ddd;
+ 	border-top: 0;
+ }
+ .panel-body{
+ 	border-top:none!important;
+ }
+}
+}
+
+//data entry
+
+//tabs styles
+
+.nav-tabs > li > a:hover{
+	background-color: @orangeLight;
+}
+
+.module-select{
+margin: 30px 20px 0;
+background: @secondary;
+color:#fff;
+padding: 14px 0 0 0;
+	.form{
+		 &:extend(.clearfix all);
+		 margin-bottom: 0;
+		li{
+			display:inline-block;
+			float: left;
+			margin-right: 20px;
+			label{
+				float: left;
+				margin-top: 4px;
+				margin-right: 10px;
+				font-weight:400;
+			}
+			select{
+				width:200px;
+				float: left;
+			}
+			#year , #month {
+				width:75px;
+			}
+		}
+	}
 }
