@@ -1,8 +1,7 @@
 define(["properties", "lodash"], function(properties, _) {
     return function(db, $http) {
-        var syncableTypes = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "organisationUnits", "organisationUnitLevels"];
         var upsertMetadata = function(data) {
-            _.each(syncableTypes, function(type) {
+            _.each(properties.metadata.types, function(type) {
                 var entities = data[type];
                 var store = db.objectStore(type);
                 if (!_.isEmpty(entities))
@@ -22,19 +21,8 @@ define(["properties", "lodash"], function(properties, _) {
         };
 
         var getLastUpdatedTime = function() {
-            var store = db.objectStore("changeLog")
+            var store = db.objectStore("changeLog");
             return store.find('metaData');
-        };
-
-        var loadMetaDataFromServer = function(metadataChangeLog) {
-            var url = properties.metadata.url;
-            if (metadataChangeLog)
-                url += "?lastUpdated=" + metadataChangeLog.lastUpdatedTime;
-            $http.get(url, {
-                headers: {
-                    'Authorization': properties.metadata.auth_header
-                }
-            }).success(upsertMetadata)
         };
 
         var getTime = function(dateString) {
@@ -51,8 +39,8 @@ define(["properties", "lodash"], function(properties, _) {
             });
         };
 
-        this.sync = function() {
-            getLastUpdatedTime().then(loadMetaDataFromFile).then(loadMetaDataFromServer);
+        this.loadMetadata = function() {
+            getLastUpdatedTime().then(loadMetaDataFromFile);
         };
     };
 });

@@ -30,6 +30,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(scope.sum(list)).toBe(10);
         });
 
+        it("should return the sum of valid values ", function() {
+            var dataEntryController = new DataEntryController(scope, q, db);
+            var list = ["1", "2", undefined, "4"];
+
+            expect(scope.sum(list)).toBe(7);
+        });
+
         it("should return the sum of valid expressions ", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             var list = ["1+3", "2", "3", "4"];
@@ -57,15 +64,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(dataSetKeys).toContain("DS_OPD");
             expect(dataSetKeys).toContain("Vacc");
 
-            expect(scope.groupedSections["DS_OPD"].length).toBe(2);
-            expect(scope.groupedSections["Vacc"].length).toBe(1);
+            expect(scope.groupedSections.DS_OPD.length).toBe(2);
+            expect(scope.groupedSections.Vacc.length).toBe(1);
         });
 
         it("should get dataelements associated with sections", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             scope.$apply();
 
-            var opdSections = scope.groupedSections["DS_OPD"];
+            var opdSections = scope.groupedSections.DS_OPD;
 
             var dataElements = opdSections[0].dataElements;
             expect(dataElements.length).toBe(2);
@@ -81,7 +88,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             var dataEntryController = new DataEntryController(scope, q, db);
             scope.$apply();
 
-            var opdSections = scope.groupedSections["DS_OPD"];
+            var opdSections = scope.groupedSections.DS_OPD;
             var dataElements = opdSections[0].dataElements;
             var categories = dataElements[0].categories;
 
@@ -92,7 +99,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             var dataEntryController = new DataEntryController(scope, q, db);
             scope.$apply();
 
-            var opdSections = scope.groupedSections["DS_OPD"];
+            var opdSections = scope.groupedSections.DS_OPD;
             var dataElements = opdSections[0].dataElements;
             var categories = dataElements[0].categories;
             var category1Options = categories[0];
@@ -132,7 +139,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             var dataEntryController = new DataEntryController(scope, q, db);
             var list = ["blah", "some"];
 
-            var repeatedList = scope.getRepeated(list, 2)
+            var repeatedList = scope.getRepeated(list, 2);
 
             expect(repeatedList).toEqual(list.concat(list));
         });

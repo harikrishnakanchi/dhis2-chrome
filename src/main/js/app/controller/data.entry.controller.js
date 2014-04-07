@@ -6,19 +6,19 @@ define(["lodash"], function(_) {
 
         $scope.sum = function(iterable) {
             return _.reduce(iterable, function(sum, currentValue) {
-                return sum + evaluateNumber(currentValue);
+                exp = currentValue || "0";
+                return sum + evaluateNumber(exp);
             }, 0);
-
         };
 
         var evaluateNumber = function(expression) {
-            var expression = expression.split("+").filter(function(e) {
+            expression = expression.split("+").filter(function(e) {
                 return e;
             });
             var sum = 0;
             _.each(expression, function(exp) {
                 sum = sum + parseInt(exp);
-            })
+            });
             return sum;
         };
 

@@ -12,5 +12,5 @@
             "page": "background.html"
         }
     },
-    "permissions": ["https://*/", "http://*/"]
+    "permissions": ["alarms", "https://*/", "http://*/"]
 }

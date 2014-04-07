@@ -24,7 +24,7 @@ module.exports = function(config) {
             }, {
                 pattern: 'test/db/*.js',
                 included: false
-            }
+            },
         ],
         exclude: [
             'main/js/lib/**/*spec.js',
@@ -32,9 +32,9 @@ module.exports = function(config) {
         ],
         autoWatch: true,
         frameworks: ['jasmine', 'requirejs'],
-        reporters: ['dots', 'junit', 'coverage'],
+        reporters: ['dots', 'coverage'],
         preprocessors: {
-            'src/main/js/app/**/*.js': ['coverage']
+            'main/js/app/**/*.js': 'coverage'
         },
         browsers: ['Chrome'],
         logLevel: config.LOG_INFO,
@@ -42,13 +42,7 @@ module.exports = function(config) {
             outputFile: 'test/coverage/test-results.xml'
         },
         coverageReporter: {
-            threshold: 85,
-            reporters: [{
-                type: 'cobertura',
-                dir: 'test/coverage/'
-            }, {
-                type: 'text-summary'
-            }]
+            dir: 'test/coverage',
         }
     });
 };
