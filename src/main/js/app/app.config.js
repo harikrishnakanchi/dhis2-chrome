@@ -11,9 +11,11 @@ require.config({
         "angular-ui-accordion": "lib/custom/angular-ui-accordion/accordion",
         "angular-ui-collapse": "lib/custom/angular-ui-collapse/collapse",
         "angular-ui-transition": "lib/custom/angular-ui-transition/transition",
+        "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
         "migrations": "../data/migrations",
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
+        "moment": "lib/moment/moment",
 
         //Controllers
         "controllers": "app/controller/controllers",
@@ -37,32 +39,28 @@ require.config({
             exports: 'angular'
         },
         'angular-route': {
-            deps: ["angular"],
-            exports: 'angular_route'
+            deps: ["angular"]
         },
         'angular-indexedDB': {
-            deps: ["angular"],
-            exports: 'angular_indexedDB'
+            deps: ["angular"]
         },
         'angular-resource': {
-            deps: ["angular"],
-            exports: 'angular_resource'
+            deps: ["angular"]
         },
         'angular-ui-tabs': {
-            deps: ["angular"],
-            exports: 'angular_ui_tabs'
+            deps: ["angular"]
         },
         'angular-ui-transition': {
-            deps: ["angular"],
-            exports: 'angular_ui_transition'
+            deps: ["angular"]
         },
         'angular-ui-collapse': {
-            deps: ["angular", "angular-ui-transition"],
-            exports: 'angular_ui_collapse'
+            deps: ["angular", "angular-ui-transition"]
         },
         'angular-ui-accordion': {
-            deps: ["angular", "angular-ui-collapse"],
-            exports: 'angular_ui_accordion'
+            deps: ["angular", "angular-ui-collapse"]
+        },
+        'angular-ui-weekselector': {
+            deps: ["angular", "moment"]
         },
     }
 });

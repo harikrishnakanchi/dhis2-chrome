@@ -1,9 +1,9 @@
 define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations",
-        "angular-route", "ng-i18n", "angular-indexedDB", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition"
+        "angular-route", "ng-i18n", "angular-indexedDB", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector"
     ],
     function(angular, Q, services, directives, controllers, migrator, migrations) {
         var init = function() {
-            var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse", "ui.bootstrap.accordion"]);
+            var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse", "ui.bootstrap.accordion", "ui.weekselector"]);
             services.init(app);
             directives.init(app);
             controllers.init(app);
@@ -14,8 +14,8 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
                         templateUrl: '/templates/dashboard.html',
                         controller: 'dashboardController'
                     }).
-                    when('/data_entry', {
-                        templateUrl: '/templates/data_entry.html',
+                    when('/data-entry', {
+                        templateUrl: '/templates/data-entry.html',
                         controller: 'dataEntryController'
                     }).
                     otherwise({

@@ -11,7 +11,9 @@
         "angular-indexedDB": "https://github.com/webcss/angular-indexedDB.git",
         "angular-route": null,
         "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
-        "lodash": null
+        "lodash": null,
+        "angularjs-directives": "https://github.com/tw-msf/angularjs-directives.git",
+        "moment": null
     },
     "devDependencies": {
         "angular-mocks": null
