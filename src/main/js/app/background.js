@@ -6,17 +6,17 @@ require(["app/background.config"], function(config) {
     require(["indexedDBLogger"], function(indexedDBLogger) {
         indexedDBLogger.configure("msfLogs");
         require(["backgroundServicesRegistry", "metadataSyncService", "properties"], function(backgroundServicesRegistry, metadataSyncService, properties) {
-            var startSync = function() {
-                console.log("starting sync");
-                metadataSyncService.sync();
+            var scheduleSync = function() {
+                console.log("scheduling sync");
                 chrome.alarms.create('metadataSyncAlarm', {
                     periodInMinutes: properties.metadata.sync.intervalInMinutes
                 });
             };
 
             window.addEventListener('online', function(e) {
-                console.log(e);
-                startSync();
+                console.log("starting sync");
+                metadataSyncService.sync();
+                scheduleSync();
             });
 
             window.addEventListener('offline', function() {
@@ -34,7 +34,7 @@ require(["app/background.config"], function(config) {
             var init = function() {
                 backgroundServicesRegistry.register();
                 if (navigator.onLine)
-                    startSync();
+                    scheduleSync();
             };
 
             init();
