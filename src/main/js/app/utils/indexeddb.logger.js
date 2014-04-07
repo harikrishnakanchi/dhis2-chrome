@@ -5,10 +5,9 @@ define([], function() {
         var _log = console.log,
             _debug = console.debug,
             _error = console.error;
-
         var logDb = {};
-
         var request = indexedDB.open(dbName, 1);
+
         request.onupgradeneeded = function(e) {
             var db = e.target.result;
             var store = db.createObjectStore(storeName, {
@@ -27,13 +26,18 @@ define([], function() {
         };
 
         var putLog = function(logLevel, args) {
-            var transaction = logDb.transaction(storeName, "readwrite");
-            var store = transaction.objectStore(storeName);
-            store.put({
-                'method': logLevel,
-                'time': new Date(),
-                'arguments': args
-            });
+            try {
+                var transaction = logDb.transaction(storeName, "readwrite");
+                var store = transaction.objectStore(storeName);
+                var logObject = {
+                    'method': logLevel,
+                    'time': new Date(),
+                    'arguments': args
+                };
+                store.put(logObject);
+            } catch (e) {
+                //burp
+            }
         };
 
         console.debug = function() {
