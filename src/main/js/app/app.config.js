@@ -28,7 +28,10 @@ require.config({
 
         //Services
         "services": "app/service/services",
-        "metadataService": "app/service/metadata.service"
+        "metadataService": "app/service/metadata.service",
+
+        //Transformers
+        "categoryOptionsComboTransformer": "app/transformers/category.options.combo.transformer",
     },
     shim: {
         "ng-i18n": {

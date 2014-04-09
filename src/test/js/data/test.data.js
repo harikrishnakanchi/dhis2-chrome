@@ -37,6 +37,80 @@ define([], function() {
         categories: [categories[1]]
     }];
 
+    var categoryOptionCombos = [{
+        "id": 0,
+        "categoryCombo": {
+            "id": "CC1"
+        },
+        "name": "(CO1, CO3)",
+        "categoryOptions": [{
+            "name": "CO1",
+            "id": "Resident"
+        }, {
+            "name": "CO3",
+            "id": "LessThan5"
+        }]
+    }, {
+        "id": 1,
+        "categoryCombo": {
+            "id": "CC1"
+        },
+        "name": "(CO1, CO4)",
+        "categoryOptions": [{
+            "name": "CO1",
+            "id": "Resident"
+        }, {
+            "name": "CO4",
+            "id": "GreaterThan5"
+        }]
+    }, {
+        "id": 3,
+        "categoryCombo": {
+            "id": "CC1"
+        },
+        "name": "(CO2, CO3)",
+        "categoryOptions": [{
+            "name": "CO2",
+            "id": "Migrant"
+        }, {
+            "name": "CO3",
+            "id": "LessThan5"
+        }]
+    }, {
+        "id": 4,
+        "categoryCombo": {
+            "id": "CC1"
+        },
+        "name": "(CO2, CO4)",
+        "categoryOptions": [{
+            "name": "CO2",
+            "id": "Migrant"
+        }, {
+            "name": "CO4",
+            "id": "GreaterThan5"
+        }]
+    }, {
+        "id": 5,
+        "categoryCombo": {
+            "id": "CC2"
+        },
+        "name": "(CO4)",
+        "categoryOptions": [{
+            "name": "CO4",
+            "id": "GreaterThan5"
+        }]
+    }, {
+        "id": 6,
+        "categoryCombo": {
+            "id": "CC2"
+        },
+        "name": "(CO3)",
+        "categoryOptions": [{
+            "name": "CO3",
+            "id": "LessThan5"
+        }]
+    }];
+
     var dataElements = [{
         id: 'DE1',
         categoryCombo: categoryCombos[0]
@@ -68,6 +142,7 @@ define([], function() {
         'categories': categories,
         'categoryCombos': categoryCombos,
         'dataElements': dataElements,
-        'categoryOptions': categoryOptions
+        'categoryOptions': categoryOptions,
+        'categoryOptionCombos': categoryOptionCombos
     };
 })

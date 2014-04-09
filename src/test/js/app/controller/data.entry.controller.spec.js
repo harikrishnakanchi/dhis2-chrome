@@ -95,6 +95,18 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(categories.length).toBe(2);
         });
 
+        it("should enrich dataelements with category option combos", function() {
+            var dataEntryController = new DataEntryController(scope, q, db);
+            scope.$apply();
+
+            var opdSections = scope.groupedSections.DS_OPD;
+            var dataElements = opdSections[0].dataElements;
+            var categoryOptionCombos = dataElements[0].categoryOptionCombos;
+            expect(categoryOptionCombos.length).toBe(4);
+            expect(dataElements[1].categoryOptionCombos.length).toBe(2);
+        });
+
+
         it("should enrich dataelements with all category combinations", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             scope.$apply();

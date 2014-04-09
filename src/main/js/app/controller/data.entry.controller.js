@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define(["lodash", "categoryOptionsComboTransformer"], function(_, categoryOptionsComboTransformer) {
     return function($scope, $q, db) {
         var dataSets;
         $scope.sectionValues = {};
@@ -66,13 +66,17 @@ define(["lodash"], function(_) {
             var dataElementsPromise = getAll("dataElements");
             var comboPromise = getAll("categoryCombos");
             var categoriesPromise = getAll("categories");
-            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise]);
+            var categoryOptionCombosPromise = getAll("categoryOptionCombos");
+
+            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise]);
+
             var transformDataSet = function(data) {
                 dataSets = data[0];
                 var sections = data[1];
                 var dataElements = data[2];
                 var categoryCombos = data[3];
                 var categories = data[4];
+                var categoryOptionCombos = data[5];
 
                 var groupedSections = _.groupBy(sections, function(section) {
                     return section.dataSet.id;
@@ -84,6 +88,12 @@ define(["lodash"], function(_) {
                     });
                 };
 
+                var getDetailedCategoryOptionCombos = function(categoryComboId) {
+                    return _.filter(categoryOptionCombos, function(c) {
+                        return c.categoryCombo.id === categoryComboId;
+                    });
+                };
+
                 var enrichDataElement = function(dataElement) {
                     var detailedDataElement = _.find(dataElements, function(d) {
                         return d.id === dataElement.id;
@@ -91,10 +101,14 @@ define(["lodash"], function(_) {
                     var detailedCategoryCombo = _.find(categoryCombos, function(c) {
                         return c.id === detailedDataElement.categoryCombo.id;
                     });
+
                     var detailedCategories = _.map(detailedCategoryCombo.categories, getDetailedCategory);
                     dataElement.categories = getCategories(_.pluck(detailedCategories, "categoryOptions"));
+
+                    dataElement.categoryOptionCombos = getDetailedCategoryOptionCombos(detailedDataElement.categoryCombo.id);
                     return dataElement;
                 };
+
 
                 $scope.groupedSections = _.mapValues(groupedSections, function(sections) {
                     return _.map(sections, function(section) {
