@@ -32,6 +32,7 @@ require.config({
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
+        "findCategoryComboOption": "app/transformers/find.category.combo.option"
     },
     shim: {
         "ng-i18n": {
