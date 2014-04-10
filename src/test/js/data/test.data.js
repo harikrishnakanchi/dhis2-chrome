@@ -38,7 +38,7 @@ define([], function() {
     }];
 
     var categoryOptionCombos = [{
-        "id": 0,
+        "id": 1,
         "categoryCombo": {
             "id": "CC1"
         },
@@ -51,7 +51,7 @@ define([], function() {
             "id": "LessThan5"
         }]
     }, {
-        "id": 1,
+        "id": 2,
         "categoryCombo": {
             "id": "CC1"
         },

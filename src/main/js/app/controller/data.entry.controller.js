@@ -104,7 +104,6 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
 
                     var detailedCategories = _.map(detailedCategoryCombo.categories, getDetailedCategory);
                     dataElement.categories = getCategories(_.pluck(detailedCategories, "categoryOptions"));
-
                     dataElement.categoryOptionCombos = getDetailedCategoryOptionCombos(detailedDataElement.categoryCombo.id);
                     return dataElement;
                 };
@@ -113,6 +112,7 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                 $scope.groupedSections = _.mapValues(groupedSections, function(sections) {
                     return _.map(sections, function(section) {
                         section.dataElements = _.map(section.dataElements, enrichDataElement);
+                        section.headers = extractHeaders(section.dataElements[0].categoryOptionCombos);
                         return section;
                     });
                 });

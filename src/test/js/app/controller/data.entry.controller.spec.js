@@ -68,6 +68,53 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(scope.groupedSections.Vacc.length).toBe(1);
         });
 
+        it("should group set headers on sections", function() {
+            var dataEntryController = new DataEntryController(scope, q, db);
+            scope.$apply();
+
+            var section1 = scope.groupedSections.DS_OPD[0];
+            expect(section1.headers).toEqual([
+                [{
+                    "label": "CO1",
+                    "id": 1,
+                    "span": 2
+                }, {
+                    "label": "CO2",
+                    "id": 3,
+                    "span": 2
+                }],
+                [{
+                    "label": "CO3",
+                    "id": 1,
+                    "span": 1
+                }, {
+                    "label": "CO4",
+                    "id": 2,
+                    "span": 1
+                }, {
+                    "label": "CO3",
+                    "id": 3,
+                    "span": 1
+                }, {
+                    "label": "CO4",
+                    "id": 4,
+                    "span": 1
+                }]
+            ]);
+            var section2 = scope.groupedSections.Vacc[0];
+            expect(section2.headers).toEqual([
+                [{
+                    "label": "CO4",
+                    "id": 5,
+                    "span": 1
+                }, {
+                    "label": "CO3",
+                    "id": 6,
+                    "span": 1
+                }]
+            ]);
+        });
+
         it("should get dataelements associated with sections", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             scope.$apply();

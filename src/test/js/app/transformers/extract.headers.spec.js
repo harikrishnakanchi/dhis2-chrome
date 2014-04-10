@@ -29,10 +29,12 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             expect(result).toEqual([
                 [{
                     "label": "Resident",
-                    "id": 1
+                    "id": 1,
+                    "span": 1
                 }, {
                     "label": "Migrant",
-                    "id": 2
+                    "id": 2,
+                    "span": 1
                 }]
             ]);
         });
@@ -97,23 +99,29 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             expect(result).toEqual([
                 [{
                     "label": "Resident",
-                    "id": 1
+                    "id": 1,
+                    "span": 2
                 }, {
                     "label": "Migrant",
-                    "id": 3
+                    "id": 3,
+                    "span": 2
                 }],
                 [{
                     "label": "LessThan5",
-                    "id": 1
+                    "id": 1,
+                    "span": 1
                 }, {
                     "label": "GreaterThan5",
-                    "id": 2
+                    "id": 2,
+                    "span": 1
                 }, {
                     "label": "LessThan5",
-                    "id": 3
+                    "id": 3,
+                    "span": 1
                 }, {
                     "label": "GreaterThan5",
-                    "id": 4
+                    "id": 4,
+                    "span": 1
                 }]
             ]);
         });
@@ -254,48 +262,62 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             expect(result).toEqual([
                 [{
                     "label": "1",
-                    "id": 1
+                    "id": 1,
+                    "span": 2
                 }, {
                     "label": "2",
-                    "id": 5
+                    "id": 5,
+                    "span": 2
                 }],
                 [{
                     "label": "a",
-                    "id": 1
+                    "id": 1,
+                    "span": 2
                 }, {
                     "label": "b",
-                    "id": 3
+                    "id": 3,
+                    "span": 2
                 }, {
                     "label": "a",
-                    "id": 5
+                    "id": 5,
+                    "span": 2
                 }, {
                     "label": "b",
-                    "id": 7
+                    "id": 7,
+                    "span": 2
                 }],
                 [{
                     "label": "x",
-                    "id": 1
+                    "id": 1,
+                    "span": 1
                 }, {
                     "label": "y",
-                    "id": 2
+                    "id": 2,
+                    "span": 1
                 }, {
                     "label": "x",
-                    "id": 3
+                    "id": 3,
+                    "span": 1
                 }, {
                     "label": "y",
-                    "id": 4
+                    "id": 4,
+                    "span": 1
                 }, {
                     "label": "x",
-                    "id": 5
+                    "id": 5,
+                    "span": 1
                 }, {
                     "label": "y",
-                    "id": 6
+                    "id": 6,
+                    "span": 1
                 }, {
                     "label": "x",
-                    "id": 7
+                    "id": 7,
+                    "span": 1
                 }, {
                     "label": "y",
-                    "id": 8
+                    "id": 8,
+                    "span": 1
                 }]
             ]);
         });
@@ -404,33 +426,42 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             expect(result).toEqual([
                 [{
                     "label": "1",
-                    "id": 1
+                    "id": 1,
+                    "span": 2
                 }],
                 [{
                     "label": "a",
-                    "id": 1
+                    "id": 1,
+                    "span": 3
                 }, {
                     "label": "b",
-                    "id": 4
+                    "id": 4,
+                    "span": 3
                 }],
                 [{
                     "label": "x",
-                    "id": 1
+                    "id": 1,
+                    "span": 1
                 }, {
                     "label": "y",
-                    "id": 2
+                    "id": 2,
+                    "span": 1
                 }, {
                     "label": "z",
-                    "id": 3
+                    "id": 3,
+                    "span": 1
                 }, {
                     "label": "x",
-                    "id": 4
+                    "id": 4,
+                    "span": 1
                 }, {
                     "label": "y",
-                    "id": 5
+                    "id": 5,
+                    "span": 1
                 }, {
                     "label": "z",
-                    "id": 6
+                    "id": 6,
+                    "span": 1
                 }]
             ]);
         });

@@ -33,7 +33,8 @@ define([], function() {
                 var option = catageroryOptionCombos[j].categoryOptions[i];
                 result[i].push({
                     "label": option.name,
-                    "id": catageroryOptionCombos[j].id
+                    "id": catageroryOptionCombos[j].id,
+                    "span": i === dimensions.length - 1 ? 1 : dimensions[i + 1]
                 });
             }
         }
