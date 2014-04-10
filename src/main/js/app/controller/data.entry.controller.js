@@ -1,4 +1,4 @@
-define(["lodash", "categoryOptionsComboTransformer"], function(_, categoryOptionsComboTransformer) {
+define(["lodash", "extractHeaders"], function(_, extractHeaders) {
     return function($scope, $q, db) {
         var dataSets;
         $scope.sectionValues = {};
