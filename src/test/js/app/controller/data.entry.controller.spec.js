@@ -68,7 +68,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(scope.groupedSections.Vacc.length).toBe(1);
         });
 
-        it("should group set headers on sections", function() {
+        xit("should group set headers on sections", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             scope.$apply();
 
