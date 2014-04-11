@@ -3,7 +3,6 @@ define([], function() {
         var thyself = function(me) {
             return me;
         };
-
         var groupedOrgUnits = _.groupBy(orgUnits, 'level');
         var sortedLevels = _.sortBy(_.keys(groupedOrgUnits), _.compose(parseInt, thyself));
         var allOrgUnits = _.reduceRight(sortedLevels, function(everyOne, level) {

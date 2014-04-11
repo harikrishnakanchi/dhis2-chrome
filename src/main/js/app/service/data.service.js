@@ -4,7 +4,6 @@ define(["lodash"], function(_) {
         var getPayload = function(dataValues) {
             var resultValues = _.flatten(_.map(dataValues, function(values, dataElement) {
                 return _.map(values, function(dataValue, categoryOptionComboId) {
-                    console.log(dataValue);
                     return {
                         "dataElement": dataElement,
                         "categoryOptionCombo": categoryOptionComboId,
