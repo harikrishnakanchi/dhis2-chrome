@@ -6,16 +6,20 @@ require.config({
         "ng-i18n": "lib/ng-i18n/src/js/ng-i18n",
         "angular-route": "lib/angular-route/angular-route",
         "angular-resource": "lib/angular-resource/angular-resource",
+        "migrations": "../data/migrations",
+        "migrator": "app/migrator/migrator",
+        "properties": "app/conf/properties",
+        "moment": "lib/moment/moment",
+
+        //3rd party angular modules
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
         "angular-ui-tabs": "lib/custom/angular-ui-tabs/tabs",
         "angular-ui-accordion": "lib/custom/angular-ui-accordion/accordion",
         "angular-ui-collapse": "lib/custom/angular-ui-collapse/collapse",
         "angular-ui-transition": "lib/custom/angular-ui-transition/transition",
         "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
-        "migrations": "../data/migrations",
-        "migrator": "app/migrator/migrator",
-        "properties": "app/conf/properties",
-        "moment": "lib/moment/moment",
+        "angular-treeview": "lib/angular-treeview/angular.treeview",
+
 
         //Controllers
         "controllers": "app/controller/controllers",
@@ -56,6 +60,9 @@ require.config({
             deps: ["angular"]
         },
         'angular-ui-transition': {
+            deps: ["angular"]
+        },
+        'angular-treeview': {
             deps: ["angular"]
         },
         'angular-ui-collapse': {

@@ -18,13 +18,7 @@ module.exports = function(config) {
             }, {
                 pattern: 'test/js/data/**/*.js',
                 included: false
-            }, {
-                pattern: 'main/db/*.js',
-                included: false
-            }, {
-                pattern: 'test/db/*.js',
-                included: false
-            },
+            }
         ],
         exclude: [
             'main/js/lib/**/*spec.js',

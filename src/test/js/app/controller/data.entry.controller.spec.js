@@ -7,6 +7,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             db = {
                 objectStore: function() {}
             };
+            scope = $rootScope.$new();
+
             mockStore = function(data) {
                 var getAll = function() {
                     return utils.getPromise(q, data);
@@ -20,9 +22,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             spyOn(db, 'objectStore').and.callFake(function(storeName) {
                 return mockStore(testData[storeName]);
             });
-            scope = $rootScope.$new();
         }));
-
         it("should return the sum of the list ", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             var list = ["1", "2", "3", "4"];

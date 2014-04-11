@@ -13,6 +13,7 @@
         "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
         "lodash": null,
         "angularjs-directives": "https://github.com/tw-msf/angularjs-directives.git",
+        "angular-treeview": "git@github.com:eu81273/angular.treeview.git",
         "moment": null
     },
     "devDependencies": {

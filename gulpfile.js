@@ -18,7 +18,8 @@ gulp.task('devtest', function() {
     return gulp.src('_')
         .pipe(karma({
             configFile: 'src/test/conf/karma.conf.js',
-            action: 'watch'
+            action: 'watch',
+            preprocessors: {}
         }));
 });
 
