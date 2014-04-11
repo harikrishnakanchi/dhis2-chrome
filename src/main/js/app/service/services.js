@@ -1,7 +1,7 @@
-define(["dataService"], function(dataService) {
+define(["metadataService", "dataService"], function(metadataService, dataService) {
     var init = function(app) {
         app.service('metadataService', ['$indexedDB', '$http', metadataService]);
-        app.service('dataService', ['$indexedDB', '$http', dataService]);
+        app.service('dataService', ['$http', dataService]);
     };
     return {
         init: init

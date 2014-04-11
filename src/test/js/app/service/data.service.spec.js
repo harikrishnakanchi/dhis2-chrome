@@ -21,7 +21,7 @@ define(["dataService", "angularMocks"], function(DataService) {
                     "32": "49",
                     "37": "67"
                 }
-            }
+            };
             var expectedJson = {
                 "completeDate": "2014-04-11",
                 "period": "2014W14",
