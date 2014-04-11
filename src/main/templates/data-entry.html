@@ -1,3 +1,4 @@
+<form name="dataentry" id="dataentry">
 <weekselector year="year" month="month" week="week"></weekselector>
 <section class="panel tab-panel">
 	<tabset>
@@ -28,9 +29,9 @@
 					<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
 						<td>{{ dataElement.name }}</td>
 						<td ng-repeat="option in section.categoryOptionComboIds">
-							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="sectionValues[section.id][dataElement.id][option]"/>
+							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="dataValues[dataElement.id][option]"/>
 						</td>
-						<td>{{sum(sectionValues[section.id][dataElement.id])}}</td>
+						<td>{{sum(dataValues[dataElement.id])}}</td>
 					</tr>
 				</table>
 			</accordion-group>
@@ -38,4 +39,8 @@
 	</div>
 </tab>
 </tabset>
+  <div>
+	<button type="submit" class="btn btn-primary" ng-click="save()"> Save </button>
+  </div>
 </section>
+</form>

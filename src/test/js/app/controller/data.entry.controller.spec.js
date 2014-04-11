@@ -120,14 +120,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(scope.getDataSetName(datasetId)).toEqual("OPD");
         });
 
-        it("should initialize section values", function() {
+        it("should initialize data values", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             scope.$apply();
-
-            expect(_.keys(scope.sectionValues).length).toBe(testData.sections.length);
-            _.each(testData.sections, function(testDataSection) {
-                expect(_.keys(scope.sectionValues[testDataSection.id]).length).toBe(testDataSection.dataElements.length);
-            });
+            expect(_.keys(scope.dataValues).length).toBe(testData.dataElements.length);
         });
 
     });

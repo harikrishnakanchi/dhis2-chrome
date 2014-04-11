@@ -1,7 +1,7 @@
 define(["lodash", "extractHeaders"], function(_, extractHeaders) {
     return function($scope, $q, db) {
         var dataSets;
-        $scope.sectionValues = {};
+        $scope.dataValues = {};
         $scope.isopen = {};
 
         $scope.sum = function(iterable) {
@@ -9,6 +9,10 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                 exp = currentValue || "0";
                 return sum + evaluateNumber(exp);
             }, 0);
+        };
+
+        $scope.save = function() {
+            console.log(JSON.stringify($scope.dataValues));
         };
 
         var evaluateNumber = function(expression) {
@@ -85,13 +89,11 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                     });
                 });
 
-                $scope.sectionValues = _.reduce(sections, function(reducedObject, section) {
-                    reducedObject[section.id] = _.reduce(section.dataElements, function(reducedDataElements, dataElement) {
-                        reducedDataElements[dataElement.id] = {};
-                        return reducedDataElements;
-                    }, {});
+                $scope.dataValues = _.reduce(dataElements, function(reducedObject, dataElement) {
+                    reducedObject[dataElement.id] = {};
                     return reducedObject;
                 }, {});
+
             };
 
             getAllData.then(transformDataSet);
