@@ -23,7 +23,7 @@ gulp.task('devtest', function() {
 });
 
 gulp.task('lint', function() {
-    gulp.src(['./src/main/js/app/**/*.js', './src/test/js/app/**/*.js'])
+    return gulp.src(['./src/main/js/app/**/*.js', './src/test/js/app/**/*.js'])
         .pipe(jshint())
         .pipe(jshint.reporter(stylish))
         .pipe(jshint.reporter('fail'));
@@ -33,11 +33,11 @@ gulp.task('less', function() {
     var less = require('gulp-less');
     var path = require('path');
 
-    gulp.src('./src/main/less/main.less')
+    return gulp.src('./src/main/less/main.less')
         .pipe(less())
         .pipe(gulp.dest('./src/main/css'));
 });
 
 gulp.task('watch', function() {
-    gulp.watch('./src/main/less/main.less', ['less']);
+    return gulp.watch('./src/main/less/main.less', ['less']);
 });
