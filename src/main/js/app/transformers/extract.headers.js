@@ -1,43 +1,43 @@
-define([], function() {
-    return function(catageroryOptionCombos) {
-        var i = 0;
-        var j = 0;
-        var temp = [];
-        var result = [];
-        var catOptions;
+define(["findCategoryComboOption"], function(findCategoryComboOption) {
+    return function(categories, categoryOptionCombos) {
+        var prod;
+        var headers = [];
 
-        for (j = 0; j < catageroryOptionCombos.length; j++) {
-            catOptions = catageroryOptionCombos[j].categoryOptions;
-            for (i = 0; i < catOptions.length; i++) {
-                temp[i] = temp[i] || [];
-                temp[i].push(catOptions[i].name);
-                temp[i] = _.uniq(temp[i]);
-            }
-        }
+        var categoryOptions = _.map(categories, function(category) {
+            return category.categoryOptions;
+        });
 
-        var dimensions = [];
-        for (i = 0; i < temp.length; i++) {
-            dimensions.push(temp[i].length);
-        }
+        var cartesianProductOf = function(arr) {
+            return _.reduce(arr, function(a, b) {
+                headers.push(a);
+                return _.flatten(_.map(a, function(x) {
+                    return _.map(b, function(y) {
+                        return x.concat([y]);
+                    });
+                }), true);
+            }, [
+                []
+            ]);
+        };
 
+        prod = cartesianProductOf(categoryOptions);
+        headers.push(prod);
+        headers.shift();
 
-        var divideWith = 1;
-        for (i = 0; i < dimensions.length; i++) {
-            catOptions = catageroryOptionCombos[i].categoryOptions;
+        var headerLabels = _.map(headers, function(a) {
+            return _.map(a, function(b) {
+                return _.last(b).name;
+            });
+        });
 
-            divideWith *= dimensions[i];
-            result[i] = result[i] || [];
-            var addFactor = catageroryOptionCombos.length / divideWith;
+        var comboIds = _.map(prod, function(a) {
+            var combo = findCategoryComboOption(categoryOptionCombos, _.pluck(a, "name"));
+            return combo.id;
+        });
 
-            for (j = 0; j < catageroryOptionCombos.length; j += addFactor) {
-                var option = catageroryOptionCombos[j].categoryOptions[i];
-                result[i].push({
-                    "label": option.name,
-                    "id": catageroryOptionCombos[j].id,
-                    "span": i === dimensions.length - 1 ? 1 : dimensions[i + 1]
-                });
-            }
-        }
-        return result;
+        return {
+            "headers": headerLabels,
+            "categoryOptionComboIds": comboIds
+        };
     };
 });

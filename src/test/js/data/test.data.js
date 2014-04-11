@@ -44,11 +44,11 @@ define([], function() {
         },
         "name": "(CO1, CO3)",
         "categoryOptions": [{
-            "name": "CO1",
-            "id": "Resident"
+            "id": "CO1",
+            "name": "Resident"
         }, {
-            "name": "CO3",
-            "id": "LessThan5"
+            "id": "CO3",
+            "name": "LessThan5"
         }]
     }, {
         "id": 2,
@@ -57,11 +57,11 @@ define([], function() {
         },
         "name": "(CO1, CO4)",
         "categoryOptions": [{
-            "name": "CO1",
-            "id": "Resident"
+            "id": "CO1",
+            "name": "Resident"
         }, {
-            "name": "CO4",
-            "id": "GreaterThan5"
+            "id": "CO4",
+            "name": "GreaterThan5"
         }]
     }, {
         "id": 3,
@@ -70,11 +70,11 @@ define([], function() {
         },
         "name": "(CO2, CO3)",
         "categoryOptions": [{
-            "name": "CO2",
-            "id": "Migrant"
+            "id": "CO2",
+            "name": "Migrant"
         }, {
-            "name": "CO3",
-            "id": "LessThan5"
+            "id": "CO3",
+            "name": "LessThan5"
         }]
     }, {
         "id": 4,
@@ -83,11 +83,11 @@ define([], function() {
         },
         "name": "(CO2, CO4)",
         "categoryOptions": [{
-            "name": "CO2",
-            "id": "Migrant"
+            "id": "CO2",
+            "name": "Migrant"
         }, {
-            "name": "CO4",
-            "id": "GreaterThan5"
+            "id": "CO4",
+            "name": "GreaterThan5"
         }]
     }, {
         "id": 5,
@@ -96,8 +96,8 @@ define([], function() {
         },
         "name": "(CO4)",
         "categoryOptions": [{
-            "name": "CO4",
-            "id": "GreaterThan5"
+            "id": "CO4",
+            "name": "GreaterThan5"
         }]
     }, {
         "id": 6,
@@ -106,8 +106,8 @@ define([], function() {
         },
         "name": "(CO3)",
         "categoryOptions": [{
-            "name": "CO3",
-            "id": "LessThan5"
+            "id": "CO3",
+            "name": "LessThan5"
         }]
     }];
 

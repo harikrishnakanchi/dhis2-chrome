@@ -26,7 +26,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
         it("should return the sum of the list ", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             var list = ["1", "2", "3", "4"];
-
             expect(scope.sum(list)).toBe(10);
         });
 
@@ -68,51 +67,22 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(scope.groupedSections.Vacc.length).toBe(1);
         });
 
-        xit("should group set headers on sections", function() {
+        it("should group set headers on sections", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             scope.$apply();
 
             var section1 = scope.groupedSections.DS_OPD[0];
             expect(section1.headers).toEqual([
-                [{
-                    "label": "CO1",
-                    "id": 1,
-                    "span": 2
-                }, {
-                    "label": "CO2",
-                    "id": 3,
-                    "span": 2
-                }],
-                [{
-                    "label": "CO3",
-                    "id": 1,
-                    "span": 1
-                }, {
-                    "label": "CO4",
-                    "id": 2,
-                    "span": 1
-                }, {
-                    "label": "CO3",
-                    "id": 3,
-                    "span": 1
-                }, {
-                    "label": "CO4",
-                    "id": 4,
-                    "span": 1
-                }]
+                ["Resident", "Migrant"],
+                ["LessThan5", "GreaterThan5", "LessThan5", "GreaterThan5", ]
             ]);
+
+            expect(section1.categoryOptionComboIds).toEqual([1, 2, 3, 4]);
             var section2 = scope.groupedSections.Vacc[0];
             expect(section2.headers).toEqual([
-                [{
-                    "label": "CO4",
-                    "id": 5,
-                    "span": 1
-                }, {
-                    "label": "CO3",
-                    "id": 6,
-                    "span": 1
-                }]
+                ["LessThan5", "GreaterThan5"]
             ]);
+            expect(section2.categoryOptionComboIds).toEqual([1, 2]);
         });
 
         it("should get dataelements associated with sections", function() {
@@ -142,45 +112,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(categories.length).toBe(2);
         });
 
-        it("should enrich dataelements with category option combos", function() {
-            var dataEntryController = new DataEntryController(scope, q, db);
-            scope.$apply();
-
-            var opdSections = scope.groupedSections.DS_OPD;
-            var dataElements = opdSections[0].dataElements;
-            var categoryOptionCombos = dataElements[0].categoryOptionCombos;
-            expect(categoryOptionCombos.length).toBe(4);
-            expect(dataElements[1].categoryOptionCombos.length).toBe(2);
-        });
-
-
-        it("should enrich dataelements with all category combinations", function() {
-            var dataEntryController = new DataEntryController(scope, q, db);
-            scope.$apply();
-
-            var opdSections = scope.groupedSections.DS_OPD;
-            var dataElements = opdSections[0].dataElements;
-            var categories = dataElements[0].categories;
-            var category1Options = categories[0];
-            var category2Options = categories[1];
-            var allCatOptions = testData.categoryOptions;
-
-            expect(category1Options.repeat).toBe(1);
-            expect(category2Options.repeat).toBe(2);
-
-            expect(category1Options.span).toBe(2);
-            expect(category2Options.span).toBe(1);
-
-            expect(category1Options.options).toEqual([allCatOptions[0], allCatOptions[1]]);
-            expect(category2Options.options).toEqual([allCatOptions[2], allCatOptions[3]]);
-        });
 
         it("should return the data set name given the id", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             scope.$apply();
-
             var datasetId = "DS_OPD";
-
             expect(scope.getDataSetName(datasetId)).toEqual("OPD");
         });
 
@@ -194,24 +130,5 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             });
         });
 
-        it("should repeat a list for given number of times", function() {
-            var dataEntryController = new DataEntryController(scope, q, db);
-            var list = ["blah", "some"];
-
-            var repeatedList = scope.getRepeated(list, 2);
-
-            expect(repeatedList).toEqual(list.concat(list));
-        });
-
-        it("should get the data entry cells given the category", function() {
-            var dataEntryController = new DataEntryController(scope, q, db);
-            var category = {
-                span: 2,
-                repeat: 3,
-                options: [{}, {}]
-            };
-
-            expect(scope.getDataEntryCells(category).length).toBe(12);
-        });
     });
 });

@@ -16,10 +16,10 @@
 				</accordion-heading>
 
 				<table class="table table-bordered">
-					<tr ng-repeat="category in section.dataElements[0].categories">
+					<tr ng-repeat="category in section.headers">
 						<th></th>
-						<th ng-repeat="option in getRepeated(category.options, category.repeat)  track by $index" colspan="{{category.span}}">
-							{{option.name}}
+						<th ng-repeat="option in category track by $index">
+							{{option}}
 						</th>
 						<th ng-show="$last">
 							Total
@@ -27,8 +27,8 @@
 					</tr>
 					<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
 						<td>{{ dataElement.name }}</td>
-						<td ng-repeat="option in getDataEntryCells(section.dataElements[0].categories[0]) track by $index">
-							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="sectionValues[section.id][dataElement.id][$index]"/>
+						<td ng-repeat="option in section.categoryOptionComboIds">
+							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="sectionValues[section.id][dataElement.id][option]"/>
 						</td>
 						<td>{{sum(sectionValues[section.id][dataElement.id])}}</td>
 					</tr>

@@ -28,33 +28,6 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
             }).name;
         };
 
-        $scope.getDataEntryCells = function(category) {
-            return new Array(category.repeat * category.span * category.options.length);
-        };
-
-        $scope.getRepeated = function(list, num) {
-            return _.flatten(_.times(num, function() {
-                return list;
-            }));
-        };
-
-        var getCategories = function(lists) {
-            var totalNumberOfRows = _.reduce(lists, function(numberOfRows, list) {
-                return numberOfRows * list.length;
-            }, 1);
-
-            var prevLength = 1;
-            return _.map(lists, function(list) {
-                var cat = {
-                    span: totalNumberOfRows / (prevLength * list.length),
-                    repeat: prevLength,
-                    options: list
-                };
-                prevLength = prevLength * list.length;
-                return cat;
-            });
-        };
-
         var getAll = function(storeName) {
             var store = db.objectStore(storeName);
             return store.getAll();
@@ -88,12 +61,6 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                     });
                 };
 
-                var getDetailedCategoryOptionCombos = function(categoryComboId) {
-                    return _.filter(categoryOptionCombos, function(c) {
-                        return c.categoryCombo.id === categoryComboId;
-                    });
-                };
-
                 var enrichDataElement = function(dataElement) {
                     var detailedDataElement = _.find(dataElements, function(d) {
                         return d.id === dataElement.id;
@@ -103,8 +70,7 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                     });
 
                     var detailedCategories = _.map(detailedCategoryCombo.categories, getDetailedCategory);
-                    dataElement.categories = getCategories(_.pluck(detailedCategories, "categoryOptions"));
-                    dataElement.categoryOptionCombos = getDetailedCategoryOptionCombos(detailedDataElement.categoryCombo.id);
+                    dataElement.categories = detailedCategories;
                     return dataElement;
                 };
 
@@ -112,7 +78,9 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                 $scope.groupedSections = _.mapValues(groupedSections, function(sections) {
                     return _.map(sections, function(section) {
                         section.dataElements = _.map(section.dataElements, enrichDataElement);
-                        // section.headers = extractHeaders(section.dataElements[0].categoryOptionCombos);
+                        var result = extractHeaders(section.dataElements[0].categories, categoryOptionCombos);
+                        section.headers = result.headers;
+                        section.categoryOptionComboIds = result.categoryOptionComboIds;
                         return section;
                     });
                 });
