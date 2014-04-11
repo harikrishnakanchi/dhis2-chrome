@@ -23,6 +23,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
                 return mockStore(testData[storeName]);
             });
         }));
+
         it("should return the sum of the list ", function() {
             var dataEntryController = new DataEntryController(scope, q, db);
             var list = ["1", "2", "3", "4"];

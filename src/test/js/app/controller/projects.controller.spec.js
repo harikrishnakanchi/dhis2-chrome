@@ -9,6 +9,21 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
                 'parent': parent
             };
         };
+        var expectedOrgUnitTree = [{
+            'id': 1,
+            'name': 'msf',
+            'level': 1,
+            'parent': null,
+            'children': [{
+                'id': 2,
+                'name': 'ocp',
+                'level': 2,
+                'parent': {
+                    id: 1
+                },
+                'children': []
+            }]
+        }];
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             q = $q;
@@ -33,21 +48,7 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
             var projectsController = new ProjectsController(scope, db);
             scope.$apply();
 
-            expect(scope.organisationUnits).toEqual([{
-                'id': 1,
-                'name': 'msf',
-                'level': 1,
-                'parent': null,
-                'children': [{
-                    'id': 2,
-                    'name': 'ocp',
-                    'level': 2,
-                    'parent': {
-                        id: 1
-                    },
-                    'children': []
-                }]
-            }]);
+            expect(scope.organisationUnits).toEqual(expectedOrgUnitTree);
         });
     });
 });
