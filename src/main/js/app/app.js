@@ -11,12 +11,16 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
                 function($routeProvider, $indexedDBProvider) {
                     $routeProvider.
                     when('/dashboard', {
-                        templateUrl: '/templates/dashboard.html',
+                        templateUrl: 'templates/dashboard.html',
                         controller: 'dashboardController'
                     }).
                     when('/data-entry', {
-                        templateUrl: '/templates/data-entry.html',
+                        templateUrl: 'templates/data-entry.html',
                         controller: 'dataEntryController'
+                    }).
+                    when('/projects', {
+                        templateUrl: 'templates/projects.html',
+                        controller: 'projectsController'
                     }).
                     otherwise({
                         redirectTo: '/dashboard'
