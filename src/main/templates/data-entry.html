@@ -19,7 +19,7 @@
 				<table class="table table-bordered">
 					<tr ng-repeat="category in section.headers">
 						<th></th>
-						<th ng-repeat="option in category track by $index">
+						<th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
 							{{option}}
 						</th>
 						<th ng-show="$last">

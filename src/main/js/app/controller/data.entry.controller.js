@@ -11,6 +11,10 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
             }, 0);
         };
 
+        $scope.maxcolumns = function(headers) {
+            return _.last(headers).length;
+        };
+
         $scope.save = function() {
 
             var successPromise = function() {
