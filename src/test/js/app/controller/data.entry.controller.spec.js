@@ -84,12 +84,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
                 ["LessThan5", "GreaterThan5", "LessThan5", "GreaterThan5", ]
             ]);
 
-            expect(section1.categoryOptionComboIds).toEqual([1, 2, 3, 4]);
+            expect(section1.categoryOptionComboIds).toEqual(['1Sec1', '2Sec1', '3Sec1', '4Sec1']);
             var section2 = scope.groupedSections.Vacc[0];
             expect(section2.headers).toEqual([
                 ["LessThan5", "GreaterThan5"]
             ]);
-            expect(section2.categoryOptionComboIds).toEqual([1, 2]);
+            expect(section2.categoryOptionComboIds).toEqual(['1Sec3', '2Sec3']);
         });
 
         it("should get dataelements associated with sections", function() {

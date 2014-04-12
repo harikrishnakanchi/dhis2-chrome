@@ -96,7 +96,7 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                 $scope.groupedSections = _.mapValues(groupedSections, function(sections) {
                     return _.map(sections, function(section) {
                         section.dataElements = _.map(section.dataElements, enrichDataElement);
-                        var result = extractHeaders(section.dataElements[0].categories, categoryOptionCombos);
+                        var result = extractHeaders(section.id, section.dataElements[0].categories, categoryOptionCombos);
                         section.headers = result.headers;
                         section.categoryOptionComboIds = result.categoryOptionComboIds;
                         return section;
