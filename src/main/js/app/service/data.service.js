@@ -1,7 +1,7 @@
 define(["lodash"], function(_) {
     return function($http) {
 
-        var getPayload = function(dataValues) {
+        var getPayload = function(dataValues, period) {
             var resultValues = _.flatten(_.map(dataValues, function(values, dataElement) {
                 return _.map(values, function(dataValue, categoryOptionComboId) {
                     return {
@@ -13,17 +13,17 @@ define(["lodash"], function(_) {
             }), true);
             return {
                 "completeDate": "2014-04-11",
-                "period": "2014W14",
+                "period": period,
                 "orgUnit": "company_0",
                 "dataValues": resultValues
             };
         };
 
-        this.save = function(dataValues) {
+        this.save = function(dataValues, period) {
             return $http({
-                url: '/api/dataValueSets',
+                url: '/dhis/api/dataValueSets',
                 method: "POST",
-                data: getPayload(dataValues),
+                data: getPayload(dataValues, period),
                 headers: {
                     'Content-Type': 'application/json'
                 }

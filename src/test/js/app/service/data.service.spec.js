@@ -22,6 +22,7 @@ define(["dataService", "angularMocks"], function(DataService) {
                     "37": "67"
                 }
             };
+            var period = "2014W14";
             var expectedJson = {
                 "completeDate": "2014-04-11",
                 "period": "2014W14",
@@ -54,9 +55,9 @@ define(["dataService", "angularMocks"], function(DataService) {
             };
 
             var dataService = new DataService(http);
-            dataService.save(dataValues);
+            dataService.save(dataValues, period);
 
-            httpBackend.expectPOST("/api/dataValueSets", expectedJson).respond(200, "ok");
+            httpBackend.expectPOST("/dhis/api/dataValueSets", expectedJson).respond(200, "ok");
             httpBackend.flush();
         });
 

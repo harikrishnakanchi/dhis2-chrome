@@ -1,6 +1,6 @@
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], function(DataEntryController, testData, mocks, _, utils) {
     describe("dataEntryController ", function() {
-        var scope, db, mockStore, q;
+        var scope, db, mockStore, q, dataService;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             q = $q;
@@ -17,6 +17,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
                 return {
                     getAll: getAll
                 };
+            };
+
+            dataService = {
+                save: function() {
+                    return "foo";
+                }
             };
 
             spyOn(db, 'objectStore').and.callFake(function(storeName) {
@@ -127,5 +133,49 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(_.keys(scope.dataValues).length).toBe(testData.dataElements.length);
         });
 
+        it("should call the dataservice save method when save is clicked and should success on successfull post", function() {
+            var dataValues = {
+                "name": "test"
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            var dataEntryController = new DataEntryController(scope, q, db, dataService);
+            var saveSuccessPromise = utils.getPromise(q, {
+                "ok": "ok"
+            });
+            spyOn(dataService, "save").and.returnValue(saveSuccessPromise);
+
+
+            scope.save();
+            scope.$apply();
+
+            expect(dataService.save).toHaveBeenCalled();
+            expect(scope.success).toBe(true);
+        });
+
+
+        it("should call the dataservice save method when save is clicked and should error on post failure", function() {
+            var dataValues = {
+                "name": "test"
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            var dataEntryController = new DataEntryController(scope, q, db, dataService);
+            var saveErrorPromise = utils.getRejectedPromise(q, {
+                "ok": "ok"
+            });
+            spyOn(dataService, "save").and.returnValue(saveErrorPromise);
+
+
+            scope.save();
+            scope.$apply();
+
+            expect(dataService.save).toHaveBeenCalled();
+            expect(scope.success).toBe(false);
+        });
     });
 });

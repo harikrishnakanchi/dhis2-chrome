@@ -6,7 +6,15 @@ define([], function() {
         return deferred.promise;
     };
 
+    var getRejectedPromise = function(q, response) {
+        response = response || '';
+        var deferred = q.defer();
+        deferred.reject(response);
+        return deferred.promise;
+    };
+
     return {
-        'getPromise': getPromise
+        'getPromise': getPromise,
+        'getRejectedPromise': getRejectedPromise,
     };
 });

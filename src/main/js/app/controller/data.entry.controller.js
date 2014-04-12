@@ -1,5 +1,5 @@
 define(["lodash", "extractHeaders"], function(_, extractHeaders) {
-    return function($scope, $q, db) {
+    return function($scope, $q, db, dataService) {
         var dataSets;
         $scope.dataValues = {};
         $scope.isopen = {};
@@ -12,7 +12,17 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
         };
 
         $scope.save = function() {
-            console.log(JSON.stringify($scope.dataValues));
+
+            var successPromise = function() {
+                $scope.success = true;
+            };
+
+            var errorPromise = function() {
+                $scope.success = false;
+            };
+
+            var period = $scope.year + "W" + $scope.week.weekNumber;
+            dataService.save($scope.dataValues, period).then(successPromise, errorPromise);
         };
 
         var evaluateNumber = function(expression) {
