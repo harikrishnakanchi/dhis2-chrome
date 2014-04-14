@@ -1,7 +1,7 @@
 <form name="dataentry" id="dataentry" ng-submit="save()">
 <weekselector year="year" month="month" week="week" on-change="resetForm()"></weekselector>
 <div ng-show="success" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
-<div ng-show="error" class="alert alert-failure">{{resourceBundle.dataSaveFailed}}</div>
+<div ng-show="error" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
 <section class="panel tab-panel">
 	<tabset>
 		<tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
