@@ -1,32 +1,10 @@
 define(["lodash", "extractHeaders"], function(_, extractHeaders) {
-    return function($scope, $q, db, dataService) {
-        var dataSets;
-        $scope.dataValues = {};
-        $scope.isopen = {};
+    return function($scope, $q, db, dataService, $anchorScroll, $location) {
+        var dataSets, dataElements;
 
-        $scope.sum = function(iterable) {
-            return _.reduce(iterable, function(sum, currentValue) {
-                exp = currentValue || "0";
-                return sum + evaluateNumber(exp);
-            }, 0);
-        };
-
-        $scope.maxcolumns = function(headers) {
-            return _.last(headers).length;
-        };
-
-        $scope.save = function() {
-
-            var successPromise = function() {
-                $scope.success = true;
-            };
-
-            var errorPromise = function() {
-                $scope.success = false;
-            };
-
-            var period = $scope.year + "W" + $scope.week.weekNumber;
-            dataService.save($scope.dataValues, period).then(successPromise, errorPromise);
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
         };
 
         var evaluateNumber = function(expression) {
@@ -46,12 +24,50 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
             }).name;
         };
 
+        $scope.safeGet = function(dataValues, id) {
+            dataValues[id] = dataValues[id] || {};
+            return dataValues[id];
+        };
+
+        $scope.resetForm = function() {
+            $scope.dataValues = {};
+            $scope.isopen = {};
+            $scope.success = false;
+            $scope.error = false;
+        };
+
+        $scope.sum = function(iterable) {
+            return _.reduce(iterable, function(sum, currentValue) {
+                exp = currentValue || "0";
+                return sum + evaluateNumber(exp);
+            }, 0);
+        };
+
+        $scope.maxcolumns = function(headers) {
+            return _.last(headers).length;
+        };
+
+        $scope.save = function() {
+            var successPromise = function() {
+                $scope.success = true;
+            };
+
+            var errorPromise = function() {
+                $scope.error = true;
+            };
+
+            var period = $scope.year + "W" + $scope.week.weekNumber;
+            dataService.save($scope.dataValues, period).then(successPromise, errorPromise);
+            scrollToTop();
+        };
+
         var getAll = function(storeName) {
             var store = db.objectStore(storeName);
             return store.getAll();
         };
 
         var init = function() {
+            $scope.resetForm();
             var dataSetPromise = getAll('dataSets');
             var sectionPromise = getAll("sections");
             var dataElementsPromise = getAll("dataElements");
@@ -63,8 +79,8 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
 
             var transformDataSet = function(data) {
                 dataSets = data[0];
+                dataElements = data[2];
                 var sections = data[1];
-                var dataElements = data[2];
                 var categoryCombos = data[3];
                 var categories = data[4];
                 var categoryOptionCombos = data[5];
@@ -92,7 +108,6 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                     return dataElement;
                 };
 
-
                 $scope.groupedSections = _.mapValues(groupedSections, function(sections) {
                     return _.map(sections, function(section) {
                         section.dataElements = _.map(section.dataElements, enrichDataElement);
@@ -102,12 +117,6 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                         return section;
                     });
                 });
-
-                $scope.dataValues = _.reduce(dataElements, function(reducedObject, dataElement) {
-                    reducedObject[dataElement.id] = {};
-                    return reducedObject;
-                }, {});
-
             };
 
             getAllData.then(transformDataSet);

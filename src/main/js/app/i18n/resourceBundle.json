@@ -1,4 +1,5 @@
 {
-    "invalidExpression": "Must be a valid expression containing digits and '+'"
-
+    "invalidExpression": "Must be a valid expression containing digits and '+'",
+    "dataSaveSuccess": "Data Saved Successfully",
+    "dataSaveFailure": "Error saving data please try again later"
 }

@@ -1,5 +1,7 @@
-<form name="dataentry" id="dataentry">
-<weekselector year="year" month="month" week="week"></weekselector>
+<form name="dataentry" id="dataentry" ng-submit="save()">
+<weekselector year="year" month="month" week="week" on-change="resetForm()"></weekselector>
+<div ng-show="success" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
+<div ng-show="error" class="alert alert-failure">{{resourceBundle.dataSaveFailed}}</div>
 <section class="panel tab-panel">
 	<tabset>
 		<tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
@@ -29,7 +31,7 @@
 					<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
 						<td>{{ dataElement.name }}</td>
 						<td ng-repeat="option in section.categoryOptionComboIds">
-							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="dataValues[dataElement.id][option]"/>
+							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="safeGet(dataValues, dataElement.id)[option]"/>
 						</td>
 						<td>{{sum(dataValues[dataElement.id])}}</td>
 					</tr>
@@ -40,7 +42,7 @@
 </tab>
 </tabset>
   <div>
-	<button type="submit" class="btn btn-primary" ng-click="save()"> Save </button>
+	<button type="submit" class="btn btn-primary"> Save </button>
   </div>
 </section>
 </form>
