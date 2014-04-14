@@ -39,6 +39,7 @@ require.config({
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
+        "dataValuesMapper": "app/transformers/datavalues.mapper",
         "findCategoryComboOption": "app/transformers/find.category.combo.option",
         "toTree": "app/transformers/to.tree"
     },

@@ -1,15 +1,13 @@
-define(["dataService", "angularMocks", "properties", "dataValuesMapper"], function(DataService, mocks, properties, dataValuesMapper) {
+define(["dataValuesMapper", "angularMocks", "properties"], function(dataValuesMapper, mocks, properties) {
     var httpBackend, http;
 
-    describe("dataService", function() {
+    describe("dataValuesMapper", function() {
 
         beforeEach(mocks.inject(function($injector, $q) {
             q = $q;
-            httpBackend = $injector.get('$httpBackend');
-            http = $injector.get('$http');
         }));
 
-        it("should post to the URL with a valid JSON", function() {
+        it("should construct a valid json given the data values", function() {
             var dataValues = {
                 "DE_Oedema": {
                     "32": "3",
@@ -53,13 +51,9 @@ define(["dataService", "angularMocks", "properties", "dataValuesMapper"], functi
                     "value": "67"
                 }]
             };
-
-            var dataService = new DataService(http);
             var payload = dataValuesMapper(dataValues, period);
-            dataService.save(payload);
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", expectedJson).respond(200, "ok");
-            httpBackend.flush();
+            expect(payload).toEqual(expectedJson);
         });
 
     });

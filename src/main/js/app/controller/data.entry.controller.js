@@ -1,4 +1,4 @@
-define(["lodash", "extractHeaders"], function(_, extractHeaders) {
+define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHeaders, dataValuesMapper) {
     return function($scope, $q, db, dataService, $anchorScroll, $location) {
         var dataSets, dataElements;
 
@@ -48,6 +48,8 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
         };
 
         $scope.save = function() {
+            var period = $scope.year + "W" + $scope.week.weekNumber;
+            var payload = dataValuesMapper($scope.dataValues, period);
             var successPromise = function() {
                 $scope.success = true;
             };
@@ -56,8 +58,16 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                 $scope.error = true;
             };
 
-            var period = $scope.year + "W" + $scope.week.weekNumber;
-            dataService.save($scope.dataValues, period).then(successPromise, errorPromise);
+            var insertToDhis = function() {
+                return dataService.save(payload);
+            };
+
+            var saveToDb = function() {
+                var dataValuesStore = db.objectStore("dataValues");
+                return dataValuesStore.upsert(payload);
+            };
+
+            saveToDb().then(insertToDhis).then(successPromise, errorPromise);
             scrollToTop();
         };
 

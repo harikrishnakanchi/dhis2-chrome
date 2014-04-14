@@ -1,6 +1,6 @@
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], function(DataEntryController, testData, mocks, _, utils) {
     describe("dataEntryController ", function() {
-        var scope, db, mockStore, q, dataService, location, anchorScroll, dataEntryController, rootScope;
+        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, saveSuccessPromise, saveErrorPromise;
 
         beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location) {
             q = $q;
@@ -11,24 +11,34 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             anchorScroll = $anchorScroll;
             rootScope = $rootScope;
             scope = $rootScope.$new();
-            mockStore = function(data) {
+            var getMockStore = function(data) {
                 var getAll = function() {
                     return utils.getPromise(q, data);
                 };
-
+                var upsert = function() {};
                 return {
-                    getAll: getAll
+                    getAll: getAll,
+                    upsert: upsert
                 };
             };
+            dataValuesStore = getMockStore("dataValues");
 
             dataService = {
-                save: function() {
-                    return "foo";
-                }
+                save: function() {}
             };
 
+            saveSuccessPromise = utils.getPromise(q, {
+                "ok": "ok"
+            });
+
+            saveErrorPromise = utils.getRejectedPromise(q, {
+                "ok": "ok"
+            });
+
             spyOn(db, 'objectStore').and.callFake(function(storeName) {
-                return mockStore(testData[storeName]);
+                if (storeName === "dataValues")
+                    return dataValuesStore;
+                return getMockStore(testData[storeName]);
             });
 
             dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
@@ -122,7 +132,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(scope.getDataSetName(datasetId)).toEqual("OPD");
         });
 
-        it("should call the dataservice save method when save is clicked and should success on successfull post", function() {
+        it("should save user to indexeddb and dhis", function() {
             var dataValues = {
                 "name": "test"
             };
@@ -131,21 +141,21 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
                 "weekNumber": 14
             };
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
-            var saveSuccessPromise = utils.getPromise(q, {
-                "ok": "ok"
-            });
+
             spyOn(dataService, "save").and.returnValue(saveSuccessPromise);
+            spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
 
             scope.save();
             scope.$apply();
 
+            expect(dataValuesStore.upsert).toHaveBeenCalled();
             expect(dataService.save).toHaveBeenCalled();
             expect(scope.success).toBe(true);
             expect(scope.error).toBe(false);
         });
 
 
-        it("should call the dataservice save method when save is clicked and should error on post failure", function() {
+        it("should let the user know of failures when saving the data to dhis", function() {
             scope = rootScope.$new();
             var dataValues = {
                 "name": "test"
@@ -155,15 +165,36 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
                 "weekNumber": 14
             };
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
-            var saveErrorPromise = utils.getRejectedPromise(q, {
-                "ok": "ok"
-            });
             spyOn(dataService, "save").and.returnValue(saveErrorPromise);
+            spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
 
             scope.save();
             scope.$apply();
 
             expect(dataService.save).toHaveBeenCalled();
+            expect(dataValuesStore.upsert).toHaveBeenCalled();
+            expect(scope.error).toBe(true);
+            expect(scope.success).toBe(false);
+        });
+
+        it("should let the user know of failures when saving the data to indexedDB", function() {
+            scope = rootScope.$new();
+            var dataValues = {
+                "name": "test"
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
+            spyOn(dataService, "save");
+            spyOn(dataValuesStore, "upsert").and.returnValue(saveErrorPromise);
+
+            scope.save();
+            scope.$apply();
+
+            expect(dataService.save).not.toHaveBeenCalled();
+            expect(dataValuesStore.upsert).toHaveBeenCalled();
             expect(scope.error).toBe(true);
             expect(scope.success).toBe(false);
         });
