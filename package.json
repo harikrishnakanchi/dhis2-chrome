@@ -8,6 +8,7 @@
         "gulp-karma": "0.0.4",
         "gulp-jshint": "*",
         "jshint-stylish": "*",
+        "yargs": "*",
         "gulp-less": "~1.2.3",
         "gulp-util": "*",
         "path": "~0.4.9",

@@ -1,6 +1,6 @@
-define([], function() {
-    var url = "https://datawhqa.twhosted.com/dhis";
-    return {
+define(['lodash', 'overrides'], function(_, overrides) {
+    var url = "http://localhost:8080";
+    var properties = {
         "metadata": {
             "sync": {
                 "intervalInMinutes": 1,
@@ -12,4 +12,6 @@ define([], function() {
             "auth_header": "Basic YWRtaW46ZGlzdHJpY3Q=",
         }
     };
+
+    return _.merge(properties, overrides);
 });

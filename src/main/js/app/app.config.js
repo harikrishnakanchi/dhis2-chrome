@@ -9,6 +9,7 @@ require.config({
         "migrations": "../data/migrations",
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
+        "overrides": "app/conf/overrides",
         "moment": "lib/moment/moment",
 
         //3rd party angular modules

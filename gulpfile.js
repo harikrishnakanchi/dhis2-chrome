@@ -3,6 +3,7 @@ var karma = require('gulp-karma');
 var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
+var argv = require('yargs').argv;
 
 gulp.task('test', function() {
     return gulp.src('_')
@@ -28,6 +29,12 @@ gulp.task('lint', function() {
         .pipe(jshint())
         .pipe(jshint.reporter(stylish))
         .pipe(jshint.reporter('fail'));
+});
+
+gulp.task('config', function() {
+    if (argv.env)
+        return gulp.src('conf/' + argv.env + '/overrides.js')
+            .pipe(gulp.dest('./src/main/js/app/conf'))
 });
 
 gulp.task('less', function() {

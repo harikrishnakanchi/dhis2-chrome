@@ -3,6 +3,7 @@ require.config({
         "Q": "lib/q/q",
         "lodash": "lib/lodash/dist/lodash",
         "properties": "app/conf/properties",
+        "overrides": "app/conf/overrides",
         "jquery": "lib/custom/jquery-ajax/jquery",
         "httpWrapper": "app/utils/http.wrapper",
         "idb": "app/utils/idb",
