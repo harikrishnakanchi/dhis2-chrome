@@ -18,6 +18,7 @@ require.config({
         "angular-ui-accordion": "lib/custom/angular-ui-accordion/accordion",
         "angular-ui-collapse": "lib/custom/angular-ui-collapse/collapse",
         "angular-ui-transition": "lib/custom/angular-ui-transition/transition",
+        "angular-ui-modal": "lib/custom/angular-ui-modal/modal",
         "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
         "angular-treeview": "lib/angular-treeview/angular.treeview",
 
@@ -70,6 +71,9 @@ require.config({
             deps: ["angular"]
         },
         'angular-ui-collapse': {
+            deps: ["angular", "angular-ui-transition"]
+        },
+        'angular-ui-modal': {
             deps: ["angular", "angular-ui-transition"]
         },
         'angular-ui-accordion': {

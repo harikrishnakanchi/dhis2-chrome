@@ -1,5 +1,5 @@
 define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHeaders, dataValuesMapper) {
-    return function($scope, $q, db, dataService, $anchorScroll, $location) {
+    return function($scope, $q, db, dataService, $anchorScroll, $location, $modal) {
         var dataSets, dataElements;
 
         var scrollToTop = function() {
