@@ -29,6 +29,16 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
             return dataValues[id];
         };
 
+        $scope.$watch('week', function() {
+            if ($scope.week) {
+                var store = db.objectStore('dataValues');
+                store.find(getPeriod()).then(function(data) {
+                    data = data || {};
+                    $scope.dataValues = dataValuesMapper.mapToView(data);
+                });
+            }
+        });
+
         $scope.resetForm = function() {
             $scope.dataValues = {};
             $scope.isopen = {};

@@ -16,9 +16,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
                     return utils.getPromise(q, data);
                 };
                 var upsert = function() {};
+                var find = function() {};
                 return {
                     getAll: getAll,
-                    upsert: upsert
+                    upsert: upsert,
+                    find: find
                 };
             };
             dataValuesStore = getMockStore("dataValues");
@@ -144,6 +146,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
 
             spyOn(dataService, "save").and.returnValue(saveSuccessPromise);
             spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
+            spyOn(dataValuesStore, 'find').and.returnValue(saveSuccessPromise);
 
             scope.save();
             scope.$apply();
@@ -167,6 +170,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
             spyOn(dataService, "save").and.returnValue(saveErrorPromise);
             spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
+            spyOn(dataValuesStore, 'find').and.returnValue(saveSuccessPromise);
 
             scope.save();
             scope.$apply();
@@ -189,6 +193,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
             spyOn(dataService, "save");
             spyOn(dataValuesStore, "upsert").and.returnValue(saveErrorPromise);
+            spyOn(dataValuesStore, 'find').and.returnValue(saveSuccessPromise);
 
             scope.save();
             scope.$apply();
@@ -230,6 +235,57 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
                 "blah": "test"
             });
             expect(result).toEqual(dataValues.blah);
+        });
+
+        it("should fetch data only if period is defined", function() {
+            scope.week = undefined;
+            spyOn(dataValuesStore, 'find');
+
+            scope.$apply();
+
+            expect(dataValuesStore.find).not.toHaveBeenCalled();
+        });
+
+        it("should fetch empty data if no data exists for the given period", function() {
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, undefined));
+
+            scope.$apply();
+
+            expect(dataValuesStore.find).toHaveBeenCalledWith("2014W14");
+            expect(scope.dataValues).toEqual({});
+        });
+
+        it("should display data for the given period", function() {
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, {
+                "dataValues": [{
+                    "dataElement": "DE_Oedema",
+                    "categoryOptionCombo": "32",
+                    "value": "3"
+                }, {
+                    "dataElement": "DE_Oedema",
+                    "categoryOptionCombo": "33",
+                    "value": "12"
+                }],
+                "blah": "some"
+            }));
+
+            scope.$apply();
+
+            expect(dataValuesStore.find).toHaveBeenCalledWith("2014W14");
+            expect(scope.dataValues).toEqual({
+                "DE_Oedema": {
+                    "32": "3",
+                    "33": "12"
+                }
+            });
         });
     });
 });
