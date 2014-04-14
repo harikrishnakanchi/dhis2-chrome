@@ -47,12 +47,12 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 "categoryOptions": [categoryOptions[1]]
             }];
 
-            var result = extractHeaders("sec1", categories, categoryOptionCombos);
+            var result = extractHeaders(categories, categoryOptionCombos);
 
             expect(result.headers).toEqual([
                 ["Resident", "Migrant"]
             ]);
-            expect(result.categoryOptionComboIds).toEqual(['1sec1', '2sec1']);
+            expect(result.categoryOptionComboIds).toEqual([1, 2]);
         });
 
         it("should extract headers 2 X 2", function() {
@@ -94,7 +94,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 "categoryOptions": [categoryOptions[1], categoryOptions[3]]
             }];
 
-            var result = extractHeaders("test", categories, categoryOptionCombos);
+            var result = extractHeaders(categories, categoryOptionCombos);
 
             expect(result.headers).toEqual(
                 [
@@ -106,7 +106,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                     ]
                 ]
             );
-            expect(result.categoryOptionComboIds).toEqual(['1test', '2test', '3test', '4test']);
+            expect(result.categoryOptionComboIds).toEqual([1, 2, 3, 4]);
         });
 
         it("should extract headers 1 X 2 X 3", function() {
@@ -238,7 +238,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 }]
             }];
 
-            var result = extractHeaders("blah", categories, categoryOptionCombos);
+            var result = extractHeaders(categories, categoryOptionCombos);
 
             expect(result.headers).toEqual([
                 ["1"],
@@ -246,7 +246,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 ["x", "y", "z", "x", "y", "z"]
             ]);
 
-            expect(result.categoryOptionComboIds).toEqual(['1blah', '2blah', '3blah', '4blah', '5blah', '6blah']);
+            expect(result.categoryOptionComboIds).toEqual([1, 2, 3, 4, 5, 6]);
         });
     });
 });

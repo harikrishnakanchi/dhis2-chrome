@@ -1,5 +1,5 @@
 define(["findCategoryComboOption"], function(findCategoryComboOption) {
-    return function(sectionId, categories, categoryOptionCombos) {
+    return function(categories, categoryOptionCombos) {
         var prod;
         var headers = [];
 
@@ -32,7 +32,7 @@ define(["findCategoryComboOption"], function(findCategoryComboOption) {
 
         var comboIds = _.map(prod, function(a) {
             var combo = findCategoryComboOption(categoryOptionCombos, _.pluck(a, "name"));
-            return combo.id + sectionId;
+            return combo.id;
         });
 
         return {

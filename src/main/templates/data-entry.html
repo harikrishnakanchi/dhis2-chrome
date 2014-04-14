@@ -5,7 +5,7 @@
 		<tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
 			<div class="exp-coll-group">
 				<accordion close-others="false">
-					<accordion-group ng-repeat="section in sections " is-open="isopen[section.id]" ng-form="sectionForm">
+					<accordion-group ng-repeat="section in sections" is-open="isopen[section.id]" ng-form="sectionForm">
 					<div>
 						<ul>
 							<li  class='alert alert-danger' ng-show='sectionForm.$error.pattern'>{{resourceBundle.invalidExpression}}</li>
@@ -26,7 +26,7 @@
 							Total
 						</th>
 					</tr>
-					<tr ng-repeat="dataElement in section.dataElements track by $index" ng-form="dataElementForm">
+					<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
 						<td>{{ dataElement.name }}</td>
 						<td ng-repeat="option in section.categoryOptionComboIds">
 							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="dataValues[dataElement.id][option]"/>
