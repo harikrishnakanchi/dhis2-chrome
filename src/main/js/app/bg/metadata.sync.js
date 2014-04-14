@@ -10,7 +10,7 @@ define(["idb", "httpWrapper", "Q", "lodash", "properties"], function(idb, httpWr
 
         var getMetadata = function(metadataChangeLog) {
             var lastUpdatedTimeQueryString = metadataChangeLog ? "?lastUpdated=" + metadataChangeLog.lastUpdatedTime : "";
-            var url = properties.metadata.url + lastUpdatedTimeQueryString;
+            var url = properties.dhis.url + "/api/metaData" + lastUpdatedTimeQueryString;
 
             console.debug("Fetching " + url);
             return httpWrapper.get(url);

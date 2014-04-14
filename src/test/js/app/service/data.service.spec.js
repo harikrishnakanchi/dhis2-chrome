@@ -1,9 +1,9 @@
-define(["dataService", "angularMocks"], function(DataService) {
+define(["dataService", "angularMocks", "properties"], function(DataService, mocks, properties) {
     var httpBackend, http;
 
     describe("dataService", function() {
 
-        beforeEach(inject(function($injector, $q) {
+        beforeEach(mocks.inject(function($injector, $q) {
             q = $q;
             httpBackend = $injector.get('$httpBackend');
             http = $injector.get('$http');
@@ -57,7 +57,7 @@ define(["dataService", "angularMocks"], function(DataService) {
             var dataService = new DataService(http);
             dataService.save(dataValues, period);
 
-            httpBackend.expectPOST("/dhis/api/dataValueSets", expectedJson).respond(200, "ok");
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", expectedJson).respond(200, "ok");
             httpBackend.flush();
         });
 

@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define(["lodash", "properties"], function(_, properties) {
     return function($http) {
 
         var getPayload = function(dataValues, period) {
@@ -20,14 +20,7 @@ define(["lodash"], function(_) {
         };
 
         this.save = function(dataValues, period) {
-            return $http({
-                url: '/dhis/api/dataValueSets',
-                method: "POST",
-                data: getPayload(dataValues, period),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            return $http.post(properties.dhis.url + '/api/dataValueSets', getPayload(dataValues, period));
         };
     };
 });

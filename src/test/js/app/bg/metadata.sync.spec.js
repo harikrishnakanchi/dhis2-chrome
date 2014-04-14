@@ -32,7 +32,7 @@ define(["metadataSyncService", "Q", "utils", "properties", "idb", "httpWrapper"]
             spyOn(idb, "put").and.returnValue(utils.getPromise(q, {}));
 
             metadataSyncService.sync().then(function() {
-                expect(httpWrapper.get.calls.argsFor(0)[0]).toEqual(properties.metadata.url + '?lastUpdated=' + today);
+                expect(httpWrapper.get.calls.argsFor(0)[0]).toEqual(properties.dhis.url + "/api/metaData" + '?lastUpdated=' + today);
                 expect(idb.put.calls.allArgs()).toEqual([
                     ['categories', category1, undefined],
                     ['changeLog', {
@@ -53,7 +53,7 @@ define(["metadataSyncService", "Q", "utils", "properties", "idb", "httpWrapper"]
             spyOn(idb, "put").and.returnValue(utils.getPromise(q, {}));
 
             metadataSyncService.sync().then(function() {
-                expect(httpWrapper.get.calls.argsFor(0)[0]).toEqual(properties.metadata.url);
+                expect(httpWrapper.get.calls.argsFor(0)[0]).toEqual(properties.dhis.url + "/api/metaData");
                 expect(idb.put.calls.allArgs()).toEqual([
                     ['categories', category1, undefined],
                     ['changeLog', {

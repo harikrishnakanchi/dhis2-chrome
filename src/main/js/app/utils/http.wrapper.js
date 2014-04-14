@@ -2,7 +2,7 @@ define(["jquery", "properties", "Q"], function($, properties, Q) {
     $.ajaxPrefilter(function(options) {
         if (!options.beforeSend) {
             options.beforeSend = function(xhr) {
-                xhr.setRequestHeader('Authorization', properties.metadata.auth_header);
+                xhr.setRequestHeader('Authorization', properties.dhis.auth_header);
             };
         }
     });
