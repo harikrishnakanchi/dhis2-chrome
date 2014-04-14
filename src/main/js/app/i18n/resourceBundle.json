@@ -1,5 +1,6 @@
 {
     "invalidExpression": "Must be a valid expression containing digits and '+'",
     "dataSaveSuccess": "Data Saved Successfully",
-    "dataSaveFailure": "Error saving data please try again later"
+    "dataSaveFailure": "Error saving data please try again later",
+    "chooseWeek": "Please choose a week to enter data."
 }
