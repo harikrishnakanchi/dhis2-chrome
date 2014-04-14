@@ -177,5 +177,16 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(dataService.save).toHaveBeenCalled();
             expect(scope.success).toBe(false);
         });
+
+        it("should fetch max length to calculate col span for category options", function() {
+            var dataEntryController = new DataEntryController(scope, q, db, dataService);
+
+            var maxCols = scope.maxcolumns([
+                [1, 2],
+                [4, 5, 4, 5]
+            ]);
+
+            expect(maxCols).toEqual(4);
+        });
     });
 });
