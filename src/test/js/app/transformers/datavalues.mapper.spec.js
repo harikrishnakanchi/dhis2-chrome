@@ -1,14 +1,10 @@
 define(["dataValuesMapper", "angularMocks", "properties"], function(dataValuesMapper, mocks, properties) {
-    var httpBackend, http;
-
     describe("dataValuesMapper", function() {
+        var viewModel, period, domain, httpBackend, http;
 
         beforeEach(mocks.inject(function($injector, $q) {
             q = $q;
-        }));
-
-        it("should construct a valid json given the data values", function() {
-            var dataValues = {
+            viewModel = {
                 "DE_Oedema": {
                     "32": "3",
                     "33": "12",
@@ -20,8 +16,8 @@ define(["dataValuesMapper", "angularMocks", "properties"], function(dataValuesMa
                     "37": "67"
                 }
             };
-            var period = "2014W14";
-            var expectedJson = {
+            period = "2014W14";
+            domain = {
                 "completeDate": "2014-04-11",
                 "period": "2014W14",
                 "orgUnit": "company_0",
@@ -51,9 +47,16 @@ define(["dataValuesMapper", "angularMocks", "properties"], function(dataValuesMa
                     "value": "67"
                 }]
             };
-            var payload = dataValuesMapper(dataValues, period);
+        }));
 
-            expect(payload).toEqual(expectedJson);
+        it("should construct a valid json given the data values", function() {
+            var payload = dataValuesMapper.mapToDomain(viewModel, period);
+            expect(payload).toEqual(domain);
+        });
+
+        it("should map to view given the json", function() {
+            var dataValues = dataValuesMapper.mapToView(domain);
+            expect(dataValues).toEqual(viewModel);
         });
 
     });

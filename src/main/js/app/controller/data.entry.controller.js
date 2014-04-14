@@ -47,9 +47,13 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
             return _.last(headers).length;
         };
 
+        var getPeriod = function() {
+            return $scope.year + "W" + $scope.week.weekNumber;
+        };
+
         $scope.save = function() {
-            var period = $scope.year + "W" + $scope.week.weekNumber;
-            var payload = dataValuesMapper($scope.dataValues, period);
+            var period = getPeriod();
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period);
             var successPromise = function() {
                 $scope.success = true;
             };

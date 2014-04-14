@@ -1,7 +1,6 @@
-define(["dataService", "angularMocks", "properties", "dataValuesMapper"], function(DataService, mocks, properties, dataValuesMapper) {
-    var httpBackend, http;
-
+define(["dataService", "angularMocks", "properties"], function(DataService, mocks, properties) {
     describe("dataService", function() {
+        var httpBackend, http;
 
         beforeEach(mocks.inject(function($injector, $q) {
             q = $q;
@@ -9,56 +8,15 @@ define(["dataService", "angularMocks", "properties", "dataValuesMapper"], functi
             http = $injector.get('$http');
         }));
 
-        it("should post to the URL with a valid JSON", function() {
+        it("should save datavalues to dhis", function() {
             var dataValues = {
-                "DE_Oedema": {
-                    "32": "3",
-                    "33": "12",
-                    "34": "23",
-                    "35": "11"
-                },
-                "DE_MLT115": {
-                    "32": "49",
-                    "37": "67"
-                }
-            };
-            var period = "2014W14";
-            var expectedJson = {
-                "completeDate": "2014-04-11",
-                "period": "2014W14",
-                "orgUnit": "company_0",
-                "dataValues": [{
-                    "dataElement": "DE_Oedema",
-                    "categoryOptionCombo": "32",
-                    "value": "3"
-                }, {
-                    "dataElement": "DE_Oedema",
-                    "categoryOptionCombo": "33",
-                    "value": "12"
-                }, {
-                    "dataElement": "DE_Oedema",
-                    "categoryOptionCombo": "34",
-                    "value": "23"
-                }, {
-                    "dataElement": "DE_Oedema",
-                    "categoryOptionCombo": "35",
-                    "value": "11"
-                }, {
-                    "dataElement": "DE_MLT115",
-                    "categoryOptionCombo": "32",
-                    "value": "49"
-                }, {
-                    "dataElement": "DE_MLT115",
-                    "categoryOptionCombo": "37",
-                    "value": "67"
-                }]
+                "blah": "blah"
             };
 
             var dataService = new DataService(http);
-            var payload = dataValuesMapper(dataValues, period);
-            dataService.save(payload);
+            dataService.save(dataValues);
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", expectedJson).respond(200, "ok");
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", dataValues).respond(200, "ok");
             httpBackend.flush();
         });
 
