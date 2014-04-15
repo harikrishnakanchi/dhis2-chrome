@@ -1,5 +1,5 @@
 define([], function() {
-    var mapToDomain = function(dataValues, period) {
+    var mapToDomain = function(dataValues, period, orgUnit) {
         var resultValues = _.flatten(_.map(dataValues, function(values, dataElement) {
             return _.map(values, function(dataValue, categoryOptionComboId) {
                 return {
@@ -12,7 +12,7 @@ define([], function() {
         return {
             "completeDate": "2014-04-11",
             "period": period,
-            "orgUnit": "company_0",
+            "orgUnit": orgUnit,
             "dataValues": resultValues
         };
     };

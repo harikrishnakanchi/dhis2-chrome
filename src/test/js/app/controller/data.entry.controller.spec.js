@@ -1,6 +1,6 @@
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], function(DataEntryController, testData, mocks, _, utils) {
     describe("dataEntryController ", function() {
-        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, saveSuccessPromise, saveErrorPromise;
+        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise;
 
         beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location) {
             q = $q;
@@ -24,6 +24,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
                 };
             };
             dataValuesStore = getMockStore("dataValues");
+            orgUnitStore = getMockStore("organisationUnits");
 
             dataService = {
                 save: function() {}
@@ -40,8 +41,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             spyOn(db, 'objectStore').and.callFake(function(storeName) {
                 if (storeName === "dataValues")
                     return dataValuesStore;
+                if (storeName === "organisationUnits")
+                    return orgUnitStore;
                 return getMockStore(testData[storeName]);
             });
+            spyOn(orgUnitStore, "find").and.returnValue(utils.getPromise(q, {
+                id: "company_0"
+            }));
 
             dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
         }));
@@ -142,11 +148,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             scope.week = {
                 "weekNumber": 14
             };
+            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
+            scope.$apply();
 
             spyOn(dataService, "save").and.returnValue(saveSuccessPromise);
             spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
-            spyOn(dataValuesStore, 'find').and.returnValue(saveSuccessPromise);
 
             scope.save();
             scope.$apply();
@@ -167,10 +174,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             scope.week = {
                 "weekNumber": 14
             };
+            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
+            scope.$apply();
             spyOn(dataService, "save").and.returnValue(saveErrorPromise);
             spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
-            spyOn(dataValuesStore, 'find').and.returnValue(saveSuccessPromise);
 
             scope.save();
             scope.$apply();
@@ -190,10 +198,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             scope.week = {
                 "weekNumber": 14
             };
+            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
+            scope.$apply();
             spyOn(dataService, "save");
             spyOn(dataValuesStore, "upsert").and.returnValue(saveErrorPromise);
-            spyOn(dataValuesStore, 'find').and.returnValue(saveSuccessPromise);
 
             scope.save();
             scope.$apply();

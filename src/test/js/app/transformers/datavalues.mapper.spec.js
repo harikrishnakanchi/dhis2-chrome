@@ -50,7 +50,7 @@ define(["dataValuesMapper", "angularMocks", "properties"], function(dataValuesMa
         }));
 
         it("should construct a valid json given the data values", function() {
-            var payload = dataValuesMapper.mapToDomain(viewModel, period);
+            var payload = dataValuesMapper.mapToDomain(viewModel, period, "company_0");
             expect(payload).toEqual(domain);
         });
 

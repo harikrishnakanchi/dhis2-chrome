@@ -63,7 +63,7 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
 
         $scope.save = function() {
             var period = getPeriod();
-            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period);
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.organisationUnit.id);
             var successPromise = function() {
                 $scope.success = true;
             };
@@ -88,6 +88,15 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
         var getAll = function(storeName) {
             var store = db.objectStore(storeName);
             return store.getAll();
+        };
+
+        var fetchOrganisationUnit = function() {
+            var store = db.objectStore("organisationUnits");
+            return store.find("proj_104");
+        };
+
+        var saveOrganisationUnit = function(orgUnit) {
+            $scope.organisationUnit = orgUnit;
         };
 
         var init = function() {
@@ -143,7 +152,7 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
                 });
             };
 
-            getAllData.then(transformDataSet);
+            getAllData.then(transformDataSet).then(fetchOrganisationUnit).then(saveOrganisationUnit);
         };
 
         init();
