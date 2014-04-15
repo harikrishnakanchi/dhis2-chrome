@@ -1,4 +1,4 @@
-define([], function() {
+define(["moment"], function(moment) {
     var mapToDomain = function(dataValues, period, orgUnit) {
         var resultValues = _.flatten(_.map(dataValues, function(values, dataElement) {
             return _.map(values, function(dataValue, categoryOptionComboId) {
@@ -10,7 +10,7 @@ define([], function() {
             });
         }), true);
         return {
-            "completeDate": "2014-04-11",
+            "completeDate": moment().format("YYYY-MM-DD"),
             "period": period,
             "orgUnit": orgUnit,
             "dataValues": resultValues

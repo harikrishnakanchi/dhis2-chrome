@@ -1,4 +1,4 @@
-define(["dataValuesMapper", "angularMocks", "properties"], function(dataValuesMapper, mocks, properties) {
+define(["dataValuesMapper", "angularMocks", "properties", "moment"], function(dataValuesMapper, mocks, properties, moment) {
     describe("dataValuesMapper", function() {
         var viewModel, period, domain, httpBackend, http;
 
@@ -18,7 +18,7 @@ define(["dataValuesMapper", "angularMocks", "properties"], function(dataValuesMa
             };
             period = "2014W14";
             domain = {
-                "completeDate": "2014-04-11",
+                "completeDate": moment().format("YYYY-MM-DD"),
                 "period": "2014W14",
                 "orgUnit": "company_0",
                 "dataValues": [{
