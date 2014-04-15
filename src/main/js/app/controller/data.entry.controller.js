@@ -138,13 +138,14 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
 
                     var detailedCategories = _.map(detailedCategoryCombo.categories, getDetailedCategory);
                     dataElement.categories = detailedCategories;
+                    dataElement.categoryCombo = detailedDataElement.categoryCombo;
                     return dataElement;
                 };
 
                 $scope.groupedSections = _.mapValues(groupedSections, function(sections) {
                     return _.map(sections, function(section) {
                         section.dataElements = _.map(section.dataElements, enrichDataElement);
-                        var result = extractHeaders(section.dataElements[0].categories, categoryOptionCombos);
+                        var result = extractHeaders(section.dataElements[0].categories, section.dataElements[0].categoryCombo, categoryOptionCombos);
                         section.headers = result.headers;
                         section.categoryOptionComboIds = result.categoryOptionComboIds;
                         return section;

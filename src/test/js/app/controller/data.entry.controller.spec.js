@@ -105,7 +105,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(section2.headers).toEqual([
                 ["LessThan5", "GreaterThan5"]
             ]);
-            expect(section2.categoryOptionComboIds).toEqual([1, 2]);
+            expect(section2.categoryOptionComboIds).toEqual([6, 5]);
         });
 
         it("should get dataelements associated with sections", function() {

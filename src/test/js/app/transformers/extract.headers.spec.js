@@ -1,6 +1,7 @@
 define(["extractHeaders", "lodash"], function(extractHeaders, _) {
 
-    var categoryOptions = [];
+    var categoryOptions = [],
+        categoryCombo;
     beforeEach(function() {
         categoryOptions = [{
             "name": "Resident",
@@ -21,6 +22,10 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             "name": "FollowUp",
             "id": "FollowUp"
         }];
+
+        categoryCombo = {
+            "id": "CC1"
+        };
     });
 
     describe("extract headers from category option combos", function() {
@@ -47,7 +52,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 "categoryOptions": [categoryOptions[1]]
             }];
 
-            var result = extractHeaders(categories, categoryOptionCombos);
+            var result = extractHeaders(categories, categoryCombo, categoryOptionCombos);
 
             expect(result.headers).toEqual([
                 ["Resident", "Migrant"]
@@ -94,7 +99,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 "categoryOptions": [categoryOptions[1], categoryOptions[3]]
             }];
 
-            var result = extractHeaders(categories, categoryOptionCombos);
+            var result = extractHeaders(categories, categoryCombo, categoryOptionCombos);
 
             expect(result.headers).toEqual(
                 [
@@ -143,7 +148,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             var categoryOptionCombos = [{
                 "id": 1,
                 "categoryCombo": {
-                    "id": "CC"
+                    "id": "CC1"
                 },
                 "name": "(1,a,x)",
                 "categoryOptions": [{
@@ -159,7 +164,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             }, {
                 "id": 2,
                 "categoryCombo": {
-                    "id": "CC"
+                    "id": "CC1"
                 },
                 "name": "(1, a, y)",
                 "categoryOptions": [{
@@ -175,7 +180,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             }, {
                 "id": 3,
                 "categoryCombo": {
-                    "id": "CC"
+                    "id": "CC1"
                 },
                 "name": "(1, a, z)",
                 "categoryOptions": [{
@@ -191,7 +196,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             }, {
                 "id": 4,
                 "categoryCombo": {
-                    "id": "CC"
+                    "id": "CC1"
                 },
                 "name": "(1,b,x)",
                 "categoryOptions": [{
@@ -207,7 +212,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             }, {
                 "id": 5,
                 "categoryCombo": {
-                    "id": "CC"
+                    "id": "CC1"
                 },
                 "name": "(1, b, y)",
                 "categoryOptions": [{
@@ -223,7 +228,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             }, {
                 "id": 6,
                 "categoryCombo": {
-                    "id": "CC"
+                    "id": "CC1"
                 },
                 "name": "(1, b, z)",
                 "categoryOptions": [{
@@ -238,7 +243,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 }]
             }];
 
-            var result = extractHeaders(categories, categoryOptionCombos);
+            var result = extractHeaders(categories, categoryCombo, categoryOptionCombos);
 
             expect(result.headers).toEqual([
                 ["1"],
