@@ -79,6 +79,18 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(scope.sum(list)).toBe(10);
         });
 
+        it("should evaluate expression on blur", function() {
+            scope.dataValues = {
+                "blah": {
+                    "some": "1+9"
+                }
+            };
+
+            scope.evaluateExpression("blah", "some");
+
+            expect(scope.dataValues.blah.some).toEqual(10);
+        });
+
         it("should group sections based on datasets", function() {
             scope.$apply();
 

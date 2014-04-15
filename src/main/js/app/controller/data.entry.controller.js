@@ -7,15 +7,19 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
             $anchorScroll();
         };
 
-        var evaluateNumber = function(expression) {
-            expression = expression.split("+").filter(function(e) {
+        var calculateSum = function(cellValue) {
+            cellValue = cellValue.toString().split("+").filter(function(e) {
                 return e;
             });
-            var sum = 0;
-            _.each(expression, function(exp) {
-                sum = sum + parseInt(exp);
-            });
-            return sum;
+            return _.reduce(cellValue, function(sum, exp) {
+                return sum + parseInt(exp);
+            }, 0);
+        };
+
+        $scope.evaluateExpression = function(elementId, option) {
+            var cellValue = $scope.dataValues[elementId][option];
+            $scope.dataValues[elementId][option] = calculateSum(cellValue);
+            return $scope.dataValues[elementId][option];
         };
 
         $scope.getDataSetName = function(id) {
@@ -49,7 +53,7 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
         $scope.sum = function(iterable) {
             return _.reduce(iterable, function(sum, currentValue) {
                 exp = currentValue || "0";
-                return sum + evaluateNumber(exp);
+                return sum + calculateSum(exp);
             }, 0);
         };
 
