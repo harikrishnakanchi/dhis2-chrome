@@ -1,8 +1,8 @@
 <form name="dataentry" id="dataentry" ng-submit="save()">
 <div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
-<weekselector year="year" month="month" week="week" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
 <div ng-show="success" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
 <div ng-show="error" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
+<weekselector year="year" month="month" week="week" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
 <section class="panel tab-panel" ng-show="week">
 	<tabset>
 		<tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
