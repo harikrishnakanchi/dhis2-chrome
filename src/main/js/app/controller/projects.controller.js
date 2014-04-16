@@ -1,5 +1,6 @@
 define(["toTree"], function(toTree) {
     return function($scope, db) {
+        $scope.organisationUnits = [];
         var getAll = function(storeName) {
             var store = db.objectStore(storeName);
             return store.getAll();

@@ -20,7 +20,7 @@ require.config({
         "angular-ui-transition": "lib/custom/angular-ui-transition/transition",
         "angular-ui-modal": "lib/custom/angular-ui-modal/modal",
         "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
-        "angular-treeview": "lib/angular-treeview/angular.treeview",
+        "angular-treeview": "lib/angularjs-directives/src/treeview/angular.treeview",
 
 
         //Controllers
