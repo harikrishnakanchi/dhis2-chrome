@@ -40,15 +40,27 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
             };
 
             spyOn(db, 'objectStore').and.returnValue(mockStore);
+            spyOn(mockStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
         }));
 
         it("should fetch and display all organisation units", function() {
-            spyOn(mockStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
-
             var projectsController = new ProjectsController(scope, db);
             scope.$apply();
 
             expect(scope.organisationUnits).toEqual(expectedOrgUnitTree);
+        });
+
+
+        it("should show the selected organisation unit details", function() {
+            var orgUnit = {
+                'id': 1
+            };
+            var projectsController = new ProjectsController(scope, db);
+
+            scope.onOrgUnitSelect(orgUnit);
+            scope.$apply();
+
+            expect(scope.orgUnit).toEqual(orgUnit);
         });
     });
 });

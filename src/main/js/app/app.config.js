@@ -37,6 +37,7 @@ require.config({
         "services": "app/service/services",
         "metadataService": "app/service/metadata.service",
         "dataService": "app/service/data.service",
+        "projectsService": "app/service/projects.service",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",

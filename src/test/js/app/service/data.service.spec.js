@@ -8,6 +8,11 @@ define(["dataService", "angularMocks", "properties"], function(DataService, mock
             http = $injector.get('$http');
         }));
 
+        afterEach(function() {
+            httpBackend.verifyNoOutstandingExpectation();
+            httpBackend.verifyNoOutstandingRequest();
+        });
+
         it("should save datavalues to dhis", function() {
             var dataValues = {
                 "blah": "blah"
