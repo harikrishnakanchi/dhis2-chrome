@@ -1,16 +1,31 @@
 <section class="panel tab-panel">
-<div class="row">
-<div class="col-md-4">
-	<treeview
-		tree-model="organisationUnits"
-		node-id="id"
-		node-label="name"
-		node-children="children"
-		on-node-select="onOrgUnitSelect"
-	/>
-</div>
-<div class="col-md-8">
-{{orgUnit.name}}
-</div>
-</div>
+	<div class="row">
+		<div class="col-md-4">
+			<treeview
+			tree-model="organisationUnits"
+			node-id="id"
+			node-label="name"
+			node-children="children"
+			on-node-select="onOrgUnitSelect"
+			/>
+		</div>
+		<div class="col-md-8">
+			<form name="form" class="form-horizontal" role="form" novalidate ng-show="orgUnit">
+				<ul>
+					<li class="form-group">
+						<label for="orgUnitName" class="col-sm-2 control-label">Name</label>
+						<div class="col-sm-4" >
+							<input type="text" class="form-control" name="orgUnitName" id="orgUnitName" ng-model="orgUnit.name" disabled="true">
+						</div>
+					</li>
+					<li class="form-group">
+						<label for="orgUnitOpeningDate" class="col-sm-2 control-label">Opening Date</label>
+						<div class="col-sm-4" >
+							<input type="text" class="form-control" name="orgUnitOpeningDate" id="orgUnitOpeningDate" ng-model="orgUnit.openingDate" disabled="true">
+						</div>
+					</li>
+				</ul>
+			</form>
+		</div>
+	</div>
 </section>
