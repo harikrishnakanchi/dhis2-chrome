@@ -9,6 +9,15 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
                 'parent': parent
             };
         };
+
+        var orgUnitLevels = [{
+            'level': 1,
+            'name': 'Company'
+        }, {
+            'level': 2,
+            'name': 'Country'
+        }];
+
         var expectedOrgUnitTree = [{
             'id': 1,
             'name': 'msf',
@@ -50,7 +59,7 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
                 "create": function() {}
             };
             spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
-            spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
+            spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnitLevels));
             projectsController = new ProjectsController(scope, db, projectsService, q);
         }));
 
@@ -58,8 +67,17 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
             scope.$apply();
 
             expect(mockOrgStore.getAll).toHaveBeenCalled();
-            expect(mockOrgUnitLevelStore.getAll).toHaveBeenCalled();
             expect(scope.organisationUnits).toEqual(expectedOrgUnitTree);
+        });
+
+        it("should get organization unit level mapping", function() {
+            scope.$apply();
+
+            expect(mockOrgUnitLevelStore.getAll).toHaveBeenCalled();
+            expect(scope.orgUnitLevelsMap).toEqual({
+                1: 'Company',
+                2: 'Country'
+            });
         });
 
         it("should show the selected organisation unit details", function() {
@@ -77,6 +95,7 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
             var orgUnit = {
                 'id': 1
             };
+
             spyOn(projectsService, 'create').and.returnValue(utils.getPromise(q, {}));
 
             scope.save(orgUnit);

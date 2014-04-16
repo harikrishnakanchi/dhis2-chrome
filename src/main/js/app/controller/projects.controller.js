@@ -6,14 +6,16 @@ define(["toTree"], function(toTree) {
             return store.getAll();
         };
 
-        var transformToTree = function(args) {
+        var save = function(args) {
             var orgUnits = args[0];
-            var orgUnitLevels = args[1];
+            $scope.orgUnitLevelsMap = _.transform(args[1], function(result, orgUnit) {
+                result[orgUnit.level] = orgUnit.name;
+            }, {});
             $scope.organisationUnits = toTree(orgUnits);
         };
 
         var init = function() {
-            $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(transformToTree);
+            $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(save);
         };
 
         $scope.onOrgUnitSelect = function(orgUnit) {
