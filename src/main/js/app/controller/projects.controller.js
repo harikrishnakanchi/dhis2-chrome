@@ -9,7 +9,7 @@ define(["toTree"], function(toTree) {
         var transformToTree = function(args) {
             var orgUnits = args[0];
             var orgUnitLevels = args[1];
-            $scope.organisationUnits = toTree(orgUnits, orgUnitLevels);
+            $scope.organisationUnits = toTree(orgUnits);
         };
 
         var init = function() {
