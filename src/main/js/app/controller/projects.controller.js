@@ -1,17 +1,19 @@
 define(["toTree"], function(toTree) {
-    return function($scope, db, projectsService) {
+    return function($scope, db, projectsService, $q) {
         $scope.organisationUnits = [];
         var getAll = function(storeName) {
             var store = db.objectStore(storeName);
             return store.getAll();
         };
 
-        var transformToTree = function(orgUnits) {
+        var transformToTree = function(args) {
+            var orgUnits = args[0];
+            var orgUnitLevels = args[1];
             $scope.organisationUnits = toTree(orgUnits);
         };
 
         var init = function() {
-            getAll("organisationUnits").then(transformToTree);
+            $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(transformToTree);
         };
 
         $scope.onOrgUnitSelect = function(orgUnit) {

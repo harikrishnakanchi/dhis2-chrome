@@ -1,6 +1,6 @@
 define(["projectsController", "angularMocks", "utils"], function(ProjectsController, mocks, utils) {
     describe("projects controller", function() {
-        var q, db, scope, mockStore, allOrgUnits, projectsService, projectsController;
+        var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService, projectsController;
         var getOrgUnit = function(id, name, level, parent) {
             return {
                 'id': id,
@@ -27,29 +27,38 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             q = $q;
-            db = {
-                objectStore: function() {}
-            };
             allOrgUnits = [getOrgUnit(1, 'msf', 1, null), getOrgUnit(2, 'ocp', 2, {
                 id: 1
             })];
             scope = $rootScope.$new();
-
-            mockStore = {
+            mockOrgStore = {
                 getAll: function() {}
             };
-
+            mockOrgUnitLevelStore = {
+                getAll: function() {}
+            };
+            var stores = {
+                "organisationUnits": mockOrgStore,
+                "organisationUnitLevels": mockOrgUnitLevelStore
+            };
+            db = {
+                objectStore: function(store) {
+                    return stores[store];
+                }
+            };
             projectsService = {
                 "create": function() {}
             };
-            spyOn(db, 'objectStore').and.returnValue(mockStore);
-            spyOn(mockStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
-            projectsController = new ProjectsController(scope, db, projectsService);
+            spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
+            spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
+            projectsController = new ProjectsController(scope, db, projectsService, q);
         }));
 
         it("should fetch and display all organisation units", function() {
             scope.$apply();
 
+            expect(mockOrgStore.getAll).toHaveBeenCalled();
+            expect(mockOrgUnitLevelStore.getAll).toHaveBeenCalled();
             expect(scope.organisationUnits).toEqual(expectedOrgUnitTree);
         });
 
