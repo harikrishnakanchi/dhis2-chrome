@@ -1,6 +1,6 @@
-define(["projectsController", "angularMocks", "utils"], function(ProjectsController, mocks, utils) {
+define(["projectsController", "angularMocks", "utils", "lodash"], function(ProjectsController, mocks, utils, _) {
     describe("projects controller", function() {
-        var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService, projectsController;
+        var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService, projectsController, parent;
         var getOrgUnit = function(id, name, level, parent) {
             return {
                 'id': id,
@@ -67,6 +67,12 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
             spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
             spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnitLevels));
             projectsController = new ProjectsController(scope, db, projectsService, q);
+
+            parent = {
+                'level': 1,
+                'name': 'Name1',
+                'id': 'Id1'
+            };
         }));
 
         it("should fetch and display all organisation units", function() {
@@ -104,15 +110,19 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
 
         it("should save organization unit in dhis", function() {
             var orgUnit = {
-                'id': 1
+                'id': 2,
+                'name': 'Org1'
             };
 
             spyOn(projectsService, 'create').and.returnValue(utils.getPromise(q, {}));
 
-            scope.save(orgUnit);
+            scope.save(orgUnit, parent);
             scope.$apply();
 
             expect(projectsService.create).toHaveBeenCalledWith(orgUnit);
+            expect(orgUnit.level).toEqual(2);
+            expect(orgUnit.shortName).toBe('Org1');
+            expect(orgUnit.parent).toEqual(_.pick(parent, "name", "id"));
             expect(scope.saveSuccess).toEqual(true);
         });
 
@@ -122,7 +132,7 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
             };
             spyOn(projectsService, 'create').and.returnValue(utils.getRejectedPromise(q, {}));
 
-            scope.save(orgUnit);
+            scope.save(orgUnit, parent);
             scope.$apply();
 
             expect(projectsService.create).toHaveBeenCalledWith(orgUnit);

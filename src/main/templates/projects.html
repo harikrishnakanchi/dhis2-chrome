@@ -14,25 +14,43 @@
 				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getNextLevel(orgUnit)" ng-show="canCreateChild(orgUnit)" ng-click="openCreateForm = true"/>
 			</div>
 			<div class="row">
-			<form name="form" class="form-horizontal" role="form" novalidate ng-show="orgUnit" ng-hide="openCreateForm">
-				<ul>
-					<li class="form-group">
-						<label for="orgUnitName" class="col-sm-2 control-label">Name</label>
-						<div class="col-sm-4" >
-							<input type="text" class="form-control" name="orgUnitName" id="orgUnitName" ng-model="orgUnit.name" disabled="true">
-						</div>
-					</li>
-					<li class="form-group">
-						<label for="orgUnitOpeningDate" class="col-sm-2 control-label">Opening Date</label>
-						<div class="col-sm-4" >
-							<input type="text" class="form-control" name="orgUnitOpeningDate" id="orgUnitOpeningDate" ng-model="orgUnit.openingDate" disabled="true">
-						</div>
-					</li>
-				</ul>
-			</form>
-			<form ng-show="openCreateForm">
-				<h3>Create {{getNextLevel(orgUnit)}}</h3>
-			</form>
+				<form name="form" class="form-horizontal" role="form" novalidate ng-hide="openCreateForm || !orgUnit">
+					<ul>
+						<li class="form-group">
+							<label for="orgUnitName" class="col-sm-2 control-label">Name</label>
+							<div class="col-sm-4" >
+								<input type="text" class="form-control" name="orgUnitName" id="orgUnitName" ng-model="orgUnit.name" disabled="true">
+							</div>
+						</li>
+						<li class="form-group">
+							<label for="orgUnitOpeningDate" class="col-sm-2 control-label">Opening Date</label>
+							<div class="col-sm-4" >
+								<input type="text" class="form-control" name="orgUnitOpeningDate" id="orgUnitOpeningDate" ng-model="orgUnit.openingDate" disabled="true">
+							</div>
+						</li>
+					</ul>
+				</form>
+				<form ng-show="openCreateForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
+					<h3>Create {{getNextLevel(orgUnit)}}</h3>
+					<ul>
+						<li class="form-group">
+							<label for="newOrgUnitName" class="col-sm-2 control-label">Name</label>
+							<div class="col-sm-4" >
+								<input type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required/>
+							</div>
+						</li>
+						<li class="form-group">
+							<label for="newOrgUnitOpeningDate" class="col-sm-2 control-label">Opening Date</label>
+							<div class="col-sm-4" >
+								<input type="text" class="form-control" name="newOrgUnitOpeningDate" id="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required/>
+							</div>
+						</li>
+						<li>
+							<input type="submit" class="btn btn-primary" ng-disabled="form.$invalid" value="Save"/>
+							<input type="button" class="btn" ng-click="reset()" value="Cancel">
+						</li>
+					</ul>
+				</form>
 			</div>
 		</div>
 	</div>

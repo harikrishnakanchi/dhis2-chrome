@@ -1,8 +1,9 @@
-define(["toTree"], function(toTree) {
+define(["toTree", "lodash"], function(toTree, _) {
     return function($scope, db, projectsService, $q) {
         $scope.organisationUnits = [];
 
-        var reset = function() {
+        $scope.reset = function() {
+            $scope.newOrgUnit = {};
             $scope.openCreateForm = false;
         };
 
@@ -20,16 +21,21 @@ define(["toTree"], function(toTree) {
         };
 
         var init = function() {
-            reset();
+            $scope.reset();
             $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(save);
         };
 
         $scope.onOrgUnitSelect = function(orgUnit) {
-            reset();
+            $scope.reset();
             $scope.orgUnit = orgUnit;
         };
 
-        $scope.save = function(orgUnit) {
+        $scope.save = function(orgUnit, parent) {
+            orgUnit = _.merge(orgUnit, {
+                'shortName': orgUnit.name,
+                'level': parent.level + 1,
+                'parent': _.pick(parent, "name", "id")
+            });
             var onSuccess = function() {
                 $scope.saveSuccess = true;
             };
