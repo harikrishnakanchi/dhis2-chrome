@@ -9,15 +9,24 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
                 'parent': parent
             };
         };
+        var orgUnitLevels = [{
+            'name': 'Company',
+            'level': 1
+        }, {
+            'name': 'Country',
+            'level': 2
+        }];
         var expectedOrgUnitTree = [{
             'id': 1,
             'name': 'msf',
             'level': 1,
+            'type': 'Company',
             'parent': null,
             'children': [{
                 'id': 2,
                 'name': 'ocp',
                 'level': 2,
+                'type': 'Country',
                 'parent': {
                     id: 1
                 },
@@ -50,7 +59,7 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
                 "create": function() {}
             };
             spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
-            spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
+            spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnitLevels));
             projectsController = new ProjectsController(scope, db, projectsService, q);
         }));
 
