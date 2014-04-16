@@ -14,6 +14,10 @@ define(["toTree"], function(toTree) {
             getAll("organisationUnits").then(transformToTree);
         };
 
+        $scope.onOrgUnitSelect = function(orgUnit) {
+            $scope.orgUnit = orgUnit;
+        };
+
         init();
     };
 });

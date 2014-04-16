@@ -1,8 +1,16 @@
 <section class="panel tab-panel">
+<div class="row">
+<div class="col-md-4">
 	<treeview
 		tree-model="organisationUnits"
 		node-id="id"
 		node-label="name"
 		node-children="children"
+		on-node-select="onOrgUnitSelect"
 	/>
+</div>
+<div class="col-md-8">
+{{orgUnit.name}}
+</div>
+</div>
 </section>
