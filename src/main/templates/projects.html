@@ -10,6 +10,10 @@
 			/>
 		</div>
 		<div class="col-md-8">
+			<div class="row">
+				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getNextLevel(orgUnit)" ng-show="canCreateChild(orgUnit)"/>
+			</div>
+			<div class="row">
 			<form name="form" class="form-horizontal" role="form" novalidate ng-show="orgUnit">
 				<ul>
 					<li class="form-group">
@@ -26,6 +30,7 @@
 					</li>
 				</ul>
 			</form>
+			</div>
 		</div>
 	</div>
 </section>

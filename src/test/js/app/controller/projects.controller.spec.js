@@ -15,7 +15,13 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
             'name': 'Company'
         }, {
             'level': 2,
+            'name': 'Operational Center'
+        }, {
+            'level': 3,
             'name': 'Country'
+        }, {
+            'level': 4,
+            'name': 'Project'
         }];
 
         var expectedOrgUnitTree = [{
@@ -76,7 +82,9 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
             expect(mockOrgUnitLevelStore.getAll).toHaveBeenCalled();
             expect(scope.orgUnitLevelsMap).toEqual({
                 1: 'Company',
-                2: 'Country'
+                2: 'Operational Center',
+                3: 'Country',
+                4: 'Project'
             });
         });
 
@@ -116,6 +124,38 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
 
             expect(projectsService.create).toHaveBeenCalledWith(orgUnit);
             expect(scope.saveSuccess).toEqual(false);
+        });
+
+        it("should get child level", function() {
+            scope.$apply();
+
+            expect(scope.getNextLevel({
+                'level': 1
+            })).toEqual("Operational Center");
+            expect(scope.getNextLevel({
+                'level': 0
+            })).toEqual("Company");
+            expect(scope.getNextLevel({
+                'level': 4
+            })).toEqual(undefined);
+            expect(scope.getNextLevel()).toEqual(undefined);
+        });
+
+        it("should allow user to only create new country or project", function() {
+            scope.$apply();
+
+            expect(scope.canCreateChild({
+                'level': 1
+            })).toEqual(false);
+            expect(scope.canCreateChild({
+                'level': 2
+            })).toEqual(true);
+            expect(scope.canCreateChild({
+                'level': 3
+            })).toEqual(true);
+            expect(scope.canCreateChild({
+                'level': 4
+            })).toEqual(false);
         });
     });
 });

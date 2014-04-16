@@ -34,6 +34,14 @@ define(["toTree"], function(toTree) {
             return projectsService.create(orgUnit).then(onSuccess, onError);
         };
 
+        $scope.getNextLevel = function(orgUnit) {
+            return orgUnit ? $scope.orgUnitLevelsMap[orgUnit.level + 1] : undefined;
+        };
+
+        $scope.canCreateChild = function(orgUnit) {
+            return _.contains(["Country", "Project"], $scope.getNextLevel(orgUnit));
+        };
+
         init();
     };
 });
