@@ -11,10 +11,10 @@
 		</div>
 		<div class="col-md-8">
 			<div class="row">
-				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getNextLevel(orgUnit)" ng-show="canCreateChild(orgUnit)"/>
+				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getNextLevel(orgUnit)" ng-show="canCreateChild(orgUnit)" ng-click="openCreateForm = true"/>
 			</div>
 			<div class="row">
-			<form name="form" class="form-horizontal" role="form" novalidate ng-show="orgUnit">
+			<form name="form" class="form-horizontal" role="form" novalidate ng-show="orgUnit" ng-hide="openCreateForm">
 				<ul>
 					<li class="form-group">
 						<label for="orgUnitName" class="col-sm-2 control-label">Name</label>
@@ -29,6 +29,9 @@
 						</div>
 					</li>
 				</ul>
+			</form>
+			<form ng-show="openCreateForm">
+				<h3>Create {{getNextLevel(orgUnit)}}</h3>
 			</form>
 			</div>
 		</div>

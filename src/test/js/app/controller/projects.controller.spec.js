@@ -74,6 +74,7 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
 
             expect(mockOrgStore.getAll).toHaveBeenCalled();
             expect(scope.organisationUnits).toEqual(expectedOrgUnitTree);
+            expect(scope.openCreateForm).toEqual(false);
         });
 
         it("should get organization unit level mapping", function() {
@@ -92,11 +93,13 @@ define(["projectsController", "angularMocks", "utils"], function(ProjectsControl
             var orgUnit = {
                 'id': 1
             };
-
+            scope.openCreateForm = true;
             scope.onOrgUnitSelect(orgUnit);
+
             scope.$apply();
 
             expect(scope.orgUnit).toEqual(orgUnit);
+            expect(scope.openCreateForm).toEqual(false);
         });
 
         it("should save organization unit in dhis", function() {
