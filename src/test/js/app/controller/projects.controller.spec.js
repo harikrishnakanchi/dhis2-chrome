@@ -122,6 +122,7 @@ define(["projectsController", "angularMocks", "utils", "lodash"], function(Proje
             expect(projectsService.create).toHaveBeenCalledWith(orgUnit);
             expect(orgUnit.level).toEqual(2);
             expect(orgUnit.shortName).toBe('Org1');
+            expect(orgUnit.id).toBe('a4acf9115a7');
             expect(orgUnit.parent).toEqual(_.pick(parent, "name", "id"));
             expect(scope.saveSuccess).toEqual(true);
         });

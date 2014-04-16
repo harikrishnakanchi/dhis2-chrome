@@ -21,6 +21,7 @@ require.config({
         "angular-ui-modal": "lib/custom/angular-ui-modal/modal",
         "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
         "angular-treeview": "lib/angularjs-directives/src/treeview/angular.treeview",
+        "md5": "lib/js-md5/js/md5",
 
 
         //Controllers

@@ -13,7 +13,8 @@
         "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
         "lodash": null,
         "angularjs-directives": "https://github.com/tw-msf/angularjs-directives.git",
-        "moment": null
+        "moment": null,
+        "js-md5": null
     },
     "devDependencies": {
         "angular-mocks": null

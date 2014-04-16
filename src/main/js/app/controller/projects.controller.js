@@ -1,4 +1,4 @@
-define(["toTree", "lodash"], function(toTree, _) {
+define(["toTree", "lodash", "md5"], function(toTree, _, md5) {
     return function($scope, db, projectsService, $q) {
         $scope.organisationUnits = [];
 
@@ -32,6 +32,7 @@ define(["toTree", "lodash"], function(toTree, _) {
 
         $scope.save = function(orgUnit, parent) {
             orgUnit = _.merge(orgUnit, {
+                'id': md5(orgUnit.name + parent.name).substr(0, 11),
                 'shortName': orgUnit.name,
                 'level': parent.level + 1,
                 'parent': _.pick(parent, "name", "id")
