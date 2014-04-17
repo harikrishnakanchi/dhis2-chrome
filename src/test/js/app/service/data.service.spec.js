@@ -27,6 +27,10 @@ define(["dataService", "angularMocks", "properties"], function(DataService, mock
             spyOn(db, 'objectStore').and.callFake(function() {
                 return dataValuesStore;
             });
+
+            spyOn(dataValuesStore, "upsert").and.callFake(function() {
+                return {};
+            });
         }));
 
         afterEach(function() {
@@ -61,7 +65,7 @@ define(["dataService", "angularMocks", "properties"], function(DataService, mock
             });
         });
 
-        it("should return sucess message if sync was successful", function() {
+        it("should return data values fetched from DHIS", function() {
             var dataValueSet = {
                 dataValues: [{
                     dataElement: "DE_Oedema",
@@ -101,10 +105,45 @@ define(["dataService", "angularMocks", "properties"], function(DataService, mock
             httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?orgUnit=company_0&dataSet=DS_ATFC&startDate=1900-01-01&endDate=2014-04-17").respond(200, dataValueSet);
             httpBackend.flush();
 
-            expect(response).toEqual({
-                message: 'Sync successful.'
-            });
+            expect(response).toEqual(dataValueSet);
         });
 
+        it("should parse and save the fetched data values", function() {
+            var dataValueSet = {
+                dataValues: [{
+                    dataElement: "DE_Oedema",
+                    period: "2014W15",
+                    orgUnit: "company_0",
+                    categoryOptionCombo: "32",
+                    value: "8",
+                    storedBy: "admin",
+                    lastUpdated: "2014-04-17T15:30:56.172+05:30",
+                    followUp: false
+                }, {
+                    dataElement: "DE_Oedema",
+                    period: "2014W15",
+                    orgUnit: "company_0",
+                    categoryOptionCombo: "33",
+                    value: "9",
+                    storedBy: "admin",
+                    lastUpdated: "2014-04-17T15:30:56.580+05:30",
+                    followUp: false
+                }, {
+                    dataElement: "DE_Oedema",
+                    period: "2014W15",
+                    orgUnit: "company_0",
+                    categoryOptionCombo: "34",
+                    value: "1",
+                    storedBy: "admin",
+                    lastUpdated: "2014-04-17T15:30:57.114+05:30",
+                    followUp: false
+                }]
+            };
+            var dataService = new DataService(http, db);
+
+            dataService.parseAndSave(dataValueSet);
+
+            expect(dataValuesStore.upsert).toHaveBeenCalled();
+        });
     });
 });
