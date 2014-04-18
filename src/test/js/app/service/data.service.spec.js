@@ -1,4 +1,4 @@
-define(["dataService", "angularMocks", "properties"], function(DataService, mocks, properties) {
+define(["dataService", "angularMocks", "properties", "moment"], function(DataService, mocks, properties, moment) {
     describe("dataService", function() {
         var httpBackend, http, db;
 
@@ -57,7 +57,8 @@ define(["dataService", "angularMocks", "properties"], function(DataService, mock
                 response = _response;
             });
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?orgUnit=company_0&dataSet=DS_ATFC&startDate=1900-01-01&endDate=2014-04-18").respond(500);
+            var today = moment().format("YYYY-MM-DD");
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?orgUnit=company_0&dataSet=DS_ATFC&startDate=1900-01-01&endDate=" + today).respond(500);
             httpBackend.flush();
 
             expect(response).toEqual({
@@ -102,7 +103,8 @@ define(["dataService", "angularMocks", "properties"], function(DataService, mock
                 response = _response;
             });
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?orgUnit=company_0&dataSet=DS_ATFC&startDate=1900-01-01&endDate=2014-04-18").respond(200, dataValueSet);
+            var today = moment().format("YYYY-MM-DD");
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?orgUnit=company_0&dataSet=DS_ATFC&startDate=1900-01-01&endDate=" + today).respond(200, dataValueSet);
             httpBackend.flush();
 
             expect(response).toEqual(dataValueSet);

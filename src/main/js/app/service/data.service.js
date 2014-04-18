@@ -16,7 +16,7 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
             return {
                 "message": "Error fetching data from server."
             };
-        }
+        };
 
         var saveToIndexedDB = function(payload) {
             var dataValuesStore = db.objectStore("dataValues");
