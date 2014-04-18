@@ -96,7 +96,7 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
 
         var fetchOrganisationUnit = function() {
             var store = db.objectStore("organisationUnits");
-            return store.find("company_0");
+            return store.find("proj_104");
         };
 
         var saveOrganisationUnit = function(orgUnit) {

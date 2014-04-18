@@ -57,7 +57,7 @@ define(["dataService", "angularMocks", "properties"], function(DataService, mock
                 response = _response;
             });
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?orgUnit=company_0&dataSet=DS_ATFC&startDate=1900-01-01&endDate=2014-04-17").respond(500);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?orgUnit=company_0&dataSet=DS_ATFC&startDate=1900-01-01&endDate=2014-04-18").respond(500);
             httpBackend.flush();
 
             expect(response).toEqual({
@@ -102,7 +102,7 @@ define(["dataService", "angularMocks", "properties"], function(DataService, mock
                 response = _response;
             });
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?orgUnit=company_0&dataSet=DS_ATFC&startDate=1900-01-01&endDate=2014-04-17").respond(200, dataValueSet);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?orgUnit=company_0&dataSet=DS_ATFC&startDate=1900-01-01&endDate=2014-04-18").respond(200, dataValueSet);
             httpBackend.flush();
 
             expect(response).toEqual(dataValueSet);

@@ -5,7 +5,7 @@ define(["lodash"], function(_) {
         var dataValues = [];
 
         var getValues = function(dataset) {
-            return dataService.fetch("company_0", dataset).then(successCallback);
+            return dataService.fetch("proj_104", dataset).then(successCallback);
         };
 
         var successCallback = function(response) {
