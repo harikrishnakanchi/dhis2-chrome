@@ -41,7 +41,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
 
             expect(scope.isSyncRunning).toEqual(false);
             expect(scope.isSyncDone).toEqual(true);
-            expect(dataService.get.calls.count()).toBe(5);
+            expect(dataService.get).toHaveBeenCalled();
             expect(dataService.parseAndSave).toHaveBeenCalled();
         });
     });

@@ -1,6 +1,5 @@
 define(["lodash", "properties", "moment"], function(_, properties, moment) {
     return function($http, db) {
-
         this.save = function(payload) {
             return $http.post(properties.dhis.url + '/api/dataValueSets', payload);
         };
@@ -27,22 +26,18 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
             }).then(onSuccess, onError);
         };
 
-        this.parseAndSave = function(dataValueSets) {
-            var periods = _.uniq(_.pluck(dataValueSets, 'period'));
-            _.each(periods, function(period) {
-                var values = _.filter(dataValueSets, {
-                    'period': period
+        this.parseAndSave = function(dataValueSets, orgUnit) {
+            var groupedDataValues = _.groupBy(dataValueSets, 'period');
+            var dataValueSetsAggregator = function(result, dataValues, period) {
+                result.push({
+                    "period": period,
+                    "dataValues": dataValues,
+                    "orgUnit": orgUnit
                 });
-
-                var dataValues = {
-                    period: period,
-                    dataValues: values,
-                    orgUnit: values[0].orgUnit
-                };
-
-                var dataValuesStore = db.objectStore("dataValues");
-                return dataValuesStore.upsert(dataValues);
-            });
+            };
+            var dataValues = _.transform(groupedDataValues, dataValueSetsAggregator, []);
+            var dataValuesStore = db.objectStore("dataValues");
+            return dataValuesStore.upsert(dataValues);
         };
     };
 });

@@ -89,23 +89,24 @@ define(["dataService", "angularMocks", "properties", "moment"], function(DataSer
         });
 
         it("should parse and save the fetched data values", function() {
-            var dataValueSet = {
-                dataValues: [{
-                    dataElement: "DE_Oedema",
-                    period: "2014W15",
-                    orgUnit: "company_0",
-                    categoryOptionCombo: "32",
-                    value: "8",
-                    storedBy: "admin",
-                    lastUpdated: "2014-04-17T15:30:56.172+05:30",
-                    followUp: false
-                }]
-            };
+            var orgUnit = "company_1";
+            var dataValueSet = [{
+                dataElement: "DE_Oedema",
+                period: "2014W15",
+                orgUnit: "company_0",
+                categoryOptionCombo: "32",
+                value: 8,
+                followUp: false
+            }];
             var dataService = new DataService(http, db);
 
-            dataService.parseAndSave(dataValueSet);
+            dataService.parseAndSave(dataValueSet, orgUnit);
 
-            expect(dataValuesStore.upsert).toHaveBeenCalled();
+            expect(dataValuesStore.upsert).toHaveBeenCalledWith([{
+                period: '2014W15',
+                dataValues: dataValueSet,
+                "orgUnit": orgUnit
+            }]);
         });
     });
 });
