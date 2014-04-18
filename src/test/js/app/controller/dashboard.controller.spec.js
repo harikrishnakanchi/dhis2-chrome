@@ -38,7 +38,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
 
             expect(dataService.fetch.calls.count()).toBe(5);
             scope.$digest();
-            expect(scope.message).toEqual("Sync success");
+            expect(scope.message).toEqual("Project data values successfully downloaded.");
             expect(dataService.parseAndSave).toHaveBeenCalled();
         });
 
