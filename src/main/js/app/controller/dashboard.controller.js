@@ -10,7 +10,7 @@ define(["lodash"], function(_) {
 
         var successCallback = function(response) {
             dataValues = dataValues.concat(response.dataValues);
-            $scope.message = "Sync success";
+            $scope.message = "Project data values successfully downloaded.";
         };
 
         $scope.syncNow = function() {
