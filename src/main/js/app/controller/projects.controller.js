@@ -42,7 +42,7 @@ define(["toTree", "lodash", "md5"], function(toTree, _, md5) {
             };
 
             var onError = function() {
-                $scope.saveSuccess = false;
+                $scope.saveFailure = true;
             };
 
             return projectsService.create(orgUnit).then(onSuccess, onError);

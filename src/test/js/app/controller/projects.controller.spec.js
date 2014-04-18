@@ -137,7 +137,7 @@ define(["projectsController", "angularMocks", "utils", "lodash"], function(Proje
             scope.$apply();
 
             expect(projectsService.create).toHaveBeenCalledWith(orgUnit);
-            expect(scope.saveSuccess).toEqual(false);
+            expect(scope.saveFailure).toEqual(true);
         });
 
         it("should get child level", function() {
