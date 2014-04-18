@@ -76,7 +76,7 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
                 $scope.error = true;
             };
 
-            var insertToDhis = function() {
+            var pushToDhis = function() {
                 return dataService.save(payload);
             };
 
@@ -85,7 +85,7 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
                 return dataValuesStore.upsert(payload);
             };
 
-            saveToDb().then(insertToDhis).then(successPromise, errorPromise);
+            saveToDb().then(pushToDhis).then(successPromise, errorPromise);
             scrollToTop();
         };
 

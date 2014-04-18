@@ -8,8 +8,6 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment"], function(da
                 "DE_Oedema": {
                     "32": "3",
                     "33": "12",
-                    "34": "23",
-                    "35": "11"
                 },
                 "DE_MLT115": {
                     "32": "49",
@@ -29,14 +27,6 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment"], function(da
                     "dataElement": "DE_Oedema",
                     "categoryOptionCombo": "33",
                     "value": "12"
-                }, {
-                    "dataElement": "DE_Oedema",
-                    "categoryOptionCombo": "34",
-                    "value": "23"
-                }, {
-                    "dataElement": "DE_Oedema",
-                    "categoryOptionCombo": "35",
-                    "value": "11"
                 }, {
                     "dataElement": "DE_MLT115",
                     "categoryOptionCombo": "32",
