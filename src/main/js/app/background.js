@@ -14,9 +14,7 @@ require(["app/background.config"], function(config) {
             };
 
             window.addEventListener('online', function(e) {
-                console.log("starting sync");
-                metadataSyncService.sync();
-                scheduleSync();
+                syncMetadata();
             });
 
             window.addEventListener('offline', function() {
@@ -31,10 +29,16 @@ require(["app/background.config"], function(config) {
                 });
             });
 
+            var syncMetadata = function() {
+                console.log("starting sync");
+                metadataSyncService.sync();
+                scheduleSync();
+            };
+
             var init = function() {
                 backgroundServicesRegistry.register();
                 if (navigator.onLine)
-                    scheduleSync();
+                    syncMetadata();
             };
 
             init();
