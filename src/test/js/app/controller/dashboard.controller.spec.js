@@ -7,7 +7,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
             scope = $rootScope.$new();
 
             dataService = {
-                "fetch": function(orgUnit, dataset) {},
+                "get": function(orgUnit, dataset) {},
                 "parseAndSave": function() {}
             };
 
@@ -18,7 +18,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
 
         it("should fetch and display all organisation units", function() {
             spyOn(dataService, "parseAndSave");
-            spyOn(dataService, "fetch").and.callFake(function() {
+            spyOn(dataService, "get").and.callFake(function() {
                 return utils.getPromise(q, {
                     dataValues: [{
                         dataElement: "DE_Oedema",
@@ -36,7 +36,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
             scope.$apply();
             scope.syncNow();
 
-            expect(dataService.fetch.calls.count()).toBe(5);
+            expect(dataService.get.calls.count()).toBe(5);
             scope.$digest();
             expect(scope.message).toEqual("Project data values successfully downloaded.");
             expect(dataService.parseAndSave).toHaveBeenCalled();
