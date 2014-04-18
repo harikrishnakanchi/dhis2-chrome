@@ -1,7 +1,5 @@
 define(["lodash"], function(_) {
     return function($scope, $q, dataService) {
-
-        $scope.message = "";
         var dataValues = [];
 
         var getValues = function(dataset) {
@@ -10,11 +8,12 @@ define(["lodash"], function(_) {
 
         var successCallback = function(response) {
             dataValues = dataValues.concat(response.dataValues);
-            $scope.message = "Project data values successfully downloaded.";
+            $scope.isSyncRunning = false;
+            $scope.isSyncDone = true;
         };
 
         $scope.syncNow = function() {
-            $scope.message = "Syncing. Please wait.";
+            $scope.isSyncRunning = true;
             var datasets = ["DS_OPD", "DS_VS", "DS_ITFC", "DS_ATFC", "DS_Physio"];
 
             $q.all(_.map(datasets, function(dataset) {

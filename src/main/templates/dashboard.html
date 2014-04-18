@@ -1,5 +1,7 @@
 <div>
 	<a href="#/data-entry">Data Entry</a>
 	<a href="#/projects">Projects</a>
-	<a href="" ng-click="syncNow()">Download All Data</a>{{message}}
+	<a href="" ng-click="syncNow()">Download All Data</a>
+	<span ng-show="isSyncRunning">{{resourceBundle.syncRunning}}</span>
+	<span ng-show="isSyncDone">{{resourceBundle.syncComplete}}</span>
 </div>

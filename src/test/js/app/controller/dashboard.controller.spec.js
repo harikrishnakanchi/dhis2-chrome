@@ -20,27 +20,29 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
             spyOn(dataService, "parseAndSave");
             spyOn(dataService, "get").and.callFake(function() {
                 return utils.getPromise(q, {
-                    dataValues: [{
-                        dataElement: "DE_Oedema",
-                        period: "2014W15",
-                        orgUnit: "company_0",
-                        categoryOptionCombo: "32",
-                        value: "8",
-                        storedBy: "admin",
-                        lastUpdated: "2014-04-17T15:30:56.172+05:30",
-                        followUp: false
+                    "dataValues": [{
+                        "dataElement": "DE_Oedema",
+                        "period": "2014W15",
+                        "orgUnit": "company_0",
+                        "categoryOptionCombo": "32",
+                        "value": "8",
+                        "storedBy": "admin",
+                        "lastUpdated": "2014-04-17T15:30:56.172+05:30",
+                        "followUp": false
                     }]
                 });
             });
 
-            scope.$apply();
             scope.syncNow();
+            expect(scope.isSyncRunning).toEqual(true);
+            expect(scope.isSyncDone).toEqual(undefined);
 
+            scope.$apply();
+
+            expect(scope.isSyncRunning).toEqual(false);
+            expect(scope.isSyncDone).toEqual(true);
             expect(dataService.get.calls.count()).toBe(5);
-            scope.$digest();
-            expect(scope.message).toEqual("Project data values successfully downloaded.");
             expect(dataService.parseAndSave).toHaveBeenCalled();
         });
-
     });
 });
