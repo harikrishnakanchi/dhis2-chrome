@@ -30,23 +30,29 @@
 						</li>
 					</ul>
 				</form>
-				<form ng-show="openCreateForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
+				<form name="createForm" ng-show="openCreateForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
 					<h3>Create {{getNextLevel(orgUnit)}}</h3>
 					<ul>
 						<li class="form-group">
 							<label for="newOrgUnitName" class="col-sm-2 control-label">Name</label>
 							<div class="col-sm-4" >
 								<input type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required/>
+								<div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
+									<span ng-show="createForm.newOrgUnitName.$error.required"class="errortxt">Name is required.</span>
+								</div>
 							</div>
 						</li>
 						<li class="form-group">
 							<label for="newOrgUnitOpeningDate" class="col-sm-2 control-label">Opening Date</label>
 							<div class="col-sm-4" >
 								<input type="text" class="form-control" name="newOrgUnitOpeningDate" id="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required/>
+								<div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid">
+									<span ng-show="createForm.newOrgUnitOpeningDate.$error.required"class="errortxt">Opening Date is required.</span>
+								</div>
 							</div>
 						</li>
 						<li>
-							<input type="submit" class="btn btn-primary" ng-disabled="form.$invalid" value="Save"/>
+							<input type="submit" class="btn btn-primary" ng-disabled="createForm.$invalid" value="Save"/>
 							<input type="button" class="btn" ng-click="reset()" value="Cancel">
 						</li>
 					</ul>
