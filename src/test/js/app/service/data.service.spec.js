@@ -100,7 +100,7 @@ define(["dataService", "angularMocks", "properties", "moment"], function(DataSer
             }];
             var dataService = new DataService(http, db);
 
-            dataService.parseAndSave(dataValueSet, orgUnit);
+            dataService.saveToDb(dataValueSet, orgUnit);
 
             expect(dataValuesStore.upsert).toHaveBeenCalledWith([{
                 period: '2014W15',

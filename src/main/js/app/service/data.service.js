@@ -26,7 +26,7 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
             }).then(onSuccess, onError);
         };
 
-        this.parseAndSave = function(dataValueSets, orgUnit) {
+        this.saveToDb = function(dataValueSets, orgUnit) {
             var groupedDataValues = _.groupBy(dataValueSets, 'period');
             var dataValueSetsAggregator = function(result, dataValues, period) {
                 result.push({

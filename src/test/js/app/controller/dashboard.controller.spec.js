@@ -8,7 +8,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
 
             dataService = {
                 "get": function(orgUnit, dataset) {},
-                "parseAndSave": function() {}
+                "saveToDb": function() {}
             };
 
             dashboardController = new DashboardController(scope, q, dataService);
@@ -17,7 +17,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
 
 
         it("should fetch and display all organisation units", function() {
-            spyOn(dataService, "parseAndSave");
+            spyOn(dataService, "saveToDb");
             spyOn(dataService, "get").and.callFake(function() {
                 return utils.getPromise(q, {
                     "dataValues": [{
@@ -42,7 +42,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
             expect(scope.isSyncRunning).toEqual(false);
             expect(scope.isSyncDone).toEqual(true);
             expect(dataService.get).toHaveBeenCalled();
-            expect(dataService.parseAndSave).toHaveBeenCalled();
+            expect(dataService.saveToDb).toHaveBeenCalled();
         });
     });
 });

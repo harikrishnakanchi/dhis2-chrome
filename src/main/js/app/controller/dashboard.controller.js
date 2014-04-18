@@ -10,7 +10,7 @@ define(["lodash"], function(_) {
         };
 
         var saveToDb = function(response) {
-            return dataService.parseAndSave(response.dataValues, ORG_UNIT);
+            return dataService.saveToDb(response.dataValues, ORG_UNIT);
         };
 
         $scope.syncNow = function() {
