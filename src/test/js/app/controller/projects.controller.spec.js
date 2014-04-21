@@ -1,7 +1,7 @@
  /*global Date:true*/
  define(["projectsController", "angularMocks", "utils", "lodash"], function(ProjectsController, mocks, utils, _) {
      describe("projects controller", function() {
-         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService, projectsController, parent, location, today, _Date;
+         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService, projectsController, parent, location, today, _Date, todayStr;
          var getOrgUnit = function(id, name, level, parent) {
              return {
                  'id': id,
@@ -72,7 +72,8 @@
              spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
              spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnitLevels));
              _Date = Date;
-             today = new Date();
+             todayStr = "2014-04-01";
+             today = new Date(todayStr);
              Date = function() {
                  return today;
              };
@@ -115,6 +116,7 @@
              expect(scope.state).toEqual({
                  currentNode: child
              });
+             expect(scope.saveSuccess).toEqual(true);
          });
 
          it("should get organization unit level mapping", function() {
@@ -145,7 +147,8 @@
          it("should save organization unit in dhis", function() {
              var orgUnit = {
                  'id': 2,
-                 'name': 'Org1'
+                 'name': 'Org1',
+                 'openingDate': today
              };
              var orgUnitId = 'a4acf9115a7';
              spyOn(mockOrgStore, 'upsert').and.returnValue(utils.getPromise(q, orgUnitId));
@@ -157,13 +160,13 @@
 
              expect(orgUnit.level).toEqual(2);
              expect(orgUnit.shortName).toBe('Org1');
-             expect(orgUnit.id).toBe(orgUnitId);
+             expect(orgUnit.id).toEqual(orgUnitId);
+             expect(orgUnit.openingDate).toEqual(todayStr);
              expect(orgUnit.parent).toEqual(_.pick(parent, "name", "id"));
 
              expect(projectsService.create).toHaveBeenCalledWith(orgUnit);
              expect(mockOrgStore.upsert).toHaveBeenCalledWith(orgUnit);
 
-             expect(scope.saveSuccess).toEqual(true);
              expect(location.hash).toHaveBeenCalledWith(orgUnitId);
          });
 

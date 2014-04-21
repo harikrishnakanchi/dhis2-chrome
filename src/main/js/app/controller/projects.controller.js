@@ -1,4 +1,4 @@
-define(["toTree", "lodash", "md5"], function(toTree, _, md5) {
+define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
     return function($scope, db, projectsService, $q, $location) {
         $scope.organisationUnits = [];
 
@@ -30,6 +30,7 @@ define(["toTree", "lodash", "md5"], function(toTree, _, md5) {
             var transformedOrgUnits = toTree(orgUnits, nodeToBeSelected);
             $scope.organisationUnits = transformedOrgUnits.rootNodes;
             if (transformedOrgUnits.selectedNode) {
+                $scope.saveSuccess = true;
                 $scope.state = {
                     "currentNode": transformedOrgUnits.selectedNode
                 };
@@ -45,7 +46,6 @@ define(["toTree", "lodash", "md5"], function(toTree, _, md5) {
 
         $scope.onOrgUnitSelect = function(orgUnit) {
             $scope.reset();
-            $scope.saveSuccess = $scope.saveFailure = false;
             $scope.orgUnit = orgUnit;
         };
 
@@ -54,11 +54,11 @@ define(["toTree", "lodash", "md5"], function(toTree, _, md5) {
                 'id': md5(orgUnit.name + parent.name).substr(0, 11),
                 'shortName': orgUnit.name,
                 'level': parent.level + 1,
+                'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
                 'parent': _.pick(parent, "name", "id")
             });
 
             var onSuccess = function(data) {
-                $scope.saveSuccess = true;
                 $scope.openCreateForm = false;
                 $location.hash(data);
             };
