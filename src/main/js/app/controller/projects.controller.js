@@ -1,5 +1,5 @@
 define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
-    return function($scope, db, projectsService, $q, $location) {
+    return function($scope, db, projectsService, $q, $location, $timeout) {
         $scope.organisationUnits = [];
 
         $scope.open = function($event) {
@@ -22,6 +22,20 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             return store.getAll();
         };
 
+        var selectCurrentNode = function(transformedOrgUnits) {
+            if (!transformedOrgUnits.selectedNode)
+                return;
+
+            $scope.saveSuccess = true;
+            $timeout(function() {
+                $scope.saveSuccess = false;
+            }, 3000);
+            $scope.state = {
+                "currentNode": transformedOrgUnits.selectedNode
+            };
+            $scope.onOrgUnitSelect(transformedOrgUnits.selectedNode);
+        };
+
         var transformToTree = function(nodeToBeSelected, args) {
             var orgUnits = args[0];
             $scope.orgUnitLevelsMap = _.transform(args[1], function(result, orgUnit) {
@@ -29,13 +43,7 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             }, {});
             var transformedOrgUnits = toTree(orgUnits, nodeToBeSelected);
             $scope.organisationUnits = transformedOrgUnits.rootNodes;
-            if (transformedOrgUnits.selectedNode) {
-                $scope.saveSuccess = true;
-                $scope.state = {
-                    "currentNode": transformedOrgUnits.selectedNode
-                };
-                $scope.onOrgUnitSelect(transformedOrgUnits.selectedNode);
-            }
+            selectCurrentNode(transformedOrgUnits);
         };
 
         var init = function() {

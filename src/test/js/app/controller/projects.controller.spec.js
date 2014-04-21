@@ -1,7 +1,8 @@
  /*global Date:true*/
  define(["projectsController", "angularMocks", "utils", "lodash"], function(ProjectsController, mocks, utils, _) {
      describe("projects controller", function() {
-         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService, projectsController, parent, location, today, _Date, todayStr;
+         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService,
+             projectsController, parent, location, today, _Date, todayStr, timeout;
          var getOrgUnit = function(id, name, level, parent) {
              return {
                  'id': id,
@@ -43,13 +44,14 @@
              'children': [child]
          }];
 
-         beforeEach(mocks.inject(function($rootScope, $q, $location) {
+         beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout) {
              q = $q;
              allOrgUnits = [getOrgUnit(1, 'msf', 1, null), getOrgUnit(2, 'ocp', 2, {
                  id: 1
              })];
              scope = $rootScope.$new();
              location = $location;
+             timeout = $timeout;
              mockOrgStore = {
                  getAll: function() {},
                  upsert: function() {}
@@ -84,7 +86,7 @@
                  'id': 'Id1'
              };
 
-             projectsController = new ProjectsController(scope, db, projectsService, q, location);
+             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout);
          }));
 
          afterEach(function() {
@@ -105,9 +107,8 @@
 
          it("should fetch and select the newly created organization unit", function() {
              spyOn(location, 'hash').and.returnValue(2);
-             projectsController = new ProjectsController(scope, db, projectsService, q, location);
+             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout);
              spyOn(scope, 'onOrgUnitSelect');
-
 
              scope.$apply();
 
@@ -117,6 +118,18 @@
                  currentNode: child
              });
              expect(scope.saveSuccess).toEqual(true);
+         });
+
+         it("should display a timed message after creating a organization unit", function() {
+             spyOn(location, 'hash').and.returnValue(2);
+             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout);
+             spyOn(scope, 'onOrgUnitSelect');
+
+             scope.$apply();
+
+             expect(scope.saveSuccess).toEqual(true);
+             timeout.flush();
+             expect(scope.saveSuccess).toEqual(false);
          });
 
          it("should get organization unit level mapping", function() {

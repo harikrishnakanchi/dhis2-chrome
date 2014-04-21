@@ -2,7 +2,7 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'project
     var init = function(app) {
         app.controller('dashboardController', ['$scope', '$q', 'dataService', dashboardController]);
         app.controller('dataEntryController', ['$scope', '$q', '$indexedDB', 'dataService', '$anchorScroll', '$location', '$modal', dataEntryController]);
-        app.controller('projectsController', ['$scope', '$indexedDB', 'projectsService', '$q', '$location', projectsController]);
+        app.controller('projectsController', ['$scope', '$indexedDB', 'projectsService', '$q', '$location', '$timeout', projectsController]);
         app.controller('mainController', ['$rootScope', 'ngI18nResourceBundle', mainController]);
     };
     return {
