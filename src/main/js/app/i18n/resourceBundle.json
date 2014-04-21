@@ -4,5 +4,9 @@
     "dataSaveFailure": "Error saving data please try again later",
     "chooseWeek": "Please choose a week to enter data.",
     "syncRunning": "Data sync initiated. Please wait.",
-    "syncComplete": "Data sync completed successfully."
+    "syncComplete": "Data sync completed successfully.",
+    "orgUnitSaved": "Organisation unit saved successfully.",
+    "orgUnitFailure": "Error saving Organization unit.",
+    "openingDateValidation": "Opening Date is required.",
+    "nameValidation": "Name is required."
 }

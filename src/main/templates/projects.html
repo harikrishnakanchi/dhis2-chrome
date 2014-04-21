@@ -9,6 +9,7 @@
 			node-label="name"
 			node-children="children"
 			on-node-select="onOrgUnitSelect"
+			state="state"
 			/>
 		</div>
 		<div class="col-md-8">
@@ -16,6 +17,8 @@
 				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getNextLevel(orgUnit)" ng-show="canCreateChild(orgUnit)" ng-click="openCreateForm = true"/>
 			</div>
 			<div class="row">
+				<div ng-show="saveSuccess" class="alert alert-success">{{resourceBundle.orgUnitSaved}}</div>
+				<div ng-show="saveFailure" class="alert alert-danger">{{resourceBundle.orgUnitFailure}}</div>
 				<form name="form" class="form-horizontal" role="form" novalidate ng-hide="openCreateForm || !orgUnit">
 					<ul>
 						<li class="form-group">
@@ -40,7 +43,7 @@
 							<div class="col-sm-4" >
 								<input type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required/>
 								<div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
-									<span ng-show="createForm.newOrgUnitName.$error.required"class="errortxt">Name is required.</span>
+									<span ng-show="createForm.newOrgUnitName.$error.required"class="errortxt">{{resourceBundle.nameValidation}}</span>
 								</div>
 							</div>
 						</li>
@@ -50,12 +53,12 @@
 							<div class="row">
 								<div class="col-md-6">
 									<p class="input-group">
-									<input type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitOpeningDate" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" is-open="opened" max-date="maxDate" close-text="Close"  ng-disabled="true" required/>
+										<input type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitOpeningDate" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" is-open="opened" max-date="maxDate" close-text="Close"  ng-disabled="true" required/>
 										<span class="input-group-btn">
 											<button class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 										</span>
 										<div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid">
-											<span ng-show="createForm.newOrgUnitOpeningDate.$error.required"class="errortxt">Opening Date is required.</span>
+											<span ng-show="createForm.newOrgUnitOpeningDate.$error.required"class="errortxt">{{resourceBundle.openingDateValidation}}</span>
 										</div>
 									</p>
 								</div>

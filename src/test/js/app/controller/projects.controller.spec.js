@@ -1,7 +1,7 @@
  /*global Date:true*/
  define(["projectsController", "angularMocks", "utils", "lodash"], function(ProjectsController, mocks, utils, _) {
      describe("projects controller", function() {
-         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService, projectsController, parent, _Date, today;
+         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService, projectsController, parent, location, today, _Date;
          var getOrgUnit = function(id, name, level, parent) {
              return {
                  'id': id,
@@ -25,30 +25,34 @@
              'name': 'Project'
          }];
 
+         var child = {
+             'id': 2,
+             'name': 'ocp',
+             'level': 2,
+             'parent': {
+                 id: 1
+             },
+             'children': []
+         };
+
          var expectedOrgUnitTree = [{
              'id': 1,
              'name': 'msf',
              'level': 1,
              'parent': null,
-             'children': [{
-                 'id': 2,
-                 'name': 'ocp',
-                 'level': 2,
-                 'parent': {
-                     id: 1
-                 },
-                 'children': []
-             }]
+             'children': [child]
          }];
 
-         beforeEach(mocks.inject(function($rootScope, $q) {
+         beforeEach(mocks.inject(function($rootScope, $q, $location) {
              q = $q;
              allOrgUnits = [getOrgUnit(1, 'msf', 1, null), getOrgUnit(2, 'ocp', 2, {
                  id: 1
              })];
              scope = $rootScope.$new();
+             location = $location;
              mockOrgStore = {
-                 getAll: function() {}
+                 getAll: function() {},
+                 upsert: function() {}
              };
              mockOrgUnitLevelStore = {
                  getAll: function() {}
@@ -67,7 +71,11 @@
              };
              spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
              spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnitLevels));
-             projectsController = new ProjectsController(scope, db, projectsService, q);
+             _Date = Date;
+             today = new Date();
+             Date = function() {
+                 return today;
+             };
 
              parent = {
                  'level': 1,
@@ -75,11 +83,7 @@
                  'id': 'Id1'
              };
 
-             _Date = Date;
-             today = new Date();
-             Date = function() {
-                 return today;
-             };
+             projectsController = new ProjectsController(scope, db, projectsService, q, location);
          }));
 
          afterEach(function() {
@@ -87,11 +91,30 @@
          });
 
          it("should fetch and display all organisation units", function() {
+             spyOn(scope, 'onOrgUnitSelect');
+
              scope.$apply();
 
              expect(mockOrgStore.getAll).toHaveBeenCalled();
              expect(scope.organisationUnits).toEqual(expectedOrgUnitTree);
+             expect(scope.onOrgUnitSelect).not.toHaveBeenCalled();
              expect(scope.openCreateForm).toEqual(false);
+             expect(scope.state).toEqual(undefined);
+         });
+
+         it("should fetch and select the newly created organization unit", function() {
+             spyOn(location, 'hash').and.returnValue(2);
+             projectsController = new ProjectsController(scope, db, projectsService, q, location);
+             spyOn(scope, 'onOrgUnitSelect');
+
+
+             scope.$apply();
+
+             child.selected = true;
+             expect(scope.onOrgUnitSelect).toHaveBeenCalledWith(child);
+             expect(scope.state).toEqual({
+                 currentNode: child
+             });
          });
 
          it("should get organization unit level mapping", function() {
@@ -124,18 +147,24 @@
                  'id': 2,
                  'name': 'Org1'
              };
-
+             var orgUnitId = 'a4acf9115a7';
+             spyOn(mockOrgStore, 'upsert').and.returnValue(utils.getPromise(q, orgUnitId));
              spyOn(projectsService, 'create').and.returnValue(utils.getPromise(q, {}));
+             spyOn(location, 'hash');
 
              scope.save(orgUnit, parent);
              scope.$apply();
 
-             expect(projectsService.create).toHaveBeenCalledWith(orgUnit);
              expect(orgUnit.level).toEqual(2);
              expect(orgUnit.shortName).toBe('Org1');
-             expect(orgUnit.id).toBe('a4acf9115a7');
+             expect(orgUnit.id).toBe(orgUnitId);
              expect(orgUnit.parent).toEqual(_.pick(parent, "name", "id"));
+
+             expect(projectsService.create).toHaveBeenCalledWith(orgUnit);
+             expect(mockOrgStore.upsert).toHaveBeenCalledWith(orgUnit);
+
              expect(scope.saveSuccess).toEqual(true);
+             expect(location.hash).toHaveBeenCalledWith(orgUnitId);
          });
 
          it("should display error if saving organization unit fails", function() {
@@ -199,7 +228,7 @@
          });
 
          it("should give maxDate", function() {
-             expect(scope.maxDate.getTime()).toEqual(today.getTime());
+             expect(scope.maxDate).toEqual(today);
          });
      });
  });
