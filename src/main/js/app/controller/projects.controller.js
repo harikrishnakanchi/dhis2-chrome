@@ -2,8 +2,18 @@ define(["toTree", "lodash", "md5"], function(toTree, _, md5) {
     return function($scope, db, projectsService, $q) {
         $scope.organisationUnits = [];
 
+        $scope.open = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.opened = true;
+        };
+
+        $scope.maxDate = new Date();
+
         $scope.reset = function() {
-            $scope.newOrgUnit = {};
+            $scope.newOrgUnit = {
+                'openingDate': new Date()
+            };
             $scope.openCreateForm = false;
         };
 

@@ -1,3 +1,5 @@
+<script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
+
 <section class="panel tab-panel">
 	<div class="row">
 		<div class="col-md-4">
@@ -42,12 +44,20 @@
 								</div>
 							</div>
 						</li>
+						
 						<li class="form-group">
 							<label for="newOrgUnitOpeningDate" class="col-sm-2 control-label">Opening Date</label>
-							<div class="col-sm-4" >
-								<input type="text" class="form-control" name="newOrgUnitOpeningDate" id="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required/>
-								<div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid">
-									<span ng-show="createForm.newOrgUnitOpeningDate.$error.required"class="errortxt">Opening Date is required.</span>
+							<div class="row">
+								<div class="col-md-6">
+									<p class="input-group">
+									<input type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitOpeningDate" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" is-open="opened" max-date="maxDate" close-text="Close"  ng-disabled="true" required/>
+										<span class="input-group-btn">
+											<button class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+										<div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid">
+											<span ng-show="createForm.newOrgUnitOpeningDate.$error.required"class="errortxt">Opening Date is required.</span>
+										</div>
+									</p>
 								</div>
 							</div>
 						</li>
