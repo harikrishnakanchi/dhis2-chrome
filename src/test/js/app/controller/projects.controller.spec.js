@@ -2,7 +2,7 @@
  define(["projectsController", "angularMocks", "utils", "lodash"], function(ProjectsController, mocks, utils, _) {
      describe("projects controller", function() {
          var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService,
-             projectsController, parent, location, today, _Date, todayStr, timeout;
+             projectsController, parent, location, today, _Date, todayStr, timeout, anchorScroll;
          var getOrgUnit = function(id, name, level, parent) {
              return {
                  'id': id,
@@ -44,7 +44,7 @@
              'children': [child]
          }];
 
-         beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout) {
+         beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout, $anchorScroll) {
              q = $q;
              allOrgUnits = [getOrgUnit(1, 'msf', 1, null), getOrgUnit(2, 'ocp', 2, {
                  id: 1
@@ -85,8 +85,8 @@
                  'name': 'Name1',
                  'id': 'Id1'
              };
-
-             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout);
+             anchorScroll = jasmine.createSpy();
+             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout, anchorScroll);
          }));
 
          afterEach(function() {
@@ -107,7 +107,7 @@
 
          it("should fetch and select the newly created organization unit", function() {
              spyOn(location, 'hash').and.returnValue(2);
-             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout);
+             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout, anchorScroll);
              spyOn(scope, 'onOrgUnitSelect');
 
              scope.$apply();
@@ -122,7 +122,7 @@
 
          it("should display a timed message after creating a organization unit", function() {
              spyOn(location, 'hash').and.returnValue(2);
-             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout);
+             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout, anchorScroll);
              spyOn(scope, 'onOrgUnitSelect');
 
              scope.$apply();
@@ -252,11 +252,14 @@
                  'id': 1
              };
              spyOn(scope, 'reset');
+             spyOn(location, 'hash');
 
              scope.onOrgUnitSelect(orgUnit);
 
+             expect(location.hash).toHaveBeenCalled();
              expect(scope.orgUnit).toEqual(orgUnit);
              expect(scope.reset).toHaveBeenCalled();
+             expect(anchorScroll).toHaveBeenCalled();
          });
 
          it("should reset form", function() {

@@ -1,5 +1,5 @@
 define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
-    return function($scope, db, projectsService, $q, $location, $timeout) {
+    return function($scope, db, projectsService, $q, $location, $timeout, $anchorScroll) {
         $scope.organisationUnits = [];
 
         $scope.open = function($event) {
@@ -53,9 +53,15 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
         };
 
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
+        };
+
         $scope.onOrgUnitSelect = function(orgUnit) {
             $scope.reset();
             $scope.orgUnit = orgUnit;
+            scrollToTop();
         };
 
         $scope.save = function(orgUnit, parent) {
