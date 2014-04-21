@@ -5,8 +5,10 @@
     "chooseWeek": "Please choose a week to enter data.",
     "syncRunning": "Data sync initiated. Please wait.",
     "syncComplete": "Data sync completed successfully.",
-    "orgUnitSaved": "Organisation unit saved successfully.",
-    "orgUnitFailure": "Error saving Organization unit.",
     "openingDateValidation": "Opening Date is required.",
-    "nameValidation": "Name is required."
+    "nameValidation": "Name is required.",
+    "savedProject": "Project created successfully.",
+    "savedCountry": "Country created successfully.",
+    "errorProject": "Error creating Project.",
+    "errorCountry": "Error creating Country."
 }

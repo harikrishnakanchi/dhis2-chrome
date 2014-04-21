@@ -14,11 +14,11 @@
 		</div>
 		<div class="col-md-8">
 			<div class="row">
-				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getNextLevel(orgUnit)" ng-show="canCreateChild(orgUnit)" ng-click="openCreateForm = true"/>
+				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getLevel(orgUnit, 1)" ng-show="canCreateChild(orgUnit)" ng-click="openCreateForm = true"/>
 			</div>
 			<div class="row">
-				<div ng-show="saveSuccess" class="alert alert-success">{{resourceBundle.orgUnitSaved}}</div>
-				<div ng-show="saveFailure" class="alert alert-danger">{{resourceBundle.orgUnitFailure}}</div>
+				<div ng-show="saveSuccess" class="alert alert-success">{{resourceBundle['saved' + getLevel(orgUnit)]}}</div>
+				<div ng-show="saveFailure" class="alert alert-danger">{{resourceBundle['error' + getLevel(orgUnit, 1)]}}</div>
 				<form name="form" class="form-horizontal" role="form" novalidate ng-hide="openCreateForm || !orgUnit">
 					<ul>
 						<li class="form-group">
@@ -36,7 +36,7 @@
 					</ul>
 				</form>
 				<form name="createForm" ng-show="openCreateForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
-					<h3>Create {{getNextLevel(orgUnit)}}</h3>
+					<h3>Create {{getLevel(orgUnit, 1)}}</h3>
 					<ul>
 						<li class="form-group">
 							<label for="newOrgUnitName" class="col-sm-2 control-label">Name</label>

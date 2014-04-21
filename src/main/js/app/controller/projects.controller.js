@@ -14,6 +14,7 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             $scope.newOrgUnit = {
                 'openingDate': new Date()
             };
+            $scope.saveFailure = $scope.saveSuccess = false;
             $scope.openCreateForm = false;
         };
 
@@ -26,14 +27,14 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             if (!transformedOrgUnits.selectedNode)
                 return;
 
-            $scope.saveSuccess = true;
-            $timeout(function() {
-                $scope.saveSuccess = false;
-            }, 3000);
             $scope.state = {
                 "currentNode": transformedOrgUnits.selectedNode
             };
             $scope.onOrgUnitSelect(transformedOrgUnits.selectedNode);
+            $scope.saveSuccess = true;
+            $timeout(function() {
+                $scope.saveSuccess = false;
+            }, 3000);
         };
 
         var transformToTree = function(nodeToBeSelected, args) {
@@ -84,12 +85,13 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
 
         };
 
-        $scope.getNextLevel = function(orgUnit) {
-            return orgUnit ? $scope.orgUnitLevelsMap[orgUnit.level + 1] : undefined;
+        $scope.getLevel = function(orgUnit, depth) {
+            depth = depth || 0;
+            return orgUnit ? $scope.orgUnitLevelsMap[orgUnit.level + depth] : undefined;
         };
 
         $scope.canCreateChild = function(orgUnit) {
-            return _.contains(["Country", "Project"], $scope.getNextLevel(orgUnit));
+            return _.contains(["Country", "Project"], $scope.getLevel(orgUnit, 1));
         };
 
         init();

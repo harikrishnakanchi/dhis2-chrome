@@ -199,16 +199,16 @@
          it("should get child level", function() {
              scope.$apply();
 
-             expect(scope.getNextLevel({
+             expect(scope.getLevel({
                  'level': 1
-             })).toEqual("Operational Center");
-             expect(scope.getNextLevel({
+             }, 1)).toEqual("Operational Center");
+             expect(scope.getLevel({
                  'level': 0
-             })).toEqual("Company");
-             expect(scope.getNextLevel({
+             }, 1)).toEqual("Company");
+             expect(scope.getLevel({
                  'level': 4
-             })).toEqual(undefined);
-             expect(scope.getNextLevel()).toEqual(undefined);
+             }, 1)).toEqual(undefined);
+             expect(scope.getLevel()).toEqual(undefined);
          });
 
          it("should allow user to only create new country or project", function() {
@@ -245,6 +245,30 @@
 
          it("should give maxDate", function() {
              expect(scope.maxDate).toEqual(today);
+         });
+
+         it("should set the organization unit", function() {
+             var orgUnit = {
+                 'id': 1
+             };
+             spyOn(scope, 'reset');
+
+             scope.onOrgUnitSelect(orgUnit);
+
+             expect(scope.orgUnit).toEqual(orgUnit);
+             expect(scope.reset).toHaveBeenCalled();
+         });
+
+         it("should reset form", function() {
+             var newOrgUnit = {
+                 'openingDate': today
+             };
+
+             scope.reset();
+
+             expect(scope.newOrgUnit).toEqual(newOrgUnit);
+             expect(scope.saveSuccess).toEqual(false);
+             expect(scope.saveFailure).toEqual(false);
          });
      });
  });
