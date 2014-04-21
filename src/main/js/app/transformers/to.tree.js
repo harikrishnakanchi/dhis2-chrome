@@ -8,7 +8,7 @@ define(["lodash"], function(_) {
                 var isLegitimateChild = function(item) {
                     return item.parent && item.parent.id === parent.id;
                 };
-                parent.children = _.filter(everyOne, isLegitimateChild);
+                parent.children = _.sortBy(_.filter(everyOne, isLegitimateChild), 'name');
                 return parent;
             };
 
