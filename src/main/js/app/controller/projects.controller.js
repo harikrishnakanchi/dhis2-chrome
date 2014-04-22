@@ -2,11 +2,19 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
     return function($scope, db, projectsService, $q, $location, $timeout, $anchorScroll) {
         $scope.organisationUnits = [];
 
-        $scope.open = function($event) {
+        $scope.openOpeningDate = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
-            $scope.opened = true;
+            $scope.openingDate = true;
         };
+
+        $scope.openEndDate = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.endDate = true;
+        };
+
+
 
         $scope.maxDate = new Date();
 
@@ -64,6 +72,9 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             scrollToTop();
         };
 
+        $scope.showProjectAttribute = function() {
+            return $scope.orgUnit.level === 3;
+        };
         $scope.save = function(orgUnit, parent) {
             orgUnit = _.merge(orgUnit, {
                 'id': md5(orgUnit.name + parent.name).substr(0, 11),

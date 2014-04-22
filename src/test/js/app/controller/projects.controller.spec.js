@@ -157,11 +157,16 @@
              expect(scope.openCreateForm).toEqual(false);
          });
 
-         it("should save organization unit in dhis", function() {
+         it("should save orgUnit in dhis", function() {
              var orgUnit = {
                  'id': 2,
                  'name': 'Org1',
                  'openingDate': today
+             };
+             var parent = {
+                 'level': 2,
+                 'name': 'Name1',
+                 'id': 'Id1'
              };
              var orgUnitId = 'a4acf9115a7';
              spyOn(mockOrgStore, 'upsert').and.returnValue(utils.getPromise(q, orgUnitId));
@@ -171,7 +176,7 @@
              scope.save(orgUnit, parent);
              scope.$apply();
 
-             expect(orgUnit.level).toEqual(2);
+             expect(orgUnit.level).toEqual(3);
              expect(orgUnit.shortName).toBe('Org1');
              expect(orgUnit.id).toEqual(orgUnitId);
              expect(orgUnit.openingDate).toEqual(todayStr);
@@ -182,6 +187,7 @@
 
              expect(location.hash).toHaveBeenCalledWith(orgUnitId);
          });
+
 
          it("should display error if saving organization unit fails", function() {
              var orgUnit = {
@@ -228,7 +234,7 @@
              })).toEqual(false);
          });
 
-         it("should open the datepicker", function() {
+         it("should open the opening date datepicker", function() {
              var event = {
                  preventDefault: function() {},
                  stopPropagation: function() {}
@@ -236,11 +242,28 @@
              spyOn(event, 'preventDefault');
              spyOn(event, 'stopPropagation');
 
-             scope.open(event);
+
+
+             scope.openOpeningDate(event);
 
              expect(event.preventDefault).toHaveBeenCalled();
              expect(event.stopPropagation).toHaveBeenCalled();
-             expect(scope.opened).toBe(true);
+             expect(scope.openingDate).toBe(true);
+         });
+
+         it("should open the end date datepicker", function() {
+             var event = {
+                 preventDefault: function() {},
+                 stopPropagation: function() {}
+             };
+             spyOn(event, 'preventDefault');
+             spyOn(event, 'stopPropagation');
+
+             scope.openEndDate(event);
+
+             expect(event.preventDefault).toHaveBeenCalled();
+             expect(event.stopPropagation).toHaveBeenCalled();
+             expect(scope.endDate).toBe(true);
          });
 
          it("should give maxDate", function() {
@@ -272,6 +295,33 @@
              expect(scope.newOrgUnit).toEqual(newOrgUnit);
              expect(scope.saveSuccess).toEqual(false);
              expect(scope.saveFailure).toEqual(false);
+         });
+
+
+         it("should show project attributes while creating project", function() {
+             var selectedOrgUnit = {
+                 'level': 3
+             };
+             scope.onOrgUnitSelect(selectedOrgUnit);
+             scope.openCreateForm = true;
+
+             scope.$apply();
+
+             expect(scope.showProjectAttribute()).toBe(true);
+
+         });
+
+         it("should not show project attributes while creating country", function() {
+             var selectedOrgUnit = {
+                 'level': 2
+             };
+             scope.onOrgUnitSelect(selectedOrgUnit);
+             scope.openCreateForm = true;
+
+             scope.$apply();
+
+             expect(scope.showProjectAttribute()).toBe(false);
+
          });
      });
  });
