@@ -16,6 +16,8 @@
 			<div class="row">
 				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getLevel(orgUnit, 1)" ng-show="canCreateChild(orgUnit)" ng-click="openCreateForm = true"/>
 			</div>
+			<div ng-include="'templates/partials/create-project.html'">
+			</div>
 			<div class="row">
 				<div ng-show="saveSuccess" class="alert alert-success">{{resourceBundle['saved' + getLevel(orgUnit)]}}</div>
 				<div ng-show="saveFailure" class="alert alert-danger">{{resourceBundle['error' + getLevel(orgUnit, 1)]}}</div>

@@ -1,8 +1,8 @@
  /*global Date:true*/
- define(["projectsController", "angularMocks", "utils", "lodash"], function(ProjectsController, mocks, utils, _) {
+ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnitController, mocks, utils, _) {
      describe("projects controller", function() {
          var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService,
-             projectsController, parent, location, today, _Date, todayStr, timeout, anchorScroll;
+             orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll;
          var getOrgUnit = function(id, name, level, parent) {
              return {
                  'id': id,
@@ -92,7 +92,7 @@
                  'id': 'Id1'
              };
              anchorScroll = jasmine.createSpy();
-             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout, anchorScroll);
+             orgUnitContoller = new OrgUnitController(scope, db, projectsService, q, location, timeout, anchorScroll);
          }));
 
          afterEach(function() {
@@ -113,7 +113,7 @@
 
          it("should fetch and select the newly created organization unit", function() {
              spyOn(location, 'hash').and.returnValue(2);
-             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout, anchorScroll);
+             orgUnitContoller = new OrgUnitController(scope, db, projectsService, q, location, timeout, anchorScroll);
              spyOn(scope, 'onOrgUnitSelect');
 
              scope.$apply();
@@ -128,7 +128,7 @@
 
          it("should display a timed message after creating a organization unit", function() {
              spyOn(location, 'hash').and.returnValue(2);
-             projectsController = new ProjectsController(scope, db, projectsService, q, location, timeout, anchorScroll);
+             orgUnitContoller = new OrgUnitController(scope, db, projectsService, q, location, timeout, anchorScroll);
              spyOn(scope, 'onOrgUnitSelect');
 
              scope.$apply();
