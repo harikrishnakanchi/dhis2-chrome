@@ -366,16 +366,17 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             })).toEqual(false);
         });
 
-        it("should set template url", function() {
+        it("should set template url for module", function() {
             var orgUnit = {
                 'id': 'something',
-                'level': 2
+                'level': 4
             };
 
             scope.$apply();
-            scope.setTemplateUrl(orgUnit, true, 1);
-            expect(scope.templateUrl).toEqual('templates/partials/project-form.html');
+            scope.setTemplateUrl(orgUnit, true, 2);
+            expect(scope.templateUrl).toEqual('templates/partials/module-form.html');
             expect(scope.isEditMode).toEqual(true);
         });
+
     });
 });
