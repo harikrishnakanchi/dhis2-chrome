@@ -17,7 +17,8 @@
         "karma-jasmine": "0.2.0",
         "karma-requirejs": "*",
         "karma-chrome-launcher": "*",
-        "karma-coverage": "*"
+        "karma-coverage": "*",
+        "protractor": "*"
     },
     "name": "DHIS2-Chrome-App",
     "version": "0.0.1"
