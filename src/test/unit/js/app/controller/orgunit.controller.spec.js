@@ -165,50 +165,6 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             expect(scope.openCreateForm).toEqual(false);
         });
 
-        it("should save orgUnit in dhis", function() {
-            var orgUnit = {
-                'id': 2,
-                'name': 'Org1',
-                'openingDate': today
-            };
-            var parent = {
-                'level': 2,
-                'name': 'Name1',
-                'id': 'Id1'
-            };
-            var orgUnitId = 'a4acf9115a7';
-            spyOn(mockOrgStore, 'upsert').and.returnValue(utils.getPromise(q, orgUnitId));
-            spyOn(projectsService, 'create').and.returnValue(utils.getPromise(q, {}));
-            spyOn(location, 'hash');
-
-            scope.save(orgUnit, parent);
-            scope.$apply();
-
-            expect(orgUnit.level).toEqual(3);
-            expect(orgUnit.shortName).toBe('Org1');
-            expect(orgUnit.id).toEqual(orgUnitId);
-            expect(orgUnit.openingDate).toEqual(todayStr);
-            expect(orgUnit.parent).toEqual(_.pick(parent, "name", "id"));
-
-            expect(projectsService.create).toHaveBeenCalledWith(orgUnit);
-            expect(mockOrgStore.upsert).toHaveBeenCalledWith(orgUnit);
-
-            expect(location.hash).toHaveBeenCalledWith(orgUnitId);
-        });
-
-
-        it("should display error if saving organization unit fails", function() {
-            var orgUnit = {
-                'id': 1
-            };
-            spyOn(projectsService, 'create').and.returnValue(utils.getRejectedPromise(q, {}));
-
-            scope.save(orgUnit, parent);
-            scope.$apply();
-
-            expect(projectsService.create).toHaveBeenCalledWith(orgUnit);
-            expect(scope.saveFailure).toEqual(true);
-        });
 
         it("should get child level", function() {
             scope.$apply();
@@ -254,38 +210,6 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             })).toEqual(false);
         });
 
-        it("should open the opening date datepicker", function() {
-            var event = {
-                preventDefault: function() {},
-                stopPropagation: function() {}
-            };
-            spyOn(event, 'preventDefault');
-            spyOn(event, 'stopPropagation');
-
-
-
-            scope.openOpeningDate(event);
-
-            expect(event.preventDefault).toHaveBeenCalled();
-            expect(event.stopPropagation).toHaveBeenCalled();
-            expect(scope.openingDate).toBe(true);
-        });
-
-        it("should open the end date datepicker", function() {
-            var event = {
-                preventDefault: function() {},
-                stopPropagation: function() {}
-            };
-            spyOn(event, 'preventDefault');
-            spyOn(event, 'stopPropagation');
-
-            scope.openEndDate(event);
-
-            expect(event.preventDefault).toHaveBeenCalled();
-            expect(event.stopPropagation).toHaveBeenCalled();
-            expect(scope.endDate).toBe(true);
-        });
-
         it("should give maxDate", function() {
             expect(scope.maxDate).toEqual(today);
         });
@@ -318,30 +242,6 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             expect(scope.saveFailure).toEqual(false);
         });
 
-
-        it("should show project attributes while creating project", function() {
-            var selectedOrgUnit = {
-                'level': 3
-            };
-            scope.openCreateForm = true;
-
-            scope.$apply();
-            scope.onOrgUnitSelect(selectedOrgUnit);
-            expect(scope.showProjectAttribute()).toBe(true);
-
-        });
-
-        it("should not show project attributes while creating country", function() {
-            var selectedOrgUnit = {
-                'level': 2
-            };
-            scope.openCreateForm = true;
-            scope.$apply();
-
-            scope.onOrgUnitSelect(selectedOrgUnit);
-            expect(scope.showProjectAttribute()).toBe(false);
-
-        });
 
         it("should get true if multiple child types are allowed", function() {
             scope.$apply();

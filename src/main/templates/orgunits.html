@@ -14,15 +14,13 @@
 		</div>
 		<div class="col-md-8">
 			<div class="row">
-				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getLevel(orgUnit, 1)" ng-show="canCreateChild(orgUnit)" ng-click="openCreateForm = true"/>
+				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getLevel(orgUnit, 1)" ng-show="canCreateChild(orgUnit)" ng-click="setTemplateUrl(orgUnit, true, 1)"/>
 				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getLevel(orgUnit, 2)" ng-show="canCreateMulitpleChildType(orgUnit)" ng-click="setTemplateUrl(orgUnit, true, 2)"/>
 			</div>
 			<div ng-include="templateUrl">
 			</div>
 			<div class="row">
-				<div ng-show="saveSuccess" class="alert alert-success">{{resourceBundle['saved' + getLevel(orgUnit)]}}</div>
-				<div ng-show="saveFailure" class="alert alert-danger">{{resourceBundle['error' + getLevel(orgUnit, 1)]}}</div>
-				<form name="form" class="form-horizontal" role="form" novalidate ng-hide="openCreateForm || !orgUnit">
+				<form name="form" class="form-horizontal" ng-show="!isEditMode" role="form" novalidate ng-hide="openCreateForm || !orgUnit">
 					<ul>
 						<li class="form-group">
 							<label for="orgUnitName" class="col-sm-2 control-label">Name</label>
@@ -37,109 +35,7 @@
 							</div>
 						</li>
 					</ul>
-				</form>
-				<form name="createForm" ng-show="openCreateForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
-					<h3>Create {{getLevel(orgUnit, 1)}}</h3>
-					<ul>
-						<li class="form-group">
-							<label for="newOrgUnitName" class="col-sm-2 control-label">Name</label>
-							<div class="col-sm-4" >
-								<input type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required/>
-								<div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
-									<span ng-show="createForm.newOrgUnitName.$error.required"class="errortxt">{{resourceBundle.nameValidation}}</span>
-								</div>
-							</div>
-						</li>
-
-						<li class="form-group" ng-if="showProjectAttribute()">
-							<label for="newOrgUnitLocation" class="col-sm-2 control-label">Location</label>
-							<div class="col-sm-4" >
-								<input type="text" class="form-control" name="newOrgUnitLocation" id="newOrgUnitLocation" ng-model="newOrgUnit.location" required/>
-								<div ng-show="createForm.newOrgUnitLocation.$dirty &amp;&amp; createForm.newOrgUnitLocation.$invalid">
-									<span ng-show="createForm.newOrgUnitLocation.$error.required"class="errortxt">{{resourceBundle.locationValidation}}</span>
-								</div>
-							</div>
-						</li>
-
-						<li class="form-group" ng-if="showProjectAttribute()">
-							<label for="newOrgUnitProjectType" class="col-sm-2 control-label">Type of project</label>
-							<div class="col-sm-4" >
-								<input type="text" class="form-control" name="newOrgUnitProjectType" id="newOrgUnitProjectType" ng-model="newOrgUnit.projectType" required/>
-								<div ng-show="createForm.newOrgUnitProjectType.$dirty &amp;&amp; createForm.newOrgUnitProjectType.$invalid">
-									<span ng-show="createForm.newOrgUnitProjectType.$error.required"class="errortxt">{{resourceBundle.projectTypeValidation}}</span>
-								</div>
-							</div>
-						</li>
-
-						<li class="form-group" ng-if="showProjectAttribute()">
-							<label for="newOrgUnitContext" class="col-sm-2 control-label">Context</label>
-							<div class="col-sm-4" >
-								<input type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" required/>
-								<div ng-show="createForm.newOrgUnitContext.$dirty &amp;&amp; createForm.newOrgUnitContext.$invalid">
-									<span ng-show="createForm.newOrgUnitContext.$error.required"class="errortxt">{{resourceBundle.contextValidation}}</span>
-								</div>
-							</div>
-						</li>
-
-						<li class="form-group" ng-if="showProjectAttribute()">
-							<label for="newOrgUnitConDays" class="col-sm-2 control-label">No of consultation days per week</label>
-							<div class="col-sm-4" >
-								<input type="text" class="form-control" name="newOrgUnitConDays" id="newOrgUnitConDays" ng-model="newOrgUnit.consultDays" required/>
-								<div ng-show="createForm.newOrgUnitConDays.$dirty &amp;&amp; createForm.newOrgUnitConDays.$invalid">
-									<span ng-show="createForm.newOrgUnitConDays.$error.required"class="errortxt">{{resourceBundle.consultDaysValidation}}</span>
-								</div>
-							</div>
-						</li>
-
-						<li class="form-group" ng-if="showProjectAttribute()">
-							<label for="newOrgUnitPopType" class="col-sm-2 control-label">Type of population</label>
-							<div class="col-sm-4" >
-								<input type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" required/>
-								<div ng-show="createForm.newOrgUnitPopType.$dirty &amp;&amp; createForm.newOrgUnitPopType.$invalid">
-									<span ng-show="createForm.newOrgUnitPopType.$error.required"class="errortxt">{{resourceBundle.populationTypeValidation}}</span>
-								</div>
-							</div>
-						</li>
-						
-						<li class="form-group">
-							<label for="newOrgUnitOpeningDate" class="col-sm-2 control-label">Opening Date</label>
-							<div class="row">
-								<div class="col-md-6">
-									<p class="input-group">
-										<input type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitOpeningDate" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" is-open="openingDate" max-date="maxDate" close-text="Close"  ng-disabled="true" required/>
-										<span class="input-group-btn">
-											<button class="btn btn-default" ng-click="openOpeningDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
-										</span>
-										<div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid">
-											<span ng-show="createForm.newOrgUnitOpeningDate.$error.required"class="errortxt">{{resourceBundle.openingDateValidation}}</span>
-										</div>
-									</p>
-								</div>
-							</div>
-						</li>
-
-						<li class="form-group" ng-if="showProjectAttribute()">
-							<label for="newOrgUnitEndDate" class="col-sm-2 control-label">End Date</label>
-							<div class="row">
-								<div class="col-md-6">
-									<p class="input-group">
-										<input type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitEndDate" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate" is-open="endDate" max-date="maxDate" close-text="Close"  ng-disabled="true" required/>
-										<span class="input-group-btn">
-											<button class="btn btn-default" ng-click="openEndDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
-										</span>
-										<div ng-show="createForm.newOrgUnitEndDate.$dirty &amp;&amp; createForm.newOrgUnitEndDate.$invalid">
-											<span ng-show="createForm.newOrgUnitEndDate.$error.required"class="errortxt">{{resourceBundle.endDateValidation}}</span>
-										</div>
-									</p>
-								</div>
-							</div>
-						</li>
-						<li>
-							<input type="submit" class="btn btn-primary" ng-disabled="createForm.$invalid" value="Save"/>
-							<input type="button" class="btn" ng-click="reset()" value="Cancel">
-						</li>
-					</ul>
-				</form>
+				</form>				
 			</div>
 		</div>
 	</div>

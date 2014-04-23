@@ -32,6 +32,7 @@ require.config({
         "dataEntryController": "app/controller/data.entry.controller",
         "orgUnitContoller": "app/controller/orgunit.controller",
         "mainController": "app/controller/main.controller",
+        "projectController": "app/controller/project.controller",
 
         //Directives
         "directives": "app/directive/directives",

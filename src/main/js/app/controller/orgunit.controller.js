@@ -4,23 +4,11 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             'Company': 'templates/partials/project-form.html',
             'Operational Center': 'templates/partials/project-form.html',
             'Country': 'templates/partials/project-form.html',
-            'Project': 'templates/partials/project-form.html',
-            'Module': 'templates/partials/module-form.html'
+            'Module': 'templates/partials/module-form.html',
+            'Project': 'templates/partials/create-project.html'
         };
 
         $scope.organisationUnits = [];
-
-        $scope.openOpeningDate = function($event) {
-            $event.preventDefault();
-            $event.stopPropagation();
-            $scope.openingDate = true;
-        };
-
-        $scope.openEndDate = function($event) {
-            $event.preventDefault();
-            $event.stopPropagation();
-            $scope.endDate = true;
-        };
 
         $scope.maxDate = new Date();
 
@@ -79,36 +67,6 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             scrollToTop();
         };
 
-        $scope.showProjectAttribute = function() {
-            return ($scope.orgUnit !== undefined && $scope.orgUnit.level === 3);
-        };
-        $scope.save = function(orgUnit, parent) {
-            orgUnit = _.merge(orgUnit, {
-                'id': md5(orgUnit.name + parent.name).substr(0, 11),
-                'shortName': orgUnit.name,
-                'level': parent.level + 1,
-                'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
-                'parent': _.pick(parent, "name", "id")
-            });
-
-            var onSuccess = function(data) {
-                $scope.openCreateForm = false;
-                $location.hash(data);
-            };
-
-            var onError = function() {
-                $scope.saveFailure = true;
-            };
-
-            var saveToDb = function() {
-                var store = db.objectStore("organisationUnits");
-                return store.upsert(orgUnit);
-            };
-
-            return projectsService.create(orgUnit).then(saveToDb).then(onSuccess, onError);
-
-        };
-
         $scope.getLevel = function(orgUnit, depth) {
             depth = depth || 0;
             var level = orgUnit ? $scope.orgUnitLevelsMap[orgUnit.level + depth] : undefined;
@@ -123,13 +81,9 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             return $scope.canCreateChild(orgUnit) && $scope.getLevel(orgUnit) === 'Project';
         };
 
-        $scope.setTemplateUrl = function(orgUnit, isEditMode, orgLevel) {
-            parentOrgUnit = _.cloneDeep($scope.orgUnit);
-            $scope.orgUnit = isEditMode ? {
-                'openingDate': new Date()
-            } : orgUnit;
-            orgLevel = orgLevel || 0;
-            var level = $scope.getLevel(orgUnit, orgLevel);
+        $scope.setTemplateUrl = function(orgUnit, isEditMode, depth) {
+            depth = depth || 0;
+            var level = $scope.getLevel(orgUnit, depth);
             $scope.templateUrl = templateUrlMap[level];
             $scope.isEditMode = isEditMode;
         };
