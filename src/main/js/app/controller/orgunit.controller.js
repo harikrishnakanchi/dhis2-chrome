@@ -1,5 +1,12 @@
 define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
     return function($scope, db, projectsService, $q, $location, $timeout, $anchorScroll) {
+        var templateUrlMap = {
+            'Company': 'templates/partials/project-form.html',
+            'Operational Center': 'templates/partials/project-form.html',
+            'Country': 'templates/partials/project-form.html',
+            'Project': 'templates/partials/project-form.html'
+        };
+
         $scope.organisationUnits = [];
 
         $scope.openOpeningDate = function($event) {
@@ -67,6 +74,7 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
         $scope.onOrgUnitSelect = function(orgUnit) {
             $scope.reset();
             $scope.orgUnit = orgUnit;
+            $scope.setTemplateUrl(orgUnit, false);
             scrollToTop();
         };
 
@@ -112,6 +120,17 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
 
         $scope.canCreateMulitpleChildType = function(orgUnit) {
             return $scope.canCreateChild(orgUnit) && $scope.getLevel(orgUnit) === 'Project';
+        };
+
+        $scope.setTemplateUrl = function(orgUnit, isEditMode, orgLevel) {
+            parentOrgUnit = _.cloneDeep($scope.orgUnit);
+            $scope.orgUnit = isEditMode ? {
+                'openingDate': new Date()
+            } : orgUnit;
+            orgLevel = orgLevel || 0;
+            var level = $scope.getLevel(orgUnit, orgLevel);
+            $scope.templateUrl = templateUrlMap[level];
+            $scope.isEditMode = isEditMode;
         };
 
         init();

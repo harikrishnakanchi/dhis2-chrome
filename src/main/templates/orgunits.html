@@ -15,7 +15,7 @@
 		<div class="col-md-8">
 			<div class="row">
 				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getLevel(orgUnit, 1)" ng-show="canCreateChild(orgUnit)" ng-click="openCreateForm = true"/>
-				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getLevel(orgUnit, 2)" ng-show="canCreateMulitpleChildType(orgUnit)" ng-click="openCreateForm = true"/>
+				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getLevel(orgUnit, 2)" ng-show="canCreateMulitpleChildType(orgUnit)" ng-click="goTo('/{{getLevel(orgUnit)}}/edit')"/>
 			</div>
 			<div ng-include="'templates/partials/create-project.html'">
 			</div>
