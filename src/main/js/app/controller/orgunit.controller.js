@@ -4,8 +4,9 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             'Company': 'templates/partials/project-form.html',
             'Operational Center': 'templates/partials/project-form.html',
             'Country': 'templates/partials/project-form.html',
+            'Project': 'templates/partials/create-project.html',
             'Module': 'templates/partials/module-form.html',
-            'Project': 'templates/partials/create-project.html'
+            'Operation Unit': 'templates/partials/op-unit-form.html'
         };
 
         $scope.organisationUnits = [];

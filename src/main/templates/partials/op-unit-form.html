@@ -1,0 +1,42 @@
+<div class="panel panel-default" ng-controller="opUnitController">
+    <div class="panel-heading">
+        <h3 class="panel-title">Project name</h3>
+        <div class="actions">
+            <button class="btn btn-add btn-xs" ng-click="addOpUnits()">Add Operation Unit</button>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <form name="form" class="form-horizontal" role="form">
+            <div class="well" ng-repeat="opUnit in opUnits">
+                <button class="btn-delete" ng-hide="$first" ng-click="delete($index)">X Delete</button>
+                <ul>
+                    <li>
+                        <label for="opUnitType" class="col-sm-4 col-md-4 control-label">Add Operation unit</label>
+                        <div class="col-sm-8 col-md-8 form-inline">
+                            <div class="radio-inline">
+                                <label for="hospital"> <input type="radio" name="opUnitType" ng-model="opUnit.type" id="hospital" value="Hospital" required> Hospital </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label for="healthcenter"> <input type="radio" name="opUnitType" ng-model="opUnit.type" id="healthcenter" value="Health Center" required> Health Center </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label for="community"> <input type="radio" name="opUnitType" ng-model="opUnit.type" id="community" value="Community" required> Community </label>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <label for="opUnitName" class="col-sm-4 col-md-4 control-label">Name of the unit</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="opUnitName" id="opUnitName" placeholder="Operation Unit Name" ng-model="opUnit.name" required>
+                            <div ng-show="form.opUnitName.$dirty &amp;&amp; form.opUnitName.$invalid">
+                                <span ng-show="form.opUnitName.$error.required" class="errortxt">{{resourceBundle.nameValidation}}</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <button class="btn btn-main pull-right" ng-click="save(opUnits)" ng-disabled="form.$invalid">Save</button>
+        </form>
+    </div>
+</div>

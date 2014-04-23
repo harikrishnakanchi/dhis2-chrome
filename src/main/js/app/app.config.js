@@ -31,6 +31,8 @@ require.config({
         "dashboardController": "app/controller/dashboard.controller",
         "dataEntryController": "app/controller/data.entry.controller",
         "orgUnitContoller": "app/controller/orgunit.controller",
+        "opUnitController": "app/controller/opunit.controller",
+        "moduleController": "app/controller/module.controller",
         "mainController": "app/controller/main.controller",
         "projectController": "app/controller/project.controller",
 
