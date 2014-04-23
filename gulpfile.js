@@ -3,7 +3,9 @@ var karma = require('gulp-karma');
 var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
+var shell = require('gulp-shell');
 var argv = require('yargs').argv;
+
 
 var karmaConf = 'src/test/unit/conf/karma.conf.js';
 
@@ -16,6 +18,14 @@ gulp.task('test', function() {
             throw err;
         });
 });
+
+gulp.task('update-webdriver', shell.task([
+    './node_modules/protractor/bin/webdriver-manager update'
+]));
+
+gulp.task('functional-test', ['update-webdriver'], shell.task([
+    './node_modules/protractor/bin/protractor ./src/test/functional/protractor.conf.js'
+]));
 
 gulp.task('devtest', function() {
     return gulp.src('_')

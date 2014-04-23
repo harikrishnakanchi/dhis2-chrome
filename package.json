@@ -11,6 +11,7 @@
         "yargs": "*",
         "gulp-less": "~1.2.3",
         "gulp-util": "*",
+        "gulp-shell": "*",
         "path": "~0.4.9",
         "watch": "~0.9.0",
 
