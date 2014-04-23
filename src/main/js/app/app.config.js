@@ -35,6 +35,7 @@ require.config({
         "moduleController": "app/controller/module.controller",
         "mainController": "app/controller/main.controller",
         "projectController": "app/controller/project.controller",
+        "loginController": "app/controller/login.controller",
 
         //Directives
         "directives": "app/directive/directives",

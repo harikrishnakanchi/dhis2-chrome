@@ -17,6 +17,10 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
                         templateUrl: 'templates/dashboard.html',
                         controller: 'dashboardController'
                     }).
+                    when('/login', {
+                        templateUrl: 'templates/login.html',
+                        controller: 'loginController'
+                    }).
                     when('/data-entry', {
                         templateUrl: 'templates/data-entry.html',
                         controller: 'dataEntryController'
@@ -51,9 +55,14 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
                 supportedLocales: ['en', 'es'],
                 basePath: "/js/app/i18n"
             });
-            app.run(['metadataService',
-                function(metadataService) {
+            app.run(['metadataService', '$rootScope', '$location',
+                function(metadataService, $rootScope, $location) {
                     metadataService.loadMetadata();
+                    $rootScope.$on('$routeChangeStart', function(e, newUrl, oldUrl) {
+                        if (!$rootScope.isLoggedIn) {
+                            $location.path("/login");
+                        }
+                    });
                 }
             ]);
             return app;

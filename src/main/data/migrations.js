@@ -31,5 +31,17 @@ define([], function() {
         create_data_store(syncable_types, db);
     };
 
-    return [add_object_stores, change_log_stores, add_organisation_units_and_level_store, create_datavalues_store];
+    var add_users_store = function(db, tx) {
+        create_store_with_key("users", "username", db);
+    };
+
+    var add_admin_user = function(db, tx) {
+        var userStore = tx.objectStore("users");
+        userStore.add({
+            'username': 'admin',
+            'password': '161ebd7d45089b3446ee4e0d86dbcf92'
+        });
+    };
+
+    return [add_object_stores, change_log_stores, add_organisation_units_and_level_store, create_datavalues_store, add_users_store, add_admin_user];
 });

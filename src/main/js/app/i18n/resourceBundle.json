@@ -16,5 +16,6 @@
     "savedProject": "Project created successfully.",
     "savedCountry": "Country created successfully.",
     "errorProject": "Error creating Project.",
-    "errorCountry": "Error creating Country."
+    "errorCountry": "Error creating Country.",
+    "loginFailed": "Invalid Credentials."
 }

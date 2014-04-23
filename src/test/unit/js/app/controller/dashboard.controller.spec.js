@@ -12,7 +12,6 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
             };
 
             dashboardController = new DashboardController(scope, q, dataService);
-
         }));
 
 
