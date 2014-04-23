@@ -1,6 +1,5 @@
 var gulp = require('gulp');
 var karma = require('gulp-karma');
-var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var shell = require('gulp-shell');
