@@ -2,12 +2,13 @@
 	<div ng-show="saveSuccess" class="alert alert-success">{{ resourceBundle.savedProject }}</div>
 	<div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
 	<form name="createForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
-		<h3>Create Project</h3>
+		<h3 ng-if="isEditMode" >Create Project</h3>
+		<h3 ng-if="!isEditMode" >{{ newOrgUnit.name }}</h3>
 		<ul>
-			<li class="form-group">
+			<li ng-if="isEditMode" class="form-group">
 				<label for="newOrgUnitName" class="col-sm-2 control-label">Name</label>
 				<div class="col-sm-4" >
-					<input type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required/>
+					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required/>
 					<div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
 						<span ng-show="createForm.newOrgUnitName.$error.required"class="errortxt">{{resourceBundle.nameValidation}}</span>
 					</div>
@@ -16,7 +17,7 @@
 			<li class="form-group">
 				<label for="newOrgUnitLocation" class="col-sm-2 control-label">Location</label>
 				<div class="col-sm-4" >
-					<input type="text" class="form-control" name="newOrgUnitLocation" id="newOrgUnitLocation" ng-model="newOrgUnit.location" required/>
+					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitLocation" id="newOrgUnitLocation" ng-model="newOrgUnit.location" required/>
 					<div ng-show="createForm.newOrgUnitLocation.$dirty &amp;&amp; createForm.newOrgUnitLocation.$invalid">
 						<span ng-show="createForm.newOrgUnitLocation.$error.required"class="errortxt">{{resourceBundle.locationValidation}}</span>
 					</div>
@@ -25,7 +26,7 @@
 			<li class="form-group">
 				<label for="newOrgUnitProjectType" class="col-sm-2 control-label">Type of project</label>
 				<div class="col-sm-4" >
-					<input type="text" class="form-control" name="newOrgUnitProjectType" id="newOrgUnitProjectType" ng-model="newOrgUnit.projectType" required/>
+					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitProjectType" id="newOrgUnitProjectType" ng-model="newOrgUnit.projectType" required/>
 					<div ng-show="createForm.newOrgUnitProjectType.$dirty &amp;&amp; createForm.newOrgUnitProjectType.$invalid">
 						<span ng-show="createForm.newOrgUnitProjectType.$error.required"class="errortxt">{{resourceBundle.projectTypeValidation}}</span>
 					</div>
@@ -34,7 +35,7 @@
 			<li class="form-group">
 				<label for="newOrgUnitContext" class="col-sm-2 control-label">Context</label>
 				<div class="col-sm-4" >
-					<input type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" required/>
+					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" required/>
 					<div ng-show="createForm.newOrgUnitContext.$dirty &amp;&amp; createForm.newOrgUnitContext.$invalid">
 						<span ng-show="createForm.newOrgUnitContext.$error.required"class="errortxt">{{resourceBundle.contextValidation}}</span>
 					</div>
@@ -43,7 +44,7 @@
 			<li class="form-group">
 				<label for="newOrgUnitConDays" class="col-sm-2 control-label">No of consultation days per week</label>
 				<div class="col-sm-4" >
-					<input type="text" class="form-control" name="newOrgUnitConDays" id="newOrgUnitConDays" ng-model="newOrgUnit.consultDays" required/>
+					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitConDays" id="newOrgUnitConDays" ng-model="newOrgUnit.consultDays" required/>
 					<div ng-show="createForm.newOrgUnitConDays.$dirty &amp;&amp; createForm.newOrgUnitConDays.$invalid">
 						<span ng-show="createForm.newOrgUnitConDays.$error.required"class="errortxt">{{resourceBundle.consultDaysValidation}}</span>
 					</div>
@@ -52,7 +53,7 @@
 			<li class="form-group">
 				<label for="newOrgUnitPopType" class="col-sm-2 control-label">Type of population</label>
 				<div class="col-sm-4" >
-					<input type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" required/>
+					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" required/>
 					<div ng-show="createForm.newOrgUnitPopType.$dirty &amp;&amp; createForm.newOrgUnitPopType.$invalid">
 						<span ng-show="createForm.newOrgUnitPopType.$error.required"class="errortxt">{{resourceBundle.populationTypeValidation}}</span>
 					</div>
@@ -64,7 +65,7 @@
 				<div class="row">
 					<div class="col-md-6">
 						<p class="input-group">
-						<input type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitOpeningDate" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" is-open="openingDate" max-date="maxDate" close-text="Close" required/>
+						<input ng-disabled="!isEditMode" type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitOpeningDate" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" is-open="openingDate" max-date="maxDate" close-text="Close" required/>
 						<span class="input-group-btn">
 						<button class="btn btn-default" ng-click="openOpeningDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 						</span>
@@ -80,7 +81,7 @@
 				<div class="row">
 					<div class="col-md-6">
 						<p class="input-group">
-						<input type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitEndDate" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate" is-open="endDate" max-date="maxDate" close-text="Close"  required/>
+						<input ng-disabled="!isEditMode" type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitEndDate" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate" is-open="endDate" max-date="maxDate" close-text="Close"  required/>
 						<span class="input-group-btn">
 						<button class="btn btn-default" ng-click="openEndDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 						</span>
@@ -91,7 +92,7 @@
 					</div>
 				</div>
 			</li>
-			<li>
+			<li ng-if="isEditMode">
 				<input type="submit" class="btn btn-primary" ng-disabled="createForm.$invalid" value="Save"/>
 				<input type="button" class="btn" ng-click="reset()" value="Cancel">
 			</li>

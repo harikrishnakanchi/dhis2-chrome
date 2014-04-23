@@ -25,6 +25,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             };
 
             anchorScroll = jasmine.createSpy();
+            scope.isEditMode = true;
             projectController = new ProjectController(scope, db, projectsService, q, location, timeout, anchorScroll);
         }));
 

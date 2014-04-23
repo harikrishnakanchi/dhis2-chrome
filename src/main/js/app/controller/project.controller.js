@@ -27,6 +27,43 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             $scope.openCreateForm = false;
         };
 
+        var init = function() {
+            if (!$scope.isEditMode) {
+                $scope.newOrgUnit.name = $scope.orgUnit.name;
+                $scope.newOrgUnit.openingDate = $scope.orgUnit.openingDate;
+                $scope.newOrgUnit.location = _.find($scope.orgUnit.attributeValues, {
+                    'attribute': {
+                        'code': 'prjLoc'
+                    }
+                }).value;
+                $scope.newOrgUnit.context = _.find($scope.orgUnit.attributeValues, {
+                    'attribute': {
+                        'code': 'prjCon'
+                    }
+                }).value;
+                $scope.newOrgUnit.endDate = _.find($scope.orgUnit.attributeValues, {
+                    'attribute': {
+                        'code': 'prjEndDate'
+                    }
+                }).value;
+                $scope.newOrgUnit.projectType = _.find($scope.orgUnit.attributeValues, {
+                    'attribute': {
+                        'code': 'prjType'
+                    }
+                }).value;
+                $scope.newOrgUnit.populationType = _.find($scope.orgUnit.attributeValues, {
+                    'attribute': {
+                        'code': 'prjPopType'
+                    }
+                }).value;
+                $scope.newOrgUnit.consultDays = _.find($scope.orgUnit.attributeValues, {
+                    'attribute': {
+                        'code': 'prjConDays'
+                    }
+                }).value;
+            }
+        };
+
         $scope.save = function(newOrgUnit, parentOrgUnit) {
             newOrgUnit = _.merge(newOrgUnit, {
                 'id': md5(newOrgUnit.name + parentOrgUnit.name).substr(0, 11),
@@ -53,5 +90,6 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             return projectsService.create(newOrgUnit).then(saveToDb).then(onSuccess, onError);
 
         };
+        init();
     };
 });
