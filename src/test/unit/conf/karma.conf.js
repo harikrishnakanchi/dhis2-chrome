@@ -1,10 +1,10 @@
 'use strict';
 module.exports = function(config) {
     config.set({
-        basePath: '../../',
+        basePath: '../../../',
         files: [
-            'test/test.main.js', {
-                pattern: 'test/test.config.js',
+            'test/unit/test.main.js', {
+                pattern: 'test/unit/test.config.js',
                 included: false
             }, {
                 pattern: 'main/js/app/**/*.js',
@@ -13,10 +13,10 @@ module.exports = function(config) {
                 pattern: 'main/js/lib/**/*.js',
                 included: false
             }, {
-                pattern: 'test/js/app/**/*.js',
+                pattern: 'test/unit/js/app/**/*.js',
                 included: false
             }, {
-                pattern: 'test/js/data/**/*.js',
+                pattern: 'test/unit/js/data/**/*.js',
                 included: false
             }
         ],
@@ -33,10 +33,10 @@ module.exports = function(config) {
         browsers: ['Chrome'],
         logLevel: config.LOG_INFO,
         junitReporter: {
-            outputFile: 'test/coverage/test-results.xml'
+            outputFile: 'test/unit/coverage/test-results.xml'
         },
         coverageReporter: {
-            dir: 'test/coverage',
+            dir: 'test/unit/coverage',
         }
     });
 };

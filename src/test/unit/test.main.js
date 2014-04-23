@@ -1,4 +1,4 @@
-require(["base/test/test.config"], function() {
+require(["base/test/unit/test.config"], function() {
     require(["app/app.config", "app/background.config"], function() {
         require.config({
             deps: tests,

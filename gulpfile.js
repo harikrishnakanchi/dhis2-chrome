@@ -5,10 +5,12 @@ var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var argv = require('yargs').argv;
 
+var karmaConf = 'src/test/unit/conf/karma.conf.js';
+
 gulp.task('test', function() {
     return gulp.src('_')
         .pipe(karma({
-            configFile: 'src/test/conf/karma.conf.js',
+            configFile: karmaConf,
             action: 'run'
         })).on('error', function(err) {
             throw err;
@@ -18,7 +20,7 @@ gulp.task('test', function() {
 gulp.task('devtest', function() {
     return gulp.src('_')
         .pipe(karma({
-            configFile: 'src/test/conf/karma.conf.js',
+            configFile: karmaConf,
             action: 'watch',
             preprocessors: {}
         }));
