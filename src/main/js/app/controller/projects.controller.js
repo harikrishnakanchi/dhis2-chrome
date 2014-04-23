@@ -71,7 +71,7 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
         };
 
         $scope.showProjectAttribute = function() {
-            return ($scope.orgUnit != undefined && $scope.orgUnit.level === 3);
+            return ($scope.orgUnit !== undefined && $scope.orgUnit.level === 3);
         };
         $scope.save = function(orgUnit, parent) {
             orgUnit = _.merge(orgUnit, {
