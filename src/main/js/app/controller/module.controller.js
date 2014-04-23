@@ -18,13 +18,5 @@ define([], function() {
             $scope.modules.splice(index, 1);
         };
 
-        $scope.getModuleNameId = function(index) {
-            return "moduleName" + index;
-        };
-
-        $scope.shouldShow = function(i) {
-            var form = $scope['form' + i];
-            return form && form.moduleName && form.moduleName.$dirty && form.moduleName.$invalid;
-        };
     };
 });
