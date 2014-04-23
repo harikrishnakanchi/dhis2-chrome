@@ -14,8 +14,6 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             $scope.endDate = true;
         };
 
-
-
         $scope.maxDate = new Date();
 
         $scope.reset = function() {
@@ -104,11 +102,12 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
 
         $scope.getLevel = function(orgUnit, depth) {
             depth = depth || 0;
-            return orgUnit ? $scope.orgUnitLevelsMap[orgUnit.level + depth] : undefined;
+            var level = orgUnit ? $scope.orgUnitLevelsMap[orgUnit.level + depth] : undefined;
+            return level ? level.split("/")[0].trim() : undefined;
         };
 
         $scope.canCreateChild = function(orgUnit) {
-            return _.contains(["Country", "Project"], $scope.getLevel(orgUnit, 1));
+            return _.contains(["Country", "Project", "Operation Unit", "Module"], $scope.getLevel(orgUnit, 1));
         };
 
         init();

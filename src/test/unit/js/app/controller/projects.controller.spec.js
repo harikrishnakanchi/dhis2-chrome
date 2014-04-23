@@ -24,6 +24,12 @@
          }, {
              'level': 4,
              'name': 'Project'
+         }, {
+             'level': 5,
+             'name': 'Operation Unit / Module'
+         }, {
+             'level': 6,
+             'name': 'Module'
          }];
 
          var child = {
@@ -140,7 +146,9 @@
                  1: 'Company',
                  2: 'Operational Center',
                  3: 'Country',
-                 4: 'Project'
+                 4: 'Project',
+                 5: 'Operation Unit / Module',
+                 6: 'Module'
              });
          });
 
@@ -213,6 +221,12 @@
              }, 1)).toEqual("Company");
              expect(scope.getLevel({
                  'level': 4
+             }, 1)).toEqual("Operation Unit");
+             expect(scope.getLevel({
+                 'level': 5
+             }, 1)).toEqual("Module");
+             expect(scope.getLevel({
+                 'level': 6
              }, 1)).toEqual(undefined);
              expect(scope.getLevel()).toEqual(undefined);
          });
@@ -231,6 +245,12 @@
              })).toEqual(true);
              expect(scope.canCreateChild({
                  'level': 4
+             })).toEqual(true);
+             expect(scope.canCreateChild({
+                 'level': 5
+             })).toEqual(true);
+             expect(scope.canCreateChild({
+                 'level': 6
              })).toEqual(false);
          });
 
