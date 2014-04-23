@@ -7,6 +7,7 @@ exports.config = {
     },
 
     specs: ['**/*.spec.js'],
+    rootElement: '#dhis2',
 
     jasmineNodeOpts: {
         showColors: true,

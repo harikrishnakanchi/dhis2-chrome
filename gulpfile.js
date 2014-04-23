@@ -23,7 +23,7 @@ gulp.task('update-webdriver', shell.task([
     './node_modules/protractor/bin/webdriver-manager update'
 ]));
 
-gulp.task('functional-test', ['update-webdriver'], shell.task([
+gulp.task('ft', ['update-webdriver'], shell.task([
     './node_modules/protractor/bin/protractor ./src/test/functional/protractor.conf.js'
 ]));
 
