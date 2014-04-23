@@ -110,6 +110,10 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             return _.contains(["Country", "Project", "Operation Unit", "Module"], $scope.getLevel(orgUnit, 1));
         };
 
+        $scope.canCreateMulitpleChildType = function(orgUnit) {
+            return $scope.canCreateChild(orgUnit) && $scope.getLevel(orgUnit) === 'Project';
+        };
+
         init();
     };
 });

@@ -343,5 +343,28 @@
              expect(scope.showProjectAttribute()).toBe(false);
 
          });
+
+         it("should get true if multiple child types are allowed", function() {
+             scope.$apply();
+
+             expect(scope.canCreateMulitpleChildType({
+                 'level': 1
+             })).toEqual(false);
+             expect(scope.canCreateMulitpleChildType({
+                 'level': 2
+             })).toEqual(false);
+             expect(scope.canCreateMulitpleChildType({
+                 'level': 3
+             })).toEqual(false);
+             expect(scope.canCreateMulitpleChildType({
+                 'level': 4
+             })).toEqual(true);
+             expect(scope.canCreateMulitpleChildType({
+                 'level': 5
+             })).toEqual(false);
+             expect(scope.canCreateMulitpleChildType({
+                 'level': 6
+             })).toEqual(false);
+         });
      });
  });
