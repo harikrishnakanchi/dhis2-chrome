@@ -4,10 +4,13 @@ var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var shell = require('gulp-shell');
+var http = require('http');
+var ecstatic = require('ecstatic');
+var protractor = require('gulp-protractor').protractor;
+
 var argv = require('yargs').argv;
-
-
 var karmaConf = 'src/test/unit/conf/karma.conf.js';
+var webserver;
 
 gulp.task('test', function() {
     return gulp.src('_')
@@ -23,10 +26,6 @@ gulp.task('update-webdriver', shell.task([
     './node_modules/protractor/bin/webdriver-manager update'
 ]));
 
-gulp.task('ft', ['update-webdriver'], shell.task([
-    './node_modules/protractor/bin/protractor ./src/test/functional/protractor.conf.js'
-]));
-
 gulp.task('devtest', function() {
     return gulp.src('_')
         .pipe(karma({
@@ -34,6 +33,26 @@ gulp.task('devtest', function() {
             action: 'watch',
             preprocessors: {}
         }));
+});
+
+gulp.task('start-http', function() {
+    webserver = http.createServer(
+        ecstatic({
+            root: __dirname + '/src/main'
+        })
+    );
+    webserver.listen(8081);
+    return webserver;
+});
+
+gulp.task('ft', ['update-webdriver', 'start-http'], function() {
+    return gulp.src('src/test/functional/**/*.spec.js').pipe(protractor({
+        configFile: 'src/test/functional/protractor.conf.js'
+    })).on('error', function(e) {
+        throw e;
+    }).on('end', function() {
+        webserver.close();
+    });
 });
 
 gulp.task('lint', function() {
@@ -46,7 +65,7 @@ gulp.task('lint', function() {
 gulp.task('config', function() {
     if (argv.env)
         return gulp.src('conf/' + argv.env + '/overrides.js')
-            .pipe(gulp.dest('./src/main/js/app/conf'))
+            .pipe(gulp.dest('./src/main/js/app/conf'));
 });
 
 gulp.task('less', function() {

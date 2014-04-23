@@ -6,6 +6,7 @@
     "devDependencies": {
         "gulp": "*",
         "gulp-karma": "0.0.4",
+        "gulp-protractor": "*",
         "gulp-jshint": "*",
         "jshint-stylish": "*",
         "yargs": "*",
@@ -19,7 +20,8 @@
         "karma-requirejs": "*",
         "karma-chrome-launcher": "*",
         "karma-coverage": "*",
-        "protractor": "*"
+        "protractor": "*",
+        "ecstatic": "*"
     },
     "name": "DHIS2-Chrome-App",
     "version": "0.0.1"
