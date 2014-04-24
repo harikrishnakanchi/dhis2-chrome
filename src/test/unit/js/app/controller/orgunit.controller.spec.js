@@ -29,7 +29,10 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             'name': 'Operation Unit / Module'
         }, {
             'level': 6,
-            'name': 'Module'
+            'name': 'Module / Dataset'
+        }, {
+            'level': 7,
+            'name': 'Dataset'
         }];
 
         var child = {
@@ -148,7 +151,8 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 3: 'Country',
                 4: 'Project',
                 5: 'Operation Unit / Module',
-                6: 'Module'
+                6: 'Module / Dataset',
+                7: 'Dataset'
             });
         });
 
@@ -183,6 +187,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             }, 1)).toEqual("Module");
             expect(scope.getLevel({
                 'level': 6
+            }, 1)).toEqual("Dataset");
+            expect(scope.getLevel({
+                'level': 7
             }, 1)).toEqual(undefined);
             expect(scope.getLevel()).toEqual(undefined);
         });
@@ -263,6 +270,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             })).toEqual(false);
             expect(scope.canCreateMulitpleChildType({
                 'level': 6
+            })).toEqual(false);
+            expect(scope.canCreateMulitpleChildType({
+                'level': 7
             })).toEqual(false);
         });
 
