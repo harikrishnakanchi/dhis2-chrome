@@ -10,7 +10,8 @@ define(['lodash', 'overrides'], function(_, overrides) {
         "dhis": {
             "url": url,
             "auth_header": "Basic YWRtaW46ZGlzdHJpY3Q=",
-        }
+        },
+        "messageTimeout": 5000
     };
 
     return _.merge(properties, overrides);

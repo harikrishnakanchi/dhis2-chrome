@@ -1,4 +1,4 @@
-define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
+define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, md5, moment, properties) {
     return function($scope, db, projectsService, $q, $location, $timeout, $anchorScroll) {
         var templateUrlMap = {
             'Company': 'templates/partials/project-form.html',
@@ -37,7 +37,7 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
             $scope.saveSuccess = true;
             $timeout(function() {
                 $scope.saveSuccess = false;
-            }, 3000);
+            }, properties.messageTimeout);
         };
 
         var transformToTree = function(nodeToBeSelected, args) {
