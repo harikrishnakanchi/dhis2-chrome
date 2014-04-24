@@ -1,5 +1,14 @@
 define([], function() {
-    return function($scope) {
+    return function($scope, orgUnitService, db, $location) {
+        var init = function() {
+            var setDatasets = function(datasets) {
+                $scope.dataSets = datasets;
+            };
+            var store = db.objectStore("dataSets");
+            $scope.rightList = [];
+            store.getAll().then(setDatasets);
+        };
+
         $scope.modules = [{
             'openingDate': new Date()
         }];
@@ -18,5 +27,6 @@ define([], function() {
             $scope.modules.splice(index, 1);
         };
 
+        init();
     };
 });

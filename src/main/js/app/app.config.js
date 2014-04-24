@@ -21,6 +21,7 @@ require.config({
         "angular-ui-modal": "lib/custom/angular-ui-modal/modal",
         "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
         "angular-treeview": "lib/angularjs-directives/src/treeview/angular.treeview",
+        "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",
         "md5": "lib/js-md5/js/md5",
         "angular-ui-datepicker": "lib/custom/angular-ui-datepicker/datepicker",
         "angular-ui-position": "lib/custom/angular-ui-position/position",
@@ -97,6 +98,9 @@ require.config({
         'angular-ui-datepicker': {
             deps: ["angular", "angular-ui-position"]
         },
+        'angular-multiselect': {
+            deps: ["angular"]
+        }
     }
 });
 console.log("Config is complete");

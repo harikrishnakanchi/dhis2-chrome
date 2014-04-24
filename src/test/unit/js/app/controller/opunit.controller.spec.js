@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["opUnitController", "angularMocks", "utils", ""], function(OpUnitController, mocks, utils) {
+define(["opUnitController", "angularMocks", "utils"], function(OpUnitController, mocks, utils) {
     describe("op unit controller", function() {
 
         var scope, opUnitController, projectsService, mockOrgStore, db, q, location, _Date;

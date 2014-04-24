@@ -11,21 +11,27 @@
 			<div class="well" ng-repeat="module in modules">
 				<ng-form name="form">
 				<button class="btn-delete" ng-hide="$first" ng-click="delete($index)">X Delete</button>
-					<ul>
-						<li>
-							<label for="moduleName" class="col-sm-4 col-md-4 control-label">Add module</label>
-							<div class="col-sm-4">
-								<input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="Module Name" ng-model="module.name" required>
-								<div ng-show="form.moduleName.$dirty &amp;&amp; form.moduleName.$invalid">
-									<span class="errortxt">{{resourceBundle.nameValidation}}</span>
-								</div>
+				<ul>
+					<li>
+						<label for="moduleName" class="col-sm-4 col-md-4 control-label">Add module</label>
+						<div class="col-sm-4">
+							<input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="Module Name" ng-model="module.name" required>
+							<div ng-show="form.moduleName.$dirty &amp;&amp; form.moduleName.$invalid">
+								<span class="errortxt">{{resourceBundle.nameValidation}}</span>
 							</div>
-
-						</li>
-					</ul>
-				</ng-form>
-			</div>
-			<button class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid">Save</button>
-		</form>
-	</div>
+						</div>
+					</li>
+					<li class="form-group">
+						<div class="col-sm-offset-2 col-sm-10"> 
+							<div class="add-item-ctrl">
+								<multiselect left-list="dataSets" name="name" ng-model="rightList"></multiselect>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</ng-form>
+		</div>
+		<button class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid">Save</button>
+	</form>
+</div>
 </div>
