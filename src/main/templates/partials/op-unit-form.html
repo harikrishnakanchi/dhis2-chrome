@@ -6,8 +6,11 @@
         </div>
     </div>
 
-    <div class="panel-body">
-        <form class="form-horizontal" role="form" novalidate>
+    <div ng-show="saveSuccess" class="alert alert-success">{{ resourceBundle.savedOpUnit }}</div>
+    <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorOpUnit }}</div>
+        
+    <div class="panel-body">   
+    <form name ="parentForm" class="form-horizontal" role="form" novalidate>
             <div class="well" ng-repeat="opUnit in opUnits">
             <ng-form name="form">
                 <button class="btn-delete" ng-hide="$first" ng-click="delete($index)">X Delete</button>
@@ -16,13 +19,13 @@
                         <label for="opUnitType" class="col-sm-4 col-md-4 control-label">Add Operation unit</label>
                         <div class="col-sm-8 col-md-8 form-inline">
                             <div class="radio-inline">
-                                <label for="hospital"> <input type="radio" name="opUnitType" ng-model="opUnit.type" id="hospital" value="Hospital" required> Hospital </label>
+                                <label for="hospital"> <input type="radio" ng-model="opUnit.type" id="hospital" value="Hospital" required> Hospital </label>
                             </div>
                             <div class="radio-inline">
-                                <label for="healthcenter"> <input type="radio" name="opUnitType" ng-model="opUnit.type" id="healthcenter" value="Health Center" required> Health Center </label>
+                                <label for="healthcenter"> <input type="radio" ng-model="opUnit.type" id="healthcenter" value="Health Center" required> Health Center </label>
                             </div>
                             <div class="radio-inline">
-                                <label for="community"> <input type="radio" name="opUnitType" ng-model="opUnit.type" id="community" value="Community" required> Community </label>
+                                <label for="community"> <input type="radio" ng-model="opUnit.type" id="community" value="Community" required> Community </label>
                             </div>
                         </div>
                     </li>
@@ -38,7 +41,8 @@
                 </ul>
                 </ng-form>
             </div>
-            <button class="btn btn-main pull-right" ng-click="save(opUnits)" ng-disabled="form.$invalid">Save</button>
+
+            <button class="btn btn-main pull-right" ng-click="save(opUnits)" ng-disabled="parentForm.$invalid">Save</button>
         </form>
     </div>
 </div>

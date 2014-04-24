@@ -31,6 +31,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             });
 
             var onSuccess = function(data) {
+                $scope.saveSuccess = true;
                 $location.hash(data);
             };
 
