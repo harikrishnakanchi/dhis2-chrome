@@ -26,7 +26,8 @@
 			<li class="form-group">
 				<label for="newOrgUnitProjectType" class="col-sm-2 control-label">Type of project</label>
 				<div class="col-sm-4" >
-					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitProjectType" id="newOrgUnitProjectType" ng-model="newOrgUnit.projectType" required/>
+					<select ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitProjectType" id="newOrgUnitProjectType" ng-model="newOrgUnit.projectType" ng-options="o as o for o in allProjectTypes" required>
+					</select>
 					<div ng-show="createForm.newOrgUnitProjectType.$dirty &amp;&amp; createForm.newOrgUnitProjectType.$invalid">
 						<span ng-show="createForm.newOrgUnitProjectType.$error.required"class="errortxt">{{resourceBundle.projectTypeValidation}}</span>
 					</div>
@@ -35,7 +36,7 @@
 			<li class="form-group">
 				<label for="newOrgUnitContext" class="col-sm-2 control-label">Context</label>
 				<div class="col-sm-4" >
-					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" required/>
+					<select ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" ng-options="o as o for o in allContexts" required></select>
 					<div ng-show="createForm.newOrgUnitContext.$dirty &amp;&amp; createForm.newOrgUnitContext.$invalid">
 						<span ng-show="createForm.newOrgUnitContext.$error.required"class="errortxt">{{resourceBundle.contextValidation}}</span>
 					</div>
@@ -44,7 +45,7 @@
 			<li class="form-group">
 				<label for="newOrgUnitConDays" class="col-sm-2 control-label">No of consultation days per week</label>
 				<div class="col-sm-4" >
-					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitConDays" id="newOrgUnitConDays" ng-model="newOrgUnit.consultDays" required/>
+					<select ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitConDays" id="newOrgUnitConDays" ng-model="newOrgUnit.consultDays" ng-options="o as o for o in allConsultDays" required></select>
 					<div ng-show="createForm.newOrgUnitConDays.$dirty &amp;&amp; createForm.newOrgUnitConDays.$invalid">
 						<span ng-show="createForm.newOrgUnitConDays.$error.required"class="errortxt">{{resourceBundle.consultDaysValidation}}</span>
 					</div>
@@ -53,7 +54,7 @@
 			<li class="form-group">
 				<label for="newOrgUnitPopType" class="col-sm-2 control-label">Type of population</label>
 				<div class="col-sm-4" >
-					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" required/>
+					<select ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" ng-options="o as o for o in allPopTypes" required></select>
 					<div ng-show="createForm.newOrgUnitPopType.$dirty &amp;&amp; createForm.newOrgUnitPopType.$invalid">
 						<span ng-show="createForm.newOrgUnitPopType.$error.required"class="errortxt">{{resourceBundle.populationTypeValidation}}</span>
 					</div>
@@ -81,13 +82,10 @@
 				<div class="row">
 					<div class="col-md-6">
 						<p class="input-group">
-						<input ng-disabled="!isEditMode" type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitEndDate" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate" is-open="endDate" min-date="thisDate" close-text="Close"  required/>
+						<input ng-disabled="!isEditMode" type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitEndDate" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate" is-open="endDate" min-date="thisDate" close-text="Close" />
 						<span class="input-group-btn">
 						<button class="btn btn-default" ng-click="openEndDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 						</span>
-						<div ng-show="createForm.newOrgUnitEndDate.$dirty &amp;&amp; createForm.newOrgUnitEndDate.$invalid">
-							<span ng-show="createForm.newOrgUnitEndDate.$error.required"class="errortxt">{{resourceBundle.endDateValidation}}</span>
-						</div>
 						</p>
 					</div>
 				</div>
