@@ -8,6 +8,7 @@ define(["md5"], function(md5) {
         var authenticate = function(user) {
             if (user && md5($scope.password) === user.password) {
                 $rootScope.isLoggedIn = true;
+                $rootScope.username = $scope.username;
                 $location.path("/dashboard");
             } else {
                 $scope.invalidCredentials = true;
