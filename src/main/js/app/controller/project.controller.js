@@ -87,7 +87,7 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
                 return store.upsert(newOrgUnit);
             };
 
-            return projectsService.create(newOrgUnit).then(saveToDb).then(onSuccess, onError);
+            return projectsService.create([newOrgUnit]).then(saveToDb).then(onSuccess, onError);
 
         };
         init();

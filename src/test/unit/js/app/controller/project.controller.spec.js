@@ -67,7 +67,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 }
             };
 
-            expect(projectsService.create).toHaveBeenCalledWith(expectedNewOrgUnit);
+            expect(projectsService.create).toHaveBeenCalledWith([expectedNewOrgUnit]);
             expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(location.hash).toHaveBeenCalledWith(orgUnitId);
         });

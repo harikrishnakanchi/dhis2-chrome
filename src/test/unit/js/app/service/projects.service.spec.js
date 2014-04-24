@@ -19,7 +19,7 @@ define(["projectsService", "angularMocks", "properties"], function(ProjectsServi
                 "id": "org_0",
                 "level": 1
             };
-            projectService.create(orgUnit);
+            projectService.create([orgUnit]);
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", {
                 "organisationUnits": [orgUnit]
