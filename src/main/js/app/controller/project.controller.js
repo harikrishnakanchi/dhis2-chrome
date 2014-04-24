@@ -1,4 +1,4 @@
-define(["lodash", "md5", "moment"], function(_, md5, moment) {
+define(["lodash", "md5", "moment", "createAttributePayload"], function(_, md5, moment, createAttributePayload) {
 
     return function($scope, db, orgUnitService, $q, $location, $timeout, $anchorScroll) {
 
@@ -58,10 +58,12 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
 
             var saveToDb = function() {
                 var store = db.objectStore("organisationUnits");
-                return store.upsert(newOrgUnit);
+                return store.upsert(payload);
             };
 
-            return orgUnitService.create([newOrgUnit]).then(saveToDb).then(onSuccess, onError);
+            var payload = createAttributePayload([newOrgUnit]);
+
+            return orgUnitService.create(payload).then(saveToDb).then(onSuccess, onError);
 
         };
 

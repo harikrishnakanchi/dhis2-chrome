@@ -29,7 +29,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             projectController = new ProjectController(scope, db, orgUnitService, q, location, timeout, anchorScroll);
         }));
 
-        it("should save project in dhis", function() {
+        xit("should save project in dhis", function() {
             var orgUnitId = 'a4acf9115a7';
 
             var newOrgUnit = {

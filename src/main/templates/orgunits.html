@@ -21,22 +21,6 @@
 			</div>
 			<div ng-include="templateUrl">
 			</div>
-				<form name="form" class="form-horizontal" ng-show="!isEditMode" role="form" novalidate ng-hide="openCreateForm || !orgUnit">
-					<ul>
-						<li class="form-group">
-							<label for="orgUnitName" class="col-sm-2 control-label">Name</label>
-							<div class="col-sm-4" >
-								<input type="text" class="form-control" name="orgUnitName" id="orgUnitName" ng-model="orgUnit.name" disabled="true">
-							</div>
-						</li>
-						<li class="form-group">
-							<label for="orgUnitOpeningDate" class="col-sm-2 control-label">Opening Date</label>
-							<div class="col-sm-4" >
-								<input type="text" class="form-control" name="orgUnitOpeningDate" id="orgUnitOpeningDate" ng-model="orgUnit.openingDate" disabled="true">
-							</div>
-						</li>
-					</ul>
-				</form>				
 		</div>
 	</div>
 </section>
