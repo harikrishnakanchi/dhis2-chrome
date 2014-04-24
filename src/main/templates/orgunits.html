@@ -1,6 +1,8 @@
-<section class="panel tab-panel">
+<section class="panel org-units">
 	<div class="row">
-		<div class="col-md-4">
+		<div class="col-sm-5 col-md-4">
+			<div class="treeview-cont">
+				<div class="content">
 			<treeview
 			tree-model="organisationUnits"
 			node-id="id"
@@ -9,14 +11,32 @@
 			on-node-select="onOrgUnitSelect"
 			state="state"
 			/>
+			</div>
+			</div>
 		</div>
-		<div class="col-md-8">
-			<div class="row">
-				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getLevel(orgUnit, 1)" ng-show="canCreateChild(orgUnit) &amp;&amp; !isEditMode" ng-click="setTemplateUrl(orgUnit, true, 1)"/>
-				<input type="button" class="btn btn-primary pull-right" ng-value="'Create ' + getLevel(orgUnit, 2)" ng-show="canCreateMulitpleChildType(orgUnit)" ng-click="setTemplateUrl(orgUnit, true, 2)"/>
+		<div class="col-sm-7 col-md-8">
+			<div class="top-actions">
+				<input type="button" class="btn btn-sub btn-sm pull-right" ng-value="'Create ' + getLevel(orgUnit, 1)" ng-show="canCreateChild(orgUnit) &amp;&amp; !isEditMode" ng-click="setTemplateUrl(orgUnit, true, 1)"/>
+				<input type="button" class="btn btn-sub btn-sm pull-right" ng-value="'Create ' + getLevel(orgUnit, 2)" ng-show="canCreateMulitpleChildType(orgUnit)" ng-click="setTemplateUrl(orgUnit, true, 2)"/>
 			</div>
 			<div ng-include="templateUrl">
 			</div>
+				<form name="form" class="form-horizontal" ng-show="!isEditMode" role="form" novalidate ng-hide="openCreateForm || !orgUnit">
+					<ul>
+						<li class="form-group">
+							<label for="orgUnitName" class="col-sm-2 control-label">Name</label>
+							<div class="col-sm-4" >
+								<input type="text" class="form-control" name="orgUnitName" id="orgUnitName" ng-model="orgUnit.name" disabled="true">
+							</div>
+						</li>
+						<li class="form-group">
+							<label for="orgUnitOpeningDate" class="col-sm-2 control-label">Opening Date</label>
+							<div class="col-sm-4" >
+								<input type="text" class="form-control" name="orgUnitOpeningDate" id="orgUnitOpeningDate" ng-model="orgUnit.openingDate" disabled="true">
+							</div>
+						</li>
+					</ul>
+				</form>				
 		</div>
 	</div>
 </section>

@@ -275,10 +275,33 @@ text-align: center;
 	font-size: 20px;
 	width: 20px;
 }
+//treeview
 
+.treeview-cont{
+	height:700px;
+	background: #e7e7e7;
+	margin-top: 20px;
+	.content{
+        margin:20px 0;
+        overflow-y: auto;
+        height:660px;
+        float: left;
+        width:100%;
+    }
+}
 
 //loginform
 
 .login-form{
-	margin:30px 0;
+	margin:30px auto;
+	width:400px;
+}
+
+//orgunits
+.org-units{
+.btn-sub + .btn-sub{ margin-right: 10px;}
+.top-actions{
+	 &:extend(.clearfix all);
+	 margin: 20px 0;
+}
 }
