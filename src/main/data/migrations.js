@@ -39,7 +39,7 @@ define([], function() {
         var userStore = tx.objectStore("users");
         userStore.add({
             'username': 'admin',
-            'password': '161ebd7d45089b3446ee4e0d86dbcf92'
+            'password': 'f6b30a5547c4062f915aafd3e4e6453a'
         });
     };
 
