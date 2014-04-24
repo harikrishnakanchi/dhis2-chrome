@@ -30,7 +30,7 @@ define(["orgUnitService", "angularMocks", "properties"], function(OrgUnitService
 
         it("should send attributes along with metadata for project org units", function() {
 
-            var orgUnit = {
+            var orgUnit = [{
                 'id': 'a4acf9115a7',
                 'name': 'Org1',
                 'shortName': 'Org1',
@@ -46,18 +46,18 @@ define(["orgUnitService", "angularMocks", "properties"], function(OrgUnitService
                     name: 'Name1',
                     id: 'Id1'
                 },
-            };
+            }];
 
             var expectedPayload = {
                 "organisationUnits": [{
-                    "id": orgUnit.id,
-                    "name": orgUnit.name,
-                    "shortName": orgUnit.shortName,
-                    "level": orgUnit.level,
-                    "openingDate": orgUnit.openingDate,
+                    "id": orgUnit[0].id,
+                    "name": orgUnit[0].name,
+                    "shortName": orgUnit[0].shortName,
+                    "level": orgUnit[0].level,
+                    "openingDate": orgUnit[0].openingDate,
                     "parent": {
-                        "name": orgUnit.parent.name,
-                        "id": orgUnit.parent.id
+                        "name": orgUnit[0].parent.name,
+                        "id": orgUnit[0].parent.id
                     },
                     "attributeValues": [{
                         "attribute": {
@@ -65,42 +65,42 @@ define(["orgUnitService", "angularMocks", "properties"], function(OrgUnitService
                             "name": "No of Consultation days per week",
                             "id": "VKc7bvogtcP"
                         },
-                        "value": orgUnit.consultDays
+                        "value": orgUnit[0].consultDays
                     }, {
                         "attribute": {
                             "code": "prjCon",
                             "name": "Context",
                             "id": "Gy8V8WeGgYs"
                         },
-                        "value": orgUnit.context
+                        "value": orgUnit[0].context
                     }, {
                         "attribute": {
                             "code": "prjLoc",
                             "name": "Location",
                             "id": "CaQPMk01JB8"
                         },
-                        "value": orgUnit.location
+                        "value": orgUnit[0].location
                     }, {
                         "attribute": {
                             "code": "prjType",
                             "name": "Type of project",
                             "id": "bnbnSvRdFYo"
                         },
-                        "value": orgUnit.projectType
+                        "value": orgUnit[0].projectType
                     }, {
                         "attribute": {
                             "code": "prjEndDate",
                             "name": "End date",
                             "id": "ZbUuOnEmVs5"
                         },
-                        "value": orgUnit.endDate
+                        "value": orgUnit[0].endDate
                     }, {
                         "attribute": {
                             "code": "prjPopType",
                             "name": "Type of population",
                             "id": "Byx9QE6IvXB"
                         },
-                        "value": orgUnit.populationType
+                        "value": orgUnit[0].populationType
                     }]
                 }]
             };

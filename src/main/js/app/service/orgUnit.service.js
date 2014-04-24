@@ -1,13 +1,10 @@
 define(["properties"], function(properties) {
     return function($http) {
-        var getPayload = function(orgUnit) {
-            return {
-                "organisationUnits": orgUnit
-            };
-        };
 
-        var getPayloadForProject = function(orgUnit) {
-            orgUnit = _.merge(orgUnit, {
+        var convertToProjectLevelOrgUnit = function(orgUnit) {
+            newOrgUnit = _.omit(orgUnit, ['consultDays', 'context', 'location', 'projectType', 'endDate', 'populationType']);
+
+            return _.merge(newOrgUnit, {
                 "attributeValues": [{
                     "attribute": {
                         "code": "prjConDays",
@@ -52,16 +49,15 @@ define(["properties"], function(properties) {
                     "value": orgUnit.populationType
                 }],
             });
-
-            orgUnit = _.omit(orgUnit, ['consultDays', 'context', 'location', 'projectType', 'endDate', 'populationType']);
-
-            return {
-                "organisationUnits": [orgUnit]
-            };
         };
 
-        var create = function(orgUnit) {
-            var payload = orgUnit.level === 4 ? getPayloadForProject(orgUnit) : getPayload(orgUnit);
+        var create = function(orgUnits) {
+            var payload = {
+                "organisationUnits": _.map(orgUnits, function(orgUnit) {
+                    return orgUnit.level === 4 ? convertToProjectLevelOrgUnit(orgUnit) : orgUnit;
+                })
+            };
+
             return $http.post(properties.dhis.url + '/api/metadata', payload);
         };
 
