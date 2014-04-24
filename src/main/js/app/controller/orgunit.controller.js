@@ -1,25 +1,15 @@
 define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, md5, moment, properties) {
-    return function($scope, db, projectsService, $q, $location, $timeout, $anchorScroll) {
+    return function($scope, db, $q, $location, $timeout, $anchorScroll) {
         var templateUrlMap = {
             'Company': 'templates/partials/project-form.html',
             'Operational Center': 'templates/partials/project-form.html',
-            'Country': 'templates/partials/project-form.html',
+            'Country': 'templates/partials/create-country.html',
             'Project': 'templates/partials/create-project.html',
             'Module': 'templates/partials/module-form.html',
             'Operation Unit': 'templates/partials/op-unit-form.html'
         };
 
         $scope.organisationUnits = [];
-
-        $scope.maxDate = new Date();
-
-        $scope.reset = function() {
-            $scope.newOrgUnit = {
-                'openingDate': new Date()
-            };
-            $scope.saveFailure = $scope.saveSuccess = false;
-            $scope.openCreateForm = false;
-        };
 
         var getAll = function(storeName) {
             var store = db.objectStore(storeName);
@@ -51,7 +41,6 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
         };
 
         var init = function() {
-            $scope.reset();
             var selectedNodeId = $location.hash();
             $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
         };
@@ -62,7 +51,6 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
         };
 
         $scope.onOrgUnitSelect = function(orgUnit) {
-            $scope.reset();
             $scope.orgUnit = orgUnit;
             $scope.setTemplateUrl(orgUnit, false);
             scrollToTop();
@@ -85,7 +73,7 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
         $scope.setTemplateUrl = function(orgUnit, isEditMode, depth) {
             depth = depth || 0;
             var level = $scope.getLevel(orgUnit, depth);
-            $scope.templateUrl = templateUrlMap[level];
+            $scope.templateUrl = templateUrlMap[level] + '?id=' + orgUnit.id;
             $scope.isEditMode = isEditMode;
         };
 

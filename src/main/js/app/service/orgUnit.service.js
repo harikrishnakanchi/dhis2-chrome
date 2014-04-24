@@ -2,7 +2,7 @@ define(["properties"], function(properties) {
     return function($http) {
         var getPayload = function(orgUnit) {
             return {
-                "organisationUnits": orgUnit
+                "organisationUnits": [orgUnit]
             };
         };
 

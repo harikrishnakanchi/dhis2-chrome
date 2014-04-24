@@ -1,4 +1,4 @@
-define(["projectsService", "angularMocks", "properties"], function(ProjectsService, mocks, properties) {
+define(["orgUnitService", "angularMocks", "properties"], function(OrgUnitService, mocks, properties) {
     describe("projects controller", function() {
         var http, httpBackend, scope, projectService;
 
@@ -6,7 +6,7 @@ define(["projectsService", "angularMocks", "properties"], function(ProjectsServi
             scope = $rootScope.$new();
             http = $http;
             httpBackend = $httpBackend;
-            projectService = new ProjectsService(http);
+            projectService = new OrgUnitService(http);
         }));
 
         afterEach(function() {
@@ -19,7 +19,7 @@ define(["projectsService", "angularMocks", "properties"], function(ProjectsServi
                 "id": "org_0",
                 "level": 1
             };
-            projectService.create([orgUnit]);
+            projectService.create(orgUnit);
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", {
                 "organisationUnits": [orgUnit]

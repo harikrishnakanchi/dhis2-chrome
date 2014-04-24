@@ -1,7 +1,7 @@
 /*global Date:true*/
 define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnitController, mocks, utils, _) {
     describe("projects controller", function() {
-        var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits, projectsService,
+        var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits,
             orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll;
         var getOrgUnit = function(id, name, level, parent) {
             return {
@@ -77,9 +77,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                     return stores[store];
                 }
             };
-            projectsService = {
-                "create": function() {}
-            };
+
             spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
             spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnitLevels));
             _Date = Date;
@@ -95,7 +93,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 'id': 'Id1'
             };
             anchorScroll = jasmine.createSpy();
-            orgUnitContoller = new OrgUnitController(scope, db, projectsService, q, location, timeout, anchorScroll);
+            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll);
         }));
 
         afterEach(function() {
@@ -110,13 +108,12 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             expect(mockOrgStore.getAll).toHaveBeenCalled();
             expect(scope.organisationUnits).toEqual(expectedOrgUnitTree);
             expect(scope.onOrgUnitSelect).not.toHaveBeenCalled();
-            expect(scope.openCreateForm).toEqual(false);
             expect(scope.state).toEqual(undefined);
         });
 
         it("should fetch and select the newly created organization unit", function() {
             spyOn(location, 'hash').and.returnValue(2);
-            orgUnitContoller = new OrgUnitController(scope, db, projectsService, q, location, timeout, anchorScroll);
+            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll);
             spyOn(scope, 'onOrgUnitSelect');
 
             scope.$apply();
@@ -131,7 +128,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
 
         it("should display a timed message after creating a organization unit", function() {
             spyOn(location, 'hash').and.returnValue(2);
-            orgUnitContoller = new OrgUnitController(scope, db, projectsService, q, location, timeout, anchorScroll);
+            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll);
             spyOn(scope, 'onOrgUnitSelect');
 
             scope.$apply();
@@ -161,12 +158,10 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 'id': 1,
                 'level': 1
             };
-            scope.openCreateForm = true;
             scope.$apply();
             scope.onOrgUnitSelect(orgUnit);
 
             expect(scope.orgUnit).toEqual(orgUnit);
-            expect(scope.openCreateForm).toEqual(false);
         });
 
 
@@ -217,38 +212,19 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             })).toEqual(false);
         });
 
-        it("should give maxDate", function() {
-            expect(scope.maxDate).toEqual(today);
-        });
-
         it("should set the organization unit", function() {
             var orgUnit = {
                 'id': 1,
                 'level': 1
             };
-            spyOn(scope, 'reset');
             spyOn(location, 'hash');
             scope.$apply();
             scope.onOrgUnitSelect(orgUnit);
 
             expect(location.hash).toHaveBeenCalled();
             expect(scope.orgUnit).toEqual(orgUnit);
-            expect(scope.reset).toHaveBeenCalled();
             expect(anchorScroll).toHaveBeenCalled();
         });
-
-        it("should reset form", function() {
-            var newOrgUnit = {
-                'openingDate': today
-            };
-
-            scope.reset();
-
-            expect(scope.newOrgUnit).toEqual(newOrgUnit);
-            expect(scope.saveSuccess).toEqual(false);
-            expect(scope.saveFailure).toEqual(false);
-        });
-
 
         it("should get true if multiple child types are allowed", function() {
             scope.$apply();
@@ -284,7 +260,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
 
             scope.$apply();
             scope.setTemplateUrl(orgUnit, true, 2);
-            expect(scope.templateUrl).toEqual('templates/partials/module-form.html');
+            expect(scope.templateUrl).toEqual('templates/partials/module-form.html?id=something');
             expect(scope.isEditMode).toEqual(true);
         });
 

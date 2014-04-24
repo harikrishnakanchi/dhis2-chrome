@@ -3,9 +3,9 @@
 	<div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
 	<form name="createForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
 		<h3 ng-if="isEditMode" >Create Project</h3>
-		<h3 ng-if="!isEditMode" >{{ newOrgUnit.name }}</h3>
+		<h3 ng-if="!isEditMode" >Project Details</h3>
 		<ul>
-			<li ng-if="isEditMode" class="form-group">
+			<li class="form-group">
 				<label for="newOrgUnitName" class="col-sm-2 control-label">Name</label>
 				<div class="col-sm-4" >
 					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required/>
@@ -65,7 +65,7 @@
 				<div class="row">
 					<div class="col-md-6">
 						<p class="input-group">
-						<input ng-disabled="!isEditMode" type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitOpeningDate" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" is-open="openingDate" max-date="maxDate" close-text="Close" required/>
+						<input ng-disabled="!isEditMode" type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitOpeningDate" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" is-open="openingDate" max-date="thisDate" close-text="Close" required/>
 						<span class="input-group-btn">
 						<button class="btn btn-default" ng-click="openOpeningDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 						</span>
@@ -81,7 +81,7 @@
 				<div class="row">
 					<div class="col-md-6">
 						<p class="input-group">
-						<input ng-disabled="!isEditMode" type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitEndDate" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate" is-open="endDate" max-date="maxDate" close-text="Close"  required/>
+						<input ng-disabled="!isEditMode" type="text" class="form-control" datepicker-popup="yyyy-MM-dd" id="newOrgUnitEndDate" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate" is-open="endDate" min-date="thisDate" close-text="Close"  required/>
 						<span class="input-group-btn">
 						<button class="btn btn-default" ng-click="openEndDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 						</span>
@@ -94,7 +94,7 @@
 			</li>
 			<li ng-if="isEditMode">
 				<input type="submit" class="btn btn-primary" ng-disabled="createForm.$invalid" value="Save"/>
-				<input type="button" class="btn" ng-click="reset()" value="Cancel">
+				<input type="button" class="btn" ng-click="reset()" value="Reset">
 			</li>
 		</ul>
 	</form>

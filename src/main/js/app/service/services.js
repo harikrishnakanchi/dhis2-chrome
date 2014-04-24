@@ -1,8 +1,8 @@
-define(["metadataService", "dataService", "projectsService"], function(metadataService, dataService, projectsService) {
+define(["metadataService", "dataService", "orgUnitService"], function(metadataService, dataService, orgUnitService) {
     var init = function(app) {
         app.service('metadataService', ['$indexedDB', '$http', metadataService]);
         app.service('dataService', ['$http', '$indexedDB', dataService]);
-        app.service('projectsService', ['$http', projectsService]);
+        app.service('orgUnitService', ['$http', orgUnitService]);
     };
     return {
         init: init

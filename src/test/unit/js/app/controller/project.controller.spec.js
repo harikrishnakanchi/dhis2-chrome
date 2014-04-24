@@ -2,7 +2,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
     describe("project controller tests", function() {
 
-        var scope, timeout, q, location, db, mockOrgStore, projectsService, anchorScroll;
+        var scope, timeout, q, location, db, mockOrgStore, orgUnitService, anchorScroll;
 
         beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
             scope = $rootScope.$new();
@@ -20,15 +20,14 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 }
             };
 
-            projectsService = {
+            orgUnitService = {
                 "create": function() {}
             };
 
             anchorScroll = jasmine.createSpy();
             scope.isEditMode = true;
-            projectController = new ProjectController(scope, db, projectsService, q, location, timeout, anchorScroll);
+            projectController = new ProjectController(scope, db, orgUnitService, q, location, timeout, anchorScroll);
         }));
-
 
         it("should save project in dhis", function() {
             var orgUnitId = 'a4acf9115a7';
@@ -46,7 +45,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 'id': 'Id1'
             };
 
-            spyOn(projectsService, 'create').and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitService, 'create').and.returnValue(utils.getPromise(q, {}));
             spyOn(mockOrgStore, 'upsert').and.returnValue(utils.getPromise(q, orgUnitId));
             spyOn(location, 'hash');
 
@@ -67,7 +66,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 }
             };
 
-            expect(projectsService.create).toHaveBeenCalledWith([expectedNewOrgUnit]);
+            expect(orgUnitService.create).toHaveBeenCalledWith([expectedNewOrgUnit]);
+
             expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(location.hash).toHaveBeenCalledWith(orgUnitId);
         });
@@ -75,7 +75,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
         it("should display error if saving organization unit fails", function() {
             var newOrgUnit = {};
 
-            spyOn(projectsService, 'create').and.returnValue(utils.getRejectedPromise(q, {}));
+            spyOn(orgUnitService, 'create').and.returnValue(utils.getRejectedPromise(q, {}));
 
             scope.save(newOrgUnit, parent);
             scope.$apply();
@@ -83,7 +83,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             expect(scope.saveFailure).toEqual(true);
         });
 
-        it("should reset form", function() {
+        xit("should reset form", function() {
             scope.newOrgUnit = {
                 'id': '123',
                 'openingDate': moment().add('days', -7).toDate(),
@@ -117,6 +117,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             expect(event.preventDefault).toHaveBeenCalled();
             expect(event.stopPropagation).toHaveBeenCalled();
             expect(scope.openingDate).toBe(true);
+            expect(scope.endDate).toBe(false);
         });
 
         it("should open the end date datepicker", function() {
@@ -131,7 +132,76 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
             expect(event.preventDefault).toHaveBeenCalled();
             expect(event.stopPropagation).toHaveBeenCalled();
+            expect(scope.openingDate).toBe(false);
             expect(scope.endDate).toBe(true);
+        });
+
+        it("should show project details when in view mode", function() {
+            scope.newOrgUnit = {};
+            scope.orgUnit = {
+                "name": "anyname",
+                "openingDate": "YYYY-MM-DD",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "prjConDays",
+                        "name": "No of Consultation days per week",
+                        "id": "VKc7bvogtcP"
+                    },
+                    "value": "val1"
+                }, {
+                    "attribute": {
+                        "code": "prjCon",
+                        "name": "Context",
+                        "id": "Gy8V8WeGgYs"
+                    },
+                    "value": "val2"
+                }, {
+                    "attribute": {
+                        "code": "prjLoc",
+                        "name": "Location",
+                        "id": "CaQPMk01JB8"
+                    },
+                    "value": "val3"
+                }, {
+                    "attribute": {
+                        "code": "prjType",
+                        "name": "Type of project",
+                        "id": "bnbnSvRdFYo"
+                    },
+                    "value": "val4"
+                }, {
+                    "attribute": {
+                        "code": "prjEndDate",
+                        "name": "End date",
+                        "id": "ZbUuOnEmVs5"
+                    },
+                    "value": "val5"
+                }, {
+                    "attribute": {
+                        "code": "prjPopType",
+                        "name": "Type of population",
+                        "id": "Byx9QE6IvXB"
+                    },
+                    "value": "val6"
+                }]
+            };
+            var expectedNewOrgUnit = {
+                'name': scope.orgUnit.name,
+                'openingDate': scope.orgUnit.openingDate,
+                'consultDays': "val1",
+                'context': "val2",
+                'location': "val3",
+                'projectType': "val4",
+                'endDate': "val5",
+                'populationType': "val6",
+            };
+
+            scope.isEditMode = false;
+            scope.$apply();
+
+            projectController = new ProjectController(scope, db, orgUnitService, q, location, timeout, anchorScroll);
+
+            expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });
 
     });

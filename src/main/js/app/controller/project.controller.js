@@ -1,21 +1,25 @@
-define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
+define(["lodash", "md5", "moment"], function(_, md5, moment) {
 
-    return function($scope, db, projectsService, $q, $location, $timeout, $anchorScroll) {
+    return function($scope, db, orgUnitService, $q, $location, $timeout, $anchorScroll) {
 
         var scrollToTop = function() {
             $location.hash();
             $anchorScroll();
         };
 
+        $scope.thisDate = moment().toDate();
+
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
             $scope.openingDate = true;
+            $scope.endDate = false;
         };
 
         $scope.openEndDate = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
+            $scope.openingDate = false;
             $scope.endDate = true;
         };
 
@@ -24,44 +28,6 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
                 'openingDate': new Date(),
             };
             $scope.saveFailure = $scope.saveSuccess = false;
-            $scope.openCreateForm = false;
-        };
-
-        var init = function() {
-            if (!$scope.isEditMode) {
-                $scope.newOrgUnit.name = $scope.orgUnit.name;
-                $scope.newOrgUnit.openingDate = $scope.orgUnit.openingDate;
-                $scope.newOrgUnit.location = _.find($scope.orgUnit.attributeValues, {
-                    'attribute': {
-                        'code': 'prjLoc'
-                    }
-                }).value;
-                $scope.newOrgUnit.context = _.find($scope.orgUnit.attributeValues, {
-                    'attribute': {
-                        'code': 'prjCon'
-                    }
-                }).value;
-                $scope.newOrgUnit.endDate = _.find($scope.orgUnit.attributeValues, {
-                    'attribute': {
-                        'code': 'prjEndDate'
-                    }
-                }).value;
-                $scope.newOrgUnit.projectType = _.find($scope.orgUnit.attributeValues, {
-                    'attribute': {
-                        'code': 'prjType'
-                    }
-                }).value;
-                $scope.newOrgUnit.populationType = _.find($scope.orgUnit.attributeValues, {
-                    'attribute': {
-                        'code': 'prjPopType'
-                    }
-                }).value;
-                $scope.newOrgUnit.consultDays = _.find($scope.orgUnit.attributeValues, {
-                    'attribute': {
-                        'code': 'prjConDays'
-                    }
-                }).value;
-            }
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
@@ -87,9 +53,34 @@ define(["toTree", "lodash", "md5", "moment"], function(toTree, _, md5, moment) {
                 return store.upsert(newOrgUnit);
             };
 
-            return projectsService.create([newOrgUnit]).then(saveToDb).then(onSuccess, onError);
+            return orgUnitService.create([newOrgUnit]).then(saveToDb).then(onSuccess, onError);
 
         };
+
+        var getAttributeValue = function(code) {
+            return _.find($scope.orgUnit.attributeValues, {
+                'attribute': {
+                    'code': code
+                }
+            }).value;
+        };
+
+        var init = function() {
+            $scope.reset();
+            if (!$scope.isEditMode) {
+                $scope.newOrgUnit.name = $scope.orgUnit.name;
+                $scope.newOrgUnit.openingDate = $scope.orgUnit.openingDate;
+                if ($scope.orgUnit.attributeValues) {
+                    $scope.newOrgUnit.location = getAttributeValue('prjLoc');
+                    $scope.newOrgUnit.context = getAttributeValue('prjCon');
+                    $scope.newOrgUnit.endDate = getAttributeValue('prjEndDate');
+                    $scope.newOrgUnit.projectType = getAttributeValue('prjType');
+                    $scope.newOrgUnit.populationType = getAttributeValue('prjPopType');
+                    $scope.newOrgUnit.consultDays = getAttributeValue('prjConDays');
+                }
+            }
+        };
+
         init();
     };
 });

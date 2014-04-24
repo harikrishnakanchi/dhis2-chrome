@@ -36,6 +36,7 @@ require.config({
         "mainController": "app/controller/main.controller",
         "projectController": "app/controller/project.controller",
         "loginController": "app/controller/login.controller",
+        "countryController": "app/controller/country.controller",
 
         //Directives
         "directives": "app/directive/directives",
@@ -44,7 +45,7 @@ require.config({
         "services": "app/service/services",
         "metadataService": "app/service/metadata.service",
         "dataService": "app/service/data.service",
-        "projectsService": "app/service/projects.service",
+        "orgUnitService": "app/service/orgUnit.service",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
