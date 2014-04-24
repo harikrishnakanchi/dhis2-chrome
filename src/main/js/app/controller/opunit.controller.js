@@ -1,5 +1,5 @@
 define(["lodash", "md5", "moment"], function(_, md5, moment) {
-    return function($scope, projectsService, db, $location) {
+    return function($scope, orgUnitService, db, $location) {
         $scope.opUnits = [{
             'openingDate': moment().format("YYYY-MM-DD")
         }];
@@ -44,7 +44,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
                 return store.upsert(newOpUnits);
             };
 
-            return projectsService.create(newOpUnits).then(saveToDb).then(onSuccess, onError);
+            return orgUnitService.create(newOpUnits).then(saveToDb).then(onSuccess, onError);
         };
 
         $scope.delete = function(index) {

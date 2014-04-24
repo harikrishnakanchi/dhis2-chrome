@@ -67,7 +67,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             scope.save(newOrgUnit, parent);
             scope.$apply();
 
-            var expectedNewOrgUnit = {
+            var expectedNewOrgUnit = [{
                 id: orgUnitId,
                 name: newOrgUnit.name,
                 openingDate: moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
@@ -77,7 +77,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                     id: parent.id,
                     name: parent.name,
                 }
-            };
+            }];
 
             expect(orgUnitService.create).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);

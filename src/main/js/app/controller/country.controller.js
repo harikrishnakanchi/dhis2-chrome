@@ -33,10 +33,10 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
 
             var saveToDb = function() {
                 var store = db.objectStore("organisationUnits");
-                return store.upsert(newOrgUnit);
+                return store.upsert([newOrgUnit]);
             };
 
-            return orgUnitService.create(newOrgUnit).then(saveToDb).then(onSuccess, onError);
+            return orgUnitService.create([newOrgUnit]).then(saveToDb).then(onSuccess, onError);
 
         };
 

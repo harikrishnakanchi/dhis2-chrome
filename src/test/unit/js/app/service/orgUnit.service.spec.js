@@ -15,14 +15,14 @@ define(["orgUnitService", "angularMocks", "properties"], function(OrgUnitService
         });
 
         it("should save organization unit in dhis", function() {
-            var orgUnit = {
+            var orgUnit = [{
                 "id": "org_0",
                 "level": 1
-            };
+            }];
             projectService.create(orgUnit);
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", {
-                "organisationUnits": [orgUnit]
+                "organisationUnits": orgUnit
             }).respond(200, "ok");
             httpBackend.flush();
         });
