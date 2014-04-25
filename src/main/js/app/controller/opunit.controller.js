@@ -30,21 +30,10 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
                 });
             });
 
-            var onSuccess = function(data) {
+            orgUnitService.create(newOpUnits).then(function(data) {
                 $scope.saveSuccess = true;
                 $location.hash(data);
-            };
-
-            var onError = function() {
-                $scope.saveFailure = true;
-            };
-
-            var saveToDb = function() {
-                var store = db.objectStore("organisationUnits");
-                return store.upsert(newOpUnits);
-            };
-
-            return orgUnitService.create(newOpUnits).then(saveToDb).then(onSuccess, onError);
+            });
         };
 
         $scope.delete = function(index) {

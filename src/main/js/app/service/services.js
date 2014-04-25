@@ -2,7 +2,7 @@ define(["metadataService", "dataService", "orgUnitService"], function(metadataSe
     var init = function(app) {
         app.service('metadataService', ['$indexedDB', '$http', metadataService]);
         app.service('dataService', ['$http', '$indexedDB', dataService]);
-        app.service('orgUnitService', ['$http', orgUnitService]);
+        app.service('orgUnitService', ['$http', '$indexedDB', orgUnitService]);
     };
     return {
         init: init

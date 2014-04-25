@@ -47,11 +47,6 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
                 $scope.saveFailure = true;
             };
 
-            var saveToDb = function() {
-                var store = db.objectStore("organisationUnits");
-                return store.upsert(payload);
-            };
-
             newOrgUnit = _.merge(newOrgUnit, {
                 'id': md5(newOrgUnit.name + parentOrgUnit.name).substr(0, 11),
                 'shortName': newOrgUnit.name,
@@ -63,7 +58,7 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
 
             var payload = orgUnitMapper.toDhisProject(newOrgUnit);
 
-            return orgUnitService.create(payload).then(saveToDb).then(onSuccess, onError);
+            return orgUnitService.create(payload).then(onSuccess, onError);
 
         };
 

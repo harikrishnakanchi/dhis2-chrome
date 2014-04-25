@@ -1,12 +1,23 @@
-define(["orgUnitService", "angularMocks", "properties"], function(OrgUnitService, mocks, properties) {
+define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUnitService, mocks, properties, utils) {
     describe("projects controller", function() {
-        var http, httpBackend, scope, projectService;
+        var http, httpBackend, projectService, db, mockOrgStore, q;
 
-        beforeEach(mocks.inject(function($rootScope, $httpBackend, $http) {
-            scope = $rootScope.$new();
+        beforeEach(mocks.inject(function($httpBackend, $http, $q) {
             http = $http;
             httpBackend = $httpBackend;
-            orgUnitService = new OrgUnitService(http);
+            q = $q;
+
+            mockOrgStore = {
+                upsert: function() {}
+            };
+            db = {
+                objectStore: function() {}
+            };
+
+            spyOn(db, "objectStore").and.returnValue(mockOrgStore);
+            spyOn(mockOrgStore, "upsert").and.returnValue(utils.getPromise(q, "someId"));
+
+            orgUnitService = new OrgUnitService(http, db);
         }));
 
         afterEach(function() {
@@ -19,11 +30,22 @@ define(["orgUnitService", "angularMocks", "properties"], function(OrgUnitService
                 "id": "org_0",
                 "level": 1
             }];
-            orgUnitService.create(orgUnit);
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", {
-                "organisationUnits": orgUnit
-            }).respond(200, "ok");
+            var expectedPayload = {
+                organisationUnits: [{
+                    id: 'org_0',
+                    level: 1
+                }]
+            };
+
+            orgUnitService.create(orgUnit).then(function(data) {
+                expect(data).toEqual("someId");
+            });
+
+            expect(db.objectStore).toHaveBeenCalledWith("organisationUnits");
+            expect(mockOrgStore.upsert).toHaveBeenCalledWith(orgUnit);
+
+            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -92,6 +114,8 @@ define(["orgUnitService", "angularMocks", "properties"], function(OrgUnitService
 
             orgUnitService.create(payload);
 
+            expect(db.objectStore).toHaveBeenCalledWith("organisationUnits");
+            expect(mockOrgStore.upsert).toHaveBeenCalledWith(payload);
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });

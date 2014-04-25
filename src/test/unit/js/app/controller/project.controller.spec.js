@@ -45,8 +45,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 'id': 'Id1'
             };
 
-            spyOn(orgUnitService, 'create').and.returnValue(utils.getPromise(q, {}));
-            spyOn(mockOrgStore, 'upsert').and.returnValue(utils.getPromise(q, orgUnitId));
+            spyOn(orgUnitService, 'create').and.returnValue(utils.getPromise(q, orgUnitId));
             spyOn(location, 'hash');
 
             scope.save(newOrgUnit, parent);
@@ -109,7 +108,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
             expect(orgUnitService.create).toHaveBeenCalledWith(expectedNewOrgUnit);
 
-            expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(location.hash).toHaveBeenCalledWith(orgUnitId);
         });
 

@@ -86,10 +86,9 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 'id': 'ParentId'
             };
 
-            spyOn(mockOrgStore, 'upsert').and.returnValue(utils.getPromise(q, [opUnit1Id, opUnit2Id]));
             spyOn(location, 'hash');
 
-            spyOn(projectsService, 'create').and.returnValue(utils.getPromise(q, {}));
+            spyOn(projectsService, 'create').and.returnValue(utils.getPromise(q, [opUnit1Id, opUnit2Id]));
 
             scope.save(opUnits);
             scope.$apply();
@@ -131,58 +130,8 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             }];
 
             expect(projectsService.create).toHaveBeenCalledWith(expectedOpUnits);
-            expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedOpUnits);
             expect(location.hash).toHaveBeenCalledWith([opUnit1Id, opUnit2Id]);
-        });
-
-        it('operation units save should fail if service gives some error', function() {
-            var opUnit1Id = '70c075414b8';
-
-            var opUnit1 = {
-                'name': 'OpUnit1',
-                'type': 'Hospital',
-                'openingDate': today
-            };
-
-            var opUnits = [opUnit1];
-
-            scope.orgUnit = {
-                'level': 4,
-                'name': 'Parent',
-                'id': 'ParentId'
-            };
-
-            spyOn(projectsService, 'create').and.returnValue(utils.getRejectedPromise(q, {}));
-
-            scope.save(opUnits);
-            scope.$apply();
-
-            expect(scope.saveFailure).toEqual(true);
-        });
-
-        it('operation units save should fail if save to db fails', function() {
-            var opUnit1Id = '70c075414b8';
-            var opUnit1 = {
-                'name': 'OpUnit1',
-                'type': 'Hospital',
-                'openingDate': today
-            };
-            var opUnits = [opUnit1];
-
-            scope.orgUnit = {
-                'level': 4,
-                'name': 'Parent',
-                'id': 'ParentId'
-            };
-
-            spyOn(mockOrgStore, 'upsert').and.returnValue(utils.getRejectedPromise(q, {}));
-
-            spyOn(projectsService, 'create').and.returnValue(utils.getPromise(q, {}));
-
-            scope.save(opUnits);
-            scope.$apply();
-
-            expect(scope.saveFailure).toEqual(true);
+            expect(scope.saveSuccess).toBe(true);
         });
     });
 });
