@@ -32,7 +32,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
 
             orgUnitService.create(newOpUnits).then(function(data) {
                 $scope.saveSuccess = true;
-                $location.hash(data);
+                $location.hash([$scope.orgUnit.id, data]);
             });
         };
 

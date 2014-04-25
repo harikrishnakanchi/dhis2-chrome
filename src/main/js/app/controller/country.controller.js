@@ -24,7 +24,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             });
 
             var onSuccess = function(data) {
-                $location.hash(data);
+                $location.hash([data]);
             };
 
             var onError = function() {

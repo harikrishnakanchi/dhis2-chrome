@@ -41,7 +41,7 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
         };
 
         var init = function() {
-            var selectedNodeId = $location.hash();
+            var selectedNodeId = $location.hash()[0];
             $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
         };
 

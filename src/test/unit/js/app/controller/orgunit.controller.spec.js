@@ -112,7 +112,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
         });
 
         it("should fetch and select the newly created organization unit", function() {
-            spyOn(location, 'hash').and.returnValue(2);
+            spyOn(location, 'hash').and.returnValue([2, 1]);
             orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll);
             spyOn(scope, 'onOrgUnitSelect');
 
@@ -127,7 +127,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
         });
 
         it("should display a timed message after creating a organization unit", function() {
-            spyOn(location, 'hash').and.returnValue(2);
+            spyOn(location, 'hash').and.returnValue([1, 2]);
             orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll);
             spyOn(scope, 'onOrgUnitSelect');
 
@@ -163,7 +163,6 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
 
             expect(scope.orgUnit).toEqual(orgUnit);
         });
-
 
         it("should get child level", function() {
             scope.$apply();

@@ -81,7 +81,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
 
             expect(orgUnitService.create).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
-            expect(location.hash).toHaveBeenCalledWith(orgUnitId);
+            expect(location.hash).toHaveBeenCalledWith([orgUnitId]);
         });
 
         it("should display error if saving organization unit fails", function() {

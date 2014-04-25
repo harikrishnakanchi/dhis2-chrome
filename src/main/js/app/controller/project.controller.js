@@ -40,7 +40,7 @@ define(["moment", "orgUnitMapper"], function(moment, orgUnitMapper) {
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
             var onSuccess = function(data) {
-                $location.hash(data);
+                $location.hash([data]);
             };
 
             var onError = function() {

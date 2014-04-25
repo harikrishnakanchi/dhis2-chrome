@@ -130,7 +130,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             }];
 
             expect(projectsService.create).toHaveBeenCalledWith(expectedOpUnits);
-            expect(location.hash).toHaveBeenCalledWith([opUnit1Id, opUnit2Id]);
+            expect(location.hash).toHaveBeenCalledWith(['ParentId', [opUnit1Id, opUnit2Id]]);
             expect(scope.saveSuccess).toBe(true);
         });
     });
