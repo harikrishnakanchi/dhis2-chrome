@@ -1,9 +1,10 @@
 define(["lodash"], function(_) {
 
     var toDhisProject = function(orgUnit) {
+
         newOrgUnit = _.omit(orgUnit, ['consultDays', 'context', 'location', 'projectType', 'endDate', 'populationType']);
 
-        return _.merge(newOrgUnit, {
+        newOrgUnit = _.merge(newOrgUnit, {
             "attributeValues": [{
                 "attribute": {
                     "code": "prjConDays",
@@ -48,6 +49,9 @@ define(["lodash"], function(_) {
                 "value": orgUnit.populationType
             }],
         });
+
+        return new Array(newOrgUnit);
+
     };
 
     return {

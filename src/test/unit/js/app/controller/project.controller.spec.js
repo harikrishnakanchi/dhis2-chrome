@@ -52,7 +52,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             scope.save(newOrgUnit, parent);
             scope.$apply();
 
-            var expectedNewOrgUnit = {
+            var expectedNewOrgUnit = [{
                 id: orgUnitId,
                 name: newOrgUnit.name,
                 shortName: newOrgUnit.name,
@@ -105,7 +105,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     },
                     "value": newOrgUnit.populationType
                 }],
-            };
+            }];
 
             expect(orgUnitService.create).toHaveBeenCalledWith(expectedNewOrgUnit);
 

@@ -57,7 +57,7 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
                 'shortName': newOrgUnit.name,
                 'level': 4,
                 'openingDate': moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
-                'endDate': moment(newOrgUnit.endDate).format("YYYY-MM-DD"),
+                'endDate': newOrgUnit.endDate ? moment(newOrgUnit.endDate).format("YYYY-MM-DD") : undefined,
                 'parent': _.pick(parentOrgUnit, "name", "id")
             });
 

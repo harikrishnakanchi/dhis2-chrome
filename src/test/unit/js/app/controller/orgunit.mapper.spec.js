@@ -1,7 +1,7 @@
 define(["orgUnitMapper", "angularMocks"], function(orgUnitMapper, mocks) {
     describe("orgUnitMapper", function() {
 
-        it("should transform payload to contain attributes", function() {
+        it("should transform orgUnit to contain attributes as per DHIS", function() {
 
             var orgUnit = {
                 'id': 'a4acf9115a7',
@@ -23,7 +23,7 @@ define(["orgUnitMapper", "angularMocks"], function(orgUnitMapper, mocks) {
 
             var result = orgUnitMapper.toDhisProject(orgUnit);
 
-            var expectedResult = {
+            var expectedResult = [{
                 "id": orgUnit.id,
                 "name": orgUnit.name,
                 "shortName": orgUnit.shortName,
@@ -76,7 +76,7 @@ define(["orgUnitMapper", "angularMocks"], function(orgUnitMapper, mocks) {
                     },
                     "value": orgUnit.populationType
                 }]
-            };
+            }];
 
             expect(result).toEqual(expectedResult);
         });
