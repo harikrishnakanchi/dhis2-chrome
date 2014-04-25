@@ -17,7 +17,7 @@
 		<div class="col-sm-7 col-md-8">
 			<div class="top-actions">
 				<input type="button" class="btn btn-sub btn-sm pull-right" ng-value="'Create ' + getLevel(orgUnit, 1)" ng-show="canCreateChild(orgUnit) &amp;&amp; !isEditMode" ng-click="setTemplateUrl(orgUnit, true, 1)"/>
-				<input type="button" class="btn btn-sub btn-sm pull-right" ng-value="'Create ' + getLevel(orgUnit, 2)" ng-show="canCreateMulitpleChildType(orgUnit)" ng-click="setTemplateUrl(orgUnit, true, 2)"/>
+				<input type="button" class="btn btn-sub btn-sm pull-right" ng-value="'Create ' + getLevel(orgUnit, 2)" ng-show="canCreateMulitpleChildType(orgUnit) &amp;&amp; !isEditMode" ng-click="setTemplateUrl(orgUnit, true, 2)"/>
 			</div>
 			<div ng-include="templateUrl">
 			</div>
