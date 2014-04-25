@@ -1,20 +1,24 @@
-<section class="panel org-units">
-	<div class="row">
-		<div class="col-sm-5 col-md-4">
+<section class="panel org-units main-columns">
+
+		<div class="treeview-col">
+			<button class="toggle">
+				<span></span>	
+			</button>
 			<div class="treeview-cont">
+
 				<div class="content">
-			<treeview
-			tree-model="organisationUnits"
-			node-id="id"
-			node-label="name"
-			node-children="children"
-			on-node-select="onOrgUnitSelect"
-			state="state"
-			/>
-			</div>
+					<treeview
+					tree-model="organisationUnits"
+					node-id="id"
+					node-label="name"
+					node-children="children"
+					on-node-select="onOrgUnitSelect"
+					state="state"
+					/>
+				</div>
 			</div>
 		</div>
-		<div class="col-sm-7 col-md-8">
+		<div class="main-content">
 			<div class="top-actions">
 				<input type="button" class="btn btn-sub btn-sm pull-right" ng-value="'Create ' + getLevel(orgUnit, 1)" ng-show="canCreateChild(orgUnit) &amp;&amp; !isEditMode" ng-click="setTemplateUrl(orgUnit, true, 1)"/>
 				<input type="button" class="btn btn-sub btn-sm pull-right" ng-value="'Create ' + getLevel(orgUnit, 2)" ng-show="canCreateMulitpleChildType(orgUnit) &amp;&amp; !isEditMode" ng-click="setTemplateUrl(orgUnit, true, 2)"/>
@@ -22,5 +26,6 @@
 			<div ng-include="templateUrl">
 			</div>
 		</div>
-	</div>
+
 </section>
+<script>

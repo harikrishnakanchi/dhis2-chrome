@@ -298,10 +298,71 @@ text-align: center;
 }
 
 //orgunits
+html, body { height:100%;}
+            .main-columns { 
+              overflow:hidden;
+              height:100%; 
+            }
+
+            .main-content { 
+              height:100%;
+              overflow:hidden;
+              padding:10px 20px;
+            }
+
+.treeview-col{
+  float:left;
+  height:100%;
+  width:280px;  
+  margin-top: 20px;
+  background: #e7e7e7;
+  .treeview-cont{
+  	display:block;
+  }
+  .toggle{
+	border:0;
+	background: transparent;
+	width:30px;
+	float: right;
+	margin:7px 7px 0;
+		span{font-size:18px;}
+		span{
+		.glyphicon;
+		.glyphicon-circle-arrow-left;
+		}
+	}
+	}
+.treeview-col.collapsed{
+  width:30px;
+  .treeview-cont{
+  	display:none;
+  }
+  .toggle{
+  	margin:7px 0 0 0;
+  	span{
+  	.glyphicon;
+  	.glyphicon-circle-arrow-right;
+  	}
+  }
+}
+
 .org-units{
 .btn-sub + .btn-sub{ margin-right: 10px;}
 .top-actions{
 	 &:extend(.clearfix all);
 	 margin: 20px 0;
 }
+}
+
+.org-units{
+label{
+	font-weight:400;
+}
+.form-group{
+	p{
+		margin-bottom: 0;
+	}
+}
+
+
 }
