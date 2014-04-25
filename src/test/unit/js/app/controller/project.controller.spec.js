@@ -29,7 +29,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             projectController = new ProjectController(scope, db, orgUnitService, q, location, timeout, anchorScroll);
         }));
 
-        xit("should save project in dhis", function() {
+        it("should save project in dhis", function() {
             var orgUnitId = 'a4acf9115a7';
 
             var newOrgUnit = {
@@ -55,18 +55,59 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             var expectedNewOrgUnit = {
                 id: orgUnitId,
                 name: newOrgUnit.name,
-                location: newOrgUnit.location,
-                openingDate: moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
-                endDate: moment(newOrgUnit.endDate).format("YYYY-MM-DD"),
                 shortName: newOrgUnit.name,
+                openingDate: moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
                 level: 4,
                 parent: {
                     id: parent.id,
                     name: parent.name,
-                }
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "prjConDays",
+                        "name": "No of Consultation days per week",
+                        "id": "VKc7bvogtcP"
+                    },
+                    "value": newOrgUnit.consultDays
+                }, {
+                    "attribute": {
+                        "code": "prjCon",
+                        "name": "Context",
+                        "id": "Gy8V8WeGgYs"
+                    },
+                    "value": newOrgUnit.context
+                }, {
+                    "attribute": {
+                        "code": "prjLoc",
+                        "name": "Location",
+                        "id": "CaQPMk01JB8"
+                    },
+                    "value": newOrgUnit.location
+                }, {
+                    "attribute": {
+                        "code": "prjType",
+                        "name": "Type of project",
+                        "id": "bnbnSvRdFYo"
+                    },
+                    "value": newOrgUnit.projectType
+                }, {
+                    "attribute": {
+                        "code": "prjEndDate",
+                        "name": "End date",
+                        "id": "ZbUuOnEmVs5"
+                    },
+                    "value": moment(newOrgUnit.endDate).format("YYYY-MM-DD")
+                }, {
+                    "attribute": {
+                        "code": "prjPopType",
+                        "name": "Type of population",
+                        "id": "Byx9QE6IvXB"
+                    },
+                    "value": newOrgUnit.populationType
+                }],
             };
 
-            expect(orgUnitService.create).toHaveBeenCalledWith([expectedNewOrgUnit]);
+            expect(orgUnitService.create).toHaveBeenCalledWith(expectedNewOrgUnit);
 
             expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(location.hash).toHaveBeenCalledWith(orgUnitId);

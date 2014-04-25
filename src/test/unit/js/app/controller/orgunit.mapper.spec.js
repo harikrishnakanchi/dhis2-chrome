@@ -1,9 +1,38 @@
-define([], function() {
-    return function(orgUnits) {
-        var convertToProjectLevelOrgUnit = function(orgUnit) {
-            newOrgUnit = _.omit(orgUnit, ['consultDays', 'context', 'location', 'projectType', 'endDate', 'populationType']);
+define(["orgUnitMapper", "angularMocks"], function(orgUnitMapper, mocks) {
+    describe("orgUnitMapper", function() {
 
-            return _.merge(newOrgUnit, {
+        it("should transform payload to contain attributes", function() {
+
+            var orgUnit = {
+                'id': 'a4acf9115a7',
+                'name': 'Org1',
+                'shortName': 'Org1',
+                'level': 4,
+                'openingDate': "YYYY-MM-DD",
+                'consultDays': "val1",
+                'context': "val2",
+                'location': "val3",
+                'projectType': "val4",
+                'endDate': "val5",
+                'populationType': "val6",
+                "parent": {
+                    name: 'Name1',
+                    id: 'Id1'
+                },
+            };
+
+            var result = orgUnitMapper.toDhisProject(orgUnit);
+
+            var expectedResult = {
+                "id": orgUnit.id,
+                "name": orgUnit.name,
+                "shortName": orgUnit.shortName,
+                "level": orgUnit.level,
+                "openingDate": orgUnit.openingDate,
+                "parent": {
+                    "name": orgUnit.parent.name,
+                    "id": orgUnit.parent.id
+                },
                 "attributeValues": [{
                     "attribute": {
                         "code": "prjConDays",
@@ -46,15 +75,11 @@ define([], function() {
                         "id": "Byx9QE6IvXB"
                     },
                     "value": orgUnit.populationType
-                }],
-            });
-        };
+                }]
+            };
 
-        var payload =
-            _.map(orgUnits, function(orgUnit) {
-                return orgUnit.level === 4 ? convertToProjectLevelOrgUnit(orgUnit) : orgUnit;
-            });
+            expect(result).toEqual(expectedResult);
+        });
 
-        return payload;
-    };
+    });
 });

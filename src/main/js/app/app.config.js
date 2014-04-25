@@ -52,7 +52,7 @@ require.config({
         "extractHeaders": "app/transformers/extract.headers",
         "dataValuesMapper": "app/transformers/datavalues.mapper",
         "findCategoryComboOption": "app/transformers/find.category.combo.option",
-        "createAttributePayload": "app/transformers/create.attribute.payload",
+        "orgUnitMapper": "app/transformers/orgunit.mapper",
         "toTree": "app/transformers/to.tree"
     },
     shim: {

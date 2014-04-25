@@ -1,4 +1,4 @@
-define(["lodash", "md5", "moment", "createAttributePayload"], function(_, md5, moment, createAttributePayload) {
+define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, orgUnitMapper) {
 
     return function($scope, db, orgUnitService, $q, $location, $timeout, $anchorScroll) {
 
@@ -39,15 +39,6 @@ define(["lodash", "md5", "moment", "createAttributePayload"], function(_, md5, m
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
-            newOrgUnit = _.merge(newOrgUnit, {
-                'id': md5(newOrgUnit.name + parentOrgUnit.name).substr(0, 11),
-                'shortName': newOrgUnit.name,
-                'level': 4,
-                'openingDate': moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
-                'endDate': moment(newOrgUnit.endDate).format("YYYY-MM-DD"),
-                'parent': _.pick(parentOrgUnit, "name", "id")
-            });
-
             var onSuccess = function(data) {
                 $location.hash(data);
             };
@@ -61,7 +52,16 @@ define(["lodash", "md5", "moment", "createAttributePayload"], function(_, md5, m
                 return store.upsert(payload);
             };
 
-            var payload = createAttributePayload([newOrgUnit]);
+            newOrgUnit = _.merge(newOrgUnit, {
+                'id': md5(newOrgUnit.name + parentOrgUnit.name).substr(0, 11),
+                'shortName': newOrgUnit.name,
+                'level': 4,
+                'openingDate': moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
+                'endDate': moment(newOrgUnit.endDate).format("YYYY-MM-DD"),
+                'parent': _.pick(parentOrgUnit, "name", "id")
+            });
+
+            var payload = orgUnitMapper.toDhisProject(newOrgUnit);
 
             return orgUnitService.create(payload).then(saveToDb).then(onSuccess, onError);
 
