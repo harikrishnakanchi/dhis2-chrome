@@ -73,7 +73,7 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
         $scope.setTemplateUrl = function(orgUnit, isEditMode, depth) {
             depth = depth || 0;
             var level = $scope.getLevel(orgUnit, depth);
-            $scope.templateUrl = templateUrlMap[level] + '?id=' + orgUnit.id;
+            $scope.templateUrl = templateUrlMap[level] + '?' + moment().format("X");
             $scope.isEditMode = isEditMode;
         };
 

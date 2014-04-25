@@ -47,8 +47,7 @@ define(["moment", "orgUnitMapper"], function(moment, orgUnitMapper) {
                 $scope.saveFailure = true;
             };
 
-            var dhisProject = new Array(orgUnitMapper.toDhisProject(newOrgUnit, parentOrgUnit));
-
+            var dhisProject = new Array(orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit));
             return orgUnitService.create(dhisProject).then(onSuccess, onError);
 
         };
@@ -56,7 +55,7 @@ define(["moment", "orgUnitMapper"], function(moment, orgUnitMapper) {
         var init = function() {
             $scope.reset();
             if (!$scope.isEditMode)
-                $scope.newOrgUnit = orgUnitMapper.toProjectForView($scope.orgUnit);
+                $scope.newOrgUnit = orgUnitMapper.mapToProjectForView($scope.orgUnit);
         };
 
         init();

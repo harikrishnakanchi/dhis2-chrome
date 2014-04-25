@@ -260,7 +260,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
 
             scope.$apply();
             scope.setTemplateUrl(orgUnit, true, 2);
-            expect(scope.templateUrl).toEqual('templates/partials/module-form.html?id=something');
+            expect(scope.templateUrl).toContain('templates/partials/module-form.html');
             expect(scope.isEditMode).toEqual(true);
         });
 

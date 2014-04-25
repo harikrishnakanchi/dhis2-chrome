@@ -1,6 +1,6 @@
 define(["lodash", "md5", "moment"], function(_, md5, moment) {
 
-    var toDhisProject = function(orgUnit, parentOrgUnit) {
+    var mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
 
         var projectOrgUnit = {
             'id': md5(orgUnit.name + parentOrgUnit.name).substr(0, 11),
@@ -78,7 +78,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
     };
 
 
-    var toProjectForView = function(dhisProject) {
+    var mapToProjectForView = function(dhisProject) {
         var endDate = getAttributeValue(dhisProject, "prjEndDate");
         return {
             'name': dhisProject.name,
@@ -93,7 +93,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
     };
 
     return {
-        "toDhisProject": toDhisProject,
-        "toProjectForView": toProjectForView,
+        "mapToProjectForDhis": mapToProjectForDhis,
+        "mapToProjectForView": mapToProjectForView,
     };
 });

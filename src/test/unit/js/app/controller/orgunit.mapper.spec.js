@@ -57,7 +57,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }]
             };
 
-            var result = orgUnitMapper.toProjectForView(dhisProject);
+            var result = orgUnitMapper.mapToProjectForView(dhisProject);
 
             var expectedResult = {
                 'name': dhisProject.name,
@@ -93,7 +93,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             };
 
 
-            var result = orgUnitMapper.toDhisProject(orgUnit, parentOrgUnit);
+            var result = orgUnitMapper.mapToProjectForDhis(orgUnit, parentOrgUnit);
 
             var expectedResult = {
                 "id": "a4acf9115a7",
