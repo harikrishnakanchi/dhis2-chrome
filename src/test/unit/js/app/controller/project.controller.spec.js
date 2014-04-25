@@ -91,18 +91,18 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     "value": newOrgUnit.projectType
                 }, {
                     "attribute": {
-                        "code": "prjEndDate",
-                        "name": "End date",
-                        "id": "ZbUuOnEmVs5"
-                    },
-                    "value": moment(newOrgUnit.endDate).format("YYYY-MM-DD")
-                }, {
-                    "attribute": {
                         "code": "prjPopType",
                         "name": "Type of population",
                         "id": "Byx9QE6IvXB"
                     },
                     "value": newOrgUnit.populationType
+                }, {
+                    "attribute": {
+                        "code": "prjEndDate",
+                        "name": "End date",
+                        "id": "ZbUuOnEmVs5"
+                    },
+                    "value": moment(newOrgUnit.endDate).format("YYYY-MM-DD")
                 }],
             }];
 
@@ -179,7 +179,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             scope.newOrgUnit = {};
             scope.orgUnit = {
                 "name": "anyname",
-                "openingDate": "YYYY-MM-DD",
+                "openingDate": "2010-01-01",
                 "attributeValues": [{
                     "attribute": {
                         "code": "prjConDays",
@@ -214,7 +214,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                         "name": "End date",
                         "id": "ZbUuOnEmVs5"
                     },
-                    "value": "val5"
+                    "value": "2011-01-01"
                 }, {
                     "attribute": {
                         "code": "prjPopType",
@@ -226,12 +226,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             };
             var expectedNewOrgUnit = {
                 'name': scope.orgUnit.name,
-                'openingDate': scope.orgUnit.openingDate,
+                'openingDate': moment("2010-01-01").toDate(),
                 'consultDays': "val1",
                 'context': "val2",
                 'location': "val3",
                 'projectType': "val4",
-                'endDate': "val5",
+                'endDate': moment("2011-01-01").toDate(),
                 'populationType': "val6",
             };
 

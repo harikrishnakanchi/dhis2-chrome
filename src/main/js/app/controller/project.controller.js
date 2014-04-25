@@ -1,4 +1,4 @@
-define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, orgUnitMapper) {
+define(["moment", "orgUnitMapper"], function(moment, orgUnitMapper) {
 
     return function($scope, db, orgUnitService, $q, $location, $timeout, $anchorScroll) {
 
@@ -47,43 +47,16 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
                 $scope.saveFailure = true;
             };
 
-            newOrgUnit = _.merge(newOrgUnit, {
-                'id': md5(newOrgUnit.name + parentOrgUnit.name).substr(0, 11),
-                'shortName': newOrgUnit.name,
-                'level': 4,
-                'openingDate': moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
-                'endDate': newOrgUnit.endDate ? moment(newOrgUnit.endDate).format("YYYY-MM-DD") : undefined,
-                'parent': _.pick(parentOrgUnit, "name", "id")
-            });
+            var dhisProject = new Array(orgUnitMapper.toDhisProject(newOrgUnit, parentOrgUnit));
 
-            var payload = orgUnitMapper.toDhisProject(newOrgUnit);
+            return orgUnitService.create(dhisProject).then(onSuccess, onError);
 
-            return orgUnitService.create(payload).then(onSuccess, onError);
-
-        };
-
-        var getAttributeValue = function(code) {
-            return _.find($scope.orgUnit.attributeValues, {
-                'attribute': {
-                    'code': code
-                }
-            }).value;
         };
 
         var init = function() {
             $scope.reset();
-            if (!$scope.isEditMode) {
-                $scope.newOrgUnit.name = $scope.orgUnit.name;
-                $scope.newOrgUnit.openingDate = $scope.orgUnit.openingDate;
-                if ($scope.orgUnit.attributeValues) {
-                    $scope.newOrgUnit.location = getAttributeValue('prjLoc');
-                    $scope.newOrgUnit.context = getAttributeValue('prjCon');
-                    $scope.newOrgUnit.endDate = getAttributeValue('prjEndDate');
-                    $scope.newOrgUnit.projectType = getAttributeValue('prjType');
-                    $scope.newOrgUnit.populationType = getAttributeValue('prjPopType');
-                    $scope.newOrgUnit.consultDays = getAttributeValue('prjConDays');
-                }
-            }
+            if (!$scope.isEditMode)
+                $scope.newOrgUnit = orgUnitMapper.toProjectForView($scope.orgUnit);
         };
 
         init();
