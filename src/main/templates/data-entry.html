@@ -30,7 +30,7 @@
 						</th>
 					</tr>
 					<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
-						<td>{{ dataElement.name }}</td>
+						<td>{{ dataElement.formName }}</td>
 						<td ng-repeat="option in section.categoryOptionComboIds">
 							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="safeGet(dataValues, dataElement.id)[option]" ng-blur="evaluateExpression(dataElement.id, option)"/>
 						</td>

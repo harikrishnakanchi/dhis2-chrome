@@ -143,6 +143,7 @@ define(["lodash", "extractHeaders", "dataValuesMapper"], function(_, extractHead
                     var detailedCategories = _.map(detailedCategoryCombo.categories, getDetailedCategory);
                     dataElement.categories = detailedCategories;
                     dataElement.categoryCombo = detailedDataElement.categoryCombo;
+                    dataElement.formName = detailedDataElement.formName;
                     return dataElement;
                 };
 

@@ -113,27 +113,48 @@ define([], function() {
 
     var dataElements = [{
         id: 'DE1',
+        name: 'DE1 - ITFC',
+        shortName: 'DE1 - ITFC',
+        formName: 'DE1',
         categoryCombo: categoryCombos[0]
     }, {
         id: 'DE2',
+        name: 'DE2 - ITFC',
+        shortName: 'DE2 - ITFC',
+        formName: 'DE2',
         categoryCombo: categoryCombos[1]
     }, {
         id: 'DE3',
+        name: 'DE3 - ITFC',
+        shortName: 'DE3 - ITFC',
+        formName: 'DE3',
         categoryCombo: categoryCombos[1]
     }];
 
     var sections = [{
         id: 'Sec1',
         dataSet: dataSets[0],
-        dataElements: [dataElements[0], dataElements[1]]
+        dataElements: [{
+            id: 'DE1',
+            name: 'DE1 - ITFC'
+        }, {
+            id: 'DE2',
+            name: 'DE2 - ITFC'
+        }]
     }, {
         id: 'Sec2',
         dataSet: dataSets[0],
-        dataElements: [dataElements[0]]
+        dataElements: [{
+            id: 'DE1',
+            name: 'DE1 - ITFC'
+        }]
     }, {
         id: 'Sec3',
         dataSet: dataSets[1],
-        dataElements: [dataElements[2]]
+        dataElements: [{
+            id: 'DE3',
+            name: 'DE3 - ITFC'
+        }]
     }];
 
     return {
