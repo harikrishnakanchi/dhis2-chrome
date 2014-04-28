@@ -39,5 +39,16 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         $scope.delete = function(index) {
             $scope.opUnits.splice(index, 1);
         };
+
+        var init = function() {
+            if (!$scope.isEditMode) {
+                $scope.opUnits = [{
+                    'name': $scope.orgUnit.name,
+                    'type': $scope.orgUnit.attributeValues[0].value
+                }];
+            }
+        };
+
+        init();
     };
 });

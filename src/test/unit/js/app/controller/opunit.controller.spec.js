@@ -6,6 +6,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
 
         beforeEach(mocks.inject(function($rootScope, $q, $location) {
             scope = $rootScope.$new();
+            scope.isEditMode = true;
             q = $q;
             location = $location;
 
@@ -132,6 +133,26 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             expect(projectsService.create).toHaveBeenCalledWith(expectedOpUnits);
             expect(location.hash).toHaveBeenCalledWith(['ParentId', [opUnit1Id, opUnit2Id]]);
             expect(scope.saveSuccess).toBe(true);
+        });
+
+        it("should set operation unit for view", function() {
+            scope.orgUnit = {
+                'name': 'opUnit1',
+                "attributeValues": [{
+                    "attribute": {
+                        "name": "Type",
+                        "id": "TypeAttr"
+                    },
+                    "value": "Health Center"
+                }]
+            };
+            scope.isEditMode = false;
+
+            opUnitController = new OpUnitController(scope, projectsService, db, location);
+
+            scope.$apply();
+            expect(scope.opUnits[0].name).toEqual('opUnit1');
+            expect(scope.opUnits[0].type).toEqual('Health Center');
         });
     });
 });
