@@ -10,7 +10,8 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
             location = $location;
 
             projectsService = {
-                "create": function() {}
+                "create": function() {},
+                "mapDataSetsToOrgUnit": function() {}
             };
             mockOrgStore = {
                 upsert: function() {},
@@ -55,6 +56,13 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
             expect(scope.dataSets).toEqual(datasets);
         });
 
+        it('should add new modules', function() {
+            scope.$apply();
+            var orginalmoduleLen = scope.modules.length;
+            scope.addModules();
+            expect(scope.modules.length).toBe(orginalmoduleLen + 1);
+        });
+
         it('should delete module', function() {
             scope.modules = [{
                 'name': 'Module1'
@@ -76,6 +84,39 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
                 'name': 'Module4'
             }]);
 
+        });
+
+        it("should save the modules and the associated datasets", function() {
+            scope.orgUnit = {
+                "name": "Project1",
+                "id": "someid"
+            };
+
+            var modules = [{
+                'name': "Module1",
+                'datasets': [{
+                    'id': 'ds_11',
+                    'name': 'dataset11',
+                }, {
+                    'id': 'ds_12',
+                    'name': 'dataset12'
+                }]
+            }];
+            var moduleList = [{
+                name: 'Module1',
+                shortName: 'Module1',
+            }]
+            spyOn(projectsService, "create").and.returnValue(utils.getPromise(q, {}));
+            spyOn(projectsService, "mapDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
+            spyOn(location, "hash");
+
+            scope.save(modules);
+            scope.$apply();
+
+            expect(projectsService.create).toHaveBeenCalled();
+            expect(projectsService.mapDataSetsToOrgUnit).toHaveBeenCalled();
+            expect(scope.saveSuccess).toEqual(true);
+            expect(location.hash).toHaveBeenCalledWith(['someid', {}]);
         });
     });
 });

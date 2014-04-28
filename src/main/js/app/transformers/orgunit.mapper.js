@@ -92,8 +92,45 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         };
     };
 
+    var mapToModules = function(modules, moduleParent) {
+        var result = _.map(modules, function(module) {
+            return {
+                name: module.name,
+                shortName: module.name,
+                level: 6,
+                id: md5(module.name + moduleParent.name).substr(0, 11),
+                openingDate: moment().format("YYYY-MM-DD"),
+                parent: {
+                    name: moduleParent.name,
+                    id: moduleParent.id
+                }
+            };
+        });
+        return result;
+    };
+
+    var mapToDataSets = function(modules, moduleParent) {
+        var result = _.map(modules, function(module) {
+            var datasets = module.datasets;
+            var restructuredDatasets = _.map(datasets, function(dataset) {
+                return {
+                    "id": dataset.id,
+                    "organisationUnits": [{
+                        "name": module.name,
+                        "id": md5(module.name + moduleParent.name).substr(0, 11)
+                    }]
+                };
+            });
+            return restructuredDatasets;
+        });
+        return _.flatten(result);
+    };
+
     return {
         "mapToProjectForDhis": mapToProjectForDhis,
         "mapToProjectForView": mapToProjectForView,
+        "mapToModules": mapToModules,
+        'mapToDataSets': mapToDataSets,
     };
+
 });

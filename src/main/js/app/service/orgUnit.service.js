@@ -20,8 +20,29 @@ define(["properties"], function(properties) {
             return saveToDb().then(saveToDhis);
         };
 
+        var mapDataSetsToOrgUnit = function(payload) {
+            payload = {
+                'dataSets': payload
+            };
+
+            var saveToDb = function() {
+                var store = db.objectStore("dataSets");
+                return store.upsert(payload.dataSets);
+            };
+
+            var saveToDhis = function(data) {
+                return $http.post(properties.dhis.url + '/api/metadata', payload).then(function() {
+                    return data;
+                });
+            };
+
+            return saveToDb().then(saveToDhis);
+
+        };
+
         return {
-            "create": create
+            "create": create,
+            "mapDataSetsToOrgUnit": mapDataSetsToOrgUnit
         };
     };
 });

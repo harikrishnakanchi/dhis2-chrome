@@ -153,5 +153,110 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             expect(result).toEqual(expectedResult);
         });
 
+        it("should map modules for dhis", function() {
+            var projectOrgUnit = {
+                'id': 'Project1Id',
+                'name': 'Project1'
+            };
+
+            var modules = [{
+                'name': "Module1",
+                'datasets': [{
+                    'id': 'ds_11',
+                    'name': 'dataset11',
+                }, {
+                    'id': 'ds_12',
+                    'name': 'dataset12'
+                }]
+            }, {
+                'name': "Module2",
+                'datasets': [{
+                    'id': 'ds_21',
+                    'name': 'dataset21',
+                }, {
+                    'id': 'ds_22',
+                    'name': 'dataset22'
+                }]
+            }];
+
+            var modules = orgUnitMapper.mapToModules(modules, projectOrgUnit);
+
+            expect(modules).toEqual([{
+                name: 'Module1',
+                shortName: 'Module1',
+                level: 6,
+                id: '86eb3db78c7',
+                openingDate: '2014-04-28',
+                parent: {
+                    name: 'Project1',
+                    id: 'Project1Id'
+                }
+            }, {
+                name: 'Module2',
+                shortName: 'Module2',
+                level: 6,
+                id: 'f1941e66f2d',
+                openingDate: '2014-04-28',
+                parent: {
+                    name: 'Project1',
+                    id: 'Project1Id'
+                }
+            }]);
+        });
+
+        it("should map datasets for dhis", function() {
+            var projectOrgUnit = {
+                'id': 'Project1Id',
+                'name': 'Project1'
+            };
+
+            var modules = [{
+                'name': "Module1",
+                'datasets': [{
+                    'id': 'ds_11',
+                    'name': 'dataset11',
+                }, {
+                    'id': 'ds_12',
+                    'name': 'dataset12'
+                }]
+            }, {
+                'name': "Module2",
+                'datasets': [{
+                    'id': 'ds_21',
+                    'name': 'dataset21',
+                }, {
+                    'id': 'ds_22',
+                    'name': 'dataset22'
+                }]
+            }];
+
+            var datasets = orgUnitMapper.mapToDataSets(modules, projectOrgUnit);
+
+            expect(datasets).toEqual([{
+                id: 'ds_11',
+                organisationUnits: [{
+                    name: 'Module1',
+                    id: '86eb3db78c7'
+                }]
+            }, {
+                id: 'ds_12',
+                organisationUnits: [{
+                    name: 'Module1',
+                    id: '86eb3db78c7'
+                }]
+            }, {
+                id: 'ds_21',
+                organisationUnits: [{
+                    name: 'Module2',
+                    id: 'f1941e66f2d'
+                }]
+            }, {
+                id: 'ds_22',
+                organisationUnits: [{
+                    name: 'Module2',
+                    id: 'f1941e66f2d'
+                }]
+            }]);
+        });
     });
 });
