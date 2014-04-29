@@ -53,7 +53,8 @@ require.config({
         "dataValuesMapper": "app/transformers/datavalues.mapper",
         "findCategoryComboOption": "app/transformers/find.category.combo.option",
         "orgUnitMapper": "app/transformers/orgunit.mapper",
-        "toTree": "app/transformers/to.tree"
+        "toTree": "app/transformers/to.tree",
+        "groupSections": "app/transformers/group.sections"
     },
     shim: {
         "ng-i18n": {

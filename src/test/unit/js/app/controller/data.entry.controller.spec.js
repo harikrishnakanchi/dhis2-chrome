@@ -120,36 +120,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(section2.categoryOptionComboIds).toEqual([6, 5]);
         });
 
-        it("should get dataelements associated with sections", function() {
-            scope.$apply();
-
-            var opdSections = scope.groupedSections.DS_OPD;
-
-            var dataElements = opdSections[0].dataElements;
-            expect(dataElements.length).toBe(2);
-            expect(dataElements[0].id).toContain("DE1");
-            expect(dataElements[1].id).toContain("DE2");
-            expect(dataElements[1].name).toContain("DE2 - ITFC");
-            expect(dataElements[1].formName).toContain("DE2");
-
-            dataElements = opdSections[1].dataElements;
-            expect(dataElements.length).toBe(1);
-            expect(dataElements[0].id).toContain("DE1");
-            expect(dataElements[0].name).toContain("DE1 - ITFC");
-            expect(dataElements[0].formName).toContain("DE1");
-        });
-
-        it("should enrich dataelements with categories", function() {
-            scope.$apply();
-
-            var opdSections = scope.groupedSections.DS_OPD;
-            var dataElements = opdSections[0].dataElements;
-            var categories = dataElements[0].categories;
-
-            expect(categories.length).toBe(2);
-        });
-
-
         it("should return the data set name given the id", function() {
             scope.$apply();
             var datasetId = "DS_OPD";
@@ -179,7 +149,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(scope.success).toBe(true);
             expect(scope.error).toBe(false);
         });
-
 
         it("should let the user know of failures when saving the data to dhis", function() {
             scope = rootScope.$new();
