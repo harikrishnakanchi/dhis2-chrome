@@ -1,6 +1,6 @@
 /*global Date:true*/
 define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnitController, mocks, utils, _) {
-    xdescribe("projects controller", function() {
+    describe("projects controller", function() {
         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits,
             orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll;
         var getOrgUnit = function(id, name, level, parent) {
@@ -29,10 +29,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             'name': 'Operation Unit / Module'
         }, {
             'level': 6,
-            'name': 'Module / Dataset'
-        }, {
-            'level': 7,
-            'name': 'Dataset'
+            'name': 'Module'
         }];
 
         var child = {
@@ -160,15 +157,20 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 3: 'Country',
                 4: 'Project',
                 5: 'Operation Unit / Module',
-                6: 'Module / Dataset',
-                7: 'Dataset'
+                6: 'Module'
             });
         });
 
         it("should show the selected organisation unit details", function() {
             var orgUnit = {
                 'id': 1,
-                'level': 1
+                'level': 1,
+                "attributeValues": [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "Company"
+                }]
             };
             scope.$apply();
             scope.onOrgUnitSelect(orgUnit);
@@ -179,7 +181,13 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
         it("should set the organization unit", function() {
             var orgUnit = {
                 'id': 1,
-                'level': 1
+                'level': 1,
+                "attributeValues": [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "Company"
+                }]
             };
             spyOn(location, 'hash');
             scope.$apply();
@@ -190,17 +198,18 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             expect(anchorScroll).toHaveBeenCalled();
         });
 
+        it("should set the template url to be displayed for edit mode", function() {
+            scope.openInEditMode('Country');
 
-        it("should set template url for module", function() {
-            var orgUnit = {
-                'id': 'something',
-                'level': 4
-            };
-
-            scope.$apply();
-            scope.setTemplateUrl(orgUnit, true, 2);
-            expect(scope.templateUrl).toContain('templates/partials/module-form.html');
+            expect(scope.templateUrl.split('?')[0]).toEqual('templates/partials/create-country.html');
             expect(scope.isEditMode).toEqual(true);
+        });
+
+        it("should set the template url for view mode", function() {
+            scope.openInViewMode('Module');
+
+            expect(scope.templateUrl.split('?')[0]).toEqual('templates/partials/module-form.html');
+            expect(scope.isEditMode).toEqual(false);
         });
 
     });

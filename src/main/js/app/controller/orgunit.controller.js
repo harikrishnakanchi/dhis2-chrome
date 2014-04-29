@@ -51,11 +51,13 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
         };
 
         $scope.getOrgUnitType = function(orgUnit) {
-            return _.find(orgUnit.attributeValues, {
-                "attribute": {
-                    "id": "a1fa2777924"
-                }
-            }).value;
+            if (!_.isEmpty(orgUnit)) {
+                return _.find(orgUnit.attributeValues, {
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    }
+                }).value;
+            }
         };
 
         $scope.onOrgUnitSelect = function(orgUnit) {

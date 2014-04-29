@@ -106,10 +106,14 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 },
                 attributeValues: [{
                     attribute: {
-                        name: "Type",
-                        id: "TypeAttr"
+                        id: "52ec8ccaf8f"
                     },
                     value: opUnit1.type
+                }, {
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "Operation Unit"
                 }]
             }, {
                 id: opUnit2Id,
@@ -123,10 +127,14 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 },
                 attributeValues: [{
                     attribute: {
-                        name: "Type",
-                        id: "TypeAttr"
+                        id: "52ec8ccaf8f"
                     },
                     value: opUnit2.type
+                }, {
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "Operation Unit"
                 }]
             }];
 
@@ -140,10 +148,14 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 'name': 'opUnit1',
                 "attributeValues": [{
                     "attribute": {
-                        "name": "Type",
-                        "id": "TypeAttr"
+                        "id": "52ec8ccaf8f"
                     },
                     "value": "Health Center"
+                }, {
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "Operation Unit"
                 }]
             };
             scope.isEditMode = false;

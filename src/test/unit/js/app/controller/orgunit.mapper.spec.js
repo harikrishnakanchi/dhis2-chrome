@@ -106,6 +106,11 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     "id": parentOrgUnit.id
                 },
                 "attributeValues": [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Project"
+                }, {
                     "attribute": {
                         "code": "prjConDays",
                         "name": "No of Consultation days per week",
@@ -156,7 +161,8 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
         it("should map modules for dhis", function() {
             var projectOrgUnit = {
                 'id': 'Project1Id',
-                'name': 'Project1'
+                'name': 'Project1',
+                'level': 4
             };
 
             var modules = [{
@@ -179,14 +185,20 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }]
             }];
 
-            var modules = orgUnitMapper.mapToModules(modules, projectOrgUnit);
+            var expectedModules = orgUnitMapper.mapToModules(modules, projectOrgUnit);
 
-            expect(modules).toEqual([{
+            expect(expectedModules).toEqual([{
                 name: 'Module1',
                 shortName: 'Module1',
-                level: 6,
+                level: 5,
                 id: '86eb3db78c7',
                 openingDate: moment().format("YYYY-MM-DD"),
+                attributeValues: [{
+                    attribute: {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }],
                 parent: {
                     name: 'Project1',
                     id: 'Project1Id'
@@ -194,9 +206,15 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             }, {
                 name: 'Module2',
                 shortName: 'Module2',
-                level: 6,
+                level: 5,
                 id: 'f1941e66f2d',
                 openingDate: moment().format("YYYY-MM-DD"),
+                attributeValues: [{
+                    attribute: {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }],
                 parent: {
                     name: 'Project1',
                     id: 'Project1Id'

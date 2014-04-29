@@ -22,10 +22,14 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
                     'parent': _.pick(parent, "name", "id"),
                     "attributeValues": [{
                         "attribute": {
-                            "name": "Type",
-                            "id": "TypeAttr"
+                            "id": "52ec8ccaf8f"
                         },
                         "value": type
+                    }, {
+                        "attribute": {
+                            "id": "a1fa2777924"
+                        },
+                        "value": "Operation Unit"
                     }]
                 });
             });
@@ -44,7 +48,11 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             if (!$scope.isEditMode) {
                 $scope.opUnits = [{
                     'name': $scope.orgUnit.name,
-                    'type': $scope.orgUnit.attributeValues[0].value
+                    'type': _.find($scope.orgUnit.attributeValues, {
+                        "attribute": {
+                            "id": "52ec8ccaf8f"
+                        }
+                    }).value
                 }];
             }
         };

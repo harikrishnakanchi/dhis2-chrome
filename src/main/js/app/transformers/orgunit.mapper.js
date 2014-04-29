@@ -9,7 +9,12 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             'level': 4,
             'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
             'parent': _.pick(parentOrgUnit, "name", "id"),
-            'attributeValues': []
+            'attributeValues': [{
+                'attribute': {
+                    id: "a1fa2777924"
+                },
+                value: "Project"
+            }]
         };
 
         projectOrgUnit.attributeValues.push({
@@ -97,9 +102,15 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             return {
                 name: module.name,
                 shortName: module.name,
-                level: 6,
+                level: moduleParent.level + 1,
                 id: md5(module.name + moduleParent.name).substr(0, 11),
                 openingDate: moment().format("YYYY-MM-DD"),
+                attributeValues: [{
+                    attribute: {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }],
                 parent: {
                     name: moduleParent.name,
                     id: moduleParent.id

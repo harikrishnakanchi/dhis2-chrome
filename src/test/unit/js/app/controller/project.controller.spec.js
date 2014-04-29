@@ -62,6 +62,11 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     name: parent.name,
                 },
                 "attributeValues": [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Project"
+                }, {
                     "attribute": {
                         "code": "prjConDays",
                         "name": "No of Consultation days per week",
