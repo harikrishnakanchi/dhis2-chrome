@@ -14,7 +14,7 @@ define([], function() {
     };
 
     var add_object_stores = function(db, tx) {
-        const syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections"];
+        const syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "systemSettings"];
         create_data_store(syncable_types, db);
     };
 
