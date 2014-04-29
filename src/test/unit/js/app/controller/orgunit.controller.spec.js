@@ -50,7 +50,8 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             'name': 'msf',
             'level': 1,
             'parent': null,
-            'children': [child]
+            'children': [child],
+            'collapsed': 'true'
         }];
 
         beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout, $anchorScroll) {

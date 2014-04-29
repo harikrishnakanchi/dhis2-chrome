@@ -37,6 +37,9 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
             }, {});
             var transformedOrgUnits = toTree(orgUnits, nodeToBeSelected);
             $scope.organisationUnits = transformedOrgUnits.rootNodes;
+            _.merge($scope.organisationUnits[0], {
+                "collapsed": "true"
+            });
             selectCurrentNode(transformedOrgUnits);
         };
 
