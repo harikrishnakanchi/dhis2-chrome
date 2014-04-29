@@ -103,23 +103,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
             expect(scope.groupedSections.Vacc.length).toBe(1);
         });
 
-        it("should group set headers on sections", function() {
-            scope.$apply();
-
-            var section1 = scope.groupedSections.DS_OPD[0];
-            expect(section1.headers).toEqual([
-                ["Resident", "Migrant"],
-                ["LessThan5", "GreaterThan5", "LessThan5", "GreaterThan5", ]
-            ]);
-
-            expect(section1.categoryOptionComboIds).toEqual([1, 2, 3, 4]);
-            var section2 = scope.groupedSections.Vacc[0];
-            expect(section2.headers).toEqual([
-                ["LessThan5", "GreaterThan5"]
-            ]);
-            expect(section2.categoryOptionComboIds).toEqual([6, 5]);
-        });
-
         it("should return the data set name given the id", function() {
             scope.$apply();
             var datasetId = "DS_OPD";
