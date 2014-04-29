@@ -6,6 +6,8 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
         var categoryCombos = data[3];
         var categories = data[4];
         var categoryOptionCombos = data[5];
+        var systemSettings = data[6];
+        var moduleId = 'moduleId';
 
         var groupedSections = _.groupBy(sections, function(section) {
             return section.dataSet.id;
@@ -32,9 +34,14 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
             return dataElement;
         };
 
+        var notInExcludes = function(dataElement) {
+            var excludedList = systemSettings.excludedDataElements;
+            return excludedList ? !_.contains(excludedList[moduleId], dataElement.id) : true;
+        };
+
         var returnVal = _.mapValues(groupedSections, function(sections) {
             return _.map(sections, function(section) {
-                section.dataElements = _.map(section.dataElements, enrichDataElement);
+                section.dataElements = _.chain(section.dataElements).filter(notInExcludes).map(enrichDataElement).value();
                 var result = extractHeaders(section.dataElements[0].categories, section.dataElements[0].categoryCombo, categoryOptionCombos);
                 section.headers = result.headers;
                 section.categoryOptionComboIds = result.categoryOptionComboIds;

@@ -8,7 +8,8 @@ define(["groupSections", "testData"], function(groupSections, testData) {
                 testData['dataElements'],
                 testData['categoryCombos'],
                 testData["categories"],
-                testData['categoryOptionCombos']
+                testData['categoryOptionCombos'],
+                testData['systemSettings']
             ];
             groupedSections = groupSections(data).groupedSections;
         });
@@ -24,10 +25,9 @@ define(["groupSections", "testData"], function(groupSections, testData) {
         });
 
         it("should get dataelements associated with sections", function() {
-
             var opdSections = groupedSections.DS_OPD;
-
             var dataElements = opdSections[0].dataElements;
+
             expect(dataElements.length).toBe(2);
             expect(dataElements[0].id).toContain("DE1");
             expect(dataElements[1].id).toContain("DE2");

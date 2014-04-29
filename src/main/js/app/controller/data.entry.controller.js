@@ -120,7 +120,8 @@ define(["lodash", "dataValuesMapper", "groupSections"], function(_, dataValuesMa
             var comboPromise = getAll("categoryCombos");
             var categoriesPromise = getAll("categories");
             var categoryOptionCombosPromise = getAll("categoryOptionCombos");
-            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise]);
+            var systemSettingsPromise = getAll('systemSettings');
+            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, systemSettingsPromise]);
             getAllData.then(setDataSets).then(transformDataSet).then(fetchOrganisationUnit).then(saveOrganisationUnit);
         };
 

@@ -129,6 +129,12 @@ define([], function() {
         shortName: 'DE3 - ITFC',
         formName: 'DE3',
         categoryCombo: categoryCombos[1]
+    }, {
+        id: 'DE4',
+        name: 'DE4 - ITFC',
+        shortName: 'DE4 - ITFC',
+        formName: 'DE4',
+        categoryCombo: categoryCombos[1]
     }];
 
     var sections = [{
@@ -140,6 +146,9 @@ define([], function() {
         }, {
             id: 'DE2',
             name: 'DE2 - ITFC'
+        }, {
+            id: 'DE4',
+            name: 'DE4 - ITFC'
         }]
     }, {
         id: 'Sec2',
@@ -157,6 +166,12 @@ define([], function() {
         }]
     }];
 
+    var systemSettings = {
+        excludedDataElements: {
+            "moduleId": ['DE4']
+        }
+    };
+
     return {
         'dataSets': dataSets,
         'sections': sections,
@@ -164,6 +179,7 @@ define([], function() {
         'categoryCombos': categoryCombos,
         'dataElements': dataElements,
         'categoryOptions': categoryOptions,
-        'categoryOptionCombos': categoryOptionCombos
+        'categoryOptionCombos': categoryOptionCombos,
+        'systemSettings': systemSettings
     };
 })
