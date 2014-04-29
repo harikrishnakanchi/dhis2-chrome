@@ -35,16 +35,18 @@ define(["moment", "orgUnitMapper"], function(moment, orgUnitMapper) {
             $scope.newOrgUnit = {
                 'openingDate': new Date(),
             };
-            $scope.saveFailure = $scope.saveSuccess = false;
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
             var onSuccess = function(data) {
                 $location.hash([data]);
+                $scope.saveSuccess = true;
+                $scope.saveFailure = false;
             };
 
             var onError = function() {
                 $scope.saveFailure = true;
+                $scope.saveSuccess = false;
             };
 
             var dhisProject = new Array(orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit));
