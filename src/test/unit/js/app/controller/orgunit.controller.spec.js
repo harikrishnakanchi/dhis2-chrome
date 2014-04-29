@@ -117,6 +117,16 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             spyOn(location, 'hash').and.returnValue([2, 1]);
             orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll);
             spyOn(scope, 'onOrgUnitSelect');
+            var child = {
+                id: 2,
+                name: 'ocp',
+                level: 2,
+                parent: {
+                    id: 1
+                },
+                children: [],
+                selected: true
+            };
 
             scope.$apply();
 

@@ -56,7 +56,16 @@ define(["toTree"], function(toTree) {
 
         it("should select node with the given id", function() {
             var tree = toTree(allOrgUnits, 2);
-
+            var child1 = {
+                id: 2,
+                name: 'ocp',
+                level: 2,
+                parent: {
+                    id: 1
+                },
+                children: [],
+                selected: true
+            };
             child1.selected = true;
             expect(tree.selectedNode).toEqual(child1);
         });

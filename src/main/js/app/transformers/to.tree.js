@@ -9,11 +9,14 @@ define(["lodash"], function(_) {
                     return item.parent && item.parent.id === parent.id;
                 };
                 parent.children = _.sortBy(_.filter(everyOne, isLegitimateChild), 'name');
-                if (!parent.collapsed) {
+                if (!parent.collapsed && selectedNodeId === undefined) {
                     _.merge(parent, {
                         "collapsed": "true"
                     });
+                } else {
+                    parent = _.omit(parent, 'collapsed');
                 }
+
                 return parent;
             };
 
