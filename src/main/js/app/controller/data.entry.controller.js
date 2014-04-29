@@ -1,20 +1,6 @@
 define(["lodash", "dataValuesMapper", "groupSections"], function(_, dataValuesMapper, groupSections) {
     return function($scope, $q, db, dataService, $anchorScroll, $location, $modal) {
 
-        var scrollToTop = function() {
-            $location.hash();
-            $anchorScroll();
-        };
-
-        var calculateSum = function(cellValue) {
-            cellValue = cellValue.toString().split("+").filter(function(e) {
-                return e;
-            });
-            return _.reduce(cellValue, function(sum, exp) {
-                return sum + parseInt(exp);
-            }, 0);
-        };
-
         $scope.evaluateExpression = function(elementId, option) {
             var cellValue = $scope.dataValues[elementId][option];
             $scope.dataValues[elementId][option] = calculateSum(cellValue);
@@ -60,10 +46,6 @@ define(["lodash", "dataValuesMapper", "groupSections"], function(_, dataValuesMa
             return _.last(headers).length;
         };
 
-        var getPeriod = function() {
-            return $scope.year + "W" + $scope.week.weekNumber;
-        };
-
         $scope.save = function() {
             var period = getPeriod();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.organisationUnit.id);
@@ -86,6 +68,24 @@ define(["lodash", "dataValuesMapper", "groupSections"], function(_, dataValuesMa
 
             saveToDb().then(pushToDhis).then(successPromise, errorPromise);
             scrollToTop();
+        };
+
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
+        };
+
+        var calculateSum = function(cellValue) {
+            cellValue = cellValue.toString().split("+").filter(function(e) {
+                return e;
+            });
+            return _.reduce(cellValue, function(sum, exp) {
+                return sum + parseInt(exp);
+            }, 0);
+        };
+
+        var getPeriod = function() {
+            return $scope.year + "W" + $scope.week.weekNumber;
         };
 
         var getAll = function(storeName) {
