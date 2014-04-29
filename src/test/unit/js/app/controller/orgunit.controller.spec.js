@@ -42,7 +42,8 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             'parent': {
                 id: 1
             },
-            'children': []
+            'children': [],
+            'collapsed': 'true'
         };
 
         var expectedOrgUnitTree = [{

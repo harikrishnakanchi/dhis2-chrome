@@ -18,7 +18,8 @@ define(["toTree"], function(toTree) {
                 'parent': {
                     id: 1
                 },
-                'children': []
+                'children': [],
+                'collapsed': 'true'
             };
             child2 = {
                 'id': 3,
@@ -27,14 +28,16 @@ define(["toTree"], function(toTree) {
                 'parent': {
                     id: 1
                 },
-                'children': []
+                'children': [],
+                'collapsed': 'true'
             };
             expectedOrgUnitTree = [{
                 'id': 1,
                 'name': 'msf',
                 'level': 1,
                 'parent': null,
-                'children': [child2, child1]
+                'children': [child2, child1],
+                'collapsed': 'true'
             }];
 
             allOrgUnits = [getOrgUnit(1, 'msf', 1, null), getOrgUnit(2, 'ocp', 2, {
