@@ -186,7 +186,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 shortName: 'Module1',
                 level: 6,
                 id: '86eb3db78c7',
-                openingDate: '2014-04-28',
+                openingDate: moment().format("YYYY-MM-DD"),
                 parent: {
                     name: 'Project1',
                     id: 'Project1Id'
@@ -196,7 +196,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 shortName: 'Module2',
                 level: 6,
                 id: 'f1941e66f2d',
-                openingDate: '2014-04-28',
+                openingDate: moment().format("YYYY-MM-DD"),
                 parent: {
                     name: 'Project1',
                     id: 'Project1Id'
