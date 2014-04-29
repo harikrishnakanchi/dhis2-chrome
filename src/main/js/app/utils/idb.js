@@ -4,6 +4,7 @@ define(["Q"], function(Q) {
     var openDb = function(dbName) {
         var request = indexedDB.open(dbName);
         var defer = Q.defer();
+
         request.onsuccess = function(e) {
             db = e.target.result;
             defer.resolve(db);

@@ -11,7 +11,8 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
 
             projectsService = {
                 "create": function() {},
-                "mapDataSetsToOrgUnit": function() {}
+                "getDatasetsAssociatedWithOrgUnit": function() {},
+                "associateDataSetsToOrgUnit": function() {}
             };
             mockOrgStore = {
                 upsert: function() {},
@@ -36,12 +37,23 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
             }, {
                 name: 'TB',
                 id: 'dataset_3'
+            }, {
+                "id": "DS1",
+                "organisationUnits": [{
+                    "name": "Mod2",
+                    "id": "Mod2Id"
+                }]
             }];
+
+            scope.orgUnit = {
+                'name': 'SomeName',
+                'id': 'someId'
+            };
+            scope.isEditMode = true;
 
             spyOn(db, 'objectStore').and.returnValue(mockOrgStore);
             spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, datasets));
             moduleController = new ModuleController(scope, projectsService, db, location);
-
         }));
 
         afterEach(function() {
@@ -49,6 +61,7 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
         });
 
         it("should get all datasets", function() {
+
             scope.$apply();
 
             expect(db.objectStore).toHaveBeenCalledWith("dataSets");
@@ -105,18 +118,50 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
             var moduleList = [{
                 name: 'Module1',
                 shortName: 'Module1',
-            }]
+            }];
             spyOn(projectsService, "create").and.returnValue(utils.getPromise(q, {}));
-            spyOn(projectsService, "mapDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
+            spyOn(projectsService, "associateDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, "hash");
 
             scope.save(modules);
             scope.$apply();
 
             expect(projectsService.create).toHaveBeenCalled();
-            expect(projectsService.mapDataSetsToOrgUnit).toHaveBeenCalled();
+            expect(projectsService.associateDataSetsToOrgUnit).toHaveBeenCalled();
             expect(scope.saveSuccess).toEqual(true);
             expect(location.hash).toHaveBeenCalledWith(['someid', {}]);
+        });
+
+        it("should set datasets associated with module for view", function() {
+
+            var datasets = [{
+                "id": "DS1",
+                "organisationUnits": [{
+                    "name": "Mod2",
+                    "id": "Mod2Id"
+                }]
+            }];
+
+            scope.orgUnit = {
+                "name": "Mod2",
+                "id": "Mod2Id"
+            };
+
+            scope.isEditMode = false;
+
+            spyOn(projectsService, "getDatasetsAssociatedWithOrgUnit").and.returnValue(utils.getPromise(q, datasets));
+            moduleController = new ModuleController(scope, projectsService, db, location);
+            scope.$apply();
+
+            expect(scope.modules[0].name).toEqual("Mod2");
+            expect(scope.modules[0].datasets).toEqual(datasets);
+            expect(scope.dataSets).toEqual([{
+                name: "Malaria",
+                id: "dataset_1"
+            }, {
+                name: 'TB',
+                id: 'dataset_3'
+            }]);
         });
     });
 });

@@ -50,31 +50,28 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
             $anchorScroll();
         };
 
+        $scope.getOrgUnitType = function(orgUnit) {
+            return _.find(orgUnit.attributeValues, {
+                "attribute": {
+                    "id": "a1fa2777924"
+                }
+            }).value;
+        };
+
         $scope.onOrgUnitSelect = function(orgUnit) {
             $scope.orgUnit = orgUnit;
-            $scope.setTemplateUrl(orgUnit, false);
+            $scope.openInViewMode($scope.getOrgUnitType(orgUnit));
             scrollToTop();
         };
 
-        $scope.getLevel = function(orgUnit, depth) {
-            depth = depth || 0;
-            var level = orgUnit ? $scope.orgUnitLevelsMap[orgUnit.level + depth] : undefined;
-            return level ? level.split("/")[0].trim() : undefined;
+        $scope.openInEditMode = function(type) {
+            $scope.templateUrl = templateUrlMap[type] + '?' + moment().format("X");
+            $scope.isEditMode = true;
         };
 
-        $scope.canCreateChild = function(orgUnit) {
-            return _.contains(["Country", "Project", "Operation Unit", "Module"], $scope.getLevel(orgUnit, 1));
-        };
-
-        $scope.canCreateMulitpleChildType = function(orgUnit) {
-            return $scope.canCreateChild(orgUnit) && $scope.getLevel(orgUnit) === 'Project';
-        };
-
-        $scope.setTemplateUrl = function(orgUnit, isEditMode, depth) {
-            depth = depth || 0;
-            var level = $scope.getLevel(orgUnit, depth);
-            $scope.templateUrl = templateUrlMap[level] + '?' + moment().format("X");
-            $scope.isEditMode = isEditMode;
+        $scope.openInViewMode = function(type) {
+            $scope.templateUrl = templateUrlMap[type] + '?' + moment().format("X");
+            $scope.isEditMode = false;
         };
 
         init();

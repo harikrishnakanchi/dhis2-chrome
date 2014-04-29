@@ -19,9 +19,11 @@
 			</div>
 		</div>
 		<div class="main-content">
-			<div class="top-actions">
-				<input type="button" class="btn btn-sub btn-sm pull-right" ng-value="'Create ' + getLevel(orgUnit, 1)" ng-show="canCreateChild(orgUnit) &amp;&amp; !isEditMode" ng-click="setTemplateUrl(orgUnit, true, 1)"/>
-				<input type="button" class="btn btn-sub btn-sm pull-right" ng-value="'Create ' + getLevel(orgUnit, 2)" ng-show="canCreateMulitpleChildType(orgUnit) &amp;&amp; !isEditMode" ng-click="setTemplateUrl(orgUnit, true, 2)"/>
+			<div class="top-actions" ng-if="!isEditMode">
+				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Country" ng-if="getOrgUnitType(orgUnit) == 'Operational Center'" ng-click="openInEditMode('Country')" />
+				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Project" ng-if="getOrgUnitType(orgUnit) == 'Country'" ng-click="openInEditMode('Project')" />
+				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Operation Unit" ng-if="getOrgUnitType(orgUnit) == 'Project'" ng-click="openInEditMode('Operation Unit')" />
+				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Module" ng-if="getOrgUnitType(orgUnit) == 'Project'" ng-click="openInEditMode('Module')" />
 			</div>
 			<div ng-include="templateUrl">
 			</div>

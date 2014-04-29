@@ -1,4 +1,4 @@
-define(["properties"], function(properties) {
+define(["properties", "lodash"], function(properties, _) {
     return function($http, db) {
 
         var create = function(payload) {
@@ -20,7 +20,7 @@ define(["properties"], function(properties) {
             return saveToDb().then(saveToDhis);
         };
 
-        var mapDataSetsToOrgUnit = function(payload) {
+        var associateDataSetsToOrgUnit = function(payload) {
             payload = {
                 'dataSets': payload
             };
@@ -40,9 +40,22 @@ define(["properties"], function(properties) {
 
         };
 
+        var getDatasetsAssociatedWithOrgUnit = function(orgUnit) {
+            var store = db.objectStore("dataSets");
+            return store.getAll().then(function(datasets) {
+                return _.filter(datasets, {
+                    'organisationUnits': [{
+                        'id': orgUnit.id
+                    }]
+                });
+            });
+
+        };
+
         return {
             "create": create,
-            "mapDataSetsToOrgUnit": mapDataSetsToOrgUnit
+            "associateDataSetsToOrgUnit": associateDataSetsToOrgUnit,
+            "getDatasetsAssociatedWithOrgUnit": getDatasetsAssociatedWithOrgUnit
         };
     };
 });

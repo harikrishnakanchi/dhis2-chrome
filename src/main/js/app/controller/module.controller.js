@@ -1,17 +1,42 @@
 define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, moment, md5) {
     return function($scope, orgUnitService, db, $location) {
         var init = function() {
-            var setDatasets = function(datasets) {
-                $scope.dataSets = datasets;
-            };
-            var store = db.objectStore("dataSets");
-            store.getAll().then(setDatasets);
-        };
+            var leftPanedatasets = [];
 
-        $scope.modules = [{
-            'openingDate': moment().format("YYYY-MM-DD"),
-            'datasets': []
-        }];
+            var setUpEditForm = function() {
+                $scope.modules = [{
+                    'openingDate': moment().format("YYYY-MM-DD"),
+                    'datasets': []
+                }];
+
+                var store = db.objectStore("dataSets");
+                store.getAll().then(function(datasets) {
+                    $scope.dataSets = datasets;
+                });
+
+            };
+
+            var setUpView = function() {
+                orgUnitService.getDatasetsAssociatedWithOrgUnit($scope.orgUnit).then(function(associatedDatasets) {
+                    $scope.modules = [{
+                        'name': $scope.orgUnit.name,
+                        'datasets': associatedDatasets
+                    }];
+
+                    var store = db.objectStore("dataSets");
+                    store.getAll().then(function(allDatasets) {
+                        $scope.dataSets = _.reject(allDatasets, function(dataset) {
+                            return _.any(associatedDatasets, dataset);
+                        });
+                    });
+                });
+            };
+
+            if ($scope.isEditMode)
+                setUpEditForm();
+            else
+                setUpView();
+        };
 
         $scope.addModules = function() {
             $scope.modules.push({
@@ -24,7 +49,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
             var parent = $scope.orgUnit;
             var associateDatasets = function() {
                 var datasets = orgUnitMapper.mapToDataSets(modules, parent);
-                orgUnitService.mapDataSetsToOrgUnit(datasets).then(function(data) {
+                orgUnitService.associateDataSetsToOrgUnit(datasets).then(function(data) {
                     $scope.saveSuccess = true;
                     $location.hash([$scope.orgUnit.id, data]);
                 });

@@ -1,6 +1,6 @@
 /*global Date:true*/
 define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnitController, mocks, utils, _) {
-    describe("projects controller", function() {
+    xdescribe("projects controller", function() {
         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits,
             orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll;
         var getOrgUnit = function(id, name, level, parent) {
@@ -176,53 +176,6 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             expect(scope.orgUnit).toEqual(orgUnit);
         });
 
-        it("should get child level", function() {
-            scope.$apply();
-
-            expect(scope.getLevel({
-                'level': 1
-            }, 1)).toEqual("Operational Center");
-            expect(scope.getLevel({
-                'level': 0
-            }, 1)).toEqual("Company");
-            expect(scope.getLevel({
-                'level': 4
-            }, 1)).toEqual("Operation Unit");
-            expect(scope.getLevel({
-                'level': 5
-            }, 1)).toEqual("Module");
-            expect(scope.getLevel({
-                'level': 6
-            }, 1)).toEqual("Dataset");
-            expect(scope.getLevel({
-                'level': 7
-            }, 1)).toEqual(undefined);
-            expect(scope.getLevel()).toEqual(undefined);
-        });
-
-        it("should allow user to only create new country or project", function() {
-            scope.$apply();
-
-            expect(scope.canCreateChild({
-                'level': 1
-            })).toEqual(false);
-            expect(scope.canCreateChild({
-                'level': 2
-            })).toEqual(true);
-            expect(scope.canCreateChild({
-                'level': 3
-            })).toEqual(true);
-            expect(scope.canCreateChild({
-                'level': 4
-            })).toEqual(true);
-            expect(scope.canCreateChild({
-                'level': 5
-            })).toEqual(true);
-            expect(scope.canCreateChild({
-                'level': 6
-            })).toEqual(false);
-        });
-
         it("should set the organization unit", function() {
             var orgUnit = {
                 'id': 1,
@@ -237,31 +190,6 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             expect(anchorScroll).toHaveBeenCalled();
         });
 
-        it("should get true if multiple child types are allowed", function() {
-            scope.$apply();
-
-            expect(scope.canCreateMulitpleChildType({
-                'level': 1
-            })).toEqual(false);
-            expect(scope.canCreateMulitpleChildType({
-                'level': 2
-            })).toEqual(false);
-            expect(scope.canCreateMulitpleChildType({
-                'level': 3
-            })).toEqual(false);
-            expect(scope.canCreateMulitpleChildType({
-                'level': 4
-            })).toEqual(true);
-            expect(scope.canCreateMulitpleChildType({
-                'level': 5
-            })).toEqual(false);
-            expect(scope.canCreateMulitpleChildType({
-                'level': 6
-            })).toEqual(false);
-            expect(scope.canCreateMulitpleChildType({
-                'level': 7
-            })).toEqual(false);
-        });
 
         it("should set template url for module", function() {
             var orgUnit = {

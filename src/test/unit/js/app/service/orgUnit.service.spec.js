@@ -8,7 +8,8 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             q = $q;
 
             mockOrgStore = {
-                upsert: function() {}
+                upsert: function() {},
+                getAll: function() {}
             };
             db = {
                 objectStore: function() {}
@@ -133,7 +134,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
                 dataSets: datasets
             };
 
-            orgUnitService.mapDataSetsToOrgUnit(datasets).then(function(data) {
+            orgUnitService.associateDataSetsToOrgUnit(datasets).then(function(data) {
                 expect(data).toEqual("someId");
             });
 
@@ -142,6 +143,50 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();
+        });
+
+        it("should get datasets associated with org units", function() {
+            var dataset1 = {
+                "id": "DS1",
+                "organisationUnits": [{
+                    "name": "Mod1",
+                    "id": "Mod1Id"
+                }, {
+                    "name": "Mod2",
+                    "id": "Mod2Id"
+                }]
+            };
+            var dataset2 = {
+                "id": "DS2",
+                "organisationUnits": [{
+                    "name": "Mod3",
+                    "id": "Mod3Id"
+                }, {
+                    "name": "Mod2",
+                    "id": "Mod2Id"
+                }]
+            };
+            var dataset3 = {
+                "id": "DS3",
+                "organisationUnits": [{
+                    "name": "Mod3",
+                    "id": "Mod3Id"
+                }, {
+                    "name": "Mod1",
+                    "id": "Mod1Id"
+                }]
+            };
+            var orgUnit = {
+                "name": "Mod2",
+                "id": "Mod2Id"
+            };
+            var datasets = [dataset1, dataset2, dataset3];
+            spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, datasets))
+
+            orgUnitService.getDatasetsAssociatedWithOrgUnit(orgUnit).then(function(associatedDataSets) {
+                expect(associatedDataSets).toEqual([dataset1, dataset2]);
+            });
+
         });
 
     });
