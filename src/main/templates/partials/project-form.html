@@ -17,7 +17,7 @@
 								<span ng-show="createForm.newOrgUnitName.$error.required" class="errortxt">{{resourceBundle.nameValidation}}</span>
 							</div>
 							<div>
-								<span ng-show="createForm.newOrgUnitName.$error.isWithin" class="errortxt">already exists</span>
+								<span ng-show="createForm.newOrgUnitName.$error.isWithin" class="errortxt">{{resourceBundle.projectExists}}</span>
 							</div>
 						</div>
 					</li>

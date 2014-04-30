@@ -62,6 +62,14 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
 
     };
 
+    var getProjects = function(allOrgUnits, parentId) {
+        return _.pluck(_.filter(allOrgUnits, {
+            parent: {
+                id: parentId,
+            }
+        }), 'name');
+    };
+
     var getAttributeValue = function(dhisProject, code) {
         var attribute = _.find(dhisProject.attributeValues, {
             'attribute': {
@@ -133,6 +141,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         "mapToProjectForView": mapToProjectForView,
         "mapToModules": mapToModules,
         'mapToDataSets': mapToDataSets,
+        "getProjects": getProjects
     };
 
 });

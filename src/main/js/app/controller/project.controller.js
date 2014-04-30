@@ -62,13 +62,8 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
         var prepareEditForm = function() {
             $scope.reset();
             getAll("organisationUnits").then(function(allOrgUnits) {
-                $scope.peerProjects = _.pluck(_.filter(allOrgUnits, {
-                    parent: {
-                        id: $scope.orgUnit.id,
-                    }
-                }), 'name');
+                $scope.peerProjects = orgUnitMapper.getProjects(allOrgUnits, $scope.orgUnit.id);
             });
-
         };
 
         var prepareView = function() {

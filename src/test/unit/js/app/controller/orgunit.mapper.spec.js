@@ -206,6 +206,26 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             }]);
         });
 
+        it("should return all the projects under a orgUnit", function() {
+            var allOrgUnit = [{
+                name: "blah1",
+                parent: {
+                    id: 1
+                }
+            }, {
+                name: "blah2",
+                parent: {
+                    id: 1
+                }
+            }];
+            var id = 1;
+            var expectedProjects = ["blah1", "blah2"];
+
+            var projects = orgUnitMapper.getProjects(allOrgUnit, id);
+
+            expect(expectedProjects).toEqual(projects);
+        });
+
         it("should map datasets for dhis", function() {
             var projectOrgUnit = {
                 'id': 'Project1Id',

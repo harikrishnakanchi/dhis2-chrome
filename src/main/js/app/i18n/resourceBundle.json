@@ -19,5 +19,6 @@
     "errorCountry": "Error creating Country.",
     "loginFailed": "Invalid Credentials.",
     "savedOpUnit": "Operation Unit created successfully.",
-    "errorOpUnit": "Error creating Operation Unit."
+    "errorOpUnit": "Error creating Operation Unit.",
+    "projectExists": "Project already exists under this country."
 }

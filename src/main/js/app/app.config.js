@@ -104,9 +104,6 @@ require.config({
         'angular-multiselect': {
             deps: ["angular"]
         },
-        'angular-ui-weekselector': {
-            deps: ["angular"]
-        },
         'angular-ui-notin': {
             deps: ["angular"]
         }

@@ -1,8 +1,8 @@
 define(["projectController", "angularMocks", "utils", "lodash", "moment"], function(ProjectController, mocks, utils, _, moment) {
 
-    xdescribe("project controller tests", function() {
+    describe("project controller tests", function() {
 
-        var scope, timeout, q, location, db, mockOrgStore, orgUnitService, anchorScroll;
+        var scope, timeout, q, location, db, mockOrgStore, orgUnitService, anchorScroll, orgunitMapper, allOrgUnits;
 
         beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
             scope = $rootScope.$new();
@@ -12,7 +12,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
             mockOrgStore = {
                 upsert: function() {},
-                getAll: function() {}
+                getAll: function() {
+                    return utils.getPromise(q, allOrgUnits);
+                }
             };
 
             db = {
@@ -21,8 +23,17 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 }
             };
 
+            orgUnitMapper = {
+                getProjects: function() {}
+            };
+
             orgUnitService = {
                 "create": function() {}
+            };
+
+            allOrgUnits = {};
+            scope.orgUnit = {
+                id: "blah"
             };
 
             anchorScroll = jasmine.createSpy();
