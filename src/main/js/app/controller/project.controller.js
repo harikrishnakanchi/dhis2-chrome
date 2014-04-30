@@ -1,11 +1,6 @@
-define(["moment", "orgUnitMapper"], function(moment, orgUnitMapper) {
+define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, toTree) {
 
     return function($scope, db, orgUnitService, $q, $location, $timeout, $anchorScroll) {
-
-        var scrollToTop = function() {
-            $location.hash();
-            $anchorScroll();
-        };
 
         $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded from TYPO analysis and Coordination'];
 
@@ -37,7 +32,9 @@ define(["moment", "orgUnitMapper"], function(moment, orgUnitMapper) {
             };
         };
 
+
         $scope.save = function(newOrgUnit, parentOrgUnit) {
+
             var onSuccess = function(data) {
                 $location.hash([data]);
                 $scope.saveSuccess = true;
@@ -54,10 +51,38 @@ define(["moment", "orgUnitMapper"], function(moment, orgUnitMapper) {
 
         };
 
-        var init = function() {
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
+        };
+
+        var getAll = function(storeName) {
+            var store = db.objectStore(storeName);
+            return store.getAll();
+        };
+
+        var prepareEditForm = function() {
             $scope.reset();
-            if (!$scope.isEditMode)
-                $scope.newOrgUnit = orgUnitMapper.mapToProjectForView($scope.orgUnit);
+            getAll("organisationUnits").then(function(allOrgUnits) {
+                $scope.peerProjects = _.pluck(_.filter(allOrgUnits, {
+                    parent: {
+                        id: $scope.orgUnit.id,
+                    }
+                }), 'name');
+            });
+
+        };
+
+        var prepareView = function() {
+            $scope.reset();
+            $scope.newOrgUnit = orgUnitMapper.mapToProjectForView($scope.orgUnit);
+        };
+
+        var init = function() {
+            if ($scope.isEditMode)
+                prepareEditForm();
+            else
+                prepareView();
         };
 
         init();
