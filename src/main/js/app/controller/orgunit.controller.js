@@ -1,8 +1,8 @@
 define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, md5, moment, properties) {
     return function($scope, db, $q, $location, $timeout, $anchorScroll) {
         var templateUrlMap = {
-            'Company': 'templates/partials/project-form.html',
-            'Operational Center': 'templates/partials/project-form.html',
+            'Company': 'templates/partials/company-form.html',
+            'Operational Center': 'templates/partials/oc-form.html',
             'Country': 'templates/partials/country-form.html',
             'Project': 'templates/partials/project-form.html',
             'Module': 'templates/partials/module-form.html',
@@ -24,10 +24,6 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
                 "currentNode": transformedOrgUnits.selectedNode
             };
             $scope.onOrgUnitSelect(transformedOrgUnits.selectedNode);
-            $scope.saveSuccess = true;
-            $timeout(function() {
-                $scope.saveSuccess = false;
-            }, properties.messageTimeout);
         };
 
         var transformToTree = function(nodeToBeSelected, args) {
