@@ -1,12 +1,12 @@
 define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "properties",
         "angular-route", "ng-i18n", "angular-indexedDB", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
-        "angular-treeview", "angular-ui-modal", "angular-ui-position", "angular-ui-datepicker", "angular-multiselect"
+        "angular-treeview", "angular-ui-modal", "angular-ui-position", "angular-ui-datepicker", "angular-multiselect", "angular-ui-notin"
     ],
     function(angular, Q, services, directives, controllers, migrator, migrations, properties) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.position", "ui.bootstrap.datepicker",
-                "ui.multiselect"
+                "ui.multiselect", "ui.notIn"
             ]);
             services.init(app);
             directives.init(app);

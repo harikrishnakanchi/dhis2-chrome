@@ -20,6 +20,7 @@ require.config({
         "angular-ui-transition": "lib/custom/angular-ui-transition/transition",
         "angular-ui-modal": "lib/custom/angular-ui-modal/modal",
         "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
+        "angular-ui-notin": "lib/angularjs-directives/src/notin/notIn",
         "angular-treeview": "lib/angularjs-directives/src/treeview/angular.treeview",
         "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",
         "md5": "lib/js-md5/js/md5",
@@ -101,6 +102,12 @@ require.config({
             deps: ["angular", "angular-ui-position"]
         },
         'angular-multiselect': {
+            deps: ["angular"]
+        },
+        'angular-ui-weekselector': {
+            deps: ["angular"]
+        },
+        'angular-ui-notin': {
             deps: ["angular"]
         }
     }
