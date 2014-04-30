@@ -19,13 +19,6 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
 
         projectOrgUnit.attributeValues.push({
             "attribute": {
-                "code": "prjConDays",
-                "name": "No of Consultation days per week",
-                "id": "VKc7bvogtcP"
-            },
-            "value": orgUnit.consultDays
-        }, {
-            "attribute": {
                 "code": "prjCon",
                 "name": "Context",
                 "id": "Gy8V8WeGgYs"
@@ -88,7 +81,6 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         return {
             'name': dhisProject.name,
             'openingDate': moment(dhisProject.openingDate).toDate(),
-            'consultDays': getAttributeValue(dhisProject, "prjConDays"),
             'context': getAttributeValue(dhisProject, "prjCon"),
             'location': getAttributeValue(dhisProject, "prjLoc"),
             'projectType': getAttributeValue(dhisProject, "prjType"),

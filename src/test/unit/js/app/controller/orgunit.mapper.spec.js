@@ -14,13 +14,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 },
                 "attributeValues": [{
                     "attribute": {
-                        "code": "prjConDays",
-                        "name": "No of Consultation days per week",
-                        "id": "VKc7bvogtcP"
-                    },
-                    "value": "val1"
-                }, {
-                    "attribute": {
                         "code": "prjCon",
                         "name": "Context",
                         "id": "Gy8V8WeGgYs"
@@ -62,7 +55,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var expectedResult = {
                 'name': dhisProject.name,
                 'openingDate': moment(dhisProject.openingDate).toDate(),
-                'consultDays': "val1",
                 'context': "val2",
                 'location': "val3",
                 'projectType': "val4",
@@ -78,7 +70,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var orgUnit = {
                 'name': 'Org1',
                 'openingDate': moment("2010-01-01").toDate(),
-                'consultDays': "val1",
                 'context': "val2",
                 'location': "val3",
                 'projectType': "val4",
@@ -110,13 +101,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         id: "a1fa2777924"
                     },
                     value: "Project"
-                }, {
-                    "attribute": {
-                        "code": "prjConDays",
-                        "name": "No of Consultation days per week",
-                        "id": "VKc7bvogtcP"
-                    },
-                    "value": orgUnit.consultDays
                 }, {
                     "attribute": {
                         "code": "prjCon",

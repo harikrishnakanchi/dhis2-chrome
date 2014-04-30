@@ -47,15 +47,6 @@
 				</div>
 			</li>
 			<li class="form-group">
-				<label for="newOrgUnitConDays" class="col-sm-4 col-md-4 control-label">No of consultation days per week</label>
-				<div class="col-sm-6 col-md-6" >
-					<select ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitConDays" id="newOrgUnitConDays" ng-model="newOrgUnit.consultDays" ng-options="o as o for o in allConsultDays" required></select>
-					<div ng-show="createForm.newOrgUnitConDays.$dirty &amp;&amp; createForm.newOrgUnitConDays.$invalid">
-						<span ng-show="createForm.newOrgUnitConDays.$error.required"class="errortxt">{{resourceBundle.consultDaysValidation}}</span>
-					</div>
-				</div>
-			</li>
-			<li class="form-group">
 				<label for="newOrgUnitPopType" class="col-sm-4 col-md-4 control-label">Type of population</label>
 				<div class="col-sm-6 col-md-6" >
 					<select ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" ng-options="o as o for o in allPopTypes" required></select>

@@ -69,13 +69,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     value: "Project"
                 }, {
                     "attribute": {
-                        "code": "prjConDays",
-                        "name": "No of Consultation days per week",
-                        "id": "VKc7bvogtcP"
-                    },
-                    "value": newOrgUnit.consultDays
-                }, {
-                    "attribute": {
                         "code": "prjCon",
                         "name": "Context",
                         "id": "Gy8V8WeGgYs"
@@ -188,13 +181,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 "openingDate": "2010-01-01",
                 "attributeValues": [{
                     "attribute": {
-                        "code": "prjConDays",
-                        "name": "No of Consultation days per week",
-                        "id": "VKc7bvogtcP"
-                    },
-                    "value": "val1"
-                }, {
-                    "attribute": {
                         "code": "prjCon",
                         "name": "Context",
                         "id": "Gy8V8WeGgYs"
@@ -233,7 +219,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             var expectedNewOrgUnit = {
                 'name': scope.orgUnit.name,
                 'openingDate': moment("2010-01-01").toDate(),
-                'consultDays': "val1",
                 'context': "val2",
                 'location': "val3",
                 'projectType': "val4",

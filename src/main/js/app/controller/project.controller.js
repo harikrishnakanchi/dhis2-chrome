@@ -6,8 +6,6 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
 
         $scope.allContexts = ['Armed conflict', 'Post-conflict'];
 
-        $scope.allConsultDays = ['1', '2', '3', '4', '5', '6', '7'];
-
         $scope.allPopTypes = ['Displaced', 'General Population', 'Mixed - Displaced/General', 'Victims of Natural Disaster'];
 
         $scope.thisDate = moment().toDate();
