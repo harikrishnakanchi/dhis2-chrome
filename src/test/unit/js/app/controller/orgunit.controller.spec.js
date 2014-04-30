@@ -132,6 +132,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             expect(scope.state).toEqual({
                 currentNode: child
             });
+            expect(scope.saveSuccess).toEqual(true);
         });
 
         it("should display a timed message after creating a organization unit", function() {
@@ -141,9 +142,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
 
             scope.$apply();
 
-            // expect(scope.saveSuccess).toEqual(true);
+            expect(scope.saveSuccess).toEqual(true);
             timeout.flush();
-            // expect(scope.saveSuccess).toEqual(false);
+            expect(scope.saveSuccess).toEqual(false);
         });
 
         it("should get organization unit level mapping", function() {

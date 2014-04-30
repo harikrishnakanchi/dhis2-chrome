@@ -24,6 +24,10 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
                 "currentNode": transformedOrgUnits.selectedNode
             };
             $scope.onOrgUnitSelect(transformedOrgUnits.selectedNode);
+            $scope.saveSuccess = true;
+            $timeout(function() {
+                $scope.saveSuccess = false;
+            }, properties.messageTimeout);
         };
 
         var transformToTree = function(nodeToBeSelected, args) {
