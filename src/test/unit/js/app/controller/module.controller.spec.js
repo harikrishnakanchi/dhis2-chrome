@@ -60,20 +60,18 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
             Date = _Date;
         });
 
-        it("should get all datasets", function() {
-
+        it("should put all datasets in scope on init", function() {
             scope.$apply();
 
-            expect(db.objectStore).toHaveBeenCalledWith("dataSets");
-            expect(mockOrgStore.getAll).toHaveBeenCalled();
-            expect(scope.dataSets).toEqual(datasets);
+            expect(scope.allDatasets).toEqual(datasets);
+            expect(scope.modules[0].allDatasets).toEqual(datasets);
         });
 
         it('should add new modules', function() {
             scope.$apply();
-            var orginalmoduleLen = scope.modules.length;
             scope.addModules();
-            expect(scope.modules.length).toBe(orginalmoduleLen + 1);
+
+            expect(scope.modules.length).toBe(2);
         });
 
         it('should delete module', function() {
@@ -86,17 +84,13 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
             }, {
                 'name': 'Module4'
             }];
-            scope.$apply();
 
             scope.delete(2);
-            expect(scope.modules).toEqual([{
-                'name': 'Module1'
-            }, {
-                'name': 'Module2'
-            }, {
-                'name': 'Module4'
-            }]);
+            scope.$apply();
 
+            expect(scope.modules[0].name).toEqual('Module1');
+            expect(scope.modules[1].name).toEqual('Module2');
+            expect(scope.modules[2].name).toEqual('Module4');
         });
 
         it("should save the modules and the associated datasets", function() {
@@ -119,6 +113,7 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
                 name: 'Module1',
                 shortName: 'Module1',
             }];
+
             spyOn(projectsService, "create").and.returnValue(utils.getPromise(q, {}));
             spyOn(projectsService, "associateDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, "hash");
@@ -155,7 +150,7 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
 
             expect(scope.modules[0].name).toEqual("Mod2");
             expect(scope.modules[0].datasets).toEqual(datasets);
-            expect(scope.dataSets).toEqual([{
+            expect(scope.modules[0].allDatasets).toEqual([{
                 name: "Malaria",
                 id: "dataset_1"
             }, {

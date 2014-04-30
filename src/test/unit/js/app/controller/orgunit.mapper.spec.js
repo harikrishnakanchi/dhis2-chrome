@@ -236,24 +236,28 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
             expect(datasets).toEqual([{
                 id: 'ds_11',
+                name: 'dataset11',
                 organisationUnits: [{
                     name: 'Module1',
                     id: '86eb3db78c7'
                 }]
             }, {
                 id: 'ds_12',
+                name: 'dataset12',
                 organisationUnits: [{
                     name: 'Module1',
                     id: '86eb3db78c7'
                 }]
             }, {
                 id: 'ds_21',
+                name: 'dataset21',
                 organisationUnits: [{
                     name: 'Module2',
                     id: 'f1941e66f2d'
                 }]
             }, {
                 id: 'ds_22',
+                name: 'dataset22',
                 organisationUnits: [{
                     name: 'Module2',
                     id: 'f1941e66f2d'

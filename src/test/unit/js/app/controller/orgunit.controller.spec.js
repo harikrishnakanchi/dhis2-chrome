@@ -201,7 +201,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
         it("should set the template url to be displayed for edit mode", function() {
             scope.openInEditMode('Country');
 
-            expect(scope.templateUrl.split('?')[0]).toEqual('templates/partials/create-country.html');
+            expect(scope.templateUrl.split('?')[0]).toEqual('templates/partials/country-form.html');
             expect(scope.isEditMode).toEqual(true);
         });
 

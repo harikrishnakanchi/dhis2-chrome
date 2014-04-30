@@ -2,18 +2,14 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
     return function($scope, orgUnitService, db, $location) {
         var init = function() {
             var leftPanedatasets = [];
-
             var setUpEditForm = function() {
-                $scope.modules = [{
-                    'openingDate': moment().format("YYYY-MM-DD"),
-                    'datasets': []
-                }];
+                $scope.modules = [];
 
                 var store = db.objectStore("dataSets");
                 store.getAll().then(function(datasets) {
-                    $scope.dataSets = datasets;
+                    $scope.allDatasets = datasets;
+                    $scope.addModules();
                 });
-
             };
 
             var setUpView = function() {
@@ -25,8 +21,10 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
 
                     var store = db.objectStore("dataSets");
                     store.getAll().then(function(allDatasets) {
-                        $scope.dataSets = _.reject(allDatasets, function(dataset) {
-                            return _.any(associatedDatasets, dataset);
+                        _.each($scope.modules, function(module) {
+                            module.allDatasets = _.reject(allDatasets, function(dataset) {
+                                return _.any(associatedDatasets, dataset);
+                            });
                         });
                     });
                 });
@@ -41,7 +39,8 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
         $scope.addModules = function() {
             $scope.modules.push({
                 'openingDate': moment().format("YYYY-MM-DD"),
-                'datasets': []
+                'datasets': [],
+                'allDatasets': _.clone($scope.allDatasets, true),
             });
         };
 

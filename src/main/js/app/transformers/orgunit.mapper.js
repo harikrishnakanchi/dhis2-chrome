@@ -116,13 +116,12 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         var result = _.map(modules, function(module) {
             var datasets = module.datasets;
             var restructuredDatasets = _.map(datasets, function(dataset) {
-                return {
-                    "id": dataset.id,
+                return _.merge(dataset, {
                     "organisationUnits": [{
                         "name": module.name,
                         "id": md5(module.name + moduleParent.name).substr(0, 11)
                     }]
-                };
+                });
             });
             return restructuredDatasets;
         });
