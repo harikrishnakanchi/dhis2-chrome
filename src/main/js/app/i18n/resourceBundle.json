@@ -19,8 +19,9 @@
     "savedProject": "Project created successfully.",
     "errorProject": "Error creating Project.",
     "projectExists": "Project already exists under this country.",
-    "savedOpUnit": "Operation Unit created successfully.",
-    "errorOpUnit": "Error creating Operation Unit.",
-    "savedModule": "Module created successfully.",
-    "errorModule": "Error creating Module."
+    "savedOpUnit": "Operation Units created successfully.",
+    "errorOpUnit": "Error creating Operation Units.",
+    "savedModule": "Modules created successfully.",
+    "errorModule": "Error creating Modules.",
+    "selectDatasets": "Select atleast one dataset to continue."
 }

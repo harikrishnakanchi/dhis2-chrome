@@ -73,6 +73,13 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
             $scope.modules.splice(index, 1);
         };
 
+        $scope.areDatasetsNotSelected = function(modules) {
+            return _.any(modules, function(module) {
+                return _.isEmpty(module.datasets);
+            });
+        };
+
+
         init();
     };
 });

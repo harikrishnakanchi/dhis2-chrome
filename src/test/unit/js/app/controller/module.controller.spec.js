@@ -155,5 +155,29 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
                 id: 'dataset_3'
             }]);
         });
+
+        it("should return true if datasets for modules not selected", function() {
+            var modules = [{
+                'name': "Module1",
+                'datasets': []
+            }];
+
+            expect(scope.areDatasetsNotSelected(modules)).toEqual(true);
+        });
+
+        it("should return false if datasets for modules are selected", function() {
+            var modules = [{
+                'name': "Module1",
+                'datasets': [{
+                    'id': 'ds_11',
+                    'name': 'dataset11',
+                }, {
+                    'id': 'ds_12',
+                    'name': 'dataset12'
+                }]
+            }];
+
+            expect(scope.areDatasetsNotSelected(modules)).toEqual(false);
+        });
     });
 });
