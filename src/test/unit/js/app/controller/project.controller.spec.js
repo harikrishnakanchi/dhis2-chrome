@@ -117,8 +117,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             }];
 
             expect(orgUnitService.create).toHaveBeenCalledWith(expectedNewOrgUnit);
-
-            expect(location.hash).toHaveBeenCalledWith([orgUnitId]);
         });
 
         it("should display error if saving organization unit fails", function() {

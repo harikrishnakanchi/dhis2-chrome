@@ -1,5 +1,4 @@
 <div ng-controller="projectController">
-	<div ng-show="saveSuccess" class="alert alert-success">{{ resourceBundle.savedProject }}</div>
 	<div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
 	<form name="createForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
 		<div class="panel panel-default">

@@ -1,14 +1,11 @@
 <div class="panel panel-default" ng-controller="opUnitController">
+    <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorOpUnit }}</div>
     <div class="panel-heading">
         <h3 class="panel-title">Operation Unit Details</h3>
         <div class="actions">
             <button class="btn btn-add btn-xs" ng-click="addOpUnits()" ng-if="isEditMode">Add Operation Unit</button>
         </div>
     </div>
-
-    <div ng-show="saveSuccess" class="alert alert-success">{{ resourceBundle.savedOpUnit }}</div>
-    <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorOpUnit }}</div>
-        
     <div class="panel-body">   
     <form name ="parentForm" class="form-horizontal" role="form" ng-submit="save(opUnits)" novalidate>
         <div class="well" ng-repeat="opUnit in opUnits">

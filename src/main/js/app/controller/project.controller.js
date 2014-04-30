@@ -34,14 +34,12 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
         $scope.save = function(newOrgUnit, parentOrgUnit) {
 
             var onSuccess = function(data) {
-                $location.hash([data]);
-                $scope.saveSuccess = true;
-                $scope.saveFailure = false;
+                if ($scope.$parent.closeEditForm)
+                    $scope.$parent.closeEditForm(data, "savedProject");
             };
 
             var onError = function() {
                 $scope.saveFailure = true;
-                $scope.saveSuccess = false;
             };
 
             var dhisProject = new Array(orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit));

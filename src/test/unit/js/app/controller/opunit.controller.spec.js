@@ -139,8 +139,6 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             }];
 
             expect(projectsService.create).toHaveBeenCalledWith(expectedOpUnits);
-            expect(location.hash).toHaveBeenCalledWith(['ParentId', [opUnit1Id, opUnit2Id]]);
-            expect(scope.saveSuccess).toBe(true);
         });
 
         it("should set operation unit for view", function() {

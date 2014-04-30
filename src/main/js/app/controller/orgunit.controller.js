@@ -42,6 +42,19 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
 
         var init = function() {
             var selectedNodeId = $location.hash()[0];
+            var message = $location.hash()[1];
+            $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
+        };
+
+        $scope.closeEditForm = function(selectedNodeId, message) {
+            console.log(selectedNodeId);
+            if (message) {
+                $scope.showMessage = true;
+                $scope.message = message;
+                $timeout(function() {
+                    $scope.showMessage = false;
+                }, properties.messageTimeout);
+            }
             $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
         };
 

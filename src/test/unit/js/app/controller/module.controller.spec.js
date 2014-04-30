@@ -116,15 +116,12 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
 
             spyOn(projectsService, "create").and.returnValue(utils.getPromise(q, {}));
             spyOn(projectsService, "associateDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
-            spyOn(location, "hash");
 
             scope.save(modules);
             scope.$apply();
 
             expect(projectsService.create).toHaveBeenCalled();
             expect(projectsService.associateDataSetsToOrgUnit).toHaveBeenCalled();
-            expect(scope.saveSuccess).toEqual(true);
-            expect(location.hash).toHaveBeenCalledWith(['someid', {}]);
         });
 
         it("should set datasets associated with module for view", function() {

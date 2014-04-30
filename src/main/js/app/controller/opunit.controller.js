@@ -13,7 +13,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         $scope.save = function(opUnits) {
             var parent = $scope.orgUnit;
             var newOpUnits = _.map(opUnits, function(opUnit) {
-                var type = opUnit.type;
+                var opUnitType = opUnit.type;
                 opUnit = _.omit(opUnit, 'type');
                 return _.merge(opUnit, {
                     'id': md5(opUnit.name + parent.name).substr(0, 11),
@@ -24,7 +24,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
                         "attribute": {
                             "id": "52ec8ccaf8f"
                         },
-                        "value": type
+                        "value": opUnitType
                     }, {
                         "attribute": {
                             "id": "a1fa2777924"
@@ -34,10 +34,16 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
                 });
             });
 
-            orgUnitService.create(newOpUnits).then(function(data) {
-                $scope.saveSuccess = true;
-                $location.hash([$scope.orgUnit.id, data]);
-            });
+            var onSuccess = function(data) {
+                if ($scope.$parent.closeEditForm)
+                    $scope.$parent.closeEditForm($scope.orgUnit.id, "savedOpUnit");
+            };
+
+            var onError = function(data) {
+                $scope.saveFailure = true;
+            };
+
+            orgUnitService.create(newOpUnits).then(onSuccess, onError);
         };
 
         $scope.delete = function(index) {

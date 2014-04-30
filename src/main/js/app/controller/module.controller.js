@@ -46,17 +46,27 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
 
         $scope.save = function(modules) {
             var parent = $scope.orgUnit;
-            var associateDatasets = function() {
-                var datasets = orgUnitMapper.mapToDataSets(modules, parent);
-                orgUnitService.associateDataSetsToOrgUnit(datasets).then(function(data) {
-                    $scope.saveSuccess = true;
-                    $location.hash([$scope.orgUnit.id, data]);
-                });
+
+            var createModules = function() {
+                var moduleDatasets = orgUnitMapper.mapToModules(modules, parent);
+                return orgUnitService.create(moduleDatasets);
             };
 
+            var associateDatasets = function() {
+                var datasets = orgUnitMapper.mapToDataSets(modules, parent);
+                return orgUnitService.associateDataSetsToOrgUnit(datasets);
+            };
 
-            var moduleDatasets = orgUnitMapper.mapToModules(modules, parent);
-            orgUnitService.create(moduleDatasets).then(associateDatasets);
+            var onSuccess = function(data) {
+                if ($scope.$parent.closeEditForm)
+                    $scope.$parent.closeEditForm($scope.orgUnit.id, "savedModule");
+            };
+
+            var onError = function(data) {
+                $scope.saveFailure = true;
+            };
+
+            createModules().then(associateDatasets).then(onSuccess, onError);
         };
 
         $scope.delete = function(index) {

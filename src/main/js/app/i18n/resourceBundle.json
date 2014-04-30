@@ -13,12 +13,14 @@
     "contextValidation": "Context is required.",
     "consultDaysValidation": "Consultation days is required.",
     "populationTypeValidation": "Population type is required.",
-    "savedProject": "Project created successfully.",
-    "savedCountry": "Country created successfully.",
-    "errorProject": "Error creating Project.",
-    "errorCountry": "Error creating Country.",
     "loginFailed": "Invalid Credentials.",
+    "savedCountry": "Country created successfully.",
+    "errorCountry": "Error creating Country.",
+    "savedProject": "Project created successfully.",
+    "errorProject": "Error creating Project.",
+    "projectExists": "Project already exists under this country.",
     "savedOpUnit": "Operation Unit created successfully.",
     "errorOpUnit": "Error creating Operation Unit.",
-    "projectExists": "Project already exists under this country."
+    "savedModule": "Module created successfully.",
+    "errorModule": "Error creating Module."
 }
