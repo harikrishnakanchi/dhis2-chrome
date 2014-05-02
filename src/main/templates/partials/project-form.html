@@ -11,7 +11,7 @@
 					<li class="form-group">
 						<label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label">Name</label>
 						<div class="col-sm-6 col-md-6" >
-							<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" not-in={{peerProjects}} required/>
+							<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" not-in="peerProjects" required/>
 							<div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
 								<span ng-show="createForm.newOrgUnitName.$error.required" class="errortxt">{{resourceBundle.nameValidation}}</span>
 							</div>
