@@ -52,10 +52,17 @@ define(["properties", "lodash"], function(properties, _) {
 
         };
 
+        var setSystemSettings = function(projectId, data) {
+            return $http.post(properties.dhis.url + '/api/systemSettings/' + projectId, data).then(function() {
+                return data;
+            });
+        };
+
         return {
             "create": create,
             "associateDataSetsToOrgUnit": associateDataSetsToOrgUnit,
-            "getDatasetsAssociatedWithOrgUnit": getDatasetsAssociatedWithOrgUnit
+            "getDatasetsAssociatedWithOrgUnit": getDatasetsAssociatedWithOrgUnit,
+            "setSystemSettings": setSystemSettings
         };
     };
 });

@@ -41,6 +41,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
                 'openingDate': moment().format("YYYY-MM-DD"),
                 'datasets': [],
                 'allDatasets': _.clone($scope.allDatasets, true),
+                'excludedDataElementIds': []
             });
         };
 
@@ -50,6 +51,11 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
             var createModules = function() {
                 var moduleDatasets = orgUnitMapper.mapToModules(modules, parent);
                 return orgUnitService.create(moduleDatasets);
+            };
+
+            var saveSystemSettings = function() {
+                var systemSettings = orgUnitMapper.constructSystemSettings(modules, parent);
+                orgUnitService.setSystemSettings(parent.id, systemSettings);
             };
 
             var associateDatasets = function() {
@@ -66,7 +72,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
                 $scope.saveFailure = true;
             };
 
-            createModules().then(associateDatasets).then(onSuccess, onError);
+            createModules().then(associateDatasets).then(saveSystemSettings).then(onSuccess, onError);
         };
 
         $scope.delete = function(index) {

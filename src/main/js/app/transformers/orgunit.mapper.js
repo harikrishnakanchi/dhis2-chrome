@@ -136,12 +136,21 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         return _.flatten(result);
     };
 
+    var constructSystemSettings = function(modules, parent) {
+        //TODO fix this
+        return {
+            "moduleId1": ["test1", "test2"],
+            "moduleId2": ["test1", "test2"]
+        };
+    };
+
     return {
         "mapToProjectForDhis": mapToProjectForDhis,
         "mapToProjectForView": mapToProjectForView,
         "mapToModules": mapToModules,
         'mapToDataSets': mapToDataSets,
-        "getProjects": getProjects
+        "getProjects": getProjects,
+        "constructSystemSettings": constructSystemSettings
     };
 
 });

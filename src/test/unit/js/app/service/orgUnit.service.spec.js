@@ -181,12 +181,26 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
                 "id": "Mod2Id"
             };
             var datasets = [dataset1, dataset2, dataset3];
-            spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, datasets))
+            spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, datasets));
 
             orgUnitService.getDatasetsAssociatedWithOrgUnit(orgUnit).then(function(associatedDataSets) {
                 expect(associatedDataSets).toEqual([dataset1, dataset2]);
             });
 
+        });
+
+        it("should save system settings to dhis", function() {
+            var data = {
+                "moduleId1": ["test1", "test2"],
+                "moduleId2": ["test1", "test2"]
+            };
+
+            var projectId = "test";
+
+            orgUnitService.setSystemSettings(projectId, data);
+
+            httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/" + projectId, data).respond(200, "ok");
+            httpBackend.flush();
         });
 
     });

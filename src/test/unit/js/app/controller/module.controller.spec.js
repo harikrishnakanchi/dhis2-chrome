@@ -2,17 +2,18 @@
 define(["moduleController", "angularMocks", "utils"], function(ModuleController, mocks, utils) {
     describe("op unit controller", function() {
 
-        var scope, moduleController, projectsService, mockOrgStore, db, q, location, _Date, datasets;
+        var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets;
 
         beforeEach(mocks.inject(function($rootScope, $q, $location) {
             scope = $rootScope.$new();
             q = $q;
             location = $location;
 
-            projectsService = {
+            orgUnitService = {
                 "create": function() {},
                 "getDatasetsAssociatedWithOrgUnit": function() {},
-                "associateDataSetsToOrgUnit": function() {}
+                "associateDataSetsToOrgUnit": function() {},
+                "setSystemSettings": function() {}
             };
             mockOrgStore = {
                 upsert: function() {},
@@ -53,7 +54,7 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
 
             spyOn(db, 'objectStore').and.returnValue(mockOrgStore);
             spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, datasets));
-            moduleController = new ModuleController(scope, projectsService, db, location);
+            moduleController = new ModuleController(scope, orgUnitService, db, location);
         }));
 
         afterEach(function() {
@@ -114,14 +115,17 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
                 shortName: 'Module1',
             }];
 
-            spyOn(projectsService, "create").and.returnValue(utils.getPromise(q, {}));
-            spyOn(projectsService, "associateDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitService, "create").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitService, "associateDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitService, "setSystemSettings").and.returnValue(utils.getPromise(q, {}));
+
 
             scope.save(modules);
             scope.$apply();
 
-            expect(projectsService.create).toHaveBeenCalled();
-            expect(projectsService.associateDataSetsToOrgUnit).toHaveBeenCalled();
+            expect(orgUnitService.create).toHaveBeenCalled();
+            expect(orgUnitService.associateDataSetsToOrgUnit).toHaveBeenCalled();
+            expect(orgUnitService.setSystemSettings).toHaveBeenCalled();
         });
 
         it("should set datasets associated with module for view", function() {
@@ -141,8 +145,8 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
 
             scope.isEditMode = false;
 
-            spyOn(projectsService, "getDatasetsAssociatedWithOrgUnit").and.returnValue(utils.getPromise(q, datasets));
-            moduleController = new ModuleController(scope, projectsService, db, location);
+            spyOn(orgUnitService, "getDatasetsAssociatedWithOrgUnit").and.returnValue(utils.getPromise(q, datasets));
+            moduleController = new ModuleController(scope, orgUnitService, db, location);
             scope.$apply();
 
             expect(scope.modules[0].name).toEqual("Mod2");
