@@ -1,12 +1,7 @@
-define(["lodash", "md5", "moment"], function(_, md5, moment) {
-    return function($scope, orgUnitService, db, $q, $location, $timeout, $anchorScroll) {
+define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, orgUnitMapper) {
+    return function($scope, orgUnitService, $q, $location, $timeout, $anchorScroll) {
 
-        var scrollToTop = function() {
-            $location.hash();
-            $anchorScroll();
-        };
-
-        $scope.thisDate = new Date();
+        $scope.thisDate = moment().toDate();
 
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -14,46 +9,63 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             $scope.openingDate = true;
         };
 
-        $scope.save = function(newOrgUnit, parentOrgUnit) {
-            newOrgUnit = _.merge(newOrgUnit, {
-                'id': md5(newOrgUnit.name + parentOrgUnit.name).substr(0, 11),
-                'shortName': newOrgUnit.name,
-                'level': 3,
-                'openingDate': moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
-                'parent': _.pick(parentOrgUnit, "name", "id")
-            });
+        $scope.save = function(orgUnit, parentOrgUnit) {
+            newOrgUnit = {
+                'id': md5(orgUnit.name + parentOrgUnit.name).substr(0, 11),
+                'name': orgUnit.name,
+                'shortName': orgUnit.name,
+                'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
+                'parent': _.pick(parentOrgUnit, "name", "id"),
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Country"
+                }]
+            };
 
             var onSuccess = function(data) {
-                $location.hash([data]);
+                if ($scope.$parent.closeEditForm)
+                    $scope.$parent.closeEditForm(data, "savedCountry");
             };
 
             var onError = function() {
                 $scope.saveFailure = true;
             };
 
-            var saveToDb = function() {
-                var store = db.objectStore("organisationUnits");
-                return store.upsert([newOrgUnit]);
-            };
-
-            return orgUnitService.create([newOrgUnit]).then(saveToDb).then(onSuccess, onError);
-
+            return orgUnitService.create([newOrgUnit]).then(onSuccess, onError);
         };
 
         $scope.reset = function() {
+            $scope.saveFailure = false;
             $scope.newOrgUnit = {
                 'openingDate': new Date(),
             };
-            $scope.saveFailure = $scope.saveSuccess = false;
-            $scope.openCreateForm = false;
+        };
+
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
+        };
+
+        var prepareEditForm = function() {
+            $scope.reset();
+            orgUnitService.getAll("organisationUnits").then(function(allOrgUnits) {
+                $scope.allCountries = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
+            });
+        };
+
+        var prepareView = function() {
+            $scope.reset();
+            $scope.newOrgUnit.name = $scope.orgUnit.name;
+            $scope.newOrgUnit.openingDate = $scope.orgUnit.openingDate;
         };
 
         var init = function() {
-            $scope.reset();
-            if (!$scope.isEditMode) {
-                $scope.newOrgUnit.name = $scope.orgUnit.name;
-                $scope.newOrgUnit.openingDate = $scope.orgUnit.openingDate;
-            }
+            if ($scope.isEditMode)
+                prepareEditForm();
+            else
+                prepareView();
         };
 
         init();

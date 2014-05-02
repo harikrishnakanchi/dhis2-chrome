@@ -14,8 +14,6 @@
 							<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" not-in="peerProjects" required/>
 							<div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
 								<span ng-show="createForm.newOrgUnitName.$error.required" class="errortxt">{{resourceBundle.nameValidation}}</span>
-							</div>
-							<div>
 								<span ng-show="createForm.newOrgUnitName.$error.isWithin" class="errortxt">{{resourceBundle.projectExists}}</span>
 							</div>
 						</div>

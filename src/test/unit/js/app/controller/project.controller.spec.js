@@ -2,43 +2,32 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
     describe("project controller tests", function() {
 
-        var scope, timeout, q, location, db, mockOrgStore, orgUnitService, anchorScroll, orgunitMapper, allOrgUnits;
+        var scope, timeout, q, location, orgUnitService, anchorScroll, orgunitMapper;
 
         beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
             scope = $rootScope.$new();
-            timeout = $timeout;
             q = $q;
+            timeout = $timeout;
             location = $location;
 
-            mockOrgStore = {
-                upsert: function() {},
-                getAll: function() {
-                    return utils.getPromise(q, allOrgUnits);
-                }
-            };
-
-            db = {
-                objectStore: function(store) {
-                    return mockOrgStore;
-                }
-            };
-
             orgUnitMapper = {
-                getProjects: function() {}
+                getChildOrgUnitNames: function() {}
             };
 
             orgUnitService = {
-                "create": function() {}
+                "create": function() {},
+                "getAll": function() {
+                    return utils.getPromise(q, {});
+                }
             };
 
-            allOrgUnits = {};
+            scope.isEditMode = true;
             scope.orgUnit = {
                 id: "blah"
             };
 
             anchorScroll = jasmine.createSpy();
-            scope.isEditMode = true;
-            projectController = new ProjectController(scope, db, orgUnitService, q, location, timeout, anchorScroll);
+            projectController = new ProjectController(scope, orgUnitService, q, location, timeout, anchorScroll);
         }));
 
         it("should save project in dhis", function() {
@@ -52,7 +41,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             };
 
             var parent = {
-                'level': 3,
                 'name': 'Name1',
                 'id': 'Id1'
             };
@@ -68,7 +56,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 name: newOrgUnit.name,
                 shortName: newOrgUnit.name,
                 openingDate: moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
-                level: 4,
                 parent: {
                     id: parent.id,
                     name: parent.name,
@@ -238,7 +225,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             scope.isEditMode = false;
             scope.$apply();
 
-            projectController = new ProjectController(scope, db, orgUnitService, q, location, timeout, anchorScroll);
+            projectController = new ProjectController(scope, orgUnitService, q, location, timeout, anchorScroll);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });

@@ -6,7 +6,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 "id": "a4acf9115a7",
                 "name": 'Org1',
                 "shortName": 'Org1',
-                "level": 4,
                 "openingDate": "2010-01-01",
                 "parent": {
                     "name": "name1",
@@ -80,7 +79,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var parentOrgUnit = {
                 name: 'Name1',
                 id: 'Id1',
-                level: 'level'
             };
 
 
@@ -90,7 +88,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 "id": "a4acf9115a7",
                 "name": orgUnit.name,
                 "shortName": orgUnit.name,
-                "level": 4,
                 "openingDate": moment(orgUnit.openingDate).format("YYYY-MM-DD"),
                 "parent": {
                     "name": parentOrgUnit.name,
@@ -146,7 +143,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var projectOrgUnit = {
                 'id': 'Project1Id',
                 'name': 'Project1',
-                'level': 4
             };
 
             var modules = [{
@@ -174,7 +170,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             expect(expectedModules).toEqual([{
                 name: 'Module1',
                 shortName: 'Module1',
-                level: 5,
                 id: '86eb3db78c7',
                 openingDate: moment().format("YYYY-MM-DD"),
                 attributeValues: [{
@@ -190,7 +185,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             }, {
                 name: 'Module2',
                 shortName: 'Module2',
-                level: 5,
                 id: 'f1941e66f2d',
                 openingDate: moment().format("YYYY-MM-DD"),
                 attributeValues: [{
@@ -221,7 +215,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var id = 1;
             var expectedProjects = ["blah1", "blah2"];
 
-            var projects = orgUnitMapper.getProjects(allOrgUnit, id);
+            var projects = orgUnitMapper.getChildOrgUnitNames(allOrgUnit, id);
 
             expect(expectedProjects).toEqual(projects);
         });

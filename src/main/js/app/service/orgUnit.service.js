@@ -41,8 +41,7 @@ define(["properties", "lodash"], function(properties, _) {
         };
 
         var getDatasetsAssociatedWithOrgUnit = function(orgUnit) {
-            var store = db.objectStore("dataSets");
-            return store.getAll().then(function(datasets) {
+            return getAll("dataSets").then(function(datasets) {
                 return _.filter(datasets, {
                     'organisationUnits': [{
                         'id': orgUnit.id
@@ -58,11 +57,17 @@ define(["properties", "lodash"], function(properties, _) {
             });
         };
 
+        var getAll = function(orgUnitType) {
+            var store = db.objectStore(orgUnitType);
+            return store.getAll();
+        };
+
         return {
             "create": create,
             "associateDataSetsToOrgUnit": associateDataSetsToOrgUnit,
             "getDatasetsAssociatedWithOrgUnit": getDatasetsAssociatedWithOrgUnit,
-            "setSystemSettings": setSystemSettings
+            "setSystemSettings": setSystemSettings,
+            "getAll": getAll,
         };
     };
 });

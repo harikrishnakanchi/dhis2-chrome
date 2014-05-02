@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, toTree) {
 
-    return function($scope, db, orgUnitService, $q, $location, $timeout, $anchorScroll) {
+    return function($scope, orgUnitService, $q, $location, $timeout, $anchorScroll) {
 
         $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded from TYPO analysis and Coordination'];
 
@@ -25,11 +25,11 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
         };
 
         $scope.reset = function() {
+            $scope.saveFailure = false;
             $scope.newOrgUnit = {
                 'openingDate': new Date(),
             };
         };
-
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
 
@@ -52,15 +52,10 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
             $anchorScroll();
         };
 
-        var getAll = function(storeName) {
-            var store = db.objectStore(storeName);
-            return store.getAll();
-        };
-
         var prepareEditForm = function() {
             $scope.reset();
-            getAll("organisationUnits").then(function(allOrgUnits) {
-                $scope.peerProjects = orgUnitMapper.getProjects(allOrgUnits, $scope.orgUnit.id);
+            orgUnitService.getAll("organisationUnits").then(function(allOrgUnits) {
+                $scope.peerProjects = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
             });
         };
 

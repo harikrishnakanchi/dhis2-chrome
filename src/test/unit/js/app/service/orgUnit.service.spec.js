@@ -203,5 +203,17 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.flush();
         });
 
+        it("should get all org units", function() {
+            var someOrgUnits = [{
+                "a": "b"
+            }, {
+                "c": "d"
+            }];
+            spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, someOrgUnits));
+            orgUnitService.getAll("someOrgUnit").then(function(results) {
+                expect(results).toEqual(someOrgUnits);
+            });
+        });
+
     });
 });

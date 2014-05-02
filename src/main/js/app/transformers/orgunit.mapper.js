@@ -6,7 +6,6 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             'id': md5(orgUnit.name + parentOrgUnit.name).substr(0, 11),
             'name': orgUnit.name,
             'shortName': orgUnit.name,
-            'level': 4,
             'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
             'parent': _.pick(parentOrgUnit, "name", "id"),
             'attributeValues': [{
@@ -62,7 +61,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
 
     };
 
-    var getProjects = function(allOrgUnits, parentId) {
+    var getChildOrgUnitNames = function(allOrgUnits, parentId) {
         return _.pluck(_.filter(allOrgUnits, {
             parent: {
                 id: parentId,
@@ -102,7 +101,6 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             return {
                 name: module.name,
                 shortName: module.name,
-                level: moduleParent.level + 1,
                 id: md5(module.name + moduleParent.name).substr(0, 11),
                 openingDate: moment().format("YYYY-MM-DD"),
                 attributeValues: [{
@@ -149,7 +147,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         "mapToProjectForView": mapToProjectForView,
         "mapToModules": mapToModules,
         'mapToDataSets': mapToDataSets,
-        "getProjects": getProjects,
+        "getChildOrgUnitNames": getChildOrgUnitNames,
         "constructSystemSettings": constructSystemSettings
     };
 

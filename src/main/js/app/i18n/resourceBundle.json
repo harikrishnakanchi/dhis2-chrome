@@ -16,6 +16,7 @@
     "loginFailed": "Invalid Credentials.",
     "savedCountry": "Country created successfully.",
     "errorCountry": "Error creating Country.",
+    "countryExists": "Country already exists.",
     "savedProject": "Project created successfully.",
     "errorProject": "Error creating Project.",
     "projectExists": "Project already exists under this country.",

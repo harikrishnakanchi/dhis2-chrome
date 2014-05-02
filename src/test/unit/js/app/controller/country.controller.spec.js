@@ -2,31 +2,32 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
 
     describe("countryControllerspec", function() {
 
-        var scope, timeout, q, location, db, mockOrgStore, orgUnitService, anchorScroll;
+        var scope, timeout, q, location, orgUnitService, anchorScroll;
 
         beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
             scope = $rootScope.$new();
-            timeout = $timeout;
             q = $q;
+            timeout = $timeout;
             location = $location;
 
-            mockOrgStore = {
-                upsert: function() {}
-            };
-
-            db = {
-                objectStore: function(store) {
-                    return mockOrgStore;
-                }
+            orgUnitMapper = {
+                getChildOrgUnitNames: function() {}
             };
 
             orgUnitService = {
-                create: function() {}
+                "create": function() {},
+                "getAll": function() {
+                    return utils.getPromise(q, {});
+                }
+            };
+
+            scope.isEditMode = true;
+            scope.orgUnit = {
+                id: "blah"
             };
 
             anchorScroll = jasmine.createSpy();
-            scope.isEditMode = true;
-            countryController = new CountryController(scope, orgUnitService, db, q, location, timeout, anchorScroll);
+            countryController = new CountryController(scope, orgUnitService, q, location, timeout, anchorScroll);
         }));
 
         it("should open the opening date datepicker", function() {
@@ -36,7 +37,6 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             };
             spyOn(event, 'preventDefault');
             spyOn(event, 'stopPropagation');
-
 
 
             scope.openOpeningDate(event);
@@ -55,33 +55,33 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             };
 
             var parent = {
-                'level': 2,
                 'name': 'Name1',
                 'id': 'Id1'
             };
 
             spyOn(orgUnitService, 'create').and.returnValue(utils.getPromise(q, {}));
-            spyOn(mockOrgStore, 'upsert').and.returnValue(utils.getPromise(q, orgUnitId));
-            spyOn(location, 'hash');
 
             scope.save(newOrgUnit, parent);
             scope.$apply();
 
             var expectedNewOrgUnit = [{
-                id: orgUnitId,
-                name: newOrgUnit.name,
-                openingDate: moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
-                shortName: newOrgUnit.name,
-                level: 3,
-                parent: {
-                    id: parent.id,
-                    name: parent.name,
-                }
+                'id': orgUnitId,
+                'name': newOrgUnit.name,
+                'openingDate': moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
+                'shortName': newOrgUnit.name,
+                'parent': {
+                    'id': parent.id,
+                    'name': parent.name,
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        'id': "a1fa2777924"
+                    },
+                    'value': "Country"
+                }]
             }];
 
             expect(orgUnitService.create).toHaveBeenCalledWith(expectedNewOrgUnit);
-            expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
-            expect(location.hash).toHaveBeenCalledWith([orgUnitId]);
         });
 
         it("should display error if saving organization unit fails", function() {
@@ -101,6 +101,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                 "name": "anyname",
                 "openingDate": "YYYY-MM-DD",
             };
+
             var expectedNewOrgUnit = {
                 'name': scope.orgUnit.name,
                 'openingDate': scope.orgUnit.openingDate,
@@ -109,7 +110,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             scope.isEditMode = false;
             scope.$apply();
 
-            countryController = new CountryController(scope, orgUnitService, db, q, location, timeout, anchorScroll);
+            countryController = new CountryController(scope, orgUnitService, q, location, timeout, anchorScroll);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });
