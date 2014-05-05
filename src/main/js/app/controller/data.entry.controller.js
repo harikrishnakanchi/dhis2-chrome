@@ -1,8 +1,6 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], function(_, dataValuesMapper, groupSections, orgUnitMapper) {
     return function($scope, $q, db, dataService, $anchorScroll, $location, $modal) {
-        $scope.organisationUnit = {
-            id: "proj_104"
-        };
+        var dataSets;
 
         $scope.evaluateExpression = function(elementId, option) {
             var cellValue = $scope.dataValues[elementId][option];
@@ -21,10 +19,16 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
             return dataValues[id];
         };
 
-        $scope.$watch('week', function() {
-            if ($scope.week) {
+        $scope.$watchCollection('[week, currentModule]', function() {
+            if ($scope.week && $scope.currentModule) {
+                var datasetsAssociatedWithModule = _.pluck(_.filter(dataSets, {
+                    'organisationUnits': [{
+                        'id': $scope.currentModule.id
+                    }]
+                }), 'id');
+                $scope.currentGroupedSections = _.pick($scope.groupedSections, datasetsAssociatedWithModule);
                 var store = db.objectStore('dataValues');
-                store.find(getPeriod()).then(function(data) {
+                store.find([getPeriod(), $scope.currentModule.id]).then(function(data) {
                     data = data || {};
                     $scope.dataValues = dataValuesMapper.mapToView(data);
                 });
@@ -51,7 +55,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
 
         $scope.save = function() {
             var period = getPeriod();
-            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.organisationUnit.id);
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id);
             var successPromise = function() {
                 $scope.success = true;
             };

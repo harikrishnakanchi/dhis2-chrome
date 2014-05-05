@@ -1,49 +1,53 @@
 <form name="dataentry" id="dataentry" ng-submit="save()">
-<div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
-<div ng-show="success" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
-<div ng-show="error" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
-<weekselector year="year" month="month" week="week" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
-<section class="panel tab-panel" ng-show="week">
-	<tabset>
-		<tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in groupedSections">
-			<div class="exp-coll-group">
-				<accordion close-others="false">
-					<accordion-group ng-repeat="section in sections" is-open="isopen[section.id]" ng-form="sectionForm">
-					<div>
-						<ul>
-							<li  class='alert alert-danger' ng-show='sectionForm.$error.pattern'>{{resourceBundle.invalidExpression}}</li>
-						</ul>
-					</div>
+	<div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
+	<div ng-show="success" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
+	<div ng-show="error" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
+	<weekselector year="year" month="month" week="week" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
+	<label for="module">Module</label>
+	<select name="module" id="module" class="input-sm" ng-model="currentModule" ng-options="module.displayName for module in modules">
+		<option value="">-</option>
+	</select>
+	<section class="panel tab-panel" ng-show="week &amp;&amp; currentModule">
+		<tabset>
+			<tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in currentGroupedSections">
+				<div class="exp-coll-group">
+					<accordion close-others="false">
+						<accordion-group ng-repeat="section in sections" is-open="isopen[section.id]" ng-form="sectionForm">
+						<div>
+							<ul>
+								<li  class='alert alert-danger' ng-show='sectionForm.$error.pattern'>{{resourceBundle.invalidExpression}}</li>
+							</ul>
+						</div>
 
-					<accordion-heading>
-					{{section.name}} <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
-				</accordion-heading>
+						<accordion-heading>
+						{{section.name}} <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
+					</accordion-heading>
 
-				<table class="table table-bordered">
-					<tr ng-repeat="category in section.headers">
-						<th></th>
-						<th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
-							{{option}}
-						</th>
-						<th ng-show="$last">
-							Total
-						</th>
-					</tr>
-					<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
-						<td>{{ dataElement.formName }}</td>
-						<td ng-repeat="option in section.categoryOptionComboIds">
-							<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="safeGet(dataValues, dataElement.id)[option]" ng-blur="evaluateExpression(dataElement.id, option)"/>
-						</td>
-						<td>{{sum(dataValues[dataElement.id])}}</td>
-					</tr>
-				</table>
-			</accordion-group>
-		</accordion>
-	</div>
-</tab>
+					<table class="table table-bordered">
+						<tr ng-repeat="category in section.headers">
+							<th></th>
+							<th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
+								{{option}}
+							</th>
+							<th ng-show="$last">
+								Total
+							</th>
+						</tr>
+						<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
+							<td>{{ dataElement.formName }}</td>
+							<td ng-repeat="option in section.categoryOptionComboIds">
+								<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="safeGet(dataValues, dataElement.id)[option]" ng-blur="evaluateExpression(dataElement.id, option)"/>
+							</td>
+							<td>{{sum(dataValues[dataElement.id])}}</td>
+						</tr>
+					</table>
+				</accordion-group>
+			</accordion>
+		</div>
+	</tab>
 </tabset>
-  <div>
+<div>
 	<button type="submit" class="btn btn-primary"> Save </button>
-  </div>
+</div>
 </section>
 </form>

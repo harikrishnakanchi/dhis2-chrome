@@ -128,6 +128,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             var dataValues = {
                 "name": "test"
             };
+            scope.currentModule = {
+                id: 'Module2'
+            };
             scope.year = 2014;
             scope.week = {
                 "weekNumber": 14
@@ -153,6 +156,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             var dataValues = {
                 "name": "test"
             };
+            scope.currentModule = {
+                id: 'Module2'
+            };
             scope.year = 2014;
             scope.week = {
                 "weekNumber": 14
@@ -176,6 +182,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope = rootScope.$new();
             var dataValues = {
                 "name": "test"
+            };
+            scope.currentModule = {
+                id: 'Module2'
             };
             scope.year = 2014;
             scope.week = {
@@ -243,11 +252,14 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
+            scope.currentModule = {
+                'id': 'Mod1'
+            };
             spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, undefined));
 
             scope.$apply();
 
-            expect(dataValuesStore.find).toHaveBeenCalledWith("2014W14");
+            expect(dataValuesStore.find).toHaveBeenCalledWith(['2014W14', 'Mod1']);
             expect(scope.dataValues).toEqual({});
         });
 
@@ -255,6 +267,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.year = 2014;
             scope.week = {
                 "weekNumber": 14
+            };
+            scope.currentModule = {
+                id: 'Module2'
             };
             spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, {
                 "dataValues": [{
@@ -271,13 +286,27 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             scope.$apply();
 
-            expect(dataValuesStore.find).toHaveBeenCalledWith("2014W14");
+            expect(dataValuesStore.find).toHaveBeenCalledWith(["2014W14", "Module2"]);
             expect(scope.dataValues).toEqual({
                 "DE_Oedema": {
                     "32": "3",
                     "33": "12"
                 }
             });
+        });
+
+        it('should set dataset sections if module is selected', function() {
+            scope.week = {
+                "weekNumber": 14
+            };
+            scope.currentModule = {
+                'id': 'Module1'
+            };
+            spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, {}));
+
+            scope.$apply();
+
+            expect(_.keys(scope.currentGroupedSections)).toEqual(['DS_OPD']);
         });
     });
 });

@@ -1,10 +1,16 @@
 define([], function() {
     var dataSets = [{
         name: 'OPD',
-        id: 'DS_OPD'
+        id: 'DS_OPD',
+        organisationUnits: [{
+            id: 'Module1'
+        }]
     }, {
         name: 'Vaccination',
-        id: 'Vacc'
+        id: 'Vacc',
+        organisationUnits: [{
+            id: 'Module2'
+        }]
     }];
 
     var categoryOptions = [{

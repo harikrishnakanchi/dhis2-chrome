@@ -23,7 +23,7 @@ define([], function() {
     };
 
     var create_datavalues_store = function(db, tx) {
-        create_store_with_key("dataValues", "period", db);
+        create_store_with_key("dataValues", ["period", "orgUnit"], db);
     };
 
     var add_organisation_units_and_level_store = function(db, tx) {
