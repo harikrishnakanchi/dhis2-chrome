@@ -1,6 +1,6 @@
-define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], function(DataEntryController, testData, mocks, _, utils) {
+define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper) {
     describe("dataEntryController ", function() {
-        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise;
+        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, modules;
 
         beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location) {
             q = $q;
@@ -23,6 +23,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
                     find: find
                 };
             };
+
             dataValuesStore = getMockStore("dataValues");
             orgUnitStore = getMockStore("organisationUnits");
 
@@ -45,12 +46,26 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils"], f
                     return orgUnitStore;
                 return getMockStore(testData[storeName]);
             });
-            spyOn(orgUnitStore, "find").and.returnValue(utils.getPromise(q, {
-                id: "company_0"
-            }));
 
+            modules = [{
+                'name': 'somename',
+                'displayName': 'somename',
+                'id': 'id1'
+            }]
+            spyOn(orgUnitStore, 'getAll').and.returnValue(utils.getPromise(q, modules));
             dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
         }));
+
+        it("should initialize modules", function() {
+            spyOn(orgUnitMapper, 'filterModules').and.returnValue(modules);
+
+            scope.$apply();
+
+            expect(scope.modules).toEqual(modules);
+            expect(db.objectStore).toHaveBeenCalledWith("organisationUnits");
+            expect(orgUnitStore.getAll).toHaveBeenCalled();
+            expect(orgUnitMapper.filterModules).toHaveBeenCalledWith(modules);
+        });
 
         it("should return the sum of the list ", function() {
             var list = ["1", "2", "3", "4"];

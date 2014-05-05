@@ -278,5 +278,72 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }]
             }]);
         });
+
+        it("should filter modules from org units", function() {
+            var project = {
+                'name': 'Project1',
+                'id': 'id1',
+                'attributeValues': [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "Project"
+                }]
+            };
+
+            var module = {
+                'name': 'Module1',
+                'attributeValues': [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "Module"
+                }],
+                "parent": {
+                    "name": "Project1",
+                    "id": "id1"
+                },
+            };
+
+            var opUnit = {
+                'name': 'opunit1',
+                'id': 'opunit1',
+                'attributeValues': [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "Operation Unit"
+                }],
+                "parent": {
+                    "name": "Project1",
+                    "id": "id1"
+                },
+            };
+
+            var moduleUnderOpunit = {
+                'name': 'Module2',
+                'attributeValues': [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "Module"
+                }],
+                "parent": {
+                    "name": "opunit1",
+                    "id": "opunit1"
+                },
+            };
+            var organisationUnits = [project, module, opUnit, moduleUnderOpunit];
+            var expectedModule1 = _.merge(_.cloneDeep(module), {
+                'displayName': 'Module1'
+            });
+            var expectedModule2 = _.merge(_.cloneDeep(moduleUnderOpunit), {
+                'displayName': 'opunit1 - Module2'
+            });
+
+            var actualModules = orgUnitMapper.filterModules(organisationUnits);
+
+            expect(actualModules).toEqual([expectedModule1, expectedModule2]);
+        });
     });
 });

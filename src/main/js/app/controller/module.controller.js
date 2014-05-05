@@ -41,11 +41,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
             };
 
             var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise]);
-
             getAllData.then(populateElements);
-
-
-
         };
 
         var getAll = function(storeName) {

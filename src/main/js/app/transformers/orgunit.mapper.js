@@ -142,13 +142,39 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         };
     };
 
+    var isOfType = function(orgUnit, type) {
+        return _.any(orgUnit.attributeValues, {
+            attribute: {
+                id: "a1fa2777924"
+            },
+            value: type
+        });
+    };
+
+    var filterModules = function(orgUnits) {
+        var populateDisplayName = function(module) {
+            var parent = _.find(orgUnits, {
+                'id': module.parent.id
+            });
+            return _.merge(module, {
+                displayName: isOfType(parent, "Operation Unit") ? parent.name + " - " + module.name : module.name
+            });
+        };
+
+        var modules = _.filter(orgUnits, function(orgUnit) {
+            return isOfType(orgUnit, "Module");
+        });
+
+        return _.map(modules, populateDisplayName);
+    };
+
     return {
         "mapToProjectForDhis": mapToProjectForDhis,
         "mapToProjectForView": mapToProjectForView,
         "mapToModules": mapToModules,
         'mapToDataSets': mapToDataSets,
         "getChildOrgUnitNames": getChildOrgUnitNames,
-        "constructSystemSettings": constructSystemSettings
+        "constructSystemSettings": constructSystemSettings,
+        "filterModules": filterModules
     };
-
 });

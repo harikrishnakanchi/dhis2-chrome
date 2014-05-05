@@ -1,5 +1,8 @@
-define(["lodash", "dataValuesMapper", "groupSections"], function(_, dataValuesMapper, groupSections) {
+define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], function(_, dataValuesMapper, groupSections, orgUnitMapper) {
     return function($scope, $q, db, dataService, $anchorScroll, $location, $modal) {
+        $scope.organisationUnit = {
+            id: "proj_104"
+        };
 
         $scope.evaluateExpression = function(elementId, option) {
             var cellValue = $scope.dataValues[elementId][option];
@@ -93,15 +96,6 @@ define(["lodash", "dataValuesMapper", "groupSections"], function(_, dataValuesMa
             return store.getAll();
         };
 
-        var fetchOrganisationUnit = function() {
-            var store = db.objectStore("organisationUnits");
-            return store.find("proj_104");
-        };
-
-        var saveOrganisationUnit = function(orgUnit) {
-            $scope.organisationUnit = orgUnit;
-        };
-
         var setDataSets = function(data) {
             dataSets = data[0];
             return data;
@@ -110,6 +104,11 @@ define(["lodash", "dataValuesMapper", "groupSections"], function(_, dataValuesMa
         var transformDataSet = function(data) {
             $scope.groupedSections = groupSections(data).groupedSections;
             return data;
+        };
+
+        var filterModules = function(modules) {
+            $scope.modules = orgUnitMapper.filterModules(modules);
+            return $scope.modules;
         };
 
         var init = function() {
@@ -121,8 +120,10 @@ define(["lodash", "dataValuesMapper", "groupSections"], function(_, dataValuesMa
             var categoriesPromise = getAll("categories");
             var categoryOptionCombosPromise = getAll("categoryOptionCombos");
             var systemSettingsPromise = getAll('systemSettings');
+            var getOrgUnits = getAll('organisationUnits');
             var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, systemSettingsPromise]);
-            getAllData.then(setDataSets).then(transformDataSet).then(fetchOrganisationUnit).then(saveOrganisationUnit);
+            getAllData.then(setDataSets).then(transformDataSet);
+            getOrgUnits.then(filterModules);
         };
 
         init();

@@ -1,7 +1,6 @@
 /*global Date:true*/
 define(["moduleController", "angularMocks", "utils"], function(ModuleController, mocks, utils) {
     xdescribe("op unit controller", function() {
-
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets;
 
         beforeEach(mocks.inject(function($rootScope, $q, $location) {
