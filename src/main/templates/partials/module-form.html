@@ -26,7 +26,7 @@
 								<div ng-show="areDatasetsNotSelected([module])">
 									<span>{{resourceBundle.selectDatasets}}</span>
 								</div>
-								<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" ng-disabled="!isEditMode" click="displayGroupedDataElements(element)"></multiselect>
+								<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isEditMode" click="displayGroupedDataElements(element)"></multiselect>
 							</div>
 							<div ng-repeat="section in selectedDataset.sections">
 								<div class="collapse-head" style="position:relative">
