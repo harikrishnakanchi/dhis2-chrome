@@ -4,6 +4,8 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
             var leftPanedatasets = [];
             $scope.isopen = {};
             $scope.isCollapsed = true;
+            $scope.selectedDataElements = {};
+            $scope.selectedSections = {};
 
             var dataSetPromise = getAll('dataSets');
             var sectionPromise = getAll("sections");
@@ -27,7 +29,9 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
                 };
 
                 _.each(sections, function(section) {
+                    $scope.selectedSections[section.id] = false;
                     section.dataElements = _.map(section.dataElements, function(dataElement) {
+                        $scope.selectedDataElements[dataElement.id] = false;
                         return enrichDataElement(dataElement);
                     });
                 });
@@ -98,8 +102,28 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
             });
         };
 
+        $scope.changeSectionSelection = function(section) {
+            _.each(section.dataElements, function(dataElement) {
+                $scope.selectedDataElements[dataElement.id] = $scope.selectedSections[section.id];
+            });
+        }
+
+        $scope.changeDataElementSelection = function(section) {
+            var selected = false;
+            _.each(section.dataElements, function(dataElement) {
+                selected = selected || $scope.selectedDataElements[dataElement.id];
+            });
+            $scope.selectedSections[section.id] = selected;
+        };
+
         $scope.displayGroupedDataElements = function(element) {
             $scope.selectedDataset = element;
+            _.each($scope.selectedDataset.sections, function(section) {
+                $scope.selectedSections[section.id] = true;
+                _.each(section.dataElements, function(dataElement) {
+                    $scope.selectedDataElements[dataElement.id] = true;
+                });
+            });
         };
 
         init();

@@ -31,13 +31,13 @@
 							<div ng-repeat="section in selectedDataset.sections">
 								<div class="collapse-head" style="position:relative">
 									<h5 ng-click="isCollapsed = !isCollapsed" style="background:#ccc;display:block;padding:10px;cursor:pointer;">{{section.name}} </h5>
-									<input type="checkbox" style="position:absolute;right:10px; top:7px;">
+									<input type="checkbox" style="position:absolute;right:10px; top:7px;" ng-change="changeSectionSelection(section)" ng-model="selectedSections[section.id]">
 								</div>
 								<div collapse="isCollapsed">
 									<ul>
 										<li ng-repeat="element in section.dataElements">
 											<label>
-												<input type="checkbox"> {{element.formName}}
+												<input type="checkbox" ng-model="selectedDataElements[element.id]" ng-change="changeDataElementSelection(section)"> {{element.formName}}
 											</label>
 										</li>
 									</ul>
