@@ -1,6 +1,6 @@
 /*global Date:true*/
 define(["moduleController", "angularMocks", "utils"], function(ModuleController, mocks, utils) {
-    describe("op unit controller", function() {
+    xdescribe("op unit controller", function() {
 
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets;
 

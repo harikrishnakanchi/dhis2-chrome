@@ -1,40 +1,63 @@
 define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, moment, md5) {
-    return function($scope, orgUnitService, db, $location) {
+    return function($scope, orgUnitService, db, $location, $q) {
         var init = function() {
             var leftPanedatasets = [];
-            var store = db.objectStore("dataSets");
+            $scope.isopen = {};
+            $scope.isCollapsed = true;
 
-            $scope.modules = [];
+            var dataSetPromise = getAll('dataSets');
+            var sectionPromise = getAll("sections");
+            var dataElementsPromise = getAll("dataElements");
 
-            store.getAll().then(function(datasets) {
-                $scope.allDatasets = datasets;
-                $scope.addModules();
-            });
+            var populateElements = function(data) {
+                $scope.allDatasets = data[0];
+                var sections = data[1];
+                var allDataElements = data[2];
 
-            var setUpView = function() {
-                orgUnitService.getDatasetsAssociatedWithOrgUnit($scope.orgUnit).then(function(associatedDatasets) {
-                    $scope.modules = [{
-                        'name': $scope.orgUnit.name,
-                        'datasets': associatedDatasets
-                    }];
+                var groupedSections = _.groupBy(sections, function(section) {
+                    return section.dataSet.id;
+                });
 
-                    _.each($scope.modules, function(module) {
-                        module.allDatasets = _.reject($scope.allDatasets, function(dataset) {
-                            return _.any(associatedDatasets, dataset);
-                        });
+                var enrichDataElement = function(dataElement) {
+                    var detailedDataElement = _.find(allDataElements, function(d) {
+                        return d.id === dataElement.id;
+                    });
+                    dataElement.formName = detailedDataElement.formName;
+                    return dataElement;
+                };
+
+                _.each(sections, function(section) {
+                    section.dataElements = _.map(section.dataElements, function(dataElement) {
+                        return enrichDataElement(dataElement);
                     });
                 });
+
+                _.each($scope.allDatasets, function(dataset) {
+                    dataset.dataElements = [];
+                    dataset.sections = groupedSections[dataset.id];
+                });
+                $scope.modules = [];
+                $scope.addModules();
             };
 
-            if (!$scope.isEditMode)
-                setUpView();
+            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise]);
+
+            getAllData.then(populateElements);
+
+
+
+        };
+
+        var getAll = function(storeName) {
+            var store = db.objectStore(storeName);
+            return store.getAll();
         };
 
         $scope.addModules = function() {
             $scope.modules.push({
                 'openingDate': moment().format("YYYY-MM-DD"),
                 'datasets': [],
-                'allDatasets': _.clone($scope.allDatasets, true),
+                'allDatasets': _.cloneDeep($scope.allDatasets, true),
                 'excludedDataElementIds': []
             });
         };
@@ -79,6 +102,9 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
             });
         };
 
+        $scope.displayGroupedDataElements = function(element) {
+            $scope.selectedDataset = element;
+        };
 
         init();
     };
