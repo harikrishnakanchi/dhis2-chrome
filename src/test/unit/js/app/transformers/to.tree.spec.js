@@ -19,7 +19,7 @@ define(["toTree"], function(toTree) {
                     id: 1
                 },
                 'children': [],
-                'collapsed': 'true'
+                'collapsed': true
             };
             child2 = {
                 'id': 3,
@@ -29,7 +29,7 @@ define(["toTree"], function(toTree) {
                     id: 1
                 },
                 'children': [],
-                'collapsed': 'true'
+                'collapsed': true
             };
             expectedOrgUnitTree = [{
                 'id': 1,
@@ -37,7 +37,7 @@ define(["toTree"], function(toTree) {
                 'level': 1,
                 'parent': null,
                 'children': [child2, child1],
-                'collapsed': 'true'
+                'collapsed': true
             }];
 
             allOrgUnits = [getOrgUnit(1, 'msf', 1, null), getOrgUnit(2, 'ocp', 2, {
@@ -51,10 +51,9 @@ define(["toTree"], function(toTree) {
             var tree = toTree(allOrgUnits, undefined);
             expect(tree.rootNodes).toEqual(expectedOrgUnitTree);
             expect(tree.selectedNode).toEqual(undefined);
-
         });
 
-        it("should select node with the given id", function() {
+        it("should select and expand node with the given id", function() {
             var tree = toTree(allOrgUnits, 2);
             var child1 = {
                 id: 2,
@@ -64,10 +63,19 @@ define(["toTree"], function(toTree) {
                     id: 1
                 },
                 children: [],
-                selected: true
+                selected: true,
+                collapsed: false
             };
             child1.selected = true;
             expect(tree.selectedNode).toEqual(child1);
+        });
+
+        it("should expand parents of selected node", function() {
+            var tree = toTree(allOrgUnits, 3);
+
+            expect(tree.rootNodes[0].collapsed).toEqual(false);
+            expect(tree.rootNodes[0].children[0].collapsed).toEqual(false);
+            expect(tree.rootNodes[0].children[1].collapsed).toEqual(true);
         });
     });
 });

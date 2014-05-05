@@ -40,7 +40,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 id: 1
             },
             'children': [],
-            'collapsed': 'true'
+            'collapsed': true
         };
 
         var expectedOrgUnitTree = [{
@@ -49,7 +49,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             'level': 1,
             'parent': null,
             'children': [child],
-            'collapsed': 'true'
+            'collapsed': true
         }];
 
         beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout, $anchorScroll) {
@@ -122,12 +122,12 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                     id: 1
                 },
                 children: [],
-                selected: true
+                selected: true,
+                collapsed: false
             };
 
             scope.$apply();
 
-            child.selected = true;
             expect(scope.onOrgUnitSelect).toHaveBeenCalledWith(child);
             expect(scope.state).toEqual({
                 currentNode: child
