@@ -2,15 +2,14 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
     return function($scope, orgUnitService, db, $location) {
         var init = function() {
             var leftPanedatasets = [];
-            var setUpEditForm = function() {
-                $scope.modules = [];
+            var store = db.objectStore("dataSets");
 
-                var store = db.objectStore("dataSets");
-                store.getAll().then(function(datasets) {
-                    $scope.allDatasets = datasets;
-                    $scope.addModules();
-                });
-            };
+            $scope.modules = [];
+
+            store.getAll().then(function(datasets) {
+                $scope.allDatasets = datasets;
+                $scope.addModules();
+            });
 
             var setUpView = function() {
                 orgUnitService.getDatasetsAssociatedWithOrgUnit($scope.orgUnit).then(function(associatedDatasets) {
@@ -19,20 +18,15 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
                         'datasets': associatedDatasets
                     }];
 
-                    var store = db.objectStore("dataSets");
-                    store.getAll().then(function(allDatasets) {
-                        _.each($scope.modules, function(module) {
-                            module.allDatasets = _.reject(allDatasets, function(dataset) {
-                                return _.any(associatedDatasets, dataset);
-                            });
+                    _.each($scope.modules, function(module) {
+                        module.allDatasets = _.reject($scope.allDatasets, function(dataset) {
+                            return _.any(associatedDatasets, dataset);
                         });
                     });
                 });
             };
 
-            if ($scope.isEditMode)
-                setUpEditForm();
-            else
+            if (!$scope.isEditMode)
                 setUpView();
         };
 
