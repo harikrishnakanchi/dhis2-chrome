@@ -26,18 +26,18 @@
 								<div ng-show="areDatasetsNotSelected([module])">
 									<span>{{resourceBundle.selectDatasets}}</span>
 								</div>
-								<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isEditMode" click="displayGroupedDataElements(element)"></multiselect>
+								<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isEditMode" click="displayGroupedDataElements(module, element)"></multiselect>
 							</div>
-							<div ng-repeat="section in selectedDataset.sections">
+							<div ng-repeat="section in module.selectedDataset.sections">
 								<div class="collapse-head" style="position:relative">
 									<h5 ng-click="isCollapsed = !isCollapsed" style="background:#ccc;display:block;padding:10px;cursor:pointer;">{{section.name}} </h5>
-									<input type="checkbox" style="position:absolute;right:10px; top:7px;" ng-change="changeSectionSelection(section)" ng-model="selectedSections[section.id]">
+									<input type="checkbox" style="position:absolute;right:10px; top:7px;" ng-change="changeSectionSelection(module, section)" ng-model="module.selectedSections[section.id]">
 								</div>
 								<div collapse="isCollapsed">
 									<ul>
 										<li ng-repeat="element in section.dataElements">
 											<label>
-												<input type="checkbox" ng-model="selectedDataElements[element.id]" ng-change="changeDataElementSelection(section)"> {{element.formName}}
+												<input type="checkbox" ng-model="module.selectedDataElements[element.id]" ng-change="changeDataElementSelection(module, section)"> {{element.formName}}
 											</label>
 										</li>
 									</ul>

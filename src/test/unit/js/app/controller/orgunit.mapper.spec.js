@@ -172,6 +172,9 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 shortName: 'Module1',
                 id: '86eb3db78c7',
                 openingDate: moment().format("YYYY-MM-DD"),
+                selectedDataset: undefined,
+                selectedSections: undefined,
+                selectedDataElements: undefined,
                 attributeValues: [{
                     attribute: {
                         id: "a1fa2777924"
@@ -187,6 +190,9 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 shortName: 'Module2',
                 id: 'f1941e66f2d',
                 openingDate: moment().format("YYYY-MM-DD"),
+                selectedDataset: undefined,
+                selectedSections: undefined,
+                selectedDataElements: undefined,
                 attributeValues: [{
                     attribute: {
                         id: "a1fa2777924"

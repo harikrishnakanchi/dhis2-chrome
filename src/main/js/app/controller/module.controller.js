@@ -1,13 +1,14 @@
-define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, moment, md5) {
+define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer"], function(_, orgUnitMapper, moment, md5, systemSettingsTransformer) {
     return function($scope, orgUnitService, db, $location, $q) {
+        var selectedDataElements = {};
+        var selectedSections = {};
+
+        $scope.isopen = {};
+        $scope.isCollapsed = true;
+        $scope.modules = [];
+
         var init = function() {
             var leftPanedatasets = [];
-            $scope.isopen = {};
-            $scope.isCollapsed = true;
-
-            $scope.selectedDataElements = {};
-            $scope.selectedSections = {};
-            $scope.modules = [];
 
             var dataSetPromise = getAll('dataSets');
             var sectionPromise = getAll("sections");
@@ -31,9 +32,9 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
                 };
 
                 _.each(sections, function(section) {
-                    $scope.selectedSections[section.id] = false;
+                    selectedSections[section.id] = true;
                     section.dataElements = _.map(section.dataElements, function(dataElement) {
-                        $scope.selectedDataElements[dataElement.id] = false;
+                        selectedDataElements[dataElement.id] = true;
                         return enrichDataElement(dataElement);
                     });
                 });
@@ -59,20 +60,23 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
                 'openingDate': moment().format("YYYY-MM-DD"),
                 'datasets': [],
                 'allDatasets': _.cloneDeep($scope.allDatasets, true),
-                'excludedDataElementIds': []
+                'selectedDataset': {},
+                'selectedSections': _.cloneDeep(selectedSections),
+                'selectedDataElements': _.cloneDeep(selectedDataElements)
             });
+
         };
 
         $scope.save = function(modules) {
             var parent = $scope.orgUnit;
-
+            var enrichedModules = {};
             var createModules = function() {
-                var moduleDatasets = orgUnitMapper.mapToModules(modules, parent);
-                return orgUnitService.create(moduleDatasets);
+                enrichedModules = orgUnitMapper.mapToModules(modules, parent);
+                return orgUnitService.create(enrichedModules);
             };
 
             var saveSystemSettings = function() {
-                var systemSettings = orgUnitMapper.constructSystemSettings(modules, parent);
+                var systemSettings = systemSettingsTransformer.constructSystemSettings(enrichedModules, parent);
                 orgUnitService.setSystemSettings(parent.id, systemSettings);
             };
 
@@ -103,28 +107,22 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
             });
         };
 
-        $scope.changeSectionSelection = function(section) {
+        $scope.changeSectionSelection = function(module, section) {
             _.each(section.dataElements, function(dataElement) {
-                $scope.selectedDataElements[dataElement.id] = $scope.selectedSections[section.id];
+                module.selectedDataElements[dataElement.id] = module.selectedSections[section.id];
             });
         };
 
-        $scope.changeDataElementSelection = function(section) {
+        $scope.changeDataElementSelection = function(module, section) {
             var selected = false;
             _.each(section.dataElements, function(dataElement) {
-                selected = selected || $scope.selectedDataElements[dataElement.id];
+                selected = selected || module.selectedDataElements[dataElement.id];
             });
-            $scope.selectedSections[section.id] = selected;
+            module.selectedSections[section.id] = selected;
         };
 
-        $scope.displayGroupedDataElements = function(element) {
-            $scope.selectedDataset = element;
-            _.each($scope.selectedDataset.sections, function(section) {
-                $scope.selectedSections[section.id] = true;
-                _.each(section.dataElements, function(dataElement) {
-                    $scope.selectedDataElements[dataElement.id] = true;
-                });
-            });
+        $scope.displayGroupedDataElements = function(module, element) {
+            module.selectedDataset = element;
         };
 
         init();

@@ -55,6 +55,7 @@ require.config({
         "findCategoryComboOption": "app/transformers/find.category.combo.option",
         "orgUnitMapper": "app/transformers/orgunit.mapper",
         "toTree": "app/transformers/to.tree",
+        "systemSettingsTransformer": "app/transformers/system.settings.transformer",
         "groupSections": "app/transformers/group.sections"
     },
     shim: {

@@ -103,6 +103,9 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
                 shortName: module.name,
                 id: md5(module.name + moduleParent.name).substr(0, 11),
                 openingDate: moment().format("YYYY-MM-DD"),
+                selectedDataset: module.selectedDataset,
+                selectedSections: module.selectedSections,
+                selectedDataElements: module.selectedDataElements,
                 attributeValues: [{
                     attribute: {
                         id: "a1fa2777924"
@@ -132,14 +135,6 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             return restructuredDatasets;
         });
         return _.flatten(result);
-    };
-
-    var constructSystemSettings = function(modules, parent) {
-        //TODO fix this
-        return {
-            "moduleId1": ["test1", "test2"],
-            "moduleId2": ["test1", "test2"]
-        };
     };
 
     var isOfType = function(orgUnit, type) {
@@ -174,7 +169,6 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         "mapToModules": mapToModules,
         'mapToDataSets': mapToDataSets,
         "getChildOrgUnitNames": getChildOrgUnitNames,
-        "constructSystemSettings": constructSystemSettings,
         "filterModules": filterModules
     };
 });

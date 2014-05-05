@@ -50,7 +50,14 @@ define(["properties", "lodash"], function(properties, _) {
         };
 
         var setSystemSettings = function(projectId, data) {
-            return $http.post(properties.dhis.url + '/api/systemSettings/' + projectId, data).then(function() {
+            return $http({
+                method: 'POST',
+                url: properties.dhis.url + '/api/systemSettings/' + projectId,
+                data: data,
+                headers: {
+                    'Content-Type': 'text/plain'
+                }
+            }).then(function() {
                 return data;
             });
         };
