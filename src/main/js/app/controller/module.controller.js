@@ -4,8 +4,10 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
             var leftPanedatasets = [];
             $scope.isopen = {};
             $scope.isCollapsed = true;
+
             $scope.selectedDataElements = {};
             $scope.selectedSections = {};
+            $scope.modules = [];
 
             var dataSetPromise = getAll('dataSets');
             var sectionPromise = getAll("sections");
@@ -40,7 +42,6 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
                     dataset.dataElements = [];
                     dataset.sections = groupedSections[dataset.id];
                 });
-                $scope.modules = [];
                 $scope.addModules();
             };
 
@@ -106,7 +107,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5"], function(_, orgUnitMapper, 
             _.each(section.dataElements, function(dataElement) {
                 $scope.selectedDataElements[dataElement.id] = $scope.selectedSections[section.id];
             });
-        }
+        };
 
         $scope.changeDataElementSelection = function(section) {
             var selected = false;

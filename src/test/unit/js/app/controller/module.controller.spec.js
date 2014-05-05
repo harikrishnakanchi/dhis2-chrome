@@ -1,7 +1,8 @@
 /*global Date:true*/
-define(["moduleController", "angularMocks", "utils"], function(ModuleController, mocks, utils) {
-    xdescribe("op unit controller", function() {
-        var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets;
+define(["moduleController", "angularMocks", "utils", "testData"], function(ModuleController, mocks, utils, testData) {
+    describe("op unit controller", function() {
+
+        var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections, dataElements, sectionsdata, datasetsdata, dataElementsdata;
 
         beforeEach(mocks.inject(function($rootScope, $q, $location) {
             scope = $rootScope.$new();
@@ -19,11 +20,8 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
                 getAll: function() {}
             };
             db = {
-                objectStore: function(store) {
-                    return mockOrgStore;
-                }
+                objectStore: function() {}
             };
-
             _Date = Date;
             todayStr = "2014-04-01";
             today = new Date(todayStr);
@@ -45,15 +43,43 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
                 }]
             }];
 
+            var getMockStore = function(data) {
+                var getAll = function() {
+                    return utils.getPromise(q, data);
+                };
+                var upsert = function() {};
+                var find = function() {};
+                return {
+                    getAll: getAll,
+                    upsert: upsert,
+                    find: find
+                };
+            };
+
+            sectionsdata = testData["sections"];
+            datasetsdata = testData["dataSets"];
+            dataElementsdata = testData["dataElements"];
+
+            sections = getMockStore(sectionsdata);
+            datasets = getMockStore(datasetsdata);
+            dataElements = getMockStore(dataElementsdata);
+
             scope.orgUnit = {
                 'name': 'SomeName',
                 'id': 'someId'
             };
             scope.isEditMode = true;
 
-            spyOn(db, 'objectStore').and.returnValue(mockOrgStore);
-            spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, datasets));
-            moduleController = new ModuleController(scope, orgUnitService, db, location);
+            spyOn(db, 'objectStore').and.callFake(function(storeName) {
+                if (storeName === "dataSets")
+                    return datasets;
+                if (storeName === "sections")
+                    return sections;
+                if (storeName === "dataElements")
+                    return dataElements;
+                return getMockStore(testData[storeName]);
+            });
+            moduleController = new ModuleController(scope, orgUnitService, db, location, q);
         }));
 
         afterEach(function() {
@@ -63,8 +89,7 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
         it("should put all datasets in scope on init", function() {
             scope.$apply();
 
-            expect(scope.allDatasets).toEqual(datasets);
-            expect(scope.modules[0].allDatasets).toEqual(datasets);
+            expect(scope.allDatasets).toEqual(datasetsdata);
         });
 
         it('should add new modules', function() {
@@ -127,7 +152,7 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
             expect(orgUnitService.setSystemSettings).toHaveBeenCalled();
         });
 
-        it("should set datasets associated with module for view", function() {
+        xit("should set datasets associated with module for view", function() {
 
             var datasets = [{
                 "id": "DS1",
@@ -145,11 +170,11 @@ define(["moduleController", "angularMocks", "utils"], function(ModuleController,
             scope.isEditMode = false;
 
             spyOn(orgUnitService, "getDatasetsAssociatedWithOrgUnit").and.returnValue(utils.getPromise(q, datasets));
-            moduleController = new ModuleController(scope, orgUnitService, db, location);
+            moduleController = new ModuleController(scope, orgUnitService, db, location, q);
             scope.$apply();
 
             expect(scope.modules[0].name).toEqual("Mod2");
-            expect(scope.modules[0].datasets).toEqual(datasets);
+            expect(scope.modules[0].datasets).toEqual(datasetsdata);
             expect(scope.modules[0].allDatasets).toEqual([{
                 name: "Malaria",
                 id: "dataset_1"
