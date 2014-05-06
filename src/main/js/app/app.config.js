@@ -39,6 +39,7 @@ require.config({
         "projectController": "app/controller/project.controller",
         "loginController": "app/controller/login.controller",
         "countryController": "app/controller/country.controller",
+        "saveDialogController": "app/controller/save.dialog.controller",
 
         //Directives
         "directives": "app/directive/directives",

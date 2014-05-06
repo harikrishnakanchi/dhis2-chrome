@@ -77,6 +77,36 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
             scrollToTop();
         };
 
+        var confirmAndMove = function(okCallback) {
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/save.dialog.html',
+                controller: 'saveDialogController',
+                scope: $scope
+            });
+
+            modalInstance.result.then(okCallback);
+        };
+
+        var deregisterSelf = $scope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
+            var okCallback = function() {
+                deregisterSelf();
+                $location.url(newUrl);
+            };
+
+            if ($scope.preventNavigation) {
+                confirmAndMove(okCallback);
+                event.preventDefault();
+            }
+        });
+
+        $scope.$watch('dataentryForm.$dirty', function(dirty) {
+            if (dirty) {
+                $scope.preventNavigation = true;
+            } else {
+                $scope.preventNavigation = false;
+            }
+        });
+
         var scrollToTop = function() {
             $location.hash();
             $anchorScroll();

@@ -7,6 +7,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             db = {
                 objectStore: function() {}
             };
+            modal = {
+                'open': function() {
+                    return {
+                        result: utils.getPromise(q, {})
+                    };
+                }
+            }
             location = $location;
             anchorScroll = $anchorScroll;
             rootScope = $rootScope;
@@ -53,7 +60,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 'id': 'id1'
             }]
             spyOn(orgUnitStore, 'getAll').and.returnValue(utils.getPromise(q, modules));
-            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
+            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal);
         }));
 
         it("should initialize modules", function() {
@@ -307,6 +314,28 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.$apply();
 
             expect(_.keys(scope.currentGroupedSections)).toEqual(['DS_OPD']);
+        });
+
+        it('should prevent navigation if data entry form is dirty', function() {
+            scope.dataentryForm = {};
+            scope.dataentryForm.$dirty = false;
+            scope.dataentryForm.$dirty = true;
+            spyOn(location, "url");
+            scope.$apply();
+
+            expect(scope.preventNavigation).toEqual(true);
+            expect(location.url).toHaveBeenCalled();
+
+        });
+
+        it('should not prevent navigation if data entry form is not dirty', function() {
+            scope.dataentryForm = {};
+            scope.dataentryForm.$dirty = true;
+            scope.dataentryForm.$dirty = false;
+            scope.$apply();
+
+            expect(scope.preventNavigation).toEqual(false);
+
         });
     });
 });

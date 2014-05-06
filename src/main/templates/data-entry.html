@@ -1,5 +1,4 @@
-<form name="dataentry" id="dataentry" ng-submit="save()">
-	<div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
+<div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
 	<div ng-show="success" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
 	<div ng-show="error" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
 	<div>
@@ -14,7 +13,8 @@
 				</li>
 			</ul>
 		</section>
-	</div>
+</div>
+<form name="dataentryForm" id="dataentry" ng-submit="save()">
 	<section class="panel tab-panel" ng-show="week &amp;&amp; currentModule">
 		<tabset>
 			<tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in currentGroupedSections">
