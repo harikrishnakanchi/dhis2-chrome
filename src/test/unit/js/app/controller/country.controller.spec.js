@@ -56,7 +56,8 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
 
             var parent = {
                 'name': 'Name1',
-                'id': 'Id1'
+                'id': 'Id1',
+                'level': '2',
             };
 
             spyOn(orgUnitService, 'create').and.returnValue(utils.getPromise(q, {}));
@@ -67,6 +68,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             var expectedNewOrgUnit = [{
                 'id': orgUnitId,
                 'name': newOrgUnit.name,
+                'level': 3,
                 'openingDate': moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
                 'shortName': newOrgUnit.name,
                 'parent': {

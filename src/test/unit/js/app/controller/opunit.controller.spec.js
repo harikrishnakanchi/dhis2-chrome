@@ -82,7 +82,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             var opUnits = [opUnit1, opUnit2];
 
             scope.orgUnit = {
-                'level': 4,
+                'level': '4',
                 'name': 'Parent',
                 'id': 'ParentId'
             };

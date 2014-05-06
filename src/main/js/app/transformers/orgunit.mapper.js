@@ -5,6 +5,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         var projectOrgUnit = {
             'id': md5(orgUnit.name + parentOrgUnit.name).substr(0, 11),
             'name': orgUnit.name,
+            'level': parseInt(parentOrgUnit.level) + 1,
             'shortName': orgUnit.name,
             'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
             'parent': _.pick(parentOrgUnit, "name", "id"),
@@ -102,6 +103,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
                 name: module.name,
                 shortName: module.name,
                 id: md5(module.name + moduleParent.name).substr(0, 11),
+                level: parseInt(moduleParent.level) + 1,
                 openingDate: moment().format("YYYY-MM-DD"),
                 selectedDataset: module.selectedDataset,
                 selectedSections: module.selectedSections,

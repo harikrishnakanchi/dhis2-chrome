@@ -13,6 +13,7 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
             newOrgUnit = {
                 'id': md5(orgUnit.name + parentOrgUnit.name).substr(0, 11),
                 'name': orgUnit.name,
+                'level': parseInt(parentOrgUnit.level) + 1,
                 'shortName': orgUnit.name,
                 'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
                 'parent': _.pick(parentOrgUnit, "name", "id"),

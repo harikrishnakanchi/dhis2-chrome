@@ -42,7 +42,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
             var parent = {
                 'name': 'Name1',
-                'id': 'Id1'
+                'id': 'Id1',
+                'level': 2,
             };
 
             spyOn(orgUnitService, 'create').and.returnValue(utils.getPromise(q, orgUnitId));
@@ -55,6 +56,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 id: orgUnitId,
                 name: newOrgUnit.name,
                 shortName: newOrgUnit.name,
+                level: 3,
                 openingDate: moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
                 parent: {
                     id: parent.id,
@@ -175,6 +177,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             scope.orgUnit = {
                 "name": "anyname",
                 "openingDate": "2010-01-01",
+                'level': 3,
                 "attributeValues": [{
                     "attribute": {
                         "code": "prjCon",

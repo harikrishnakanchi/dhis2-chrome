@@ -47,7 +47,6 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
         };
 
         $scope.closeEditForm = function(selectedNodeId, message) {
-            console.log(selectedNodeId);
             if (message) {
                 $scope.showMessage = true;
                 $scope.message = message;

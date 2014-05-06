@@ -18,7 +18,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
                 return _.merge(opUnit, {
                     'id': md5(opUnit.name + parent.name).substr(0, 11),
                     'shortName': opUnit.name,
-                    'level': parent.level + 1,
+                    'level': parseInt(parent.level) + 1,
                     'parent': _.pick(parent, "name", "id"),
                     "attributeValues": [{
                         "attribute": {

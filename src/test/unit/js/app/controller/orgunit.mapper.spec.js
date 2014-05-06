@@ -5,6 +5,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var dhisProject = {
                 "id": "a4acf9115a7",
                 "name": 'Org1',
+                "level": 3,
                 "shortName": 'Org1',
                 "openingDate": "2010-01-01",
                 "parent": {
@@ -79,6 +80,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var parentOrgUnit = {
                 name: 'Name1',
                 id: 'Id1',
+                level: "2",
             };
 
 
@@ -88,6 +90,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 "id": "a4acf9115a7",
                 "name": orgUnit.name,
                 "shortName": orgUnit.name,
+                "level": 3,
                 "openingDate": moment(orgUnit.openingDate).format("YYYY-MM-DD"),
                 "parent": {
                     "name": parentOrgUnit.name,
@@ -143,6 +146,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var projectOrgUnit = {
                 'id': 'Project1Id',
                 'name': 'Project1',
+                'level': '3',
             };
 
             var modules = [{
@@ -171,6 +175,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 name: 'Module1',
                 shortName: 'Module1',
                 id: '86eb3db78c7',
+                level: 4,
                 openingDate: moment().format("YYYY-MM-DD"),
                 selectedDataset: undefined,
                 selectedSections: undefined,
@@ -189,6 +194,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 name: 'Module2',
                 shortName: 'Module2',
                 id: 'f1941e66f2d',
+                level: 4,
                 openingDate: moment().format("YYYY-MM-DD"),
                 selectedDataset: undefined,
                 selectedSections: undefined,
