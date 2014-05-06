@@ -57,7 +57,10 @@ require.config({
         "toTree": "app/transformers/to.tree",
         "systemSettingsTransformer": "app/transformers/system.settings.transformer",
         "datasetTransformer": "app/transformers/dataset.transformer",
-        "groupSections": "app/transformers/group.sections"
+        "groupSections": "app/transformers/group.sections",
+
+        //Interceptors
+        "httpInterceptor": "app/interceptors/http.interceptor"
     },
     shim: {
         "ng-i18n": {

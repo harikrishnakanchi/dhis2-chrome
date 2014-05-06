@@ -1,8 +1,8 @@
-define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "properties",
+define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "properties", "httpInterceptor",
         "angular-route", "ng-i18n", "angular-indexedDB", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-ui-position", "angular-ui-datepicker", "angular-multiselect", "angular-ui-notin"
     ],
-    function(angular, Q, services, directives, controllers, migrator, migrations, properties) {
+    function(angular, Q, services, directives, controllers, migrator, migrations, properties, httpInterceptor) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.position", "ui.bootstrap.datepicker",
@@ -11,6 +11,7 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
             services.init(app);
             directives.init(app);
             controllers.init(app);
+            app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider',
                 function($routeProvider, $indexedDBProvider, $httpProvider) {
                     $routeProvider.
@@ -39,16 +40,7 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
                             migrator.run(event.oldVersion, db, tx, migrations);
                         });
 
-                    $httpProvider.interceptors.push(function() {
-                        return {
-                            'request': function(config) {
-                                if (config.url.indexOf(properties.dhis.url) === 0) {
-                                    config.headers.Authorization = properties.dhis.auth_header;
-                                }
-                                return config;
-                            }
-                        };
-                    });
+                    $httpProvider.interceptors.push('httpInterceptor');
                 }
             ]);
             app.value('ngI18nConfig', {
