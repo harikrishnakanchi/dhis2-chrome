@@ -145,7 +145,8 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.flush();
         });
 
-        xit("should get datasets associated with org units", function() {
+        it("should get datasets associated with org units", function() {
+
             var dataset1 = {
                 "id": "DS1",
                 "organisationUnits": [{
@@ -181,12 +182,12 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
                 "id": "Mod2Id"
             };
 
-            var datasets = [dataset1, dataset2, dataset3];
-            spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, datasets));
+            var datasets = [dataset1, dataset2];
 
-            orgUnitService.getDatasetsAssociatedWithOrgUnit(orgUnit).then(function(associatedDataSets) {
-                expect(associatedDataSets).toEqual([dataset1, dataset2]);
-            });
+            var actualDatasets = orgUnitService.getAssociatedDatasets(orgUnit, datasets);
+
+            expect(actualDatasets).toEqual([dataset1, dataset2]);
+
 
         });
 

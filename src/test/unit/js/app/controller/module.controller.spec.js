@@ -11,9 +11,10 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
 
             orgUnitService = {
                 "create": function() {},
-                "getDatasetsAssociatedWithOrgUnit": function() {},
+                "getAssociatedDatasets": function() {},
                 "associateDataSetsToOrgUnit": function() {},
-                "setSystemSettings": function() {}
+                "setSystemSettings": function() {},
+                "getSystemSettings": function() {}
             };
             mockOrgStore = {
                 upsert: function() {},
@@ -146,36 +147,80 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             expect(orgUnitService.setSystemSettings).toHaveBeenCalled();
         });
 
-        xit("should set datasets associated with module for view", function() {
+        it("should set datasets associated with module for view", function() {
 
-            var datasets = [{
-                "id": "DS1",
-                "organisationUnits": [{
-                    "name": "Mod2",
-                    "id": "Mod2Id"
+            var dataSets = [{
+                name: 'OPD',
+                id: 'DS_OPD',
+                organisationUnits: [{
+                    id: 'Module1'
+                }],
+                sections: [{
+                    id: 'Sec1',
+                    dataSet: {
+                        id: "Module1"
+                    },
+                    dataElements: [{
+                        id: 'DE1',
+                        name: 'DE1 - ITFC'
+                    }, {
+                        id: 'DE2',
+                        name: 'DE2 - ITFC'
+                    }, {
+                        id: 'DE4',
+                        name: 'DE4 - ITFC'
+                    }]
                 }]
             }];
 
+            var systemSettings = {
+                "excludedDataElements": {
+                    "Mod2Id": ['DE4']
+                }
+            };
+
+            var expectedModule = {
+                name: 'Mod2',
+                datasets: [{
+                    name: 'OPD',
+                    id: 'DS_OPD',
+                    organisationUnits: [{
+                        id: 'Module1'
+                    }],
+                    sections: [{
+                        id: 'Sec1',
+                        dataSet: {
+                            id: 'Module1'
+                        },
+                        dataElements: [{
+                            id: 'DE1',
+                            name: 'DE1 - ITFC'
+                        }, {
+                            id: 'DE2',
+                            name: 'DE2 - ITFC'
+                        }]
+                    }]
+                }]
+            };
+
             scope.orgUnit = {
                 "name": "Mod2",
-                "id": "Mod2Id"
+                "id": "Mod2Id",
+                "parent": {
+                    id: "test"
+                }
             };
 
             scope.isEditMode = false;
 
-            spyOn(orgUnitService, "getDatasetsAssociatedWithOrgUnit").and.returnValue(utils.getPromise(q, datasets));
+            spyOn(orgUnitService, "getAssociatedDatasets").and.returnValue(dataSets);
+            spyOn(orgUnitService, "getSystemSettings").and.returnValue(utils.getPromise(q, systemSettings));
             moduleController = new ModuleController(scope, orgUnitService, db, location, q);
             scope.$apply();
 
             expect(scope.modules[0].name).toEqual("Mod2");
-            expect(scope.modules[0].datasets).toEqual(datasetsdata);
-            expect(scope.modules[0].allDatasets).toEqual([{
-                name: "Malaria",
-                id: "dataset_1"
-            }, {
-                name: 'TB',
-                id: 'dataset_3'
-            }]);
+            expect(scope.modules[0]).toEqual(expectedModule);
+
         });
 
         it("should return true if datasets for modules not selected", function() {
