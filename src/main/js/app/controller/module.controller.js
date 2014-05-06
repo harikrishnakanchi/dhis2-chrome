@@ -2,6 +2,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer"]
     return function($scope, orgUnitService, db, $location, $q) {
         var selectedDataElements = {};
         var selectedSections = {};
+        var originalDatasets;
 
         $scope.isopen = {};
         $scope.isCollapsed = true;
@@ -15,7 +16,8 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer"]
             var dataElementsPromise = getAll("dataElements");
 
             var populateElements = function(data) {
-                $scope.allDatasets = data[0];
+                originalDatasets = data[0];
+                $scope.allDatasets = _.cloneDeep(data[0]);
                 var sections = data[1];
                 var allDataElements = data[2];
 
@@ -81,7 +83,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer"]
             };
 
             var associateDatasets = function() {
-                var datasets = orgUnitMapper.mapToDataSets(modules, parent);
+                var datasets = orgUnitMapper.mapToDataSets(modules, parent, originalDatasets);
                 return orgUnitService.associateDataSetsToOrgUnit(datasets);
             };
 

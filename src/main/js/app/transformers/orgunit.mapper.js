@@ -121,20 +121,32 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         return result;
     };
 
-    var mapToDataSets = function(modules, moduleParent) {
-        var result = _.map(modules, function(module) {
-            var datasets = module.datasets;
-            var restructuredDatasets = _.map(datasets, function(dataset) {
-                return _.merge(dataset, {
-                    "organisationUnits": [{
-                        "name": module.name,
-                        "id": md5(module.name + moduleParent.name).substr(0, 11)
-                    }]
-                });
+    var mapToDataSets = function(modules, moduleParent, originalDatasets) {
+        var currentDatasets = _.filter(originalDatasets, function(ds) {
+            return _.any(modules, {
+                "datasets": [{
+                    "id": ds.id
+                }]
             });
-            return restructuredDatasets;
         });
-        return _.flatten(result);
+        return _.map(currentDatasets, function(ds) {
+            var belongsToThisDataSet = {
+                "datasets": [{
+                    "id": ds.id
+                }]
+            };
+            var intoOrgUnits = function(module) {
+                return {
+                    "name": module.name,
+                    "id": md5(module.name + moduleParent.name).substr(0, 11)
+                };
+            };
+
+            var modulesWithThisDataset = _.map(_.filter(modules, belongsToThisDataSet), intoOrgUnits);
+            ds.organisationUnits = ds.organisationUnits || [];
+            ds.organisationUnits = ds.organisationUnits.concat(modulesWithThisDataset);
+            return ds;
+        });
     };
 
     var isOfType = function(orgUnit, type) {

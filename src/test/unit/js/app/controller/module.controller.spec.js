@@ -86,12 +86,6 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             Date = _Date;
         });
 
-        it("should put all datasets in scope on init", function() {
-            scope.$apply();
-
-            expect(scope.allDatasets).toEqual(datasetsdata);
-        });
-
         it('should add new modules', function() {
             scope.$apply();
             scope.addModules();

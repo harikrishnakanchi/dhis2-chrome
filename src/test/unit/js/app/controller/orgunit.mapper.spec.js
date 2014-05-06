@@ -227,6 +227,14 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
         });
 
         it("should map datasets for dhis", function() {
+            var originalDataSets = [{
+                'id': 'ds_11',
+                'name': 'dataset11',
+            }, {
+                'id': 'ds_12',
+                'name': 'dataset12'
+            }];
+
             var projectOrgUnit = {
                 'id': 'Project1Id',
                 'name': 'Project1'
@@ -244,22 +252,21 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             }, {
                 'name': "Module2",
                 'datasets': [{
-                    'id': 'ds_21',
+                    'id': 'ds_11',
                     'name': 'dataset21',
-                }, {
-                    'id': 'ds_22',
-                    'name': 'dataset22'
                 }]
             }];
 
-            var datasets = orgUnitMapper.mapToDataSets(modules, projectOrgUnit);
-
-            expect(datasets).toEqual([{
+            var datasets = orgUnitMapper.mapToDataSets(modules, projectOrgUnit, originalDataSets);
+            var expectedDatasets = [{
                 id: 'ds_11',
                 name: 'dataset11',
                 organisationUnits: [{
                     name: 'Module1',
                     id: '86eb3db78c7'
+                }, {
+                    name: 'Module2',
+                    id: 'f1941e66f2d'
                 }]
             }, {
                 id: 'ds_12',
@@ -268,21 +275,9 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     name: 'Module1',
                     id: '86eb3db78c7'
                 }]
-            }, {
-                id: 'ds_21',
-                name: 'dataset21',
-                organisationUnits: [{
-                    name: 'Module2',
-                    id: 'f1941e66f2d'
-                }]
-            }, {
-                id: 'ds_22',
-                name: 'dataset22',
-                organisationUnits: [{
-                    name: 'Module2',
-                    id: 'f1941e66f2d'
-                }]
-            }]);
+            }];
+
+            expect(datasets).toEqual(expectedDatasets);
         });
 
         it("should filter modules from org units", function() {
