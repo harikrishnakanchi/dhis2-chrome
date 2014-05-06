@@ -2,11 +2,19 @@
 	<div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
 	<div ng-show="success" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
 	<div ng-show="error" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
-	<weekselector year="year" month="month" week="week" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
-	<label for="module">Module</label>
-	<select name="module" id="module" class="input-sm" ng-model="currentModule" ng-options="module.displayName for module in modules">
-		<option value="">-</option>
-	</select>
+	<div>
+		<weekselector year="year" month="month" week="week" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
+		<section class="module-select">
+			<ul class="form">
+				<li class="form-group">
+					<label for="module">Module</label>
+					<select name="module" id="module" class="input-sm" ng-model="currentModule" ng-options="module.displayName for module in modules">
+						<option value="">-</option>
+					</select>
+				</li>
+			</ul>
+		</section>
+	</div>
 	<section class="panel tab-panel" ng-show="week &amp;&amp; currentModule">
 		<tabset>
 			<tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in currentGroupedSections">
