@@ -1,6 +1,6 @@
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper) {
     describe("dataEntryController ", function() {
-        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, modules;
+        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, modules, dataEntryFormMock;
 
         beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location) {
             q = $q;
@@ -18,6 +18,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             anchorScroll = $anchorScroll;
             rootScope = $rootScope;
             scope = $rootScope.$new();
+            dataEntryFormMock = {
+                $setPristine: function() {}
+            };
+            scope.dataentryForm = dataEntryFormMock;
             var getMockStore = function(data) {
                 var getAll = function() {
                     return utils.getPromise(q, data);
@@ -160,6 +164,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it("should let the user know of failures when saving the data to dhis", function() {
             scope = rootScope.$new();
+            scope.dataentryForm = dataEntryFormMock;
             var dataValues = {
                 "name": "test"
             };
@@ -187,6 +192,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it("should let the user know of failures when saving the data to indexedDB", function() {
             scope = rootScope.$new();
+            scope.dataentryForm = dataEntryFormMock;
             var dataValues = {
                 "name": "test"
             };
@@ -309,11 +315,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.currentModule = {
                 'id': 'Module1'
             };
+            spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, {}));
 
             scope.$apply();
 
             expect(_.keys(scope.currentGroupedSections)).toEqual(['DS_OPD']);
+            expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
         });
 
         it('should prevent navigation if data entry form is dirty', function() {

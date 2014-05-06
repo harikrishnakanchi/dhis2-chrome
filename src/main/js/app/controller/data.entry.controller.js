@@ -32,6 +32,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
                     data = data || {};
                     $scope.dataValues = dataValuesMapper.mapToView(data);
                 });
+                $scope.dataentryForm.$setPristine();
             }
         });
 
