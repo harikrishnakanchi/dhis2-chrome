@@ -50,16 +50,26 @@ define(["properties", "lodash"], function(properties, _) {
         };
 
         var setSystemSettings = function(projectId, data) {
-            return $http({
-                method: 'POST',
-                url: properties.dhis.url + '/api/systemSettings/' + projectId,
-                data: data,
-                headers: {
-                    'Content-Type': 'text/plain'
-                }
-            }).then(function() {
-                return data;
-            });
+            var saveToDhis = function() {
+                return $http({
+                    method: 'POST',
+                    url: properties.dhis.url + '/api/systemSettings/' + projectId,
+                    data: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    }
+                }).then(function() {
+                    return data;
+                });
+            };
+
+            var saveToDb = function() {
+                var store = db.objectStore("systemSettings");
+                data.id = projectId;
+                return store.upsert(data);
+            };
+
+            return saveToDb().then(saveToDhis);
         };
 
         var getAll = function(orgUnitType) {

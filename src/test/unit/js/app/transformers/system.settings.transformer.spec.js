@@ -33,7 +33,7 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
         });
 
         it("should construct system settings", function() {
-            expect(systemSettingsTransformer.constructSystemSettings(modules, parent)).toEqual(JSON.stringify(expectedSystemSettings));
+            expect(systemSettingsTransformer.constructSystemSettings(modules, parent)).toEqual(expectedSystemSettings);
         });
     });
 });

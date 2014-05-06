@@ -77,7 +77,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer"]
 
             var saveSystemSettings = function() {
                 var systemSettings = systemSettingsTransformer.constructSystemSettings(enrichedModules, parent);
-                orgUnitService.setSystemSettings(parent.id, systemSettings);
+                return orgUnitService.setSystemSettings(parent.id, systemSettings);
             };
 
             var associateDatasets = function() {

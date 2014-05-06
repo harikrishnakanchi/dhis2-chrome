@@ -13,7 +13,7 @@ define(["lodash"], function(_) {
             excludedDataElements = _.without(excludedDataElements, undefined);
             returnVal.excludedDataElements[module.id] = excludedDataElements;
         });
-        return JSON.stringify(returnVal);
+        return returnVal;
     };
     return {
         "constructSystemSettings": constructSystemSettings
