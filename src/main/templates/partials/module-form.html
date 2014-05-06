@@ -9,7 +9,7 @@
 	<div class="panel-body">
 		<form class="form-horizontal" name="form" role="form" ng-submit="save(modules)" novalidate>
 			<div class="well" ng-repeat="module in modules">
-				<button class="btn-delete" ng-hide="$first" ng-click="delete($index)">X Delete</button>
+				<button class="btn-delete" ng-hide="$first || !isEditMode" ng-click="delete($index)">X Delete</button>
 				<ul>
 					<li>
 						<label for="moduleName" class="col-sm-4 col-md-4 control-label">Add module</label>
@@ -21,7 +21,7 @@
 						</div>
 					</li>
 					<li class="form-group">
-						<div class="col-sm-offset-2 col-sm-10">
+						<div class="col-sm-offset-2 col-sm-10" ng-show="isEditMode">
 							<div class="add-item-ctrl">
 								<div ng-show="areDatasetsNotSelected([module])">
 									<span>{{resourceBundle.selectDatasets}}</span>
@@ -43,6 +43,32 @@
 									</ul>
 								</div>
 							</div>
+						</div>
+						<div ng-show="!isEditMode">
+							<div name="left-side">
+								<ul>
+									<li ng-repeat="dataset in module.datasets">
+										<h5 ng-click="displayGroupedDataElements(module, dataset)">{{dataset.name}}</h5>
+									</li>
+								</ul>
+							</div>
+							<div name="right-side">
+								<div ng-repeat="section in module.selectedDataset.sections">
+									<div class="collapse-head" style="position:relative">
+										<h5 ng-click="isCollapsed = !isCollapsed" style="background:#ccc;display:block;padding:10px;cursor:pointer;">{{section.name}} </h5>
+									</div>
+									<div collapse="isCollapsed">
+										<ul>
+											<li ng-repeat="element in section.dataElements">
+												<label>
+													{{element.formName}}
+												</label>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						
 						</div>
 					</li>
 				</ul>

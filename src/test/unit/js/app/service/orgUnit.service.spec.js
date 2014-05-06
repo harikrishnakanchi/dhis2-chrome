@@ -145,7 +145,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.flush();
         });
 
-        it("should get datasets associated with org units", function() {
+        xit("should get datasets associated with org units", function() {
             var dataset1 = {
                 "id": "DS1",
                 "organisationUnits": [{
@@ -180,6 +180,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
                 "name": "Mod2",
                 "id": "Mod2Id"
             };
+
             var datasets = [dataset1, dataset2, dataset3];
             spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, datasets));
 

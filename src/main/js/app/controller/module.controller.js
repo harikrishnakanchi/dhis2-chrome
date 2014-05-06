@@ -45,11 +45,25 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer"]
                     dataset.dataElements = [];
                     dataset.sections = groupedSections[dataset.id];
                 });
-                $scope.addModules();
+            };
+
+            var setUpView = function() {
+                var associatedDatasets = orgUnitService.getDatasetsAssociatedWithOrgUnit($scope.orgUnit, $scope.allDatasets).then(function(associatedDatasets) {
+                    $scope.modules.push({
+                        'name': $scope.orgUnit.name,
+                        'datasets': associatedDatasets
+                    });
+                });
             };
 
             var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise]);
-            getAllData.then(populateElements);
+            getAllData.then(populateElements).then(function() {
+                if ($scope.isEditMode) {
+                    $scope.addModules();
+                } else {
+                    setUpView();
+                }
+            });
         };
 
         var getAll = function(storeName) {
