@@ -1,4 +1,4 @@
-define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer"], function(_, orgUnitMapper, moment, md5, systemSettingsTransformer) {
+define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer", "datasetTransformer"], function(_, orgUnitMapper, moment, md5, systemSettingsTransformer, datasetTransformer) {
     return function($scope, orgUnitService, db, $location, $q) {
         var selectedDataElements = {};
         var selectedSections = {};
@@ -14,56 +14,46 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer"]
             var dataSetPromise = getAll('dataSets');
             var sectionPromise = getAll("sections");
             var dataElementsPromise = getAll("dataElements");
+            var sections = [];
 
-            var populateElements = function(data) {
+            var setUpData = function(data) {
                 originalDatasets = data[0];
-                $scope.allDatasets = _.cloneDeep(data[0]);
-                var sections = data[1];
-                var allDataElements = data[2];
-
-                var groupedSections = _.groupBy(sections, function(section) {
-                    return section.dataSet.id;
-                });
-
-                var enrichDataElement = function(dataElement) {
-                    var detailedDataElement = _.find(allDataElements, function(d) {
-                        return d.id === dataElement.id;
-                    });
-                    dataElement.formName = detailedDataElement.formName;
-                    return dataElement;
-                };
-
-                _.each(sections, function(section) {
-                    selectedSections[section.id] = true;
-                    section.dataElements = _.map(section.dataElements, function(dataElement) {
-                        selectedDataElements[dataElement.id] = true;
-                        return enrichDataElement(dataElement);
-                    });
-                });
-
-                _.each($scope.allDatasets, function(dataset) {
-                    dataset.dataElements = [];
-                    dataset.sections = groupedSections[dataset.id];
-                });
+                sections = data[1];
+                $scope.allDatasets = datasetTransformer.enrichDatasets(data);
             };
 
-            var setUpView = function() {
-                var associatedDatasets = orgUnitService.getDatasetsAssociatedWithOrgUnit($scope.orgUnit, $scope.allDatasets).then(function(associatedDatasets) {
-                    $scope.modules.push({
-                        'name': $scope.orgUnit.name,
-                        'datasets': associatedDatasets
+            var setUpForm = function() {
+
+                var setUpEditMode = function() {
+                    _.each(sections, function(section) {
+                        selectedSections[section.id] = true;
+                        _.each(section.dataElements, function(dataElement) {
+                            selectedDataElements[dataElement.id] = true;
+                        });
                     });
-                });
+                    $scope.addModules();
+                };
+
+                var setUpViewMode = function() {
+                    var associatedDatasets = orgUnitService.getAssociatedDatasets($scope.orgUnit, $scope.allDatasets);
+                    var systemSettingsPromise = orgUnitService.getSystemSettings($scope.orgUnit.parent.id);
+                    systemSettingsPromise.then(function(systemSettings) {
+                        $scope.modules.push({
+                            'name': $scope.orgUnit.name,
+                            'datasets': datasetTransformer.getFilteredDatasets(associatedDatasets, systemSettings, $scope.orgUnit.id)
+                        });
+                    });
+                };
+
+                if ($scope.isEditMode) {
+                    setUpEditMode();
+                } else {
+                    setUpViewMode();
+                }
             };
 
             var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise]);
-            getAllData.then(populateElements).then(function() {
-                if ($scope.isEditMode) {
-                    $scope.addModules();
-                } else {
-                    setUpView();
-                }
-            });
+            getAllData.then(setUpData).then(setUpForm);
         };
 
         var getAll = function(storeName) {

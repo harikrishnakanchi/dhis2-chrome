@@ -56,6 +56,7 @@ require.config({
         "orgUnitMapper": "app/transformers/orgunit.mapper",
         "toTree": "app/transformers/to.tree",
         "systemSettingsTransformer": "app/transformers/system.settings.transformer",
+        "datasetTransformer": "app/transformers/dataset.transformer",
         "groupSections": "app/transformers/group.sections"
     },
     shim: {

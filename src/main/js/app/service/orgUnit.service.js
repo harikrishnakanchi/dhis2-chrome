@@ -38,35 +38,17 @@ define(["properties", "lodash"], function(properties, _) {
 
         };
 
-        var getDatasetsAssociatedWithOrgUnit = function(orgUnit, datasets) {
-            var allDatasets = _.filter(datasets, {
+        var getAssociatedDatasets = function(orgUnit, datasets) {
+            return _.filter(datasets, {
                 'organisationUnits': [{
                     'id': orgUnit.id
                 }]
             });
+        };
 
-            var filterDataElements = function(systemSettings) {
-                allDatasets = _.map(allDatasets, function(dataset) {
-                    dataset.sections = _.map(dataset.sections, function(section) {
-                        section.dataElements = _.filter(section.dataElements, function(dataElement) {
-                            var excludedList = systemSettings.excludedDataElements;
-                            return excludedList ? !_.contains(excludedList[orgUnit.id], dataElement.id) : true;
-                        });
-                        return section;
-                    });
-                    return dataset;
-                });
-
-                return _.map(allDatasets, function(dataset) {
-                    dataset.sections = _.filter(dataset.sections, function(section) {
-                        return section.dataElements.length > 0;
-                    });
-                });
-            };
+        var getSystemSettings = function(parentId) {
             var store = db.objectStore("systemSettings");
-            return store.find(orgUnit.parent.id).then(filterDataElements).then(function() {
-                return allDatasets;
-            });
+            return store.find(parentId);
         };
 
         var setSystemSettings = function(projectId, data) {
@@ -100,9 +82,10 @@ define(["properties", "lodash"], function(properties, _) {
         return {
             "create": create,
             "associateDataSetsToOrgUnit": associateDataSetsToOrgUnit,
-            "getDatasetsAssociatedWithOrgUnit": getDatasetsAssociatedWithOrgUnit,
+            "getAssociatedDatasets": getAssociatedDatasets,
             "setSystemSettings": setSystemSettings,
             "getAll": getAll,
+            "getSystemSettings": getSystemSettings
         };
     };
 });
