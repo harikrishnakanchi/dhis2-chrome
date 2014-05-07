@@ -24,5 +24,14 @@
     "errorOpUnit": "Error creating Operation Units.",
     "savedModule": "Modules created successfully.",
     "errorModule": "Error creating Modules.",
-    "selectDatasets": "Select atleast one dataset to continue."
+    "selectDatasets": "Select atleast one dataset to continue.",
+    "errorUser": "Error creating User.",
+    "savedUser": "User saved successfully.",
+    "usernameValidation": "Username is required.",
+    "roleValidation": "Role is required.",
+    "usernameExists": "Username already exists.",
+    "passwordValidation": "Password must be between 8 and 35 characters long, should have at least have one capital letter and one digit.",
+    "pwdRequired": "Password is required.",
+    "confirmPassword": "Confirm your password.",
+    "pwdMatch": "Passwords do not match."
 }

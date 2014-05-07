@@ -6,7 +6,8 @@ define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, 
             'Country': 'templates/partials/country-form.html',
             'Project': 'templates/partials/project-form.html',
             'Module': 'templates/partials/module-form.html',
-            'Operation Unit': 'templates/partials/op-unit-form.html'
+            'Operation Unit': 'templates/partials/op-unit-form.html',
+            'User': 'templates/partials/project-user-form.html'
         };
 
         $scope.organisationUnits = [];

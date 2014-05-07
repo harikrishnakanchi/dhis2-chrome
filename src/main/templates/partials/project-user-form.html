@@ -1,0 +1,59 @@
+<div ng-controller="projectUserController">
+	<div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorUser }}</div>
+	<form name="createForm" class="form-horizontal" role="form" novalidate  ng-submit="save(projectUser, orgUnit)">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Create User</h3>
+			</div>
+			<div class="panel-body">
+				<ul>
+					<li class="form-group">
+						<label for="userName" class="col-sm-4 col-md-4 control-label">Username</label>
+						<div class="col-sm-6 col-md-6" >
+							<input type="text" class="form-control" name="userName" id="userName" ng-model="projectUser.username" not-in="existingUsers" required/>
+							<div ng-show="createForm.userName.$dirty &amp;&amp; createForm.userName.$invalid">
+								<span ng-show="createForm.userName.$error.required" class="errortxt">{{resourceBundle.usernameValidation}}</span>
+								<span ng-show="createForm.userName.$error.isWithin" class="errortxt">{{resourceBundle.usernameExists}}</span>
+							</div>
+						</div>
+					</li>
+					<li class="form-group">
+						<label for="userRole" class="col-sm-4 col-md-4 control-label">Role</label>
+						<div class="col-sm-6 col-md-6" >
+							<select type="text" class="form-control" name="userRole" id="userRole" ng-model="projectUser.userRole " ng-options="role as role.name for role in userRoles" required>
+							</select>
+							<div ng-show="createForm.userRole.$dirty &amp;&amp; createForm.userRole.$invalid">
+								<span ng-show="createForm.userRole.$error.required" class="errortxt">{{resourceBundle.roleValidation}}</span>
+							</div>
+						</div>
+					</li>
+					<li class="form-group">
+						<label for="password" class="col-sm-4 col-md-4 control-label">Password</label>
+						<div class="col-sm-6 col-md-6" >
+							<input type="password" name="password" autocomplete="off" class="form-control" id="password" ng-model="projectUser.password" ng-pattern="/((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,35})/" required>
+							<div ng-show="createForm.password.$dirty &amp;&amp; createForm.password.$invalid">
+								<span ng-show="createForm.password.$error.pattern" class="errortxt">{{resourceBundle.passwordValidation}}</span>
+								<span ng-show="createForm.password.$error.required" class="errortxt">{{resourceBundle.pwdRequired}}</span>
+							</div>
+						</div>
+					</li>
+					<li class="form-group">
+						<label for="confPassword" class="col-sm-4 col-md-4 control-label">Confirm Password</label>
+						<div class="col-sm-6 col-md-6" >
+							<input type="password" name="confPassword" class="form-control" id="confPassword" ng-model="projectUser.confirmPassword" equals="{{ projectUser.password }}" required>
+							<div ng-show="createForm.confPassword.$dirty &amp;&amp; createForm.confPassword.$invalid">
+								<span ng-show="createForm.confPassword.$error.required" class="errortxt">{{resourceBundle.confirmPassword}}</span>
+								<span ng-show="createForm.confPassword.$error.notEqual" class="errortxt">{{resourceBundle.pwdMatch}}</span>
+							</div>
+						</div>
+					</li>
+					<li>
+						<div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
+							<input type="submit" class="btn btn-main" ng-disabled="createForm.$invalid" value="Save"/>
+							<input type="button" class="btn" ng-click="reset()" value="Reset">
+						</div>
+					</li>
+				</ul>
+			</div>
+		</form>
+	</div>

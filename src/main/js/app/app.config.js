@@ -21,6 +21,7 @@ require.config({
         "angular-ui-modal": "lib/custom/angular-ui-modal/modal",
         "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
         "angular-ui-notin": "lib/angularjs-directives/src/notin/notIn",
+        "angular-ui-equals": "lib/angularjs-directives/src/equals/equals",
         "angular-treeview": "lib/angularjs-directives/src/treeview/angular.treeview",
         "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",
         "md5": "lib/js-md5/js/md5",
@@ -40,6 +41,7 @@ require.config({
         "loginController": "app/controller/login.controller",
         "countryController": "app/controller/country.controller",
         "saveDialogController": "app/controller/save.dialog.controller",
+        "projectUserController": "app/controller/project.user.controller",
 
         //Directives
         "directives": "app/directive/directives",
@@ -49,6 +51,7 @@ require.config({
         "metadataService": "app/service/metadata.service",
         "dataService": "app/service/data.service",
         "orgUnitService": "app/service/orgUnit.service",
+        "userService": "app/service/user.service",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
@@ -108,6 +111,9 @@ require.config({
             deps: ["angular", "angular-ui-position"]
         },
         'angular-multiselect': {
+            deps: ["angular"]
+        },
+        'angular-ui-equals': {
             deps: ["angular"]
         },
         'angular-ui-notin': {

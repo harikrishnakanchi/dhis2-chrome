@@ -24,6 +24,8 @@
 				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Project" ng-if="getOrgUnitType(orgUnit) == 'Country'" ng-click="openInEditMode('Project')" />
 				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Operation Unit" ng-if="getOrgUnitType(orgUnit) == 'Project'" ng-click="openInEditMode('Operation Unit')" />
 				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Module" ng-if="getOrgUnitType(orgUnit) == 'Project' || getOrgUnitType(orgUnit) == 'Operation Unit'" ng-click="openInEditMode('Module')" />
+				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-if="getOrgUnitType(orgUnit) == 'Project'" 
+				ng-click="openInEditMode('User')" />
 			</div>
 			<div ng-show="showMessage" class="alert alert-success">{{ resourceBundle[message] }}</div>
 			<div ng-include="templateUrl">
