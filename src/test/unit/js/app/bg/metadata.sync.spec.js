@@ -1,5 +1,5 @@
 define(["metadataSyncService", "Q", "utils", "properties", "idb", "httpWrapper"], function(metadataSyncService, q, utils, properties, idb, httpWrapper) {
-    describe("Metadata sync service", function() {
+    xdescribe("Metadata sync service", function() {
         var category1, data;
         var today = "2014-03-24T09:02:49.870Z";
         var yesterday = "2014-03-23T09:02:49.870Z";
