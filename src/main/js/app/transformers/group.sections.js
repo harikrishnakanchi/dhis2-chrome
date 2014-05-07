@@ -1,12 +1,11 @@
 define(["lodash", "extractHeaders"], function(_, extractHeaders) {
-    return function(data) {
+    var enrichGroupedSections = function(data) {
 
         var dataElements = data[2];
         var sections = data[1];
         var categoryCombos = data[3];
         var categories = data[4];
         var categoryOptionCombos = data[5];
-        var systemSettings = data[6];
         var moduleId = 'moduleId';
 
         var groupedSections = _.groupBy(sections, function(section) {
@@ -34,23 +33,37 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
             return dataElement;
         };
 
-        var notInExcludes = function(dataElement) {
-            var excludedList = systemSettings.excludedDataElements;
-            return excludedList ? !_.contains(excludedList[moduleId], dataElement.id) : true;
-        };
-
         var returnVal = _.mapValues(groupedSections, function(sections) {
             return _.map(sections, function(section) {
-                section.dataElements = _.chain(section.dataElements).filter(notInExcludes).map(enrichDataElement).value();
+                section.dataElements = _.map(section.dataElements, enrichDataElement);
                 var result = extractHeaders(section.dataElements[0].categories, section.dataElements[0].categoryCombo, categoryOptionCombos);
                 section.headers = result.headers;
                 section.categoryOptionComboIds = result.categoryOptionComboIds;
                 return section;
             });
         });
-
-        return {
-            "groupedSections": returnVal
-        };
+        return returnVal;
     };
+
+    var filterDataElements = function(sections, moduleId, systemSettings, parentId) {
+        var systemSetting = _.find(systemSettings, function(s) {
+            return s.id === parentId;
+        });
+        var filteredSections = _.map(sections, function(section) {
+            section.dataElements = _.filter(section.dataElements, function(dataElement) {
+                var excludedList = systemSetting.excludedDataElements;
+                return excludedList ? !_.contains(excludedList[moduleId], dataElement.id) : true;
+            });
+            return section;
+        });
+        return _.filter(filteredSections, function(section) {
+            return section.dataElements.length > 0;
+        });
+    };
+
+    return {
+        "enrichGroupedSections": enrichGroupedSections,
+        "filterDataElements": filterDataElements
+    };
+
 });

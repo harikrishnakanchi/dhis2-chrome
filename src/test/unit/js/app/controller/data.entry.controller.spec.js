@@ -142,7 +142,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "name": "test"
             };
             scope.currentModule = {
-                id: 'Module2'
+                id: 'Module2',
+                parent: {
+                    id: 'parent'
+                }
             };
             scope.year = 2014;
             scope.week = {
@@ -171,7 +174,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "name": "test"
             };
             scope.currentModule = {
-                id: 'Module2'
+                id: 'Module2',
+                parent: {
+                    id: 'parent'
+                }
             };
             scope.year = 2014;
             scope.week = {
@@ -199,7 +205,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "name": "test"
             };
             scope.currentModule = {
-                id: 'Module2'
+                id: 'Module2',
+                parent: {
+                    id: 'parent'
+                }
             };
             scope.year = 2014;
             scope.week = {
@@ -284,7 +293,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "weekNumber": 14
             };
             scope.currentModule = {
-                id: 'Module2'
+                id: 'Module2',
+                parent: {
+                    id: 'parent'
+                }
             };
             spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, {
                 "dataValues": [{
@@ -315,7 +327,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "weekNumber": 14
             };
             scope.currentModule = {
-                'id': 'Module1'
+                'id': 'Module1',
+                parent: {
+                    id: 'parent'
+                }
             };
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, {}));

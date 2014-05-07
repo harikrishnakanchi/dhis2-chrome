@@ -11,7 +11,7 @@ define(["groupSections", "testData"], function(groupSections, testData) {
                 testData['categoryOptionCombos'],
                 testData['systemSettings']
             ];
-            groupedSections = groupSections(data).groupedSections;
+            groupedSections = groupSections.enrichGroupedSections(data);
         });
 
         it("should group sections based on datasets", function() {
@@ -28,7 +28,7 @@ define(["groupSections", "testData"], function(groupSections, testData) {
             var opdSections = groupedSections.DS_OPD;
             var dataElements = opdSections[0].dataElements;
 
-            expect(dataElements.length).toBe(2);
+            expect(dataElements.length).toBe(3);
             expect(dataElements[0].id).toContain("DE1");
             expect(dataElements[1].id).toContain("DE2");
             expect(dataElements[1].name).toContain("DE2 - ITFC");

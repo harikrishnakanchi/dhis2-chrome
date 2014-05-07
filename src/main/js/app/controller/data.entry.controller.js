@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], function(_, dataValuesMapper, groupSections, orgUnitMapper) {
     return function($scope, $q, db, dataService, $anchorScroll, $location, $modal) {
-        var dataSets;
+        var dataSets, systemSettings;
 
         $scope.evaluateExpression = function(elementId, option) {
             var cellValue = $scope.dataValues[elementId][option];
@@ -32,6 +32,11 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
                     data = data || {};
                     $scope.dataValues = dataValuesMapper.mapToView(data);
                 });
+                var selectedDatasets = _.keys($scope.currentGroupedSections);
+                _.each(selectedDatasets, function(selectedDataset) {
+                    $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.currentModule.id, systemSettings, $scope.currentModule.parent.id);
+                });
+
                 $scope.dataentryForm.$setPristine();
             }
         });
@@ -130,13 +135,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
             return store.getAll();
         };
 
-        var setDataSets = function(data) {
+        var setData = function(data) {
             dataSets = data[0];
+            systemSettings = data[6];
             return data;
         };
 
         var transformDataSet = function(data) {
-            $scope.groupedSections = groupSections(data).groupedSections;
+            $scope.groupedSections = groupSections.enrichGroupedSections(data);
             return data;
         };
 
@@ -157,7 +163,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
             var systemSettingsPromise = getAll('systemSettings');
             var getOrgUnits = getAll('organisationUnits');
             var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, systemSettingsPromise]);
-            getAllData.then(setDataSets).then(transformDataSet);
+            getAllData.then(setData).then(transformDataSet);
             getOrgUnits.then(filterModules);
         };
 

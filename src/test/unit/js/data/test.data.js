@@ -172,11 +172,12 @@ define([], function() {
         }]
     }];
 
-    var systemSettings = {
+    var systemSettings = [{
         excludedDataElements: {
             "moduleId": ['DE4']
-        }
-    };
+        },
+        id: 'parent'
+    }];
 
     return {
         'dataSets': dataSets,
