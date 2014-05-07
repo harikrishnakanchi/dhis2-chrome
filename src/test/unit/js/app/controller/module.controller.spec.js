@@ -1,6 +1,6 @@
 /*global Date:true*/
 define(["moduleController", "angularMocks", "utils", "testData"], function(ModuleController, mocks, utils, testData) {
-    describe("op unit controller", function() {
+    describe("module controller", function() {
 
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections, dataElements, sectionsdata, datasetsdata, dataElementsdata;
 
@@ -142,6 +142,7 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             scope.save(modules);
             scope.$apply();
 
+            expect(scope.saveFailure).toBe(false);
             expect(orgUnitService.create).toHaveBeenCalled();
             expect(orgUnitService.associateDataSetsToOrgUnit).toHaveBeenCalled();
             expect(orgUnitService.setSystemSettings).toHaveBeenCalled();
@@ -245,6 +246,114 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             }];
 
             expect(scope.areDatasetsNotSelected(modules)).toEqual(false);
+        });
+
+        it("should return true if dataset is not selected", function() {
+            var modules = [{
+                'name': "Module1",
+                'datasets': []
+            }];
+
+            expect(scope.areDatasetsNotSelected(modules)).toEqual(true);
+        });
+
+        it("should de-select all data elements if the section containing it is de-selected", function() {
+            var module = {
+                "selectedDataElements": {
+                    "test1": true,
+                    "test2": true,
+                    "test3": true
+                },
+                "selectedSections": {
+                    "sec1": true
+                }
+            };
+
+            var section = {
+                'id': "sec1",
+                "dataElements": [{
+                    'id': "test1"
+                }, {
+                    'id': "test2"
+                }, {
+                    'id': "test3"
+                }]
+            };
+
+            var expectedModule = {
+                "selectedDataElements": {
+                    "test1": false,
+                    "test2": false,
+                    "test3": false
+                },
+                "selectedSections": {
+                    "sec1": false
+                }
+            };
+
+            module.selectedSections["sec1"] = false;
+            scope.changeSectionSelection(module, section);
+            expect(module).toEqual(expectedModule);
+        });
+
+        it("should de-select the section if all data elements under it are de-selected", function() {
+            var module = {
+                "selectedDataElements": {
+                    "test1": true,
+                    "test2": true,
+                    "test3": true
+                },
+                "selectedSections": {
+                    "sec1": true
+                }
+            };
+
+            var section = {
+                'id': "sec1",
+                "dataElements": [{
+                    'id': "test1"
+                }, {
+                    'id': "test2"
+                }, {
+                    'id': "test3"
+                }]
+            };
+
+            var expectedModule = {
+                "selectedDataElements": {
+                    "test1": false,
+                    "test2": false,
+                    "test3": false
+                },
+                "selectedSections": {
+                    "sec1": false
+                }
+            };
+
+            module.selectedDataElements["test1"] = false;
+            module.selectedDataElements["test2"] = false;
+            module.selectedDataElements["test3"] = false;
+            scope.changeDataElementSelection(module, section);
+            expect(module).toEqual(expectedModule);
+        });
+
+        it("should select a dataset", function() {
+            var module = {
+                "selectedDataElements": {
+                    "test1": true,
+                    "test2": true,
+                    "test3": true
+                },
+                "selectedSections": {
+                    "sec1": true
+                }
+            };
+            var dataset = {
+                name: "Malaria",
+                id: "dataset_1"
+            };
+            scope.selectDataSet(module, dataset);
+            expect(module.selectedDataset).toEqual(dataset);
         });
     });
 });

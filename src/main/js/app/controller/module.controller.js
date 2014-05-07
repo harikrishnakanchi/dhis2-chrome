@@ -92,6 +92,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
             };
 
             var onSuccess = function(data) {
+                $scope.saveFailure = false;
                 if ($scope.$parent.closeEditForm)
                     $scope.$parent.closeEditForm($scope.orgUnit.id, "savedModule");
             };
@@ -127,7 +128,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
             module.selectedSections[section.id] = selected;
         };
 
-        $scope.displayGroupedDataElements = function(module, element) {
+        $scope.selectDataSet = function(module, element) {
             module.selectedDataset = element;
         };
 
