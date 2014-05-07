@@ -64,6 +64,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 'id': 'id1'
             }]
             spyOn(orgUnitStore, 'getAll').and.returnValue(utils.getPromise(q, modules));
+            spyOn(location, "hash");
             dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal);
         }));
 
@@ -72,6 +73,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             scope.$apply();
 
+            expect(location.hash).toHaveBeenCalledWith('top');
             expect(scope.modules).toEqual(modules);
             expect(db.objectStore).toHaveBeenCalledWith("organisationUnits");
             expect(orgUnitStore.getAll).toHaveBeenCalled();
