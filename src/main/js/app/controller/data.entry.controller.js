@@ -93,7 +93,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
                 deregisterSelf();
                 $location.url(newUrl);
             };
-
             if ($scope.preventNavigation) {
                 confirmAndMove(okCallback);
                 event.preventDefault();
@@ -148,6 +147,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
 
         var init = function() {
             $scope.resetForm();
+            $location.hash('top');
             var dataSetPromise = getAll('dataSets');
             var sectionPromise = getAll("sections");
             var dataElementsPromise = getAll("dataElements");
