@@ -1,7 +1,7 @@
 define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, orgUnitMapper) {
     return function($scope, orgUnitService, $q, $location, $timeout, $anchorScroll) {
 
-        $scope.thisDate = moment().toDate();
+        $scope.thisDate = moment().format("YYYY-MM-DD");
 
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -40,8 +40,12 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
         $scope.reset = function() {
             $scope.saveFailure = false;
             $scope.newOrgUnit = {
-                'openingDate': new Date(),
+                'openingDate': moment().format("YYYY-MM-DD"),
             };
+        };
+
+        $scope.isAfterMaxDate = function() {
+            return moment($scope.newOrgUnit.openingDate).isAfter(moment($scope.thisDate));
         };
 
         var scrollToTop = function() {

@@ -8,7 +8,7 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
 
         $scope.allPopTypes = ['Displaced', 'General Population', 'Mixed - Displaced/General', 'Victims of Natural Disaster'];
 
-        $scope.thisDate = moment().toDate();
+        $scope.thisDate = moment().format("YYYY-MM-DD");
 
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -27,7 +27,7 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
         $scope.reset = function() {
             $scope.saveFailure = false;
             $scope.newOrgUnit = {
-                'openingDate': new Date(),
+                'openingDate': moment().format("YYYY-MM-DD")
             };
         };
 
@@ -45,6 +45,10 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
             var dhisProject = new Array(orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit));
             return orgUnitService.create(dhisProject).then(onSuccess, onError);
 
+        };
+
+        $scope.isAfterMaxDate = function() {
+            return moment($scope.newOrgUnit.openingDate).isAfter(moment($scope.thisDate));
         };
 
         var scrollToTop = function() {

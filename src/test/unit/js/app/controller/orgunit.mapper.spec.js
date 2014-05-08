@@ -54,12 +54,12 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
             var expectedResult = {
                 'name': dhisProject.name,
-                'openingDate': moment(dhisProject.openingDate).toDate(),
+                'openingDate': moment(dhisProject.openingDate).format("YYYY-MM-DD"),
                 'context': "val2",
                 'location': "val3",
                 'projectType': "val4",
                 'populationType': "val5",
-                'endDate': moment("2011-01-01").toDate(),
+                'endDate': moment("2011-01-01").format("YYYY-MM-DD"),
             };
 
             expect(result).toEqual(expectedResult);

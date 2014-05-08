@@ -88,12 +88,12 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
         var endDate = getAttributeValue(dhisProject, "prjEndDate");
         return {
             'name': dhisProject.name,
-            'openingDate': moment(dhisProject.openingDate).toDate(),
+            'openingDate': moment(dhisProject.openingDate).format("YYYY-MM-DD"),
             'context': getAttributeValue(dhisProject, "prjCon"),
             'location': getAttributeValue(dhisProject, "prjLoc"),
             'projectType': getAttributeValue(dhisProject, "prjType"),
             'populationType': getAttributeValue(dhisProject, "prjPopType"),
-            'endDate': endDate ? moment(endDate).toDate() : undefined,
+            'endDate': endDate ? moment(endDate).format("YYYY-MM-DD") : undefined,
         };
     };
 

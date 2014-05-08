@@ -223,11 +223,11 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             };
             var expectedNewOrgUnit = {
                 'name': scope.orgUnit.name,
-                'openingDate': moment("2010-01-01").toDate(),
+                'openingDate': moment("2010-01-01").format("YYYY-MM-DD"),
                 'context': "val2",
                 'location': "val3",
                 'projectType': "val4",
-                'endDate': moment("2011-01-01").toDate(),
+                'endDate': moment("2011-01-01").format("YYYY-MM-DD"),
                 'populationType': "val6",
             };
 

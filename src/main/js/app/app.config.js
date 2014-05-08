@@ -25,9 +25,6 @@ require.config({
         "angular-treeview": "lib/angularjs-directives/src/treeview/angular.treeview",
         "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",
         "md5": "lib/js-md5/js/md5",
-        "angular-ui-datepicker": "lib/custom/angular-ui-datepicker/datepicker",
-        "angular-ui-position": "lib/custom/angular-ui-position/position",
-
 
         //Controllers
         "controllers": "app/controller/controllers",
@@ -103,12 +100,6 @@ require.config({
         },
         'angular-ui-weekselector': {
             deps: ["angular", "moment"]
-        },
-        'angular-ui-position': {
-            deps: ["angular"]
-        },
-        'angular-ui-datepicker': {
-            deps: ["angular", "angular-ui-position"]
         },
         'angular-multiselect': {
             deps: ["angular"]
