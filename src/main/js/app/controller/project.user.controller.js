@@ -13,6 +13,9 @@ define([], function() {
         }];
 
         var init = function() {
+            $scope.userNamePrefix = $scope.orgUnit.name.toLowerCase().replace(/ /g, "_").concat("_");
+            $scope.userNameMatchExpr = new RegExp($scope.userNamePrefix, "i");
+
             $scope.userRoles = allRoles;
             userService.getAllUsernames().then(function(data) {
                 $scope.existingUsers = data;
@@ -21,7 +24,7 @@ define([], function() {
 
         $scope.save = function(projectUser) {
             var userPayload = {
-                "username": projectUser.username,
+                "username": projectUser.username.toLowerCase(),
                 "surname": "LNU",
                 "firstName": "FNU",
                 "userCredentials": {

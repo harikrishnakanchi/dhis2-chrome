@@ -23,13 +23,16 @@ define(["properties", "lodash"], function(properties, _) {
         };
 
         var getAllProjectUsers = function(projectName) {
-            var project = projectName.toLowerCase().replace(/ /g, "_");
-            var store = db.objectStore("users");
-            return store.getAll().then(function(users) {
-                return _.filter(users, function(user) {
-                    return user.userName.indexOf(projectName) === 0;
+            var project = projectName.toLowerCase().replace(/ /g, "_").concat("_");
+
+            var filterProjectUsers = function(allUsers) {
+                return _.filter(allUsers, function(user) {
+                    return user.username.indexOf(project) === 0;
                 });
-            });
+            };
+
+            var store = db.objectStore("users");
+            return store.getAll().then(filterProjectUsers);
         };
 
         return {

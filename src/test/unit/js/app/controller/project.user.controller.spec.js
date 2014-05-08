@@ -12,13 +12,17 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                 'getAllUsernames': function() {}
             };
 
+            scope.orgUnit = {
+                "name": "Proj 1"
+            };
+
             spyOn(userService, "getAllUsernames").and.returnValue(utils.getPromise(q, []));
             projectUserController = new ProjectUserController(scope, userService);
         }));
 
         it("should create user", function() {
             var user = {
-                username: "proj_1_username1",
+                username: "ProJ_1_Blah",
                 password: "P@ssw0rd",
                 userRole: {
                     name: 'SomeRole',
@@ -26,7 +30,7 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                 }
             };
             var expectedUserPayload = {
-                "username": user.username,
+                "username": 'proj_1_blah',
                 "surname": "LNU",
                 "firstName": "FNU",
                 "userCredentials": {
@@ -46,6 +50,18 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
             expect(userService.create).toHaveBeenCalledWith(expectedUserPayload);
             expect(scope.saveSuccess).toEqual(true);
             expect(scope.saveFailure).toEqual(false);
+        });
+
+        it("should determine username prefix and return validate username", function() {
+            var projectName = "Some Project";
+            var specifiedUserName = "some_Project_user1";
+
+            scope.orgUnit.name = projectName;
+
+            projectUserController = new ProjectUserController(scope, userService);
+
+            expect(scope.userNamePrefix).toEqual("some_project_");
+            expect(scope.userNameMatchExpr.test(specifiedUserName)).toEqual(true);
         });
     });
 });

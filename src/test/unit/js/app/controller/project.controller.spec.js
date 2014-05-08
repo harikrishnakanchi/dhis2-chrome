@@ -2,7 +2,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
     describe("project controller tests", function() {
 
-        var scope, timeout, q, location, orgUnitService, anchorScroll, orgunitMapper;
+        var scope, timeout, q, location, orgUnitService, anchorScroll, orgunitMapper, userService;
 
         beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
             scope = $rootScope.$new();
@@ -21,13 +21,19 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 }
             };
 
+            userService = {
+                "getAllProjectUsers": function() {
+                    return utils.getPromise(q, [{}]);
+                }
+            };
+
             scope.isEditMode = true;
             scope.orgUnit = {
                 id: "blah"
             };
 
             anchorScroll = jasmine.createSpy();
-            projectController = new ProjectController(scope, orgUnitService, q, location, timeout, anchorScroll);
+            projectController = new ProjectController(scope, orgUnitService, q, location, timeout, anchorScroll, userService);
         }));
 
         it("should save project in dhis", function() {
@@ -226,11 +232,54 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             };
 
             scope.isEditMode = false;
-            scope.$apply();
 
-            projectController = new ProjectController(scope, orgUnitService, q, location, timeout, anchorScroll);
+            projectController = new ProjectController(scope, orgUnitService, q, location, timeout, anchorScroll, userService);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
+        });
+
+        it('should set project users in view mode', function() {
+            scope.orgUnit = {
+                "name": "anyname",
+            };
+            scope.isEditMode = false;
+            var users = [{
+                'username': 'foobar',
+                'userCredentials': {
+                    'userAuthorityGroups': [{
+                        "name": 'Role1',
+                        "id": 'Role1Id'
+                    }, {
+                        "name": 'Role2',
+                        "id": 'Role2Id'
+                    }]
+                }
+            }, {
+                'username': 'blah',
+                'userCredentials': {
+                    'userAuthorityGroups': [{
+                        "name": 'Role1',
+                        "id": 'Role1Id'
+                    }, {
+                        "name": 'Role3',
+                        "id": 'Role3Id'
+                    }]
+                }
+            }];
+
+            var expectedUsers = [{
+                'username': 'foobar',
+                'roles': 'Role1, Role2'
+            }, {
+                'username': 'blah',
+                'roles': 'Role1, Role3'
+            }];
+            spyOn(userService, "getAllProjectUsers").and.returnValue(utils.getPromise(q, users));
+
+            projectController = new ProjectController(scope, orgUnitService, q, location, timeout, anchorScroll, userService);
+            scope.$apply();
+
+            expect(scope.projectUsers).toEqual(expectedUsers);
         });
 
     });

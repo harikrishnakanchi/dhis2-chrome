@@ -1,10 +1,12 @@
 define(["userService", "angularMocks", "properties", "utils"], function(UserService, mocks, properties, utils) {
     describe("user service", function() {
-        var http, httpBackend, db, mockOrgStore, userService;
+        var http, httpBackend, userService, db, mockOrgStore, q, rootScope;
 
-        beforeEach(mocks.inject(function($httpBackend, $http) {
+        beforeEach(mocks.inject(function($httpBackend, $http, $q, $rootScope) {
             http = $http;
             httpBackend = $httpBackend;
+            q = $q;
+            rootScope = $rootScope;
 
             mockOrgStore = {
                 upsert: function() {},
@@ -15,6 +17,7 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
             };
 
             spyOn(db, "objectStore").and.returnValue(mockOrgStore);
+
             userService = new UserService(http, db);
         }));
 
@@ -31,11 +34,12 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
 
             expect(mockOrgStore.upsert).toHaveBeenCalledWith(user);
             httpBackend.expectPOST(properties.dhis.url + "/api/users", user).respond(200, "ok");
+            httpBackend.flush();
         });
 
         it("should get all project users", function() {
             var projUser1 = {
-                "username": "proj_1_user1"
+                "username": "proj_1_user1",
             };
 
             var projUser2 = {
@@ -55,6 +59,7 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
                 expect(data[0]).toEqual(projUser1);
                 expect(data[1]).toEqual(projUser2);
             });
+            rootScope.$apply();
         });
 
         it("should get all usernames", function() {
@@ -68,6 +73,7 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
             userService.getAllUsernames().then(function(usernames) {
                 expect(usernames).toEqual(["proj_2_user1", "someone@example.com"]);
             });
+            rootScope.$apply();
         });
     });
 });

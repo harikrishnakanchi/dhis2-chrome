@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, toTree) {
 
-    return function($scope, orgUnitService, $q, $location, $timeout, $anchorScroll) {
+    return function($scope, orgUnitService, $q, $location, $timeout, $anchorScroll, userService) {
 
         $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded from TYPO analysis and Coordination'];
 
@@ -62,6 +62,18 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
         var prepareView = function() {
             $scope.reset();
             $scope.newOrgUnit = orgUnitMapper.mapToProjectForView($scope.orgUnit);
+            $scope.projectUsers = [];
+            userService.getAllProjectUsers($scope.newOrgUnit.name).then(function(projectUsers) {
+                _.each(projectUsers, function(user) {
+                    var roles = user.userCredentials.userAuthorityGroups.map(function(role) {
+                        return role.name;
+                    });
+                    $scope.projectUsers.push({
+                        "username": user.username,
+                        "roles": roles.join(", ")
+                    });
+                });
+            });
         };
 
         var init = function() {

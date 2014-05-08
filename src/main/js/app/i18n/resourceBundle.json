@@ -28,6 +28,7 @@
     "errorUser": "Error creating User.",
     "savedUser": "User saved successfully.",
     "usernameValidation": "Username is required.",
+    "usernamePrefixValidation": "Should begin with ",
     "roleValidation": "Role is required.",
     "usernameExists": "Username already exists.",
     "passwordValidation": "Password must be between 8 and 35 characters long, should have at least have one capital letter and one digit.",
