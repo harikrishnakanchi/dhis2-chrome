@@ -11,7 +11,10 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             location = $location;
 
             projectsService = {
-                "create": function() {}
+                "create": function() {},
+                "getAll": function() {
+                    return utils.getPromise(q, {});
+                }
             };
             mockOrgStore = {
                 upsert: function() {}
@@ -20,6 +23,10 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 objectStore: function(store) {
                     return mockOrgStore;
                 }
+            };
+
+            scope.orgUnit = {
+                id: "blah"
             };
 
             _Date = Date;
@@ -37,6 +44,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
         });
 
         it('should add new op units', function() {
+            scope.isEditMode = false;
             scope.$apply();
             var orginalOpUnitLen = scope.opUnits.length;
             scope.addOpUnits();
@@ -53,6 +61,8 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             }, {
                 'name': 'opUnit4'
             }];
+
+            scope.isEditMode = false;
             scope.$apply();
 
             scope.delete(2);

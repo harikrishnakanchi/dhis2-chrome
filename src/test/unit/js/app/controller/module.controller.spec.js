@@ -14,7 +14,10 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                 "getAssociatedDatasets": function() {},
                 "associateDataSetsToOrgUnit": function() {},
                 "setSystemSettings": function() {},
-                "getSystemSettings": function() {}
+                "getSystemSettings": function() {},
+                "getAll": function() {
+                    return utils.getPromise(q, {});
+                }
             };
             mockOrgStore = {
                 upsert: function() {},
@@ -22,6 +25,9 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             };
             db = {
                 objectStore: function() {}
+            };
+            scope.orgUnit = {
+                id: "blah"
             };
             _Date = Date;
             todayStr = "2014-04-01";

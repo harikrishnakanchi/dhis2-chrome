@@ -35,5 +35,6 @@
     "passwordValidation": "Password must be between 8 and 35 characters long, should have at least have one capital letter and one digit.",
     "pwdRequired": "Password is required.",
     "confirmPassword": "Confirm your password.",
-    "pwdMatch": "Passwords do not match."
+    "pwdMatch": "Passwords do not match.",
+    "alreadyExists": "Name already exists under this country"
 }

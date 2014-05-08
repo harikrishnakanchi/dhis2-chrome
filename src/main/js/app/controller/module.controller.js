@@ -31,6 +31,9 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
                             selectedDataElements[dataElement.id] = true;
                         });
                     });
+                    orgUnitService.getAll("organisationUnits").then(function(allOrgUnits) {
+                        $scope.allModules = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
+                    });
                     $scope.addModules();
                 };
 

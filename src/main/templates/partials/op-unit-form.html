@@ -28,9 +28,10 @@
                     <li>
                         <label for="opUnitName" class="col-sm-4 col-md-4 control-label">Name of the unit</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="opUnitName" id="opUnitName" placeholder="Operation Unit Name" ng-model="opUnit.name" required ng-disabled="!isEditMode">
+                            <input type="text" class="form-control" name="opUnitName" id="opUnitName" placeholder="Operation Unit Name" ng-model="opUnit.name" not-in="allOpUnits" required ng-disabled="!isEditMode">
                             <div ng-show="form.opUnitName.$dirty &amp;&amp; form.opUnitName.$invalid">
-                                <span class="errortxt">{{resourceBundle.nameValidation}}</span>
+                                <span class="errortxt" ng-show="form.opUnitName.$error.required">{{resourceBundle.nameValidation}}</span>
+                                <span class="errortxt" ng-show="form.opUnitName.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
                             </div>
                         </div>
                     </li>

@@ -14,9 +14,10 @@
 					<li class="form-group">
 						<label for="moduleName" class="col-sm-4 col-md-4 control-label">Add module</label>
 						<div class="col-sm-4">
-							<input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="Module Name" ng-model="module.name"  ng-disabled="!isEditMode" required>
+							<input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="Module Name" ng-model="module.name" not-in="allModules" ng-disabled="!isEditMode" required>
 							<div ng-show="form.moduleName.$dirty &amp;&amp; form.moduleName.$invalid">
-								<span class="errortxt">{{resourceBundle.nameValidation}}</span>
+								<span class="errortxt" ng-show="form.moduleName.$error.required">{{resourceBundle.nameValidation}}</span>
+								<span class="errortxt" ng-show="form.moduleName.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
 							</div>
 						</div>
 					</li>
