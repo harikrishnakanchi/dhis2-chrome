@@ -4,7 +4,7 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
         var scope, projectUserController, userService, q;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
-            scope = $rootScope;
+            scope = $rootScope.$new();
             q = $q;
             userService = {
                 'create': function() {},
@@ -13,7 +13,8 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
             };
 
             scope.orgUnit = {
-                "name": "Proj 1"
+                "name": "Proj 1",
+                "id": "someId"
             };
 
             spyOn(userService, "getAllUsernames").and.returnValue(utils.getPromise(q, []));
@@ -40,7 +41,11 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                         "id": user.userRole.id
                     }],
                     "password": user.password,
-                }
+                },
+                "organisationUnits": [{
+                    "id": scope.orgUnit.id,
+                    "name": scope.orgUnit.name
+                }]
             };
             spyOn(userService, "create").and.returnValue(utils.getPromise(q, {}));
 
@@ -48,8 +53,8 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
             scope.$apply();
 
             expect(userService.create).toHaveBeenCalledWith(expectedUserPayload);
-            expect(scope.saveSuccess).toEqual(true);
             expect(scope.saveFailure).toEqual(false);
+
         });
 
         it("should determine username prefix and return validate username", function() {

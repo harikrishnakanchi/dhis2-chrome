@@ -34,12 +34,17 @@ define([], function() {
                         "id": projectUser.userRole.id
                     }],
                     "password": projectUser.password,
-                }
+                },
+                "organisationUnits": [{
+                    "id": $scope.orgUnit.id,
+                    "name": $scope.orgUnit.name
+                }]
             };
 
             var onSuccess = function(data) {
-                $scope.saveSuccess = true;
                 $scope.saveFailure = false;
+                if ($scope.$parent.closeEditForm)
+                    $scope.$parent.closeEditForm($scope.orgUnit.id, "savedUser");
                 return data;
             };
 

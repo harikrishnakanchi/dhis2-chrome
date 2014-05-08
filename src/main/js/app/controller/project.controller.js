@@ -56,6 +56,19 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
             $anchorScroll();
         };
 
+        var setProjectUsersForView = function(projectUsers) {
+            $scope.projectUsers = [];
+            _.each(projectUsers, function(user) {
+                var roles = user.userCredentials.userAuthorityGroups.map(function(role) {
+                    return role.name;
+                });
+                $scope.projectUsers.push({
+                    "username": user.username,
+                    "roles": roles.join(", ")
+                });
+            });
+        };
+
         var prepareEditForm = function() {
             $scope.reset();
             orgUnitService.getAll("organisationUnits").then(function(allOrgUnits) {
@@ -66,18 +79,7 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
         var prepareView = function() {
             $scope.reset();
             $scope.newOrgUnit = orgUnitMapper.mapToProjectForView($scope.orgUnit);
-            $scope.projectUsers = [];
-            userService.getAllProjectUsers($scope.newOrgUnit.name).then(function(projectUsers) {
-                _.each(projectUsers, function(user) {
-                    var roles = user.userCredentials.userAuthorityGroups.map(function(role) {
-                        return role.name;
-                    });
-                    $scope.projectUsers.push({
-                        "username": user.username,
-                        "roles": roles.join(", ")
-                    });
-                });
-            });
+            userService.getAllProjectUsers($scope.newOrgUnit.name).then(setProjectUsersForView);
         };
 
         var init = function() {
