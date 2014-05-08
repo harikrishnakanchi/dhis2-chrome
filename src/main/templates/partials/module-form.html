@@ -11,7 +11,7 @@
 			<div class="well" ng-repeat="module in modules">
 				<button class="btn-delete" ng-hide="$first || !isEditMode" ng-click="delete($index)">X Delete</button>
 				<ul>
-					<li>
+					<li class="form-group">
 						<label for="moduleName" class="col-sm-4 col-md-4 control-label">Add module</label>
 						<div class="col-sm-4">
 							<input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="Module Name" ng-model="module.name"  ng-disabled="!isEditMode" required>
@@ -21,28 +21,36 @@
 						</div>
 					</li>
 					<li class="form-group">
-						<div class="col-sm-offset-2 col-sm-10" ng-show="isEditMode">
-							<div class="add-item-ctrl">
-								<div ng-show="areDatasetsNotSelected([module])">
-									<span>{{resourceBundle.selectDatasets}}</span>
+						<label for="moduleName" class="col-sm-4 col-md-4 control-label">Add service</label>
+					</li>
+					<li class="form-group">
+						<div class="col-sm-12" ng-show="isEditMode">
+							<section class="module-details">
+								<div class="add-item-ctrl">
+									<div ng-show="areDatasetsNotSelected([module])">
+										<span>{{resourceBundle.selectDatasets}}</span>
+									</div>
+									<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isEditMode" click="selectDataSet(module, element)"></multiselect>
 								</div>
-								<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isEditMode" click="selectDataSet(module, element)"></multiselect>
-							</div>
-							<div ng-repeat="section in module.selectedDataset.sections">
-								<div class="collapse-head" style="position:relative">
-									<h5 ng-click="isCollapsed = !isCollapsed" style="background:#ccc;display:block;padding:10px;cursor:pointer;">{{section.name}} </h5>
-									<input type="checkbox" style="position:absolute;right:10px; top:7px;" ng-change="changeSectionSelection(module, section)" ng-model="module.selectedSections[section.id]">
+								<div class="details" ng-show="module.selectedDataset.sections.length > 0">
+								<div ng-repeat="section in module.selectedDataset.sections">
+
+									<div class="collapse-head">
+										<h5 ng-click="isCollapsed = !isCollapsed">{{section.name}} </h5>
+										<input type="checkbox" ng-change="changeSectionSelection(module, section)" ng-model="module.selectedSections[section.id]">
+									</div>
+									<div collapse="isCollapsed" class="collapse-body">
+										<ul>
+											<li ng-repeat="element in section.dataElements">
+												<label>
+													<input type="checkbox" ng-model="module.selectedDataElements[element.id]" ng-change="changeDataElementSelection(module, section)"> {{element.formName}}
+												</label>
+											</li>
+										</ul>
+									</div>
 								</div>
-								<div collapse="isCollapsed">
-									<ul>
-										<li ng-repeat="element in section.dataElements">
-											<label>
-												<input type="checkbox" ng-model="module.selectedDataElements[element.id]" ng-change="changeDataElementSelection(module, section)"> {{element.formName}}
-											</label>
-										</li>
-									</ul>
 								</div>
-							</div>
+							</section>
 						</div>
 						<div ng-show="!isEditMode">
 							<div name="left-side">
