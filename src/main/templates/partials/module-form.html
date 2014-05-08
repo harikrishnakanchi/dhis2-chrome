@@ -12,7 +12,7 @@
 				<button class="btn-delete" ng-hide="$first || !isEditMode" ng-click="delete($index)">X Delete</button>
 				<ul>
 					<li class="form-group">
-						<label for="moduleName" class="col-sm-4 col-md-4 control-label">Add module</label>
+						<label for="moduleName" class="col-sm-4 col-md-4 control-label">Module name</label>
 						<div class="col-sm-4">
 							<input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="Module Name" ng-model="module.name" not-in="allModules" ng-disabled="!isEditMode" required>
 							<div ng-show="form.moduleName.$dirty &amp;&amp; form.moduleName.$invalid">
