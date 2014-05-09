@@ -3,6 +3,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
         var selectedDataElements = {};
         var selectedSections = {};
         var originalDatasets;
+        var allSections = [];
 
         $scope.isopen = {};
         $scope.isCollapsed = true;
@@ -14,18 +15,16 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
             var dataSetPromise = getAll('dataSets');
             var sectionPromise = getAll("sections");
             var dataElementsPromise = getAll("dataElements");
-            var sections = [];
 
             var setUpData = function(data) {
                 originalDatasets = data[0];
-                sections = data[1];
+                allSections = data[1];
                 $scope.allDatasets = datasetTransformer.enrichDatasets(data);
             };
 
             var setUpForm = function() {
-
                 var setUpEditMode = function() {
-                    _.each(sections, function(section) {
+                    _.each(allSections, function(section) {
                         selectedSections[section.id] = true;
                         _.each(section.dataElements, function(dataElement) {
                             selectedDataElements[dataElement.id] = true;
@@ -57,6 +56,15 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
 
             var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise]);
             getAllData.then(setUpData).then(setUpForm);
+        };
+
+        var initDataElementSelection = function(module, sections) {
+            _.each(sections, function(section) {
+                module.selectedSections[section.id] = true;
+                _.each(section.dataElements, function(dataElement) {
+                    module.selectedDataElements[dataElement.id] = true;
+                });
+            });
         };
 
         var getAll = function(storeName) {
@@ -131,8 +139,15 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
             module.selectedSections[section.id] = selected;
         };
 
-        $scope.selectDataSet = function(module, element) {
-            module.selectedDataset = element;
+        $scope.selectDataSet = function(module, item) {
+            module.selectedDataset = item;
+        };
+
+        $scope.discardDataSet = function(module, items) {
+            _.each(items, function(dataset) {
+                initDataElementSelection(module, dataset.sections);
+            });
+            module.selectedDataset = undefined;
         };
 
         init();

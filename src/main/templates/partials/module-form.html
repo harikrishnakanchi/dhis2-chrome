@@ -32,13 +32,12 @@
 									<div ng-show="areDatasetsNotSelected([module])">
 										<span>{{resourceBundle.selectDatasets}}</span>
 									</div>
-									<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isEditMode" click="selectDataSet(module, element)"></multiselect>
+									<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isEditMode" on-right-item-select="selectDataSet(module, item)" on-move-left="discardDataSet(module, items)"></multiselect>
 								</div>
 								<div class="details" ng-show="module.selectedDataset.sections.length > 0">
 								<div ng-repeat="section in module.selectedDataset.sections">
-
 									<div class="collapse-head">
-										<h5 ng-click="isCollapsed = !isCollapsed">{{section.name}} </h5>
+										<h5 ng-click="isCollapsed = !isCollapsed">{{section.name}} {{module.selectedSections[section.id]}}</h5>
 										<input type="checkbox" ng-change="changeSectionSelection(module, section)" ng-model="module.selectedSections[section.id]">
 									</div>
 									<div collapse="isCollapsed" class="collapse-body">
