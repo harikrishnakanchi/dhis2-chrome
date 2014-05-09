@@ -37,7 +37,7 @@
 								<div class="details" ng-show="module.selectedDataset.sections.length > 0">
 								<div ng-repeat="section in module.selectedDataset.sections">
 									<div class="collapse-head">
-										<h5 ng-click="isCollapsed = !isCollapsed">{{section.name}} {{module.selectedSections[section.id]}}</h5>
+										<h5 ng-click="isCollapsed = !isCollapsed">{{section.name}}</h5>
 										<input type="checkbox" ng-change="changeSectionSelection(module, section)" ng-model="module.selectedSections[section.id]">
 									</div>
 									<div collapse="isCollapsed" class="collapse-body">
