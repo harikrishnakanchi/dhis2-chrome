@@ -22,7 +22,8 @@
 						</div>
 					</li>
 					<li class="form-group">
-						<label for="moduleName" class="col-sm-4 col-md-4 control-label">Add service</label>
+						<label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-show="isEditMode">Add service</label>
+						<label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-hide="isEditMode">Services</label>
 					</li>
 					<li class="form-group">
 						<div class="col-sm-12" ng-show="isEditMode">
