@@ -52,7 +52,7 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
                 function(metadataService, $rootScope, $location) {
                     metadataService.loadMetadata();
                     $rootScope.$on('$routeChangeStart', function(e, newUrl, oldUrl) {
-                        if (!$rootScope.isLoggedIn) {
+                        if (!(properties.devMode || $rootScope.isLoggedIn)) {
                             $location.path("/login");
                         }
                     });
