@@ -39,7 +39,6 @@ define(["idb", "httpWrapper", "Q", "lodash", "properties"], function(idb, httpWr
 
         var getSystemSettings = function() {
             var url = properties.dhis.url + "/api/systemSettings";
-
             console.debug("Fetching " + url);
             return httpWrapper.get(url);
         };
