@@ -1,4 +1,5 @@
-define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper) {
+/*global Date:true*/
+define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment) {
     describe("dataEntryController ", function() {
         var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, modules, dataEntryFormMock;
 
@@ -13,7 +14,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                         result: utils.getPromise(q, {})
                     };
                 }
-            }
+            };
             location = $location;
             anchorScroll = $anchorScroll;
             rootScope = $rootScope;
@@ -62,7 +63,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 'name': 'somename',
                 'displayName': 'somename',
                 'id': 'id1'
-            }]
+            }];
+
             spyOn(orgUnitStore, 'getAll').and.returnValue(utils.getPromise(q, modules));
             spyOn(location, "hash");
             dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal);
@@ -137,7 +139,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.getDataSetName(datasetId)).toEqual("OPD");
         });
 
-        it("should save user to indexeddb and dhis", function() {
+        it("should submit data values to indexeddb and dhis", function() {
             var dataValues = {
                 "name": "test"
             };
@@ -158,11 +160,41 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataService, "save").and.returnValue(saveSuccessPromise);
             spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
 
-            scope.save();
+            scope.submit();
             scope.$apply();
 
             expect(dataValuesStore.upsert).toHaveBeenCalled();
             expect(dataService.save).toHaveBeenCalled();
+            expect(scope.success).toBe(true);
+            expect(scope.error).toBe(false);
+        });
+
+        it("should save data values as draft to indexeddb", function() {
+            var dataValues = {
+                "name": "test"
+            };
+            scope.currentModule = {
+                id: 'Module2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
+            scope.$apply();
+
+            spyOn(dataService, "save");
+            spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
+
+            scope.saveAsDraft();
+            scope.$apply();
+
+            expect(dataValuesStore.upsert).toHaveBeenCalled();
+            expect(dataService.save).not.toHaveBeenCalled();
             expect(scope.success).toBe(true);
             expect(scope.error).toBe(false);
         });
@@ -189,7 +221,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataService, "save").and.returnValue(saveErrorPromise);
             spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
 
-            scope.save();
+            scope.submit();
             scope.$apply();
 
             expect(dataService.save).toHaveBeenCalled();
@@ -198,7 +230,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.success).toBe(false);
         });
 
-        it("should let the user know of failures when saving the data to indexedDB", function() {
+        it("should let the user know of failures when saving the data to indexedDB ", function() {
             scope = rootScope.$new();
             scope.dataentryForm = dataEntryFormMock;
             var dataValues = {
@@ -220,7 +252,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataService, "save");
             spyOn(dataValuesStore, "upsert").and.returnValue(saveErrorPromise);
 
-            scope.save();
+            scope.submit();
             scope.$apply();
 
             expect(dataService.save).not.toHaveBeenCalled();
@@ -361,6 +393,28 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             expect(scope.preventNavigation).toEqual(false);
 
+        });
+
+        it("should return true if current week is selected", function() {
+            var selectedWeek = {
+                'weekNumber': 2,
+                'startOfWeek': moment().startOf("isoWeek").format("YYYY-MM-DD"),
+                'endOfWeek': moment().endOf("isoWeek").format("YYYY-MM-DD")
+            };
+
+            expect(scope.isCurrentWeekSelected(selectedWeek)).toEqual(true);
+            scope.$apply();
+        });
+
+        it("should return false if current week is not selected", function() {
+            var selectedWeek = {
+                'weekNumber': 21,
+                'startOfWeek': moment("2001-01-01", "YYYY-MM-DD").startOf("isoWeek").format("YYYY-MM-DD"),
+                'endOfWeek': moment("2001-01-01", "YYYY-MM-DD").endOf("isoWeek").format("YYYY-MM-DD")
+            };
+
+            expect(scope.isCurrentWeekSelected(selectedWeek)).toEqual(false);
+            scope.$apply();
         });
     });
 });

@@ -1,4 +1,4 @@
-define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], function(_, dataValuesMapper, groupSections, orgUnitMapper) {
+define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
     return function($scope, $q, db, dataService, $anchorScroll, $location, $modal) {
         var dataSets, systemSettings;
 
@@ -59,7 +59,15 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
             return _.last(headers).length;
         };
 
-        $scope.save = function() {
+        $scope.submit = function() {
+            save(false);
+        };
+
+        $scope.saveAsDraft = function() {
+            save(true);
+        };
+
+        var save = function(asDraft) {
             var period = getPeriod();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id);
             var successPromise = function() {
@@ -79,8 +87,19 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper"], functio
                 return dataValuesStore.upsert(payload);
             };
 
-            saveToDb().then(pushToDhis).then(successPromise, errorPromise);
+            if (asDraft) {
+                saveToDb().then(successPromise, errorPromise);
+            } else {
+                saveToDb().then(pushToDhis).then(successPromise, errorPromise);
+            }
             scrollToTop();
+        };
+
+        $scope.isCurrentWeekSelected = function(week) {
+            var today = moment().format("YYYY-MM-DD");
+            if (today >= week.startOfWeek && today <= week.endOfWeek)
+                return true;
+            return false;
         };
 
         var confirmAndMove = function(okCallback) {
