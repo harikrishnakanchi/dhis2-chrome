@@ -3,9 +3,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         var dataSets, systemSettings;
 
         $scope.evaluateExpression = function(elementId, option) {
-            var cellValue = $scope.dataValues[elementId][option];
-            $scope.dataValues[elementId][option] = calculateSum(cellValue);
-            return $scope.dataValues[elementId][option];
+            var cellValue = $scope.dataValues[elementId][option].value;
+            $scope.dataValues[elementId][option].formula = cellValue;
+            $scope.dataValues[elementId][option].value = calculateSum(cellValue);
+        };
+
+        $scope.restoreExpression = function(elementId, option) {
+            $scope.dataValues[elementId][option].value = $scope.dataValues[elementId][option].formula;
         };
 
         $scope.getDataSetName = function(id) {
@@ -16,10 +20,12 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         $scope.safeGet = function(dataValues, id, option) {
             dataValues[id] = dataValues[id] || {};
-            if (!(option in dataValues[id])) {
-                dataValues[id][option] = "";
-            }
-            return dataValues[id];
+
+            dataValues[id][option] = dataValues[id][option] || {
+                'formula': '',
+                'value': ''
+            };
+            return dataValues[id][option];
         };
 
         $scope.$watchCollection('[week, currentModule]', function() {
@@ -52,8 +58,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.sum = function(iterable) {
-            return _.reduce(iterable, function(sum, currentValue) {
-                exp = currentValue || "0";
+            return _.reduce(iterable, function(sum, currentOption) {
+                exp = currentOption.value || "0";
                 return sum + calculateSum(exp);
             }, 0);
         };
@@ -138,6 +144,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var calculateSum = function(cellValue) {
+            if (!cellValue)
+                return 0;
+
             cellValue = cellValue.toString().split("+").filter(function(e) {
                 return e;
             });

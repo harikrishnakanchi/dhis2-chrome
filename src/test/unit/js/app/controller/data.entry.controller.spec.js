@@ -83,28 +83,77 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should return the sum of the list ", function() {
-            var list = ["1", "2", "3", "4"];
+            var list = {
+                "option1": {
+                    "value": 1
+                },
+                "option2": {
+                    "value": 2
+                },
+                "option3": {
+                    "value": 3
+                },
+                "option4": {
+                    "value": 4
+                }
+            };
+
             expect(scope.sum(list)).toBe(10);
         });
 
         it("should return the sum of valid values ", function() {
-            var list = ["1", "2", undefined, "4"];
+            var list = {
+                "option1": {
+                    "value": 1
+                },
+                "option2": {
+                    "value": 2
+                },
+                "option3": {
+                    "value": undefined
+                },
+                "option4": {
+                    "value": 4
+                }
+            };
 
             expect(scope.sum(list)).toBe(7);
         });
 
         it("should return the sum of valid expressions ", function() {
-            var list = ["1+3", "2", "3", "4"];
+            var list = {
+                "option1": {
+                    "formula": "1 + 3",
+                    "value": 4
+                },
+                "option2": {
+                    "value": 2
+                },
+                "option3": {
+                    "value": 3
+                },
+                "option4": {
+                    "value": 4
+                }
+            };
 
             expect(scope.sum(list)).toBe(13);
         });
 
         it("should return the sum of the map ", function() {
             var list = {
-                a: "1",
-                b: "2",
-                c: "3",
-                d: "4"
+                "option1": {
+                    "value": 1
+                },
+                "option2": {
+                    "value": 2
+                },
+                "option3": {
+                    "value": 3
+                },
+                "option4": {
+                    "value": 4
+                }
             };
             expect(scope.sum(list)).toBe(10);
         });
@@ -112,13 +161,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         it("should evaluate expression on blur", function() {
             scope.dataValues = {
                 "blah": {
-                    "some": "1+9"
+                    "some": {
+                        "value": "1 + 9"
+                    }
                 }
             };
 
             scope.evaluateExpression("blah", "some");
 
-            expect(scope.dataValues.blah.some).toEqual(10);
+            expect(scope.dataValues.blah.some.value).toEqual(10);
         });
 
         it("should group sections based on datasets", function() {
@@ -272,34 +323,37 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it("safe get dataValues should initialize data value and option if not present", function() {
             var dataValues = {};
-
-            var result = scope.safeGet(dataValues, "blah", "option");
+            var result = scope.safeGet(dataValues, "blah", "someOption");
 
             expect(dataValues).toEqual({
-                "blah": {
-                    "option": ""
+                blah: {
+                    someOption: {
+                        formula: '',
+                        value: ''
+                    }
                 }
             });
             expect(result).toEqual({
-                "option": ""
+                formula: '',
+                value: ''
             });
         });
 
         it("safe get dataValues should return if already present", function() {
             var dataValues = {
                 "blah": {
-                    "option": 123
+                    "someOption": "test"
                 }
             };
 
-            var result = scope.safeGet(dataValues, "blah", "option");
+            var result = scope.safeGet(dataValues, "blah", "someOption");
 
             expect(dataValues).toEqual({
-                "blah": {
-                    "option": 123
+                blah: {
+                    someOption: 'test'
                 }
             });
-            expect(result).toEqual(dataValues.blah);
+            expect(result).toEqual(dataValues.blah.someOption);
         });
 
         it("should fetch data only if period is defined", function() {
@@ -355,9 +409,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             expect(dataValuesStore.find).toHaveBeenCalledWith(["2014W14", "Module2"]);
             expect(scope.dataValues).toEqual({
-                "DE_Oedema": {
-                    "32": "3",
-                    "33": "12"
+                DE_Oedema: {
+                    32: {
+                        formula: '3',
+                        value: '3'
+                    },
+                    33: {
+                        formula: '12',
+                        value: '12'
+                    }
                 }
             });
         });

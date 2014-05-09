@@ -1,4 +1,4 @@
-define(["dataValuesMapper", "angularMocks", "properties", "moment"], function(dataValuesMapper, mocks, properties, moment) {
+define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], function(dataValuesMapper, mocks, properties, moment, _) {
     describe("dataValuesMapper", function() {
         var viewModel, period, domain, httpBackend, http;
 
@@ -6,12 +6,24 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment"], function(da
             q = $q;
             viewModel = {
                 "DE_Oedema": {
-                    "32": "3",
-                    "33": "12",
+                    "32": {
+                        "value": 3,
+                        "formula": "1+2"
+                    },
+                    "33": {
+                        "value": 12,
+                        "formula": "12"
+                    },
                 },
                 "DE_MLT115": {
-                    "32": "49",
-                    "37": "67"
+                    "32": {
+                        "value": 49,
+                        "formula": "49"
+                    },
+                    "37": {
+                        "value": 67,
+                        "formula": "67"
+                    }
                 }
             };
             period = "2014W14";
@@ -22,19 +34,23 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment"], function(da
                 "dataValues": [{
                     "dataElement": "DE_Oedema",
                     "categoryOptionCombo": "32",
-                    "value": "3"
+                    "formula": "1+2",
+                    "value": 3
                 }, {
                     "dataElement": "DE_Oedema",
                     "categoryOptionCombo": "33",
-                    "value": "12"
+                    "formula": "12",
+                    "value": 12
                 }, {
                     "dataElement": "DE_MLT115",
                     "categoryOptionCombo": "32",
-                    "value": "49"
+                    "formula": "49",
+                    "value": 49
                 }, {
                     "dataElement": "DE_MLT115",
                     "categoryOptionCombo": "37",
-                    "value": "67"
+                    "formula": "67",
+                    "value": 67
                 }]
             };
         }));
@@ -50,11 +66,20 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment"], function(da
         });
 
         it("should filter out empty values when converting view to domain", function() {
-            viewModel["DE_Podimas"] = {
-                "33": ""
-            };
+            _.merge(viewModel, {
+                "DE_Podimas": {
+                    "33": {
+                        "formula": "",
+                        "value": ""
+                    }
+                }
+            });
+
             var payload = dataValuesMapper.mapToDomain(viewModel, period, "company_0");
+
             expect(payload).toEqual(domain);
         });
+
+
     });
 });

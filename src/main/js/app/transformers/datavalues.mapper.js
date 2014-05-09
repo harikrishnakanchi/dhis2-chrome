@@ -5,7 +5,8 @@ define(["moment"], function(moment) {
                 return {
                     "dataElement": dataElement,
                     "categoryOptionCombo": categoryOptionComboId,
-                    "value": dataValue
+                    "formula": dataValue.formula,
+                    "value": dataValue.value
                 };
             });
         }), true);
@@ -23,7 +24,10 @@ define(["moment"], function(moment) {
     var mapToView = function(data) {
         return _.reduce(data.dataValues, function(dataValues, v) {
             dataValues[v.dataElement] = dataValues[v.dataElement] || {};
-            dataValues[v.dataElement][v.categoryOptionCombo] = v.value;
+            dataValues[v.dataElement][v.categoryOptionCombo] = {
+                formula: v.formula || v.value,
+                value: v.value
+            };
             return dataValues;
         }, {});
     };
