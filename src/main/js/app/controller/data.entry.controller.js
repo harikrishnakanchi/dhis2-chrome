@@ -98,7 +98,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         $scope.isCurrentWeekSelected = function(week) {
             var today = moment().format("YYYY-MM-DD");
-            if (today >= week.startOfWeek && today <= week.endOfWeek)
+            if (week && today >= week.startOfWeek && today <= week.endOfWeek)
                 return true;
             return false;
         };
