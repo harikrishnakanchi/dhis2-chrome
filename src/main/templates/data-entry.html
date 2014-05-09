@@ -54,8 +54,8 @@
 	</tab>
 </tabset>
 <div>
-	<button type="submit" class="btn btn-primary" ng-click="saveAsDraft()"> Save </button>
-	<button type="submit" class="btn btn-primary" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week)"> Submit </button>
+	<button type="submit" class="btn btn-primary" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid"> Save </button>
+	<button type="submit" class="btn btn-primary" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid"> Submit </button>
 </div>
 </section>
 </form>
