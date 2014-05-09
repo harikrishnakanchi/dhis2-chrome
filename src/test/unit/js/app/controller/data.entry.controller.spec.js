@@ -270,34 +270,26 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(maxCols).toEqual(4);
         });
 
-        it("safe get dataValues should initialize data value and option if not present", function() {
+        it("safe get dataValues should initialize if not present", function() {
             var dataValues = {};
 
-            var result = scope.safeGet(dataValues, "blah", "option");
+            var result = scope.safeGet(dataValues, "blah");
 
             expect(dataValues).toEqual({
-                "blah": {
-                    "option": ""
-                }
+                "blah": {}
             });
-            expect(result).toEqual({
-                "option": ""
-            });
+            expect(result).toEqual({});
         });
 
         it("safe get dataValues should return if already present", function() {
             var dataValues = {
-                "blah": {
-                    "option": 123
-                }
+                "blah": "test"
             };
 
-            var result = scope.safeGet(dataValues, "blah", "option");
+            var result = scope.safeGet(dataValues, "blah");
 
             expect(dataValues).toEqual({
-                "blah": {
-                    "option": 123
-                }
+                "blah": "test"
             });
             expect(result).toEqual(dataValues.blah);
         });

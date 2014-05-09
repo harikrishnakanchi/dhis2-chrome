@@ -39,7 +39,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment"], function(da
             };
         }));
 
-        it("should construct a valid json filtering out empty values given the data values", function() {
+        it("should construct a valid json given the data values", function() {
             var payload = dataValuesMapper.mapToDomain(viewModel, period, "company_0");
             expect(payload).toEqual(domain);
         });
@@ -49,12 +49,5 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment"], function(da
             expect(dataValues).toEqual(viewModel);
         });
 
-        it("should filter out empty values when converting view to domain", function() {
-            viewModel["DE_Podimas"] = {
-                "33": ""
-            };
-            var payload = dataValuesMapper.mapToDomain(viewModel, period, "company_0");
-            expect(payload).toEqual(domain);
-        });
     });
 });
