@@ -9,11 +9,14 @@ define(["moment"], function(moment) {
                 };
             });
         }), true);
+        var nonEmptyValues = _.filter(resultValues, function(de) {
+            return de.value !== "";
+        });
         return {
             "completeDate": moment().format("YYYY-MM-DD"),
             "period": period,
             "orgUnit": orgUnit,
-            "dataValues": resultValues
+            "dataValues": nonEmptyValues
         };
     };
 

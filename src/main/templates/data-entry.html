@@ -43,7 +43,7 @@
 						<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
 							<td> <span> {{ dataElement.formName }} </span> </td>
 							<td ng-repeat="option in section.categoryOptionComboIds">
-								<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="safeGet(dataValues, dataElement.id)[option]" ng-blur="evaluateExpression(dataElement.id, option)"/>
+								<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="safeGet(dataValues, dataElement.id, option)[option]" ng-blur="evaluateExpression(dataElement.id, option)"/>
 							</td>
 							<td>{{sum(dataValues[dataElement.id])}}</td>
 						</tr>

@@ -14,8 +14,11 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             }).name;
         };
 
-        $scope.safeGet = function(dataValues, id) {
+        $scope.safeGet = function(dataValues, id, option) {
             dataValues[id] = dataValues[id] || {};
+            if (!(option in dataValues[id])) {
+                dataValues[id][option] = "";
+            }
             return dataValues[id];
         };
 
@@ -79,7 +82,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var pushToDhis = function() {
-                return dataService.save(payload);
+                if (!asDraft) {
+                    return dataService.save(payload);
+                }
             };
 
             var saveToDb = function() {
@@ -87,11 +92,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 return dataValuesStore.upsert(payload);
             };
 
-            if (asDraft) {
-                saveToDb().then(successPromise, errorPromise);
-            } else {
-                saveToDb().then(pushToDhis).then(successPromise, errorPromise);
-            }
+            saveToDb().then(pushToDhis).then(successPromise, errorPromise);
             scrollToTop();
         };
 
