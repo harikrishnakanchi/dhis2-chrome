@@ -149,7 +149,6 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
         it("should get filtered datasets", function() {
             expect(datasetTransformer.getFilteredDatasets(enrichedDatasets, systemSettings, "Module1")).toEqual(expectedFilteredDatasets);
         });
-
     });
 
 });

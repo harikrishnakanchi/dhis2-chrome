@@ -1,5 +1,6 @@
 define(["lodash"], function(_) {
     var getFilteredDatasets = function(allDatasets, systemSettings, orgUnitId) {
+        systemSettings = systemSettings || {};
         allDatasets = _.map(allDatasets, function(dataset) {
             dataset.sections = _.map(dataset.sections, function(section) {
                 section.dataElements = _.filter(section.dataElements, function(dataElement) {
