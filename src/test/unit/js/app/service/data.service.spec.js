@@ -1,6 +1,6 @@
-define(["dataService", "angularMocks", "properties", "moment"], function(DataService, mocks, properties, moment) {
+define(["dataService", "angularMocks", "properties", "moment", "utils", "testData"], function(DataService, mocks, properties, moment, utils, td) {
     describe("dataService", function() {
-        var httpBackend, http, db;
+        var httpBackend, http, db, dataSetStore, dataValuesStore;
 
         beforeEach(mocks.inject(function($injector, $q) {
             q = $q;
@@ -22,10 +22,15 @@ define(["dataService", "angularMocks", "properties", "moment"], function(DataSer
                     find: find
                 };
             };
-            dataValuesStore = getMockStore("dataValues");
+            dataValuesStore = getMockStore({});
+            dataSetStore = getMockStore(td.dataSets);
 
-            spyOn(db, 'objectStore').and.callFake(function() {
-                return dataValuesStore;
+            spyOn(db, 'objectStore').and.callFake(function(storeName) {
+                var stores = {
+                    "dataValues": dataValuesStore,
+                    "dataSets": dataSetStore
+                };
+                return stores[storeName];
             });
 
             spyOn(dataValuesStore, "upsert").and.callFake(function() {
@@ -53,9 +58,9 @@ define(["dataService", "angularMocks", "properties", "moment"], function(DataSer
         it("should return error message if data values were not fetched", function() {
             var dataService = new DataService(http, db);
             var today = moment().format("YYYY-MM-DD");
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?dataSet=DS_ATFC&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(500);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(500);
 
-            dataService.get('company_0', 'DS_ATFC').then(function(response) {
+            dataService.get('company_0', 'DS_OPD').then(function(response) {
                 expect(response).toEqual({
                     message: 'Error fetching data from server.'
                 });
@@ -79,9 +84,9 @@ define(["dataService", "angularMocks", "properties", "moment"], function(DataSer
                 }]
             };
             var today = moment().format("YYYY-MM-DD");
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?dataSet=DS_ATFC&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, dataValueSet);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, dataValueSet);
 
-            dataService.get('company_0', 'DS_ATFC').then(function(response) {
+            dataService.get('company_0', 'DS_OPD').then(function(response) {
                 expect(response).toEqual(dataValueSet);
             });
 

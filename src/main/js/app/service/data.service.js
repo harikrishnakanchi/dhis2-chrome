@@ -4,7 +4,7 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
             return $http.post(properties.dhis.url + '/api/dataValueSets', payload);
         };
 
-        this.get = function(orgUnit, dataSets) {
+        this.get = function(orgUnit) {
             var today = moment().format("YYYY-MM-DD");
             var onSuccess = function(response) {
                 return response.data;
@@ -16,14 +16,23 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
                 };
             };
 
-            return $http.get(properties.dhis.url + '/api/dataValueSets', {
-                "params": {
-                    "orgUnit": orgUnit,
-                    "dataSet": dataSets,
-                    "startDate": "1900-01-01",
-                    "endDate": today
-                }
-            }).then(onSuccess, onError);
+            var getAllDatasets = function() {
+                var store = db.objectStore("dataSets");
+                return store.getAll();
+            };
+
+            var getDataForDatasets = function(dataSets) {
+                return $http.get(properties.dhis.url + '/api/dataValueSets', {
+                    "params": {
+                        "orgUnit": orgUnit,
+                        "dataSet": _.map(dataSets, "id"),
+                        "startDate": "1900-01-01",
+                        "endDate": today
+                    }
+                }).then(onSuccess, onError);
+            };
+
+            return getAllDatasets().then(getDataForDatasets);
         };
 
         this.saveToDb = function(dataValueSets, orgUnit) {

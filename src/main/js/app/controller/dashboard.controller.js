@@ -1,7 +1,6 @@
 define(["lodash"], function(_) {
     return function($scope, $q, dataService) {
         var dataValues = [];
-        var DATA_SETS = ["DS_OPD", "DS_VS", "DS_ITFC", "DS_ATFC", "DS_Physio"];
         var ORG_UNIT = "proj_104";
 
         var onSuccess = function(response) {
@@ -15,7 +14,7 @@ define(["lodash"], function(_) {
 
         $scope.syncNow = function() {
             $scope.isSyncRunning = true;
-            dataService.get(ORG_UNIT, DATA_SETS).then(saveToDb).then(onSuccess);
+            dataService.get(ORG_UNIT).then(saveToDb).then(onSuccess);
         };
     };
 });
