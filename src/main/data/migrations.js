@@ -14,6 +14,7 @@ define([], function() {
     };
 
     var add_object_stores = function(db, tx) {
+
         const syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "systemSettings"];
         create_data_store(syncable_types, db);
     };
@@ -31,17 +32,27 @@ define([], function() {
         create_data_store(syncable_types, db);
     };
 
-    var add_users_store = function(db, tx) {
-        create_store_with_key("users", "username", db);
+    var add_user_store_for_dhis_users = function(db, tx) {
+        create_store_with_key("users", "userCredentials.username", db);
     };
 
-    var add_admin_user = function(db, tx) {
-        var userStore = tx.objectStore("users");
+    var add_local_user_credentials_store = function(db, tx) {
+        create_store_with_key("localUserCredentials", "username", db);
+    };
+
+    var add_admin_user_to_local_cred_store = function(db, tx) {
+        var userStore = tx.objectStore("localUserCredentials");
         userStore.add({
             'username': 'admin',
             'password': 'f6b30a5547c4062f915aafd3e4e6453a'
         });
     };
 
-    return [add_object_stores, change_log_stores, add_organisation_units_and_level_store, create_datavalues_store, add_users_store, add_admin_user];
+    return [add_object_stores,
+        change_log_stores,
+        add_organisation_units_and_level_store,
+        create_datavalues_store,
+        add_user_store_for_dhis_users,
+        add_local_user_credentials_store,
+        add_admin_user_to_local_cred_store];
 });
