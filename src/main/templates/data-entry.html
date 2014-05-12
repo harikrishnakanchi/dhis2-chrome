@@ -45,7 +45,9 @@
 						<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
 							<td> <span> {{ dataElement.formName }} </span> </td>
 							<td ng-repeat="option in section.categoryOptionComboIds">
-								<input type="text" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option)['value']" ng-focus="restoreExpression(dataElement.id, option)" ng-blur="evaluateExpression(dataElement.id, option)" /><br/>
+								<ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
+									<input type="text" name="datavalue" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option)['value']" ng-focus="restoreExpression(dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(dataElement.id, option)" /><br/>
+								</ng-form>
 							</td>
 							<td>{{sum(dataValues[dataElement.id])}}</td>
 						</tr>
