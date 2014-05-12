@@ -13,7 +13,7 @@
 							<input type="text" class="form-control" name="userName" id="userName" ng-model="projectUser.username" not-in="existingUsers" ng-pattern="userNameMatchExpr" placeholder="Username should begin with {{userNamePrefix}}" required/>
 							<div ng-show="createForm.userName.$dirty &amp;&amp; createForm.userName.$invalid">
 								<span ng-show="createForm.userName.$error.required" class="errortxt">{{resourceBundle.usernameValidation}}</span>
-							<span ng-show="createForm.userName.$error.pattern" class="errortxt">{{resourceBundle.usernamePrefixValidation}} {{userNamePrefix}}</span>
+							<span ng-show="createForm.userName.$error.pattern" class="errortxt">{{resourceBundle.usernamePrefixValidation}} {{userNamePrefix}}.</span>
 								<span ng-show="createForm.userName.$error.isWithin" class="errortxt">{{resourceBundle.usernameExists}}</span>
 							</div>
 						</div>
