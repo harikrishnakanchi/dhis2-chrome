@@ -29,7 +29,7 @@
     "errorModule": "Error creating Modules.",
     "selectDatasets": "Select atleast one dataset to continue.",
     "errorUser": "Error creating User.",
-    "savedUser": "User saved successfully.",
+    "savedUser": "User created successfully.",
     "usernameValidation": "Username is required.",
     "usernamePrefixValidation": "Should begin with ",
     "roleValidation": "Role is required.",
