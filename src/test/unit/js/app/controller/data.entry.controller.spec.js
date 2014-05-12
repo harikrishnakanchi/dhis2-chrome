@@ -498,5 +498,24 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.isCurrentWeekSelected(selectedWeek)).toEqual(false);
             scope.$apply();
         });
+
+        it("should expand the first dataset panel", function() {
+            var id = "first_panel_id";
+            var isDatasetOpen = scope.getDatasetState(id, true);
+            expect(isDatasetOpen[id]).toBe(true);
+        });
+
+        it("should not expand the first dataset panel after the first time", function() {
+            var id = "first_panel_id";
+            scope.isDatasetOpen[id] = false;
+            var isDatasetOpen = scope.getDatasetState(id, true);
+            expect(isDatasetOpen[id]).toBe(false);
+        });
+
+        it("should not expand the other panels", function() {
+            var id = "some_other_panel_id";
+            var isDatasetOpen = scope.getDatasetState(id, false);
+            expect(isDatasetOpen[id]).toBe(undefined);
+        });
     });
 });

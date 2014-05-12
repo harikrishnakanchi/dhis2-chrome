@@ -56,9 +56,17 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             }
         });
 
+        $scope.getDatasetState = function(id, isFirst) {
+            if (isFirst && !(id in $scope.isDatasetOpen)) {
+                $scope.isDatasetOpen[id] = true;
+            }
+            return $scope.isDatasetOpen;
+        };
+
         $scope.resetForm = function() {
             $scope.dataValues = {};
             $scope.isopen = {};
+            $scope.isDatasetOpen = {};
             $scope.saveSuccess = false;
             $scope.saveError = false;
             $scope.submitSuccess = false;

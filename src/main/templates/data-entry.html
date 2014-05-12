@@ -17,8 +17,11 @@
 </div>
 <form name="dataentryForm" id="dataentry">
 	<section class="panel tab-panel" ng-show="week &amp;&amp; currentModule">
-		<tabset>
-			<tab heading="{{getDataSetName(dataSetId)}}" ng-repeat="(dataSetId, sections) in currentGroupedSections">
+		<accordion close-others="false">
+			<accordion-group ng-repeat="(dataSetId, sections) in currentGroupedSections" is-open="getDatasetState(dataSetId, $first)[dataSetId]">
+					<accordion-heading>
+						{{getDataSetName(dataSetId)}} <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSetId], 'glyphicon-chevron-right': !isDatasetOpen[dataSetId]}"></i>
+					</accordion-heading>
 				<div class="exp-coll-group">
 					<accordion close-others="false">
 						<accordion-group ng-repeat="section in sections" is-open="isopen[section.id]" ng-form="sectionForm">
@@ -55,8 +58,8 @@
 				</accordion-group>
 			</accordion>
 		</div>
-	</tab>
-</tabset>
+	</accordion-group>
+</accordion>
 <div>
 	<button type="submit" class="btn btn-primary" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid"> Save </button>
 	<button type="submit" class="btn btn-primary" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid"> Submit </button>
