@@ -2,13 +2,19 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
     return function($scope, $q, db, dataService, $anchorScroll, $location, $modal) {
         var dataSets, systemSettings;
 
+        $scope.validDataValuePattern = /^[0-9+]*$/;
+
         $scope.evaluateExpression = function(elementId, option) {
+            if (!$scope.validDataValuePattern.test($scope.dataValues[elementId][option].value))
+                return;
             var cellValue = $scope.dataValues[elementId][option].value;
             $scope.dataValues[elementId][option].formula = cellValue;
             $scope.dataValues[elementId][option].value = calculateSum(cellValue);
         };
 
         $scope.restoreExpression = function(elementId, option) {
+            if (!$scope.validDataValuePattern.test($scope.dataValues[elementId][option].value))
+                return;
             $scope.dataValues[elementId][option].value = $scope.dataValues[elementId][option].formula;
         };
 
@@ -53,8 +59,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         $scope.resetForm = function() {
             $scope.dataValues = {};
             $scope.isopen = {};
-            $scope.success = false;
-            $scope.error = false;
+            $scope.saveSuccess = false;
+            $scope.saveError = false;
+            $scope.submitSuccess = false;
+            $scope.submitError = false;
         };
 
         $scope.sum = function(iterable) {
@@ -80,11 +88,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var period = getPeriod();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id);
             var successPromise = function() {
-                $scope.success = true;
+                $scope.saveSuccess = asDraft ? true : false;
+                $scope.submitSuccess = !asDraft ? true : false;
             };
 
             var errorPromise = function() {
-                $scope.error = true;
+                $scope.saveError = asDraft ? true : false;
+                $scope.submitError = !asDraft ? true : false;
             };
 
             var pushToDhis = function() {

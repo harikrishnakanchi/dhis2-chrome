@@ -1,7 +1,9 @@
 {
     "invalidExpression": "Must be a valid expression containing digits and '+'",
-    "dataSaveSuccess": "Data Saved Successfully",
-    "dataSaveFailure": "Error saving data please try again later",
+    "dataSaveSuccess": "Data saved successfully",
+    "dataSaveFailure": "Error saving data, Please try again later",
+    "dataSubmitSuccess": "Data submitted successfully",
+    "dataSubmitFailure": "Error submitting data. Please try again later",
     "chooseWeek": "Please choose a week to enter data.",
     "syncRunning": "Data sync initiated. Please wait.",
     "syncComplete": "Data sync completed successfully.",

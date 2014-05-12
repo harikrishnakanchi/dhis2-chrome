@@ -162,7 +162,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.dataValues = {
                 "blah": {
                     "some": {
-                        "value": "1 + 9"
+                        "value": "1+9"
                     }
                 }
             };
@@ -216,8 +216,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             expect(dataValuesStore.upsert).toHaveBeenCalled();
             expect(dataService.save).toHaveBeenCalled();
-            expect(scope.success).toBe(true);
-            expect(scope.error).toBe(false);
+            expect(scope.submitSuccess).toBe(true);
+            expect(scope.saveSuccess).toBe(false);
+            expect(scope.submitError).toBe(false);
+            expect(scope.saveError).toBe(false);
         });
 
         it("should save data values as draft to indexeddb", function() {
@@ -246,11 +248,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             expect(dataValuesStore.upsert).toHaveBeenCalled();
             expect(dataService.save).not.toHaveBeenCalled();
-            expect(scope.success).toBe(true);
-            expect(scope.error).toBe(false);
+            expect(scope.submitSuccess).toBe(false);
+            expect(scope.saveSuccess).toBe(true);
+            expect(scope.submitError).toBe(false);
+            expect(scope.saveError).toBe(false);
         });
 
-        it("should let the user know of failures when saving the data to dhis", function() {
+        it("should let the user know of failures when submitting the data to dhis", function() {
             scope = rootScope.$new();
             scope.dataentryForm = dataEntryFormMock;
             var dataValues = {
@@ -277,8 +281,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             expect(dataService.save).toHaveBeenCalled();
             expect(dataValuesStore.upsert).toHaveBeenCalled();
-            expect(scope.error).toBe(true);
-            expect(scope.success).toBe(false);
+            expect(scope.submitSuccess).toBe(false);
+            expect(scope.saveSuccess).toBe(false);
+            expect(scope.submitError).toBe(true);
+            expect(scope.saveError).toBe(false);
         });
 
         it("should let the user know of failures when saving the data to indexedDB ", function() {
@@ -303,13 +309,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataService, "save");
             spyOn(dataValuesStore, "upsert").and.returnValue(saveErrorPromise);
 
-            scope.submit();
+            scope.saveAsDraft();
             scope.$apply();
 
             expect(dataService.save).not.toHaveBeenCalled();
             expect(dataValuesStore.upsert).toHaveBeenCalled();
-            expect(scope.error).toBe(true);
-            expect(scope.success).toBe(false);
+            expect(scope.submitSuccess).toBe(false);
+            expect(scope.saveSuccess).toBe(false);
+            expect(scope.submitError).toBe(false);
+            expect(scope.saveError).toBe(true);
         });
 
         it("should fetch max length to calculate col span for category options", function() {

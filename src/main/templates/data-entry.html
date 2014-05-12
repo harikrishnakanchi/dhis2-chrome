@@ -1,7 +1,9 @@
 <div class="page-content">
 <div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
-<div ng-show="success" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
-<div ng-show="error" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
+<div ng-show="saveSuccess" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
+<div ng-show="submitSuccess" class="alert alert-success">{{resourceBundle.dataSubmitSuccess}}</div>
+<div ng-show="saveError" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
+<div ng-show="submitError" class="alert alert-danger">{{resourceBundle.dataSubmitFailure}}</div>
 	<div class="module-select"> 
 		<weekselector year="year" month="month" week="week" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
 		<ul class="form">
@@ -43,7 +45,7 @@
 						<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
 							<td> <span> {{ dataElement.formName }} </span> </td>
 							<td ng-repeat="option in section.categoryOptionComboIds">
-								<input type="text" ng-pattern="/^[0-9+]*$/" ng-model="safeGet(dataValues, dataElement.id, option)['value']" ng-focus="restoreExpression(dataElement.id, option)" ng-blur="evaluateExpression(dataElement.id, option)" /><br/>
+								<input type="text" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option)['value']" ng-focus="restoreExpression(dataElement.id, option)" ng-blur="evaluateExpression(dataElement.id, option)" /><br/>
 							</td>
 							<td>{{sum(dataValues[dataElement.id])}}</td>
 						</tr>
