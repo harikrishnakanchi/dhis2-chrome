@@ -204,6 +204,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
+            spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
             scope.$apply();
@@ -220,6 +221,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(false);
             expect(scope.saveError).toBe(false);
+            expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
         });
 
         it("should save data values as draft to indexeddb", function() {
@@ -236,6 +238,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
+            spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
             scope.$apply();
@@ -252,6 +255,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.saveSuccess).toBe(true);
             expect(scope.submitError).toBe(false);
             expect(scope.saveError).toBe(false);
+            expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
         });
 
         it("should let the user know of failures when submitting the data to dhis", function() {
@@ -270,6 +274,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
+            spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
             scope.$apply();
@@ -303,6 +308,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
+
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
             scope.$apply();

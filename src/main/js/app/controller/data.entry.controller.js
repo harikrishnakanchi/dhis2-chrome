@@ -90,6 +90,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var successPromise = function() {
                 $scope.saveSuccess = asDraft ? true : false;
                 $scope.submitSuccess = !asDraft ? true : false;
+                $scope.dataentryForm.$setPristine();
             };
 
             var errorPromise = function() {
