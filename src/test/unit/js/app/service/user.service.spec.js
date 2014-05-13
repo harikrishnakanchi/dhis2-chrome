@@ -1,6 +1,6 @@
 define(["userService", "angularMocks", "properties", "utils"], function(UserService, mocks, properties, utils) {
     describe("user service", function() {
-        var http, httpBackend, userService, db, mockOrgStore, q, rootScope;
+        var http, httpBackend, userService, db, fakeUserStore, fakeUserCredentialsStore, q, rootScope;
 
         beforeEach(mocks.inject(function($httpBackend, $http, $q, $rootScope) {
             http = $http;
@@ -8,31 +8,62 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
             q = $q;
             rootScope = $rootScope;
 
-            mockOrgStore = {
+            fakeUserStore = {
                 upsert: function() {},
                 getAll: function() {}
             };
+
+            fakeUserCredentialsStore = {
+                upsert: function() {},
+            };
+
             db = {
                 objectStore: function() {}
             };
 
-            spyOn(db, "objectStore").and.returnValue(mockOrgStore);
+            spyOn(db, "objectStore").and.callFake(function(storeName) {
+                if (storeName === "users")
+                    return fakeUserStore;
+
+                if (storeName === "localUserCredentials")
+                    return fakeUserCredentialsStore;
+            });
 
             userService = new UserService(http, db);
         }));
 
         it("should create user", function() {
             var user = {
-                "username": "someone@example.com",
-                "password": "Handique"
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "someone@example.com",
+                    "password": "blah"
+                }
             };
-            spyOn(mockOrgStore, "upsert").and.returnValue(utils.getPromise(q, "someData"));
+
+            var expectedUser = {
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "someone@example.com",
+                }
+            }
+
+            var expectedUserCredentials = {
+                "username": "someone@example.com",
+                "password": "6f1ed002ab5595859014ebf0951522d9"
+            }
+
+            spyOn(fakeUserStore, "upsert").and.returnValue(utils.getPromise(q, "someData"));
+            spyOn(fakeUserCredentialsStore, "upsert").and.returnValue(utils.getPromise(q, "someData"));
 
             userService.create(user).then(function(data) {
                 expect(data).toEqual("someData");
+                expect(fakeUserStore.upsert).toHaveBeenCalledWith(expectedUser);
+                expect(fakeUserCredentialsStore.upsert).toHaveBeenCalledWith(expectedUserCredentials);
             });
 
-            expect(mockOrgStore.upsert).toHaveBeenCalledWith(user);
             httpBackend.expectPOST(properties.dhis.url + "/api/users", user).respond(200, "ok");
             httpBackend.flush();
         });
@@ -60,7 +91,7 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
                 }
             }]
 
-            spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, users));
+            spyOn(fakeUserStore, "getAll").and.returnValue(utils.getPromise(q, users));
 
             userService.getAllProjectUsers("Proj 1").then(function(data) {
                 expect(data.length).toEqual(2);
@@ -80,7 +111,7 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
                     "username": "someone@example.com"
                 }
             }];
-            spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, users));
+            spyOn(fakeUserStore, "getAll").and.returnValue(utils.getPromise(q, users));
 
             userService.getAllUsernames().then(function(usernames) {
                 expect(usernames).toEqual(["proj_2_user1", "someone@example.com"]);

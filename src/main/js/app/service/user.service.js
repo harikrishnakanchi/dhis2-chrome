@@ -1,9 +1,22 @@
-define(["properties", "lodash"], function(properties, _) {
+define(["properties", "lodash", "md5"], function(properties, _, md5) {
     return function($http, db) {
         var create = function(user) {
             var saveToDb = function() {
+                var dhisUser = _.cloneDeep(user);
+                dhisUser.userCredentials = _.omit(dhisUser.userCredentials, "password");
+
                 var store = db.objectStore("users");
-                return store.upsert(user);
+                return store.upsert(dhisUser);
+            };
+
+            var saveCredentialsToLocalStore = function(data) {
+                var userCredentials = {
+                    username: user.userCredentials.username,
+                    password: md5(user.userCredentials.password),
+                };
+
+                var store = db.objectStore("localUserCredentials");
+                return store.upsert(userCredentials);
             };
 
             var saveToDhis = function(data) {
@@ -12,7 +25,7 @@ define(["properties", "lodash"], function(properties, _) {
                 });
             };
 
-            return saveToDb().then(saveToDhis);
+            return saveToDb().then(saveCredentialsToLocalStore).then(saveToDhis);
         };
 
         var getAllUsernames = function() {
