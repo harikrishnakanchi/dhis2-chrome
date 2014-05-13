@@ -1,17 +1,18 @@
 define(["dashboardController", "angularMocks", "utils"], function(DashboardController, mocks, utils) {
     describe("dashboard controller", function() {
-        var q, db, dataService, dashboardController;
+        var q, db, dataService, dashboardController, rootScope;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             q = $q;
             scope = $rootScope.$new();
+            rootScope = $rootScope;
 
             dataService = {
                 "get": function(orgUnit, dataset) {},
                 "saveToDb": function() {}
             };
 
-            dashboardController = new DashboardController(scope, q, dataService);
+            dashboardController = new DashboardController(scope, q, dataService, rootScope);
         }));
 
 
@@ -42,6 +43,104 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
             expect(scope.isSyncDone).toEqual(true);
             expect(dataService.get).toHaveBeenCalled();
             expect(dataService.saveToDb).toHaveBeenCalled();
+        });
+
+
+
+        it("should show appropriate links for superuser", function() {
+
+            rootScope.currentUser = {
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "dataentryuser",
+                    "userAuthorityGroups": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Superuser'
+                    }, {
+                        "id": "hxNB8lleCsl",
+                        "name": 'blah'
+                    }]
+                }
+            };
+
+            rootScope.$apply();
+
+            expect(scope.canEnterData()).toEqual(false);
+            expect(scope.canViewOrManageProjects()).toEqual(true);
+            expect(scope.canTriggerDataSync()).toEqual(true);
+        });
+
+        it("should show appropriate links for Data entry user", function() {
+
+            rootScope.currentUser = {
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "dataentryuser",
+                    "userAuthorityGroups": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Data entry user'
+                    }, {
+                        "id": "hxNB8lleCsl",
+                        "name": 'blah'
+                    }]
+                }
+            };
+
+            rootScope.$apply();
+
+            expect(scope.canEnterData()).toEqual(true);
+            expect(scope.canViewOrManageProjects()).toEqual(false);
+            expect(scope.canTriggerDataSync()).toEqual(true);
+        });
+
+        it("should show appropriate links for level 1 Approver", function() {
+
+            rootScope.currentUser = {
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "dataentryuser",
+                    "userAuthorityGroups": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Approver - Level 1'
+                    }, {
+                        "id": "hxNB8lleCsl",
+                        "name": 'blah'
+                    }]
+                }
+            };
+
+            rootScope.$apply();
+
+            expect(scope.canEnterData()).toEqual(false);
+            expect(scope.canViewOrManageProjects()).toEqual(false);
+            expect(scope.canTriggerDataSync()).toEqual(true);
+        });
+
+        it("should show appropriate links for level 2 Approver", function() {
+
+            rootScope.currentUser = {
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "dataentryuser",
+                    "userAuthorityGroups": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Approver - Level 2'
+                    }, {
+                        "id": "hxNB8lleCsl",
+                        "name": 'blah'
+                    }]
+                }
+            };
+
+            rootScope.$apply();
+
+            expect(scope.canEnterData()).toEqual(false);
+            expect(scope.canViewOrManageProjects()).toEqual(false);
+            expect(scope.canTriggerDataSync()).toEqual(true);
         });
     });
 });

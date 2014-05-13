@@ -51,7 +51,7 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
             scope.login();
             scope.$apply();
 
-            expect(rootScope.username).toEqual('admin');
+            expect(rootScope.currentUser.userCredentials.username).toEqual('admin');
             expect(rootScope.isLoggedIn).toEqual(true);
             expect(location.path).toHaveBeenCalledWith("/dashboard");
             expect(scope.invalidCredentials).toEqual(false);

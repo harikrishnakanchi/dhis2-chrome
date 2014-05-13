@@ -27,7 +27,7 @@ define(["md5"], function(md5) {
                 $scope.invalidCredentials = false;
                 $scope.promptForPassword = false;
                 $rootScope.isLoggedIn = true;
-                $rootScope.username = $scope.username;
+                $rootScope.currentUser = user;
                 $location.path("/dashboard");
             }
         };

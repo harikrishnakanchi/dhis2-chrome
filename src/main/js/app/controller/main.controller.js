@@ -9,6 +9,7 @@ define(["ng-i18n"], function() {
 
         $scope.logout = function() {
             $rootScope.isLoggedIn = false;
+            $rootScope.currentUser = undefined;
         };
     };
 });
