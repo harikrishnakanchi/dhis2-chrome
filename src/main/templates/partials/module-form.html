@@ -58,7 +58,7 @@
 							<div name="left-side" class="content left">
 								<ul>
 									<li ng-repeat="dataset in module.datasets">
-										<h5 ng-click="selectDataSet(module, dataset)">{{dataset.name}}</h5>
+										<h5 ng-click="selectDataSet(module, dataset)" ng-class="{sel: dataset === module.selectedDataset}">{{dataset.name}}</h5>
 									</li>
 								</ul>
 							</div>

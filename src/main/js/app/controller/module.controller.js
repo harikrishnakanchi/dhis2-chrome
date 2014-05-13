@@ -40,9 +40,11 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
                     var associatedDatasets = orgUnitService.getAssociatedDatasets($scope.orgUnit, $scope.allDatasets);
                     var systemSettingsPromise = orgUnitService.getSystemSettings($scope.orgUnit.parent.id);
                     systemSettingsPromise.then(function(systemSettings) {
+                        var datasets = datasetTransformer.getFilteredDatasets(associatedDatasets, systemSettings, $scope.orgUnit.id);
                         $scope.modules.push({
                             'name': $scope.orgUnit.name,
-                            'datasets': datasetTransformer.getFilteredDatasets(associatedDatasets, systemSettings, $scope.orgUnit.id)
+                            'datasets': datasets,
+                            'selectedDataset': datasets[0]
                         });
                     });
                 };

@@ -207,7 +207,27 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                             name: 'DE2 - ITFC'
                         }]
                     }]
-                }]
+                }],
+                selectedDataset: {
+                    name: 'OPD',
+                    id: 'DS_OPD',
+                    organisationUnits: [{
+                        id: 'Module1'
+                    }],
+                    sections: [{
+                        id: 'Sec1',
+                        dataSet: {
+                            id: 'Module1'
+                        },
+                        dataElements: [{
+                            id: 'DE1',
+                            name: 'DE1 - ITFC'
+                        }, {
+                            id: 'DE2',
+                            name: 'DE2 - ITFC'
+                        }]
+                    }]
+                }
             };
 
             scope.orgUnit = {
