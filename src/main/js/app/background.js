@@ -13,6 +13,18 @@ require(["app/background.config"], function(config) {
                 });
             };
 
+            var onMigrationComplete = function(request, sender, sendResponse) {
+                var onSyncSuccess = function(data) {
+                    if (navigator.onLine)
+                        scheduleSync();
+                };
+
+                if (request === "migrationComplete") {
+                    console.log("dB migration complete. Starting sync");
+                    metadataSyncService.sync().then(onSyncSuccess);
+                }
+            };
+
             window.addEventListener('online', function(e) {
                 console.log("starting sync");
                 metadataSyncService.sync();
@@ -24,6 +36,8 @@ require(["app/background.config"], function(config) {
                 chrome.alarms.clear('metadataSyncAlarm');
             });
 
+            chrome.runtime.onMessage.addListener(onMigrationComplete);
+
             chrome.app.runtime.onLaunched.addListener(function(launchData) {
                 chrome.app.window.create('../../index.html', {
                     id: 'DHIS2',
@@ -33,8 +47,6 @@ require(["app/background.config"], function(config) {
 
             var init = function() {
                 backgroundServicesRegistry.register();
-                if (navigator.onLine)
-                    scheduleSync();
             };
 
             init();

@@ -4,7 +4,6 @@ define(["Q", "lodash"], function(q, _) {
             console.log("running migration " + i);
             migrations[i].call(this, db, tx);
         }
-        console.log("upgraded");
     };
 
     return {

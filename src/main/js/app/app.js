@@ -38,6 +38,8 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
                     $indexedDBProvider.connection('msf')
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
+                        }).dbReady(function(data) {
+                            chrome.runtime.sendMessage("migrationComplete");
                         });
 
                     $httpProvider.interceptors.push('httpInterceptor');
