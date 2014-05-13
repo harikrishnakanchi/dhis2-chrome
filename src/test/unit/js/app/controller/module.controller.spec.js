@@ -381,5 +381,93 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             scope.selectDataSet(module, dataset);
             expect(module.selectedDataset).toEqual(dataset);
         });
+
+
+
+        it("should return true if no section is selected from each dataset", function() {
+            var module = {
+                "selectedSections": {
+                    "someId": true
+                },
+                "datasets": [{
+                    "sections": [{
+                        "name": "section1",
+                        "id": "section_1"
+                    }, {
+                        "name": "section2",
+                        "id": "section_2"
+                    }]
+                }]
+            };
+
+            expect(scope.areNoSectionsSelected([module])).toEqual(true);
+        });
+
+        it("should return false if any one section is selected from each dataset", function() {
+            var module = {
+                "selectedSections": {
+                    "section_1": true,
+                    "section_3": true
+                },
+                "datasets": [{
+                    "sections": [{
+                        "name": "section1",
+                        "id": "section_1"
+                    }, {
+                        "name": "section2",
+                        "id": "section_2"
+                    }]
+                }, {
+                    "sections": [{
+                        "name": "section3",
+                        "id": "section_3"
+                    }]
+                }]
+            };
+
+            expect(scope.areNoSectionsSelected([module])).toEqual(false);
+        });
+
+        it("should return true if no section is selected for dataset", function() {
+            var dataset = {
+                "sections": [{
+                    "name": "section1",
+                    "id": "section_1"
+                }, {
+                    "name": "section2",
+                    "id": "section_2"
+                }]
+            };
+
+            var module = {
+                "selectedSections": {
+                    "someId": true
+                },
+            };
+
+            expect(scope.areNoSectionsSelectedForDataset(module, dataset)).toEqual(true);
+        });
+
+        it("should return false if any one section is selected for dataset", function() {
+            var dataset = {
+                "sections": [{
+                    "name": "section1",
+                    "id": "section_1"
+                }, {
+                    "name": "section2",
+                    "id": "section_2"
+                }]
+            };
+
+            var module = {
+                "selectedSections": {
+                    "section_1": true
+                },
+            };
+
+            expect(scope.areNoSectionsSelectedForDataset(module, dataset)).toEqual(false);
+        });
+
+
     });
 });

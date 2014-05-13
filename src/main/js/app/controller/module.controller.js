@@ -127,6 +127,22 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
             });
         };
 
+        $scope.areNoSectionsSelected = function(modules) {
+            return _.any(modules, function(module) {
+                return _.any(module.datasets, function(set) {
+                    return _.all(set.sections, function(section) {
+                        return !module.selectedSections[section.id];
+                    });
+                });
+            });
+        };
+
+        $scope.areNoSectionsSelectedForDataset = function(module, dataset) {
+            return _.all(dataset.sections, function(section) {
+                return !module.selectedSections[section.id];
+            });
+        };
+
         $scope.changeSectionSelection = function(module, section) {
             _.each(section.dataElements, function(dataElement) {
                 module.selectedDataElements[dataElement.id] = module.selectedSections[section.id];

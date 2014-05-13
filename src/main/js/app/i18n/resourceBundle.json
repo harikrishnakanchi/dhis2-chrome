@@ -28,6 +28,7 @@
     "savedModule": "Modules created successfully.",
     "errorModule": "Error creating Modules.",
     "selectDatasets": "Select atleast one dataset to continue.",
+    "selectDatasetSection": "Select atleast one dataset section to continue.",
     "errorUser": "Error creating User.",
     "savedUser": "User created successfully.",
     "usernameValidation": "Username is required.",
