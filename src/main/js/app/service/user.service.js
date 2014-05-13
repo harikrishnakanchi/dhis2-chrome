@@ -18,7 +18,8 @@ define(["properties", "lodash"], function(properties, _) {
         var getAllUsernames = function() {
             var store = db.objectStore("users");
             return store.getAll().then(function(users) {
-                return _.pluck(users, "username");
+                var userCredentials = _.pluck(users, "userCredentials");
+                return _.pluck(userCredentials, "username");
             });
         };
 
@@ -27,7 +28,7 @@ define(["properties", "lodash"], function(properties, _) {
 
             var filterProjectUsers = function(allUsers) {
                 return _.filter(allUsers, function(user) {
-                    return user.username.indexOf(project) === 0;
+                    return user.userCredentials.username.indexOf(project) === 0;
                 });
             };
 

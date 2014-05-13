@@ -63,7 +63,7 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
                     return role.name;
                 });
                 $scope.projectUsers.push({
-                    "username": user.username,
+                    "username": user.userCredentials.username,
                     "roles": roles.join(", ")
                 });
             });

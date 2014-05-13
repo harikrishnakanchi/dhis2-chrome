@@ -39,17 +39,25 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
 
         it("should get all project users", function() {
             var projUser1 = {
-                "username": "proj_1_user1",
+                "userCredentials": {
+                    "username": "proj_1_user1"
+                }
             };
 
             var projUser2 = {
-                "username": "proj_1_user2"
+                "userCredentials": {
+                    "username": "proj_1_user2"
+                }
             };
 
             var users = [projUser1, projUser2, {
-                "username": "proj_2_user1"
+                "userCredentials": {
+                    "username": "proj_2_user1"
+                }
             }, {
-                "username": "someone@example.com"
+                "userCredentials": {
+                    "username": "someone@example.com"
+                }
             }]
 
             spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, users));
@@ -64,9 +72,13 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
 
         it("should get all usernames", function() {
             var users = [{
-                "username": "proj_2_user1"
+                "userCredentials": {
+                    "username": "proj_2_user1"
+                }
             }, {
-                "username": "someone@example.com"
+                "userCredentials": {
+                    "username": "someone@example.com"
+                }
             }];
             spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, users));
 

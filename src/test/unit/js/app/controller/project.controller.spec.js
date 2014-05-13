@@ -244,8 +244,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             };
             scope.isEditMode = false;
             var users = [{
-                'username': 'foobar',
                 'userCredentials': {
+                    'username': 'foobar',
                     'userAuthorityGroups': [{
                         "name": 'Role1',
                         "id": 'Role1Id'
@@ -255,8 +255,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     }]
                 }
             }, {
-                'username': 'blah',
                 'userCredentials': {
+                    'username': 'blah',
                     'userAuthorityGroups': [{
                         "name": 'Role1',
                         "id": 'Role1Id'
