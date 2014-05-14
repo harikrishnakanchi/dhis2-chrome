@@ -5,9 +5,9 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
 
         beforeEach(function() {
 
-            datasets = testData["dataSets"];
-            sections = testData["sections"];
-            dataelements = testData["dataElements"];
+            datasets = testData.get("dataSets");
+            sections = testData.get("sections");
+            dataelements = testData.get("dataElements");
             data = [datasets, sections, dataelements];
             systemSettings = {
                 excludedDataElements: {

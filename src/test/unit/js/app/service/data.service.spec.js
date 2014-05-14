@@ -1,4 +1,4 @@
-define(["dataService", "angularMocks", "properties", "moment", "utils", "testData"], function(DataService, mocks, properties, moment, utils, td) {
+define(["dataService", "angularMocks", "properties", "moment", "utils", "testData"], function(DataService, mocks, properties, moment, utils, testData) {
     describe("dataService", function() {
         var httpBackend, http, db, dataSetStore, dataValuesStore;
 
@@ -23,7 +23,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
                 };
             };
             dataValuesStore = getMockStore({});
-            dataSetStore = getMockStore(td.dataSets);
+            dataSetStore = getMockStore(testData.get("dataSets"));
 
             spyOn(db, 'objectStore').and.callFake(function(storeName) {
                 var stores = {

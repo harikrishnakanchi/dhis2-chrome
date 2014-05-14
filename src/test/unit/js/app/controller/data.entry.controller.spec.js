@@ -56,7 +56,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     return dataValuesStore;
                 if (storeName === "organisationUnits")
                     return orgUnitStore;
-                return getMockStore(testData[storeName]);
+                return getMockStore(testData.get(storeName));
             });
 
             modules = [{

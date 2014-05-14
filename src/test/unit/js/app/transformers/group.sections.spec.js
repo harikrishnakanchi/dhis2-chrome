@@ -3,13 +3,13 @@ define(["groupSections", "testData"], function(groupSections, testData) {
         var data, groupedSections;
 
         beforeEach(function() {
-            data = [testData["dataSets"],
-                testData["sections"],
-                testData['dataElements'],
-                testData['categoryCombos'],
-                testData["categories"],
-                testData['categoryOptionCombos'],
-                testData['systemSettings']
+            data = [testData.get("dataSets"),
+                testData.get("sections"),
+                testData.get('dataElements'),
+                testData.get('categoryCombos'),
+                testData.get("categories"),
+                testData.get('categoryOptionCombos'),
+                testData.get('systemSettings')
             ];
             groupedSections = groupSections.enrichGroupedSections(data);
         });
@@ -57,12 +57,12 @@ define(["groupSections", "testData"], function(groupSections, testData) {
                 ["LessThan5", "GreaterThan5", "LessThan5", "GreaterThan5", ]
             ]);
 
-            expect(section1.categoryOptionComboIds).toEqual([1, 2, 3, 4]);
+            expect(section1.categoryOptionComboIds).toEqual(["1", "2", "3", "4"]);
             var section2 = groupedSections.Vacc[0];
             expect(section2.headers).toEqual([
                 ["LessThan5", "GreaterThan5"]
             ]);
-            expect(section2.categoryOptionComboIds).toEqual([6, 5]);
+            expect(section2.categoryOptionComboIds).toEqual(["6", "5"]);
         });
 
     });

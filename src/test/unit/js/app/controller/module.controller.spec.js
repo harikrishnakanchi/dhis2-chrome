@@ -63,9 +63,9 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                 };
             };
 
-            sectionsdata = testData["sections"];
-            datasetsdata = testData["dataSets"];
-            dataElementsdata = testData["dataElements"];
+            sectionsdata = testData.get("sections");
+            datasetsdata = testData.get("dataSets");
+            dataElementsdata = testData.get("dataElements");
 
             sections = getMockStore(sectionsdata);
             datasets = getMockStore(datasetsdata);
@@ -84,7 +84,7 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                     return sections;
                 if (storeName === "dataElements")
                     return dataElements;
-                return getMockStore(testData[storeName]);
+                return getMockStore(testData.get(storeName));
             });
             moduleController = new ModuleController(scope, orgUnitService, db, location, q);
         }));
