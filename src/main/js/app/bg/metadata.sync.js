@@ -71,6 +71,29 @@ define(["idb", "httpWrapper", "Q", "lodash", "properties"], function(idb, httpWr
             });
         };
 
+        var getTranslations = function() {
+            var url = properties.dhis.url + "/api/translations";
+            console.debug("Fetching " + url);
+            return httpWrapper.get(url);
+        };
+
+        var upsertTranslations = function(data) {
+            console.debug("Processing translations ", data);
+            var type = "translations";
+            var translations = data.translations;
+            var putData = function(transaction) {
+                console.debug("Storing ", type, translations.length);
+                _.each(translations, function(translation) {
+                    var putRequest = idb.put(type, translation, transaction);
+                    return putRequest.then(function() {
+                        return translation;
+                    });
+                });
+            };
+
+            return idb.usingTransaction(type, putData);
+        };
+
         return openDb()
             .then(getLastUpdatedTime)
             .then(getMetadata)
@@ -78,6 +101,8 @@ define(["idb", "httpWrapper", "Q", "lodash", "properties"], function(idb, httpWr
             .then(updateChangeLog)
             .then(getSystemSettings)
             .then(upsertSystemSettings)
+            .then(getTranslations)
+            .then(upsertTranslations)
             .then(function() {
                 console.log("Metadata sync complete");
             });
