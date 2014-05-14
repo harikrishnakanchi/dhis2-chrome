@@ -1,7 +1,7 @@
 /*global Date:true*/
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment) {
     describe("dataEntryController ", function() {
-        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, modules, dataEntryFormMock;
+        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock, orgUnits;
 
         beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location) {
             q = $q;
@@ -59,27 +59,157 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 return getMockStore(testData.get(storeName));
             });
 
-            modules = [{
-                'name': 'somename',
-                'displayName': 'somename',
-                'id': 'id1'
+            orgUnits = [{
+                'name': 'proj1',
+                'id': 'proj_1',
+                'parent': {
+                    id: "country_1"
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Project"
+                }]
+            }, {
+                'name': 'proj2',
+                'id': 'proj_2',
+                'parent': {
+                    id: "country_1"
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Project"
+                }]
+            }, {
+                'name': 'mod1',
+                'id': 'mod1',
+                'parent': {
+                    id: "proj_1"
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }]
+            }, {
+                'name': 'mod2',
+                'id': 'mod2',
+                'parent': {
+                    id: "proj_1"
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }]
+            }, {
+                'name': 'mod3',
+                'id': 'mod3',
+                'parent': {
+                    id: "proj_2"
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }]
             }];
 
-            spyOn(orgUnitStore, 'getAll').and.returnValue(utils.getPromise(q, modules));
+            rootScope.currentUser = {
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "dataentryuser",
+                    "userAuthorityGroups": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Superuser'
+                    }, {
+                        "id": "hxNB8lleCsl",
+                        "name": 'blah'
+                    }]
+                },
+                "organisationUnits": [{
+                    id: "proj_1",
+                    "name": "MISSIONS EXPLOS"
+                }, {
+                    id: "test1",
+                    "name": "MISSIONS EXPLOS123"
+                }, {
+                    id: "test2",
+                    "name": "MISSIONS EXPLOS345"
+                }]
+            };
+
+            spyOn(orgUnitStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnits));
             spyOn(location, "hash");
-            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal);
+            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
         }));
 
         it("should initialize modules", function() {
-            spyOn(orgUnitMapper, 'filterModules').and.returnValue(modules);
+            rootScope.currentUser = {
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "dataentryuser",
+                    "userAuthorityGroups": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Superuser'
+                    }, {
+                        "id": "hxNB8lleCsl",
+                        "name": 'blah'
+                    }]
+                },
+                "organisationUnits": [{
+                    id: "proj_1",
+                    "name": "MISSIONS EXPLOS"
+                }, {
+                    id: "test1",
+                    "name": "MISSIONS EXPLOS123"
+                }, {
+                    id: "test2",
+                    "name": "MISSIONS EXPLOS345"
+                }]
+            };
+
+            var expectedModules = [{
+                'name': 'mod1',
+                'displayName': 'mod1',
+                'id': 'mod1',
+                'parent': {
+                    id: "proj_1"
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }]
+            }, {
+                'name': 'mod2',
+                'displayName': 'mod2',
+                'id': 'mod2',
+                'parent': {
+                    id: "proj_1"
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }]
+            }];
 
             scope.$apply();
 
-            expect(location.hash).toHaveBeenCalledWith('top');
-            expect(scope.modules).toEqual(modules);
-            expect(db.objectStore).toHaveBeenCalledWith("organisationUnits");
-            expect(orgUnitStore.getAll).toHaveBeenCalled();
-            expect(orgUnitMapper.filterModules).toHaveBeenCalledWith(modules);
+            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
+
+            expect(scope.modules).toEqual(expectedModules);
         });
 
         it("should return the sum of the list ", function() {
@@ -206,12 +336,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             };
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
-            scope.$apply();
-
             spyOn(dataService, "save").and.returnValue(saveSuccessPromise);
             spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
 
+            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.submit();
             scope.$apply();
 
@@ -240,7 +368,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             };
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
+            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
 
             spyOn(dataService, "save");
@@ -276,7 +404,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             };
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
+            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
             spyOn(dataService, "save").and.returnValue(saveErrorPromise);
             spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
@@ -310,7 +438,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             };
 
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location);
+            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
             spyOn(dataService, "save");
             spyOn(dataValuesStore, "upsert").and.returnValue(saveErrorPromise);
@@ -517,5 +645,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             var isDatasetOpen = scope.getDatasetState(id, false);
             expect(isDatasetOpen[id]).toBe(undefined);
         });
+
+
     });
 });

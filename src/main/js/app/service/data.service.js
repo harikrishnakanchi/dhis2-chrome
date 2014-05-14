@@ -1,7 +1,18 @@
 define(["lodash", "properties", "moment"], function(_, properties, moment) {
-    return function($http, db) {
+    return function($http, db, $q) {
         this.save = function(payload) {
-            return $http.post(properties.dhis.url + '/api/dataValueSets', payload);
+            var sucessResponse = function(response) {
+                if (response.data.status === "ERROR") {
+                    return $q.reject(response);
+                }
+                return response;
+            };
+
+            var errorResponse = function(response) {
+                return $q.reject(response);
+            };
+
+            return $http.post(properties.dhis.url + '/api/dataValueSets', payload).then(sucessResponse, errorResponse);
         };
 
         this.get = function(orgUnit) {

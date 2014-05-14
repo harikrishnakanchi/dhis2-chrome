@@ -48,15 +48,51 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
                 "blah": "blah"
             };
 
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", dataValues).respond(200, "ok");
+
             var dataService = new DataService(http, db);
             dataService.save(dataValues);
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", dataValues).respond(200, "ok");
             httpBackend.flush();
         });
 
+        it("should return a reject promise if dhis responds with an error", function() {
+            var dataValues = {
+                "blah": "blah"
+            };
+
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", dataValues).respond(200, {
+                "status": "ERROR",
+                "description": "The import process failed: Failed to flush BatchHandler",
+                "dataValueCount": {
+                    "imported": 0,
+                    "updated": 0,
+                    "ignored": 0,
+                    "deleted": 0
+                },
+                "importCount": {
+                    "imported": 0,
+                    "updated": 0,
+                    "ignored": 0,
+                    "deleted": 0
+                }
+            });
+
+            var dataService = new DataService(http, db, q);
+
+            var onSuccess = jasmine.createSpy();
+            var onError = jasmine.createSpy();
+
+            dataService.save(dataValues).then(onSuccess, onError);
+
+            httpBackend.flush();
+
+            expect(onSuccess).not.toHaveBeenCalled();
+            expect(onError).toHaveBeenCalled();
+        });
+
         it("should return error message if data values were not fetched", function() {
-            var dataService = new DataService(http, db);
+            var dataService = new DataService(http, db, q);
             var today = moment().format("YYYY-MM-DD");
             httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(500);
 
@@ -70,7 +106,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
         });
 
         it("should return data values fetched from DHIS", function() {
-            var dataService = new DataService(http, db);
+            var dataService = new DataService(http, db, q);
             var dataValueSet = {
                 dataValues: [{
                     dataElement: "DE_Oedema",
@@ -103,7 +139,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
                 value: 8,
                 followUp: false
             }];
-            var dataService = new DataService(http, db);
+            var dataService = new DataService(http, db, q);
 
             dataService.saveToDb(dataValueSet, orgUnit);
 

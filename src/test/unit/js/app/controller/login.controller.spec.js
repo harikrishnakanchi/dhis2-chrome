@@ -13,23 +13,11 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
             };
 
             fakeUserStore = {
-                "find": function() {
-                    return utils.getPromise(q, {
-                        "id": "xYRvx4y7Gm9",
-                        "userCredentials": {
-                            "username": "admin"
-                        }
-                    });
-                }
+                "find": function() {}
             };
 
             fakeUserCredentialsStore = {
-                "find": function() {
-                    return utils.getPromise(q, {
-                        "username": "admin",
-                        "password": "5f4dcc3b5aa765d61d8327deb882cf99"
-                    });
-                }
+                "find": function() {}
             };
 
             spyOn(location, 'path');
@@ -41,16 +29,30 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
                     return fakeUserCredentialsStore;
             });
 
+            spyOn(fakeUserStore, 'find').and.returnValue(utils.getPromise(q, {
+                "id": "xYRvx4y7Gm9",
+                "userCredentials": {
+                    "username": "admin"
+                }
+            }));
+
+            spyOn(fakeUserCredentialsStore, 'find').and.returnValue(utils.getPromise(q, {
+                "username": "admin",
+                "password": "5f4dcc3b5aa765d61d8327deb882cf99"
+            }));
+
             loginController = new LoginController(scope, $rootScope, location, db, q);
         }));
 
         it("should login user with valid credentials and redirect to dashboard", function() {
-            scope.username = "admin";
+            scope.username = "Admin";
             scope.password = "password";
 
             scope.login();
             scope.$apply();
 
+            expect(fakeUserStore.find).toHaveBeenCalledWith("admin");
+            expect(fakeUserCredentialsStore.find).toHaveBeenCalledWith("admin");
             expect(rootScope.currentUser.userCredentials.username).toEqual('admin');
             expect(rootScope.isLoggedIn).toEqual(true);
             expect(location.path).toHaveBeenCalledWith("/dashboard");

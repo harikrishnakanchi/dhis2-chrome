@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-    return function($scope, $q, db, dataService, $anchorScroll, $location, $modal) {
+    return function($scope, $q, db, dataService, $anchorScroll, $location, $modal, $rootScope) {
         var dataSets, systemSettings;
 
         $scope.validDataValuePattern = /^[0-9+]*$/;
@@ -194,9 +194,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             return data;
         };
 
-        var filterModules = function(modules) {
-            $scope.modules = orgUnitMapper.filterModules(modules);
-            return $scope.modules;
+        var setAvailableModules = function(orgUnits) {
+            var allModules = orgUnitMapper.filterModules(orgUnits);
+            $scope.modules = _.filter(allModules, function(module) {
+                return _.any($rootScope.currentUser.organisationUnits, {
+                    'id': module.parent.id
+                });
+            });
+            return orgUnits;
         };
 
         var init = function() {
@@ -212,7 +217,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var getOrgUnits = getAll('organisationUnits');
             var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, systemSettingsPromise]);
             getAllData.then(setData).then(transformDataSet);
-            getOrgUnits.then(filterModules);
+            getOrgUnits.then(setAvailableModules);
         };
 
         init();

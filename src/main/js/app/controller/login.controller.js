@@ -2,12 +2,12 @@ define(["md5"], function(md5) {
     return function($scope, $rootScope, $location, db, $q) {
         var getUser = function() {
             var userStore = db.objectStore("users");
-            return userStore.find($scope.username);
+            return userStore.find($scope.username.toLowerCase());
         };
 
         var getUserCredentials = function() {
             var userCredentialsStore = db.objectStore("localUserCredentials");
-            return userCredentialsStore.find($scope.username);
+            return userCredentialsStore.find($scope.username.toLowerCase());
         };
 
         var authenticateOrPromptUserForPassword = function(data) {
