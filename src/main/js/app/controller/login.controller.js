@@ -7,7 +7,9 @@ define(["md5"], function(md5) {
 
         var getUserCredentials = function() {
             var userCredentialsStore = db.objectStore("localUserCredentials");
-            return userCredentialsStore.find($scope.username.toLowerCase());
+            if ($scope.username.toLowerCase() === "admin")
+                return userCredentialsStore.find("admin");
+            return userCredentialsStore.find("project_user");
         };
 
         var authenticateOrPromptUserForPassword = function(data) {
@@ -15,17 +17,9 @@ define(["md5"], function(md5) {
             var userCredentials = data[1];
 
             $scope.invalidCredentials = true;
-            $scope.promptForPassword = false;
 
-            if (user && !userCredentials) {
+            if (user && md5($scope.password) === userCredentials.password) {
                 $scope.invalidCredentials = false;
-                $scope.promptForPassword = true;
-                return;
-            }
-
-            if (user && userCredentials && md5($scope.password) === userCredentials.password) {
-                $scope.invalidCredentials = false;
-                $scope.promptForPassword = false;
                 $rootScope.isLoggedIn = true;
                 $rootScope.currentUser = user;
                 $location.path("/dashboard");

@@ -9,23 +9,13 @@ define(["properties", "lodash", "md5"], function(properties, _, md5) {
                 return store.upsert(dhisUser);
             };
 
-            var saveCredentialsToLocalStore = function(data) {
-                var userCredentials = {
-                    username: user.userCredentials.username,
-                    password: md5(user.userCredentials.password),
-                };
-
-                var store = db.objectStore("localUserCredentials");
-                return store.upsert(userCredentials);
-            };
-
             var saveToDhis = function(data) {
                 return $http.post(properties.dhis.url + '/api/users', user).then(function() {
                     return data;
                 });
             };
 
-            return saveToDb().then(saveCredentialsToLocalStore).then(saveToDhis);
+            return saveToDb().then(saveToDhis);
         };
 
         var getAllUsernames = function() {

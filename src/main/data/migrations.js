@@ -48,11 +48,20 @@ define([], function() {
         });
     };
 
+    var add_project_user_to_local_cred_store = function(db, tx) {
+        var userStore = tx.objectStore("localUserCredentials");
+        userStore.add({
+            'username': 'project_user',
+            'password': 'aa63a86bbc63b2ae67ef0a069db7fb9'
+        });
+    };
+
     return [add_object_stores,
         change_log_stores,
         add_organisation_units_and_level_store,
         create_datavalues_store,
         add_user_store_for_dhis_users,
         add_local_user_credentials_store,
-        add_admin_user_to_local_cred_store];
+        add_admin_user_to_local_cred_store,
+        add_project_user_to_local_cred_store];
 });

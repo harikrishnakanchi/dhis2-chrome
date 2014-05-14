@@ -13,21 +13,11 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
                 getAll: function() {}
             };
 
-            fakeUserCredentialsStore = {
-                upsert: function() {},
-            };
-
             db = {
                 objectStore: function() {}
             };
 
-            spyOn(db, "objectStore").and.callFake(function(storeName) {
-                if (storeName === "users")
-                    return fakeUserStore;
-
-                if (storeName === "localUserCredentials")
-                    return fakeUserCredentialsStore;
-            });
+            spyOn(db, "objectStore").and.returnValue(fakeUserStore);
 
             userService = new UserService(http, db);
         }));
@@ -50,18 +40,11 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
                 }
             }
 
-            var expectedUserCredentials = {
-                "username": "someone@example.com",
-                "password": "6f1ed002ab5595859014ebf0951522d9"
-            }
-
             spyOn(fakeUserStore, "upsert").and.returnValue(utils.getPromise(q, "someData"));
-            spyOn(fakeUserCredentialsStore, "upsert").and.returnValue(utils.getPromise(q, "someData"));
 
             userService.create(user).then(function(data) {
                 expect(data).toEqual("someData");
                 expect(fakeUserStore.upsert).toHaveBeenCalledWith(expectedUser);
-                expect(fakeUserCredentialsStore.upsert).toHaveBeenCalledWith(expectedUserCredentials);
             });
 
             httpBackend.expectPOST(properties.dhis.url + "/api/users", user).respond(200, "ok");

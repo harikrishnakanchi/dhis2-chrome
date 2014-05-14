@@ -29,22 +29,32 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
                     return fakeUserCredentialsStore;
             });
 
-            spyOn(fakeUserStore, 'find').and.returnValue(utils.getPromise(q, {
-                "id": "xYRvx4y7Gm9",
-                "userCredentials": {
-                    "username": "admin"
-                }
-            }));
+            spyOn(fakeUserStore, 'find').and.callFake(function(username) {
+                return utils.getPromise(q, {
+                    "id": "xYRvx4y7Gm9",
+                    "userCredentials": {
+                        "username": username
+                    }
+                });
+            });
 
-            spyOn(fakeUserCredentialsStore, 'find').and.returnValue(utils.getPromise(q, {
-                "username": "admin",
-                "password": "5f4dcc3b5aa765d61d8327deb882cf99"
-            }));
+            spyOn(fakeUserCredentialsStore, 'find').and.callFake(function(username) {
+                if (username === "admin")
+                    return utils.getPromise(q, {
+                        "username": "admin",
+                        "password": "5f4dcc3b5aa765d61d8327deb882cf99"
+                    });
+                return utils.getPromise(q, {
+                    "username": "project_user",
+                    "password": "caa63a86bbc63b2ae67ef0a069db7fb9"
+                });
+
+            });
 
             loginController = new LoginController(scope, $rootScope, location, db, q);
         }));
 
-        it("should login user with valid credentials and redirect to dashboard", function() {
+        it("should login admin user with valid credentials and redirect to dashboard", function() {
             scope.username = "Admin";
             scope.password = "password";
 
@@ -59,7 +69,7 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
             expect(scope.invalidCredentials).toEqual(false);
         });
 
-        it("should not login user with invalid password", function() {
+        it("should not login admin user with invalid password", function() {
             scope.username = "admin";
             scope.password = "password1234";
 
@@ -70,6 +80,33 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
             expect(location.path).not.toHaveBeenCalled();
             expect(scope.invalidCredentials).toEqual(true);
         });
+
+
+        it("should login project user with valid credentials and redirect to dashboard", function() {
+            scope.username = "someProjectUser";
+            scope.password = "msfuser";
+
+            scope.login();
+            scope.$apply();
+
+            expect(rootScope.currentUser.userCredentials.username).toEqual('someprojectuser');
+            expect(rootScope.isLoggedIn).toEqual(true);
+            expect(location.path).toHaveBeenCalledWith("/dashboard");
+            expect(scope.invalidCredentials).toEqual(false);
+        });
+
+        it("should not login project user with invalid password", function() {
+            scope.username = "someProjectUser";
+            scope.password = "msfuser1234";
+
+            scope.login();
+            scope.$apply();
+
+            expect(rootScope.isLoggedIn).toEqual(undefined);
+            expect(location.path).not.toHaveBeenCalled();
+            expect(scope.invalidCredentials).toEqual(true);
+        });
+
 
         it("should not login user with invalid username", function() {
             fakeUserStore = {
@@ -87,37 +124,6 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
             expect(rootScope.isLoggedIn).toEqual(undefined);
             expect(location.path).not.toHaveBeenCalled();
             expect(scope.invalidCredentials).toEqual(true);
-        });
-
-        it("should prompt for setting password if username exists but the usercredentials does not", function() {
-            fakeUserStore = {
-                "find": function() {
-                    return utils.getPromise(q, {
-                        "id": "xYRvx4y7Gm9",
-                        "userCredentials": {
-                            "username": "newuser"
-                        }
-                    });
-                }
-            };
-
-            fakeUserCredentialsStore = {
-                "find": function() {
-                    return utils.getPromise(q, undefined);
-                }
-            };
-
-            scope.username = "newuser";
-            scope.password = "password123";
-
-            scope.login();
-            scope.$apply();
-
-            expect(rootScope.isLoggedIn).toEqual(undefined);
-            expect(location.path).not.toHaveBeenCalled();
-
-            expect(scope.invalidCredentials).toEqual(false);
-            expect(scope.promptForPassword).toEqual(true);
         });
 
     });
