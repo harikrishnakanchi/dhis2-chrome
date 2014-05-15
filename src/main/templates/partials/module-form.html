@@ -33,7 +33,6 @@
 										<span>{{resourceBundle.selectDatasets}}</span>
 									</div>
 									<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isEditMode" on-right-item-select="selectDataSet(module, item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
-									<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isEditMode" on-right-item-select="selectDataSet(module, item)" on-move-left="discardDataSet(module, items)"></multiselect>
 								</div>
 								<div class="details" ng-show="module.selectedDataset.sections.length > 0">
 								<span ng-show="areNoSectionsSelectedForDataset(module, module.selectedDataset)">{{resourceBundle.selectDatasetSection}}</span> 
