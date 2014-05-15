@@ -68,5 +68,17 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
             expect(scope.userNamePrefix).toEqual("some_project_");
             expect(scope.userNameMatchExpr.test(specifiedUserName)).toEqual(true);
         });
+
+        it("should reset form", function() {
+            scope.projectUser = {
+                "name": "blah",
+                "id": "blah",
+                "lastname": "blah",
+            }
+
+            scope.reset();
+
+            expect(scope.projectUser).toEqual({});
+        });
     });
 });

@@ -22,6 +22,10 @@ define([], function() {
             });
         };
 
+        $scope.reset = function() {
+            $scope.projectUser = {};
+        };
+
         $scope.save = function(projectUser) {
             var userPayload = {
                 "username": projectUser.username.toLowerCase(),
