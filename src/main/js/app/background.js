@@ -14,14 +14,13 @@ require(["app/background.config"], function(config) {
             };
 
             var onMigrationComplete = function(request, sender, sendResponse) {
-                var onSyncSuccess = function(data) {
-                    if (navigator.onLine)
-                        scheduleSync();
-                };
-
                 if (request === "migrationComplete") {
                     console.log("dB migration complete. Starting sync");
-                    metadataSyncService.sync().then(onSyncSuccess);
+                    if (navigator.onLine) {
+                        metadataSyncService.sync();
+                        scheduleSync();
+                    }
+
                 }
             };
 
