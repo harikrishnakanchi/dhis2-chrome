@@ -52,7 +52,7 @@ define([], function() {
         var userStore = tx.objectStore("localUserCredentials");
         userStore.add({
             'username': 'project_user',
-            'password': 'aa63a86bbc63b2ae67ef0a069db7fb9'
+            'password': 'caa63a86bbc63b2ae67ef0a069db7fb9'
         });
     };
 
