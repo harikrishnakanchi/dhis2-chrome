@@ -195,12 +195,38 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var setAvailableModules = function(orgUnits) {
-            var allModules = orgUnitMapper.filterModules(orgUnits);
-            $scope.modules = _.filter(allModules, function(module) {
-                return _.any($rootScope.currentUser.organisationUnits, {
-                    'id': module.parent.id
+
+            var getUserModules = function(modules) {
+                return _.filter(modules, function(module) {
+                    return _.any($rootScope.currentUser.organisationUnits, {
+                        'id': module.parent.id
+                    });
                 });
-            });
+            };
+
+            var getModulesUnderOpUnits = function(allModules) {
+                var filteredModules = [];
+                _.forEach(allModules, function(module) {
+                    var moduleParents = _.filter(orgUnits, {
+                        'id': module.parent.id,
+                        'attributeValues': [{
+                            'attribute': {
+                                id: "a1fa2777924"
+                            },
+                            value: "Operation Unit"
+                        }]
+                    });
+                    var modules = getUserModules(moduleParents);
+                    if (!_.isEmpty(modules))
+                        filteredModules.push(module);
+                });
+                return filteredModules;
+            };
+
+            var allModules = orgUnitMapper.filterModules(orgUnits);
+            $scope.modules = getUserModules(allModules);
+
+            $scope.modules = $scope.modules.concat(getModulesUnderOpUnits(allModules));
             return orgUnits;
         };
 

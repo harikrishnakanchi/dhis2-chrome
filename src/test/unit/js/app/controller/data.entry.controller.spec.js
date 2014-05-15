@@ -119,6 +119,30 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     },
                     value: "Module"
                 }]
+            }, {
+                'name': 'modunderopunit',
+                'id': 'mod11',
+                'parent': {
+                    id: "opunit1"
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }]
+            }, {
+                'name': 'opunitUnderPrj',
+                'id': 'opunit1',
+                'parent': {
+                    id: "proj_1"
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Operation Unit"
+                }]
             }];
 
             rootScope.currentUser = {
@@ -196,6 +220,19 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 'id': 'mod2',
                 'parent': {
                     id: "proj_1"
+                },
+                'attributeValues': [{
+                    'attribute': {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }]
+            }, {
+                'name': 'modunderopunit',
+                'displayName': 'opunitUnderPrj - modunderopunit',
+                'id': 'mod11',
+                'parent': {
+                    id: "opunit1"
                 },
                 'attributeValues': [{
                     'attribute': {
