@@ -39,10 +39,10 @@
 								<h4>{{module.selectedDataset.name}}</h4>
 								<div ng-repeat="section in module.selectedDataset.sections">
 									<div class="collapse-head">
-										<h5 ng-click="isCollapsed = !isCollapsed">{{section.name}}</h5>
+										<h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">{{section.name}}</h5>
 										<input type="checkbox" ng-change="changeSectionSelection(module, section)" ng-model="module.selectedSections[section.id]">
 									</div>
-									<div collapse="isCollapsed" class="collapse-body">
+									<div collapse="!isExpanded[section.id]" class="collapse-body">
 										<ul>
 											<li ng-repeat="element in section.dataElements">
 												<label>
@@ -67,9 +67,9 @@
 							<div name="right-side" class="content right">
 								<div ng-repeat="section in module.selectedDataset.sections">
 									<div class="collapse-head" style="position:relative">
-										<h5 ng-click="isCollapsed = !isCollapsed" style="background:#ccc;display:block;padding:10px;cursor:pointer;">{{section.name}} </h5>
+										<h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]" style="background:#ccc;display:block;padding:10px;cursor:pointer;">{{section.name}} </h5>
 									</div>
-									<div collapse="isCollapsed">
+									<div collapse="!isExpanded[section.id]">
 										<ul>
 											<li ng-repeat="element in section.dataElements">
 												<label>

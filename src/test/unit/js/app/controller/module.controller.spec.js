@@ -376,10 +376,43 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             };
             var dataset = {
                 name: "Malaria",
-                id: "dataset_1"
+                id: "dataset_1",
+                sections: [{
+                    'id': 'Id1'
+                }, {
+                    'id': 'Id2'
+                }]
             };
             scope.selectDataSet(module, dataset);
             expect(module.selectedDataset).toEqual(dataset);
+            expect(scope.isExpanded['Id1']).toEqual(true);
+            expect(scope.isExpanded['Id2']).toEqual(false);
+        });
+
+        it("should select a dataset", function() {
+            var module = {
+                "selectedDataElements": {
+                    "test1": true,
+                    "test2": true,
+                    "test3": true
+                },
+                "selectedSections": {
+                    "sec1": true
+                }
+            };
+            var dataset = {
+                name: "Malaria",
+                id: "dataset_1",
+                sections: [{
+                    'id': 'Id1'
+                }, {
+                    'id': 'Id2'
+                }]
+            };
+            scope.selectDataSet(module, dataset);
+            expect(module.selectedDataset).toEqual(dataset);
+            expect(scope.isExpanded['Id1']).toEqual(true);
+            expect(scope.isExpanded['Id2']).toEqual(false);
         });
 
 

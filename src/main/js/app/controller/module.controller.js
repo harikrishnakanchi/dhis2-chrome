@@ -6,8 +6,8 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
         var allSections = [];
 
         $scope.isopen = {};
-        $scope.isCollapsed = true;
         $scope.modules = [];
+        $scope.isExpanded = [];
 
         var init = function() {
             var leftPanedatasets = [];
@@ -151,6 +151,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
 
         $scope.changeDataElementSelection = function(module, section) {
             var selected = false;
+            $scope.isExpanded = [];
             _.each(section.dataElements, function(dataElement) {
                 selected = selected || module.selectedDataElements[dataElement.id];
             });
@@ -159,6 +160,10 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
 
         $scope.selectDataSet = function(module, item) {
             module.selectedDataset = item;
+            _.each(module.selectedDataset.sections, function(section) {
+                $scope.isExpanded[section.id] = false;
+            })
+            $scope.isExpanded[module.selectedDataset.sections[0].id] = true;
         };
 
         $scope.discardDataSet = function(module, items) {
