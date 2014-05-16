@@ -29,7 +29,7 @@ define(["properties", "lodash"], function(properties, _) {
             return new Date(dateString).getTime();
         };
 
-        var loadMetaDataFromFile = function(metadataChangeLog) {
+        var loadMetadata = function(metadataChangeLog) {
             return $http.get("/data/metadata.json").then(function(response) {
                 var data = response.data;
                 if (!(metadataChangeLog && metadataChangeLog.lastUpdatedTime) ||
@@ -39,8 +39,8 @@ define(["properties", "lodash"], function(properties, _) {
             });
         };
 
-        this.loadMetadata = function() {
-            getLastUpdatedTime().then(loadMetaDataFromFile);
+        this.loadMetadataFromFile = function() {
+            getLastUpdatedTime().then(loadMetadata);
         };
     };
 });

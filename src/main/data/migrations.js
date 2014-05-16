@@ -41,10 +41,20 @@ define([], function() {
     };
 
     var add_admin_user_to_local_cred_store = function(db, tx) {
-        var userStore = tx.objectStore("localUserCredentials");
-        userStore.add({
+        var credStore = tx.objectStore("localUserCredentials");
+        credStore.add({
             'username': 'admin',
             'password': 'f6b30a5547c4062f915aafd3e4e6453a'
+        });
+        var userStore = tx.objectStore("users");
+        userStore.add({
+            "userCredentials": {
+                "username": "admin",
+                "userAuthorityGroups": [{
+                    "name": "Superuser",
+                }],
+                "disabled": false
+            }
         });
     };
 

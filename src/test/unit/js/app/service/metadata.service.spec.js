@@ -45,7 +45,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             setupLocalFileHttpRequest(today);
             spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, undefined));
             var metadataService = new MetadataService(db, http);
-            metadataService.loadMetadata();
+            metadataService.loadMetadataFromFile();
 
             httpBackend.flush();
 
@@ -64,7 +64,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             }));
             var metadataService = new MetadataService(db, http);
 
-            metadataService.loadMetadata();
+            metadataService.loadMetadataFromFile();
             httpBackend.flush();
 
             expect(mockStore.upsert.calls.count()).toEqual(0);

@@ -17,8 +17,8 @@ require(["app/background.config"], function(config) {
                 if (request === "migrationComplete") {
                     console.log("dB migration complete. Starting sync");
                     if (navigator.onLine) {
-                        metadataSyncService.sync();
-                        scheduleSync();
+                        metadataSyncService.sync().
+                        finally(scheduleSync);
                     }
 
                 }

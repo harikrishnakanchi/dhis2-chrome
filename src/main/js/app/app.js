@@ -52,12 +52,21 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
             });
             app.run(['metadataService', '$rootScope', '$location',
                 function(metadataService, $rootScope, $location) {
-                    metadataService.loadMetadata();
+                    metadataService.loadMetadataFromFile();
                     $rootScope.$on('$routeChangeStart', function(e, newUrl, oldUrl) {
                         if (!$rootScope.isLoggedIn) {
                             $location.path("/login");
                         }
                     });
+
+                    $rootScope.hasRoles = function(allowedRoles) {
+                        if ($rootScope.currentUser === undefined)
+                            return false;
+
+                        return _.any($rootScope.currentUser.userCredentials.userAuthorityGroups, function(userAuth) {
+                            return _.contains(allowedRoles, userAuth.name);
+                        });
+                    };
                 }
             ]);
             return app;
