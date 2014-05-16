@@ -9,7 +9,7 @@
 		<ul class="form">
 			<li class="form-group">
 				<label for="module">Module</label>
-				<select name="module" id="module" class="input-sm" ng-model="currentModule" ng-options="module.displayName for module in modules | orderBy:'name'">
+				<select name="module" id="module" class="input-sm" ng-model="currentModule" ng-options="module.displayName for module in modules | orderBy:'displayName'">
 					<option value="">-</option>
 				</select>
 			</li>
