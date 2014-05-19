@@ -45,6 +45,20 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
                 "id": "Byx9QE6IvXB"
             },
             "value": orgUnit.populationType
+        }, {
+            "attribute": {
+                "code": "projCode",
+                "name": "Project Code",
+                "id": "fa5e00d5cd2"
+            },
+            "value": orgUnit.projectCode
+        }, {
+            "attribute": {
+                "code": "event",
+                "name": "Event",
+                "id": "a4ecfc70574"
+            },
+            "value": orgUnit.event
         });
 
         if (orgUnit.endDate)
@@ -94,6 +108,8 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             'projectType': getAttributeValue(dhisProject, "prjType"),
             'populationType': getAttributeValue(dhisProject, "prjPopType"),
             'endDate': endDate ? moment(endDate).format("YYYY-MM-DD") : undefined,
+            'event': getAttributeValue(dhisProject, "event"),
+            'projectCode': getAttributeValue(dhisProject, "projCode"),
         };
     };
 

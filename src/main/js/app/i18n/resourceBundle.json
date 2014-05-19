@@ -39,5 +39,7 @@
     "pwdRequired": "Password is required.",
     "confirmPassword": "Confirm your password.",
     "pwdMatch": "Passwords do not match.",
-    "alreadyExists": "Name already exists under this country"
+    "alreadyExists": "Name already exists under this country.",
+    "eventValidation": "Event is required.",
+    "projectCodeValidation": "Project Code is required."
 }

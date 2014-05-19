@@ -57,6 +57,24 @@
 						</div>
 					</li>
 					<li class="form-group">
+						<label for="newOrgUnitEvent" class="col-sm-4 col-md-4 control-label">Event</label>
+						<div class="col-sm-6 col-md-6" >
+							<select ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitEvent" id="newOrgUnitEvent" ng-model="newOrgUnit.event" ng-options="e as e for e in allEvents" required></select>
+							<div ng-show="createForm.newOrgUnitEvent.$dirty &amp;&amp; createForm.newOrgUnitEvent.$invalid">
+								<span ng-show="createForm.newOrgUnitEvent.$error.required"class="errortxt">{{resourceBundle.eventValidation}}</span>
+							</div>
+						</div>
+					</li>
+					<li class="form-group">
+						<label for="newOrgUnitProjCode" class="col-sm-4 col-md-4  control-label">Project Code</label>
+						<div class="col-sm-6 col-md-6" >
+							<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitProjCode" id="newOrgUnitProjCode" ng-model="newOrgUnit.projectCode" required/>
+							<div ng-show="createForm.newOrgUnitProjCode.$dirty &amp;&amp; createForm.newOrgUnitProjCode.$invalid">
+								<span ng-show="createForm.newOrgUnitProjCode.$error.required"class="errortxt">{{resourceBundle.projectCodeValidation}}</span>
+							</div>
+						</div>
+					</li>
+					<li class="form-group">
 						<label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
 						<div class="col-sm-6 col-md-6" >
 							<input type="date" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" ng-disabled="!isEditMode" required>

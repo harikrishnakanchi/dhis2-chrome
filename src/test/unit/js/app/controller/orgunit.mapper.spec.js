@@ -47,6 +47,20 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         "id": "ZbUuOnEmVs5"
                     },
                     "value": "2011-01-01"
+                }, {
+                    "attribute": {
+                        "code": "event",
+                        "name": "Event",
+                        "id": "a4ecfc70574"
+                    },
+                    "value": "Armed Conflict: disruption of health systems due to conflict"
+                }, {
+                    "attribute": {
+                        "code": "projCode",
+                        "name": "Project Code",
+                        "id": "fa5e00d5cd2"
+                    },
+                    "value": "RU118"
                 }]
             };
 
@@ -60,6 +74,8 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 'projectType': "val4",
                 'populationType': "val5",
                 'endDate': moment("2011-01-01").format("YYYY-MM-DD"),
+                'event': 'Armed Conflict: disruption of health systems due to conflict',
+                'projectCode': 'RU118'
             };
 
             expect(result).toEqual(expectedResult);
@@ -75,6 +91,8 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 'projectType': "val4",
                 'endDate': moment("2011-01-01").toDate(),
                 'populationType': "val6",
+                'projectCode': 'AB001',
+                'event': 'Other'
             };
 
             var parentOrgUnit = {
@@ -129,6 +147,20 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         "id": "Byx9QE6IvXB"
                     },
                     "value": orgUnit.populationType
+                }, {
+                    "attribute": {
+                        "code": "projCode",
+                        "name": "Project Code",
+                        "id": "fa5e00d5cd2"
+                    },
+                    "value": orgUnit.projectCode
+                }, {
+                    "attribute": {
+                        "code": "event",
+                        "name": "Event",
+                        "id": "a4ecfc70574"
+                    },
+                    "value": orgUnit.event
                 }, {
                     "attribute": {
                         "code": "prjEndDate",

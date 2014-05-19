@@ -2,11 +2,17 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
 
     return function($scope, orgUnitService, $q, $location, $timeout, $anchorScroll, userService) {
 
-        $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded from TYPO analysis and Coordination'];
+        $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded', 'Coordination', 'Remote Control'];
 
-        $scope.allContexts = ['Armed conflict', 'Post-conflict'];
+        $scope.allContexts = ['Armed Conflict', 'Post-Conflict', 'Stable', 'Internal Instability'];
 
-        $scope.allPopTypes = ['Displaced', 'General Population', 'Mixed - Displaced/General', 'Victims of Natural Disaster'];
+        $scope.allPopTypes = ['Displaced', 'General Population', 'Mixed Displaced/General', 'Victims of Natural Disasters'];
+
+        $scope.allEvents = ['Armed Conflict: direct violence towards the civilian population', 'Armed Conflict: disruption of health systems due to conflict',
+            'Armed Conflict: refugees/internally displaced people', 'Population affected by endemics/epidemics',
+            'Population affected by natural disaster', 'Population affected by social violence and health care exclusion',
+            'Victims of armed conflict', 'Other'
+        ];
 
         $scope.thisDate = moment().format("YYYY-MM-DD");
 

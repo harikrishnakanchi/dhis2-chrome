@@ -44,6 +44,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 'location': 'Some Location',
                 'openingDate': moment().toDate(),
                 'endDate': moment().add('days', 7).toDate(),
+                'projectCode': 'AB001',
+                'event': 'Other'
             };
 
             var parent = {
@@ -103,6 +105,20 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     "value": newOrgUnit.populationType
                 }, {
                     "attribute": {
+                        "code": "projCode",
+                        "name": "Project Code",
+                        "id": "fa5e00d5cd2"
+                    },
+                    "value": newOrgUnit.projectCode
+                }, {
+                    "attribute": {
+                        "code": "event",
+                        "name": "Event",
+                        "id": "a4ecfc70574"
+                    },
+                    "value": newOrgUnit.event
+                }, {
+                    "attribute": {
                         "code": "prjEndDate",
                         "name": "End date",
                         "id": "ZbUuOnEmVs5"
@@ -125,22 +141,20 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             expect(scope.saveFailure).toEqual(true);
         });
 
-        xit("should reset form", function() {
+        it("should reset form", function() {
             scope.newOrgUnit = {
                 'id': '123',
                 'openingDate': moment().add('days', -7).toDate(),
                 'endDate': moment().add('days', 7).toDate(),
             };
-            scope.saveSuccess = true;
             scope.saveFailure = true;
 
             scope.reset();
             scope.$apply();
 
             expect(scope.newOrgUnit).toEqual({
-                openingDate: moment().toDate(),
+                openingDate: moment().format('YYYY-MM-DD'),
             });
-            expect(scope.saveSuccess).toEqual(false);
             expect(scope.saveFailure).toEqual(false);
         });
 
@@ -219,6 +233,20 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                         "id": "Byx9QE6IvXB"
                     },
                     "value": "val6"
+                }, {
+                    "attribute": {
+                        "code": "event",
+                        "name": "Event",
+                        "id": "a4ecfc70574"
+                    },
+                    "value": "Armed Conflict: disruption of health systems due to conflict"
+                }, {
+                    "attribute": {
+                        "code": "projCode",
+                        "name": "Project Code",
+                        "id": "fa5e00d5cd2"
+                    },
+                    "value": "RU118"
                 }]
             };
             var expectedNewOrgUnit = {
@@ -229,6 +257,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 'projectType': "val4",
                 'endDate': moment("2011-01-01").format("YYYY-MM-DD"),
                 'populationType': "val6",
+                'event': 'Armed Conflict: disruption of health systems due to conflict',
+                'projectCode': 'RU118'
             };
 
             scope.isEditMode = false;
