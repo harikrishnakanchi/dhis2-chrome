@@ -172,6 +172,13 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
             module.selectedDataset = undefined;
         };
 
+        $scope.shouldCollapse = function(current, allSections) {
+            if ($scope.isExpanded[current.id] === undefined && allSections[0].id === current.id) {
+                $scope.isExpanded[current.id] = true;
+            }
+            return !$scope.isExpanded[current.id];
+        }
+
         init();
     };
 });

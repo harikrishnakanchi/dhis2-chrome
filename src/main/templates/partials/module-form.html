@@ -69,7 +69,7 @@
 									<div class="collapse-head" style="position:relative">
 										<h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]" style="background:#ccc;display:block;padding:10px;cursor:pointer;">{{section.name}} </h5>
 									</div>
-									<div collapse="!isExpanded[section.id]">
+									<div collapse="shouldCollapse(section,module.selectedDataset.sections)">
 										<ul>
 											<li ng-repeat="element in section.dataElements">
 												<label>
