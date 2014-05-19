@@ -282,6 +282,18 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             expect(scope.projectUsers).toEqual(expectedUsers);
         });
 
+        it("should set user project as currently selected project", function() {
+            scope.orgUnit = {
+                "name": "anyname",
+            };
+            scope.currentUser = {
+                'id': 'admin'
+            };
+            scope.setUserProject();
+
+            expect(scope.currentUser.organisationUnits[0]).toEqual(scope.orgUnit);
+        });
+
     });
 
 });

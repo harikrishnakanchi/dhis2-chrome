@@ -1,10 +1,11 @@
 /*global Date:true*/
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment) {
     describe("dataEntryController ", function() {
-        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock, orgUnits;
+        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock, orgUnits, window;
 
-        beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location) {
+        beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location, $window) {
             q = $q;
+            window = $window;
             db = {
                 objectStore: function() {}
             };
@@ -172,7 +173,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             spyOn(orgUnitStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnits));
             spyOn(location, "hash");
-            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
+            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope, window);
         }));
 
         it("should initialize modules", function() {
@@ -683,6 +684,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(isDatasetOpen[id]).toBe(undefined);
         });
 
+        it("should print", function() {
+            spyOn(window, "print");
+            scope.printWindow();
+
+            expect(window.print).toHaveBeenCalled();
+        });
 
     });
 });

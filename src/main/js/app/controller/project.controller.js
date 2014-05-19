@@ -51,6 +51,10 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
             return moment($scope.newOrgUnit.openingDate).isAfter(moment($scope.thisDate));
         };
 
+        $scope.setUserProject = function() {
+            $scope.currentUser.organisationUnits = [$scope.orgUnit];
+        };
+
         var scrollToTop = function() {
             $location.hash();
             $anchorScroll();

@@ -13,6 +13,9 @@
 					<option value="">-</option>
 				</select>
 			</li>
+			<li>
+				<input type="button" ng-click="printWindow()" value="Print Tally Sheet" ng-show="currentModule"></input>
+			</li>
 		</ul>
 </div>
 <form name="dataentryForm" id="dataentry">
@@ -61,8 +64,8 @@
 	</accordion-group>
 </accordion>
 <div>
-	<button type="submit" class="btn btn-primary" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid"> Save </button>
-	<button type="submit" class="btn btn-primary" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid"> Submit </button>
+	<button type="submit" class="btn btn-main" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid"> Save </button>
+	<button type="submit" class="btn btn-main" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid"> Submit </button>
 </div>
 </section>
 </form>

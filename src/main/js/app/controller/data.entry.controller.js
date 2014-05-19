@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-    return function($scope, $q, db, dataService, $anchorScroll, $location, $modal, $rootScope) {
+    return function($scope, $q, db, dataService, $anchorScroll, $location, $modal, $rootScope, $window) {
         var dataSets, systemSettings;
 
         $scope.validDataValuePattern = /^[0-9+]*$/;
@@ -32,6 +32,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 'value': ''
             };
             return dataValues[id][option];
+        };
+
+        $scope.printWindow = function() {
+            $window.print();
         };
 
         $scope.$watchCollection('[week, currentModule]', function() {
