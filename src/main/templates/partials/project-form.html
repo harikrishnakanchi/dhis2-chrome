@@ -20,6 +20,15 @@
 						</div>
 					</li>
 					<li class="form-group">
+						<label for="newOrgUnitProjCode" class="col-sm-4 col-md-4  control-label">Project Code</label>
+						<div class="col-sm-6 col-md-6" >
+							<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitProjCode" id="newOrgUnitProjCode" ng-model="newOrgUnit.projectCode" required/>
+							<div ng-show="createForm.newOrgUnitProjCode.$dirty &amp;&amp; createForm.newOrgUnitProjCode.$invalid">
+								<span ng-show="createForm.newOrgUnitProjCode.$error.required"class="errortxt">{{resourceBundle.projectCodeValidation}}</span>
+							</div>
+						</div>
+					</li>
+					<li class="form-group">
 						<label for="newOrgUnitLocation" class="col-sm-4 col-md-4  control-label">Location</label>
 						<div class="col-sm-6 col-md-6" >
 							<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitLocation" id="newOrgUnitLocation" ng-model="newOrgUnit.location" required/>
@@ -65,15 +74,7 @@
 							</div>
 						</div>
 					</li>
-					<li class="form-group">
-						<label for="newOrgUnitProjCode" class="col-sm-4 col-md-4  control-label">Project Code</label>
-						<div class="col-sm-6 col-md-6" >
-							<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitProjCode" id="newOrgUnitProjCode" ng-model="newOrgUnit.projectCode" required/>
-							<div ng-show="createForm.newOrgUnitProjCode.$dirty &amp;&amp; createForm.newOrgUnitProjCode.$invalid">
-								<span ng-show="createForm.newOrgUnitProjCode.$error.required"class="errortxt">{{resourceBundle.projectCodeValidation}}</span>
-							</div>
-						</div>
-					</li>
+					
 					<li class="form-group">
 						<label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
 						<div class="col-sm-6 col-md-6" >
