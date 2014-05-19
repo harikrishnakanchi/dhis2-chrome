@@ -177,7 +177,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
                 $scope.isExpanded[current.id] = true;
             }
             return !$scope.isExpanded[current.id];
-        }
+        };
 
         init();
     };

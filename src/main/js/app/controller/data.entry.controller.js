@@ -47,7 +47,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 }), 'id');
                 $scope.currentGroupedSections = _.pick($scope.groupedSections, datasetsAssociatedWithModule);
                 var store = db.objectStore('dataValues');
-                store.find([getPeriod(), $scope.currentModule.id]).then(function(data) {
+                store.find([getPeriod(), $rootScope.currentUser.organisationUnits[0].id]).then(function(data) {
                     data = data || {};
                     $scope.dataValues = dataValuesMapper.mapToView(data);
                 });
@@ -98,7 +98,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         var save = function(asDraft) {
             var period = getPeriod();
-            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id);
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $rootScope.currentUser.organisationUnits[0].id);
             var successPromise = function() {
                 $scope.saveSuccess = asDraft ? true : false;
                 $scope.submitSuccess = !asDraft ? true : false;
