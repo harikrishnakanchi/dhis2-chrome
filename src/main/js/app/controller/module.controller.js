@@ -151,7 +151,6 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
 
         $scope.changeDataElementSelection = function(module, section) {
             var selected = false;
-            $scope.isExpanded = [];
             _.each(section.dataElements, function(dataElement) {
                 selected = selected || module.selectedDataElements[dataElement.id];
             });
@@ -162,7 +161,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
             module.selectedDataset = item;
             _.each(module.selectedDataset.sections, function(section) {
                 $scope.isExpanded[section.id] = false;
-            })
+            });
             $scope.isExpanded[module.selectedDataset.sections[0].id] = true;
         };
 

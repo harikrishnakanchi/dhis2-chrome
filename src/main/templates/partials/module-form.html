@@ -36,7 +36,7 @@
 								</div>
 								<div class="details" ng-show="module.selectedDataset.sections.length > 0">
 								<span ng-show="areNoSectionsSelectedForDataset(module, module.selectedDataset)">{{resourceBundle.selectDatasetSection}}</span> 
-								<h4>{{module.selectedDataset.name}}</h4>
+								<h4 ng-class="{cur: true}">{{module.selectedDataset.name}}</h4>
 								<div ng-repeat="section in module.selectedDataset.sections">
 									<div class="collapse-head">
 										<h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">{{section.name}}</h5>
