@@ -501,6 +501,29 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             expect(scope.areNoSectionsSelectedForDataset(module, dataset)).toEqual(false);
         });
 
+        it("should not collapse the first section", function() {
+            var currentSection = {
+                "name": "test",
+                "id": 2,
+                "lastName": "testing"
+            };
 
+            var allSections = [{
+                "name": "test",
+                "id": 2
+            }, {
+                "name": "test1",
+                "id": 3
+            }, {
+                "name": "test2",
+                "id": 4
+            }];
+
+            scope.shouldCollapse(currentSection, allSections);
+
+            expect(scope.isExpanded[2]).toEqual(true);
+            expect(scope.isExpanded[3]).toEqual(undefined);
+            expect(scope.isExpanded[4]).toEqual(undefined);
+        });
     });
 });
