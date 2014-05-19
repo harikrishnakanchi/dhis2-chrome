@@ -1,7 +1,6 @@
     define(["lodash"], function(_) {
         return function($scope, $q, dataService, $rootScope) {
             var dataValues = [];
-            var ORG_UNIT = "proj_104";
 
             var onSuccess = function(response) {
                 $scope.isSyncRunning = false;
@@ -9,12 +8,12 @@
             };
 
             var saveToDb = function(response) {
-                return dataService.saveToDb(response.dataValues, ORG_UNIT);
+                return dataService.saveToDb(response.dataValues, $rootScope.currentUser.organisationUnits[0].id);
             };
 
             $scope.syncNow = function() {
                 $scope.isSyncRunning = true;
-                dataService.get(ORG_UNIT).then(saveToDb).then(onSuccess);
+                dataService.get($rootScope.currentUser.organisationUnits[0].id).then(saveToDb).then(onSuccess);
             };
         };
     });

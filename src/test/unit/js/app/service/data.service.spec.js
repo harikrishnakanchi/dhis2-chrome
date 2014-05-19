@@ -94,7 +94,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
         it("should return error message if data values were not fetched", function() {
             var dataService = new DataService(http, db, q);
             var today = moment().format("YYYY-MM-DD");
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(500);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(500);
 
             dataService.get('company_0', 'DS_OPD').then(function(response) {
                 expect(response).toEqual({
@@ -120,7 +120,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
                 }]
             };
             var today = moment().format("YYYY-MM-DD");
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, dataValueSet);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, dataValueSet);
 
             dataService.get('company_0', 'DS_OPD').then(function(response) {
                 expect(response).toEqual(dataValueSet);

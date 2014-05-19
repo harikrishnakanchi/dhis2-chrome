@@ -36,6 +36,7 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
                 return $http.get(properties.dhis.url + '/api/dataValueSets', {
                     "params": {
                         "orgUnit": orgUnit,
+                        "children": true,
                         "dataSet": _.map(dataSets, "id"),
                         "startDate": "1900-01-01",
                         "endDate": today
