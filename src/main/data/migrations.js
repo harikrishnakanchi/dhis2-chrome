@@ -70,6 +70,10 @@ define([], function() {
         create_store_with_key("translations", ["uid", "locale"], db)
     };
 
+    var add_approval_store = function(db, tx) {
+        create_store_with_key("approvals", ["dataSet", "period", "orgUnit"], db)
+    };
+
     return [add_object_stores,
         change_log_stores,
         add_organisation_units_and_level_store,
@@ -78,5 +82,6 @@ define([], function() {
         add_local_user_credentials_store,
         add_admin_user_to_local_cred_store,
         add_project_user_to_local_cred_store,
-        add_translation_store];
+        add_translation_store,
+        add_approval_store];
 });

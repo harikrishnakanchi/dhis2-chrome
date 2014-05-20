@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-    return function($scope, $q, db, dataService, $anchorScroll, $location, $modal, $rootScope, $window) {
+    return function($scope, $q, db, dataService, $anchorScroll, $location, $modal, $rootScope, $window, approvalService) {
         var dataSets, systemSettings;
 
         $scope.validDataValuePattern = /^[0-9+]*$/;
@@ -75,6 +75,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $scope.saveError = false;
             $scope.submitSuccess = false;
             $scope.submitError = false;
+            $scope.approveSuccess = false;
+            $scope.approveError = false;
         };
 
         $scope.sum = function(iterable) {
@@ -97,7 +99,26 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.approve = function() {
+            var onSuccess = function() {
+                $scope.approveSuccess = true;
+                $scope.approveError = false;
+                $scope.dataentryForm.$setPristine();
+            };
 
+            var onError = function() {
+                $scope.approveSuccess = false;
+                $scope.approveError = true;
+            };
+
+            var approvalRequest = _.map(_.keys($scope.currentGroupedSections), function(k) {
+                return {
+                    "dataSet": k,
+                    "period": getPeriod(),
+                    "orgUnit": $scope.currentModule.id
+                };
+            });
+
+            approvalService.approve(approvalRequest).then(onSuccess, onError);
         };
 
         $scope.accept = function() {

@@ -2,8 +2,11 @@
 <div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
 <div ng-show="saveSuccess" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
 <div ng-show="submitSuccess" class="alert alert-success">{{resourceBundle.dataSubmitSuccess}}</div>
+<div ng-show="approveSuccess" class="alert alert-success">{{resourceBundle.dataApproveSuccess}}</div>
 <div ng-show="saveError" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
 <div ng-show="submitError" class="alert alert-danger">{{resourceBundle.dataSubmitFailure}}</div>
+<div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
+
 	<div class="module-select"> 
 		<weekselector year="year" month="month" week="week" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
 		<ul class="form">

@@ -9,7 +9,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
         },
         "dhis": {
             "url": url,
-            "auth_header": "Basic YWRtaW46ZGlzdHJpY3Q=",
+            "auth_header": "Basic c2VydmljZS5hY2NvdW50Okkxb1Y2Y29HNWVkMw==",
         },
         "messageTimeout": 5000,
         "devMode": true

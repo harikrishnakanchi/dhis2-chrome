@@ -1,7 +1,8 @@
 /*global Date:true*/
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment) {
     describe("dataEntryController ", function() {
-        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock, orgUnits, window;
+        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
+            orgUnits, window, approvalService;
 
         beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location, $window) {
             q = $q;
@@ -36,7 +37,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     find: find
                 };
             };
-
+            approvalService = {
+                approve: function() {}
+            };
             dataValuesStore = getMockStore("dataValues");
             orgUnitStore = getMockStore("organisationUnits");
 
@@ -173,7 +176,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             spyOn(orgUnitStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnits));
             spyOn(location, "hash");
-            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope, window);
+            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope, window, approvalService);
         }));
 
         it("should initialize modules", function() {
@@ -689,6 +692,58 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.printWindow();
 
             expect(window.print).toHaveBeenCalled();
+        });
+
+        it("should approve", function() {
+            scope.currentModule = {
+                id: 'Module2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            spyOn(approvalService, "approve").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+
+            scope.approve();
+
+            scope.$apply();
+            var expectedApprovalRequest = [{
+                "dataSet": "Vacc",
+                "period": "2014W14",
+                "orgUnit": "Module2"
+            }];
+            expect(approvalService.approve).toHaveBeenCalledWith(expectedApprovalRequest);
+            expect(scope.approveSuccess).toBe(true);
+            expect(scope.approveError).toBe(false);
+        });
+
+
+        it("should show appropriate message on approval failure", function() {
+            scope.currentModule = {
+                id: 'Module2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            spyOn(approvalService, "approve").and.returnValue(utils.getRejectedPromise(q, {}));
+            scope.$apply();
+
+            scope.approve();
+
+            scope.$apply();
+
+            expect(scope.approveSuccess).toBe(false);
+            expect(scope.approveError).toBe(true);
         });
 
     });

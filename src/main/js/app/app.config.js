@@ -49,6 +49,7 @@ require.config({
         "dataService": "app/service/data.service",
         "orgUnitService": "app/service/orgUnit.service",
         "userService": "app/service/user.service",
+        "approvalService": "app/service/approval.service",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
