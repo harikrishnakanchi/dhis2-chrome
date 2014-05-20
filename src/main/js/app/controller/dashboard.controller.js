@@ -8,7 +8,7 @@
             };
 
             var saveToDb = function(response) {
-                return dataService.saveToDb(response.dataValues, $rootScope.currentUser.organisationUnits[0].id);
+                return dataService.saveToDb(response.dataValues);
             };
 
             $scope.syncNow = function() {

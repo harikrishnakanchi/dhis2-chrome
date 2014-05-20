@@ -557,7 +557,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             scope.$apply();
 
-            expect(dataValuesStore.find).toHaveBeenCalledWith(['2014W14', 'proj_1']);
+            expect(dataValuesStore.find).toHaveBeenCalledWith(['2014W14', 'Mod1']);
             expect(scope.dataValues).toEqual({});
         });
 
@@ -587,7 +587,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             scope.$apply();
 
-            expect(dataValuesStore.find).toHaveBeenCalledWith(["2014W14", "proj_1"]);
+            expect(dataValuesStore.find).toHaveBeenCalledWith(["2014W14", "Module2"]);
             expect(scope.dataValues).toEqual({
                 DE_Oedema: {
                     32: {

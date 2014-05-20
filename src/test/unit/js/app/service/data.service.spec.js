@@ -130,7 +130,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
         });
 
         it("should parse and save the fetched data values", function() {
-            var orgUnit = "company_1";
+            var orgUnit = "company_0";
             var dataValueSet = [{
                 dataElement: "DE_Oedema",
                 period: "2014W15",

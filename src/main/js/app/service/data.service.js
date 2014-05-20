@@ -47,13 +47,16 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
             return getAllDatasets().then(getDataForDatasets);
         };
 
-        this.saveToDb = function(dataValueSets, orgUnit) {
-            var groupedDataValues = _.groupBy(dataValueSets, 'period');
-            var dataValueSetsAggregator = function(result, dataValues, period) {
+        this.saveToDb = function(dataValueSets) {
+            var groupedDataValues = _.groupBy(dataValueSets, function(dataValue) {
+                return [dataValue.period, dataValue.orgUnit];
+            });
+            var dataValueSetsAggregator = function(result, dataValues, tuple) {
+                var split = tuple.split(",");
                 result.push({
-                    "period": period,
+                    "period": split[0],
                     "dataValues": dataValues,
-                    "orgUnit": orgUnit
+                    "orgUnit": split[1]
                 });
             };
             var dataValues = _.transform(groupedDataValues, dataValueSetsAggregator, []);
