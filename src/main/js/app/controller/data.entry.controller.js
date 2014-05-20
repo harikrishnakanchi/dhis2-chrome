@@ -96,6 +96,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             save(true);
         };
 
+        $scope.approve = function() {
+
+        };
+
+        $scope.accept = function() {
+
+        };
+
         var save = function(asDraft) {
             var period = getPeriod();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $rootScope.currentUser.organisationUnits[0].id);
