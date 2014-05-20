@@ -32,5 +32,5 @@ authorization=$1
 url=$2"/api/metadata.json"
 destination="src/main/data/metadata.json"
 
-# do_curl
+do_curl
 package_chrome_app
