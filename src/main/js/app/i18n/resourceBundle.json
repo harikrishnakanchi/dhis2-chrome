@@ -11,7 +11,6 @@
     "endDateValidation": "End Date is required.",
     "beyondMaxDate": "Date cannot exceed today's date.",
     "nameValidation": "Name is required.",
-    "locationValidation": "Location is required.",
     "projectTypeValidation": "Project type is required.",
     "contextValidation": "Context is required.",
     "consultDaysValidation": "Consultation days is required.",
