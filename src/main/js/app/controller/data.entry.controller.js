@@ -146,8 +146,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var saveToDb = function() {
-                var dataValuesStore = db.objectStore("dataValues");
-                return dataValuesStore.upsert(payload);
+                return dataService.saveToDb([payload]);
             };
 
             saveToDb().then(pushToDhis).then(successPromise, errorPromise);

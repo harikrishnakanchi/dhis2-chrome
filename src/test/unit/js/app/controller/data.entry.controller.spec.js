@@ -44,7 +44,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             orgUnitStore = getMockStore("organisationUnits");
 
             dataService = {
-                save: function() {}
+                save: function() {},
+                saveToDb: function() {}
             };
 
             saveSuccessPromise = utils.getPromise(q, {
@@ -362,9 +363,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should submit data values to indexeddb and dhis", function() {
-            var dataValues = {
+            var dataValues = [{
                 "name": "test"
-            };
+            }];
             scope.currentModule = {
                 id: 'Module2',
                 parent: {
@@ -375,16 +376,22 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
+            var payload = [{
+                "dataValues": dataValues,
+                "period": "2014W14",
+                "orgUnit": "Module2",
+                "completeDate": "2014-05-20"
+            }]
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "saveToDb").and.returnValue(saveSuccessPromise);
             spyOn(dataService, "save").and.returnValue(saveSuccessPromise);
-            spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
 
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.submit();
             scope.$apply();
 
-            expect(dataValuesStore.upsert).toHaveBeenCalled();
+            expect(dataService.saveToDb).toHaveBeenCalled();
             expect(dataService.save).toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(true);
             expect(scope.saveSuccess).toBe(false);
@@ -394,9 +401,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should save data values as draft to indexeddb", function() {
-            var dataValues = {
-                "name": "test"
-            };
+
             scope.currentModule = {
                 id: 'Module2',
                 parent: {
@@ -413,12 +418,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.$apply();
 
             spyOn(dataService, "save");
-            spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "saveToDb").and.returnValue(saveSuccessPromise);
 
             scope.saveAsDraft();
             scope.$apply();
 
-            expect(dataValuesStore.upsert).toHaveBeenCalled();
+            expect(dataService.saveToDb).toHaveBeenCalled();
             expect(dataService.save).not.toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(true);
@@ -448,13 +453,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
             spyOn(dataService, "save").and.returnValue(saveErrorPromise);
-            spyOn(dataValuesStore, "upsert").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "saveToDb").and.returnValue(saveSuccessPromise);
 
             scope.submit();
             scope.$apply();
 
             expect(dataService.save).toHaveBeenCalled();
-            expect(dataValuesStore.upsert).toHaveBeenCalled();
+            expect(dataService.saveToDb).toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(true);
@@ -482,13 +487,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
             spyOn(dataService, "save");
-            spyOn(dataValuesStore, "upsert").and.returnValue(saveErrorPromise);
+            spyOn(dataService, "saveToDb").and.returnValue(saveErrorPromise);
 
             scope.saveAsDraft();
             scope.$apply();
 
             expect(dataService.save).not.toHaveBeenCalled();
-            expect(dataValuesStore.upsert).toHaveBeenCalled();
+            expect(dataService.saveToDb).toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(false);
