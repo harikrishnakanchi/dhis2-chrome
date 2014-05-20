@@ -55,7 +55,7 @@
 							<td> <span> {{ dataElement.formName }} </span> </td>
 							<td ng-repeat="option in section.categoryOptionComboIds">
 								<ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
-									<input type="text" name="datavalue" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option)['value']" ng-focus="restoreExpression(dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(dataElement.id, option)" /><br/>
+									<input type="text" name="datavalue" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option)['value']" ng-focus="restoreExpression(dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(dataElement.id, option)" ng-disabled="isReadOnly" /><br/>
 								</ng-form>
 							</td>
 							<td>{{sum(dataValues[dataElement.id])}}</td>
@@ -67,10 +67,10 @@
 	</accordion-group>
 </accordion>
 <div>
-	<button type="submit" class="btn btn-primary" ng-click="approve()" ng-disabled="dataentryForm.$invalid" ng-if="hasRoles(['Approver - Level 1'])"> Approve </button>
-	<button type="submit" class="btn btn-primary" ng-click="accept()" ng-disabled="dataentryForm.$invalid" ng-if="hasRoles(['Approver - Level 2'])"> Accept </button>
-	<button type="submit" class="btn btn-main" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid" ng-if="hasRoles(['Data entry user'])"> Save </button>
-	<button type="submit" class="btn btn-main" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid" ng-if="hasRoles(['Data entry user'])"> Submit </button>
+	<input type="submit" class="btn btn-primary" ng-click="approve()" ng-disabled="dataentryForm.$invalid || isReadOnly	" ng-if="hasRoles(['Approver - Level 1'])" value="Approve" />
+	<input type="submit" class="btn btn-primary" ng-click="accept()" ng-disabled="dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Approver - Level 2'])" value="Accept" />
+	<input type="submit" class="btn btn-main" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" value="Save" />
+	<input type="submit" class="btn btn-main" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" value="Submit" />
 </div>
 </section>
 </form>

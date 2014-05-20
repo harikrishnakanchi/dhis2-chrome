@@ -56,6 +56,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.currentModule.id, systemSettings, $scope.currentModule.parent.id);
                 });
 
+                setApprovalState();
+
                 $scope.dataentryForm.$setPristine();
             }
         });
@@ -102,6 +104,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var onSuccess = function() {
                 $scope.approveSuccess = true;
                 $scope.approveError = false;
+                setApprovalState();
                 $scope.dataentryForm.$setPristine();
             };
 
@@ -224,6 +227,17 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         var transformDataSet = function(data) {
             $scope.groupedSections = groupSections.enrichGroupedSections(data);
             return data;
+        };
+
+        var setApprovalState = function() {
+            store = db.objectStore('approvals');
+            var query = db.queryBuilder().$index('by_period_orgUnit').$eq([getPeriod(), $scope.currentModule.id]).compile();
+
+            store.each(query).then(function(result) {
+                $scope.isReadOnly = _.any(result, function(approvalState) {
+                    return approvalState.isApproved;
+                });
+            });
         };
 
         var setAvailableModules = function(orgUnits) {

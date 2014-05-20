@@ -7,9 +7,15 @@ define([], function() {
         });
     };
 
-    var create_store_with_key = function(store, key, db) {
-        db.createObjectStore(store, {
+    var create_store_with_key = function(storeName, key, db) {
+        return db.createObjectStore(storeName, {
             keyPath: key
+        });
+    };
+
+    var create_index = function(store, indexName, key, isUnique) {
+        store.createIndex(indexName, key, {
+            "unique": isUnique
         });
     };
 
@@ -71,7 +77,8 @@ define([], function() {
     };
 
     var add_approval_store = function(db, tx) {
-        create_store_with_key("approvals", ["dataSet", "period", "orgUnit"], db)
+        var approvalStore = create_store_with_key("approvals", ["dataSet", "period", "orgUnit"], db);
+        create_index(approvalStore, "by_period_orgUnit", ["period", "orgUnit"], false);
     };
 
     return [add_object_stores,

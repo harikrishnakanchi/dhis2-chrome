@@ -1,15 +1,31 @@
 /*global Date:true*/
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment) {
     describe("dataEntryController ", function() {
-        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
-            orgUnits, window, approvalService;
+        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, approvalStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
+            orgUnits, window, approvalService, approvalStoreSpy;
 
         beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location, $window) {
             q = $q;
             window = $window;
-            db = {
-                objectStore: function() {}
+
+            var queryBuilder = function() {
+                this.$index = function() {
+                    return this;
+                };
+                this.$eq = function(v) {
+                    return this;
+                };
+                this.compile = function() {
+                    return "blah";
+                }
+                return this;
             };
+
+            db = {
+                "objectStore": function() {},
+                "queryBuilder": queryBuilder
+            };
+
             modal = {
                 'open': function() {
                     return {
@@ -17,6 +33,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     };
                 }
             };
+
             location = $location;
             anchorScroll = $anchorScroll;
             rootScope = $rootScope;
@@ -31,10 +48,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 };
                 var upsert = function() {};
                 var find = function() {};
+                var each = function() {};
+
                 return {
                     getAll: getAll,
                     upsert: upsert,
-                    find: find
+                    find: find,
+                    each: each,
                 };
             };
             approvalService = {
@@ -42,6 +62,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             };
             dataValuesStore = getMockStore("dataValues");
             orgUnitStore = getMockStore("organisationUnits");
+            approvalStore = getMockStore("approvals");
 
             dataService = {
                 save: function() {},
@@ -61,6 +82,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     return dataValuesStore;
                 if (storeName === "organisationUnits")
                     return orgUnitStore;
+                if (storeName === "approvals")
+                    return approvalStore;
                 return getMockStore(testData.get(storeName));
             });
 
@@ -177,6 +200,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             spyOn(orgUnitStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnits));
             spyOn(location, "hash");
+            approvalStoreSpy = spyOn(approvalStore, "each");
+            approvalStoreSpy.and.returnValue(utils.getPromise(q, [{}]));
             dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope, window, approvalService);
         }));
 
@@ -714,6 +739,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(approvalService, "approve").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
 
+            expect(scope.isReadOnly).toBe(false);
+
             scope.approve();
 
             scope.$apply();
@@ -749,6 +776,27 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             expect(scope.approveSuccess).toBe(false);
             expect(scope.approveError).toBe(true);
+        });
+
+        it("should be read-only if data is already approved", function() {
+            scope.currentModule = {
+                id: 'Module2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            approvalStoreSpy.and.returnValue(utils.getPromise(q, [{
+                "isApproved": true
+            }]));
+
+            scope.$apply();
+
+            expect(scope.isReadOnly).toBe(true);
         });
 
     });

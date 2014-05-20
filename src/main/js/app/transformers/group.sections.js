@@ -51,7 +51,7 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
         });
         var filteredSections = _.map(sections, function(section) {
             section.dataElements = _.filter(section.dataElements, function(dataElement) {
-                var excludedList = systemSetting.excludedDataElements;
+                var excludedList = systemSetting ? systemSetting.excludedDataElements : undefined;
                 return excludedList ? !_.contains(excludedList[moduleId], dataElement.id) : true;
             });
             return section;
