@@ -40,5 +40,6 @@
     "confirmPassword": "Confirm your password.",
     "pwdMatch": "Passwords do not match.",
     "alreadyExists": "Name already exists under this country.",
-    "projectCodeValidation": "Project Code is required."
+    "projectCodeValidation": "Project Code is required.",
+    "disabledCredentials": "User is disabled. Please contact admin for more details."
 }
