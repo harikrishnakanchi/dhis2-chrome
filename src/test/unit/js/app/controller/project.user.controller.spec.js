@@ -40,7 +40,7 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                         "name": user.userRole.name,
                         "id": user.userRole.id
                     }],
-                    "password": user.password,
+                    "password": "msfuser",
                 },
                 "organisationUnits": [{
                     "id": scope.orgUnit.id,
@@ -54,7 +54,6 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
 
             expect(userService.create).toHaveBeenCalledWith(expectedUserPayload);
             expect(scope.saveFailure).toEqual(false);
-
         });
 
         it("should determine username prefix and return validate username", function() {

@@ -37,7 +37,7 @@ define([], function() {
                         "name": projectUser.userRole.name,
                         "id": projectUser.userRole.id
                     }],
-                    "password": projectUser.password,
+                    "password": "msfuser",
                 },
                 "organisationUnits": [{
                     "id": $scope.orgUnit.id,
