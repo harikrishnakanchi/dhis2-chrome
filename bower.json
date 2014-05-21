@@ -14,7 +14,8 @@
         "lodash": null,
         "angularjs-directives": "https://github.com/tw-msf/angularjs-directives.git",
         "moment": null,
-        "js-md5": null
+        "js-md5": null,
+        "hustle": "https://github.com/orthecreedence/hustle.git"
     },
     "devDependencies": {
         "angular-mocks": null

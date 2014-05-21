@@ -11,6 +11,8 @@ require.config({
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
         "moment": "lib/moment/moment",
+        "hustle": "lib/hustle/hustle",
+
 
         //3rd party angular modules
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
