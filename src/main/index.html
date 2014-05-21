@@ -13,7 +13,7 @@
 <div id="dhis2" name="dhis2" ng-csp ng-controller="mainController">
     <header>
       <div class="container">
-        <a class="navbar-brand" href="#/dashboard"><img src="img/logo.png" alt="" title="DHIS"></a>
+        <a class="navbar-brand" href="#/dashboard"><img src="img/logo.png" alt="" title="DHIS" id="logoImg"></a>
         <ul class="nav navbar-nav navbar-right">
           <li class="active" ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">Logout</a></li>
           <li><p class="navbar-text"> {{currentUser.userCredentials.username}} </p></li>
