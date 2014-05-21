@@ -12,6 +12,7 @@ require.config({
         "overrides": "app/conf/overrides",
         "moment": "lib/moment/moment",
         "hustle": "lib/hustle/hustle",
+        "hustleInit": "app/hustle.init",
 
 
         //3rd party angular modules

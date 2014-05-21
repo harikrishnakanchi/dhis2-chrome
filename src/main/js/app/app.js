@@ -1,8 +1,8 @@
-define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "properties", "httpInterceptor",
+define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "properties", "hustleInit", "httpInterceptor",
         "angular-route", "ng-i18n", "angular-indexedDB", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals"
     ],
-    function(angular, Q, services, directives, controllers, migrator, migrations, properties, httpInterceptor) {
+    function(angular, Q, services, directives, controllers, migrator, migrations, properties, hustleInit, httpInterceptor) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal",
@@ -11,6 +11,8 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
             services.init(app);
             directives.init(app);
             controllers.init(app);
+            hustleInit.init();
+
             app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider',
                 function($routeProvider, $indexedDBProvider, $httpProvider) {
