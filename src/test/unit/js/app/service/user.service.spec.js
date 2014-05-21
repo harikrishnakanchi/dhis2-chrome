@@ -10,7 +10,8 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
 
             fakeUserStore = {
                 upsert: function() {},
-                getAll: function() {}
+                getAll: function() {},
+                find: function() {}
             };
 
             db = {
@@ -100,6 +101,46 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
                 expect(usernames).toEqual(["proj_2_user1", "someone@example.com"]);
             });
             rootScope.$apply();
+        });
+
+        it("should disable user", function() {
+            var user = {
+                "id": 1,
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "someone@example.com",
+                    "password": "blah",
+                    "disabled": true
+                },
+                "organisationUnits": []
+            };
+            var expectedUser = {
+                "id": 1,
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "someone@example.com",
+                    "password": "blah",
+                    "disabled": false
+                },
+                "organisationUnits": []
+            };
+            var expectedPayload = {
+                "userCredentials": expectedUser.userCredentials,
+                "organisationUnits": expectedUser.organisationUnits,
+            };
+
+            spyOn(fakeUserStore, "find").and.returnValue(utils.getPromise(q, user));
+            spyOn(fakeUserStore, "upsert").and.returnValue(utils.getPromise(q, "someData"));
+
+            userService.toggleDisabledState(user, false).then(function(data) {
+                expect(data).toEqual("someData");
+                expect(fakeUserStore.upsert).toHaveBeenCalledWith(expectedUser);
+            });
+
+            httpBackend.expectPUT(properties.dhis.url + '/api/users/' + user.id, expectedPayload).respond(200, "ok");
+            httpBackend.flush();
         });
     });
 });

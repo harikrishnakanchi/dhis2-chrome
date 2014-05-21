@@ -97,6 +97,8 @@
 			<h3 class="panel-title">Project User List</h3>
 		</div>
 		<div class="panel-body">
+			<div ng-show="isUserToBeDisabled &amp;&amp; userStateSuccessfullyToggled" class = "alert alert-success">{{ resourceBundle.userDisableSuccess }}</div>
+			<div ng-show="!isUserToBeDisabled &amp;&amp; userStateSuccessfullyToggled" class = "alert alert-success">{{ resourceBundle.userEnableSuccess }}</div>
 			<table class="table table-bordered">
 				<thead>
 					<tr>
@@ -108,13 +110,16 @@
 				</thead>
 				<tbody>
 					<tr ng-repeat="user in projectUsers | orderBy: 'userCredentials.username'">
-						<td> {{user.username}}</td>
+						<td> {{user.userCredentials.username}}</td>
 						<td> {{user.roles}}</td>
 						<td>
 							<a href="" title="Edit" class="edit"><span class="glyphicon glyphicon-edit"></span></a> 
 						</td>
 						<td>
-						<a href="" title="Delete" class="delete"><span class="glyphicon glyphicon-remove"></span></a> 
+						<a href="" title="Delete" class="delete" ng-click="toggleUserDisabledState(user)">
+							<span class="glyphicon glyphicon-remove" ng-show="!user.userCredentials.disabled"></span>
+							<span class="glyphicon glyphicon-ok" ng-show="user.userCredentials.disabled"></span>
+						</a> 
 						</td>
 					</tr>
 				</tbody>

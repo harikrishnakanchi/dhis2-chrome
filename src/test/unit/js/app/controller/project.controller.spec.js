@@ -2,7 +2,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
     describe("project controller tests", function() {
 
-        var scope, timeout, q, location, orgUnitService, anchorScroll, orgunitMapper, userService;
+        var scope, timeout, q, location, orgUnitService, anchorScroll, orgunitMapper, userService,
+            fakeModal;
 
         beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
             scope = $rootScope.$new();
@@ -24,12 +25,25 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             userService = {
                 "getAllProjectUsers": function() {
                     return utils.getPromise(q, [{}]);
+                },
+                "toggleDisabledState": function() {
+                    return utils.getPromise(q, "");
                 }
             };
 
             scope.isEditMode = true;
             scope.orgUnit = {
                 id: "blah"
+            };
+
+            fakeModal = {
+                close: function() {
+                    this.result.confirmCallBack();
+                },
+                dismiss: function(type) {
+                    this.result.cancelCallback(type);
+                },
+                open: function(object) {}
             };
 
             anchorScroll = jasmine.createSpy();
@@ -298,11 +312,29 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             }];
 
             var expectedUsers = [{
-                'username': 'foobar',
-                'roles': 'Role1, Role2'
+                'roles': 'Role1, Role2',
+                'userCredentials': {
+                    'username': 'foobar',
+                    'userAuthorityGroups': [{
+                        "name": 'Role1',
+                        "id": 'Role1Id'
+                    }, {
+                        "name": 'Role2',
+                        "id": 'Role2Id',
+                    }]
+                }
             }, {
-                'username': 'blah',
-                'roles': 'Role1, Role3'
+                'roles': 'Role1, Role3',
+                'userCredentials': {
+                    'username': 'blah',
+                    'userAuthorityGroups': [{
+                        "name": 'Role1',
+                        "id": 'Role1Id'
+                    }, {
+                        "name": 'Role3',
+                        "id": 'Role3Id'
+                    }]
+                }
             }];
             spyOn(userService, "getAllProjectUsers").and.returnValue(utils.getPromise(q, users));
 
@@ -322,6 +354,44 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             scope.setUserProject();
 
             expect(scope.currentUser.organisationUnits[0]).toEqual(scope.orgUnit);
+        });
+
+        it("should not toggle user's disabled state if confirmation cancelled", function() {
+            spyOn(fakeModal, 'open').and.returnValue({
+                result: utils.getRejectedPromise(q, {})
+            });
+            projectController = new ProjectController(scope, orgUnitService, q, location, timeout, anchorScroll, userService, fakeModal);
+            var user = {
+                id: '123',
+                name: "blah blah",
+                userCredentials: {
+                    disabled: false
+                }
+            };
+            scope.toggleUserDisabledState(user, true);
+            scope.$apply();
+
+            expect(scope.userStateSuccessfullyToggled).toBe(false);
+        });
+
+        it("should toggle user's disabled state if confirmed", function() {
+            spyOn(fakeModal, 'open').and.returnValue({
+                result: utils.getPromise(q, {})
+            });
+            spyOn(userService, 'toggleDisabledState').and.returnValue(utils.getPromise(q, {}));
+
+            projectController = new ProjectController(scope, orgUnitService, q, location, timeout, anchorScroll, userService, fakeModal);
+            var user = {
+                id: '123',
+                name: "blah blah",
+                userCredentials: {
+                    disabled: false
+                }
+            };
+            scope.toggleUserDisabledState(user, true);
+            scope.$apply();
+
+            expect(scope.userStateSuccessfullyToggled).toBe(true);
         });
 
     });

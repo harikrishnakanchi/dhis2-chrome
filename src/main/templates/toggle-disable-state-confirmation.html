@@ -1,0 +1,12 @@
+<div class="modal-header">
+	<h4 ng-if="isUserToBeDisabled">Disable User</h4>
+	<h4 ng-if="!isUserToBeDisabled">Enable User</h4>
+</div>
+<div class="modal-body">
+	<p ng-if="isUserToBeDisabled">Are you sure you want to disable {{toggleStateUsername}}?</p>
+	<p ng-if="!isUserToBeDisabled">Are you sure you want to enable {{toggleStateUsername}}?</p>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-main" ng-click="ok()">Yes</button>
+	<button class="btn" ng-click="cancel()">Cancel</button>
+</div>

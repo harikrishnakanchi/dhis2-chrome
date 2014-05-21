@@ -1,6 +1,6 @@
-define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, toTree) {
+define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, orgUnitMapper, toTree, properties) {
 
-    return function($scope, orgUnitService, $q, $location, $timeout, $anchorScroll, userService) {
+    return function($scope, orgUnitService, $q, $location, $timeout, $anchorScroll, userService, $modal) {
 
         $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded', 'Coordination', 'Remote Control'];
 
@@ -50,7 +50,33 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
 
             var dhisProject = new Array(orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit));
             return orgUnitService.create(dhisProject).then(onSuccess, onError);
+        };
 
+        $scope.toggleUserDisabledState = function(user) {
+            $scope.toggleStateUsername = user.name;
+            $scope.isUserToBeDisabled = !user.userCredentials.disabled;
+            $scope.userStateSuccessfullyToggled = false;
+
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/toggle-disable-state-confirmation.html',
+                controller: 'confirmDialogController',
+                scope: $scope
+            });
+
+            var onTimeOut = function() {
+                $scope.userStateSuccessfullyToggled = false;
+            };
+
+            var okConfirmation = function() {
+                return userService.toggleDisabledState(user, $scope.isUserToBeDisabled);
+            };
+            modalInstance.result.then(okConfirmation).then(function() {
+                $scope.userStateSuccessfullyToggled = true;
+                $timeout(onTimeOut, properties.messageTimeout);
+            }, function() {
+                $scope.userStateSuccessfullyToggled = false;
+                $timeout(onTimeOut, properties.messageTimeout);
+            });
         };
 
         $scope.isAfterMaxDate = function() {
@@ -72,10 +98,8 @@ define(["moment", "orgUnitMapper", "toTree"], function(moment, orgUnitMapper, to
                 var roles = user.userCredentials.userAuthorityGroups.map(function(role) {
                     return role.name;
                 });
-                $scope.projectUsers.push({
-                    "username": user.userCredentials.username,
-                    "roles": roles.join(", ")
-                });
+                user.roles = roles.join(", ");
+                $scope.projectUsers.push(user);
             });
         };
 

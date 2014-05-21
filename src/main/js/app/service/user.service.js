@@ -39,10 +39,39 @@ define(["properties", "lodash", "md5"], function(properties, _, md5) {
             return store.getAll().then(filterProjectUsers);
         };
 
+        var toggleDisabledState = function(user, shouldDisable) {
+            var saveToDb = function() {
+                var userStore = db.objectStore("users");
+                return userStore.find(user.userCredentials.username.toLowerCase())
+                    .then(function(user) {
+                        user.userCredentials.disabled = shouldDisable;
+                        return userStore.upsert(user);
+                    });
+            };
+
+            var deleteUserPayload = function() {
+                var payload = {
+                    "userCredentials": user.userCredentials,
+                    "organisationUnits": user.organisationUnits,
+                };
+                payload.userCredentials.disabled = shouldDisable;
+                return payload;
+            };
+
+            var saveToDhis = function(data) {
+                return $http.put(properties.dhis.url + '/api/users/' + user.id, deleteUserPayload()).then(function() {
+                    return data;
+                });
+            };
+
+            return saveToDb().then(saveToDhis);
+        };
+
         return {
             "create": create,
             "getAllProjectUsers": getAllProjectUsers,
-            "getAllUsernames": getAllUsernames
+            "getAllUsernames": getAllUsernames,
+            "toggleDisabledState": toggleDisabledState
         };
     };
 });
