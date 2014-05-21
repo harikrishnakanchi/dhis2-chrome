@@ -67,7 +67,7 @@
 	</accordion-group>
 </accordion>
 <div>
-	<input type="submit" class="btn btn-primary" ng-click="approve()" ng-disabled="dataentryForm.$invalid || isReadOnly	" ng-if="hasRoles(['Approver - Level 1'])" value="Approve" />
+	<input type="submit" class="btn btn-primary" ng-click="approveData()" ng-disabled="dataentryForm.$invalid || isReadOnly	" ng-if="hasRoles(['Approver - Level 1'])" value="Approve" />
 	<input type="submit" class="btn btn-primary" ng-click="accept()" ng-disabled="dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Approver - Level 2'])" value="Accept" />
 	<input type="submit" class="btn btn-main" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" value="Save" />
 	<input type="submit" class="btn btn-main" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" value="Submit" />

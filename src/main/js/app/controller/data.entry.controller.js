@@ -100,7 +100,21 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             save(true);
         };
 
-        $scope.approve = function() {
+        $scope.approveData = function() {
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/approve.dialog.html',
+                controller: 'saveDialogController',
+                scope: $scope
+            });
+
+            var okCallback = function() {
+                approve();
+            };
+
+            modalInstance.result.then(okCallback);
+        };
+
+        var approve = function() {
             var onSuccess = function() {
                 $scope.approveSuccess = true;
                 $scope.approveError = false;

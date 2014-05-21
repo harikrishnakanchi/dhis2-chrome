@@ -741,7 +741,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             expect(scope.isReadOnly).toBe(false);
 
-            scope.approve();
+            scope.approveData();
 
             scope.$apply();
             var expectedApprovalRequest = [{
@@ -770,7 +770,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(approvalService, "approve").and.returnValue(utils.getRejectedPromise(q, {}));
             scope.$apply();
 
-            scope.approve();
+            scope.approveData();
 
             scope.$apply();
 
