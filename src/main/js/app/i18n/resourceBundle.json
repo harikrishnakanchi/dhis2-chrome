@@ -16,7 +16,6 @@
     "projectTypeValidation": "Project type is required.",
     "contextValidation": "Context is required.",
     "consultDaysValidation": "Consultation days is required.",
-    "populationTypeValidation": "Population type is required.",
     "loginFailed": "Invalid Credentials.",
     "savedCountry": "Country created successfully.",
     "errorCountry": "Error creating Country.",
@@ -41,6 +40,5 @@
     "confirmPassword": "Confirm your password.",
     "pwdMatch": "Passwords do not match.",
     "alreadyExists": "Name already exists under this country.",
-    "eventValidation": "Event is required.",
     "projectCodeValidation": "Project Code is required."
 }
