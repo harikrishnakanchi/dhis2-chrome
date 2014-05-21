@@ -65,8 +65,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             approvalStore = getMockStore("approvals");
 
             dataService = {
-                save: function() {},
-                saveToDb: function() {}
+                saveDataAsDraft: function() {},
+                submitData: function() {}
             };
 
             saveSuccessPromise = utils.getPromise(q, {
@@ -409,15 +409,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             }]
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
-            spyOn(dataService, "saveToDb").and.returnValue(saveSuccessPromise);
-            spyOn(dataService, "save").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
 
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.submit();
             scope.$apply();
 
-            expect(dataService.saveToDb).toHaveBeenCalled();
-            expect(dataService.save).toHaveBeenCalled();
+            expect(dataService.submitData).toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(true);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(false);
@@ -442,14 +440,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
 
-            spyOn(dataService, "save");
-            spyOn(dataService, "saveToDb").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "saveDataAsDraft").and.returnValue(saveSuccessPromise);
 
             scope.saveAsDraft();
             scope.$apply();
 
-            expect(dataService.saveToDb).toHaveBeenCalled();
-            expect(dataService.save).not.toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(true);
             expect(scope.submitError).toBe(false);
@@ -477,14 +472,18 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
-            spyOn(dataService, "save").and.returnValue(saveErrorPromise);
-            spyOn(dataService, "saveToDb").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "submitData").and.returnValue(saveErrorPromise);
 
             scope.submit();
             scope.$apply();
 
-            expect(dataService.save).toHaveBeenCalled();
-            expect(dataService.saveToDb).toHaveBeenCalled();
+            var expectedPayload = {
+                completeDate: moment().format("YYYY-MM-DD"),
+                period: '2014W14',
+                orgUnit: 'Module2',
+                dataValues: []
+            };
+            expect(dataService.submitData).toHaveBeenCalledWith(expectedPayload);
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(true);
@@ -511,14 +510,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
-            spyOn(dataService, "save");
-            spyOn(dataService, "saveToDb").and.returnValue(saveErrorPromise);
+            spyOn(dataService, "saveDataAsDraft").and.returnValue(saveErrorPromise);
 
             scope.saveAsDraft();
             scope.$apply();
 
-            expect(dataService.save).not.toHaveBeenCalled();
-            expect(dataService.saveToDb).toHaveBeenCalled();
+            expect(dataService.saveDataAsDraft).toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(false);
@@ -735,6 +732,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
+            scope.dataentryForm.$dirty = true;
+            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             spyOn(approvalService, "approve").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
@@ -754,7 +753,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.approveError).toBe(false);
         });
 
-
         it("should show appropriate message on approval failure", function() {
             scope.currentModule = {
                 id: 'Module2',
@@ -766,6 +764,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
+            scope.dataentryForm.$dirty = true;
+            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
             spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
             spyOn(approvalService, "approve").and.returnValue(utils.getRejectedPromise(q, {}));
             scope.$apply();

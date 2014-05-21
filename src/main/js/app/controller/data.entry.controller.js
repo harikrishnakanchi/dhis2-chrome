@@ -114,6 +114,25 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             modalInstance.result.then(okCallback);
         };
 
+        $scope.accept = function() {
+
+        };
+
+        $scope.isCurrentWeekSelected = function(week) {
+            var today = moment().format("YYYY-MM-DD");
+            if (week && today >= week.startOfWeek && today <= week.endOfWeek)
+                return true;
+            return false;
+        };
+
+        $scope.$watch('dataentryForm.$dirty', function(dirty) {
+            if (dirty) {
+                $scope.preventNavigation = true;
+            } else {
+                $scope.preventNavigation = false;
+            }
+        });
+
         var approve = function() {
             var onSuccess = function() {
                 $scope.approveSuccess = true;
@@ -127,19 +146,24 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.approveError = true;
             };
 
-            var approvalRequest = _.map(_.keys($scope.currentGroupedSections), function(k) {
-                return {
-                    "dataSet": k,
-                    "period": getPeriod(),
-                    "orgUnit": $scope.currentModule.id
-                };
-            });
+            var approveAllData = function() {
+                var approvalRequest = _.map(_.keys($scope.currentGroupedSections), function(k) {
+                    return {
+                        "dataSet": k,
+                        "period": getPeriod(),
+                        "orgUnit": $scope.currentModule.id
+                    };
+                });
 
-            approvalService.approve(approvalRequest).then(onSuccess, onError);
-        };
+                return approvalService.approve(approvalRequest);
+            };
 
-        $scope.accept = function() {
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, getPeriod(), $scope.currentModule.id);
 
+            if ($scope.dataentryForm.$dirty) {
+                dataService.submitData(payload).then(approveAllData).then(onSuccess, onError);
+            } else
+                approveAllData().then(onSuccess, onError);
         };
 
         var save = function(asDraft) {
@@ -156,25 +180,11 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.submitError = !asDraft ? true : false;
             };
 
-            var pushToDhis = function() {
-                if (!asDraft) {
-                    return dataService.save(payload);
-                }
-            };
-
-            var saveToDb = function() {
-                return dataService.saveToDb([payload]);
-            };
-
-            saveToDb().then(pushToDhis).then(successPromise, errorPromise);
+            if (asDraft)
+                dataService.saveDataAsDraft(payload).then(successPromise, errorPromise);
+            else
+                dataService.submitData(payload).then(successPromise, errorPromise);
             scrollToTop();
-        };
-
-        $scope.isCurrentWeekSelected = function(week) {
-            var today = moment().format("YYYY-MM-DD");
-            if (week && today >= week.startOfWeek && today <= week.endOfWeek)
-                return true;
-            return false;
         };
 
         var confirmAndMove = function(okCallback) {
@@ -195,14 +205,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             if ($scope.preventNavigation) {
                 confirmAndMove(okCallback);
                 event.preventDefault();
-            }
-        });
-
-        $scope.$watch('dataentryForm.$dirty', function(dirty) {
-            if (dirty) {
-                $scope.preventNavigation = true;
-            } else {
-                $scope.preventNavigation = false;
             }
         });
 

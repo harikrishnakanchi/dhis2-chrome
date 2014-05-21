@@ -1,30 +1,31 @@
 define(["lodash", "properties", "moment"], function(_, properties, moment) {
     return function($http, db, $q) {
-        this.save = function(payload) {
-            var sucessResponse = function(response) {
-                if (response.data.status === "ERROR") {
-                    return $q.reject(response);
-                }
-                return response;
-            };
-
-            var errorResponse = function(response) {
-                return $q.reject(response);
-            };
-
-            return $http.post(properties.dhis.url + '/api/dataValueSets', payload).then(sucessResponse, errorResponse);
+        this.saveDataAsDraft = function(payload) {
+            return saveToDb([payload]);
         };
 
-        this.get = function(orgUnit) {
+        this.submitData = function(payload) {
+            return saveToDb([payload]).then(save);
+        };
+
+        this.downloadAllData = function(orgUnitId) {
+            return get(orgUnitId).then(saveToDb);
+        };
+
+        var get = function(orgUnit) {
             var today = moment().format("YYYY-MM-DD");
             var onSuccess = function(response) {
-                return response.data;
+                var deferred = $q.defer();
+                deferred.resolve(response.data.dataValues);
+                return deferred.promise;
             };
 
             var onError = function(response) {
-                return {
+                var deferred = $q.defer();
+                deferred.reject({
                     "message": "Error fetching data from server."
-                };
+                });
+                return deferred.promise;
             };
 
             var getAllDatasets = function() {
@@ -47,7 +48,22 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
             return getAllDatasets().then(getDataForDatasets);
         };
 
-        this.saveToDb = function(dataValueSets) {
+        var save = function(payload) {
+            var sucessResponse = function(response) {
+                if (response.data.status === "ERROR") {
+                    return $q.reject(response);
+                }
+                return response;
+            };
+
+            var errorResponse = function(response) {
+                return $q.reject(response);
+            };
+
+            return $http.post(properties.dhis.url + '/api/dataValueSets', payload).then(sucessResponse, errorResponse);
+        };
+
+        var saveToDb = function(dataValueSets) {
             var groupedDataValues = _.groupBy(dataValueSets, function(dataValue) {
                 return [dataValue.period, dataValue.orgUnit];
             });
@@ -61,7 +77,9 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
             };
             var dataValues = _.transform(groupedDataValues, dataValueSetsAggregator, []);
             var dataValuesStore = db.objectStore("dataValues");
-            return dataValuesStore.upsert(dataValues);
+            return dataValuesStore.upsert(dataValues).then(function(data) {
+                return dataValueSets[0];
+            });
         };
     };
 });

@@ -7,13 +7,9 @@
                 $scope.isSyncDone = true;
             };
 
-            var saveToDb = function(response) {
-                return dataService.saveToDb(response.dataValues);
-            };
-
             $scope.syncNow = function() {
                 $scope.isSyncRunning = true;
-                dataService.get($rootScope.currentUser.organisationUnits[0].id).then(saveToDb).then(onSuccess);
+                dataService.downloadAllData($rootScope.currentUser.organisationUnits[0].id).then(onSuccess);
             };
         };
     });

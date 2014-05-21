@@ -33,8 +33,8 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
                 return stores[storeName];
             });
 
-            spyOn(dataValuesStore, "upsert").and.callFake(function() {
-                return {};
+            spyOn(dataValuesStore, "upsert").and.callFake(function(data) {
+                return utils.getPromise(q, data);
             });
         }));
 
@@ -44,16 +44,44 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
         });
 
         it("should save datavalues to dhis", function() {
-            var dataValues = {
-                "blah": "blah"
+            var payload = {
+                completeDate: moment().format("YYYY-MM-DD"),
+                period: '2014W15',
+                orgUnit: 'company_0',
+                dataValues: [{
+                    dataElement: "DE1",
+                    categoryOptionCombo: "COC1",
+                    value: 1,
+                }, {
+                    dataElement: "DE2",
+                    categoryOptionCombo: "COC2",
+                    value: 2,
+                }]
             };
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", dataValues).respond(200, "ok");
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", payload).respond(200, "ok");
 
             var dataService = new DataService(http, db);
-            dataService.save(dataValues);
+            dataService.submitData(payload);
 
             httpBackend.flush();
+
+            expect(dataValuesStore.upsert).toHaveBeenCalledWith([{
+                period: '2014W15',
+                dataValues: [payload],
+                "orgUnit": "company_0"
+            }]);
+        });
+
+        it("should save data values as draft", function() {
+            spyOn(http, "post");
+
+            var dataService = new DataService(http, db, q);
+            dataService.saveDataAsDraft({});
+
+            expect(dataValuesStore.upsert).toHaveBeenCalled();
+
+            expect(http.post).not.toHaveBeenCalled();
         });
 
         it("should return a reject promise if dhis responds with an error", function() {
@@ -83,7 +111,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
             var onSuccess = jasmine.createSpy();
             var onError = jasmine.createSpy();
 
-            dataService.save(dataValues).then(onSuccess, onError);
+            dataService.submitData(dataValues).then(onSuccess, onError);
 
             httpBackend.flush();
 
@@ -91,63 +119,171 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
             expect(onError).toHaveBeenCalled();
         });
 
-        it("should return error message if data values were not fetched", function() {
-            var dataService = new DataService(http, db, q);
-            var today = moment().format("YYYY-MM-DD");
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(500);
-
-            dataService.get('company_0', 'DS_OPD').then(function(response) {
-                expect(response).toEqual({
-                    message: 'Error fetching data from server.'
-                });
-            });
-
-            httpBackend.flush();
-        });
-
-        it("should return data values fetched from DHIS", function() {
+        it("should download all data for an org unit", function() {
             var dataService = new DataService(http, db, q);
             var dataValueSet = {
-                dataValues: [{
-                    dataElement: "DE_Oedema",
-                    period: "2014W15",
-                    orgUnit: "company_0",
-                    categoryOptionCombo: "32",
-                    value: "8",
-                    storedBy: "admin",
-                    lastUpdated: "2014-04-17T15:30:56.172+05:30",
-                    followUp: false
+                "dataValues": [{
+                    "dataElement": "b9634a78271",
+                    "period": "2014W18",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "12",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W18",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "AgGAN4mbMvb",
+                    "value": "23",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W18",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "e4okw2JPhev",
+                    "value": "0",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W19",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "12",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W19",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "AgGAN4mbMvb",
+                    "value": "12",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W19",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "e4okw2JPhev",
+                    "value": "0",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "940e7245079",
+                    "period": "2014W18",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "LVvnPvuj1qg",
+                    "value": "4",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "940e7245079",
+                    "period": "2014W19",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "LVvnPvuj1qg",
+                    "value": "1",
+                    "storedBy": "service.account",
+                    "followUp": false
                 }]
             };
+            var expectedDataSets =
+                [{
+                period: '2014W18',
+                dataValues: [{
+                    "dataElement": "b9634a78271",
+                    "period": "2014W18",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "12",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W18",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "AgGAN4mbMvb",
+                    "value": "23",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W18",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "e4okw2JPhev",
+                    "value": "0",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "940e7245079",
+                    "period": "2014W18",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "LVvnPvuj1qg",
+                    "value": "4",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }],
+                orgUnit: 'c484c99b86d'
+            }, {
+                period: '2014W19',
+                dataValues: [{
+                    "dataElement": "b9634a78271",
+                    "period": "2014W19",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "12",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W19",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "AgGAN4mbMvb",
+                    "value": "12",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W19",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "e4okw2JPhev",
+                    "value": "0",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "940e7245079",
+                    "period": "2014W19",
+                    "orgUnit": "c484c99b86d",
+                    "categoryOptionCombo": "LVvnPvuj1qg",
+                    "value": "1",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }],
+                orgUnit: 'c484c99b86d'
+            }];
+
             var today = moment().format("YYYY-MM-DD");
             httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, dataValueSet);
 
-            dataService.get('company_0', 'DS_OPD').then(function(response) {
-                expect(response).toEqual(dataValueSet);
+            dataService.downloadAllData('company_0').then(function(data) {
+                console.log("asD");
+                expect(dataValuesStore.upsert).toHaveBeenCalledWith(expectedDataSets);
             });
 
             httpBackend.flush();
+
         });
 
-        it("should parse and save the fetched data values", function() {
-            var orgUnit = "company_0";
-            var dataValueSet = [{
-                dataElement: "DE_Oedema",
-                period: "2014W15",
-                orgUnit: "company_0",
-                categoryOptionCombo: "32",
-                value: 8,
-                followUp: false
-            }];
+
+        it("should return a reject promise if download all data fails", function() {
+            httpBackend.expectGET().respond(500, {});
             var dataService = new DataService(http, db, q);
+            dataService.downloadAllData('company_0').then(undefined, function(data) {
+                expect(data.message).toBeDefined();
+            });
 
-            dataService.saveToDb(dataValueSet, orgUnit);
-
-            expect(dataValuesStore.upsert).toHaveBeenCalledWith([{
-                period: '2014W15',
-                dataValues: dataValueSet,
-                "orgUnit": orgUnit
-            }]);
+            httpBackend.flush();
         });
     });
 });
