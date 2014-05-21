@@ -1,6 +1,6 @@
-define(["saveDialogController", "angularMocks"], function(SaveDialogController, mocks) {
-    describe("saveDialogController", function() {
-        var scope, modalInstance, saveDialogController;
+define(["confirmDialogController", "angularMocks"], function(ConfirmDialogController, mocks) {
+    describe("confirmDialogController", function() {
+        var scope, modalInstance, confirmDialogController;
 
         beforeEach(mocks.inject(function($rootScope) {
             scope = $rootScope.$new();
@@ -8,7 +8,7 @@ define(["saveDialogController", "angularMocks"], function(SaveDialogController, 
                 'close': function() {},
                 'dismiss': function() {}
             };
-            saveDialogController = new SaveDialogController(scope, modalInstance);
+            confirmDialogController = new ConfirmDialogController(scope, modalInstance);
 
         }));
 

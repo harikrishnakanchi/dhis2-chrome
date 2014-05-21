@@ -103,7 +103,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         $scope.approveData = function() {
             var modalInstance = $modal.open({
                 templateUrl: 'templates/approve.dialog.html',
-                controller: 'saveDialogController',
+                controller: 'confirmDialogController',
                 scope: $scope
             });
 
@@ -180,7 +180,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         var confirmAndMove = function(okCallback) {
             var modalInstance = $modal.open({
                 templateUrl: 'templates/save.dialog.html',
-                controller: 'saveDialogController',
+                controller: 'confirmDialogController',
                 scope: $scope
             });
 
