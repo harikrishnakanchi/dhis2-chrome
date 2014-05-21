@@ -1,7 +1,7 @@
 <div class="login-form">
 <form name="loginForm" role="form" ng-submit="login()">
-	<p  class='alert alert-danger' ng-show='invalidCredentials'>{{resourceBundle.loginFailed}}</p>
-  <p  class='alert alert-danger' ng-show='disabledCredentials'>{{resourceBundle.disabledCredentials}}</p>
+	<p  class='alert alert-danger' ng-show='invalidCredentials' id="loginFailedMsg">{{resourceBundle.loginFailed}}</p>
+  <p  class='alert alert-danger' ng-show='disabledCredentials' id="userDisabledMsg">{{resourceBundle.disabledCredentials}}</p>
 	<ul class="form-horizontal">
    <li class="form-group">
     <label for="username" class="col-sm-4 control-label">Username</label>

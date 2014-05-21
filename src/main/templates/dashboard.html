@@ -2,7 +2,7 @@
 <div style="margin:30px;">
 	<a id="linkToDataEntry" ng-if="hasRoles(['Data entry user'])" href="#/data-entry" class="btn btn-default">Data Entry</a>
 	<a id="linkToDataApproval" ng-if="hasRoles(['Approver - Level 1', 'Approver - Level 2'])" href="#/data-entry" class="btn btn-default">Approve data</a>
-	<a id="linkToProjects" ng-if="hasRoles(['Superuser'])" href="#/projects" id="projects" class="btn btn-default">Projects</a>
+	<a id="linkToProjects" ng-if="hasRoles(['Superuser'])" href="#/projects" class="btn btn-default">Projects</a>
 	<a id="linkToDownloadData" ng-if="hasRoles(['Superuser', 'Data entry user', 'Approver - Level 1', 'Approver - Level 2'])" href="" ng-click="syncNow()" class="btn btn-default">Download All Data</a>
 	<span ng-show="isSyncRunning">{{resourceBundle.syncRunning}}</span>
 	<span ng-show="isSyncDone">{{resourceBundle.syncComplete}}</span>
