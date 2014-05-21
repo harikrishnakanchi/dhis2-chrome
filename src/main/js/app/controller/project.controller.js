@@ -53,7 +53,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         };
 
         $scope.toggleUserDisabledState = function(user) {
-            $scope.toggleStateUsername = user.name;
+            $scope.toggleStateUsername = user.userCredentials.username;
             $scope.isUserToBeDisabled = !user.userCredentials.disabled;
             $scope.userStateSuccessfullyToggled = false;
 
