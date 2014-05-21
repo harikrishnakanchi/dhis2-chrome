@@ -139,7 +139,7 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
 
         $scope.areNoSectionsSelectedForDataset = function(module, dataset) {
             return _.all(dataset.sections, function(section) {
-                return !module.selectedSections[section.id];
+                return module.selectedSections && !module.selectedSections[section.id];
             });
         };
 

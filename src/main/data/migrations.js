@@ -73,7 +73,7 @@ define([], function() {
     };
 
     var add_translation_store = function(db, tx) {
-        create_store_with_key("translations", ["uid", "locale"], db)
+        create_store_with_key("translations", ["objectUid", "locale"], db)
     };
 
     var add_approval_store = function(db, tx) {
