@@ -1,13 +1,15 @@
-define(["angular", "Q", "services", "hustleInit", "angular-indexedDB"],
-    function(angular, Q, services, hustleInit) {
+define(["angular", "Q", "services", "hustleInit", "httpInterceptor", "angular-indexedDB"],
+    function(angular, Q, services, hustleInit, httpInterceptor) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB"]);
             services.init(app);
             // hustleInit.init();
 
-            app.config(['$indexedDBProvider',
-                function($indexedDBProvider) {
+            app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
+            app.config(['$indexedDBProvider', '$httpProvider',
+                function($indexedDBProvider, $httpProvider) {
                     $indexedDBProvider.connection('msf');
+                    $httpProvider.interceptors.push('httpInterceptor');
                 }
             ]);
 
@@ -25,7 +27,7 @@ define(["angular", "Q", "services", "hustleInit", "angular-indexedDB"],
                         metadataService.sync().
                         finally(scheduleSync);
                     }
-                    dataService.downloadAllData("c484c99b86d");
+                    // dataService.downloadAllData("c484c99b86d");
                     var registerCallback = function(alarmName, callback) {
                         return function(alarm) {
                             if (alarm.name === alarmName)
@@ -38,6 +40,7 @@ define(["angular", "Q", "services", "hustleInit", "angular-indexedDB"],
                     }
                 }
             ]);
+
             return app;
         };
 

@@ -17,7 +17,10 @@ require.config({
         "metadataService": "app/service/metadata.service",
         "services": "app/service/bg.services",
 
-        "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb"
+        "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
+
+        //Interceptors
+        "httpInterceptor": "app/interceptors/http.interceptor"
     },
     shim: {
         'angular': {
