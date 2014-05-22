@@ -26,7 +26,7 @@ define(["findCategoryComboOption"], function(findCategoryComboOption) {
 
         var headerLabels = _.map(headers, function(a) {
             return _.map(a, function(b) {
-                return _.last(b).name;
+                return _.last(b);
             });
         });
 

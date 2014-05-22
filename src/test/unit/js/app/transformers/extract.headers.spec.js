@@ -55,7 +55,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             var result = extractHeaders(categories, categoryCombo, categoryOptionCombos);
 
             expect(result.headers).toEqual([
-                ["Resident", "Migrant"]
+                [categoryOptions[0], categoryOptions[1]]
             ]);
             expect(result.categoryOptionComboIds).toEqual([1, 2]);
         });
@@ -103,12 +103,8 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
 
             expect(result.headers).toEqual(
                 [
-                    [
-                        "Resident", "Migrant"
-                    ],
-                    [
-                        "LessThan5", "GreaterThan5", "LessThan5", "GreaterThan5"
-                    ]
+                    [categoryOptions[0], categoryOptions[1]],
+                    [categoryOptions[2], categoryOptions[3], categoryOptions[2], categoryOptions[3]]
                 ]
             );
             expect(result.categoryOptionComboIds).toEqual([1, 2, 3, 4]);
@@ -246,9 +242,36 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             var result = extractHeaders(categories, categoryCombo, categoryOptionCombos);
 
             expect(result.headers).toEqual([
-                ["1"],
-                ["a", "b"],
-                ["x", "y", "z", "x", "y", "z"]
+                [{
+                    "name": "1",
+                    "id": "1"
+                }],
+                [{
+                    "name": "a",
+                    "id": "a"
+                }, {
+                    "name": "b",
+                    "id": "b"
+                }],
+                [{
+                    "name": "x",
+                    "id": "x"
+                }, {
+                    "name": "y",
+                    "id": "y"
+                }, {
+                    "name": "z",
+                    "id": "z"
+                }, {
+                    "name": "x",
+                    "id": "x"
+                }, {
+                    "name": "y",
+                    "id": "y"
+                }, {
+                    "name": "z",
+                    "id": "z"
+                }]
             ]);
 
             expect(result.categoryOptionComboIds).toEqual([1, 2, 3, 4, 5, 6]);

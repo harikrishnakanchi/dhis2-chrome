@@ -4,6 +4,7 @@
     "approveDataLabel": "Approuver Données",
     "projectsLabel": "Les projets",
     "downloadDataLabel": "Télécharger toutes les données",
+    "totalLabel": "Totale",
     "invalidExpression": "Doit être une expression valide contenant des chiffres et des '+'",
     "savedUser": "Usuario guardado correctamente."
 }

@@ -3,5 +3,6 @@
     "dataEntryLabel": "إدخال البيانات",
     "approveDataLabel": "الموافقة على البيانات",
     "projectsLabel": "مشاريع",
-    "downloadDataLabel": "تحميل جميع البيانات"
+    "downloadDataLabel": "تحميل جميع البيانات",
+    "totalLabel": "مجموع"
 }

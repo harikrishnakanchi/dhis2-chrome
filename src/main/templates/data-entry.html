@@ -50,11 +50,13 @@
 					<table class="table table-bordered">
 						<tr ng-repeat="category in section.headers">
 							<th></th>
+
 							<th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
-								{{option}}
+								<span ng-if="!resourceBundle[option.id]">{{option.name}}</span>
+								<span ng-if="resourceBundle[option.id]">resourceBundle[option.id]</span>
 							</th>
 							<th ng-show="$last">
-								Total
+								{{ resourceBundle.totalLabel }}
 							</th>
 						</tr>
 						<tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">

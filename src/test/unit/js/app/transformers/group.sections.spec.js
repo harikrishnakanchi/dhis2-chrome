@@ -53,14 +53,38 @@ define(["groupSections", "testData"], function(groupSections, testData) {
         it("should set headers and categoryOptionComboIds on sections", function() {
             var section1 = groupedSections.DS_OPD[0];
             expect(section1.headers).toEqual([
-                ["Resident", "Migrant"],
-                ["LessThan5", "GreaterThan5", "LessThan5", "GreaterThan5", ]
+                [{
+                    "id": 'CO1',
+                    "name": 'Resident'
+                }, {
+                    "id": 'CO2',
+                    "name": 'Migrant'
+                }],
+                [{
+                    "id": 'CO3',
+                    "name": 'LessThan5'
+                }, {
+                    "id": 'CO4',
+                    "name": 'GreaterThan5'
+                }, {
+                    "id": 'CO3',
+                    "name": 'LessThan5'
+                }, {
+                    "id": 'CO4',
+                    "name": 'GreaterThan5'
+                }]
             ]);
 
             expect(section1.categoryOptionComboIds).toEqual(["1", "2", "3", "4"]);
             var section2 = groupedSections.Vacc[0];
             expect(section2.headers).toEqual([
-                ["LessThan5", "GreaterThan5"]
+                [{
+                    "id": 'CO3',
+                    "name": 'LessThan5'
+                }, {
+                    "id": 'CO4',
+                    "name": 'GreaterThan5'
+                }]
             ]);
             expect(section2.categoryOptionComboIds).toEqual(["6", "5"]);
         });
