@@ -267,7 +267,6 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
             httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, dataValueSet);
 
             dataService.downloadAllData('company_0').then(function(data) {
-                console.log("asD");
                 expect(dataValuesStore.upsert).toHaveBeenCalledWith(expectedDataSets);
             });
 

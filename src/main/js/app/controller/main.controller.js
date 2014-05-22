@@ -1,10 +1,13 @@
 define(["ng-i18n"], function() {
-
     return function($scope, $rootScope, ngI18nResourceBundle) {
-        ngI18nResourceBundle.get({
-            locale: "en"
-        }).success(function(resourceBundle) {
-            $rootScope.resourceBundle = resourceBundle;
+        $scope.locale = "en";
+
+        $scope.$watch("locale", function() {
+            ngI18nResourceBundle.get({
+                locale: $scope.locale
+            }).then(function(data) {
+                $rootScope.resourceBundle = data.data;
+            });
         });
 
         $scope.logout = function() {

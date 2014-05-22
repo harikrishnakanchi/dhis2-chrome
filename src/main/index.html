@@ -9,12 +9,19 @@
 </head>
 
 <body >
-<a id="top"></a>
-<div id="dhis2" name="dhis2" ng-csp ng-controller="mainController">
+  <a id="top"></a>
+  <div id="dhis2" name="dhis2" ng-csp ng-controller="mainController">
     <header>
       <div class="container">
         <a class="navbar-brand" href="#/dashboard"><img src="img/logo.png" alt="" title="DHIS" id="logoImg"></a>
         <ul class="nav navbar-nav navbar-right">
+          <li>
+            <select ng-model="locale">
+              <option value="en">English</option>
+              <option value="fr">French</option>
+              <option value="ar">Arabic</option>
+            </select>
+          </li>
           <li class="active" ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">Logout</a></li>
           <li><p class="navbar-text"> {{currentUser.userCredentials.username}} </p></li>
         </ul>
@@ -22,12 +29,12 @@
     </header>
     <div class="container">
      <div class="loading" ng-show="loading">
-        <img src="img/ajax-loader.gif" class="spinner"/>
-      </div>
-     <div ng-view="ng-view">
-     </div>
-   </div>
- </div>
+      <img src="img/ajax-loader.gif" class="spinner"/>
+    </div>
+    <div ng-view="ng-view">
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
