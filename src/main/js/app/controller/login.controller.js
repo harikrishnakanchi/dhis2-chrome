@@ -12,6 +12,16 @@ define(["md5"], function(md5) {
             return userCredentialsStore.find("project_user");
         };
 
+        var setLocale = function() {
+            var store = db.objectStore('userPreferences');
+            store.find($rootScope.currentUser.id).then(function(data) {
+                $rootScope.currentUser.locale = data.locale;
+            }).
+            catch (function(data) {
+                $rootScope.currentUser.locale = "en";
+            });
+        };
+
         var authenticateOrPromptUserForPassword = function(data) {
             var user = data[0];
             var userCredentials = data[1];
@@ -26,6 +36,7 @@ define(["md5"], function(md5) {
                 $scope.invalidCredentials = false;
                 $rootScope.isLoggedIn = true;
                 $rootScope.currentUser = user;
+                setLocale();
                 $location.path("/dashboard");
             }
         };

@@ -75,8 +75,13 @@ define([], function() {
         });
     };
 
+    var add_user_preference_store = function(db, tx) {
+        var userPrefenreceStore = create_store_with_key("userPreferences", "id", db);
+    };
+
     var add_translation_store = function(db, tx) {
-        create_store_with_key("translations", ["objectUid", "locale"], db)
+        var translationsStore = create_store_with_key("translations", ["objectUid", "locale"], db)
+        create_index(translationsStore, "by_locale", "locale", false);
     };
 
     var add_approval_store = function(db, tx) {
@@ -94,5 +99,6 @@ define([], function() {
         add_project_user_to_local_cred_store,
         add_translation_store,
         add_approval_store,
-        add_system_settings_store];
+        add_system_settings_store,
+        add_user_preference_store];
 });

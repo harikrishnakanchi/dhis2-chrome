@@ -1,4 +1,9 @@
 {
+    "logoutLabel": "Logout",
+    "dataEntryLabel": "Data Entry",
+    "approveDataLabel": "Approve data",
+    "projectsLabel": "Projects",
+    "downloadDataLabel": "Download All Data",
     "invalidExpression": "Must be a valid expression containing digits and '+'",
     "dataSaveSuccess": "Data saved successfully",
     "dataSaveFailure": "Error saving data, Please try again later",

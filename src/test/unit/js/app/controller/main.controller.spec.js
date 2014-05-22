@@ -1,19 +1,68 @@
 define(["mainController", "angularMocks", "utils"], function(MainController, mocks, utils) {
     describe("dashboard controller", function() {
-        var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy;
+        var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, db,
+            translationStore, userPreferenceStore;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             scope = $rootScope.$new();
             q = $q;
             rootScope = $rootScope;
+            rootScope.currentUser = {};
+
             i18nResourceBundle = {
                 get: function() {}
             };
+
+            var queryBuilder = function() {
+                this.$index = function() {
+                    return this;
+                };
+                this.$eq = function(v) {
+                    return this;
+                };
+                this.compile = function() {
+                    return "blah";
+                }
+                return this;
+            };
+            db = {
+                "objectStore": function() {},
+                "queryBuilder": queryBuilder
+            };
+
+            var getMockStore = function(data) {
+                var upsert = function() {};
+                var find = function() {};
+                var each = function() {};
+
+                return {
+                    upsert: upsert,
+                    find: find,
+                    each: each,
+                };
+            };
+
             getResourceBundleSpy = spyOn(i18nResourceBundle, "get");
             getResourceBundleSpy.and.returnValue(utils.getPromise(q, {
                 "data": {}
             }));
-            mainController = new MainController(scope, rootScope, i18nResourceBundle);
+
+            translationStore = getMockStore("translations");
+            userPreferenceStore = getMockStore("userPreferences");
+
+            spyOn(translationStore, "each").and.returnValue(utils.getPromise(q, {}));
+            spyOn(db, 'objectStore').and.callFake(function(storeName) {
+                if (storeName === "translations")
+                    return translationStore;
+                if (storeName === "userPreferences")
+                    return userPreferenceStore;
+            });
+            spyOn(userPreferenceStore, 'upsert').and.returnValue(utils.getPromise(q, {
+                'id': 1,
+                'locale': 'en'
+            }));
+
+            mainController = new MainController(scope, rootScope, i18nResourceBundle, db);
         }));
 
         it("should logout user", function() {
@@ -28,11 +77,11 @@ define(["mainController", "angularMocks", "utils"], function(MainController, moc
             scope.$apply();
 
             expect(rootScope.resourceBundle).toEqual({});
-            expect(scope.locale).toEqual("en");
         });
 
         it("should change resourceBundle if locale changes", function() {
-            scope.locale = "fr";
+            rootScope.currentUser.locale = "fr";
+
             var frenchResourceBundle = {
                 "data": {
                     "login": "french"

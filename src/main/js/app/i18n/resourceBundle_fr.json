@@ -1,4 +1,9 @@
 {
+    "logoutLabel": "Logout",
+    "dataEntryLabel": "Saisie de Données",
+    "approveDataLabel": "Approuver Données",
+    "projectsLabel": "Les projets",
+    "downloadDataLabel": "Télécharger toutes les données",
     "invalidExpression": "Doit être une expression valide contenant des chiffres et des '+'",
     "savedUser": "Usuario guardado correctamente."
 }

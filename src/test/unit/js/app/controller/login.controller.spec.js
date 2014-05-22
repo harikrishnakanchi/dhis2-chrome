@@ -1,6 +1,6 @@
 define(["loginController", "angularMocks", "utils"], function(LoginController, mocks, utils) {
     describe("dashboard controller", function() {
-        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore;
+        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, userPreferenceStore;
 
         beforeEach(mocks.inject(function($rootScope, $location, $q) {
             scope = $rootScope.$new();
@@ -20,6 +20,10 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
                 "find": function() {}
             };
 
+            userPreferenceStore = {
+                "find": function() {}
+            };
+
             spyOn(location, 'path');
 
             spyOn(db, 'objectStore').and.callFake(function(storeName) {
@@ -27,6 +31,8 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
                     return fakeUserStore;
                 if (storeName === "localUserCredentials")
                     return fakeUserCredentialsStore;
+                if (storeName === "userPreferences")
+                    return userPreferenceStore;
             });
 
             spyOn(fakeUserStore, 'find').and.callFake(function(username) {
@@ -48,8 +54,9 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
                     "username": "project_user",
                     "password": "caa63a86bbc63b2ae67ef0a069db7fb9"
                 });
-
             });
+
+            spyOn(userPreferenceStore, 'find').and.returnValue(utils.getPromise(q, {}));
 
             loginController = new LoginController(scope, $rootScope, location, db, q);
         }));
@@ -81,7 +88,6 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
             expect(scope.invalidCredentials).toEqual(true);
         });
 
-
         it("should login project user with valid credentials and redirect to dashboard", function() {
             scope.username = "someProjectUser";
             scope.password = "msfuser";
@@ -106,7 +112,6 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
             expect(location.path).not.toHaveBeenCalled();
             expect(scope.invalidCredentials).toEqual(true);
         });
-
 
         it("should not login user with invalid username", function() {
             fakeUserStore = {

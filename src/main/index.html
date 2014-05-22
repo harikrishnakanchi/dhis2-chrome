@@ -2,7 +2,7 @@
 <html>
 <head>
  <title>DHIS2</title>
-
+ <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
  <link rel="stylesheet" type="text/css" href="js/lib/angular/angular-csp.css">
  <link rel="stylesheet" type="text/css" href="css/main.css">
  <script src="js/lib/requirejs/require.js" data-main="js/app/bootstrap.js"></script>
@@ -16,13 +16,13 @@
         <a class="navbar-brand" href="#/dashboard"><img src="img/logo.png" alt="" title="DHIS" id="logoImg"></a>
         <ul class="nav navbar-nav navbar-right">
           <li>
-            <select ng-model="locale">
+            <select ng-model="currentUser.locale" ng-if="currentUser"> 
               <option value="en">English</option>
-              <option value="fr">French</option>
-              <option value="ar">Arabic</option>
+              <option dir="rtl" lang="fr" value="fr">Français</option>
+              <option dir="rtl" lang="ar" value="ar">العربية</option>
             </select>
           </li>
-          <li class="active" ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">Logout</a></li>
+          <li class="active" ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a></li>
           <li><p class="navbar-text"> {{currentUser.userCredentials.username}} </p></li>
         </ul>
       </div>
