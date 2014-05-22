@@ -3,7 +3,7 @@ require.config({
 });
 
 require(["app/background.config"], function(config) {
-    require(["indexedDBLogger"], function(indexedDBLogger) {
+    require(["indexedDBLogger", "app"], function(indexedDBLogger, app) {
         indexedDBLogger.configure("msfLogs");
         require(["backgroundServicesRegistry", "metadataSyncService", "properties"], function(backgroundServicesRegistry, metadataSyncService, properties) {
             var scheduleSync = function() {
@@ -15,6 +15,7 @@ require(["app/background.config"], function(config) {
 
             var onMigrationComplete = function(request, sender, sendResponse) {
                 if (request === "migrationComplete") {
+                    app.bootstrap(app.init());
                     console.log("dB migration complete. Starting sync");
                     if (navigator.onLine) {
                         metadataSyncService.sync().
