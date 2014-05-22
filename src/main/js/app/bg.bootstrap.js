@@ -2,7 +2,7 @@ require.config({
     baseUrl: "js/"
 });
 
-require(["app/background.config"], function(config) {
+require(["app/bg.config"], function(config) {
     require(["indexedDBLogger", "app"], function(indexedDBLogger, app) {
         indexedDBLogger.configure("msfLogs");
         require(["backgroundServicesRegistry", "metadataSyncService", "properties"], function(backgroundServicesRegistry, metadataSyncService, properties) {
@@ -21,7 +21,6 @@ require(["app/background.config"], function(config) {
                         metadataSyncService.sync().
                         finally(scheduleSync);
                     }
-
                 }
             };
 

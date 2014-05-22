@@ -9,11 +9,16 @@ require.config({
         "idb": "app/utils/idb",
         "indexedDBLogger": "app/utils/indexeddb.logger",
         "metadataSyncService": "app/bg/metadata.sync",
-        "app": "app/background.app",
+        "app": "app/bg.app",
         "hustle": "lib/hustle/hustle",
+        "moment": "lib/moment/moment",
         "hustleInit": "app/hustle.init",
 
         "angular": "lib/angular/angular",
+
+        //services
+        "dataService": "app/service/data.service",
+        "services": "app/service/bg.services",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
         "backgroundServicesRegistry": "app/bg/background.services.registry",

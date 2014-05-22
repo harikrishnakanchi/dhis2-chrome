@@ -1,8 +1,8 @@
-define(["angular", "Q", "hustleInit", "angular-indexedDB"],
-    function(angular, Q, hustleInit) {
+define(["angular", "Q", "services", "hustleInit", "angular-indexedDB"],
+    function(angular, Q, services, hustleInit) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB"]);
-            // services.init(app);
+            services.init(app);
             // hustleInit.init();
 
             app.config(['$indexedDBProvider',
@@ -10,6 +10,13 @@ define(["angular", "Q", "hustleInit", "angular-indexedDB"],
                     $indexedDBProvider.connection('msf');
                 }
             ]);
+
+            app.run(['dataService',
+                function(dataService) {
+                    dataService.downloadAllData("c484c99b86d");
+                }
+            ])
+
             return app;
         };
 
