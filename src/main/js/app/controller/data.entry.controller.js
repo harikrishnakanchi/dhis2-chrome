@@ -69,7 +69,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             });
 
             setApprovalState();
-            $scope.dataentryForm.$setPristine();
+            if ($scope.dataentryForm !== undefined)
+                $scope.dataentryForm.$setPristine();
         };
 
         $scope.$watchCollection('[week, currentModule]', function() {
