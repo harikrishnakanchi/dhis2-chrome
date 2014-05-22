@@ -1,12 +1,17 @@
 /*global Date:true*/
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment) {
     describe("dataEntryController ", function() {
-        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, dataValuesStore, orgUnitStore, approvalStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
+        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, approvalStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
             orgUnits, window, approvalService, approvalStoreSpy;
 
         beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location, $window) {
             q = $q;
             window = $window;
+            location = $location;
+            anchorScroll = $anchorScroll;
+            rootScope = $rootScope;
+
+            scope = $rootScope.$new();
 
             var queryBuilder = function() {
                 this.$index = function() {
@@ -17,7 +22,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 };
                 this.compile = function() {
                     return "blah";
-                }
+                };
                 return this;
             };
 
@@ -34,14 +39,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 }
             };
 
-            location = $location;
-            anchorScroll = $anchorScroll;
-            rootScope = $rootScope;
-            scope = $rootScope.$new();
-            dataEntryFormMock = {
+            scope.dataentryForm = {
                 $setPristine: function() {}
             };
-            scope.dataentryForm = dataEntryFormMock;
+
             var getMockStore = function(data) {
                 var getAll = function() {
                     return utils.getPromise(q, data);
@@ -57,122 +58,23 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     each: each,
                 };
             };
+            approvalStore = getMockStore("approvals");
+
+            spyOn(db, 'objectStore').and.callFake(function(storeName) {
+                if (storeName === "approvals")
+                    return approvalStore;
+                return getMockStore(testData.get(storeName));
+            });
+
             approvalService = {
                 approve: function() {}
             };
-            dataValuesStore = getMockStore("dataValues");
-            orgUnitStore = getMockStore("organisationUnits");
-            approvalStore = getMockStore("approvals");
 
             dataService = {
                 saveDataAsDraft: function() {},
                 submitData: function() {},
                 getDataValues: function() {}
             };
-
-            saveSuccessPromise = utils.getPromise(q, {
-                "ok": "ok"
-            });
-
-            saveErrorPromise = utils.getRejectedPromise(q, {
-                "ok": "ok"
-            });
-
-            spyOn(db, 'objectStore').and.callFake(function(storeName) {
-                if (storeName === "dataValues")
-                    return dataValuesStore;
-                if (storeName === "organisationUnits")
-                    return orgUnitStore;
-                if (storeName === "approvals")
-                    return approvalStore;
-                return getMockStore(testData.get(storeName));
-            });
-
-            orgUnits = [{
-                'name': 'proj1',
-                'id': 'proj_1',
-                'parent': {
-                    id: "country_1"
-                },
-                'attributeValues': [{
-                    'attribute': {
-                        id: "a1fa2777924"
-                    },
-                    value: "Project"
-                }]
-            }, {
-                'name': 'proj2',
-                'id': 'proj_2',
-                'parent': {
-                    id: "country_1"
-                },
-                'attributeValues': [{
-                    'attribute': {
-                        id: "a1fa2777924"
-                    },
-                    value: "Project"
-                }]
-            }, {
-                'name': 'mod1',
-                'id': 'mod1',
-                'parent': {
-                    id: "proj_1"
-                },
-                'attributeValues': [{
-                    'attribute': {
-                        id: "a1fa2777924"
-                    },
-                    value: "Module"
-                }]
-            }, {
-                'name': 'mod2',
-                'id': 'mod2',
-                'parent': {
-                    id: "proj_1"
-                },
-                'attributeValues': [{
-                    'attribute': {
-                        id: "a1fa2777924"
-                    },
-                    value: "Module"
-                }]
-            }, {
-                'name': 'mod3',
-                'id': 'mod3',
-                'parent': {
-                    id: "proj_2"
-                },
-                'attributeValues': [{
-                    'attribute': {
-                        id: "a1fa2777924"
-                    },
-                    value: "Module"
-                }]
-            }, {
-                'name': 'modunderopunit',
-                'id': 'mod11',
-                'parent': {
-                    id: "opunit1"
-                },
-                'attributeValues': [{
-                    'attribute': {
-                        id: "a1fa2777924"
-                    },
-                    value: "Module"
-                }]
-            }, {
-                'name': 'opunitUnderPrj',
-                'id': 'opunit1',
-                'parent': {
-                    id: "proj_1"
-                },
-                'attributeValues': [{
-                    'attribute': {
-                        id: "a1fa2777924"
-                    },
-                    value: "Operation Unit"
-                }]
-            }];
 
             rootScope.currentUser = {
                 "firstName": "test1",
@@ -199,10 +101,21 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 }]
             };
 
-            spyOn(orgUnitStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnits));
             spyOn(location, "hash");
+
+            getDataValuesPromise = utils.getPromise(q, undefined);
+
+            saveSuccessPromise = utils.getPromise(q, {
+                "ok": "ok"
+            });
+
+            saveErrorPromise = utils.getRejectedPromise(q, {
+                "ok": "ok"
+            });
+
             approvalStoreSpy = spyOn(approvalStore, "each");
             approvalStoreSpy.and.returnValue(utils.getPromise(q, [{}]));
+
             dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope, window, approvalService);
         }));
 
@@ -389,11 +302,14 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should submit data values to indexeddb and dhis", function() {
-            var dataValues = [{
-                "name": "test"
-            }];
+            spyOn(scope.dataentryForm, '$setPristine');
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
+
+            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
+
             scope.currentModule = {
-                id: 'Module2',
+                id: 'mod2',
                 parent: {
                     id: 'parent'
                 }
@@ -402,17 +318,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
-            var payload = [{
-                "dataValues": dataValues,
-                "period": "2014W14",
-                "orgUnit": "Module2",
-                "completeDate": "2014-05-20"
-            }]
-            spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
-            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
 
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.submit();
             scope.$apply();
 
@@ -425,9 +331,14 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should save data values as draft to indexeddb", function() {
+            spyOn(scope.dataentryForm, '$setPristine');
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataService, "saveDataAsDraft").and.returnValue(saveSuccessPromise);
+
+            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
 
             scope.currentModule = {
-                id: 'Module2',
+                id: 'mod2',
                 parent: {
                     id: 'parent'
                 }
@@ -436,16 +347,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
-            spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
-            scope.$apply();
-
-            spyOn(dataService, "saveDataAsDraft").and.returnValue(saveSuccessPromise);
 
             scope.saveAsDraft();
             scope.$apply();
 
+            expect(dataService.saveDataAsDraft).toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(true);
             expect(scope.submitError).toBe(false);
@@ -454,13 +360,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should let the user know of failures when submitting the data to dhis", function() {
-            scope = rootScope.$new();
-            scope.dataentryForm = dataEntryFormMock;
-            var dataValues = {
-                "name": "test"
-            };
+            spyOn(scope.dataentryForm, '$setPristine');
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataService, "submitData").and.returnValue(saveErrorPromise);
+
+            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.currentModule = {
-                id: 'Module2',
+                id: 'mod2',
                 parent: {
                     id: 'parent'
                 }
@@ -469,21 +375,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
-            spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
-            scope.$apply();
-            spyOn(dataService, "submitData").and.returnValue(saveErrorPromise);
 
             scope.submit();
             scope.$apply();
-
-            var expectedPayload = {
-                completeDate: moment().format("YYYY-MM-DD"),
-                period: '2014W14',
-                orgUnit: 'Module2',
-                dataValues: []
-            };
 
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(false);
@@ -492,13 +386,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should let the user know of failures when saving the data to indexedDB ", function() {
-            scope = rootScope.$new();
-            scope.dataentryForm = dataEntryFormMock;
-            var dataValues = {
-                "name": "test"
-            };
+
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataService, "saveDataAsDraft").and.returnValue(saveErrorPromise);
+
+            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.currentModule = {
-                id: 'Module2',
+                id: 'mod2',
                 parent: {
                     id: 'parent'
                 }
@@ -508,15 +402,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "weekNumber": 14
             };
 
-            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
-            scope.$apply();
-            spyOn(dataService, "saveDataAsDraft").and.returnValue(saveErrorPromise);
-
             scope.saveAsDraft();
             scope.$apply();
 
-            expect(dataService.saveDataAsDraft).toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(false);
@@ -568,12 +456,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should fetch data only if period is defined", function() {
-            scope.week = undefined;
-            spyOn(dataValuesStore, 'find');
+            spyOn(dataService, 'getDataValues');
 
+            scope.week = undefined;
             scope.$apply();
 
-            expect(dataValuesStore.find).not.toHaveBeenCalled();
+            expect(dataService.getDataValues).not.toHaveBeenCalled();
         });
 
         it("should fetch empty data if no data exists for the given period", function() {
@@ -584,7 +472,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.currentModule = {
                 'id': 'Mod1'
             };
-            spyOn(dataService, "getDataValues").and.returnValue(utils.getPromise(q, undefined));
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
 
             scope.$apply();
 
@@ -598,7 +486,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "weekNumber": 14
             };
             scope.currentModule = {
-                id: 'Module2',
+                id: 'mod2',
                 parent: {
                     id: 'parent'
                 }
@@ -618,7 +506,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             scope.$apply();
 
-            expect(dataService.getDataValues).toHaveBeenCalledWith("2014W14", "Module2");
+            expect(dataService.getDataValues).toHaveBeenCalledWith("2014W14", "mod2");
             expect(scope.dataValues).toEqual({
                 DE_Oedema: {
                     32: {
@@ -634,17 +522,18 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it('should set dataset sections if module is selected', function() {
+            spyOn(scope.dataentryForm, '$setPristine');
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+
             scope.week = {
                 "weekNumber": 14
             };
             scope.currentModule = {
-                'id': 'Module1',
+                'id': 'mod1',
                 parent: {
                     id: 'parent'
                 }
             };
-            spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataService, "getDataValues").and.returnValue(utils.getPromise(q, {}));
 
             scope.$apply();
 
@@ -722,9 +611,14 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(window.print).toHaveBeenCalled();
         });
 
+
         it("should approve", function() {
+            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(approvalService, "approve").and.returnValue(utils.getPromise(q, {}));
+
             scope.currentModule = {
-                id: 'Module2',
+                id: 'mod2',
                 parent: {
                     id: 'parent'
                 }
@@ -734,12 +628,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "weekNumber": 14
             };
             scope.dataentryForm.$dirty = true;
-            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
-            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
-            spyOn(approvalService, "approve").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
-
-            expect(scope.isReadOnly).toBe(false);
 
             scope.approveData();
 
@@ -747,16 +636,21 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             var expectedApprovalRequest = [{
                 "dataSet": "Vacc",
                 "period": "2014W14",
-                "orgUnit": "Module2"
+                "orgUnit": "mod2"
             }];
+
             expect(approvalService.approve).toHaveBeenCalledWith(expectedApprovalRequest);
             expect(scope.approveSuccess).toBe(true);
             expect(scope.approveError).toBe(false);
         });
 
         it("should show appropriate message on approval failure", function() {
+            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(approvalService, "approve").and.returnValue(utils.getRejectedPromise(q, {}));
+
             scope.currentModule = {
-                id: 'Module2',
+                id: 'mod2',
                 parent: {
                     id: 'parent'
                 }
@@ -766,9 +660,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "weekNumber": 14
             };
             scope.dataentryForm.$dirty = true;
-            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
-            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
-            spyOn(approvalService, "approve").and.returnValue(utils.getRejectedPromise(q, {}));
             scope.$apply();
 
             scope.approveData();
@@ -781,7 +672,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it("should be read-only if data is already approved", function() {
             scope.currentModule = {
-                id: 'Module2',
+                id: 'mod2',
                 parent: {
                     id: 'parent'
                 }
@@ -790,7 +681,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
-            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
             approvalStoreSpy.and.returnValue(utils.getPromise(q, [{
                 "isApproved": true
             }]));
@@ -798,6 +689,124 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.$apply();
 
             expect(scope.isReadOnly).toBe(true);
+        });
+
+        it("should not be read-only if data is not approved", function() {
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+
+            scope.$apply();
+
+            expect(scope.isReadOnly).toBe(false);
+        });
+
+        it("should show not-ready-for-approval message if no data has been saved or submitted", function() {
+            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+
+            scope.$apply();
+
+            expect(scope.isSubmitted).toBe(false);
+        });
+
+
+        it("should show not-ready-for-approval message if data has been saved as draft", function() {
+            spyOn(dataService, "getDataValues").and.returnValue(utils.getPromise(q, {
+                "period": "2014W14",
+                "orgUnit": "mod2",
+                "isDraft": true,
+                "dataValues": [{
+                    "dataElement": "b9634a78271",
+                    "period": "2014W14",
+                    "orgUnit": "mod2",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "12",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W14",
+                    "orgUnit": "mod2",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "13",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }]
+            }));
+
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+
+            scope.$apply();
+
+            expect(scope.isSubmitted).toBe(false);
+        });
+
+        it("should show ready-for-approval message if data has already been submitted for approval", function() {
+            spyOn(dataService, "getDataValues").and.returnValue(utils.getPromise(q, {
+                "period": "2014W14",
+                "orgUnit": "mod2",
+                "dataValues": [{
+                    "dataElement": "b9634a78271",
+                    "period": "2014W14",
+                    "orgUnit": "mod2",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "12",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W14",
+                    "orgUnit": "mod2",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "13",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }]
+            }));
+
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+
+            scope.$apply();
+
+            expect(scope.isSubmitted).toBe(true);
         });
 
     });

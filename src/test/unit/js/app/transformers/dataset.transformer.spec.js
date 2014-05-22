@@ -11,14 +11,14 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
             data = [datasets, sections, dataelements];
             systemSettings = {
                 excludedDataElements: {
-                    "Module1": ['DE3']
+                    "mod1": ['DE3']
                 }
             };
             expectedEnrichedDatasets = [{
                 name: 'OPD',
                 id: 'DS_OPD',
                 organisationUnits: [{
-                    id: 'Module1'
+                    id: 'mod1'
                 }],
                 dataElements: [],
                 sections: [{
@@ -27,7 +27,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                         name: 'OPD',
                         id: 'DS_OPD',
                         organisationUnits: [{
-                            id: 'Module1'
+                            id: 'mod1'
                         }]
                     },
                     dataElements: [{
@@ -49,7 +49,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                         name: 'OPD',
                         id: 'DS_OPD',
                         organisationUnits: [{
-                            id: 'Module1'
+                            id: 'mod1'
                         }]
                     },
                     dataElements: [{
@@ -62,7 +62,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 name: 'Vaccination',
                 id: 'Vacc',
                 organisationUnits: [{
-                    id: 'Module2'
+                    id: 'mod2'
                 }],
                 dataElements: [],
                 sections: [{
@@ -71,7 +71,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                         name: 'Vaccination',
                         id: 'Vacc',
                         organisationUnits: [{
-                            id: 'Module2'
+                            id: 'mod2'
                         }]
                     },
                     dataElements: [{
@@ -86,7 +86,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 name: 'OPD',
                 id: 'DS_OPD',
                 organisationUnits: [{
-                    id: 'Module1'
+                    id: 'mod1'
                 }],
                 dataElements: [],
                 sections: [{
@@ -95,7 +95,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                         name: 'OPD',
                         id: 'DS_OPD',
                         organisationUnits: [{
-                            id: 'Module1'
+                            id: 'mod1'
                         }]
                     },
                     dataElements: [{
@@ -117,7 +117,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                         name: 'OPD',
                         id: 'DS_OPD',
                         organisationUnits: [{
-                            id: 'Module1'
+                            id: 'mod1'
                         }]
                     },
                     dataElements: [{
@@ -130,7 +130,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 name: 'Vaccination',
                 id: 'Vacc',
                 organisationUnits: [{
-                    id: 'Module2'
+                    id: 'mod2'
                 }],
                 dataElements: [],
                 sections: []
@@ -141,13 +141,12 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
         });
 
 
-
         it("should enrich datasets", function() {
             expect(datasetTransformer.enrichDatasets(data)).toEqual(expectedEnrichedDatasets);
         });
 
         it("should get filtered datasets", function() {
-            expect(datasetTransformer.getFilteredDatasets(enrichedDatasets, systemSettings, "Module1")).toEqual(expectedFilteredDatasets);
+            expect(datasetTransformer.getFilteredDatasets(enrichedDatasets, systemSettings, "mod1")).toEqual(expectedFilteredDatasets);
         });
     });
 

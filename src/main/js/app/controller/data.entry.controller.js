@@ -38,26 +38,43 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $window.print();
         };
 
+        var initDataEntryForm = function() {
+            var setApprovalState = function() {
+                store = db.objectStore('approvals');
+                var query = db.queryBuilder().$index('by_period_orgUnit').$eq([getPeriod(), $scope.currentModule.id]).compile();
+
+                store.each(query).then(function(result) {
+                    $scope.isReadOnly = _.any(result, function(approvalState) {
+                        return approvalState.isApproved;
+                    });
+                });
+            };
+
+            dataService.getDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
+                data = data || {};
+                $scope.dataValues = dataValuesMapper.mapToView(data);
+                $scope.isSubmitted = (!_.isEmpty(data) && !data.isDraft);
+            });
+
+            var datasetsAssociatedWithModule = _.pluck(_.filter(dataSets, {
+                'organisationUnits': [{
+                    'id': $scope.currentModule.id
+                }]
+            }), 'id');
+
+            $scope.currentGroupedSections = _.pick($scope.groupedSections, datasetsAssociatedWithModule);
+            var selectedDatasets = _.keys($scope.currentGroupedSections);
+            _.each(selectedDatasets, function(selectedDataset) {
+                $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.currentModule.id, systemSettings, $scope.currentModule.parent.id);
+            });
+
+            setApprovalState();
+            $scope.dataentryForm.$setPristine();
+        };
+
         $scope.$watchCollection('[week, currentModule]', function() {
             if ($scope.week && $scope.currentModule) {
-                var datasetsAssociatedWithModule = _.pluck(_.filter(dataSets, {
-                    'organisationUnits': [{
-                        'id': $scope.currentModule.id
-                    }]
-                }), 'id');
-                $scope.currentGroupedSections = _.pick($scope.groupedSections, datasetsAssociatedWithModule);
-                dataService.getDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
-                    data = data || {};
-                    $scope.dataValues = dataValuesMapper.mapToView(data);
-                });
-                var selectedDatasets = _.keys($scope.currentGroupedSections);
-                _.each(selectedDatasets, function(selectedDataset) {
-                    $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.currentModule.id, systemSettings, $scope.currentModule.parent.id);
-                });
-
-                setApprovalState();
-
-                $scope.dataentryForm.$setPristine();
+                initDataEntryForm();
             }
         });
 
@@ -136,8 +153,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var onSuccess = function() {
                 $scope.approveSuccess = true;
                 $scope.approveError = false;
-                setApprovalState();
-                $scope.dataentryForm.$setPristine();
+                initDataEntryForm();
             };
 
             var onError = function() {
@@ -166,19 +182,20 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var save = function(asDraft) {
-            var period = getPeriod();
-            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
             var successPromise = function() {
                 $scope.saveSuccess = asDraft ? true : false;
                 $scope.submitSuccess = !asDraft ? true : false;
-                $scope.dataentryForm.$setPristine();
+                initDataEntryForm();
             };
 
             var errorPromise = function() {
                 $scope.saveError = asDraft ? true : false;
                 $scope.submitError = !asDraft ? true : false;
+                $scope.isSubmitted = false;
             };
 
+            var period = getPeriod();
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
             if (asDraft)
                 dataService.saveDataAsDraft(payload).then(successPromise, errorPromise);
             else
@@ -244,19 +261,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             return data;
         };
 
-        var setApprovalState = function() {
-            store = db.objectStore('approvals');
-            var query = db.queryBuilder().$index('by_period_orgUnit').$eq([getPeriod(), $scope.currentModule.id]).compile();
-
-            store.each(query).then(function(result) {
-                $scope.isReadOnly = _.any(result, function(approvalState) {
-                    return approvalState.isApproved;
-                });
-            });
-        };
-
         var setAvailableModules = function(orgUnits) {
-
             var getUserModules = function(modules) {
                 return _.filter(modules, function(module) {
                     return _.any($rootScope.currentUser.organisationUnits, {

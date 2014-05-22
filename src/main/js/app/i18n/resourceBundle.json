@@ -10,7 +10,7 @@
     "dataSubmitSuccess": "Data submitted successfully",
     "dataSubmitFailure": "Error submitting data. Please try again later",
     "dataApproveSuccess": "Data will be sent for second level of approval.",
-    "dataApprovalConfirmationMessage": "Are you sure you want to approve in your preferred language?",
+    "dataApprovalConfirmationMessage": "Are you sure you want to approve?",
     "dataApproveFailure": "Error approving data. Please try again later",
     "chooseWeek": "Please choose a week to enter data.",
     "syncRunning": "Data sync initiated. Please wait.",
@@ -47,5 +47,7 @@
     "projectCodeValidation": "Project Code is required.",
     "disabledCredentials": "User is disabled. Please contact admin for more details.",
     "userDisableSuccess": "User disabled successfully.",
-    "userEnableSuccess": "User enabled successfully."
+    "userEnableSuccess": "User enabled successfully.",
+    "dataSubmittedForApproval": "Data submitted for approval.",
+    "noDataForApproval": "No data available for approval."
 }

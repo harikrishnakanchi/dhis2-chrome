@@ -4,13 +4,13 @@ define(["lodash"], function(_) {
         "name": "OPD",
         "id": "DS_OPD",
         "organisationUnits": [{
-            "id": "Module1"
+            "id": "mod1"
         }]
     }, {
         "name": "Vaccination",
         "id": "Vacc",
         "organisationUnits": [{
-            "id": "Module2"
+            "id": "mod2"
         }]
     }];
 
@@ -173,6 +173,92 @@ define(["lodash"], function(_) {
         }]
     }];
 
+    var organisationUnits = [{
+        "name": "proj1",
+        "id": "proj_1",
+        "parent": {
+            "id": "country_1"
+        },
+        "attributeValues": [{
+            "attribute": {
+                "id": "a1fa2777924"
+            },
+            "value": "Project"
+        }]
+    }, {
+        "name": "proj2",
+        "id": "proj_2",
+        "parent": {
+            "id": "country_1"
+        },
+        "attributeValues": [{
+            "attribute": {
+                "id": "a1fa2777924"
+            },
+            "value": "Project"
+        }]
+    }, {
+        "name": "mod1",
+        "id": "mod1",
+        "parent": {
+            "id": "proj_1"
+        },
+        "attributeValues": [{
+            "attribute": {
+                "id": "a1fa2777924"
+            },
+            "value": "Module"
+        }]
+    }, {
+        "name": "mod2",
+        "id": "mod2",
+        "parent": {
+            "id": "proj_1"
+        },
+        "attributeValues": [{
+            "attribute": {
+                "id": "a1fa2777924"
+            },
+            "value": "Module"
+        }]
+    }, {
+        "name": "mod3",
+        "id": "mod3",
+        "parent": {
+            "id": "proj_2"
+        },
+        "attributeValues": [{
+            "attribute": {
+                "id": "a1fa2777924"
+            },
+            "value": "Module"
+        }]
+    }, {
+        "name": "modunderopunit",
+        "id": "mod11",
+        "parent": {
+            "id": "opunit1"
+        },
+        "attributeValues": [{
+            "attribute": {
+                "id": "a1fa2777924"
+            },
+            "value": "Module"
+        }]
+    }, {
+        "name": "opunitUnderPrj",
+        "id": "opunit1",
+        "parent": {
+            "id": "proj_1"
+        },
+        "attributeValues": [{
+            "attribute": {
+                "id": "a1fa2777924"
+            },
+            "value": "Operation Unit"
+        }]
+    }];
+
     var systemSettings = [{
         "excludedDataElements": {
             "moduleId": ["DE4"]
@@ -188,6 +274,7 @@ define(["lodash"], function(_) {
         "categoryOptionCombos": categoryOptionCombos,
         "dataElements": dataElements,
         "sections": sections,
+        "organisationUnits": organisationUnits,
         "systemSettings": systemSettings
     };
 
