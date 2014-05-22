@@ -1,9 +1,12 @@
 define(["moment"], function(moment) {
-    var mapToDomain = function(dataValues, period, orgUnit) {
+    var mapToDomain = function(dataValues, period, orgUnit, storedBy) {
         var resultValues = _.flatten(_.map(dataValues, function(values, dataElement) {
             return _.map(values, function(dataValue, categoryOptionComboId) {
                 return {
                     "dataElement": dataElement,
+                    "period": period,
+                    "orgUnit": orgUnit,
+                    "storedBy": storedBy,
                     "categoryOptionCombo": categoryOptionComboId,
                     "formula": dataValue.formula,
                     "value": dataValue.value
@@ -14,9 +17,6 @@ define(["moment"], function(moment) {
             return de.value !== "";
         });
         return {
-            "completeDate": moment().format("YYYY-MM-DD"),
-            "period": period,
-            "orgUnit": orgUnit,
             "dataValues": nonEmptyValues
         };
     };

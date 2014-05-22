@@ -158,7 +158,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 return approvalService.approve(approvalRequest);
             };
 
-            var payload = dataValuesMapper.mapToDomain($scope.dataValues, getPeriod(), $scope.currentModule.id);
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, getPeriod(), $scope.currentModule.id, $scope.currentUser.userCredentials.username);
 
             if ($scope.dataentryForm.$dirty) {
                 dataService.submitData(payload).then(approveAllData).then(onSuccess, onError);
@@ -168,7 +168,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         var save = function(asDraft) {
             var period = getPeriod();
-            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id);
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
             var successPromise = function() {
                 $scope.saveSuccess = asDraft ? true : false;
                 $scope.submitSuccess = !asDraft ? true : false;

@@ -45,14 +45,15 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
 
         it("should save datavalues to dhis", function() {
             var payload = {
-                completeDate: moment().format("YYYY-MM-DD"),
-                period: '2014W15',
-                orgUnit: 'company_0',
                 dataValues: [{
+                    period: '2014W15',
+                    orgUnit: 'company_0',
                     dataElement: "DE1",
                     categoryOptionCombo: "COC1",
                     value: 1,
                 }, {
+                    period: '2014W15',
+                    orgUnit: 'company_0',
                     dataElement: "DE2",
                     categoryOptionCombo: "COC2",
                     value: 2,
@@ -68,7 +69,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
 
             expect(dataValuesStore.upsert).toHaveBeenCalledWith([{
                 period: '2014W15',
-                dataValues: [payload],
+                dataValues: payload.dataValues,
                 "orgUnit": "company_0"
             }]);
         });
@@ -132,58 +133,10 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
                     "followUp": false
                 }, {
                     "dataElement": "b9634a78271",
-                    "period": "2014W18",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "AgGAN4mbMvb",
-                    "value": "23",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
-                    "period": "2014W18",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "e4okw2JPhev",
-                    "value": "0",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
                     "period": "2014W19",
                     "orgUnit": "c484c99b86d",
                     "categoryOptionCombo": "h48rgCOjDTg",
-                    "value": "12",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
-                    "period": "2014W19",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "AgGAN4mbMvb",
-                    "value": "12",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
-                    "period": "2014W19",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "e4okw2JPhev",
-                    "value": "0",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "940e7245079",
-                    "period": "2014W18",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "LVvnPvuj1qg",
-                    "value": "4",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "940e7245079",
-                    "period": "2014W19",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "LVvnPvuj1qg",
-                    "value": "1",
+                    "value": "13",
                     "storedBy": "service.account",
                     "followUp": false
                 }]
@@ -199,30 +152,6 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
                     "value": "12",
                     "storedBy": "service.account",
                     "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
-                    "period": "2014W18",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "AgGAN4mbMvb",
-                    "value": "23",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
-                    "period": "2014W18",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "e4okw2JPhev",
-                    "value": "0",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "940e7245079",
-                    "period": "2014W18",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "LVvnPvuj1qg",
-                    "value": "4",
-                    "storedBy": "service.account",
-                    "followUp": false
                 }],
                 orgUnit: 'c484c99b86d'
             }, {
@@ -232,31 +161,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
                     "period": "2014W19",
                     "orgUnit": "c484c99b86d",
                     "categoryOptionCombo": "h48rgCOjDTg",
-                    "value": "12",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
-                    "period": "2014W19",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "AgGAN4mbMvb",
-                    "value": "12",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
-                    "period": "2014W19",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "e4okw2JPhev",
-                    "value": "0",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "940e7245079",
-                    "period": "2014W19",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "LVvnPvuj1qg",
-                    "value": "1",
+                    "value": "13",
                     "storedBy": "service.account",
                     "followUp": false
                 }],
@@ -266,12 +171,11 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
             var today = moment().format("YYYY-MM-DD");
             httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, dataValueSet);
 
-            dataService.downloadAllData('company_0').then(function(data) {
-                expect(dataValuesStore.upsert).toHaveBeenCalledWith(expectedDataSets);
-            });
+            dataService.downloadAllData('company_0');
 
             httpBackend.flush();
 
+            expect(dataValuesStore.upsert).toHaveBeenCalledWith(expectedDataSets);
         });
 
 

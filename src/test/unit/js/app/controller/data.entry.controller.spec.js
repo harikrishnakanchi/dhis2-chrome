@@ -483,7 +483,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 orgUnit: 'Module2',
                 dataValues: []
             };
-            expect(dataService.submitData).toHaveBeenCalledWith(expectedPayload);
+
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(true);
