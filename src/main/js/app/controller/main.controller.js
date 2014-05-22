@@ -2,9 +2,21 @@ define(["lodash"], function(_) {
     return function($scope, $rootScope, ngI18nResourceBundle, db) {
 
         $rootScope.$watch("currentUser.locale", function() {
+
+            var getResourceBundle = function(locale, shouldFetchTranslations) {
+                ngI18nResourceBundle.get({
+                    "locale": locale
+                }).then(function(data) {
+                    $rootScope.resourceBundle = data.data;
+                    if (shouldFetchTranslations) getTranslationsForCurrentLocale();
+                });
+            };
+
             if ($rootScope.currentUser) {
                 var getTranslationsForCurrentLocale = function() {
-
+                    if (!$rootScope.currentUser.locale) {
+                        $rootScope.currentUser.locale = "en";
+                    }
                     var data = {
                         'id': $rootScope.currentUser.id,
                         'locale': $scope.currentUser.locale
@@ -22,12 +34,9 @@ define(["lodash"], function(_) {
                     });
                 };
 
-                ngI18nResourceBundle.get({
-                    locale: $scope.currentUser.locale
-                }).then(function(data) {
-                    $rootScope.resourceBundle = data.data;
-                    getTranslationsForCurrentLocale();
-                });
+                getResourceBundle($scope.currentUser.locale, true);
+            } else {
+                getResourceBundle("en", false);
             }
         });
 
