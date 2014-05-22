@@ -46,8 +46,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     }]
                 }), 'id');
                 $scope.currentGroupedSections = _.pick($scope.groupedSections, datasetsAssociatedWithModule);
-                var store = db.objectStore('dataValues');
-                store.find([getPeriod(), $scope.currentModule.id]).then(function(data) {
+                dataService.getDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
                     data = data || {};
                     $scope.dataValues = dataValuesMapper.mapToView(data);
                 });

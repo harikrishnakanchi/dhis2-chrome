@@ -1,15 +1,20 @@
 define(["lodash", "properties", "moment"], function(_, properties, moment) {
     return function($http, db, $q) {
         this.saveDataAsDraft = function(payload) {
-            return saveToDb(payload);
+            return saveToDb(payload, true);
         };
 
         this.submitData = function(payload) {
-            return saveToDb(payload).then(save);
+            return saveToDb(payload, false).then(save);
         };
 
         this.downloadAllData = function(orgUnitId) {
             return get(orgUnitId).then(saveToDb);
+        };
+
+        this.getDataValues = function(period, orgUnitId) {
+            var store = db.objectStore('dataValues');
+            return store.find([period, orgUnitId]);
         };
 
         var get = function(orgUnit) {
@@ -63,17 +68,22 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
             return $http.post(properties.dhis.url + '/api/dataValueSets', payload).then(sucessResponse, errorResponse);
         };
 
-        var saveToDb = function(payload) {
+        var saveToDb = function(payload, isDraft) {
             var groupedDataValues = _.groupBy(payload.dataValues, function(dataValue) {
                 return [dataValue.period, dataValue.orgUnit];
             });
             var dataValueSetsAggregator = function(result, dataValues, tuple) {
                 var split = tuple.split(",");
-                result.push({
+                var dataValue = {
                     "period": split[0],
                     "dataValues": dataValues,
                     "orgUnit": split[1]
-                });
+                };
+                if (isDraft)
+                    dataValue = _.merge(dataValue, {
+                        "isDraft": true
+                    });
+                result.push(dataValue);
             };
 
             var dataValues = _.transform(groupedDataValues, dataValueSetsAggregator, []);

@@ -66,7 +66,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             dataService = {
                 saveDataAsDraft: function() {},
-                submitData: function() {}
+                submitData: function() {},
+                getDataValues: function() {}
             };
 
             saveSuccessPromise = utils.getPromise(q, {
@@ -408,7 +409,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "completeDate": "2014-05-20"
             }]
             spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
             spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
 
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
@@ -436,7 +437,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "weekNumber": 14
             };
             spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
 
@@ -469,7 +470,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "weekNumber": 14
             };
             spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
             spyOn(dataService, "submitData").and.returnValue(saveErrorPromise);
@@ -507,7 +508,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "weekNumber": 14
             };
 
-            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
             var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
             scope.$apply();
             spyOn(dataService, "saveDataAsDraft").and.returnValue(saveErrorPromise);
@@ -583,11 +584,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.currentModule = {
                 'id': 'Mod1'
             };
-            spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, undefined));
+            spyOn(dataService, "getDataValues").and.returnValue(utils.getPromise(q, undefined));
 
             scope.$apply();
 
-            expect(dataValuesStore.find).toHaveBeenCalledWith(['2014W14', 'Mod1']);
+            expect(dataService.getDataValues).toHaveBeenCalledWith('2014W14', 'Mod1');
             expect(scope.dataValues).toEqual({});
         });
 
@@ -602,7 +603,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     id: 'parent'
                 }
             };
-            spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, {
+            spyOn(dataService, "getDataValues").and.returnValue(utils.getPromise(q, {
                 "dataValues": [{
                     "dataElement": "DE_Oedema",
                     "categoryOptionCombo": "32",
@@ -617,7 +618,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             scope.$apply();
 
-            expect(dataValuesStore.find).toHaveBeenCalledWith(["2014W14", "Module2"]);
+            expect(dataService.getDataValues).toHaveBeenCalledWith("2014W14", "Module2");
             expect(scope.dataValues).toEqual({
                 DE_Oedema: {
                     32: {
@@ -643,7 +644,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 }
             };
             spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataValuesStore, 'find').and.returnValue(utils.getPromise(q, {}));
+            spyOn(dataService, "getDataValues").and.returnValue(utils.getPromise(q, {}));
 
             scope.$apply();
 
@@ -734,7 +735,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             };
             scope.dataentryForm.$dirty = true;
             spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
-            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
             spyOn(approvalService, "approve").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
 
@@ -766,7 +767,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             };
             scope.dataentryForm.$dirty = true;
             spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
-            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
             spyOn(approvalService, "approve").and.returnValue(utils.getRejectedPromise(q, {}));
             scope.$apply();
 
@@ -789,7 +790,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
-            spyOn(dataValuesStore, "find").and.returnValue(saveSuccessPromise);
+            spyOn(dataService, "getDataValues").and.returnValue(saveSuccessPromise);
             approvalStoreSpy.and.returnValue(utils.getPromise(q, [{
                 "isApproved": true
             }]));

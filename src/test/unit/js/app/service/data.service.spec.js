@@ -77,10 +77,31 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
         it("should save data values as draft", function() {
             spyOn(http, "post");
 
-            var dataService = new DataService(http, db, q);
-            dataService.saveDataAsDraft({});
+            var payload = {
+                dataValues: [{
+                    period: '2014W15',
+                    orgUnit: 'module_1',
+                    dataElement: "DE1",
+                    categoryOptionCombo: "COC1",
+                    value: 1,
+                }, {
+                    period: '2014W15',
+                    orgUnit: 'module_1',
+                    dataElement: "DE2",
+                    categoryOptionCombo: "COC2",
+                    value: 2,
+                }]
+            };
 
-            expect(dataValuesStore.upsert).toHaveBeenCalled();
+            var dataService = new DataService(http, db, q);
+            dataService.saveDataAsDraft(payload);
+
+            expect(dataValuesStore.upsert).toHaveBeenCalledWith([{
+                period: '2014W15',
+                dataValues: payload.dataValues,
+                "orgUnit": "module_1",
+                "isDraft": true
+            }]);
 
             expect(http.post).not.toHaveBeenCalled();
         });
@@ -187,6 +208,14 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
             });
 
             httpBackend.flush();
+        });
+
+        it("should get the data values", function() {
+            var dataService = new DataService(http, db, q);
+            spyOn(dataValuesStore, 'find');
+            dataService.getDataValues('period', 'orgUnitId');
+
+            expect(dataValuesStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
         });
     });
 });
