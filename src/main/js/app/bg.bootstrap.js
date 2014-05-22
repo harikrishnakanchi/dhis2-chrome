@@ -5,7 +5,7 @@ require.config({
 require(["app/bg.config"], function(config) {
     require(["indexedDBLogger", "app"], function(indexedDBLogger, app) {
         indexedDBLogger.configure("msfLogs");
-        require(["backgroundServicesRegistry", "metadataSyncService", "properties"], function(backgroundServicesRegistry, metadataSyncService, properties) {
+        require(["properties"], function(properties) {
             var scheduleSync = function() {
                 console.log("scheduling sync");
                 chrome.alarms.create('metadataSyncAlarm', {
@@ -16,24 +16,8 @@ require(["app/bg.config"], function(config) {
             var onMigrationComplete = function(request, sender, sendResponse) {
                 if (request === "migrationComplete") {
                     app.bootstrap(app.init());
-                    console.log("dB migration complete. Starting sync");
-                    if (navigator.onLine) {
-                        metadataSyncService.sync().
-                        finally(scheduleSync);
-                    }
                 }
             };
-
-            window.addEventListener('online', function(e) {
-                console.log("starting sync");
-                metadataSyncService.sync();
-                scheduleSync();
-            });
-
-            window.addEventListener('offline', function() {
-                console.log("stopping sync");
-                chrome.alarms.clear('metadataSyncAlarm');
-            });
 
             chrome.runtime.onMessage.addListener(onMigrationComplete);
 
@@ -43,12 +27,6 @@ require(["app/bg.config"], function(config) {
                     state: 'fullscreen'
                 });
             });
-
-            var init = function() {
-                backgroundServicesRegistry.register();
-            };
-
-            init();
         });
     });
 });

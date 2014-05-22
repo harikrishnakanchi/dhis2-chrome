@@ -22,7 +22,7 @@ module.exports = function(config) {
         ],
         exclude: [
             'main/js/lib/**/*spec.js',
-            'main/js/app/background.js'
+            'main/js/app/bg.bootstrap.js'
         ],
         autoWatch: true,
         frameworks: ['jasmine', 'requirejs'],
