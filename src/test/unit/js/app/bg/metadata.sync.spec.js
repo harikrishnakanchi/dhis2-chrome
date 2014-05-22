@@ -60,8 +60,11 @@ define(["metadataSyncService", "Q", "utils", "properties", "idb", "httpWrapper"]
                         lastUpdatedTime: tomorrow
                     }],
                     ['systemSettings', {
-                            excludedDataElements: {
-                                module1: ['DE1', 'DE2']
+                            "key": 'proj_0',
+                            "value": {
+                                excludedDataElements: {
+                                    module1: ['DE1', 'DE2']
+                                }
                             }
                         },
                         undefined
@@ -104,8 +107,11 @@ define(["metadataSyncService", "Q", "utils", "properties", "idb", "httpWrapper"]
                         lastUpdatedTime: tomorrow
                     }],
                     ['systemSettings', {
-                            excludedDataElements: {
-                                module1: ['DE1', 'DE2']
+                            key: 'proj_0',
+                            value: {
+                                excludedDataElements: {
+                                    module1: ['DE1', 'DE2']
+                                }
                             }
                         },
                         undefined

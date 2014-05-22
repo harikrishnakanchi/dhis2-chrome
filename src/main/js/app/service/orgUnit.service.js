@@ -68,7 +68,11 @@ define(["properties", "lodash"], function(properties, _) {
             var saveToDb = function() {
                 var store = db.objectStore("systemSettings");
                 data.id = projectId;
-                return store.upsert(data);
+                var payload = {
+                    "key": projectId,
+                    "value": data
+                };
+                return store.upsert(payload);
             };
 
             return saveToDb().then(saveToDhis);

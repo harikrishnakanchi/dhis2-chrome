@@ -47,11 +47,11 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
 
     var filterDataElements = function(sections, moduleId, systemSettings, parentId) {
         var systemSetting = _.find(systemSettings, function(s) {
-            return s.id === parentId;
+            return s.key === parentId;
         });
         var filteredSections = _.map(sections, function(section) {
             section.dataElements = _.filter(section.dataElements, function(dataElement) {
-                var excludedList = systemSetting ? systemSetting.excludedDataElements : undefined;
+                var excludedList = systemSetting ? systemSetting.value.excludedDataElements : undefined;
                 return excludedList ? !_.contains(excludedList[moduleId], dataElement.id) : true;
             });
             return section;

@@ -43,13 +43,25 @@ define(["idb", "httpWrapper", "Q", "lodash", "properties"], function(idb, httpWr
             return httpWrapper.get(url);
         };
 
+        var tryParseJson = function(val) {
+            if (typeof(val) != "string") return val;
+            try {
+                return JSON.parse(val);
+            } catch (e) {
+                return val;
+            }
+        };
+
         var upsertSystemSettings = function(data) {
             console.debug("Processing system settings ", data);
             var type = "systemSettings";
             var putData = function(transaction) {
-                var projectIds = _.keys(data);
-                var entities = _.map(projectIds, function(projectId) {
-                    return JSON.parse(data[projectId]);
+                var keys = _.keys(data);
+                var entities = _.map(keys, function(key) {
+                    return {
+                        "key": key,
+                        "value": tryParseJson(data[key])
+                    };
                 });
                 console.debug("Storing ", type, entities.length);
                 _.each(entities, function(entity) {

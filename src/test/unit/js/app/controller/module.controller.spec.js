@@ -181,8 +181,11 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             }];
 
             var systemSettings = {
-                "excludedDataElements": {
-                    "Mod2Id": ['DE4']
+                "key": "123",
+                "value": {
+                    "excludedDataElements": {
+                        "Mod2Id": ['DE4']
+                    }
                 }
             };
 
@@ -414,8 +417,6 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             expect(scope.isExpanded['Id1']).toEqual(true);
             expect(scope.isExpanded['Id2']).toEqual(false);
         });
-
-
 
         it("should return true if no section is selected from each dataset", function() {
             var module = {

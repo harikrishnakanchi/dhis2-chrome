@@ -20,9 +20,12 @@ define([], function() {
     };
 
     var add_object_stores = function(db, tx) {
-
-        const syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "systemSettings"];
+        const syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections"];
         create_data_store(syncable_types, db);
+    };
+
+    var add_system_settings_store = function(db, tx) {
+        create_store_with_key("systemSettings", "key", db);
     };
 
     var change_log_stores = function(db, tx) {
@@ -90,5 +93,6 @@ define([], function() {
         add_admin_user_to_local_cred_store,
         add_project_user_to_local_cred_store,
         add_translation_store,
-        add_approval_store];
+        add_approval_store,
+        add_system_settings_store];
 });
