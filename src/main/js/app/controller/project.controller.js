@@ -113,7 +113,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         var prepareView = function() {
             $scope.reset();
             $scope.newOrgUnit = orgUnitMapper.mapToProjectForView($scope.orgUnit);
-            userService.getAllProjectUsers($scope.newOrgUnit.name).then(setProjectUsersForView);
+            userService.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForView);
         };
 
         var init = function() {

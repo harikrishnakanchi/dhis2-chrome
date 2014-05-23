@@ -26,12 +26,13 @@ define(["properties", "lodash", "md5"], function(properties, _, md5) {
             });
         };
 
-        var getAllProjectUsers = function(projectName) {
-            var project = projectName.toLowerCase().replace(/ /g, "_").concat("_");
+        var getAllProjectUsers = function(project) {
 
             var filterProjectUsers = function(allUsers) {
-                return _.filter(allUsers, function(user) {
-                    return user.userCredentials.username.indexOf(project) === 0;
+                return _.filter(allUsers, {
+                    "organisationUnits": [{
+                        'id': project.id
+                    }]
                 });
             };
 

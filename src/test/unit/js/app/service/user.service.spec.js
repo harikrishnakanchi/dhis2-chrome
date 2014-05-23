@@ -39,7 +39,7 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
                 "userCredentials": {
                     "username": "someone@example.com",
                 }
-            }
+            };
 
             spyOn(fakeUserStore, "upsert").and.returnValue(utils.getPromise(q, "someData"));
 
@@ -53,31 +53,52 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
         });
 
         it("should get all project users", function() {
+            var project1 = {
+                'id': 'proj_1',
+                'name': 'Project 1'
+            };
+
             var projUser1 = {
                 "userCredentials": {
                     "username": "proj_1_user1"
-                }
+                },
+                "organisationUnits": [{
+                    'id': 'proj_1',
+                    'name': 'Proj 1'
+                }]
             };
 
             var projUser2 = {
                 "userCredentials": {
                     "username": "proj_1_user2"
-                }
+                },
+                "organisationUnits": [{
+                    'id': 'proj_1',
+                    'name': 'Proj 1'
+                }]
             };
 
             var users = [projUser1, projUser2, {
                 "userCredentials": {
                     "username": "proj_2_user1"
-                }
+                },
+                "organisationUnits": [{
+                    'id': 'proj_2',
+                    'name': 'Proj 2'
+                }]
             }, {
                 "userCredentials": {
                     "username": "someone@example.com"
-                }
-            }]
+                },
+                "organisationUnits": [{
+                    'id': 'proj_3',
+                    'name': 'Proj 3'
+                }]
+            }];
 
             spyOn(fakeUserStore, "getAll").and.returnValue(utils.getPromise(q, users));
 
-            userService.getAllProjectUsers("Proj 1").then(function(data) {
+            userService.getAllProjectUsers(project1).then(function(data) {
                 expect(data.length).toEqual(2);
                 expect(data[0]).toEqual(projUser1);
                 expect(data[1]).toEqual(projUser2);
