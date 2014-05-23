@@ -50,5 +50,20 @@
     "userDisableSuccess": "Utilisateur désactivé avec succès.",
     "userEnableSuccess": "Utilisateur activé avec succès.",
     "dataSubmittedForApproval": "Les données soumises pour approbation.",
-    "noDataForApproval": "Pas de données disponibles pour approbation."
+    "noDataForApproval": "Pas de données disponibles pour approbation.",
+    "yesLabel": "Oui",
+    "cancelLabel": "Annuler",
+    "unsavedDataLabel": "Les données non enregistrées",
+    "okLabel": "Bien",
+    "unsavedDataMessage": "Vous avez des données non enregistrées. Etes-vous sûr de vouloir le perdre?",
+    "moduleLabel": "Module",
+    "approveBtnValue": "Approuver",
+    "acceptBtnValue": "Accepter",
+    "saveBtnValue": "Sauver",
+    "submitBtnValue": "Soumettre",
+    "disableUserLabel": "Désactiver L'utilisateur",
+    "enableUserLabel": "Activer l'utilisateur",
+    "userDisableConfMessage": "Etes-vous sûr que vous voulez désactiver ",
+    "userEnableConfMessage": "Etes-vous sûr que vous voulez activer ",
+    "printTallySheetBtnValue": "Imprimer la feuille de pointage"
 }

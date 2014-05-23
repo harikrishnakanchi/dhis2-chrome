@@ -50,5 +50,20 @@
     "userDisableSuccess": "User disabled successfully.",
     "userEnableSuccess": "User enabled successfully.",
     "dataSubmittedForApproval": "Data submitted for approval.",
-    "noDataForApproval": "No data available for approval."
+    "noDataForApproval": "No data available for approval.",
+    "yesLabel": "Yes",
+    "cancelLabel": "Cancel",
+    "unsavedDataLabel": "Unsaved Data",
+    "okLabel": "OK",
+    "unsavedDataMessage": "Do you want to move away without saving changes?",
+    "moduleLabel": "Module",
+    "approveBtnValue": "Approve",
+    "acceptBtnValue": "Accept",
+    "saveBtnValue": "Save",
+    "submitBtnValue": "Submit",
+    "disableUserLabel": "Disable User",
+    "enableUserLabel": "Enable User",
+    "userDisableConfMessage": "Are you sure you want to disable ",
+    "userEnableConfMessage": "Are you sure you want to enable ",
+    "printTallySheetBtnValue": "Print Tally Sheet"
 }

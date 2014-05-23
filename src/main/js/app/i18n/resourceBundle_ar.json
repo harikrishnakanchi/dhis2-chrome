@@ -50,5 +50,20 @@
     "userDisableSuccess": "مستخدم تعطيل بنجاح.",
     "userEnableSuccess": "تمكين المستخدم بنجاح.",
     "dataSubmittedForApproval": "قدمت بيانات للموافقة عليها.",
-    "noDataForApproval": "لا توجد بيانات متاحة للموافقة عليها."
+    "noDataForApproval": "لا توجد بيانات متاحة للموافقة عليها.",
+    "yesLabel": "نعم",
+    "cancelLabel": "إلغاء",
+    "unsavedDataLabel": "بيانات لم يتم حفظها",
+    "okLabel": "حسنا",
+    "unsavedDataMessage": "لديك بيانات لم يتم حفظها. هل أنت متأكد أنك تريد أن تفقد ذلك؟",
+    "moduleLabel": "وحدة",
+    "approveBtnValue": "وافق",
+    "acceptBtnValue": "تقبل",
+    "saveBtnValue": "حفظ",
+    "submitBtnValue": "عرض",
+    "disableUserLabel": "تعطيل العضو",
+    "enableUserLabel": "تمكين المستخدم",
+    "userDisableConfMessage": "هل أنت متأكد أنك تريد تعطيل ",
+    "userEnableConfMessage": "هل أنت متأكد أنك تريد تمكين ",
+    "printTallySheetBtnValue": "ورقة الطباعة تالي"
 }
