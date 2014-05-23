@@ -18,9 +18,9 @@ require.config({
         "services": "app/service/bg.services",
 
         //consumers
-        "consumers": "app/consumers/consumers",
-        "registerConsumers": "app/consumers/register.consumers",
-        "dataValuesConsumer": "app/consumers/datavalues.consumer",
+        "consumers": "app/consumer/consumers",
+        "registerConsumers": "app/consumer/register.consumers",
+        "dataValuesConsumer": "app/consumer/datavalues.consumer",
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
 
         //Interceptors

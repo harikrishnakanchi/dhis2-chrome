@@ -5,7 +5,7 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
         };
 
         this.submitData = function(payload) {
-            return saveToDb(payload, false).then(save);
+            return saveToDb(payload, false).then(this.save);
         };
 
         this.downloadAllData = function(orgUnitId) {
@@ -53,7 +53,7 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
             return getAllDatasets().then(getDataForDatasets);
         };
 
-        var save = function(payload) {
+        this.save = function(payload) {
             var sucessResponse = function(response) {
                 if (response.data.status === "ERROR") {
                     return $q.reject(response);
