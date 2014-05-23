@@ -1,10 +1,10 @@
 define(["lodash"], function(_) {
-    var getFilteredDatasets = function(allDatasets, systemSettings, orgUnitId) {
-        systemSettings = systemSettings || {};
+    var getFilteredDatasets = function(allDatasets, systemSetting, orgUnitId) {
+        systemSettingValue = systemSetting ? systemSetting.value : {};
         allDatasets = _.map(allDatasets, function(dataset) {
             dataset.sections = _.map(dataset.sections, function(section) {
                 section.dataElements = _.filter(section.dataElements, function(dataElement) {
-                    var excludedList = systemSettings.excludedDataElements;
+                    var excludedList = systemSettingValue.excludedDataElements;
                     return excludedList ? !_.contains(excludedList[orgUnitId], dataElement.id) : true;
                 });
                 return section;

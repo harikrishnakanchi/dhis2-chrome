@@ -10,9 +10,13 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
             dataelements = testData.get("dataElements");
             data = [datasets, sections, dataelements];
             systemSettings = {
-                excludedDataElements: {
-                    "mod1": ['DE3']
+                'key': 'someKey',
+                'value': {
+                    excludedDataElements: {
+                        "mod1": ['DE3']
+                    }
                 }
+
             };
             expectedEnrichedDatasets = [{
                 name: 'OPD',

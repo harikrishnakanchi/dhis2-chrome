@@ -39,11 +39,8 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
                 var setUpViewMode = function() {
                     var associatedDatasets = orgUnitService.getAssociatedDatasets($scope.orgUnit, $scope.allDatasets);
                     var systemSettingsPromise = orgUnitService.getSystemSettings($scope.orgUnit.parent.id);
-                    systemSettingsPromise.then(function(systemSettings) {
-                        var datasets = associatedDatasets;
-                        if (systemSettings) {
-                            datasets = datasetTransformer.getFilteredDatasets(associatedDatasets, systemSettings.value, $scope.orgUnit.id);
-                        }
+                    systemSettingsPromise.then(function(systemSetting) {
+                        var datasets = datasetTransformer.getFilteredDatasets(associatedDatasets, systemSetting, $scope.orgUnit.id);
                         $scope.modules.push({
                             'name': $scope.orgUnit.name,
                             'datasets': datasets,
