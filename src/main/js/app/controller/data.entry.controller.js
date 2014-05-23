@@ -176,10 +176,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, getPeriod(), $scope.currentModule.id, $scope.currentUser.userCredentials.username);
 
-            if ($scope.dataentryForm.$dirty) {
+            if ($scope.dataentryForm && $scope.dataentryForm.$dirty) {
                 dataService.submitData(payload).then(approveAllData).then(onSuccess, onError);
             } else
-                approveAllData().then(onSuccess, onError);
+            approveAllData().then(onSuccess, onError);
         };
 
         var save = function(asDraft) {
