@@ -54,6 +54,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 data = data || {};
                 $scope.dataValues = dataValuesMapper.mapToView(data);
                 $scope.isSubmitted = (!_.isEmpty(data) && !data.isDraft);
+                $scope.isDataFormInitialized = true;
             });
 
             var datasetsAssociatedWithModule = _.pluck(_.filter(dataSets, {
@@ -90,6 +91,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $scope.dataValues = {};
             $scope.isopen = {};
             $scope.isDatasetOpen = {};
+            $scope.isDataFormInitialized = false;
             $scope.saveSuccess = false;
             $scope.saveError = false;
             $scope.submitSuccess = false;
@@ -179,7 +181,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             if ($scope.dataentryForm && $scope.dataentryForm.$dirty) {
                 dataService.submitData(payload).then(approveAllData).then(onSuccess, onError);
             } else
-            approveAllData().then(onSuccess, onError);
+                approveAllData().then(onSuccess, onError);
         };
 
         var save = function(asDraft) {

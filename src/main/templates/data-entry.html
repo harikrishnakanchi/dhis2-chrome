@@ -23,7 +23,8 @@
 </div>
 
 <section class="panel tab-panel" ng-if="week &amp;&amp; currentModule">
-<div class="alert alert-danger" ng-if="!isSubmitted &amp;&amp; hasRoles(['Approver - Level 1'])" >{{resourceBundle.noDataForApproval}}</div>
+<div class="alert alert-success" ng-if="isSubmitted &amp;&amp; !hasRoles(['Approver - Level 1'])" >{{resourceBundle.dataSubmittedForApproval}}</div>
+<div class="alert alert-danger" ng-if="isDataFormInitialized &amp;&amp; !isSubmitted &amp;&amp; hasRoles(['Approver - Level 1'])" >{{resourceBundle.noDataForApproval}}</div>
 <form name="dataentryForm" id="dataentry" ng-if="isSubmitted || !hasRoles(['Approver - Level 1'])">
 		<accordion close-others="false">
 			<accordion-group ng-repeat="(dataSetId, sections) in currentGroupedSections" is-open="getDatasetState(dataSetId, $first)[dataSetId]">
@@ -80,7 +81,7 @@
 <div>
 	<input type="submit" class="btn btn-primary" ng-click="approveData()" ng-disabled="dataentryForm.$invalid || isReadOnly	" ng-if="hasRoles(['Approver - Level 1'])" value="{{resourceBundle.approveBtnValue}}" />
 	<input type="submit" class="btn btn-primary" ng-click="accept()" ng-disabled="dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Approver - Level 2'])" value="{{resourceBundle.acceptBtnValue}}" />
-	<input type="submit" class="btn btn-main" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid || isReadOnly || isSubmitted" ng-if="hasRoles(['Data entry user'])" value="{{resourceBundle.saveBtnValue}}" />
+	<input type="submit" class="btn btn-main" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" value="{{resourceBundle.saveBtnValue}}" ng-hide="isSubmitted"/>
 	<input type="submit" class="btn btn-main" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" value="{{resourceBundle.submitBtnValue}}" />
 </div>
 </form>
