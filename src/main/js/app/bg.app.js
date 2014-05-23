@@ -1,8 +1,9 @@
-define(["angular", "Q", "services", "hustleModule", "httpInterceptor", "angular-indexedDB"],
-    function(angular, Q, services, hustleModule, httpInterceptor) {
+define(["angular", "Q", "services", "consumers", "hustleModule", "httpInterceptor", "angular-indexedDB"],
+    function(angular, Q, services, consumers, hustleModule, httpInterceptor) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
             services.init(app);
+            consumers.init(app);
 
             app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider',
@@ -20,8 +21,8 @@ define(["angular", "Q", "services", "hustleModule", "httpInterceptor", "angular-
                 });
             };
 
-            app.run(['dataService', 'metadataService',
-                function(dataService, metadataService) {
+            app.run(['dataService', 'metadataService', 'registerConsumers',
+                function(dataService, metadataService, registerConsumers) {
                     console.log("dB migration complete. Starting sync");
                     if (navigator.onLine) {
                         metadataService.sync().
@@ -38,6 +39,7 @@ define(["angular", "Q", "services", "hustleModule", "httpInterceptor", "angular-
                     if (chrome.alarms) {
                         chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataService.sync));
                     }
+                    registerConsumers.run();
                 }
             ]);
 

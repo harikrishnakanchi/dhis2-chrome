@@ -17,6 +17,10 @@ require.config({
         "metadataService": "app/service/metadata.service",
         "services": "app/service/bg.services",
 
+        //consumers
+        "consumers": "app/consumers/consumers",
+        "registerConsumers": "app/consumers/register.consumers",
+        "dataValuesConsumer": "app/consumers/datavalues.consumer",
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
 
         //Interceptors
