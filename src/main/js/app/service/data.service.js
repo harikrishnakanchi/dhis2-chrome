@@ -1,20 +1,7 @@
 define(["lodash", "properties", "moment"], function(_, properties, moment) {
     return function($http, db, $q) {
-        this.saveDataAsDraft = function(payload) {
-            return saveToDb(payload, true);
-        };
-
-        this.submitData = function(payload) {
-            return saveToDb(payload, false).then(this.save);
-        };
-
         this.downloadAllData = function(orgUnitId) {
             return get(orgUnitId).then(saveToDb);
-        };
-
-        this.getDataValues = function(period, orgUnitId) {
-            var store = db.objectStore('dataValues');
-            return store.find([period, orgUnitId]);
         };
 
         var get = function(orgUnit) {

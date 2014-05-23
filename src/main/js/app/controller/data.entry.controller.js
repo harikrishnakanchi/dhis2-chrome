@@ -1,6 +1,7 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-    return function($scope, $q, db, dataService, $anchorScroll, $location, $modal, $rootScope, $window, approvalService) {
+    return function($scope, $q, $hustle, db, dataRepository, dataService, $anchorScroll, $location, $modal, $rootScope, $window, approvalService) {
         var dataSets, systemSettings;
+        var DATA_VALUES_TUBE = "dataValues";
 
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -50,7 +51,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 });
             };
 
-            dataService.getDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
+            dataRepository.getDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
                 data = data || {};
                 $scope.dataValues = dataValuesMapper.mapToView(data);
                 $scope.isSubmitted = (!_.isEmpty(data) && !data.isDraft);
@@ -179,9 +180,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, getPeriod(), $scope.currentModule.id, $scope.currentUser.userCredentials.username);
 
             if ($scope.dataentryForm && $scope.dataentryForm.$dirty) {
-                dataService.submitData(payload).then(approveAllData).then(onSuccess, onError);
+                dataRepository.save(payload).then(saveToDhis).then(approveAllData).then(onSuccess, onError);
             } else
                 approveAllData().then(onSuccess, onError);
+        };
+
+        var saveToDhis = function(data) {
+            return $hustle.publish(data, DATA_VALUES_TUBE);
         };
 
         var save = function(asDraft) {
@@ -197,12 +202,15 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.isSubmitted = false;
             };
 
+
+
             var period = getPeriod();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
-            if (asDraft)
-                dataService.saveDataAsDraft(payload).then(successPromise, errorPromise);
-            else
-                dataService.submitData(payload).then(successPromise, errorPromise);
+            if (asDraft) {
+                dataRepository.saveAsDraft(payload).then(successPromise, errorPromise);
+            } else {
+                dataRepository.save(payload).then(saveToDhis).then(successPromise, errorPromise);
+            }
             scrollToTop();
         };
 

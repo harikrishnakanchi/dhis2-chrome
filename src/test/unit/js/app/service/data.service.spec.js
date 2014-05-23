@@ -63,83 +63,11 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
             httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", payload).respond(200, "ok");
 
             var dataService = new DataService(http, db);
-            dataService.submitData(payload);
+            dataService.save(payload);
 
             httpBackend.flush();
-
-            expect(dataValuesStore.upsert).toHaveBeenCalledWith([{
-                period: '2014W15',
-                dataValues: payload.dataValues,
-                "orgUnit": "company_0"
-            }]);
         });
 
-        it("should save data values as draft", function() {
-            spyOn(http, "post");
-
-            var payload = {
-                dataValues: [{
-                    period: '2014W15',
-                    orgUnit: 'module_1',
-                    dataElement: "DE1",
-                    categoryOptionCombo: "COC1",
-                    value: 1,
-                }, {
-                    period: '2014W15',
-                    orgUnit: 'module_1',
-                    dataElement: "DE2",
-                    categoryOptionCombo: "COC2",
-                    value: 2,
-                }]
-            };
-
-            var dataService = new DataService(http, db, q);
-            dataService.saveDataAsDraft(payload);
-
-            expect(dataValuesStore.upsert).toHaveBeenCalledWith([{
-                period: '2014W15',
-                dataValues: payload.dataValues,
-                "orgUnit": "module_1",
-                "isDraft": true
-            }]);
-
-            expect(http.post).not.toHaveBeenCalled();
-        });
-
-        it("should return a reject promise if dhis responds with an error", function() {
-            var dataValues = {
-                "blah": "blah"
-            };
-
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", dataValues).respond(200, {
-                "status": "ERROR",
-                "description": "The import process failed: Failed to flush BatchHandler",
-                "dataValueCount": {
-                    "imported": 0,
-                    "updated": 0,
-                    "ignored": 0,
-                    "deleted": 0
-                },
-                "importCount": {
-                    "imported": 0,
-                    "updated": 0,
-                    "ignored": 0,
-                    "deleted": 0
-                }
-            });
-
-            var dataService = new DataService(http, db, q);
-
-            var onSuccess = jasmine.createSpy();
-            var onError = jasmine.createSpy();
-
-            dataService.submitData(dataValues).then(onSuccess, onError);
-
-            httpBackend.flush();
-
-            expect(onSuccess).not.toHaveBeenCalled();
-            expect(onError).toHaveBeenCalled();
-        });
 
         it("should download all data for an org unit", function() {
             var dataService = new DataService(http, db, q);
@@ -210,12 +138,5 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
             httpBackend.flush();
         });
 
-        it("should get the data values", function() {
-            var dataService = new DataService(http, db, q);
-            spyOn(dataValuesStore, 'find');
-            dataService.getDataValues('period', 'orgUnitId');
-
-            expect(dataValuesStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
-        });
     });
 });

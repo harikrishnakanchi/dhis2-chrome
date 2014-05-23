@@ -54,6 +54,10 @@ require.config({
         "userService": "app/service/user.service",
         "approvalService": "app/service/approval.service",
 
+        //Repositories
+        "repositories": "app/repository/repositories",
+        "dataRepository": "app/repository/data.repository",
+
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
         "dataValuesMapper": "app/transformers/datavalues.mapper",

@@ -1,17 +1,20 @@
 /*global Date:true*/
-define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment) {
+define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository) {
     describe("dataEntryController ", function() {
         var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, approvalStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
-            orgUnits, window, approvalService, approvalStoreSpy;
+            orgUnits, window, approvalService, approvalStoreSpy, hustle, dataRepository;
 
-        beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location, $window) {
+        beforeEach(module('hustle'));
+        beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window) {
             q = $q;
+            hustle = $hustle;
             window = $window;
             location = $location;
             anchorScroll = $anchorScroll;
             rootScope = $rootScope;
 
             scope = $rootScope.$new();
+            dataRepository = new DataRepository();
 
             var queryBuilder = function() {
                 this.$index = function() {
@@ -116,7 +119,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             approvalStoreSpy = spyOn(approvalStore, "each");
             approvalStoreSpy.and.returnValue(utils.getPromise(q, [{}]));
 
-            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope, window, approvalService);
+            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope, window, approvalService);
         }));
 
         it("should initialize modules", function() {
@@ -188,7 +191,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             scope.$apply();
 
-            dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
+            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope);
 
             expect(scope.modules).toEqual(expectedModules);
         });
@@ -303,10 +306,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it("should submit data values to indexeddb and dhis", function() {
             spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
-            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+            spyOn(hustle, "publish");
 
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope);
 
             scope.currentModule = {
                 id: 'mod2',
@@ -322,7 +326,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.submit();
             scope.$apply();
 
-            expect(dataService.submitData).toHaveBeenCalled();
+            expect(dataRepository.save).toHaveBeenCalled();
+            expect(hustle.publish).toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(true);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(false);
@@ -331,11 +336,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should save data values as draft to indexeddb", function() {
-            spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
-            spyOn(dataService, "saveDataAsDraft").and.returnValue(saveSuccessPromise);
 
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
+            spyOn(scope.dataentryForm, '$setPristine');
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "saveAsDraft").and.returnValue(saveSuccessPromise);
+            spyOn(hustle, "publish");
+
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope);
 
             scope.currentModule = {
                 id: 'mod2',
@@ -351,7 +358,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.saveAsDraft();
             scope.$apply();
 
-            expect(dataService.saveDataAsDraft).toHaveBeenCalled();
+            expect(dataRepository.saveAsDraft).toHaveBeenCalled();
+            expect(hustle.publish).not.toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(true);
             expect(scope.submitError).toBe(false);
@@ -359,12 +367,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
         });
 
-        it("should let the user know of failures when submitting the data to dhis", function() {
-            spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
-            spyOn(dataService, "submitData").and.returnValue(saveErrorPromise);
+        it("should let the user know of failures when saving the data to indexedDB ", function() {
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "save").and.returnValue(saveErrorPromise);
+            spyOn(hustle, "publish");
 
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
+
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope);
             scope.currentModule = {
                 id: 'mod2',
                 parent: {
@@ -379,18 +388,22 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.submit();
             scope.$apply();
 
+            expect(dataRepository.save).toHaveBeenCalled();
+            expect(hustle.publish).not.toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(true);
             expect(scope.saveError).toBe(false);
         });
 
-        it("should let the user know of failures when saving the data to indexedDB ", function() {
+        it("should let the user know of failures when saving to queue ", function() {
 
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
-            spyOn(dataService, "saveDataAsDraft").and.returnValue(saveErrorPromise);
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+            spyOn(hustle, "publish").and.returnValue(saveErrorPromise);;
 
-            var dataEntryController = new DataEntryController(scope, q, db, dataService, anchorScroll, location, modal, rootScope);
+
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope);
             scope.currentModule = {
                 id: 'mod2',
                 parent: {
@@ -402,13 +415,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "weekNumber": 14
             };
 
-            scope.saveAsDraft();
+            scope.submit();
             scope.$apply();
 
+            expect(dataRepository.save).toHaveBeenCalled();
+            expect(hustle.publish).toHaveBeenCalled();
             expect(scope.submitSuccess).toBe(false);
             expect(scope.saveSuccess).toBe(false);
-            expect(scope.submitError).toBe(false);
-            expect(scope.saveError).toBe(true);
+            expect(scope.submitError).toBe(true);
+            expect(scope.saveError).toBe(false);
         });
 
         it("should fetch max length to calculate col span for category options", function() {
@@ -456,12 +471,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should fetch data only if period is defined", function() {
-            spyOn(dataService, 'getDataValues');
+            spyOn(dataRepository, 'getDataValues');
 
             scope.week = undefined;
             scope.$apply();
 
-            expect(dataService.getDataValues).not.toHaveBeenCalled();
+            expect(dataRepository.getDataValues).not.toHaveBeenCalled();
         });
 
         it("should fetch empty data if no data exists for the given period", function() {
@@ -472,11 +487,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.currentModule = {
                 'id': 'Mod1'
             };
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
 
             scope.$apply();
 
-            expect(dataService.getDataValues).toHaveBeenCalledWith('2014W14', 'Mod1');
+            expect(dataRepository.getDataValues).toHaveBeenCalledWith('2014W14', 'Mod1');
             expect(scope.dataValues).toEqual({});
         });
 
@@ -491,7 +506,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     id: 'parent'
                 }
             };
-            spyOn(dataService, "getDataValues").and.returnValue(utils.getPromise(q, {
+            spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {
                 "dataValues": [{
                     "dataElement": "DE_Oedema",
                     "categoryOptionCombo": "32",
@@ -506,7 +521,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             scope.$apply();
 
-            expect(dataService.getDataValues).toHaveBeenCalledWith("2014W14", "mod2");
+            expect(dataRepository.getDataValues).toHaveBeenCalledWith("2014W14", "mod2");
             expect(scope.dataValues).toEqual({
                 DE_Oedema: {
                     32: {
@@ -523,7 +538,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it('should set dataset sections if module is selected', function() {
             spyOn(scope.dataentryForm, '$setPristine');
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
 
             scope.week = {
                 "weekNumber": 14
@@ -613,9 +628,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
 
         it("should approve", function() {
-            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(approvalService, "approve").and.returnValue(utils.getPromise(q, {}));
+            spyOn(hustle, "publish").and.returnValue(saveSuccessPromise);
 
             scope.currentModule = {
                 id: 'mod2',
@@ -645,8 +661,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should show appropriate message on approval failure", function() {
-            spyOn(dataService, "submitData").and.returnValue(saveSuccessPromise);
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+            spyOn(hustle, "publish");
+
             spyOn(approvalService, "approve").and.returnValue(utils.getRejectedPromise(q, {}));
 
             scope.currentModule = {
@@ -681,7 +699,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             approvalStoreSpy.and.returnValue(utils.getPromise(q, [{
                 "isApproved": true
             }]));
@@ -692,7 +710,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should not be read-only if data is not approved", function() {
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
 
             scope.currentModule = {
                 id: 'mod2',
@@ -711,7 +729,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should show not-ready-for-approval message if no data has been saved or submitted", function() {
-            spyOn(dataService, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
 
             scope.currentModule = {
                 id: 'mod2',
@@ -731,7 +749,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
 
         it("should show not-ready-for-approval message if data has been saved as draft", function() {
-            spyOn(dataService, "getDataValues").and.returnValue(utils.getPromise(q, {
+            spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {
                 "period": "2014W14",
                 "orgUnit": "mod2",
                 "isDraft": true,
@@ -771,7 +789,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should show ready-for-approval message if data has already been submitted for approval", function() {
-            spyOn(dataService, "getDataValues").and.returnValue(utils.getPromise(q, {
+            spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {
                 "period": "2014W14",
                 "orgUnit": "mod2",
                 "dataValues": [{
