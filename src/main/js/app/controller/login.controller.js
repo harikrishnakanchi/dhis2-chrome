@@ -14,7 +14,7 @@ define(["md5"], function(md5) {
 
         var setLocale = function() {
             var store = db.objectStore('userPreferences');
-            store.find($rootScope.currentUser.id).then(function(data) {
+            store.find($rootScope.currentUser.userCredentials.username).then(function(data) {
                 if (data) {
                     $rootScope.currentUser.locale = data.locale;
                 } else {

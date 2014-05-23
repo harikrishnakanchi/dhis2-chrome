@@ -76,7 +76,7 @@ define([], function() {
     };
 
     var add_user_preference_store = function(db, tx) {
-        var userPrefenreceStore = create_store_with_key("userPreferences", "id", db);
+        var userPrefenreceStore = create_store_with_key("userPreferences", "username", db);
     };
 
     var add_translation_store = function(db, tx) {

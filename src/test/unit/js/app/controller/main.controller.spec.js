@@ -7,7 +7,6 @@ define(["mainController", "angularMocks", "utils"], function(MainController, moc
             scope = $rootScope.$new();
             q = $q;
             rootScope = $rootScope;
-            rootScope.currentUser = {};
 
             i18nResourceBundle = {
                 get: function() {}
@@ -58,7 +57,7 @@ define(["mainController", "angularMocks", "utils"], function(MainController, moc
                     return userPreferenceStore;
             });
             spyOn(userPreferenceStore, 'upsert').and.returnValue(utils.getPromise(q, {
-                'id': 1,
+                'username': "1",
                 'locale': 'en'
             }));
 
@@ -80,6 +79,11 @@ define(["mainController", "angularMocks", "utils"], function(MainController, moc
         });
 
         it("should change resourceBundle if locale changes", function() {
+            rootScope.currentUser = {
+                "userCredentials": {
+                    "username": "1"
+                }
+            };
             rootScope.currentUser.locale = "fr";
 
             var frenchResourceBundle = {

@@ -18,7 +18,7 @@ define(["lodash"], function(_) {
                         $rootScope.currentUser.locale = "en";
                     }
                     var data = {
-                        'id': $rootScope.currentUser.id,
+                        'username': $rootScope.currentUser.userCredentials.username,
                         'locale': $scope.currentUser.locale
                     };
                     var preferenceStore = db.objectStore('userPreferences');
