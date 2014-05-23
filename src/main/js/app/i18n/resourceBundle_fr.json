@@ -20,8 +20,6 @@
     "endDateValidation": "Date de fin est nécessaire",
     "beyondMaxDate": "La date ne peut pas dépasser la date d'aujourd'hui.",
     "nameValidation": "Le nom est obligatoire.",
-    "projectTypeValidation": "Type de projet est nécessaire.",
-    "contextValidation": "Contexte est nécessaire.",
     "consultDaysValidation": "Jours de consultation est nécessaire.",
     "loginFailed": "Pouvoirs invalides.",
     "savedCountry": "Pays créé avec succès.",

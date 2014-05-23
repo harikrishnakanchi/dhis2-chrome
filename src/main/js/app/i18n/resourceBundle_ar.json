@@ -20,8 +20,6 @@
     "endDateValidation": "مطلوب تاريخ نهاية",
     "beyondMaxDate": "تاريخ لا يمكن أن يتجاوز تاريخ اليوم.",
     "nameValidation": "مطلوب الاسم.",
-    "projectTypeValidation": "مطلوب نوع المشروع.",
-    "contextValidation": "مطلوب السياق.",
     "consultDaysValidation": "مطلوب أيام التشاور.",
     "loginFailed": "وثائق التفويض غير صالحة.",
     "savedCountry": "خلقت البلاد بنجاح.",

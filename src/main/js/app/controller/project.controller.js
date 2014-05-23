@@ -2,17 +2,20 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
 
     return function($scope, orgUnitService, $q, $location, $timeout, $anchorScroll, userService, $modal) {
 
-        $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded', 'Coordination', 'Remote Control'];
+        $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded', 'Coordination', 'Remote Control'].sort();
 
-        $scope.allContexts = ['Armed Conflict', 'Post-Conflict', 'Stable', 'Internal Instability'];
+        $scope.allContexts = ['Armed Conflict', 'Post-Conflict', 'Stable', 'Internal Instability'].sort();
 
-        $scope.allPopTypes = ['Displaced', 'General Population', 'Mixed Displaced/General', 'Victims of Natural Disasters'];
+        $scope.allPopTypes = ['Displaced', 'General Population', 'Mixed Displaced/General', 'Victims of Natural Disasters'].sort();
 
-        $scope.allEvents = ['Armed Conflict: direct violence towards the civilian population', 'Armed Conflict: disruption of health systems due to conflict',
+        var allEventsExceptOther = ['Armed Conflict: direct violence towards the civilian population', 'Armed Conflict: disruption of health systems due to conflict',
             'Armed Conflict: refugees/internally displaced people', 'Population affected by endemics/epidemics',
             'Population affected by natural disaster', 'Population affected by social violence and health care exclusion',
-            'Victims of armed conflict', 'Other'
-        ];
+            'Victims of armed conflict'
+        ].sort();
+
+        $scope.allEvents = allEventsExceptOther.concat(['Other']);
+
 
         $scope.thisDate = moment().format("YYYY-MM-DD");
 
