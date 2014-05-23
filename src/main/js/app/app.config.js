@@ -12,7 +12,7 @@ require.config({
         "overrides": "app/conf/overrides",
         "moment": "lib/moment/moment",
         "hustle": "lib/hustle/hustle",
-        "hustleInit": "app/hustle.init",
+        "hustleModule": "lib/angularjs-hustle/hustle.module",
 
 
         //3rd party angular modules
@@ -113,6 +113,9 @@ require.config({
         },
         'angular-ui-notin': {
             deps: ["angular"]
+        },
+        'hustleModule': {
+            deps: ["angular", "hustle"]
         }
     }
 });

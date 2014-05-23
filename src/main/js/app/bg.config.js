@@ -8,7 +8,7 @@ require.config({
         "app": "app/bg.app",
         "hustle": "lib/hustle/hustle",
         "moment": "lib/moment/moment",
-        "hustleInit": "app/hustle.init",
+        "hustleModule": "lib/angularjs-hustle/hustle.module",
 
         "angular": "lib/angular/angular",
 
@@ -28,6 +28,9 @@ require.config({
         },
         'angular-indexedDB': {
             deps: ["angular"]
+        },
+        'hustleModule': {
+            deps: ["angular", "hustle"]
         }
     }
 });

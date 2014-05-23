@@ -1,21 +1,20 @@
-define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "properties", "hustleInit", "httpInterceptor",
-        "angular-route", "ng-i18n", "angular-indexedDB", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
+define(["angular", "Q", "services", "directives", "controllers", "migrator", "migrations", "properties", "httpInterceptor",
+        "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals"
     ],
-    function(angular, Q, services, directives, controllers, migrator, migrations, properties, hustleInit, httpInterceptor) {
+    function(angular, Q, services, directives, controllers, migrator, migrations, properties, httpInterceptor) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal",
-                "ui.multiselect", "ui.notIn", "ui.equals"
+                "ui.multiselect", "ui.notIn", "ui.equals", "hustle"
             ]);
             services.init(app);
             directives.init(app);
             controllers.init(app);
-            hustleInit.init();
 
             app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
-            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider',
-                function($routeProvider, $indexedDBProvider, $httpProvider) {
+            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider',
+                function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider) {
                     $routeProvider.
                     when('/dashboard', {
                         templateUrl: 'templates/dashboard.html',
@@ -44,14 +43,16 @@ define(["angular", "Q", "services", "directives", "controllers", "migrator", "mi
                             chrome.runtime.sendMessage("migrationComplete");
                         });
 
+                    $hustleProvider.init("hustle", 1, ["dataValues"]);
                     $httpProvider.interceptors.push('httpInterceptor');
                 }
             ]);
             app.value('ngI18nConfig', {
                 defaultLocale: 'en',
-                supportedLocales: ['en', 'fr', 'ar'],
+                supportedLocales: ['en', 'es'],
                 basePath: "/js/app/i18n"
             });
+
             app.run(['metadataService', '$rootScope', '$location',
                 function(metadataService, $rootScope, $location) {
                     metadataService.loadMetadataFromFile();

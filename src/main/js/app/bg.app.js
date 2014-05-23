@@ -1,15 +1,15 @@
-define(["angular", "Q", "services", "hustleInit", "httpInterceptor", "angular-indexedDB"],
-    function(angular, Q, services, hustleInit, httpInterceptor) {
+define(["angular", "Q", "services", "hustleModule", "httpInterceptor", "angular-indexedDB"],
+    function(angular, Q, services, hustleModule, httpInterceptor) {
         var init = function() {
-            var app = angular.module('DHIS2', ["xc.indexedDB"]);
+            var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
             services.init(app);
-            // hustleInit.init();
 
             app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
-            app.config(['$indexedDBProvider', '$httpProvider',
-                function($indexedDBProvider, $httpProvider) {
+            app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider',
+                function($indexedDBProvider, $httpProvider, $hustleProvider) {
                     $indexedDBProvider.connection('msf');
                     $httpProvider.interceptors.push('httpInterceptor');
+                    $hustleProvider.init("hustle", 1, ["dataValues"]);
                 }
             ]);
 
