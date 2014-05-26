@@ -50,7 +50,7 @@ define(["md5"], function(md5) {
                 then(saveUserPreferences).
                 then(downloadDataValues).
                 then(function() {
-                    $location.path("/dashboard")
+                    $location.path("/dashboard");
                 });
             }
         };
