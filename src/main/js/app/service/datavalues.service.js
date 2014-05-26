@@ -47,7 +47,7 @@ define(["lodash", "moment"], function(_, moment) {
             var saveAllDataValues = function(data) {
                 console.debug("Storing data values : ", data);
                 if (dataToUpload && hasConflict(dataToUpload.dataValues, data.dataValues)) {
-                    console.debug("Conflicting data values : ", data, uploadData);
+                    console.debug("Conflicting data values : ", data, dataToUpload);
                     dataRepository.save(data);
                     return $q.reject("");
                 } else if (dataToUpload) {

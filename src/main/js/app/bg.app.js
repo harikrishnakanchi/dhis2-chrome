@@ -15,8 +15,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 }
             ]);
 
-            app.run(['dataValuesService', 'metadataService', 'consumerRegistry', '$hustle',
-                function(dataValuesService, metadataService, consumerRegistry, $hustle) {
+            app.run(['metadataService', 'consumerRegistry', '$hustle',
+                function(metadataService, consumerRegistry, $hustle) {
                     console.log("dB migration complete. Starting sync");
 
                     var scheduleSync = function() {
@@ -31,7 +31,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     };
 
                     var startSyncAndRegisterConsumers = function() {
-                        metadataService.sync().
+                        metadataService.sync().then(downloadDataValues).
                         finally(scheduleSync);
                         consumerRegistry.register();
                     };
