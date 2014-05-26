@@ -1,5 +1,5 @@
 define(["md5"], function(md5) {
-    return function($scope, $rootScope, $location, db, $q, userPreferenceRepository) {
+    return function($scope, $rootScope, $location, db, $q, $hustle, userPreferenceRepository) {
         var getUser = function() {
             var userStore = db.objectStore("users");
             return userStore.find($scope.username.toLowerCase());
@@ -23,7 +23,13 @@ define(["md5"], function(md5) {
                 'locale': $rootScope.currentUser.locale,
                 'orgUnits': $rootScope.currentUser.organisationUnits || []
             };
-            userPreferenceRepository.save(userPreferences);
+            return userPreferenceRepository.save(userPreferences);
+        };
+
+        var downloadDataValues = function() {
+            return $hustle.publish({
+                "type": "download"
+            }, "dataValues");
         };
 
         var authenticateOrPromptUserForPassword = function(data) {
@@ -40,11 +46,14 @@ define(["md5"], function(md5) {
                 $scope.invalidCredentials = false;
                 $rootScope.isLoggedIn = true;
                 $rootScope.currentUser = user;
-                setLocale().then(saveUserPreferences);
-                $location.path("/dashboard");
+                setLocale().
+                then(saveUserPreferences).
+                then(downloadDataValues).
+                then(function() {
+                    $location.path("/dashboard")
+                });
             }
         };
-
 
         $scope.login = function() {
             $q.all([getUser(), getUserCredentials()]).then(authenticateOrPromptUserForPassword);

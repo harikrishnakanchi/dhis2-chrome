@@ -1,11 +1,14 @@
 define(["loginController", "angularMocks", "utils", "userPreferenceRepository"], function(LoginController, mocks, utils, UserPreferenceRepository) {
     describe("dashboard controller", function() {
-        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, userPreferenceStore, userPreferenceRepository;
+        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, userPreferenceStore, userPreferenceRepository, hustle;
 
-        beforeEach(mocks.inject(function($rootScope, $location, $q) {
+        beforeEach(module("hustle"));
+
+        beforeEach(mocks.inject(function($rootScope, $location, $q, $hustle) {
             scope = $rootScope.$new();
             rootScope = $rootScope;
             location = $location;
+            hustle = $hustle;
             q = $q;
             userPreferenceRepository = new UserPreferenceRepository();
             spyOn(userPreferenceRepository, 'get').and.returnValue(utils.getPromise(q, {}));
@@ -60,8 +63,9 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
 
             spyOn(userPreferenceStore, 'find').and.returnValue(utils.getPromise(q, {}));
             spyOn(userPreferenceRepository, 'save').and.returnValue(utils.getPromise(q, {}));
+            spyOn(hustle, "publish");
 
-            loginController = new LoginController(scope, $rootScope, location, db, q, userPreferenceRepository);
+            loginController = new LoginController(scope, $rootScope, location, db, q, hustle, userPreferenceRepository);
         }));
 
         it("should login admin user with valid credentials and redirect to dashboard", function() {
@@ -82,6 +86,9 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
                 locale: undefined,
                 orgUnits: []
             });
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "type": "download"
+            }, "dataValues");
         });
 
         it("should not login admin user with invalid password", function() {
@@ -105,6 +112,9 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
 
             expect(rootScope.currentUser.userCredentials.username).toEqual('someprojectuser');
             expect(rootScope.isLoggedIn).toEqual(true);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "type": "download"
+            }, "dataValues");
             expect(location.path).toHaveBeenCalledWith("/dashboard");
             expect(scope.invalidCredentials).toEqual(false);
         });

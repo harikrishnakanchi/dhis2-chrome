@@ -11,7 +11,7 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('moduleController', ['$scope', 'orgUnitService', '$indexedDB', '$location', '$q', moduleController]);
             app.controller('projectController', ['$scope', 'orgUnitService', '$q', '$location', '$timeout', '$anchorScroll', 'userService', '$modal', projectController]);
             app.controller('mainController', ['$scope', '$rootScope', 'ngI18nResourceBundle', '$indexedDB', 'userPreferenceRepository', mainController]);
-            app.controller('loginController', ['$scope', '$rootScope', '$location', '$indexedDB', '$q', 'userPreferenceRepository', loginController]);
+            app.controller('loginController', ['$scope', '$rootScope', '$location', '$indexedDB', '$q', '$hustle', 'userPreferenceRepository', loginController]);
             app.controller('countryController', ['$scope', 'orgUnitService', '$q', '$location', '$timeout', '$anchorScroll', countryController]);
             app.controller('confirmDialogController', ['$scope', '$modalInstance', confirmDialogController]);
             app.controller('projectUserController', ['$scope', 'userService', projectUserController]);
