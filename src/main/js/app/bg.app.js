@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "consumers", "hustleModule", "httpInterceptor", "angular-indexedDB"],
-    function(angular, Q, services, consumers, hustleModule, httpInterceptor) {
+define(["angular", "Q", "services", "consumers", "hustleModule", "httpInterceptor", "properties", "angular-indexedDB"],
+    function(angular, Q, services, consumers, hustleModule, httpInterceptor, properties) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
             services.init(app);
@@ -35,7 +35,6 @@ define(["angular", "Q", "services", "consumers", "hustleModule", "httpIntercepto
                                 callback();
                         };
                     };
-
                     if (chrome.alarms) {
                         chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataService.sync));
                     }
