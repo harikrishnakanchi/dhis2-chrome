@@ -1,5 +1,5 @@
 define(["md5"], function(md5) {
-    return function($scope, $rootScope, $location, db, $q) {
+    return function($scope, $rootScope, $location, db, $q, userPreferenceRepository) {
         var getUser = function() {
             var userStore = db.objectStore("users");
             return userStore.find($scope.username.toLowerCase());
@@ -7,23 +7,23 @@ define(["md5"], function(md5) {
 
         var getUserCredentials = function() {
             var userCredentialsStore = db.objectStore("localUserCredentials");
-            if ($scope.username.toLowerCase() === "admin")
-                return userCredentialsStore.find("admin");
-            return userCredentialsStore.find("project_user");
+            var username = $scope.username.toLowerCase() === "admin" ? "admin" : "project_user";
+            return userCredentialsStore.find(username);
         };
 
         var setLocale = function() {
-            var store = db.objectStore('userPreferences');
-            store.find($rootScope.currentUser.userCredentials.username).then(function(data) {
-                if (data) {
-                    $rootScope.currentUser.locale = data.locale;
-                } else {
-                    $rootScope.currentUser.locale = "en";
-                }
-            }).
-            catch (function(data) {
-                $rootScope.currentUser.locale = "en";
+            return userPreferenceRepository.get($rootScope.currentUser.userCredentials.username).then(function(data) {
+                $rootScope.currentUser.locale = data ? data.locale : "en";
             });
+        };
+
+        var saveUserPreferences = function() {
+            var userPreferences = {
+                'username': $rootScope.currentUser.userCredentials.username,
+                'locale': $scope.currentUser.locale,
+                'orgUnits': $scope.currentUser.organisationUnits
+            };
+            userPreferenceRepository.save(userPreferences);
         };
 
         var authenticateOrPromptUserForPassword = function(data) {
@@ -40,7 +40,7 @@ define(["md5"], function(md5) {
                 $scope.invalidCredentials = false;
                 $rootScope.isLoggedIn = true;
                 $rootScope.currentUser = user;
-                setLocale();
+                setLocale().then(saveUserPreferences);
                 $location.path("/dashboard");
             }
         };

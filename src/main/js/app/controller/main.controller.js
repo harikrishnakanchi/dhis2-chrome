@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $rootScope, ngI18nResourceBundle, db) {
+    return function($scope, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository) {
 
         $rootScope.$watch("currentUser.locale", function() {
 
@@ -17,12 +17,12 @@ define(["lodash"], function(_) {
                     if (!$rootScope.currentUser.locale) {
                         $rootScope.currentUser.locale = "en";
                     }
-                    var data = {
+                    var userPreferences = {
                         'username': $rootScope.currentUser.userCredentials.username,
-                        'locale': $scope.currentUser.locale
+                        'locale': $scope.currentUser.locale,
+                        'orgUnits': $scope.currentUser.organisationUnits
                     };
-                    var preferenceStore = db.objectStore('userPreferences');
-                    preferenceStore.upsert(data);
+                    userPreferenceRepository.save(userPreferences);
 
                     var store = db.objectStore('translations');
                     var query = db.queryBuilder().$index('by_locale').$eq($rootScope.currentUser.locale).compile();

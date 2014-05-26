@@ -1,12 +1,14 @@
-define(["loginController", "angularMocks", "utils"], function(LoginController, mocks, utils) {
+define(["loginController", "angularMocks", "utils", "userPreferenceRepository"], function(LoginController, mocks, utils, UserPreferenceRepository) {
     describe("dashboard controller", function() {
-        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, userPreferenceStore;
+        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, userPreferenceStore, userPreferenceRepository;
 
         beforeEach(mocks.inject(function($rootScope, $location, $q) {
             scope = $rootScope.$new();
             rootScope = $rootScope;
             location = $location;
             q = $q;
+            userPreferenceRepository = new UserPreferenceRepository();
+            spyOn(userPreferenceRepository, 'get').and.returnValue(utils.getPromise(q, {}));
 
             db = {
                 objectStore: function() {}
@@ -57,8 +59,9 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
             });
 
             spyOn(userPreferenceStore, 'find').and.returnValue(utils.getPromise(q, {}));
+            spyOn(userPreferenceRepository, 'save').and.returnValue(utils.getPromise(q, {}));
 
-            loginController = new LoginController(scope, $rootScope, location, db, q);
+            loginController = new LoginController(scope, $rootScope, location, db, q, userPreferenceRepository);
         }));
 
         it("should login admin user with valid credentials and redirect to dashboard", function() {
@@ -74,6 +77,11 @@ define(["loginController", "angularMocks", "utils"], function(LoginController, m
             expect(rootScope.isLoggedIn).toEqual(true);
             expect(location.path).toHaveBeenCalledWith("/dashboard");
             expect(scope.invalidCredentials).toEqual(false);
+            expect(userPreferenceRepository.save).toHaveBeenCalledWith({
+                username: 'admin',
+                locale: undefined,
+                orgUnits: undefined
+            });
         });
 
         it("should not login admin user with invalid password", function() {

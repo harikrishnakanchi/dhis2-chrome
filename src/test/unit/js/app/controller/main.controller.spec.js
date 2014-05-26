@@ -1,12 +1,13 @@
-define(["mainController", "angularMocks", "utils"], function(MainController, mocks, utils) {
+define(["mainController", "angularMocks", "utils", "userPreferenceRepository"], function(MainController, mocks, utils, UserPreferenceRepository) {
     describe("dashboard controller", function() {
         var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, db,
-            translationStore, userPreferenceStore;
+            translationStore, userPreferenceStore, userPreferenceRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             scope = $rootScope.$new();
             q = $q;
             rootScope = $rootScope;
+            userPreferenceRepository = new UserPreferenceRepository();
 
             i18nResourceBundle = {
                 get: function() {}
@@ -61,7 +62,7 @@ define(["mainController", "angularMocks", "utils"], function(MainController, moc
                 'locale': 'en'
             }));
 
-            mainController = new MainController(scope, rootScope, i18nResourceBundle, db);
+            mainController = new MainController(scope, rootScope, i18nResourceBundle, db, userPreferenceRepository);
         }));
 
         it("should logout user", function() {
@@ -82,15 +83,18 @@ define(["mainController", "angularMocks", "utils"], function(MainController, moc
             rootScope.currentUser = {
                 "userCredentials": {
                     "username": "1"
-                }
+                },
+                "organisationUnits": [{
+                    "id": "123"
+                }]
             };
             rootScope.currentUser.locale = "fr";
-
             var frenchResourceBundle = {
                 "data": {
                     "login": "french"
                 }
             };
+            spyOn(userPreferenceRepository, "save");
             getResourceBundleSpy.and.returnValue(utils.getPromise(q, frenchResourceBundle));
 
             scope.$apply();
@@ -99,6 +103,13 @@ define(["mainController", "angularMocks", "utils"], function(MainController, moc
                 "locale": "fr"
             });
             expect(rootScope.resourceBundle).toEqual(frenchResourceBundle.data);
+            expect(userPreferenceRepository.save).toHaveBeenCalledWith({
+                "username": '1',
+                "locale": 'fr',
+                "orgUnits": [{
+                    "id": '123'
+                }]
+            });
         });
     });
 });
