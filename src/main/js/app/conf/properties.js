@@ -7,6 +7,11 @@ define(['lodash', 'overrides'], function(_, overrides) {
             },
             "types": ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "organisationUnits", "organisationUnitLevels", "users"],
         },
+        "dataValues": {
+            "sync": {
+                "intervalInMinutes": 1,
+            }
+        },
         "dhis": {
             "url": url,
             "auth_header": "Basic c2VydmljZS5hY2NvdW50Okkxb1Y2Y29HNWVkMw==",

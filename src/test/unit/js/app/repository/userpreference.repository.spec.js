@@ -35,5 +35,17 @@ define(["userPreferenceRepository", "angularMocks", "utils"], function(UserPrefe
 
             expect(mockStore.upsert).toHaveBeenCalledWith(userPreference);
         });
+
+        it("should get all user preferences", function() {
+            var allPrefs = [{
+                "username": "blah"
+            }];
+            mockStore.getAll.and.returnValue(utils.getPromise(q, allPrefs));
+            userPreferenceRepository.getAll().then(function(data) {
+                expect(data).toEqual(allPrefs);
+            });
+            scope.$apply();
+            expect(mockStore.getAll).toHaveBeenCalled();
+        });
     });
 });

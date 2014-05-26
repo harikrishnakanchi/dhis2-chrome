@@ -5,9 +5,14 @@ define(["lodash"], function(_) {
             return store.find(username);
         };
 
+        this.getAll = function() {
+            var store = db.objectStore('userPreferences');
+            return store.getAll();
+        };
+
         this.save = function(userPreferences) {
-            var preferenceStore = db.objectStore('userPreferences');
-            return preferenceStore.upsert(userPreferences);
+            var store = db.objectStore('userPreferences');
+            return store.upsert(userPreferences);
         };
     };
 });

@@ -53,6 +53,7 @@ require.config({
         "orgUnitService": "app/service/orgUnit.service",
         "userService": "app/service/user.service",
         "approvalService": "app/service/approval.service",
+        "dataValuesService": "app/service/datavalues.service",
 
         //Repositories
         "repositories": "app/repository/repositories",

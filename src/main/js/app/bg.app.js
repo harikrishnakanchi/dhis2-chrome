@@ -1,9 +1,10 @@
-define(["angular", "Q", "services", "consumers", "hustleModule", "httpInterceptor", "properties", "angular-indexedDB"],
-    function(angular, Q, services, consumers, hustleModule, httpInterceptor, properties) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "httpInterceptor", "properties", "angular-indexedDB"],
+    function(angular, Q, services, repositories, consumers, hustleModule, httpInterceptor, properties) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
             services.init(app);
             consumers.init(app);
+            repositories.init(app);
 
             app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider',
@@ -19,16 +20,19 @@ define(["angular", "Q", "services", "consumers", "hustleModule", "httpIntercepto
                 chrome.alarms.create('metadataSyncAlarm', {
                     periodInMinutes: properties.metadata.sync.intervalInMinutes
                 });
+
+                chrome.alarms.create('dataValuesSyncAlarm', {
+                    periodInMinutes: properties.dataValues.sync.intervalInMinutes
+                });
             };
 
-            app.run(['dataService', 'metadataService', 'registerConsumers',
-                function(dataService, metadataService, registerConsumers) {
+            app.run(['dataValuesService', 'metadataService', 'registerConsumers',
+                function(dataValuesService, metadataService, registerConsumers) {
                     console.log("dB migration complete. Starting sync");
                     if (navigator.onLine) {
                         metadataService.sync().
                         finally(scheduleSync);
                     }
-                    // dataService.downloadAllData("c484c99b86d");
                     var registerCallback = function(alarmName, callback) {
                         return function(alarm) {
                             if (alarm.name === alarmName)
@@ -37,6 +41,7 @@ define(["angular", "Q", "services", "consumers", "hustleModule", "httpIntercepto
                     };
                     if (chrome.alarms) {
                         chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataService.sync));
+                        chrome.alarms.onAlarm.addListener(registerCallback("dataValuesSyncAlarm", dataValuesService.sync));
                     }
                     registerConsumers.run();
                 }
