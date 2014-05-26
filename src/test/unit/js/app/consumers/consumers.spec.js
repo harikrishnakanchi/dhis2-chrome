@@ -1,4 +1,4 @@
-define(["consumers", "dataValuesConsumer", "registerConsumers"], function(consumers, dataValuesConsumer, registerConsumers) {
+define(["consumers", "dataValuesConsumer", "consumerRegistry"], function(consumers, dataValuesConsumer, consumerRegistry) {
     describe("consumers", function() {
         var app;
         beforeEach(function() {
@@ -9,7 +9,7 @@ define(["consumers", "dataValuesConsumer", "registerConsumers"], function(consum
         it("should register consumers with angular", function() {
             consumers.init(app);
             expect(app.service).toHaveBeenCalledWith("dataValuesConsumer", ["dataService", dataValuesConsumer]);
-            expect(app.service).toHaveBeenCalledWith("registerConsumers", ["$hustle", "dataValuesConsumer", registerConsumers]);
+            expect(app.service).toHaveBeenCalledWith("consumerRegistry", ["$hustle", "dataValuesConsumer", "$q", consumerRegistry]);
         });
     })
 })

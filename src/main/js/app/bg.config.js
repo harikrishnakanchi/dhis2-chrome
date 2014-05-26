@@ -27,7 +27,7 @@ require.config({
 
         //consumers
         "consumers": "app/consumer/consumers",
-        "registerConsumers": "app/consumer/register.consumers",
+        "consumerRegistry": "app/consumer/consumer.registry",
         "dataValuesConsumer": "app/consumer/datavalues.consumer",
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
 

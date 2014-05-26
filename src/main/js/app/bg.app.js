@@ -26,24 +26,41 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 });
             };
 
-            app.run(['dataValuesService', 'metadataService', 'registerConsumers',
-                function(dataValuesService, metadataService, registerConsumers) {
+            app.run(['dataValuesService', 'metadataService', 'consumerRegistry',
+                function(dataValuesService, metadataService, consumerRegistry) {
                     console.log("dB migration complete. Starting sync");
-                    if (navigator.onLine) {
-                        metadataService.sync().
+                    var startSyncAndRegisterConsumers = function() {
+                        metadataService.sync().then(dataValuesService.sync).
                         finally(scheduleSync);
-                    }
+                        consumerRegistry.register();
+                    };
                     var registerCallback = function(alarmName, callback) {
                         return function(alarm) {
                             if (alarm.name === alarmName)
                                 callback();
                         };
                     };
+
+                    if (navigator.onLine) {
+                        startSyncAndRegisterConsumers();
+                    }
+
                     if (chrome.alarms) {
                         chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataService.sync));
                         chrome.alarms.onAlarm.addListener(registerCallback("dataValuesSyncAlarm", dataValuesService.sync));
                     }
-                    registerConsumers.run();
+
+                    window.addEventListener('online', function(e) {
+                        console.log("You are online.");
+                        startSyncAndRegisterConsumers();
+                    });
+
+                    window.addEventListener('offline', function() {
+                        console.log("You are offline. Stopping Sync.");
+                        chrome.alarms.clear('metadataSyncAlarm');
+                        chrome.alarms.clear('dataValuesSyncAlarm');
+                        consumerRegistry.deregister();
+                    });
                 }
             ]);
 
