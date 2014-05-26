@@ -1,41 +1,11 @@
 define(["dataService", "angularMocks", "properties", "moment", "utils", "testData"], function(DataService, mocks, properties, moment, utils, testData) {
     describe("dataService", function() {
-        var httpBackend, http, db, dataSetStore, dataValuesStore;
+        var httpBackend, http, dataSetStore, dataValuesStore;
 
         beforeEach(mocks.inject(function($injector, $q) {
             q = $q;
             httpBackend = $injector.get('$httpBackend');
             http = $injector.get('$http');
-
-            db = {
-                objectStore: function() {}
-            };
-            var getMockStore = function(data) {
-                var getAll = function() {
-                    return utils.getPromise(q, data);
-                };
-                var upsert = function() {};
-                var find = function() {};
-                return {
-                    getAll: getAll,
-                    upsert: upsert,
-                    find: find
-                };
-            };
-            dataValuesStore = getMockStore({});
-            dataSetStore = getMockStore(testData.get("dataSets"));
-
-            spyOn(db, 'objectStore').and.callFake(function(storeName) {
-                var stores = {
-                    "dataValues": dataValuesStore,
-                    "dataSets": dataSetStore
-                };
-                return stores[storeName];
-            });
-
-            spyOn(dataValuesStore, "upsert").and.callFake(function(data) {
-                return utils.getPromise(q, data);
-            });
         }));
 
         afterEach(function() {
@@ -62,7 +32,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
 
             httpBackend.expectPOST(properties.dhis.url + "/api/dataValueSets", payload).respond(200, "ok");
 
-            var dataService = new DataService(http, db);
+            var dataService = new DataService(http);
             dataService.save(payload);
 
             httpBackend.flush();
@@ -70,26 +40,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
 
 
         it("should download all data for an org unit", function() {
-            var dataService = new DataService(http, db, q);
-            var dataValueSet = {
-                "dataValues": [{
-                    "dataElement": "b9634a78271",
-                    "period": "2014W18",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "h48rgCOjDTg",
-                    "value": "12",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }, {
-                    "dataElement": "b9634a78271",
-                    "period": "2014W19",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "h48rgCOjDTg",
-                    "value": "13",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }]
-            };
+            var dataService = new DataService(http, q);
             var expectedDataSets =
                 [{
                 period: '2014W18',
@@ -103,34 +54,27 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
                     "followUp": false
                 }],
                 orgUnit: 'c484c99b86d'
+            }];
+            var dataSets = [{
+                "id": "DS_OPD"
             }, {
-                period: '2014W19',
-                dataValues: [{
-                    "dataElement": "b9634a78271",
-                    "period": "2014W19",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "h48rgCOjDTg",
-                    "value": "13",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }],
-                orgUnit: 'c484c99b86d'
+                "id": "Vacc"
             }];
 
             var today = moment().format("YYYY-MM-DD");
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, dataValueSet);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, expectedDataSets);
 
-            dataService.downloadAllData('company_0');
+            dataService.downloadAllData('company_0', dataSets).then(function(result) {
+                expect(result).toEqual(expectedDataSets);
+            });
 
             httpBackend.flush();
-
-            expect(dataValuesStore.upsert).toHaveBeenCalledWith(expectedDataSets);
         });
 
 
         it("should return a reject promise if download all data fails", function() {
             httpBackend.expectGET().respond(500, {});
-            var dataService = new DataService(http, db, q);
+            var dataService = new DataService(http, q);
             dataService.downloadAllData('company_0').then(undefined, function(data) {
                 expect(data.message).toBeDefined();
             });

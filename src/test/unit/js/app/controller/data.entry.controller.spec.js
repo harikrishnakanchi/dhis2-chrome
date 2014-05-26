@@ -1,7 +1,7 @@
 /*global Date:true*/
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository) {
     describe("dataEntryController ", function() {
-        var scope, db, q, dataService, location, anchorScroll, dataEntryController, rootScope, approvalStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
+        var scope, db, q, location, anchorScroll, dataEntryController, rootScope, approvalStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
             orgUnits, window, approvalService, approvalStoreSpy, hustle, dataRepository;
 
         beforeEach(module('hustle'));
@@ -73,12 +73,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 approve: function() {}
             };
 
-            dataService = {
-                saveDataAsDraft: function() {},
-                submitData: function() {},
-                getDataValues: function() {}
-            };
-
             rootScope.currentUser = {
                 "firstName": "test1",
                 "lastName": "test1last",
@@ -119,7 +113,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             approvalStoreSpy = spyOn(approvalStore, "each");
             approvalStoreSpy.and.returnValue(utils.getPromise(q, [{}]));
 
-            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope, window, approvalService);
+            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope, window, approvalService);
         }));
 
         it("should initialize modules", function() {
@@ -191,7 +185,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             scope.$apply();
 
-            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope);
+            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
 
             expect(scope.modules).toEqual(expectedModules);
         });
@@ -310,7 +304,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
             spyOn(hustle, "publish");
 
-            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope);
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
 
             scope.currentModule = {
                 id: 'mod2',
@@ -342,7 +336,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataRepository, "saveAsDraft").and.returnValue(saveSuccessPromise);
             spyOn(hustle, "publish");
 
-            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope);
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
 
             scope.currentModule = {
                 id: 'mod2',
@@ -373,7 +367,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(hustle, "publish");
 
 
-            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope);
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
             scope.currentModule = {
                 id: 'mod2',
                 parent: {
@@ -403,7 +397,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(hustle, "publish").and.returnValue(saveErrorPromise);;
 
 
-            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, dataService, anchorScroll, location, modal, rootScope);
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
             scope.currentModule = {
                 id: 'mod2',
                 parent: {

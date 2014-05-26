@@ -34,5 +34,4 @@ define(["lodash"], function(_) {
             this.save(payload, true);
         };
     };
-
 });

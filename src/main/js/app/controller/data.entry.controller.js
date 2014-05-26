@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-    return function($scope, $q, $hustle, db, dataRepository, dataService, $anchorScroll, $location, $modal, $rootScope, $window, approvalService) {
+    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalService) {
         var dataSets, systemSettings;
         var DATA_VALUES_TUBE = "dataValues";
 

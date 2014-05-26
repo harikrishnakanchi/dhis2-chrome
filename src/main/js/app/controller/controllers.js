@@ -1,8 +1,11 @@
-define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'moduleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController'],
-    function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, moduleController, projectController, countryController, confirmDialogController, projectUserController) {
+define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'moduleController', 'projectController', 'countryController', 'confirmDialogController',
+        'projectUserController', 'dataSetRepository'
+    ],
+    function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, moduleController, projectController, countryController, confirmDialogController,
+        projectUserController, dataSetRepository) {
         var init = function(app) {
-            app.controller('dashboardController', ['$scope', '$q', 'dataService', '$rootScope', dashboardController]);
-            app.controller('dataEntryController', ['$scope', '$q', '$hustle', '$indexedDB', 'dataRepository', 'dataService', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', 'approvalService', dataEntryController]);
+            app.controller('dashboardController', ['$scope', '$q', 'dataSetRepository', 'dataRepository', 'dataService', '$rootScope', dashboardController]);
+            app.controller('dataEntryController', ['$scope', '$q', '$hustle', '$indexedDB', 'dataRepository', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', 'approvalService', dataEntryController]);
             app.controller('orgUnitContoller', ['$scope', '$indexedDB', '$q', '$location', '$timeout', '$anchorScroll', orgUnitContoller]);
             app.controller('opUnitController', ['$scope', 'orgUnitService', '$indexedDB', '$location', opUnitController]);
             app.controller('moduleController', ['$scope', 'orgUnitService', '$indexedDB', '$location', '$q', moduleController]);

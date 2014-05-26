@@ -1,36 +1,39 @@
-define(["dashboardController", "angularMocks", "utils"], function(DashboardController, mocks, utils) {
+define(["dashboardController", "dataSetRepository", "dataRepository", "dataService", "angularMocks", "utils"], function(DashboardController, DataSetRepository, DataRepository, DataService, mocks, utils) {
     describe("dashboard controller", function() {
-        var q, db, dataService, dashboardController, rootScope;
+        var q, db, dataService, dashboardController, rootScope, dataRepository, dataSetRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             q = $q;
             scope = $rootScope.$new();
             rootScope = $rootScope;
 
-            dataService = {
-                "downloadAllData": function() {}
-            };
-
-            dashboardController = new DashboardController(scope, q, dataService, rootScope);
+            dataService = new DataService();
+            dataRepository = new DataRepository();
+            dataSetRepository = new DataSetRepository();
+            dashboardController = new DashboardController(scope, q, dataSetRepository, dataRepository, dataService, rootScope);
         }));
 
 
         it("should fetch and display all organisation units", function() {
-            spyOn(dataService, "downloadAllData").and.callFake(function() {
-                return utils.getPromise(q, {});
-            });
-
+            var allDataSets = [{
+                "id": "DS_OPD"
+            }];
+            var orgUnit = "proj_0";
+            spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
+            spyOn(dataService, "downloadAllData").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dataRepository, "save");
             rootScope.currentUser = {
                 "firstName": "testfirst",
                 "surName": "testsur",
                 "userName": "testuser",
                 "organisationUnits": [{
-                    "id": "proj_0",
+                    "id": orgUnit,
                     "name": "blah"
                 }]
             };
 
             scope.syncNow();
+
             expect(scope.isSyncRunning).toEqual(true);
             expect(scope.isSyncDone).toEqual(undefined);
 
@@ -38,7 +41,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
 
             expect(scope.isSyncRunning).toEqual(false);
             expect(scope.isSyncDone).toEqual(true);
-            expect(dataService.downloadAllData).toHaveBeenCalledWith("proj_0");
+            expect(dataService.downloadAllData).toHaveBeenCalledWith(orgUnit, allDataSets);
         });
     });
 });

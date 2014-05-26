@@ -18,7 +18,8 @@ define([], function() {
             upsert: jasmine.createSpy().and.callFake(function(data) {
                 return getPromise(q, data);
             }),
-            find: jasmine.createSpy()
+            find: jasmine.createSpy(),
+            getAll: jasmine.createSpy()
         };
         var db = {
             "objectStore": function() {
