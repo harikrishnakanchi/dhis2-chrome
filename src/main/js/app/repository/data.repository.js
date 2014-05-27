@@ -31,7 +31,7 @@ define(["lodash"], function(_) {
         };
 
         this.saveAsDraft = function(payload) {
-            this.save(payload, true);
+            return this.save(payload, true);
         };
     };
 });
