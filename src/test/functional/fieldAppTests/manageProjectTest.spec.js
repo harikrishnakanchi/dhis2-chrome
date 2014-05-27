@@ -17,7 +17,7 @@ describe('The admin ', function() {
         expect(projectLink.getText()).toEqual('Projects');
 
         downloadDataButton.click();
-        expect($('[ng-show=isSyncRunning]').isDisplayed()).toBeTruthy();
+        expect($('[ng-show=isSyncDone]').isDisplayed()).toBeTruthy();
 
         projectLink.click();
     });
