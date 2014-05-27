@@ -2,6 +2,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
     return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalService) {
         var dataSets, systemSettings;
         var DATA_VALUES_TUBE = "dataValues";
+        var UPLOAD = "upload";
 
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -186,7 +187,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var saveToDhis = function(data) {
-            return $hustle.publish(data, DATA_VALUES_TUBE);
+            return $hustle.publish({
+                "data": data,
+                "type": UPLOAD
+            }, DATA_VALUES_TUBE);
         };
 
         var save = function(asDraft) {

@@ -29,16 +29,26 @@ define(["dataValuesConsumer"], function(DataValuesConsumer) {
                     value: 2,
                 }]
             };
-            message["data"] = payload;
+            message["data"] = {
+                "type": "upload",
+                "data": payload
+            };
             dataService = {
                 save: jasmine.createSpy()
             };
         });
 
-        it("should save data in dhis", function() {
+        it("should save data in dhis if message type is upload", function() {
             dataValuesConsumer = new DataValuesConsumer(dataService);
             dataValuesConsumer.run(message);
             expect(dataService.save).toHaveBeenCalledWith(payload);
+        });
+
+        it("should not upload data to dhis if message type is not upload", function() {
+            dataValuesConsumer = new DataValuesConsumer(dataService);
+            message.data.type = "download";
+            dataValuesConsumer.run(message);
+            expect(dataService.save).not.toHaveBeenCalled();
         });
     });
 });

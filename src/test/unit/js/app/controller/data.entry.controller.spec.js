@@ -321,7 +321,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.$apply();
 
             expect(dataRepository.save).toHaveBeenCalled();
-            expect(hustle.publish).toHaveBeenCalled();
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: {
+                    ok: 'ok'
+                },
+                type: 'upload'
+            }, 'dataValues');
             expect(scope.submitSuccess).toBe(true);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(false);
@@ -391,11 +396,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should let the user know of failures when saving to queue ", function() {
-
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-            spyOn(hustle, "publish").and.returnValue(saveErrorPromise);;
-
+            spyOn(hustle, "publish").and.returnValue(saveErrorPromise);
 
             var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
             scope.currentModule = {
