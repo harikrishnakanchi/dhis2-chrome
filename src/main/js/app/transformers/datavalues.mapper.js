@@ -9,7 +9,8 @@ define(["moment"], function(moment) {
                     "storedBy": storedBy,
                     "categoryOptionCombo": categoryOptionComboId,
                     "formula": dataValue.formula,
-                    "value": dataValue.value
+                    "value": dataValue.value,
+                    "lastUpdated": new Date().toISOString()
                 };
             });
         }), true);
