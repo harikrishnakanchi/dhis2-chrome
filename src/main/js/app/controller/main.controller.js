@@ -19,8 +19,8 @@ define(["lodash"], function(_) {
                     }
                     var userPreferences = {
                         'username': $rootScope.currentUser.userCredentials.username,
-                        'locale': $scope.currentUser.locale,
-                        'orgUnits': $scope.currentUser.organisationUnits
+                        'locale': $rootScope.currentUser.locale,
+                        'orgUnits': $rootScope.currentUser.organisationUnits || []
                     };
                     userPreferenceRepository.save(userPreferences);
 
@@ -34,7 +34,7 @@ define(["lodash"], function(_) {
                     });
                 };
 
-                getResourceBundle($scope.currentUser.locale, true);
+                getResourceBundle($rootScope.currentUser.locale, true);
             } else {
                 getResourceBundle("en", false);
             }

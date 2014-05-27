@@ -20,8 +20,8 @@ define(["md5"], function(md5) {
         var saveUserPreferences = function() {
             var userPreferences = {
                 'username': $rootScope.currentUser.userCredentials.username,
-                'locale': $scope.currentUser.locale,
-                'orgUnits': $scope.currentUser.organisationUnits
+                'locale': $rootScope.currentUser.locale,
+                'orgUnits': $rootScope.currentUser.organisationUnits || []
             };
             userPreferenceRepository.save(userPreferences);
         };

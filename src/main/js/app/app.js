@@ -49,7 +49,7 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
             ]);
             app.value('ngI18nConfig', {
                 defaultLocale: 'en',
-                supportedLocales: ['en', 'es'],
+                supportedLocales: ['en', 'fr', 'ar'],
                 basePath: "/js/app/i18n"
             });
 

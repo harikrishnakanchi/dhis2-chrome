@@ -80,7 +80,7 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             expect(userPreferenceRepository.save).toHaveBeenCalledWith({
                 username: 'admin',
                 locale: undefined,
-                orgUnits: undefined
+                orgUnits: []
             });
         });
 
