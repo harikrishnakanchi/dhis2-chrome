@@ -1,6 +1,6 @@
-define(["dataValuesConsumer", "dataService", "dataValuesService"], function(DataValuesConsumer, DataService, DataValuesService) {
+define(["dataValuesConsumer", "dataValuesService"], function(DataValuesConsumer, DataValuesService) {
     describe("data values consumer", function() {
-        var message, payload, dataService, dataValuesService, dataValuesConsumer;
+        var message, payload, dataValuesService, dataValuesConsumer;
         beforeEach(function() {
             message = {
                 "priority": 1024,
@@ -34,26 +34,21 @@ define(["dataValuesConsumer", "dataService", "dataValuesService"], function(Data
                 "data": payload
             };
 
-            dataService = new DataService();
             dataValuesService = new DataValuesService();
-
-            spyOn(dataService, "save");
             spyOn(dataValuesService, "sync");
 
-            dataValuesConsumer = new DataValuesConsumer(dataService, dataValuesService);
+            dataValuesConsumer = new DataValuesConsumer(dataValuesService);
         });
 
         it("should save data in dhis if message type is upload", function() {
             dataValuesConsumer.run(message);
-            expect(dataService.save).toHaveBeenCalledWith(payload);
-            expect(dataValuesService.sync).not.toHaveBeenCalled();
+            expect(dataValuesService.sync).toHaveBeenCalledWith(message.data.data);
         });
 
         it("should not upload data to dhis if message type is not upload", function() {
             message.data.type = "download";
             dataValuesConsumer.run(message);
-            expect(dataService.save).not.toHaveBeenCalled();
-            expect(dataValuesService.sync).toHaveBeenCalled();
+            expect(dataValuesService.sync).toHaveBeenCalledWith();
         });
     });
 });

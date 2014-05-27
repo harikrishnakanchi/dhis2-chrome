@@ -1,13 +1,8 @@
 define([], function() {
-    return function(dataService, dataValuesService) {
+    return function(dataValuesService) {
         this.run = function(message) {
             var payload = message.data;
-            var ops = {
-                "upload": dataService.save,
-                "download": dataValuesService.sync
-            };
-            var operation = ops[payload.type] || function() {};
-            operation(payload.data);
+            return payload.type === "upload" ? dataValuesService.sync(payload.data) : dataValuesService.sync();
         };
     };
 });

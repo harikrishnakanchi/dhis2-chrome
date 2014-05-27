@@ -1,6 +1,6 @@
 define([], function() {
     return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q) {
-        this.sync = function() {
+        this.sync = function(dataToUpload) {
             var dataValues = [];
             var getAllDataValues = function(vals) {
                 var orgUnitIds = vals[0];
@@ -22,7 +22,11 @@ define([], function() {
                 });
             };
 
-            return $q.all([getAllOrgUnits(), dataSetRepository.getAll()]).then(getAllDataValues).then(saveAllDataValues);
+            var uploadData = function() {
+                if (dataToUpload) dataService.save(dataToUpload);
+            };
+
+            return $q.all([getAllOrgUnits(), dataSetRepository.getAll()]).then(getAllDataValues).then(saveAllDataValues).then(uploadData);
         };
     };
 });

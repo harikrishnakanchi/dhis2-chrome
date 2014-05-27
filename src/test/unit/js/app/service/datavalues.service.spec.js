@@ -31,6 +31,7 @@ define(["dataValuesService", "angularMocks", "properties", "utils", "dataService
                 spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
                 spyOn(dataRepository, "save");
                 spyOn(dataService, "downloadAllData").and.returnValue(utils.getPromise(q, []));
+                spyOn(dataService, "save");
 
                 dataValuesService.sync();
                 scope.$apply();
@@ -38,6 +39,26 @@ define(["dataValuesService", "angularMocks", "properties", "utils", "dataService
                 expect(userPreferenceRepository.getAll).toHaveBeenCalled();
                 expect(dataSetRepository.getAll).toHaveBeenCalled();
                 expect(dataService.downloadAllData).toHaveBeenCalled();
+                expect(dataService.save).not.toHaveBeenCalled();
+            });
+
+            it("should download and upload datavalues", function() {
+                var dataValuesToUpload = [{
+                    "id": 1
+                }];
+                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
+                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
+                spyOn(dataRepository, "save");
+                spyOn(dataService, "downloadAllData").and.returnValue(utils.getPromise(q, []));
+                spyOn(dataService, "save");
+
+                dataValuesService.sync(dataValuesToUpload);
+                scope.$apply();
+
+                expect(userPreferenceRepository.getAll).toHaveBeenCalled();
+                expect(dataSetRepository.getAll).toHaveBeenCalled();
+                expect(dataService.downloadAllData).toHaveBeenCalled();
+                expect(dataService.save).toHaveBeenCalledWith(dataValuesToUpload);
             });
 
             it("should not sync data values if org units is not present", function() {
