@@ -15,22 +15,23 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 }
             ]);
 
-            var scheduleSync = function() {
-                console.log("scheduling sync");
-                chrome.alarms.create('metadataSyncAlarm', {
-                    periodInMinutes: properties.metadata.sync.intervalInMinutes
-                });
-
-                chrome.alarms.create('dataValuesSyncAlarm', {
-                    periodInMinutes: properties.dataValues.sync.intervalInMinutes
-                });
-            };
-
-            app.run(['dataValuesService', 'metadataService', 'consumerRegistry',
-                function(dataValuesService, metadataService, consumerRegistry) {
+            app.run(['dataValuesService', 'metadataService', 'consumerRegistry', '$hustle',
+                function(dataValuesService, metadataService, consumerRegistry, $hustle) {
                     console.log("dB migration complete. Starting sync");
+
+                    var scheduleSync = function() {
+                        console.log("scheduling sync");
+                        chrome.alarms.create('metadataSyncAlarm', {
+                            periodInMinutes: properties.metadata.sync.intervalInMinutes
+                        });
+
+                        chrome.alarms.create('dataValuesSyncAlarm', {
+                            periodInMinutes: properties.dataValues.sync.intervalInMinutes
+                        });
+                    };
+
                     var startSyncAndRegisterConsumers = function() {
-                        metadataService.sync().then(dataValuesService.sync).
+                        metadataService.sync().
                         finally(scheduleSync);
                         consumerRegistry.register();
                     };
@@ -41,13 +42,19 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         };
                     };
 
+                    var downloadDataValues = function() {
+                        $hustle.publish({
+                            "type": "download"
+                        }, "dataValues");
+                    };
+
                     if (navigator.onLine) {
                         startSyncAndRegisterConsumers();
                     }
 
                     if (chrome.alarms) {
                         chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataService.sync));
-                        chrome.alarms.onAlarm.addListener(registerCallback("dataValuesSyncAlarm", dataValuesService.sync));
+                        chrome.alarms.onAlarm.addListener(registerCallback("dataValuesSyncAlarm", downloadDataValues));
                     }
 
                     window.addEventListener('online', function(e) {

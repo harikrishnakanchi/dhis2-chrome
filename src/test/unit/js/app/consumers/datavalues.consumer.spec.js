@@ -1,6 +1,6 @@
-define(["dataValuesConsumer"], function(DataValuesConsumer) {
+define(["dataValuesConsumer", "dataService", "dataValuesService"], function(DataValuesConsumer, DataService, DataValuesService) {
     describe("data values consumer", function() {
-        var message, payload, dataService;
+        var message, payload, dataService, dataValuesService, dataValuesConsumer;
         beforeEach(function() {
             message = {
                 "priority": 1024,
@@ -29,26 +29,31 @@ define(["dataValuesConsumer"], function(DataValuesConsumer) {
                     value: 2,
                 }]
             };
-            message["data"] = {
+            message.data = {
                 "type": "upload",
                 "data": payload
             };
-            dataService = {
-                save: jasmine.createSpy()
-            };
+
+            dataService = new DataService();
+            dataValuesService = new DataValuesService();
+
+            spyOn(dataService, "save");
+            spyOn(dataValuesService, "sync");
+
+            dataValuesConsumer = new DataValuesConsumer(dataService, dataValuesService);
         });
 
         it("should save data in dhis if message type is upload", function() {
-            dataValuesConsumer = new DataValuesConsumer(dataService);
             dataValuesConsumer.run(message);
             expect(dataService.save).toHaveBeenCalledWith(payload);
+            expect(dataValuesService.sync).not.toHaveBeenCalled();
         });
 
         it("should not upload data to dhis if message type is not upload", function() {
-            dataValuesConsumer = new DataValuesConsumer(dataService);
             message.data.type = "download";
             dataValuesConsumer.run(message);
             expect(dataService.save).not.toHaveBeenCalled();
+            expect(dataValuesService.sync).toHaveBeenCalled();
         });
     });
 });
