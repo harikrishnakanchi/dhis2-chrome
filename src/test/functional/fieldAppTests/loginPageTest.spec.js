@@ -4,14 +4,8 @@ describe('The admin ', function() {
     	browser.get('http://localhost:8081/#/dashboard');
     });
 
-    // afterEach(function(){
-    // 	var logout = element(by.id(logout_link));
-    // 	if(isElementPresent(logout))
-    //         logout.click();
-    // });
 
     it('should be able to login with correct password', function() {
-
         var userName = element(by.id(username_textBox));
         var password = element(by.id(password_textBox));
         var logoutLink = element(by.id(logout_link));
@@ -26,21 +20,23 @@ describe('The admin ', function() {
 
         projectLink.click();
         logoutLink.click();
-
-        // expect(loginButton.text()).toBe('Login');
-
+        expect(loginButton.isPresent()).toBe(true);
     });
 
     it('should not be able to login with incorrect password',function(){
-
     	var userName = element(by.id(username_textBox));
         var password = element(by.id(password_textBox));
+        var loginButton = element(by.id(login_button));
         var invalidLoginMsg = element(by.id(invalid_login_msg_id));
 
         userName.sendKeys(admin_username);
-        password.sendKeys(incorrect_password+'\n');
-
+        password.sendKeys(incorrect_password);
+        
+        loginButton.click();
         expect(invalidLoginMsg.getText()).toEqual(invalid_login_error_msg);
+        expect(loginButton.isPresent()).toBe(true);
     });
-
 });
+
+
+
