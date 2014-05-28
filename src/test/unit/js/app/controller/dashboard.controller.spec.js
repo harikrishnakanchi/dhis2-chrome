@@ -1,18 +1,20 @@
-define(["dashboardController", "dataValuesService", "angularMocks", "utils"], function(DashboardController, DataValuesService, mocks, utils) {
+define(["dashboardController", "angularMocks", "utils"], function(DashboardController, mocks, utils) {
     describe("dashboard controller", function() {
-        var q, db, dataValuesService, dashboardController;
+        var q, db, hustle, dashboardController;
 
-        beforeEach(mocks.inject(function($rootScope, $q) {
+        beforeEach(module("hustle"));
+
+        beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
             q = $q;
             scope = $rootScope.$new();
+            hustle = $hustle;
 
-            dataValuesService = new DataValuesService();
-            dashboardController = new DashboardController(scope, dataValuesService);
+            dashboardController = new DashboardController(scope, hustle);
         }));
 
 
         it("should fetch and display all organisation units", function() {
-            spyOn(dataValuesService, "sync").and.returnValue(utils.getPromise(q, {}));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
             scope.syncNow();
 
@@ -23,7 +25,9 @@ define(["dashboardController", "dataValuesService", "angularMocks", "utils"], fu
 
             expect(scope.isSyncRunning).toEqual(false);
             expect(scope.isSyncDone).toEqual(true);
-            expect(dataValuesService.sync).toHaveBeenCalled();
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "type": "download"
+            }, "dataValues");
         });
     });
 });

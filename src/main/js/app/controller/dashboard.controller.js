@@ -1,5 +1,5 @@
-    define(["lodash"], function(_) {
-        return function($scope, dataValuesService) {
+    define([], function() {
+        return function($scope, $hustle) {
             var dataValues = [];
 
             $scope.syncNow = function() {
@@ -10,7 +10,9 @@
                     $scope.isSyncDone = true;
                 };
 
-                dataValuesService.sync().then(onSuccess);
+                return $hustle.publish({
+                    "type": "download"
+                }, "dataValues").then(onSuccess);
             };
         };
     });

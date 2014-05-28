@@ -16,7 +16,6 @@ require.config({
         "dataService": "app/service/data.service",
         "metadataService": "app/service/metadata.service",
         "services": "app/service/bg.services",
-        "dataValuesService": "app/service/datavalues.service",
 
         //Repositories
         "repositories": "app/repository/bg.repositories",

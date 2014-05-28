@@ -4,7 +4,7 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
     function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, moduleController, projectController, countryController, confirmDialogController,
         projectUserController) {
         var init = function(app) {
-            app.controller('dashboardController', ['$scope', 'dataValuesService', dashboardController]);
+            app.controller('dashboardController', ['$scope', '$hustle', dashboardController]);
             app.controller('dataEntryController', ['$scope', '$q', '$hustle', '$indexedDB', 'dataRepository', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', 'approvalService', dataEntryController]);
             app.controller('orgUnitContoller', ['$scope', '$indexedDB', '$q', '$location', '$timeout', '$anchorScroll', orgUnitContoller]);
             app.controller('opUnitController', ['$scope', 'orgUnitService', '$indexedDB', '$location', opUnitController]);
