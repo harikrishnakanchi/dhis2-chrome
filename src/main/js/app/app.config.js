@@ -71,7 +71,10 @@ require.config({
         "groupSections": "app/transformers/group.sections",
 
         //Interceptors
-        "httpInterceptor": "app/interceptors/http.interceptor"
+        "httpInterceptor": "app/interceptors/http.interceptor",
+
+        //Queue
+        "retryStrategyFactory": "app/queue/retry.strategy.factory"
     },
     shim: {
         "ng-i18n": {

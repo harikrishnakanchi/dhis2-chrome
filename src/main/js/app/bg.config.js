@@ -31,7 +31,10 @@ require.config({
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
 
         //Interceptors
-        "httpInterceptor": "app/interceptors/http.interceptor"
+        "httpInterceptor": "app/interceptors/http.interceptor",
+
+        //Queue
+        "retryStrategyFactory": "app/queue/retry.strategy.factory"
     },
     shim: {
         'angular': {

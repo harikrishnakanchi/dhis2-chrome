@@ -16,6 +16,9 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "url": url,
             "auth_header": "Basic c2VydmljZS5hY2NvdW50Okkxb1Y2Y29HNWVkMw==",
         },
+        "queue": {
+            "maxretries": 5
+        },
         "messageTimeout": 5000,
         "devMode": true
     };
