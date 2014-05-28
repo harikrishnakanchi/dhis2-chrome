@@ -202,9 +202,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.submitError = !asDraft ? true : false;
                 $scope.isSubmitted = false;
             };
-
-
-
             var period = getPeriod();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
             if (asDraft) {
