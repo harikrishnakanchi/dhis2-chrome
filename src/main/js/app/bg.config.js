@@ -34,7 +34,7 @@ require.config({
         "httpInterceptor": "app/interceptors/http.interceptor",
 
         //Queue
-        "retryStrategyFactory": "app/queue/retry.strategy.factory"
+        "failureStrategyFactory": "app/queue/failure.strategy.factory"
     },
     shim: {
         'angular': {

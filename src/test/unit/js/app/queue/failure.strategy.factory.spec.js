@@ -1,10 +1,10 @@
-define(["retryStrategyFactory", "angularMocks", "hustle", "properties"], function(retryStrategyFactory, mocks, hustle, properties) {
+define(["failureStrategyFactory", "angularMocks", "hustle", "properties"], function(failureStrategyFactory, mocks, hustle, properties) {
     describe('retry strategy factory', function() {
 
         var hustle, retryStrategy;
         beforeEach(function() {
             hustle = new Hustle();
-            retryStrategy = retryStrategyFactory.create(hustle);
+            retryStrategy = failureStrategyFactory.create(hustle);
         });
 
         it('should release message if number of releases is less than max retries', function() {

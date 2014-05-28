@@ -1,8 +1,8 @@
-define(["angular", "Q", "services", "directives", "controllers", "repositories", "migrator", "migrations", "properties", "httpInterceptor", "retryStrategyFactory",
+define(["angular", "Q", "services", "directives", "controllers", "repositories", "migrator", "migrations", "properties", "httpInterceptor", "failureStrategyFactory",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals"
     ],
-    function(angular, Q, services, directives, controllers, repositories, migrator, migrations, properties, httpInterceptor, retryStrategyFactory) {
+    function(angular, Q, services, directives, controllers, repositories, migrator, migrations, properties, httpInterceptor, failureStrategyFactory) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal",
@@ -43,7 +43,7 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
                             chrome.runtime.sendMessage("migrationComplete");
                         });
 
-                    $hustleProvider.init("hustle", 1, ["dataValues"], retryStrategyFactory);
+                    $hustleProvider.init("hustle", 1, ["dataValues"], failureStrategyFactory);
                     $httpProvider.interceptors.push('httpInterceptor');
                 }
             ]);
