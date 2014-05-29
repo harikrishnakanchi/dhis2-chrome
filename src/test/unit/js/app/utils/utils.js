@@ -15,16 +15,16 @@ define([], function() {
 
     var getMockDB = function(q) {
         var mockStore = {
-            upsert: jasmine.createSpy().and.callFake(function(data) {
+            upsert: jasmine.createSpy("upsert").and.callFake(function(data) {
                 return getPromise(q, data);
             }),
-            find: jasmine.createSpy(),
-            getAll: jasmine.createSpy()
+            find: jasmine.createSpy("find"),
+            getAll: jasmine.createSpy("getAll")
         };
         var db = {
-            "objectStore": function() {
+            "objectStore": jasmine.createSpy("objectStore").and.callFake(function() {
                 return mockStore;
-            }
+            })
         };
 
         return {

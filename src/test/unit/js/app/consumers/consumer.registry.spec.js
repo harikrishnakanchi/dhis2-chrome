@@ -13,7 +13,7 @@ define(["consumerRegistry", "angularMocks", "hustleModule", "utils"], function(C
             };
             q = $q;
             scope = $rootScope.$new();
-            consumerRegistry = new ConsumerRegistry($hustle, dataValueConsumer, $q);
+            consumerRegistry = new ConsumerRegistry($hustle, $q, dataValueConsumer);
         }));
 
         it("should register and start consumers", function() {

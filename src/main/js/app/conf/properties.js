@@ -7,10 +7,8 @@ define(['lodash', 'overrides'], function(_, overrides) {
             },
             "types": ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "organisationUnits", "organisationUnitLevels", "users"],
         },
-        "dataValues": {
-            "sync": {
-                "intervalInMinutes": 1,
-            }
+        "projectDataSync": {
+            "intervalInMinutes": 1,
         },
         "dhis": {
             "url": url,

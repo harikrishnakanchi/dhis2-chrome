@@ -8,8 +8,8 @@ define(["consumers", "dataValuesConsumer", "consumerRegistry"], function(consume
         });
         it("should register consumers with angular", function() {
             consumers.init(app);
-            expect(app.service).toHaveBeenCalledWith("dataValuesConsumer", ["dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "$q", dataValuesConsumer]);
-            expect(app.service).toHaveBeenCalledWith("consumerRegistry", ["$hustle", "dataValuesConsumer", "$q", consumerRegistry]);
+            expect(app.service).toHaveBeenCalledWith("dataValuesConsumer", ["dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "$q", "approvalService", dataValuesConsumer]);
+            expect(app.service).toHaveBeenCalledWith("consumerRegistry", ["$hustle", "$q", "dataValuesConsumer", consumerRegistry]);
         });
     })
 })

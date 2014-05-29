@@ -1,5 +1,5 @@
 define(["moment", "lodash"], function(moment, _) {
-    return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q) {
+    return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q, approvalService) {
         var getAllDataValues = function(vals) {
             var orgUnitIds = vals[0];
             var allDataSets = vals[1];
@@ -51,30 +51,56 @@ define(["moment", "lodash"], function(moment, _) {
             });
         };
 
-        var sync = function(dataToUpload) {
+        var downloadDataValues = function() {
             var saveAllDataValues = function(data) {
                 console.debug("Storing data values : ", data);
-                if (dataToUpload && hasConflict(dataToUpload.dataValues, data.dataValues)) {
+                return dataRepository.save(data);
+            };
+
+            return $q.all([getAllOrgUnits(), dataSetRepository.getAll()]).then(getAllDataValues).then(saveAllDataValues);
+        };
+
+        var uploadDataValues = function(dataToUpload) {
+            var saveAllDataValues = function(data) {
+                console.debug("Storing data values : ", data);
+                if (hasConflict(dataToUpload.dataValues, data.dataValues)) {
                     console.debug("Conflicting data values : ", data, dataToUpload);
                     dataRepository.save(data);
                     return $q.reject("");
-                } else if (dataToUpload) {
+                } else {
                     data = merge(dataToUpload, data);
                 }
                 return dataRepository.save(data);
             };
 
             var uploadData = function() {
-                if (dataToUpload) dataService.save(dataToUpload);
+                dataService.save(dataToUpload);
             };
 
             var dataValues = [];
             return $q.all([getAllOrgUnits(), dataSetRepository.getAll()]).then(getAllDataValues).then(saveAllDataValues).then(uploadData);
         };
 
+        var downloadApprovalData = function() {
+            var getAllLevelOneApprovalData = function(data) {
+                var userOrgUnitIds = data[0];
+                var allDataSets = _.pluck(data[1], "id");
+
+                return approvalService.getAllLevelOneApprovalData(userOrgUnitIds, allDataSets);
+            };
+
+            return $q.all([getAllOrgUnits(), dataSetRepository.getAll()]).then(getAllLevelOneApprovalData).then(approvalService.saveLevelOneApprovalData);
+        };
+
         this.run = function(message) {
             var payload = message.data;
-            return payload.type === "upload" ? sync(payload.data) : sync();
+            var action = {
+                "uploadDataValues": uploadDataValues,
+                "downloadDataValues": downloadDataValues,
+                "downloadApprovalData": downloadApprovalData
+            };
+
+            return action[payload.type](payload.data);
         };
     };
 });

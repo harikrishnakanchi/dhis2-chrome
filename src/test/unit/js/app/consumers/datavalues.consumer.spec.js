@@ -1,8 +1,8 @@
-define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository"],
-    function(DataValuesConsumer, mocks, properties, utils, DataService, DataRepository, DataSetRepository, UserPreferenceRepository) {
+define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "approvalService"],
+    function(DataValuesConsumer, mocks, properties, utils, DataService, DataRepository, DataSetRepository, UserPreferenceRepository, ApprovalService) {
         describe("data values service", function() {
 
-            var dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, scope, allDataSets, userPref, dataValuesConsumer, message;
+            var dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, scope, allDataSets, userPref, dataValuesConsumer, message, approvalService;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
@@ -12,8 +12,9 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 dataRepository = new DataRepository();
                 dataSetRepository = new DataSetRepository();
                 userPreferenceRepository = new UserPreferenceRepository();
+                approvalService = new ApprovalService();
 
-                dataValuesConsumer = new DataValuesConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q);
+                dataValuesConsumer = new DataValuesConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, approvalService);
 
                 userPref = [{
                     "orgUnits": [{
@@ -27,7 +28,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
 
                 message = {
                     "data": {
-                        "type": "download"
+                        "type": "downloadDataValues"
                     }
                 };
 
@@ -95,7 +96,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }]
                 };
                 message.data.data = dataValuesToUpload;
-                message.data.type = "upload";
+                message.data.type = "uploadDataValues";
 
                 spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
                 spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
@@ -135,7 +136,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }]
                 };
                 message.data.data = dataValuesToUpload;
-                message.data.type = "upload";
+                message.data.type = "uploadDataValues";
 
                 spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
                 spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
@@ -178,6 +179,38 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(userPreferenceRepository.getAll).toHaveBeenCalled();
                 expect(dataSetRepository.getAll).toHaveBeenCalled();
                 expect(dataService.downloadAllData).not.toHaveBeenCalled();
+            });
+
+            it("should download approval data", function() {
+
+                var completionData = {
+                    "blah": true
+                };
+
+                var userPref = [{
+                    "orgUnits": [{
+                        "id": "org_0"
+                    }]
+                }];
+
+                var allDataSets = [{
+                    "id": "DS_OPD"
+                }];
+
+                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
+                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
+                spyOn(approvalService, "getAllLevelOneApprovalData").and.returnValue(utils.getPromise(q, completionData));
+                spyOn(approvalService, "saveLevelOneApprovalData");
+
+                dataValuesConsumer.run({
+                    "data": {
+                        "type": "downloadApprovalData"
+                    }
+                });
+                scope.$apply();
+
+                expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalledWith(["org_0"], ["DS_OPD"]);
+                expect(approvalService.saveLevelOneApprovalData).toHaveBeenCalledWith(completionData);
             });
         });
     });

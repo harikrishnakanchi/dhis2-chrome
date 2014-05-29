@@ -9,7 +9,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
             scope = $rootScope.$new();
             hustle = $hustle;
 
-            dashboardController = new DashboardController(scope, hustle);
+            dashboardController = new DashboardController(scope, hustle, q);
         }));
 
 
@@ -26,7 +26,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
             expect(scope.isSyncRunning).toEqual(false);
             expect(scope.isSyncDone).toEqual(true);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "download"
+                "type": "downloadDataValues"
             }, "dataValues");
         });
     });

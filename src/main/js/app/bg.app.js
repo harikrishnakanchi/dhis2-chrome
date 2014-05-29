@@ -25,13 +25,14 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             periodInMinutes: properties.metadata.sync.intervalInMinutes
                         });
 
-                        chrome.alarms.create('dataValuesSyncAlarm', {
-                            periodInMinutes: properties.dataValues.sync.intervalInMinutes
+                        chrome.alarms.create('projectDataSyncAlarm', {
+                            periodInMinutes: properties.projectDataSync.intervalInMinutes
                         });
+
                     };
 
                     var startSyncAndRegisterConsumers = function() {
-                        metadataService.sync().then(downloadDataValues).
+                        metadataService.sync().then(projectDataSync).
                         finally(scheduleSync);
                         consumerRegistry.register();
                     };
@@ -42,9 +43,13 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         };
                     };
 
-                    var downloadDataValues = function() {
+                    var projectDataSync = function() {
                         $hustle.publish({
-                            "type": "download"
+                            "type": "downloadDataValues"
+                        }, "dataValues");
+
+                        $hustle.publish({
+                            "type": "downloadApprovalData"
                         }, "dataValues");
                     };
 
@@ -54,7 +59,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                     if (chrome.alarms) {
                         chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataService.sync));
-                        chrome.alarms.onAlarm.addListener(registerCallback("dataValuesSyncAlarm", downloadDataValues));
+                        chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
                     }
 
                     window.addEventListener('online', function(e) {
@@ -65,7 +70,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     window.addEventListener('offline', function() {
                         console.log("You are offline. Stopping Sync.");
                         chrome.alarms.clear('metadataSyncAlarm');
-                        chrome.alarms.clear('dataValuesSyncAlarm');
+                        chrome.alarms.clear('projectDataSyncAlarm');
                         consumerRegistry.deregister();
                     });
                 }
@@ -74,10 +79,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             return app;
         };
 
-        var bootstrap = function(app) {
+        var bootstrap = function(appInit) {
             var deferred = Q.defer();
             var injector = angular.bootstrap(angular.element(document.querySelector('#dhis2')), ['DHIS2']);
-            deferred.resolve([injector, app]);
+            deferred.resolve([injector, appInit]);
             console.debug("bootstrapping background app");
             return deferred.promise;
         };

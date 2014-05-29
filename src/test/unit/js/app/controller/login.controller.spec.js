@@ -87,7 +87,7 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
                 orgUnits: []
             });
             expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "download"
+                "type": "downloadDataValues"
             }, "dataValues");
         });
 
@@ -113,7 +113,7 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             expect(rootScope.currentUser.userCredentials.username).toEqual('someprojectuser');
             expect(rootScope.isLoggedIn).toEqual(true);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "download"
+                "type": "downloadDataValues"
             }, "dataValues");
             expect(location.path).toHaveBeenCalledWith("/dashboard");
             expect(scope.invalidCredentials).toEqual(false);

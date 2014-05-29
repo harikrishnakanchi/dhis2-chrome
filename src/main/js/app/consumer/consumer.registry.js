@@ -1,5 +1,5 @@
 define([], function() {
-    return function($hustle, dataValuesConsumer, $q) {
+    return function($hustle, $q, dataValuesConsumer) {
         var allConsumers = [];
 
         this.register = function() {

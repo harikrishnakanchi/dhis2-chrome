@@ -14,6 +14,7 @@ require.config({
 
         //services
         "dataService": "app/service/data.service",
+        "approvalService": "app/service/approval.service",
         "metadataService": "app/service/metadata.service",
         "services": "app/service/bg.services",
 

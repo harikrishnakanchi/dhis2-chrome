@@ -118,6 +118,35 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             save(true);
         };
 
+        $scope.markDataAsComplete = function() {
+            var onSuccess = function() {
+                console.log("completed");
+            };
+
+            var onError = function() {
+                console.log("error completing");
+            };
+
+            var markAllDataAsComplete = function() {
+                var approvalRequest = _.map(_.keys($scope.currentGroupedSections), function(k) {
+                    return {
+                        "dataSet": k,
+                        "period": getPeriod(),
+                        "orgUnit": $scope.currentModule.id,
+                        "categoryCombination": null,
+                        "categoryOption": null,
+                        "multipleOrgUnits": false,
+                        "storedBy": $scope.currentUser.userCredentials.username,
+                        "date": moment().format()
+                    };
+                });
+
+                return approvalService.complete(approvalRequest);
+            };
+
+            markAllDataAsComplete().then(onSuccess, onError);
+        };
+
         $scope.approveData = function() {
             var modalInstance = $modal.open({
                 templateUrl: 'templates/approve.dialog.html',
@@ -186,7 +215,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         var saveToDhis = function(data) {
             return $hustle.publish({
                 "data": data,
-                "type": "upload"
+                "type": "uploadDataValues"
             }, "dataValues");
         };
 

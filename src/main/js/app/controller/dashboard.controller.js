@@ -1,5 +1,5 @@
     define([], function() {
-        return function($scope, $hustle) {
+        return function($scope, $hustle, $q) {
             var dataValues = [];
 
             $scope.syncNow = function() {
@@ -10,9 +10,15 @@
                     $scope.isSyncDone = true;
                 };
 
-                return $hustle.publish({
-                    "type": "download"
-                }, "dataValues").then(onSuccess);
+                var downloadDataValues = $hustle.publish({
+                    "type": "downloadDataValues"
+                }, "dataValues");
+
+                var downloadApprovalData = $hustle.publish({
+                    "type": "downloadApprovalData"
+                }, "dataValues");
+
+                return $q.all([downloadDataValues, downloadApprovalData]).then(onSuccess);
             };
         };
     });

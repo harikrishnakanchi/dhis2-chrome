@@ -89,6 +89,10 @@ define([], function() {
         create_index(approvalStore, "by_period_orgUnit", ["period", "orgUnit"], false);
     };
 
+    var add_complete_datasets_store = function(db, tx) {
+        var completeDataSetsStore = create_store_with_key("completeDataSets", ["period", "orgUnit"], db);
+    };
+
     return [add_object_stores,
         change_log_stores,
         add_organisation_units_and_level_store,
@@ -100,5 +104,6 @@ define([], function() {
         add_translation_store,
         add_approval_store,
         add_system_settings_store,
-        add_user_preference_store];
+        add_user_preference_store,
+        add_complete_datasets_store];
 });

@@ -325,7 +325,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 data: {
                     ok: 'ok'
                 },
-                type: 'upload'
+                type: 'uploadDataValues'
             }, 'dataValues');
             expect(scope.submitSuccess).toBe(true);
             expect(scope.saveSuccess).toBe(false);
