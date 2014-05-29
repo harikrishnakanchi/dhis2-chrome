@@ -63,5 +63,9 @@
     "enableUserLabel": "Enable User",
     "userDisableConfMessage": "Are you sure you want to disable ",
     "userEnableConfMessage": "Are you sure you want to enable ",
-    "printTallySheetBtnValue": "Print Tally Sheet"
+    "printTallySheetBtnValue": "Print Tally Sheet",
+    "weekLabel": "Week",
+    "yearLabel": "Year",
+    "monthLabel": "Month"
+
 }

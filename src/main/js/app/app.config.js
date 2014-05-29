@@ -10,7 +10,7 @@ require.config({
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
-        "moment": "lib/moment/moment",
+        "moment": "lib/moment/min/moment-with-langs",
         "hustle": "lib/hustle/hustle",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
 

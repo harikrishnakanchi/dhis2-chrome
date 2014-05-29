@@ -1,5 +1,5 @@
 {
-    "logoutLabel": "Logout",
+    "logoutLabel": "déconnecter",
     "dataEntryLabel": "Saisie de Données",
     "approveDataLabel": "Approuver Données",
     "projectsLabel": "Les projets",
@@ -54,7 +54,7 @@
     "unsavedDataLabel": "Les données non enregistrées",
     "okLabel": "Bien",
     "unsavedDataMessage": "Vous avez des données non enregistrées. Etes-vous sûr de vouloir le perdre?",
-    "moduleLabel": "Module",
+    "moduleLabel": "Le module",
     "approveBtnValue": "Approuver",
     "acceptBtnValue": "Accepter",
     "saveBtnValue": "Sauver",
@@ -63,5 +63,8 @@
     "enableUserLabel": "Activer l'utilisateur",
     "userDisableConfMessage": "Etes-vous sûr que vous voulez désactiver ",
     "userEnableConfMessage": "Etes-vous sûr que vous voulez activer ",
-    "printTallySheetBtnValue": "Imprimer la feuille de pointage"
+    "printTallySheetBtnValue": "Imprimer la feuille de pointage",
+    "weekLabel": "Semaine",
+    "yearLabel": "Année",
+    "monthLabel": "Mois"
 }

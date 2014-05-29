@@ -63,5 +63,8 @@
     "enableUserLabel": "تمكين المستخدم",
     "userDisableConfMessage": "هل أنت متأكد أنك تريد تعطيل ",
     "userEnableConfMessage": "هل أنت متأكد أنك تريد تمكين ",
-    "printTallySheetBtnValue": "ورقة الطباعة تالي"
+    "printTallySheetBtnValue": "ورقة الطباعة تالي",
+    "weekLabel": "أسبوع",
+    "yearLabel": "عام",
+    "monthLabel": "شهر"
 }

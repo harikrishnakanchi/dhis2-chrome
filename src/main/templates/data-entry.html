@@ -8,7 +8,7 @@
 <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
 
 	<div class="module-select"> 
-		<weekselector year="year" month="month" week="week" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
+		<weekselector year="year" month="month" week="week" labels="resourceBundle" language="currentUser.locale" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
 		<ul class="form">
 			<li class="form-group">
 				<label for="module">{{resourceBundle.moduleLabel}}</label>
