@@ -5,12 +5,26 @@ define(["lodash"], function(_) {
         "id": "DS_OPD",
         "organisationUnits": [{
             "id": "mod1"
+        }],
+        "attributeValues": [{
+            "attribute": {
+                "id": "wFC6joy3I8Q",
+                "code": "isNewDataModel",
+            },
+            "value": "false"
         }]
     }, {
         "name": "Vaccination",
         "id": "Vacc",
         "organisationUnits": [{
             "id": "mod2"
+        }],
+        "attributeValues": [{
+            "attribute": {
+                "id": "wFC6joy3I8Q",
+                "code": "isNewDataModel",
+            },
+            "value": "true"
         }]
     }];
 
@@ -146,7 +160,7 @@ define(["lodash"], function(_) {
 
     var sections = [{
         "id": "Sec1",
-        "dataSet": dataSets[0],
+        "dataSet": _.pick(dataSets[0], ['name', 'id']),
         "dataElements": [{
             "id": "DE1",
             "name": "DE1 - ITFC"
@@ -159,14 +173,14 @@ define(["lodash"], function(_) {
         }]
     }, {
         "id": "Sec2",
-        "dataSet": dataSets[0],
+        "dataSet": _.pick(dataSets[0], ['name', 'id']),
         "dataElements": [{
             "id": "DE1",
             "name": "DE1 - ITFC"
         }]
     }, {
         "id": "Sec3",
-        "dataSet": dataSets[1],
+        "dataSet": _.pick(dataSets[1], ['name', 'id']),
         "dataElements": [{
             "id": "DE3",
             "name": "DE3 - ITFC"

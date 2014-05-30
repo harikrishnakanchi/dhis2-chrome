@@ -36,20 +36,6 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                 return today;
             };
 
-            datasets = [{
-                name: "Malaria",
-                id: "dataset_1"
-            }, {
-                name: 'TB',
-                id: 'dataset_3'
-            }, {
-                "id": "DS1",
-                "organisationUnits": [{
-                    "name": "Mod2",
-                    "id": "Mod2Id"
-                }]
-            }];
-
             var getMockStore = function(data) {
                 var getAll = function() {
                     return utils.getPromise(q, data);
@@ -93,10 +79,12 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             Date = _Date;
         });
 
-        it('should add new modules', function() {
+        it('should filter in new data models when adding new modules', function() {
             scope.$apply();
+
             scope.addModules();
 
+            expect(scope.modules[1].allDatasets.length).toEqual(1);
             expect(scope.modules.length).toBe(2);
         });
 
@@ -162,6 +150,15 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                 organisationUnits: [{
                     id: 'Module1'
                 }],
+                "attributeValues": [{
+                    "attribute": {
+                        "id": "wFC6joy3I8Q",
+                        "name": "currentDataModel",
+                        "created": "2014-05-30T09:38:35.398+0000",
+                        "lastUpdated": "2014-05-30T09:38:35.398+0000"
+                    },
+                    "value": "true"
+                }],
                 sections: [{
                     id: 'Sec1',
                     dataSet: {
@@ -197,6 +194,15 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                     organisationUnits: [{
                         id: 'Module1'
                     }],
+                    attributeValues: [{
+                        attribute: {
+                            id: 'wFC6joy3I8Q',
+                            name: 'currentDataModel',
+                            created: '2014-05-30T09:38:35.398+0000',
+                            lastUpdated: '2014-05-30T09:38:35.398+0000'
+                        },
+                        value: 'true'
+                    }],
                     sections: [{
                         id: 'Sec1',
                         dataSet: {
@@ -217,6 +223,15 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                     organisationUnits: [{
                         id: 'Module1'
                     }],
+                    attributeValues: [{
+                        attribute: {
+                            id: 'wFC6joy3I8Q',
+                            name: 'currentDataModel',
+                            created: '2014-05-30T09:38:35.398+0000',
+                            lastUpdated: '2014-05-30T09:38:35.398+0000'
+                        },
+                        value: 'true'
+                    }],
                     sections: [{
                         id: 'Sec1',
                         dataSet: {
@@ -231,7 +246,7 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                         }]
                     }]
                 }
-            };
+            }
 
             scope.orgUnit = {
                 "name": "Mod2",

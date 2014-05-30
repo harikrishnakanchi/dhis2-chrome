@@ -75,15 +75,24 @@ define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer",
         };
 
         $scope.addModules = function() {
+            var isNewDataModel = function(ds) {
+                var attr = _.find(ds.attributeValues, {
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    }
+                });
+                return attr.value === 'true';
+            };
+            var newDataModels = _.filter($scope.allDatasets, isNewDataModel);
+
             $scope.modules.push({
                 'openingDate': moment().format("YYYY-MM-DD"),
                 'datasets': [],
-                'allDatasets': _.cloneDeep($scope.allDatasets, true),
+                'allDatasets': _.cloneDeep(newDataModels, true),
                 'selectedDataset': {},
                 'selectedSections': _.cloneDeep(selectedSections),
                 'selectedDataElements': _.cloneDeep(selectedDataElements)
             });
-
         };
 
         $scope.save = function(modules) {

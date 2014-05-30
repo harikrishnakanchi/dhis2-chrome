@@ -24,15 +24,19 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 organisationUnits: [{
                     id: 'mod1'
                 }],
+                attributeValues: [{
+                    attribute: {
+                        id: 'wFC6joy3I8Q',
+                        code: 'isNewDataModel'
+                    },
+                    value: 'false'
+                }],
                 dataElements: [],
                 sections: [{
                     id: 'Sec1',
                     dataSet: {
                         name: 'OPD',
-                        id: 'DS_OPD',
-                        organisationUnits: [{
-                            id: 'mod1'
-                        }]
+                        id: 'DS_OPD'
                     },
                     dataElements: [{
                         id: 'DE1',
@@ -51,10 +55,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     id: 'Sec2',
                     dataSet: {
                         name: 'OPD',
-                        id: 'DS_OPD',
-                        organisationUnits: [{
-                            id: 'mod1'
-                        }]
+                        id: 'DS_OPD'
                     },
                     dataElements: [{
                         id: 'DE1',
@@ -68,15 +69,19 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 organisationUnits: [{
                     id: 'mod2'
                 }],
+                attributeValues: [{
+                    attribute: {
+                        id: 'wFC6joy3I8Q',
+                        code: 'isNewDataModel'
+                    },
+                    value: 'true'
+                }],
                 dataElements: [],
                 sections: [{
                     id: 'Sec3',
                     dataSet: {
                         name: 'Vaccination',
-                        id: 'Vacc',
-                        organisationUnits: [{
-                            id: 'mod2'
-                        }]
+                        id: 'Vacc'
                     },
                     dataElements: [{
                         id: 'DE3',
@@ -92,15 +97,19 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 organisationUnits: [{
                     id: 'mod1'
                 }],
+                attributeValues: [{
+                    attribute: {
+                        id: 'wFC6joy3I8Q',
+                        code: 'isNewDataModel'
+                    },
+                    value: 'false'
+                }],
                 dataElements: [],
                 sections: [{
                     id: 'Sec1',
                     dataSet: {
                         name: 'OPD',
-                        id: 'DS_OPD',
-                        organisationUnits: [{
-                            id: 'mod1'
-                        }]
+                        id: 'DS_OPD'
                     },
                     dataElements: [{
                         id: 'DE1',
@@ -119,10 +128,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     id: 'Sec2',
                     dataSet: {
                         name: 'OPD',
-                        id: 'DS_OPD',
-                        organisationUnits: [{
-                            id: 'mod1'
-                        }]
+                        id: 'DS_OPD'
                     },
                     dataElements: [{
                         id: 'DE1',
@@ -136,14 +142,19 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 organisationUnits: [{
                     id: 'mod2'
                 }],
+                attributeValues: [{
+                    attribute: {
+                        id: 'wFC6joy3I8Q',
+                        code: 'isNewDataModel'
+                    },
+                    value: 'true'
+                }],
                 dataElements: [],
                 sections: []
             }];
 
             enrichedDatasets = _.cloneDeep(expectedEnrichedDatasets);
-
         });
-
 
         it("should enrich datasets", function() {
             expect(datasetTransformer.enrichDatasets(data)).toEqual(expectedEnrichedDatasets);

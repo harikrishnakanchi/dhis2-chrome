@@ -54,7 +54,7 @@
 
 							<th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
 								<span ng-if="!resourceBundle[option.id]">{{option.name}}</span>
-								<span ng-if="resourceBundle[option.id]">resourceBundle[option.id]</span>
+								<span ng-if="resourceBundle[option.id]">{{resourceBundle[option.id]}}</span>
 							</th>
 							<th ng-show="$last">
 								{{ resourceBundle.totalLabel }}
