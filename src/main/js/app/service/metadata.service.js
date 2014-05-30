@@ -47,14 +47,29 @@ define(["properties", "lodash"], function(properties, _) {
                 var data = response.data;
                 if (!(metadataChangeLog && metadataChangeLog.lastUpdatedTime) ||
                     (getTime(metadataChangeLog.lastUpdatedTime) < getTime(data.created)))
-                    return upsertMetadata(data);
+                    return upsertMetadata(data)
+                        .then(getLocalSystemSettings)
+                        .then(upsertSystemSettings)
+                        .then(getLocalTranslations)
+                        .then(upsertTranslations);
                 return metadataChangeLog;
             });
         };
+
         var getSystemSettings = function() {
             var url = properties.dhis.url + "/api/systemSettings";
             console.debug("Fetching " + url);
             return $http.get(url).then(getDataFromResponse);
+        };
+
+        var getLocalSystemSettings = function() {
+            console.debug("Fetching /data/systemSettings.json");
+            return $http.get("/data/systemSettings.json").then(getDataFromResponse);
+        };
+
+        var getLocalTranslations = function() {
+            console.debug("Fetching /data/translations.json");
+            return $http.get("/data/translations.json").then(getDataFromResponse);
         };
 
         var tryParseJson = function(val) {
@@ -94,7 +109,8 @@ define(["properties", "lodash"], function(properties, _) {
         };
 
         this.loadMetadataFromFile = function() {
-            getLastUpdatedTime().then(loadMetadata);
+            getLastUpdatedTime()
+                .then(loadMetadata);
         };
 
         this.sync = function() {

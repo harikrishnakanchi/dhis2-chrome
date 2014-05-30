@@ -57,6 +57,8 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
         it("should fetch all metadata from file the first time", function() {
             var findCall = 0;
             setupLocalFileHttpRequest(today);
+            httpBackend.expectGET("/data/systemSettings.json").respond(200, {});
+            httpBackend.expectGET("/data/translations.json").respond(200, {});
             spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, undefined));
             var metadataService = new MetadataService(http, db);
             metadataService.loadMetadataFromFile();
@@ -68,7 +70,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 type: 'metaData',
                 lastUpdatedTime: today
             });
-            expect(mockStore.upsert.calls.count()).toEqual(2);
+            expect(mockStore.upsert.calls.count()).toEqual(4);
         });
 
         it("should not upsert metaData if import has already happened one time", function() {
