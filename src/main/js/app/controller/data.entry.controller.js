@@ -38,17 +38,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var initDataEntryForm = function() {
-            var setApprovalState = function() {
-                store = db.objectStore('approvals');
-                var query = db.queryBuilder().$index('by_period_orgUnit').$eq([getPeriod(), $scope.currentModule.id]).compile();
-
-                store.each(query).then(function(result) {
-                    $scope.isReadOnly = _.any(result, function(approvalState) {
-                        return approvalState.isApproved;
-                    });
-                });
-            };
-
             dataRepository.getDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
                 data = data || {};
                 $scope.dataValues = dataValuesMapper.mapToView(data);
@@ -68,7 +57,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.currentModule.id, systemSettings, $scope.currentModule.parent.id);
             });
 
-            setApprovalState();
             if ($scope.dataentryForm !== undefined)
                 $scope.dataentryForm.$setPristine();
         };
@@ -118,12 +106,31 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             save(true);
         };
 
-        $scope.markDataAsComplete = function() {
+        $scope.firstLevelApproval = function() {
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/approve.dialog.html',
+                controller: 'confirmDialogController',
+                scope: $scope
+            });
+
+            var okCallback = function() {
+                markDataAsComplete();
+            };
+
+            modalInstance.result.then(okCallback);
+        };
+
+        var markDataAsComplete = function() {
             var onSuccess = function() {
+                $scope.approveSuccess = true;
+                $scope.approveError = false;
+                initDataEntryForm();
                 console.log("completed");
             };
 
             var onError = function() {
+                $scope.approveSuccess = false;
+                $scope.approveError = true;
                 console.log("error completing");
             };
 
@@ -147,24 +154,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             markAllDataAsComplete().then(onSuccess, onError);
         };
 
-        $scope.approveData = function() {
-            var modalInstance = $modal.open({
-                templateUrl: 'templates/approve.dialog.html',
-                controller: 'confirmDialogController',
-                scope: $scope
-            });
-
-            var okCallback = function() {
-                approve();
-            };
-
-            modalInstance.result.then(okCallback);
-        };
-
-        $scope.accept = function() {
-
-        };
-
         $scope.isCurrentWeekSelected = function(week) {
             var today = moment().format("YYYY-MM-DD");
             if (week && today >= week.startOfWeek && today <= week.endOfWeek)
@@ -179,38 +168,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.preventNavigation = false;
             }
         });
-
-        var approve = function() {
-            var onSuccess = function() {
-                $scope.approveSuccess = true;
-                $scope.approveError = false;
-                initDataEntryForm();
-            };
-
-            var onError = function() {
-                $scope.approveSuccess = false;
-                $scope.approveError = true;
-            };
-
-            var approveAllData = function() {
-                var approvalRequest = _.map(_.keys($scope.currentGroupedSections), function(k) {
-                    return {
-                        "dataSet": k,
-                        "period": getPeriod(),
-                        "orgUnit": $scope.currentModule.id
-                    };
-                });
-
-                return approvalService.approve(approvalRequest);
-            };
-
-            var payload = dataValuesMapper.mapToDomain($scope.dataValues, getPeriod(), $scope.currentModule.id, $scope.currentUser.userCredentials.username);
-
-            if ($scope.dataentryForm && $scope.dataentryForm.$dirty) {
-                dataRepository.save(payload).then(saveToDhis).then(approveAllData).then(onSuccess, onError);
-            } else
-                approveAllData().then(onSuccess, onError);
-        };
 
         var saveToDhis = function(data) {
             return $hustle.publish({

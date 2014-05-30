@@ -84,11 +84,6 @@ define([], function() {
         create_index(translationsStore, "by_locale", "locale", false);
     };
 
-    var add_approval_store = function(db, tx) {
-        var approvalStore = create_store_with_key("approvals", ["dataSet", "period", "orgUnit"], db);
-        create_index(approvalStore, "by_period_orgUnit", ["period", "orgUnit"], false);
-    };
-
     var add_complete_datasets_store = function(db, tx) {
         var completeDataSetsStore = create_store_with_key("completeDataSets", ["period", "orgUnit"], db);
     };
@@ -102,7 +97,6 @@ define([], function() {
         add_admin_user_to_local_cred_store,
         add_project_user_to_local_cred_store,
         add_translation_store,
-        add_approval_store,
         add_system_settings_store,
         add_user_preference_store,
         add_complete_datasets_store];

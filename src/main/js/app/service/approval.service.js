@@ -1,21 +1,5 @@
 define(["properties", "moment"], function(properties, moment) {
     return function($http, db, $q) {
-        var approve = function(approvalRequests) {
-            var saveToDb = function() {
-                var payload = _.map(approvalRequests, function(a) {
-                    return _.merge(a, {
-                        "isApproved": true
-                    });
-                });
-                var store = db.objectStore("approvals");
-                return store.upsert(payload);
-            };
-
-            var saveToDhis = $http.post(properties.dhis.url + "/api/dataApprovals/bulk", approvalRequests);
-            return saveToDhis.
-            finally(saveToDb);
-        };
-
         var complete = function(firstLevelApprovalRequests) {
             var onSuccess = function(response) {
                 return response.data;
@@ -72,7 +56,6 @@ define(["properties", "moment"], function(properties, moment) {
         };
 
         return {
-            "approve": approve,
             "complete": complete,
             "getAllLevelOneApprovalData": getAllLevelOneApprovalData,
             "saveLevelOneApprovalData": saveLevelOneApprovalData

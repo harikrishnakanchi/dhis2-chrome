@@ -18,60 +18,6 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment"], fun
             httpBackend.verifyNoOutstandingRequest();
         });
 
-        it("should save approval in dhis and in db", function() {
-            var approvalRequests = [{
-                "dataSet": "170b8cd5e53",
-                "period": "2014W20",
-                "orgUnit": "c484c99b86d"
-            }, {
-                "dataSet": "b6203b33069",
-                "period": "2014W20",
-                "orgUnit": "c484c99b86d"
-            }];
-
-            var expectedApprovalState = [{
-                "dataSet": "170b8cd5e53",
-                "period": "2014W20",
-                "orgUnit": "c484c99b86d",
-                "isApproved": true,
-            }, {
-                "dataSet": "b6203b33069",
-                "period": "2014W20",
-                "orgUnit": "c484c99b86d",
-                "isApproved": true,
-            }];
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals/bulk", approvalRequests).respond(200, "ok");
-
-            var approvalService = new ApprovalService(http, db);
-            approvalService.approve(approvalRequests);
-            httpBackend.flush();
-
-            expect(db.objectStore).toHaveBeenCalledWith("approvals");
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedApprovalState);
-        });
-
-        it("should save approval in db even if save to dhis fails", function() {
-            var approvalRequests = [{
-                "dataSet": "170b8cd5e53",
-                "period": "2014W20",
-                "orgUnit": "c484c99b86d"
-            }];
-            var expectedApprovalState = [{
-                "dataSet": "170b8cd5e53",
-                "period": "2014W20",
-                "orgUnit": "c484c99b86d",
-                "isApproved": true,
-            }];
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals/bulk", approvalRequests).respond(500, "not ok");
-
-            var approvalService = new ApprovalService(http, db);
-            approvalService.approve(approvalRequests);
-            httpBackend.flush();
-
-            expect(db.objectStore).toHaveBeenCalledWith("approvals");
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedApprovalState);
-        });
-
         it("should mark data as complete in dhis", function() {
             var approvalRequests = [{
                 "dataSet": "170b8cd5e53",
