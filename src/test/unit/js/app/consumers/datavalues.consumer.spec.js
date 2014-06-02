@@ -212,5 +212,29 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalledWith(["org_0"], ["DS_OPD"]);
                 expect(approvalService.saveLevelOneApprovalData).toHaveBeenCalledWith(completionData);
             });
+
+            it("should abort approval data download if no orgunits are found in user pref", function() {
+
+                var userPref = undefined;
+
+                var allDataSets = [{
+                    "id": "DS_OPD"
+                }];
+
+                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
+                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
+                spyOn(approvalService, "getAllLevelOneApprovalData");
+                spyOn(approvalService, "saveLevelOneApprovalData");
+
+                dataValuesConsumer.run({
+                    "data": {
+                        "type": "downloadApprovalData"
+                    }
+                });
+                scope.$apply();
+
+                expect(approvalService.getAllLevelOneApprovalData).not.toHaveBeenCalled();
+                expect(approvalService.saveLevelOneApprovalData).not.toHaveBeenCalled();
+            });
         });
     });

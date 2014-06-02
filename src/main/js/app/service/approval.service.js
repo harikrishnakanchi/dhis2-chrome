@@ -1,24 +1,48 @@
 define(["properties", "moment"], function(properties, moment) {
     return function($http, db, $q) {
-        var complete = function(firstLevelApprovalRequests) {
-            var onSuccess = function(response) {
-                return response.data;
-            };
 
-            var onFailure = function(response) {
-                var deferred = $q.defer();
-                deferred.reject({
-                    "message": "Error saving completion data on server."
+        var markAsComplete = function(dataSets, period, orgUnit, storedBy) {
+
+            var saveToDhis = function() {
+                return $http({
+                    method: 'POST',
+                    url: properties.dhis.url + "/api/completeDataSetRegistrations",
+                    params: {
+                        "ds": dataSets,
+                        "pe": period,
+                        "ou": orgUnit,
+                        "sb": storedBy,
+                        "cd": completionDate,
+                        "multiOu": true
+                    },
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
                 });
-                return deferred.promise;
             };
 
-            return $http.post(properties.dhis.url + "/api/completeDataSetRegistrations/bulk", firstLevelApprovalRequests).then(onSuccess, onFailure);
+            var completionDate = moment().toISOString();
+
+            var payload = {
+                'period': period,
+                'orgUnit': orgUnit,
+                'storedBy': storedBy,
+                'date': completionDate,
+                'dataSets': dataSets
+            };
+
+            var store = db.objectStore("completeDataSets");
+            return store.upsert(payload).then(saveToDhis);
         };
 
         var getAllLevelOneApprovalData = function(orgUnits, dataSets) {
             var onSuccess = function(response) {
-                return response.data;
+                var deferred = $q.defer();
+                if (response.data.completeDataSetRegistrationList)
+                    deferred.resolve(response.data.completeDataSetRegistrationList);
+                else
+                    deferred.resolve([]);
+                return deferred.promise;
             };
 
             var onFailure = function(response) {
@@ -41,22 +65,27 @@ define(["properties", "moment"], function(properties, moment) {
 
         };
 
-        var saveLevelOneApprovalData = function(data) {
-            var approvedList = data.completeDataSetRegistrationList;
-            var payload = {
-                'period': _.pluck(approvedList, 'period')[0].id,
-                'orgUnit': _.pluck(approvedList, 'organisationUnit')[0].id,
-                'storedBy': _.pluck(approvedList, 'storedBy')[0],
-                'date': _.pluck(approvedList, 'date')[0],
-                'dataSets': _.pluck(_.pluck(approvedList, 'dataSet'), 'id')
-            };
+        var saveLevelOneApprovalData = function(completeDataSetRegistrationList) {
+            var registrationsGroupedByPeriodAndOu = _.groupBy(completeDataSetRegistrationList, function(registration) {
+                return [registration.period.id, registration.organisationUnit.id];
+            });
+
+            var payload = _.map(registrationsGroupedByPeriodAndOu, function(item) {
+                return {
+                    'period': _.pluck(item, 'period')[0].id,
+                    'orgUnit': _.pluck(item, 'organisationUnit')[0].id,
+                    'storedBy': _.pluck(item, 'storedBy')[0],
+                    'date': _.pluck(item, 'date')[0],
+                    'dataSets': _.pluck(_.pluck(item, 'dataSet'), 'id')
+                };
+            });
 
             var store = db.objectStore("completeDataSets");
             return store.upsert(payload);
         };
 
         return {
-            "complete": complete,
+            "markAsComplete": markAsComplete,
             "getAllLevelOneApprovalData": getAllLevelOneApprovalData,
             "saveLevelOneApprovalData": saveLevelOneApprovalData
         };

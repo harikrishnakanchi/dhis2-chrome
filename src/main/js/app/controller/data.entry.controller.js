@@ -135,20 +135,12 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var markAllDataAsComplete = function() {
-                var approvalRequest = _.map(_.keys($scope.currentGroupedSections), function(k) {
-                    return {
-                        "dataSet": k,
-                        "period": getPeriod(),
-                        "orgUnit": $scope.currentModule.id,
-                        "categoryCombination": null,
-                        "categoryOption": null,
-                        "multipleOrgUnits": false,
-                        "storedBy": $scope.currentUser.userCredentials.username,
-                        "date": moment().format()
-                    };
-                });
+                var dataSets = _.keys($scope.currentGroupedSections);
+                var period = getPeriod();
+                var orgUnit = $scope.currentModule.id;
+                var storedBy = $scope.currentUser.userCredentials.username;
 
-                return approvalService.complete(approvalRequest);
+                return approvalService.markAsComplete(dataSets, period, orgUnit, storedBy);
             };
 
             markAllDataAsComplete().then(onSuccess, onError);

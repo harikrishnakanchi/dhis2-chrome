@@ -86,10 +86,19 @@ define(["moment", "lodash"], function(moment, _) {
                 var userOrgUnitIds = data[0];
                 var allDataSets = _.pluck(data[1], "id");
 
+                if (userOrgUnitIds.length === 0)
+                    return $q.reject("No org units for this user");
+
                 return approvalService.getAllLevelOneApprovalData(userOrgUnitIds, allDataSets);
             };
 
-            return $q.all([getAllOrgUnits(), dataSetRepository.getAll()]).then(getAllLevelOneApprovalData).then(approvalService.saveLevelOneApprovalData);
+            var saveAllLevelOneApprovalData = function(data) {
+                return approvalService.saveLevelOneApprovalData(data);
+            };
+
+            return $q.all([getAllOrgUnits(), dataSetRepository.getAll()])
+                .then(getAllLevelOneApprovalData)
+                .then(saveAllLevelOneApprovalData);
         };
 
         this.run = function(message) {
