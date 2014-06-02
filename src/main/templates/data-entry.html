@@ -56,7 +56,9 @@
 								<span ng-if="!resourceBundle[option.id]">{{option.name}}</span>
 								<span ng-if="resourceBundle[option.id]">{{resourceBundle[option.id]}}</span>
 							</th>
-							<th ng-show="$last">
+							<th ng-hide="$last" class="last-column">
+							</th>
+							<th ng-show="$last" class="last-column">
 								{{ resourceBundle.totalLabel }}
 							</th>
 						</tr>
@@ -70,7 +72,7 @@
 									<input type="text" name="datavalue" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option)['value']" ng-focus="restoreExpression(dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(dataElement.id, option)" ng-disabled="isReadOnly" /><br/>
 								</ng-form>
 							</td>
-							<td>{{sum(dataValues[dataElement.id])}}</td>
+							<td class="last-column">{{sum(dataValues[dataElement.id])}}</td>
 						</tr>
 					</table>
 				</accordion-group>
