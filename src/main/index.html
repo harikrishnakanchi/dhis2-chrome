@@ -16,15 +16,15 @@
       <div class="container">
         <a class="navbar-brand" href="#/dashboard"><img src="img/logo.png" alt="" title="DHIS" id="logoImg"></a>
         <ul class="nav navbar-nav navbar-right">
-          <li>
-            <select ng-model="currentUser.locale" ng-if="currentUser"> 
+          <li><p class="navbar-text"> {{currentUser.userCredentials.username}} </p></li>
+          <li class="active" ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a></li>
+                    <li>
+            <select ng-model="currentUser.locale" ng-if="currentUser" class="input-sm"> 
               <option value="en">English</option>
               <option dir="rtl" lang="fr" value="fr">Français</option>
               <option dir="rtl" lang="ar" value="ar">العربية</option>
             </select>
           </li>
-          <li class="active" ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a></li>
-          <li><p class="navbar-text"> {{currentUser.userCredentials.username}} </p></li>
         </ul>
       </div>
     </header>

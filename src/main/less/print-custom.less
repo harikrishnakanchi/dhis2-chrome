@@ -40,14 +40,24 @@
 .panel-group {
 margin-bottom: 0px;
 }
+		table tr td:first-child {
+			width:22%;
+			span { display:inline; white-space:normal;}
+			}
 		table tr {
 			.last-column{
 				display:none;
 			}
+			th{ text-align:center;}
+			td:first-child {
+				width:22%;
+			}
 			td, th{
 				white-space: nowrap;
+
 			}
 		}
+
 		.module-select {
 			 	margin: 20px 0px 20px!important;
 			    border-radius: 0px!important;
@@ -61,7 +71,7 @@ margin-bottom: 0px;
 			}
 			select{
 				visibility:hidden;
-				width:120px!important;
+				width:90px!important;
 			}
 			select#module{
 				visibility: visible;
