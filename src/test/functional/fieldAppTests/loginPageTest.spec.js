@@ -3,6 +3,8 @@ var fs = require('fs');
 describe('The admin ', function() {
 
     beforeEach(function(){
+        var ptor = protractor.getInstance();
+        ptor.sleep(10000);
         browser.get('http://localhost:8081/index.html#/dashboard');
     });
 
@@ -47,16 +49,15 @@ describe('The admin ', function() {
     afterEach(function () {
         var currentSpec = jasmine.getEnv().currentSpec,
         passed = currentSpec.results().passed();
-
-        browser.takeScreenshot().then(function (png) {
-            browser.getCapabilities().then(function (capabilities) {
-                var browserName = capabilities.caps_.browserName,
-                passFail = (passed) ? 'pass' : 'FAIL',
-                filename = currentSpec.description + '.png';
-
-                writeScreenShot(png, filename);
+        if(!passed){
+            browser.takeScreenshot().then(function (png) {
+                browser.getCapabilities().then(function (capabilities) {
+                    var browserName = capabilities.caps_.browserName,
+                    filename = currentSpec.description + '.png';
+                    writeScreenShot(png, filename);
+                });
             });
-        });
+        }
     })
 });
 
