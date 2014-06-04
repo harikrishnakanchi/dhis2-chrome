@@ -3,5 +3,6 @@ src/main/js/lib/*
 src/test/unit/coverage/
 src/main/css
 .DS_Store
+screenShots/*.png
 
 !src/main/js/lib/custom
