@@ -1,7 +1,7 @@
 describe('The admin ', function() {
 
     beforeEach(function(){
-    	browser.get('http://localhost:8081/#/dashboard');
+    	browser.get('http://localhost:8081/index.html#/dashboard');
     });
 
     it('should be able to view the manage project page', function() {
