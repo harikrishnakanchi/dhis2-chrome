@@ -1,6 +1,7 @@
 exports.config = {
     chromeOnly: true,
     chromeDriver: '../../../node_modules/protractor/selenium/chromedriver',
+    baseUrl: 'http://localhost:8081/',
 
     capabilities: {
         'browserName': 'chrome'

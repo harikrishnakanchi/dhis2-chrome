@@ -5,7 +5,6 @@ describe('The admin ', function() {
     beforeEach(function(){
         var ptor = protractor.getInstance();
         browser.get('http://localhost:8081/index.html#/dashboard');
-        ptor.sleep(10000);
     });
 
     function writeScreenShot(data, filename) {
