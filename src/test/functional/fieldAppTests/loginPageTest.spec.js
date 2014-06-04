@@ -34,7 +34,7 @@ describe('The admin ', function() {
         
         loginButton.click();
         expect(invalidLoginMsg.getText()).toEqual(invalid_login_error_msg);
-        expect(loginButton.isPresent()).toBe(truech);
+        expect(loginButton.isPresent()).toBe(true);
     });
 });
 

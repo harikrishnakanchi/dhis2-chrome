@@ -6,7 +6,7 @@ password_textBox = "password";
 //dashboard links
 dashboard_project_link = "linkToProjects";
 dashboard_download_data_link = "linkToDownloadData";
-
+dashboard_data_entry_link = "linkToDataEntry";
 
 logout_link = "linkToLogout";
 login_button = "loginButton";
