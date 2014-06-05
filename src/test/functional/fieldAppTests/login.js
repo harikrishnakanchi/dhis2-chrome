@@ -8,4 +8,5 @@
         userName.sendKeys(admin_username);
         password.sendKeys(admin_password);
         loginButton.click();
+        return;
     };
