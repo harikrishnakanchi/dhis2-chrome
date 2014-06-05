@@ -3,7 +3,6 @@ var fs = require('fs');
 describe('The admin ', function() {
 
     beforeEach(function(){
-        browser.get('http://localhost:8081/index.html#/dashboard');
         ptor = protractor.getInstance();
     	browser.get('http://localhost:8081/index.html#/dashboard');
     });
