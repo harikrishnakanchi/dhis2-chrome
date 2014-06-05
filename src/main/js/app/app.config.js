@@ -23,7 +23,7 @@ require.config({
         "angular-ui-transition": "lib/custom/angular-ui-transition/transition",
         "angular-ui-modal": "lib/custom/angular-ui-modal/modal",
         "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
-        "angular-ui-notin": "lib/angularjs-directives/src/notin/notIn",
+        "angular-ui-notin": "lib/angularjs-directives/src/notIn/notIn",
         "angular-ui-equals": "lib/angularjs-directives/src/equals/equals",
         "angular-treeview": "lib/angularjs-directives/src/treeview/angular.treeview",
         "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",

@@ -3,9 +3,7 @@ var fs = require('fs');
 describe('The admin ', function() {
 
     beforeEach(function(){
-        var ptor = protractor.getInstance();
-        ptor.get('http://localhost:8081/index.html#/dashboard');
-        ptor.waitForAngular();
+        browser.get('http://localhost:8081/index.html#/dashboard');
     });
 
     function writeScreenShot(data, filename) {
