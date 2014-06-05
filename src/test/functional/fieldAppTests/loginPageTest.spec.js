@@ -23,6 +23,7 @@ describe('The admin ', function() {
         userName.sendKeys(admin_username);
         password.sendKeys(admin_password);
         loginButton.click();
+        browser.sleep(2000);
         expect(projectLink.getText()).toEqual('Projects');
 
         projectLink.click();
