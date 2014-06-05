@@ -5,7 +5,7 @@ exports.config = {
         'browserName': 'chrome'
     },
 
-    specs: ['**/*.spec.js','**/**/*.spec.js'],
+    specs: ['**/*.js', '**/**/*.js'],
     rootElement: '#dhis2',
 
     jasmineNodeOpts: {

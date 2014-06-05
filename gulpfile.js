@@ -45,7 +45,7 @@ gulp.task('start-http', function() {
 });
 
 gulp.task('ft', ['update-webdriver', 'start-http'], function() {
-    return gulp.src('src/test/functional/**/*.spec.js').pipe(protractor({
+    return gulp.src('src/test/functional/**/*.js').pipe(protractor({
         configFile: 'src/test/functional/protractor.conf.js'
     })).on('error', function(e) {
         throw e;

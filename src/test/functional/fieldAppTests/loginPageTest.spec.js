@@ -2,9 +2,9 @@ var fs = require('fs');
 
 describe('The admin ', function() {
 
-    beforeEach(function(){
+    beforeEach(function() {
         ptor = protractor.getInstance();
-    	browser.get('http://localhost:8081/index.html#/dashboard');
+        browser.get('http://localhost:8081/index.html#/dashboard');
     });
 
     function writeScreenShot(data, filename) {
@@ -21,9 +21,10 @@ describe('The admin ', function() {
         var loginButton = element(by.id(login_button));
         var projectLink = element(by.id(dashboard_project_link));
 
-        userName.sendKeys(admin_username);
-        password.sendKeys(admin_password);
-        loginButton.click();
+        // userName.sendKeys(admin_username);
+        // password.sendKeys(admin_password);
+        // loginButton.click();
+        login();
         ptor.waitForAngular();
         expect(projectLink.getText()).toEqual('Projects');
 
@@ -32,7 +33,7 @@ describe('The admin ', function() {
         expect(loginButton.isPresent()).toBe(true);
     });
 
-    it('should not be able to login with incorrect password',function(){
+    it('should not be able to login with incorrect password', function() {
         var userName = element(by.id(username_textBox));
         var password = element(by.id(password_textBox));
         var loginButton = element(by.id(login_button));
@@ -46,20 +47,17 @@ describe('The admin ', function() {
         expect(loginButton.isPresent()).toBe(true);
     });
 
-    afterEach(function () {
+    afterEach(function() {
         var currentSpec = jasmine.getEnv().currentSpec,
-        passed = currentSpec.results().passed();
-        if(!passed){
-            browser.takeScreenshot().then(function (png) {
-                browser.getCapabilities().then(function (capabilities) {
+            passed = currentSpec.results().passed();
+        if (!passed) {
+            browser.takeScreenshot().then(function(png) {
+                browser.getCapabilities().then(function(capabilities) {
                     var browserName = capabilities.caps_.browserName,
-                    filename = currentSpec.description + '.png';
+                        filename = currentSpec.description + '.png';
                     writeScreenShot(png, filename);
                 });
             });
         }
-    })
+    });
 });
-
-
-
