@@ -5,7 +5,7 @@ describe('The admin ', function() {
     	browser.get('http://localhost:8081/index.html#/dashboard');
     });
 
-    it('should be able to view the manage project page', function() {
+    xit('should be able to view the manage project page', function() {
         var userName = element(by.id(username_textBox));
         var password = element(by.id(password_textBox));
         var projectLink = element(by.id(dashboard_project_link));
