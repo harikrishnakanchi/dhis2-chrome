@@ -40,7 +40,9 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
                         }).dbReady(function(data) {
-                            chrome.runtime.sendMessage("migrationComplete");
+                            if(chrome.runtime){
+                                chrome.runtime.sendMessage("migrationComplete");
+                            }
                         });
 
                     $hustleProvider.init("hustle", 1, ["dataValues"], failureStrategyFactory);
