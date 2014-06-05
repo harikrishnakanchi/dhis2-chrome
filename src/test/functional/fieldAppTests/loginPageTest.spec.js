@@ -4,6 +4,8 @@ describe('The admin ', function() {
 
     beforeEach(function(){
         browser.get('http://localhost:8081/index.html#/dashboard');
+        ptor = protractor.getInstance();
+    	browser.get('http://localhost:8081/index.html#/dashboard');
     });
 
     function writeScreenShot(data, filename) {
@@ -23,7 +25,7 @@ describe('The admin ', function() {
         userName.sendKeys(admin_username);
         password.sendKeys(admin_password);
         loginButton.click();
-        browser.sleep(2000);
+        ptor.waitForAngular();
         expect(projectLink.getText()).toEqual('Projects');
 
         projectLink.click();
