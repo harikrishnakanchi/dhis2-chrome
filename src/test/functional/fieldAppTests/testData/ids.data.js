@@ -1,4 +1,3 @@
-
 //text fields
 username_textBox = "username";
 password_textBox = "password";
@@ -11,6 +10,8 @@ dashboard_data_entry_link = "linkToDataEntry";
 logout_link = "linkToLogout";
 login_button = "loginButton";
 
+//headers
+logged_in_user = "loggedInUser";
 
 //suuccess or error messages
 invalid_login_msg_id = "loginFailedMsg";

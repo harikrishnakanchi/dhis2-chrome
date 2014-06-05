@@ -5,6 +5,8 @@ setUpLoginData = function() {
     loginButton = element(by.id(login_button));
     projectLink = element(by.id(dashboard_project_link));
     invalidLoginMsg = element(by.id(invalid_login_msg_id));
+    loggedInUser = element(by.id(logged_in_user));
+    downloadDataButton = element(by.id(dashboard_download_data_link));
 };
 
 loginAsAdmin = function() {
@@ -15,8 +17,8 @@ loginAsAdmin = function() {
     ptor.waitForAngular();
 
     expect(projectLink.getText()).toEqual('Projects');
-
-    projectLink.click();
+    expect(downloadDataButton.getText()).toEqual('Download All Data');
+    expect(loggedInUser.getText()).toEqual(admin_username);
 };
 
 logout = function() {
