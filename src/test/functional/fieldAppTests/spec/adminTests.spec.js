@@ -35,7 +35,7 @@ describe('The admin ', function() {
     });
 
     it('should not be able to login with incorrect password', function() {
-        loginAsAdminWithInvalidCredentials();
+        loginWithInvalidCredentials();
     });
 
 });
