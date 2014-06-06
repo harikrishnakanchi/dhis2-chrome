@@ -16,9 +16,9 @@ loginAsAdmin = function() {
     loginButton.click();
     ptor.waitForAngular();
 
+    expect(loggedInUser.getText()).toEqual(admin_username);
     expect(projectLink.getText()).toEqual('Projects');
     expect(downloadDataButton.getText()).toEqual('Download All Data');
-    expect(loggedInUser.getText()).toEqual(admin_username);
 };
 
 logout = function() {
@@ -30,6 +30,7 @@ logout = function() {
 loginAsAdminWithInvalidCredentials = function() {
     userName.sendKeys(admin_username);
     password.sendKeys(incorrect_password);
+    
     loginButton.click();
 
     expect(invalidLoginMsg.getText()).toEqual(invalid_login_error_msg);

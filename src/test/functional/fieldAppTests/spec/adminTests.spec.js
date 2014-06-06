@@ -8,22 +8,6 @@ describe('The admin ', function() {
         setUpLoginData();
     });
 
-    function writeScreenShot(data, filename) {
-        var stream = fs.createWriteStream("screenShots/" + filename);
-
-        stream.write(new Buffer(data, 'base64'));
-        stream.end();
-    }
-
-    it('should be able to login with correct password', function() {
-        loginAsAdmin();
-        logout();
-    });
-
-    it('should not be able to login with incorrect password', function() {
-        loginAsAdminWithInvalidCredentials();
-    });
-
     afterEach(function() {
         var currentSpec = jasmine.getEnv().currentSpec,
             passed = currentSpec.results().passed();
@@ -37,4 +21,21 @@ describe('The admin ', function() {
             });
         }
     });
+
+    function writeScreenShot(data, filename) {
+        var stream = fs.createWriteStream("screenShots/" + filename);
+        stream.write(new Buffer(data, 'base64'));
+        stream.end();
+    }
+
+    
+    it('should be able to login with correct password', function() {
+        loginAsAdmin();
+        logout();
+    });
+
+    it('should not be able to login with incorrect password', function() {
+        loginAsAdminWithInvalidCredentials();
+    });
+
 });

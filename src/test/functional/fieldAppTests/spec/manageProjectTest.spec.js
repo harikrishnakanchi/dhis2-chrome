@@ -6,11 +6,11 @@ describe('The admin ', function() {
         setUpLoginData();
     });
 
+    
     it('should be able to view the manage project page', function() {
+        
         loginAsAdmin();
-
         projectLink.click();
-
         logout();
     });
 
