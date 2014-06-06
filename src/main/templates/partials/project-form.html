@@ -99,16 +99,12 @@
 						<th>Username</th>
 						<th>Role</th>
 						<th></th>
-						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr ng-repeat="user in projectUsers | orderBy: 'userCredentials.username'">
 						<td> {{user.userCredentials.username}}</td>
 						<td> {{user.roles}}</td>
-						<td>
-							<a href="" title="Edit" class="edit"><span class="glyphicon glyphicon-edit"></span></a> 
-						</td>
 						<td>
 						<a href="" title="Delete" class="delete" ng-click="toggleUserDisabledState(user)">
 							<span class="glyphicon glyphicon-remove" ng-show="!user.userCredentials.disabled"></span>
