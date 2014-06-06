@@ -69,7 +69,7 @@
 							</td> 
 							<td ng-repeat="option in section.categoryOptionComboIds">
 								<ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
-									<input type="text" name="datavalue" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option)['value']" ng-focus="restoreExpression(dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user'])" /><br/>
+									<input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option)['value']" ng-focus="restoreExpression(dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user'])" /><br/>
 								</ng-form>
 							</td>
 							<td class="last-column">{{sum(dataValues[dataElement.id])}}</td>
@@ -82,7 +82,7 @@
 </accordion>
 <div>
 	<input type="submit" class="btn btn-main" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}"/>
-	<input type="submit" class="btn btn-main" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" value="{{resourceBundle.submitBtnValue}}" />
+	<input type="submit" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" value="{{resourceBundle.submitBtnValue}}" />
 	<input type="submit" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="dataentryForm.$invalid || isReadOnly	" ng-if="hasRoles(['Approver - Level 1'])"  value="{{resourceBundle.approveBtnValue}}" />
 </div>
 </form>

@@ -1,44 +1,41 @@
 // describe('The data entry user ', function() {
 
-//     beforeEach(function(){
-//     	browser.get('http://localhost:8081/#/dashboard');
+//     beforeEach(function() {
+//         ptor = protractor.getInstance();
+//         browser.get('http://localhost:8081/index.html#/dashboard');
+//         setUpLoginData();
 //     });
 
 
-//     it('should be able to login with correct password', function() {
-//         var userName = element(by.id(username_textBox));
-//         var password = element(by.id(password_textBox));
-//         var logoutLink = element(by.id(logout_link));
-//         var loginButton = element(by.id(login_button));
-//         var dataEntryLink = element(by.id(dashboard_data_entry_link));
+//     xit('should be able to enter data', function() {
+//         var datasetSectionButton = element(by.id(acc));
+//         var selectButton = element(by.id(module_select));
 
-//         userName.sendKeys(dataEntry_username);
-//         password.sendKeys(dataEntry_password);
-        
-//         console.log("reached");
-//         loginButton.click();
+//         loginAsDataEntryUser();
+//         dataEntryButton.click();
 
-//         expect(dataEntryLink.getText()).toEqual('Data Entry');
+//         selectDropdownbyNum = function(element, optionNum) {
+//             if (optionNum) {
+//                 var options = element.findElements(by.tagName('option'))
+//                     .then(function(options) {
+//                         options[optionNum].click();
+//                     });
+//             }
+//         };
 
-//         // projectLink.click();
-//         // logoutLink.click();
-//         // expect(loginButton.isPresent()).toBe(true);
+//         selectDropdownbyNum(selectButton, 2);
+//         ptor.waitForAngular();
+
+//         expect(datasetSectionButton.getText()).toEqual('Sex at admission');
+//         datasetSectionButton.click();
+
+//         // var box1 = element(by.id('datafield_2'));
+//         // box1.sendKeys('1');
+
+//         // var save = element(by.id('dataEntrySubmit'));
+//         // save.click();
+
+
 //     });
 
-//     // it('should not be able to login with incorrect password',function(){
-//     // 	var userName = element(by.id(username_textBox));
-//     //     var password = element(by.id(password_textBox));
-//     //     var loginButton = element(by.id(login_button));
-//     //     var invalidLoginMsg = element(by.id(invalid_login_msg_id));
-
-//     //     userName.sendKeys(admin_username);
-//     //     password.sendKeys(incorrect_password);
-        
-//     //     loginButton.click();
-//     //     expect(invalidLoginMsg.getText()).toEqual(invalid_login_error_msg);
-//     //     expect(loginButton.isPresent()).toBe(true);
-//     // });
 // });
-
-
-
