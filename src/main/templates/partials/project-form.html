@@ -1,5 +1,4 @@
 <div ng-controller="projectController">
-	<a href="#/data-entry" class="panel-title" ng-click="setUserProject()" ng-show="!isEditMode">View Tally Sheet</a>
 	<div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
 	<form name="createForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
 		<div class="panel panel-default">
