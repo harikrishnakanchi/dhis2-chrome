@@ -125,13 +125,11 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.approveSuccess = true;
                 $scope.approveError = false;
                 initDataEntryForm();
-                console.log("completed");
             };
 
             var onError = function() {
                 $scope.approveSuccess = false;
                 $scope.approveError = true;
-                console.log("error completing");
             };
 
             var markAllDataAsComplete = function() {
@@ -143,7 +141,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 return approvalService.markAsComplete(dataSets, period, orgUnit, storedBy);
             };
 
-            markAllDataAsComplete().then(onSuccess, onError);
+            markAllDataAsComplete().then(onSuccess, onError).
+            finally(scrollToTop);
         };
 
         $scope.isCurrentWeekSelected = function(week) {
