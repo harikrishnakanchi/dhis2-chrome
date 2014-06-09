@@ -13,7 +13,11 @@ define([], function() {
         }];
 
         var init = function() {
-            $scope.userNamePrefix = $scope.orgUnit.name.toLowerCase().replace(/ /g, "_").concat("_");
+            $scope.userNamePrefix = _.find($scope.orgUnit.attributeValues, {
+                'attribute': {
+                    'code': 'projCode'
+                }
+            }).value.toLowerCase() + "_";
             $scope.userNameMatchExpr = new RegExp($scope.userNamePrefix + "(.)+", "i");
 
             $scope.userRoles = allRoles;

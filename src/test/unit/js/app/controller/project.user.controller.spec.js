@@ -14,7 +14,15 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
 
             scope.orgUnit = {
                 "name": "Proj 1",
-                "id": "someId"
+                "id": "someId",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "projCode",
+                        "name": "Project Code",
+                        "id": "fa5e00d5cd2"
+                    },
+                    "value": "PRJ"
+                }]
             };
 
             spyOn(userService, "getAllUsernames").and.returnValue(utils.getPromise(q, []));
@@ -57,14 +65,11 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
         });
 
         it("should determine username prefix and return validate username", function() {
-            var projectName = "Some Project";
-            var specifiedUserName = "some_Project_user1";
-
-            scope.orgUnit.name = projectName;
+            var specifiedUserName = "prj_afdssd";
 
             projectUserController = new ProjectUserController(scope, userService);
 
-            expect(scope.userNamePrefix).toEqual("some_project_");
+            expect(scope.userNamePrefix).toEqual("prj_");
             expect(scope.userNameMatchExpr.test(specifiedUserName)).toEqual(true);
         });
 
