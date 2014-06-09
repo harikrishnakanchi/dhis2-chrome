@@ -5,11 +5,8 @@ define([], function() {
             "id": "hxNB8lleCsl",
             "name": "Data entry user"
         }, {
-            "id": "cb4uEzD2fMS",
+            "id": "a276eebf9df",
             "name": "Approver - Level 1"
-        }, {
-            "id": "fV7TIrX8HGO",
-            "name": "Approver - Level 2"
         }];
 
         var init = function() {
