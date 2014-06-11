@@ -32,7 +32,15 @@ verifyDownloadData =function(){
 };
 
 navigateToManageProjectPage = function(){
-        projectLink.click();
+    projectLink.click();
+};
+
+navigateToDataEntryPage = function(){
+    dataEntryButton.click();
+};
+
+navigateToApprovalPage = function(){
+    dataApprovalButton.click();
 };
 
 logout = function() {

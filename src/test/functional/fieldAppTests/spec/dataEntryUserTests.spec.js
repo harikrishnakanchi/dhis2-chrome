@@ -35,6 +35,8 @@ describe('The data entry user ', function() {
         loginAsDataEntryUser();
         verifyDataEntryUserLogin();
         verifyDownloadData();
+        navigateToDataEntryPage();
+        verifyUserOnDataEntryPage();
         logout();
     });
 
