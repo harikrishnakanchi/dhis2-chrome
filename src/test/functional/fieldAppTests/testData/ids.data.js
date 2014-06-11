@@ -17,6 +17,11 @@ logged_in_user = "loggedInUser";
 //suuccess or error messages
 invalid_login_msg_id = "loginFailedMsg";
 
-//dataentry page
+//data entry page
 acc = "00X";
-module_select = "module";
+module_dropdown_id = "module";
+year_dropdown_id = "year";
+month_dropdown_id = "month";
+week_dropdown_id = "week";
+save_button_id = "dataEntrySave";
+submit_button_id = "dataEntrySubmit";

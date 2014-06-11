@@ -8,6 +8,7 @@ describe('The data entry user ', function() {
         
         setUpLoginData();
         setUpDashboardData();
+        setUpDataEntryPageData();
     });
 
     afterEach(function() {
@@ -36,7 +37,7 @@ describe('The data entry user ', function() {
         verifyDataEntryUserLogin();
         verifyDownloadData();
         navigateToDataEntryPage();
-        verifyUserOnDataEntryPage();
+        // verifyUserOnDataEntryPage();
         logout();
     });
 
