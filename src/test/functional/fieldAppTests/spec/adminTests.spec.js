@@ -5,7 +5,9 @@ describe('The admin ', function() {
     beforeEach(function() {
         ptor = protractor.getInstance();
         browser.get('http://localhost:8081/index.html#/dashboard');
+        
         setUpLoginData();
+        setUpDashboardData();
     });
 
     afterEach(function() {
@@ -29,13 +31,16 @@ describe('The admin ', function() {
     }
 
     
-    it('should be able to login with correct password', function() {
+    it('should be able to proceed to the manage project page', function() {
         loginAsAdmin();
+        verifyAdminLogin();
+        verifyDownloadData();
+        navigateToManageProjectPage();
         logout();
     });
 
     it('should not be able to login with incorrect password', function() {
         loginWithInvalidCredentials();
     });
-
+    
 });

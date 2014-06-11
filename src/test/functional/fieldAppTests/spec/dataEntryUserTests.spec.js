@@ -1,41 +1,41 @@
-// describe('The data entry user ', function() {
+var fs = require('fs');
 
-//     beforeEach(function() {
-//         ptor = protractor.getInstance();
-//         browser.get('http://localhost:8081/index.html#/dashboard');
-//         setUpLoginData();
-//     });
+describe('The data entry user ', function() {
 
+    beforeEach(function() {
+        ptor = protractor.getInstance();
+        browser.get('http://localhost:8081/index.html#/dashboard');
+        
+        setUpLoginData();
+        setUpDashboardData();
+    });
 
-//     xit('should be able to enter data', function() {
-//         var datasetSectionButton = element(by.id(acc));
-//         var selectButton = element(by.id(module_select));
+    afterEach(function() {
+        var currentSpec = jasmine.getEnv().currentSpec,
+            passed = currentSpec.results().passed();
+        if (!passed) {
+            browser.takeScreenshot().then(function(png) {
+                browser.getCapabilities().then(function(capabilities) {
+                    var browserName = capabilities.caps_.browserName,
+                        filename = currentSpec.description + '.png';
+                    writeScreenShot(png, filename);
+                });
+            });
+        }
+    });
 
-//         loginAsDataEntryUser();
-//         dataEntryButton.click();
+    function writeScreenShot(data, filename) {
+        var stream = fs.createWriteStream("screenShots/" + filename);
+        stream.write(new Buffer(data, 'base64'));
+        stream.end();
+    }
 
-//         selectDropdownbyNum = function(element, optionNum) {
-//             if (optionNum) {
-//                 var options = element.findElements(by.tagName('option'))
-//                     .then(function(options) {
-//                         options[optionNum].click();
-//                     });
-//             }
-//         };
+    
+    it('should be able to login with correct password', function() {
+        loginAsDataEntryUser();
+        verifyDataEntryUserLogin();
+        verifyDownloadData();
+        logout();
+    });
 
-//         selectDropdownbyNum(selectButton, 2);
-//         ptor.waitForAngular();
-
-//         expect(datasetSectionButton.getText()).toEqual('Sex at admission');
-//         datasetSectionButton.click();
-
-//         // var box1 = element(by.id('datafield_2'));
-//         // box1.sendKeys('1');
-
-//         // var save = element(by.id('dataEntrySubmit'));
-//         // save.click();
-
-
-//     });
-
-// });
+});
