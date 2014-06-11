@@ -2,7 +2,7 @@ define([], function() {
     return function($scope, userService) {
 
         var allRoles = [{
-            "id": "hxNB8lleCsl",
+            "id": "8d32f0f1336",
             "name": "Data entry user"
         }, {
             "id": "a276eebf9df",
