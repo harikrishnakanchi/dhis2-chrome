@@ -133,12 +133,16 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var markAllDataAsComplete = function() {
-                var dataSets = _.keys($scope.currentGroupedSections);
-                var period = getPeriod();
-                var orgUnit = $scope.currentModule.id;
-                var storedBy = $scope.currentUser.userCredentials.username;
-
-                return approvalService.markAsComplete(dataSets, period, orgUnit, storedBy);
+                var data = {
+                    "dataSets": _.keys($scope.currentGroupedSections),
+                    "period": getPeriod(),
+                    "orgUnit": $scope.currentModule.id,
+                    "storedBy": $scope.currentUser.userCredentials.username
+                };
+                return $hustle.publish({
+                    "data": data,
+                    "type": "uploadApprovalData"
+                }, "dataValues");
             };
 
             markAllDataAsComplete().then(onSuccess, onError).

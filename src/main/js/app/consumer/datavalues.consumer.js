@@ -100,13 +100,17 @@ define(["moment", "lodash"], function(moment, _) {
                 .then(getAllLevelOneApprovalData)
                 .then(saveAllLevelOneApprovalData);
         };
+        var uploadApprovalData = function(data) {
+            return approvalService.markAsComplete(data.dataSets, data.period, data.orgUnit, data.storedBy);
+        };
 
         this.run = function(message) {
             var payload = message.data;
             var action = {
                 "uploadDataValues": uploadDataValues,
                 "downloadDataValues": downloadDataValues,
-                "downloadApprovalData": downloadApprovalData
+                "downloadApprovalData": downloadApprovalData,
+                "uploadApprovalData": uploadApprovalData
             };
 
             return action[payload.type](payload.data);

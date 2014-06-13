@@ -34,14 +34,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "queryBuilder": queryBuilder
             };
 
-            modal = {
-                'open': function() {
-                    return {
-                        result: utils.getPromise(q, {})
-                    };
-                }
-            };
-
             scope.dataentryForm = {
                 $setPristine: function() {}
             };
@@ -113,7 +105,18 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             approvalStoreSpy = spyOn(approvalStore, "each");
             approvalStoreSpy.and.returnValue(utils.getPromise(q, [{}]));
 
-            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope, window, approvalService);
+
+            fakeModal = {
+                close: function() {
+                    this.result.confirmCallBack();
+                },
+                dismiss: function(type) {
+                    this.result.cancelCallback(type);
+                },
+                open: function(object) {}
+            };
+
+            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalService);
         }));
 
         it("should initialize modules", function() {
@@ -185,7 +188,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             scope.$apply();
 
-            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
+            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope);
 
             expect(scope.modules).toEqual(expectedModules);
         });
@@ -304,7 +307,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
             spyOn(hustle, "publish");
 
-            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope);
 
             scope.currentModule = {
                 id: 'mod2',
@@ -341,7 +344,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataRepository, "saveAsDraft").and.returnValue(saveSuccessPromise);
             spyOn(hustle, "publish");
 
-            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope);
 
             scope.currentModule = {
                 id: 'mod2',
@@ -372,7 +375,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(hustle, "publish");
 
 
-            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope);
             scope.currentModule = {
                 id: 'mod2',
                 parent: {
@@ -400,7 +403,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
             spyOn(hustle, "publish").and.returnValue(saveErrorPromise);
 
-            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, modal, rootScope);
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope);
             scope.currentModule = {
                 id: 'mod2',
                 parent: {
@@ -558,6 +561,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.dataentryForm.$dirty = false;
             scope.dataentryForm.$dirty = true;
             spyOn(location, "url");
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
             scope.$apply();
 
             expect(scope.preventNavigation).toEqual(true);
@@ -642,7 +648,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.isSubmitted).toBe(false);
         });
 
-
         it("should show not-ready-for-approval message if data has been saved as draft", function() {
             spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {
                 "period": "2014W14",
@@ -720,6 +725,38 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.$apply();
 
             expect(scope.isSubmitted).toBe(true);
+        });
+
+        it("should submit data for approval", function() {
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
+            spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            scope.firstLevelApproval();
+            scope.$apply();
+
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: {
+                    dataSets: [],
+                    period: '2014W14',
+                    orgUnit: 'mod2',
+                    storedBy: 'dataentryuser'
+                },
+                type: 'uploadApprovalData'
+            }, 'dataValues');
+            expect(scope.approveSuccess).toBe(true);
+            expect(scope.approveError).toBe(false);
         });
 
     });
