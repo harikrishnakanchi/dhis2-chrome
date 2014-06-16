@@ -7,13 +7,13 @@ function do_curl
 
 function usage
 {
-	echo "usage: ./package.sh username:password url destinationFilePath"
+	echo "usage: ./package.sh username:password url env"
 }
 
 function package_chrome_app
 {
 	 google-chrome --pack-extension=src/main
-	 mv src/main.crx src/dhis2.crx
+	 mv src/main.crx src/dhis2_$env.crx
 }
 
 ##### Main
@@ -29,7 +29,7 @@ fi
 
 
 authorization=$1
-
+env=$3
 metadata_url=$2"/api/metadata.json"
 metadata_dest="src/main/data/metadata.json"
 
