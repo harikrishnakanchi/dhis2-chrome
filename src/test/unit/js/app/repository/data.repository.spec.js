@@ -46,5 +46,10 @@ define(["dataRepository", "angularMocks", "utils"], function(DataRepository, moc
             expect(mockStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
         });
 
+        it("should get the complete data values", function() {
+            dataRepository.getCompleteDataValues('period', 'orgUnitId');
+            expect(mockStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
+        });
+
     });
 });

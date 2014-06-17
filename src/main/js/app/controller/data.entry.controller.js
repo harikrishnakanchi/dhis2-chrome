@@ -38,6 +38,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var initDataEntryForm = function() {
+            dataRepository.getCompleteDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
+                if (_.isEmpty(data)) {
+                    $scope.isApproved = false || $scope.approveSuccess;
+                } else {
+                    $scope.isApproved = true;
+                }
+            });
+
             dataRepository.getDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
                 data = data || {};
                 $scope.dataValues = dataValuesMapper.mapToView(data);

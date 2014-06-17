@@ -83,7 +83,7 @@
 <div>
 	<input type="submit" class="btn btn-main" id="dataEntrySave" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}"/>
 	<input type="submit" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || isReadOnly" ng-if="hasRoles(['Data entry user'])" value="{{resourceBundle.submitBtnValue}}" />
-	<input type="submit" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="dataentryForm.$invalid || isReadOnly	" ng-if="hasRoles(['Approver - Level 1'])"  value="{{resourceBundle.approveBtnValue}}" />
+	<input type="submit" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="dataentryForm.$invalid || isApproved" ng-if="hasRoles(['Approver - Level 1'])"  value="{{resourceBundle.approveBtnValue}}" />
 </div>
 </form>
 </section>

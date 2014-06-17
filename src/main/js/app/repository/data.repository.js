@@ -30,6 +30,11 @@ define(["lodash"], function(_) {
             return store.find([period, orgUnitId]);
         };
 
+        this.getCompleteDataValues = function(period, orgUnitId) {
+            var store = db.objectStore('completeDataSets');
+            return store.find([period, orgUnitId]);
+        };
+
         this.saveAsDraft = function(payload) {
             return this.save(payload, true);
         };

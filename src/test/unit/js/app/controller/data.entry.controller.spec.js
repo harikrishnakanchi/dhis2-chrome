@@ -302,6 +302,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should submit data values to indexeddb and dhis", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
@@ -338,7 +339,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should save data values as draft to indexeddb", function() {
-
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(dataRepository, "saveAsDraft").and.returnValue(saveSuccessPromise);
@@ -370,6 +371,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should let the user know of failures when saving the data to indexedDB ", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(dataRepository, "save").and.returnValue(saveErrorPromise);
             spyOn(hustle, "publish");
@@ -399,6 +401,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should let the user know of failures when saving to queue ", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
             spyOn(hustle, "publish").and.returnValue(saveErrorPromise);
@@ -480,6 +483,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should fetch empty data if no data exists for the given period", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
+
             scope.year = 2014;
             scope.week = {
                 "weekNumber": 14
@@ -496,6 +501,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should display data for the given period", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
+
             scope.year = 2014;
             scope.week = {
                 "weekNumber": 14
@@ -537,6 +544,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it('should set dataset sections if module is selected', function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
+
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
 
@@ -630,6 +639,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should show not-ready-for-approval message if no data has been saved or submitted", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
+
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
 
             scope.currentModule = {
@@ -649,6 +660,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should show not-ready-for-approval message if data has been saved as draft", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
+
             spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {
                 "period": "2014W14",
                 "orgUnit": "mod2",
@@ -689,6 +702,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should show ready-for-approval message if data has already been submitted for approval", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
+
             spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {
                 "period": "2014W14",
                 "orgUnit": "mod2",
@@ -728,6 +743,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         });
 
         it("should submit data for approval", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
+
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(fakeModal, "open").and.returnValue({
                 result: utils.getPromise(q, {})
@@ -757,7 +774,78 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             }, 'dataValues');
             expect(scope.approveSuccess).toBe(true);
             expect(scope.approveError).toBe(false);
+            expect(scope.isApproved).toEqual(true);
         });
+
+        it("should not submit data for approval", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
+
+            spyOn(hustle, "publish").and.returnValue(utils.getRejectedPromise(q, {}));
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
+            spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            scope.firstLevelApproval();
+            scope.$apply();
+
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: {
+                    dataSets: [],
+                    period: '2014W14',
+                    orgUnit: 'mod2',
+                    storedBy: 'dataentryuser'
+                },
+                type: 'uploadApprovalData'
+            }, 'dataValues');
+            expect(scope.approveSuccess).toBe(false);
+            expect(scope.approveError).toBe(true);
+            expect(scope.isApproved).toEqual(false);
+        });
+
+        it("should mark data as approved if proccessed", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, 'abc'));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
+            spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+            scope.firstLevelApproval();
+            scope.$apply();
+
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: {
+                    dataSets: [],
+                    period: '2014W14',
+                    orgUnit: 'mod2',
+                    storedBy: 'dataentryuser'
+                },
+                type: 'uploadApprovalData'
+            }, 'dataValues');
+            expect(scope.approveSuccess).toBe(true);
+            expect(scope.approveError).toBe(false);
+            expect(scope.isApproved).toEqual(true);
+        });
+
 
     });
 });
