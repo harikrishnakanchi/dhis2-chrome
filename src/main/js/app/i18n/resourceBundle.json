@@ -10,7 +10,7 @@
     "dataSaveFailure": "Error saving data, Please try again later",
     "dataSubmitSuccess": "Data submitted successfully",
     "dataSubmitFailure": "Error submitting data. Please try again later",
-    "dataApproveSuccess": "Data will be sent for second level of approval.",
+    "dataApproveSuccess": "Data sent for second level of approval.",
     "dataApprovalConfirmationMessage": "Are you sure you want to approve?",
     "dataApproveFailure": "Error approving data. Please try again later",
     "chooseWeek": "Please choose a week to enter data.",
