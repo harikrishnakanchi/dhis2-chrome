@@ -1,6 +1,6 @@
 define(["properties"], function(properties) {
     var create = function(hustle) {
-        return function(message) {
+        return function(message, data) {
             console.debug("retrying message: id", message.id, "releases:", message.releases);
             if (message.releases < properties.queue.maxretries) {
                 return hustle.Queue.release(message.id);

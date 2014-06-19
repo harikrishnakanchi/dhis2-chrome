@@ -74,7 +74,7 @@ define(["moment", "lodash"], function(moment, _) {
             };
 
             var uploadData = function() {
-                dataService.save(dataToUpload);
+                return dataService.save(dataToUpload);
             };
 
             var dataValues = [];
