@@ -9,27 +9,17 @@ setUpDataEntryPageData = function() {
 };
 
 
-verifyUserOnDataEntryPage = function(){
-    selectModule(0);
+verifyUserOnDataEntryPage = function() {
+    selectDropdownbyNum(moduleDropdown, 0);
     expect((saveButton).isDisplayed()).toBeTruthy();
+
 };
 
-selectModule = function(module_num){
-    // element(by.css('select option[value="1"]')).click()
-
-    if (module_num) {
-                var options = moduleDropdown.findElements(by.tagName('option'))
-                    .then(function(options) {
-                        options[module_num].click();
-                    });
-            }
+var selectDropdownbyNum = function(element, optionNum) {
+    if (optionNum) {
+        var options = element.findElements(by.tagName('option'))
+            .then(function(options) {
+                options[optionNum].click();
+            });
+    }
 };
-
-        // selectDropdownbyNum = function(element, optionNum) {
-        //     if (optionNum) {
-        //         var options = element.findElements(by.tagName('option'))
-        //             .then(function(options) {
-        //                 options[optionNum].click();
-        //             });
-        //     }
-        // };

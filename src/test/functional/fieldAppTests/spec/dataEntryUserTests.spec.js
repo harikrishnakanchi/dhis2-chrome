@@ -5,7 +5,7 @@ describe('The data entry user ', function() {
     beforeEach(function() {
         ptor = protractor.getInstance();
         browser.get('http://localhost:8081/index.html#/dashboard');
-        
+
         setUpLoginData();
         setUpDashboardData();
         setUpDataEntryPageData();
@@ -31,13 +31,13 @@ describe('The data entry user ', function() {
         stream.end();
     }
 
-    
+
     it('should be able to login with correct password', function() {
         loginAsDataEntryUser();
         verifyDataEntryUserLogin();
         verifyDownloadData();
         navigateToDataEntryPage();
-        // verifyUserOnDataEntryPage();
+        verifyUserOnDataEntryPage();
         logout();
     });
 
