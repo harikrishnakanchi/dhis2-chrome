@@ -10,6 +10,11 @@ define(['lodash', 'overrides'], function(_, overrides) {
         "projectDataSync": {
             "intervalInMinutes": 1,
         },
+        "dhisPing": {
+            "url": url + "/favicon.ico",
+            "timeoutInSeconds": 3,
+            "retryIntervalInMinutes": 1
+        },
         "dhis": {
             "url": url,
             "auth_header": "Basic c2VydmljZS5hY2NvdW50Okkxb1Y2Y29HNWVkMw==",

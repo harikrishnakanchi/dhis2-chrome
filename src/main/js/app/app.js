@@ -1,8 +1,8 @@
-define(["angular", "Q", "services", "directives", "controllers", "repositories", "migrator", "migrations", "properties", "httpInterceptor", "failureStrategyFactory",
+define(["angular", "Q", "services", "directives", "controllers", "repositories", "migrator", "migrations", "properties", "httpInterceptor", "failureStrategyFactory", "monitors",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals"
     ],
-    function(angular, Q, services, directives, controllers, repositories, migrator, migrations, properties, httpInterceptor, failureStrategyFactory) {
+    function(angular, Q, services, directives, controllers, repositories, migrator, migrations, properties, httpInterceptor, failureStrategyFactory, monitors) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal",
@@ -12,6 +12,8 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
             directives.init(app);
             controllers.init(app);
             repositories.init(app);
+            monitors.init(app);
+
             app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider',
                 function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider) {
@@ -40,7 +42,7 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
                         }).dbReady(function(data) {
-                            if(chrome.runtime){
+                            if (chrome.runtime) {
                                 chrome.runtime.sendMessage("migrationComplete");
                             }
                         });
@@ -55,13 +57,23 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['metadataService', '$rootScope', '$location',
-                function(metadataService, $rootScope, $location) {
+            app.run(['metadataService', 'dhisMonitor', '$rootScope', '$location',
+                function(metadataService, dhisMonitor, $rootScope, $location) {
                     metadataService.loadMetadataFromFile();
                     $rootScope.$on('$routeChangeStart', function(e, newUrl, oldUrl) {
                         if (!$rootScope.isLoggedIn) {
                             $location.path("/login");
                         }
+                    });
+
+                    $rootScope.isDhisOnline = false;
+                    dhisMonitor.start().then(function() {
+                        dhisMonitor.online(function() {
+                            $rootScope.isDhisOnline = true;
+                        });
+                        dhisMonitor.offline(function() {
+                            $rootScope.isDhisOnline = false;
+                        });
                     });
 
                     $rootScope.hasRoles = function(allowedRoles) {

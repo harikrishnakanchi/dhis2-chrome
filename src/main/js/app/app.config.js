@@ -70,6 +70,10 @@ require.config({
         "datasetTransformer": "app/transformers/dataset.transformer",
         "groupSections": "app/transformers/group.sections",
 
+        //Monitors
+        "dhisMonitor": "app/monitors/dhis.monitor",
+        "monitors": "app/monitors/monitors",
+
         //Interceptors
         "httpInterceptor": "app/interceptors/http.interceptor",
 

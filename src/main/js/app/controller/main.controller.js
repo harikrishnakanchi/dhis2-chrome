@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository) {
+    return function($scope, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository, dhisMonitor) {
 
         $rootScope.$watch("currentUser.locale", function() {
 
@@ -44,5 +44,6 @@ define(["lodash"], function(_) {
             $rootScope.isLoggedIn = false;
             $rootScope.currentUser = undefined;
         };
+
     };
 });

@@ -1,10 +1,12 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "httpInterceptor", "properties", "failureStrategyFactory", "angular-indexedDB"],
-    function(angular, Q, services, repositories, consumers, hustleModule, httpInterceptor, properties, failureStrategyFactory) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "httpInterceptor", "properties", "failureStrategyFactory", "monitors", "angular-indexedDB"],
+    function(angular, Q, services, repositories, consumers, hustleModule, httpInterceptor, properties, failureStrategyFactory, monitors) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
             services.init(app);
             consumers.init(app);
             repositories.init(app);
+            monitors.init(app);
+
 
             app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider',
@@ -15,27 +17,9 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 }
             ]);
 
-            app.run(['metadataService', 'consumerRegistry', '$hustle',
-                function(metadataService, consumerRegistry, $hustle) {
-                    console.log("dB migration complete. Starting sync");
+            app.run(['metadataService', 'consumerRegistry', 'dhisMonitor', '$hustle',
+                function(metadataService, consumerRegistry, dhisMonitor, $hustle) {
 
-                    var scheduleSync = function() {
-                        console.log("scheduling sync");
-                        chrome.alarms.create('metadataSyncAlarm', {
-                            periodInMinutes: properties.metadata.sync.intervalInMinutes
-                        });
-
-                        chrome.alarms.create('projectDataSyncAlarm', {
-                            periodInMinutes: properties.projectDataSync.intervalInMinutes
-                        });
-
-                    };
-
-                    var startSyncAndRegisterConsumers = function() {
-                        metadataService.sync().then(projectDataSync).
-                        finally(scheduleSync);
-                        consumerRegistry.register();
-                    };
                     var registerCallback = function(alarmName, callback) {
                         return function(alarm) {
                             if (alarm.name === alarmName)
@@ -43,7 +27,21 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         };
                     };
 
+                    var metadataSync = function() {
+                        if (!dhisMonitor.isOnline())
+                            return;
+
+                        console.log("Starting metadata sync");
+
+                        metadataService.sync();
+                    };
+
                     var projectDataSync = function() {
+                        if (!dhisMonitor.isOnline())
+                            return;
+
+                        console.log("Starting project data sync");
+
                         $hustle.publish({
                             "type": "downloadDataValues"
                         }, "dataValues");
@@ -53,26 +51,27 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         }, "dataValues");
                     };
 
-                    if (navigator.onLine) {
-                        startSyncAndRegisterConsumers();
-                    }
+                    chrome.alarms.create('metadataSyncAlarm', {
+                        periodInMinutes: properties.metadata.sync.intervalInMinutes
+                    });
+                    chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataSync));
 
-                    if (chrome.alarms) {
-                        chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataService.sync));
-                        chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
-                    }
+                    chrome.alarms.create('projectDataSyncAlarm', {
+                        periodInMinutes: properties.projectDataSync.intervalInMinutes
+                    });
+                    chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
 
-                    window.addEventListener('online', function(e) {
-                        console.log("You are online.");
-                        startSyncAndRegisterConsumers();
+                    dhisMonitor.online(function() {
+                        consumerRegistry.register();
                     });
 
-                    window.addEventListener('offline', function() {
-                        console.log("You are offline. Stopping Sync.");
-                        chrome.alarms.clear('metadataSyncAlarm');
-                        chrome.alarms.clear('projectDataSyncAlarm');
+                    dhisMonitor.offline(function() {
                         consumerRegistry.deregister();
                     });
+
+                    dhisMonitor.start()
+                        .then(metadataSync)
+                        .then(projectDataSync);
                 }
             ]);
 

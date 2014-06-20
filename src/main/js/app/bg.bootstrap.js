@@ -8,6 +8,7 @@ require(["app/bg.config"], function(config) {
         require(["properties"], function(properties) {
             var onMigrationComplete = function(request, sender, sendResponse) {
                 if (request === "migrationComplete") {
+                    console.log("dB migration complete");
                     app.bootstrap(app.init());
                 }
             };

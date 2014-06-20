@@ -24,6 +24,9 @@ require.config({
         "dataSetRepository": "app/repository/dataset.repository",
         "userPreferenceRepository": "app/repository/userpreference.repository",
 
+        //Monitors
+        "dhisMonitor": "app/monitors/dhis.monitor",
+        "monitors": "app/monitors/monitors",
 
         //consumers
         "consumers": "app/consumer/consumers",
