@@ -16,7 +16,7 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
                 var opUnitType = opUnit.type;
                 opUnit = _.omit(opUnit, 'type');
                 return _.merge(opUnit, {
-                    'id': md5(opUnit.name + parent.name).substr(0, 11),
+                    'id': md5(opUnit.name + parent.id).substr(0, 11),
                     'shortName': opUnit.name,
                     'level': parseInt(parent.level) + 1,
                     'parent': _.pick(parent, "name", "id"),

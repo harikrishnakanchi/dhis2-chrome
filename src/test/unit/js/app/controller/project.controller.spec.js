@@ -51,7 +51,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
         }));
 
         it("should save project in dhis", function() {
-            var orgUnitId = 'a4acf9115a7';
+            var orgUnitId = '1ef081fea77';
 
             var newOrgUnit = {
                 'name': 'Org1',

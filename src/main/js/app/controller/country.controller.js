@@ -11,7 +11,7 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
 
         $scope.save = function(orgUnit, parentOrgUnit) {
             newOrgUnit = {
-                'id': md5(orgUnit.name + parentOrgUnit.name).substr(0, 11),
+                'id': md5(orgUnit.name + parentOrgUnit.id).substr(0, 11),
                 'name': orgUnit.name,
                 'level': parseInt(parentOrgUnit.level) + 1,
                 'shortName': orgUnit.name,

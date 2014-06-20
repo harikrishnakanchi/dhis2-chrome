@@ -1,4 +1,4 @@
-define(["lodash", "orgUnitMapper", "moment", "md5", "systemSettingsTransformer", "datasetTransformer"], function(_, orgUnitMapper, moment, md5, systemSettingsTransformer, datasetTransformer) {
+define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer) {
     return function($scope, orgUnitService, db, $location, $q) {
         var selectedDataElements = {};
         var selectedSections = {};

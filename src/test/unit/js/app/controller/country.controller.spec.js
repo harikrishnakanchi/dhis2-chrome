@@ -1,6 +1,6 @@
 define(["countryController", "angularMocks", "utils", "moment"], function(CountryController, mocks, utils, moment) {
 
-    describe("countryControllerspec", function() {
+    describe("contry controller", function() {
 
         var scope, timeout, q, location, orgUnitService, anchorScroll;
 
@@ -47,7 +47,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
         });
 
         it("should save country in dhis", function() {
-            var orgUnitId = 'a4acf9115a7';
+            var orgUnitId = '1ef081fea77';
 
             var newOrgUnit = {
                 'name': 'Org1',

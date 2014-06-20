@@ -105,69 +105,69 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var result = orgUnitMapper.mapToProjectForDhis(orgUnit, parentOrgUnit);
 
             var expectedResult = {
-                "id": "a4acf9115a7",
-                "name": orgUnit.name,
-                "shortName": orgUnit.name,
-                "level": 3,
-                "openingDate": moment(orgUnit.openingDate).format("YYYY-MM-DD"),
-                "parent": {
-                    "name": parentOrgUnit.name,
-                    "id": parentOrgUnit.id
+                id: '1ef081fea77',
+                name: 'Org1',
+                level: 3,
+                shortName: 'Org1',
+                openingDate: '2010-01-01',
+                parent: {
+                    name: 'Name1',
+                    id: 'Id1'
                 },
-                "attributeValues": [{
-                    'attribute': {
-                        id: "a1fa2777924"
+                attributeValues: [{
+                    attribute: {
+                        id: 'a1fa2777924'
                     },
-                    value: "Project"
+                    value: 'Project'
                 }, {
-                    "attribute": {
-                        "code": "prjCon",
-                        "name": "Context",
-                        "id": "Gy8V8WeGgYs"
+                    attribute: {
+                        code: 'prjCon',
+                        name: 'Context',
+                        id: 'Gy8V8WeGgYs'
                     },
-                    "value": orgUnit.context
+                    value: 'val2'
                 }, {
-                    "attribute": {
-                        "code": "prjLoc",
-                        "name": "Location",
-                        "id": "CaQPMk01JB8"
+                    attribute: {
+                        code: 'prjLoc',
+                        name: 'Location',
+                        id: 'CaQPMk01JB8'
                     },
-                    "value": orgUnit.location
+                    value: 'val3'
                 }, {
-                    "attribute": {
-                        "code": "prjType",
-                        "name": "Type of project",
-                        "id": "bnbnSvRdFYo"
+                    attribute: {
+                        code: 'prjType',
+                        name: 'Type of project',
+                        id: 'bnbnSvRdFYo'
                     },
-                    "value": orgUnit.projectType
+                    value: 'val4'
                 }, {
-                    "attribute": {
-                        "code": "prjPopType",
-                        "name": "Type of population",
-                        "id": "Byx9QE6IvXB"
+                    attribute: {
+                        code: 'prjPopType',
+                        name: 'Type of population',
+                        id: 'Byx9QE6IvXB'
                     },
-                    "value": orgUnit.populationType
+                    value: 'val6'
                 }, {
-                    "attribute": {
-                        "code": "projCode",
-                        "name": "Project Code",
-                        "id": "fa5e00d5cd2"
+                    attribute: {
+                        code: 'projCode',
+                        name: 'Project Code',
+                        id: 'fa5e00d5cd2'
                     },
-                    "value": orgUnit.projectCode
+                    value: 'AB001'
                 }, {
-                    "attribute": {
-                        "code": "event",
-                        "name": "Event",
-                        "id": "a4ecfc70574"
+                    attribute: {
+                        code: 'event',
+                        name: 'Event',
+                        id: 'a4ecfc70574'
                     },
-                    "value": orgUnit.event
+                    value: 'Other'
                 }, {
-                    "attribute": {
-                        "code": "prjEndDate",
-                        "name": "End date",
-                        "id": "ZbUuOnEmVs5"
+                    attribute: {
+                        code: 'prjEndDate',
+                        name: 'End date',
+                        id: 'ZbUuOnEmVs5'
                     },
-                    "value": moment(orgUnit.endDate).format("YYYY-MM-DD")
+                    value: '2011-01-01'
                 }]
             };
 
@@ -201,22 +201,22 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }]
             }];
 
-            var expectedModules = orgUnitMapper.mapToModules(modules, projectOrgUnit);
+            var actualModules = orgUnitMapper.mapToModules(modules, projectOrgUnit);
 
-            expect(expectedModules).toEqual([{
+            expect(actualModules).toEqual([{
                 name: 'Module1',
                 shortName: 'Module1',
-                id: '86eb3db78c7',
+                id: '8110fbcb2a4',
                 level: 4,
-                openingDate: moment().format("YYYY-MM-DD"),
+                openingDate: '2014-06-20',
                 selectedDataset: undefined,
                 selectedSections: undefined,
                 selectedDataElements: undefined,
                 attributeValues: [{
                     attribute: {
-                        id: "a1fa2777924"
+                        id: 'a1fa2777924'
                     },
-                    value: "Module"
+                    value: 'Module'
                 }],
                 parent: {
                     name: 'Project1',
@@ -225,17 +225,17 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             }, {
                 name: 'Module2',
                 shortName: 'Module2',
-                id: 'f1941e66f2d',
+                id: 'c59e050c2a8',
                 level: 4,
-                openingDate: moment().format("YYYY-MM-DD"),
+                openingDate: '2014-06-20',
                 selectedDataset: undefined,
                 selectedSections: undefined,
                 selectedDataElements: undefined,
                 attributeValues: [{
                     attribute: {
-                        id: "a1fa2777924"
+                        id: 'a1fa2777924'
                     },
-                    value: "Module"
+                    value: 'Module'
                 }],
                 parent: {
                     name: 'Project1',
@@ -301,17 +301,17 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 name: 'dataset11',
                 organisationUnits: [{
                     name: 'Module1',
-                    id: '86eb3db78c7'
+                    id: '8110fbcb2a4'
                 }, {
                     name: 'Module2',
-                    id: 'f1941e66f2d'
+                    id: 'c59e050c2a8'
                 }]
             }, {
                 id: 'ds_12',
                 name: 'dataset12',
                 organisationUnits: [{
                     name: 'Module1',
-                    id: '86eb3db78c7'
+                    id: '8110fbcb2a4'
                 }]
             }];
 

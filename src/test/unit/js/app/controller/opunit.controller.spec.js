@@ -77,8 +77,8 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
         });
 
         it('should save operation units', function() {
-            var opUnit1Id = '70c075414b8';
-            var opUnit2Id = '62dbceaaf89';
+            var opUnit1Id = '133e9670f74';
+            var opUnit2Id = 'e9f172906f6';
             var opUnit1 = {
                 'name': 'OpUnit1',
                 'type': 'Hospital',

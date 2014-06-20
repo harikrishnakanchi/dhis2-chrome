@@ -1,4 +1,4 @@
-define(["properties", "lodash", "md5"], function(properties, _, md5) {
+define(["properties", "lodash"], function(properties, _) {
     return function($http, db) {
         var create = function(user) {
             var saveToDb = function() {

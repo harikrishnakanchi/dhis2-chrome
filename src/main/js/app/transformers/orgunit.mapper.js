@@ -3,7 +3,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
     var mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
 
         var projectOrgUnit = {
-            'id': md5(orgUnit.name + parentOrgUnit.name).substr(0, 11),
+            'id': md5(orgUnit.name + parentOrgUnit.id).substr(0, 11),
             'name': orgUnit.name,
             'level': parseInt(parentOrgUnit.level) + 1,
             'shortName': orgUnit.name,
@@ -91,10 +91,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             }
         });
 
-        if (attribute)
-            return attribute.value;
-
-        return undefined;
+        return attribute ? attribute.value : undefined;
     };
 
 
@@ -118,7 +115,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             return {
                 name: module.name,
                 shortName: module.name,
-                id: md5(module.name + moduleParent.name).substr(0, 11),
+                id: md5(module.name + moduleParent.id).substr(0, 11),
                 level: parseInt(moduleParent.level) + 1,
                 openingDate: moment().format("YYYY-MM-DD"),
                 selectedDataset: module.selectedDataset,
@@ -156,7 +153,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             var intoOrgUnits = function(module) {
                 return {
                     "name": module.name,
-                    "id": md5(module.name + moduleParent.name).substr(0, 11)
+                    "id": md5(module.name + moduleParent.id).substr(0, 11)
                 };
             };
 
