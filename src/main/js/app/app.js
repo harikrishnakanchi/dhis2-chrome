@@ -69,10 +69,14 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
                     $rootScope.isDhisOnline = false;
                     dhisMonitor.start().then(function() {
                         dhisMonitor.online(function() {
-                            $rootScope.isDhisOnline = true;
+                            $rootScope.$apply(function() {
+                                $rootScope.isDhisOnline = true;
+                            });
                         });
                         dhisMonitor.offline(function() {
-                            $rootScope.isDhisOnline = false;
+                            $rootScope.$apply(function() {
+                                $rootScope.isDhisOnline = false;
+                            });
                         });
                     });
 
