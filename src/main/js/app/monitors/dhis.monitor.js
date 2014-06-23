@@ -36,13 +36,13 @@ define(["properties", "lodash"], function(properties, _) {
 
         var onDhisOnline = function() {
             _.each(onlineEventHandlers, function(handler) {
-                handler.call();
+                handler.call({});
             });
         };
 
         var onDhisOffline = function() {
             _.each(offlineEventHandlers, function(handler) {
-                handler.call();
+                handler.call({});
             });
         };
 
