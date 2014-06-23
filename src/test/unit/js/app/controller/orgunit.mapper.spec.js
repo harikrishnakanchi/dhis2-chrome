@@ -201,6 +201,9 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }]
             }];
 
+            var today = new Date("2010-01-01T00:00:00");
+            spyOn(window, 'Date').and.returnValue(today);
+
             var actualModules = orgUnitMapper.mapToModules(modules, projectOrgUnit);
 
             expect(actualModules).toEqual([{
@@ -208,7 +211,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 shortName: 'Module1',
                 id: '8110fbcb2a4',
                 level: 4,
-                openingDate: moment().format("YYYY-MM-DD"),
+                openingDate: "2010-01-01",
                 selectedDataset: undefined,
                 selectedSections: undefined,
                 selectedDataElements: undefined,
@@ -227,7 +230,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 shortName: 'Module2',
                 id: 'c59e050c2a8',
                 level: 4,
-                openingDate: moment().format("YYYY-MM-DD"),
+                openingDate: "2010-01-01",
                 selectedDataset: undefined,
                 selectedSections: undefined,
                 selectedDataElements: undefined,
