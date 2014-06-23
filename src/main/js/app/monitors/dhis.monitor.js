@@ -1,6 +1,9 @@
 define(["properties", "lodash"], function(properties, _) {
     return function($http) {
-        var onlineEventHandlers, offlineEventHandlers, isDhisOnline;
+        var onlineEventHandlers = [];
+        var offlineEventHandlers = [];
+        var isDhisOnline = false;
+
 
         var registerAlarmCallback = function(alarmName, callback) {
             return function(alarm) {
@@ -55,10 +58,6 @@ define(["properties", "lodash"], function(properties, _) {
 
             chrome.runtime.onMessage.addListener(registerMessageCallback("dhisOnline", onDhisOnline));
             chrome.runtime.onMessage.addListener(registerMessageCallback("dhisOffline", onDhisOffline));
-
-            onlineEventHandlers = [];
-            offlineEventHandlers = [];
-            isDhisOnline = false;
 
             return dhisConnectivityCheck();
         };

@@ -62,10 +62,12 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
 
                     dhisMonitor.online(function() {
+                        console.log("Registering hustle consumers");
                         consumerRegistry.register();
                     });
 
                     dhisMonitor.offline(function() {
+                        console.log("De-registering hustle consumers");
                         consumerRegistry.deregister();
                     });
 
