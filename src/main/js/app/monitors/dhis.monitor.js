@@ -46,18 +46,18 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
             });
         };
 
-        var start = function() {
-
+        var createAlarms = function() {
             if (chrome.alarms) {
+                console.log("Registering dhis monitor alarm");
                 chrome.alarms.create("dhisConnectivityCheckAlarm", {
                     periodInMinutes: properties.dhisPing.retryIntervalInMinutes
                 });
                 chrome.alarms.onAlarm.addListener(registerAlarmCallback("dhisConnectivityCheckAlarm", dhisConnectivityCheck));
             }
+        };
 
-            chromeRuntime.addListener("dhisOffline", onDhisOffline);
-            chromeRuntime.addListener("dhisOnline", onDhisOnline);
-
+        var start = function() {
+            createAlarms();
             return dhisConnectivityCheck();
         };
 
@@ -84,6 +84,9 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
         var checkNow = function() {
             return dhisConnectivityCheck();
         };
+
+        chromeRuntime.addListener("dhisOffline", onDhisOffline);
+        chromeRuntime.addListener("dhisOnline", onDhisOnline);
 
         return {
             "start": start,

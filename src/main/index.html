@@ -17,6 +17,7 @@
         <ul class="nav navbar-nav navbar-right">
           <li><p class="navbar-text" id="loggedInUser"> {{currentUser.userCredentials.username}} </p></li>
           <li><p class="navbar-text" ng-show="isDhisOnline">Online</p></li>
+          <li><p class="navbar-text" ng-show="!isDhisOnline">Offline</p></li>
           <li class="active" ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a></li>
                     <li>
             <select id="languageSelectButton" ng-model="currentUser.locale" ng-if="currentUser" class="input-sm"> 
