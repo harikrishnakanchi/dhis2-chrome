@@ -1,4 +1,4 @@
-define(["properties", "lodash"], function(properties, _) {
+define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRuntime, _) {
     return function($http) {
         var onlineEventHandlers = [];
         var offlineEventHandlers = [];
@@ -12,13 +12,6 @@ define(["properties", "lodash"], function(properties, _) {
             };
         };
 
-        var registerMessageCallback = function(messageName, callback) {
-            return function(request, sender, sendResponse) {
-                if (request === messageName)
-                    callback();
-            };
-        };
-
         var dhisConnectivityCheck = function() {
 
             var pingUrl = properties.dhisPing.url + "?" + (new Date()).getTime();
@@ -28,12 +21,12 @@ define(["properties", "lodash"], function(properties, _) {
             }).then(function(response) {
                 console.log("DHIS is accessible");
                 isDhisOnline = true;
-                chrome.runtime.sendMessage("dhisOnline");
+                chromeRuntime.sendMessage("dhisOnline");
             }).
             catch (function(response) {
                 console.log("DHIS is not accessible");
                 isDhisOnline = false;
-                chrome.runtime.sendMessage("dhisOffline");
+                chromeRuntime.sendMessage("dhisOffline");
             });
         };
 
@@ -51,19 +44,23 @@ define(["properties", "lodash"], function(properties, _) {
 
         var start = function() {
 
-            chrome.alarms.create("dhisConnectivityCheckAlarm", {
-                periodInMinutes: properties.dhisPing.retryIntervalInMinutes
-            });
-            chrome.alarms.onAlarm.addListener(registerAlarmCallback("dhisConnectivityCheckAlarm", dhisConnectivityCheck));
+            if (chrome.alarms) {
+                chrome.alarms.create("dhisConnectivityCheckAlarm", {
+                    periodInMinutes: properties.dhisPing.retryIntervalInMinutes
+                });
+                chrome.alarms.onAlarm.addListener(registerAlarmCallback("dhisConnectivityCheckAlarm", dhisConnectivityCheck));
+            }
 
-            chrome.runtime.onMessage.addListener(registerMessageCallback("dhisOnline", onDhisOnline));
-            chrome.runtime.onMessage.addListener(registerMessageCallback("dhisOffline", onDhisOffline));
+            chromeRuntime.addListener("dhisOffline", onDhisOffline);
+            chromeRuntime.addListener("dhisOnline", onDhisOnline);
 
             return dhisConnectivityCheck();
         };
 
         var stop = function() {
-            chrome.alarms.clear("dhisConnectivityCheckAlarm");
+            if (chrome.alarms) {
+                chrome.alarms.clear("dhisConnectivityCheckAlarm");
+            }
         };
 
         var isOnline = function() {

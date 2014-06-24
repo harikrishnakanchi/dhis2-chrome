@@ -14,6 +14,7 @@ require.config({
         angularMocks: 'lib/angular-mocks/angular-mocks',
         testData: '../../test/unit/js/data/test.data',
         utils: '../../test/unit/js/app/utils/utils',
+        mockChrome: '../../test/unit/js/app/utils/mockChrome',
     },
     shim: {
         'angular': {

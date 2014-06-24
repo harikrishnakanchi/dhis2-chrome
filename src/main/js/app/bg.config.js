@@ -38,7 +38,10 @@ require.config({
         "httpInterceptor": "app/interceptors/http.interceptor",
 
         //Queue
-        "failureStrategyFactory": "app/queue/failure.strategy.factory"
+        "failureStrategyFactory": "app/queue/failure.strategy.factory",
+
+        //Utils
+        "chromeRuntime": "app/utils/chrome.runtime"
     },
     shim: {
         'angular': {
