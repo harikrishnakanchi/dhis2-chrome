@@ -2,7 +2,7 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
     return function($http) {
         var onlineEventHandlers = [];
         var offlineEventHandlers = [];
-        var isDhisOnline = false;
+        var isDhisOnline;
 
 
         var registerAlarmCallback = function(alarmName, callback) {
@@ -20,13 +20,17 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
                 "timeout": 1000 * properties.dhisPing.timeoutInSeconds
             }).then(function(response) {
                 console.log("DHIS is accessible");
-                isDhisOnline = true;
-                chromeRuntime.sendMessage("dhisOnline");
+                if (isDhisOnline === undefined || isDhisOnline === false) {
+                    isDhisOnline = true;
+                    chromeRuntime.sendMessage("dhisOnline");
+                }
             }).
             catch (function(response) {
                 console.log("DHIS is not accessible");
-                isDhisOnline = false;
-                chromeRuntime.sendMessage("dhisOffline");
+                if (isDhisOnline === undefined || isDhisOnline === true) {
+                    isDhisOnline = false;
+                    chromeRuntime.sendMessage("dhisOffline");
+                }
             });
         };
 
