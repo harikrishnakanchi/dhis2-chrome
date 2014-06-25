@@ -1,5 +1,5 @@
 define([], function() {
-    return function(dataValuesConsumer, orgUnitConsumer) {
+    return function($q, dataValuesConsumer, orgUnitConsumer) {
         this.run = function(message) {
             switch (message.data.type) {
                 case "uploadDataValues":
@@ -9,6 +9,8 @@ define([], function() {
                     return dataValuesConsumer.run(message);
                 case "createOrgUnit":
                     return orgUnitConsumer.run(message);
+                default:
+                    return $q.reject();
             }
         };
     };
