@@ -16,6 +16,7 @@ require.config({
         "dataService": "app/service/data.service",
         "approvalService": "app/service/approval.service",
         "metadataService": "app/service/metadata.service",
+        "orgUnitService": "app/service/orgUnit.service",
         "services": "app/service/bg.services",
 
         //Repositories
