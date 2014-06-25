@@ -59,6 +59,7 @@ require.config({
         "dataRepository": "app/repository/data.repository",
         "dataSetRepository": "app/repository/dataset.repository",
         "userPreferenceRepository": "app/repository/userpreference.repository",
+        "orgUnitRepository": "app/repository/orgunit.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",

@@ -31,7 +31,7 @@ module.exports = function(config) {
             'main/js/app/**/*.js': 'coverage'
         },
         browsers: ['Chrome'],
-        logLevel: config.LOG_INFO,
+        logLevel: config.LOG_ERROR,
         junitReporter: {
             outputFile: 'test/unit/coverage/test-results.xml'
         },
