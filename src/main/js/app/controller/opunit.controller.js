@@ -1,5 +1,5 @@
 define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, orgUnitMapper) {
-    return function($scope, orgUnitService, db, $location) {
+    return function($scope, orgUnitService, orgUnitRepository, db, $location) {
         $scope.opUnits = [{
             'openingDate': moment().format("YYYY-MM-DD")
         }];

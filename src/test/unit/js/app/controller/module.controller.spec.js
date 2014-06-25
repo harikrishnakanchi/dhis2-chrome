@@ -2,7 +2,8 @@
 define(["moduleController", "angularMocks", "utils", "testData"], function(ModuleController, mocks, utils, testData) {
     describe("module controller", function() {
 
-        var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections, dataElements, sectionsdata, datasetsdata, dataElementsdata;
+        var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
+            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo;
 
         beforeEach(mocks.inject(function($rootScope, $q, $location) {
             scope = $rootScope.$new();
@@ -19,6 +20,9 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                     return utils.getPromise(q, {});
                 }
             };
+
+            orgUnitRepo = jasmine.createSpyObj({}, ['save']);
+
             mockOrgStore = {
                 upsert: function() {},
                 getAll: function() {}
@@ -72,7 +76,7 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                     return dataElements;
                 return getMockStore(testData.get(storeName));
             });
-            moduleController = new ModuleController(scope, orgUnitService, db, location, q);
+            moduleController = new ModuleController(scope, orgUnitService, orgUnitRepo, db, location, q);
         }));
 
         afterEach(function() {
@@ -260,7 +264,7 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
 
             spyOn(orgUnitService, "getAssociatedDatasets").and.returnValue(dataSets);
             spyOn(orgUnitService, "getSystemSettings").and.returnValue(utils.getPromise(q, systemSettings));
-            moduleController = new ModuleController(scope, orgUnitService, db, location, q);
+            moduleController = new ModuleController(scope, orgUnitService, orgUnitRepo, db, location, q);
             scope.$apply();
 
             expect(scope.modules[0].name).toEqual("Mod2");

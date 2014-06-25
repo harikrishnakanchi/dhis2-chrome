@@ -1,5 +1,5 @@
 define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, orgUnitMapper) {
-    return function($scope, orgUnitService, $q, $location, $timeout, $anchorScroll) {
+    return function($scope, orgUnitService, orgUnitRepository, $q, $location, $timeout, $anchorScroll) {
 
         $scope.thisDate = moment().format("YYYY-MM-DD");
 
