@@ -1,38 +1,21 @@
 define(["properties", "moment"], function(properties, moment) {
     return function($http, db, $q) {
+        var markAsComplete = function(dataSets, period, orgUnit, storedBy, completionDate) {
+            return $http.post(properties.dhis.url + "/api/completeDataSetRegistrations", undefined, {
+                params: {
+                    "ds": dataSets,
+                    "pe": period,
+                    "ou": orgUnit,
+                    "sb": storedBy,
+                    "cd": completionDate,
+                    "multiOu": true
+                }
+            });
+        };
 
-        var markAsComplete = function(dataSets, period, orgUnit, storedBy) {
-
-            var saveToDhis = function() {
-                return $http({
-                    method: 'POST',
-                    url: properties.dhis.url + "/api/completeDataSetRegistrations",
-                    params: {
-                        "ds": dataSets,
-                        "pe": period,
-                        "ou": orgUnit,
-                        "sb": storedBy,
-                        "cd": completionDate,
-                        "multiOu": true
-                    },
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                });
-            };
-
-            var completionDate = moment().toISOString();
-
-            var payload = {
-                'period': period,
-                'orgUnit': orgUnit,
-                'storedBy': storedBy,
-                'date': completionDate,
-                'dataSets': dataSets
-            };
-
+        var saveCompletionToDB = function(payload) {
             var store = db.objectStore("completeDataSets");
-            return store.upsert(payload).then(saveToDhis);
+            return store.upsert(payload);
         };
 
         var getAllLevelOneApprovalData = function(orgUnits, dataSets) {
@@ -86,6 +69,7 @@ define(["properties", "moment"], function(properties, moment) {
 
         return {
             "markAsComplete": markAsComplete,
+            "saveCompletionToDB": saveCompletionToDB,
             "getAllLevelOneApprovalData": getAllLevelOneApprovalData,
             "saveLevelOneApprovalData": saveLevelOneApprovalData
         };

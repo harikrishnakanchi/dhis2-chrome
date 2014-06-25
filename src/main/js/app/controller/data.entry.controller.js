@@ -129,6 +129,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var markDataAsComplete = function() {
+            var dataForApproval = {
+                "dataSets": _.keys($scope.currentGroupedSections),
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id,
+                "storedBy": $scope.currentUser.userCredentials.username,
+                "date": moment().toISOString()
+            };
             var onSuccess = function() {
                 $scope.approveSuccess = true;
                 $scope.approveError = false;
@@ -141,19 +148,17 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var markAllDataAsComplete = function() {
-                var data = {
-                    "dataSets": _.keys($scope.currentGroupedSections),
-                    "period": getPeriod(),
-                    "orgUnit": $scope.currentModule.id,
-                    "storedBy": $scope.currentUser.userCredentials.username
-                };
+                return approvalService.saveCompletionToDB(dataForApproval);
+            };
+
+            var saveToDhis = function() {
                 return $hustle.publish({
-                    "data": data,
+                    "data": dataForApproval,
                     "type": "uploadApprovalData"
                 }, "dataValues");
             };
 
-            markAllDataAsComplete().then(onSuccess, onError).
+            markAllDataAsComplete().then(saveToDhis).then(onSuccess, onError).
             finally(scrollToTop);
         };
 

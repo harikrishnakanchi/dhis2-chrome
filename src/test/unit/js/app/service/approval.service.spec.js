@@ -1,5 +1,5 @@
 define(["approvalService", "angularMocks", "properties", "utils", "moment", "lodash"], function(ApprovalService, mocks, properties, utils, moment, _) {
-    describe("dataService", function() {
+    describe("approval service", function() {
         var http, httpBackend, db, q, mockStore;
 
         beforeEach(mocks.inject(function($injector) {
@@ -26,18 +26,30 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             httpBackend.expectPOST(properties.dhis.url + "/api/completeDataSetRegistrations?cd=2014-05-30T12:43:54.972Z&ds=170b8cd5e53&multiOu=true&ou=17yugc&pe=2014W01&sb=testproj_approver_l1").respond(200, "ok");
 
             var approvalService = new ApprovalService(http, db, q);
-            approvalService.markAsComplete(["170b8cd5e53"], "2014W01", "17yugc", "testproj_approver_l1");
+            approvalService.markAsComplete(["170b8cd5e53"], "2014W01", "17yugc", "testproj_approver_l1", moment().toISOString());
 
             httpBackend.flush();
 
-            expect(db.objectStore).toHaveBeenCalledWith("completeDataSets");
-            expect(mockStore.upsert).toHaveBeenCalledWith({
-                "orgUnit": "17yugc",
-                "period": "2014W01",
-                "storedBy": "testproj_approver_l1",
-                "date": "2014-05-30T12:43:54.972Z",
-                "dataSets": ["170b8cd5e53"]
-            });
+        });
+
+        it("should mark data as complete in db", function() {
+
+            var _Date = Date;
+            spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
+
+            var data = {
+                dataSets: [],
+                period: '2014W14',
+                orgUnit: 'mod2',
+                storedBy: 'dataentryuser',
+                date: moment().toISOString()
+            };
+
+            var approvalService = new ApprovalService(http, db, q);
+            approvalService.saveCompletionToDB(data);
+
+            expect(mockStore.upsert).toHaveBeenCalledWith(data);
+
         });
 
         it("should get complete datasets", function() {

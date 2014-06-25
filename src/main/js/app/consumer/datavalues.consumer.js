@@ -101,7 +101,7 @@ define(["moment", "lodash"], function(moment, _) {
                 .then(saveAllLevelOneApprovalData);
         };
         var uploadApprovalData = function(data) {
-            return approvalService.markAsComplete(data.dataSets, data.period, data.orgUnit, data.storedBy);
+            return approvalService.markAsComplete(data.dataSets, data.period, data.orgUnit, data.storedBy, data.date);
         };
 
         this.run = function(message) {
