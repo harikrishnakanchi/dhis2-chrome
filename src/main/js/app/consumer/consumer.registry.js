@@ -1,10 +1,10 @@
 define([], function() {
-    return function($hustle, $q, dataValuesConsumer) {
+    return function($hustle, $q, dispatcher) {
         var allConsumers = [];
 
         this.register = function() {
             if (allConsumers.length === 0) {
-                $q.all([$hustle.registerConsumer(dataValuesConsumer.run, "dataValues")]).then(function(data) {
+                $q.all([$hustle.registerConsumer(dispatcher.run, "dataValues")]).then(function(data) {
                     allConsumers = data;
                 });
             } else {

@@ -32,6 +32,9 @@ require.config({
         "consumers": "app/consumer/consumers",
         "consumerRegistry": "app/consumer/consumer.registry",
         "dataValuesConsumer": "app/consumer/datavalues.consumer",
+        "orgUnitConsumer": "app/consumer/orgunit.consumer",
+        "dispatcher": "app/consumer/dispatcher",
+
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
 
         //Interceptors
