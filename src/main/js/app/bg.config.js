@@ -17,6 +17,7 @@ require.config({
         "approvalService": "app/service/approval.service",
         "metadataService": "app/service/metadata.service",
         "orgUnitService": "app/service/orgUnit.service",
+        "datasetService": "app/service/dataset.service",
         "services": "app/service/bg.services",
 
         //Repositories
@@ -34,6 +35,7 @@ require.config({
         "consumerRegistry": "app/consumer/consumer.registry",
         "dataValuesConsumer": "app/consumer/datavalues.consumer",
         "orgUnitConsumer": "app/consumer/orgunit.consumer",
+        "datasetConsumer": "app/consumer/dataset.consumer",
         "dispatcher": "app/consumer/dispatcher",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",

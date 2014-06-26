@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer) {
-    return function($scope, $hustle, orgUnitService, orgUnitRepository, db, $location, $q) {
+    return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, db, $location, $q) {
         var selectedDataElements = {};
         var selectedSections = {};
         var originalDatasets;
@@ -100,16 +100,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var enrichedModules = {};
 
 
-            var saveToDhis = function(data) {
+            var saveToDhis = function(data, action) {
                 return $hustle.publish({
                     "data": data,
-                    "type": "createOrgUnit"
+                    "type": action
                 }, "dataValues");
             };
 
             var createModules = function() {
                 enrichedModules = orgUnitMapper.mapToModules(modules, parent);
-                return orgUnitRepository.save(enrichedModules).then(saveToDhis);
+                return orgUnitRepository.save(enrichedModules).then(function(data) {
+                    return saveToDhis(data, "createOrgUnit");
+                });
             };
 
             var saveSystemSettings = function() {
@@ -119,7 +121,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
             var associateDatasets = function() {
                 var datasets = orgUnitMapper.mapToDataSets(modules, parent, originalDatasets);
-                return orgUnitService.associateDataSetsToOrgUnit(datasets);
+                return dataSetRepository.upsert(datasets).then(function(data) {
+                    return saveToDhis(data, "associateDataset");
+                });
             };
 
             var onSuccess = function(data) {

@@ -19,5 +19,19 @@ define(["dataSetRepository", "angularMocks", "utils"], function(DataSetRepositor
             expect(mockStore.getAll).toHaveBeenCalled();
             expect(result).toEqual(allDataSets);
         });
+
+        it("should update data sets", function() {
+            var datasets = [{
+                "id": "DS_Physio",
+                "organisationUnits": [{
+                    "name": "Mod1",
+                    "id": "hvybNW8qEov"
+                }]
+            }];
+
+            var result = dataSetRepository.upsert(datasets);
+
+            expect(mockStore.upsert).toHaveBeenCalledWith(datasets);
+        });
     });
 });

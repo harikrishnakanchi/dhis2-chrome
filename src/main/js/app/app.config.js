@@ -51,6 +51,7 @@ require.config({
         "metadataService": "app/service/metadata.service",
         "dataService": "app/service/data.service",
         "orgUnitService": "app/service/orgUnit.service",
+        "datasetService": "app/service/dataset.service",
         "userService": "app/service/user.service",
         "approvalService": "app/service/approval.service",
 

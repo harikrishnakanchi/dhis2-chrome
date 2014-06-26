@@ -113,30 +113,6 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.flush();
         });
 
-        it("should associate organization units to datasets in dhis", function() {
-            var datasets = [{
-                "id": "DS_Physio",
-                "organisationUnits": [{
-                    "name": "Mod1",
-                    "id": "hvybNW8qEov"
-                }]
-            }];
-
-            var expectedPayload = {
-                dataSets: datasets
-            };
-
-            orgUnitService.associateDataSetsToOrgUnit(datasets).then(function(data) {
-                expect(data).toEqual("someId");
-            });
-
-            expect(db.objectStore).toHaveBeenCalledWith("dataSets");
-            expect(mockOrgStore.upsert).toHaveBeenCalledWith(datasets);
-
-            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
-            httpBackend.flush();
-        });
-
         it("should get datasets associated with org units", function() {
 
             var dataset1 = {

@@ -7,26 +7,6 @@ define(["properties", "lodash"], function(properties, _) {
             });
         };
 
-        var associateDataSetsToOrgUnit = function(payload) {
-            payload = {
-                'dataSets': payload
-            };
-
-            var saveToDb = function() {
-                var store = db.objectStore("dataSets");
-                return store.upsert(payload.dataSets);
-            };
-
-            var saveToDhis = function(data) {
-                return $http.post(properties.dhis.url + '/api/metadata', payload).then(function() {
-                    return data;
-                });
-            };
-
-            return saveToDb().then(saveToDhis);
-
-        };
-
         var getAssociatedDatasets = function(orgUnit, datasets) {
             return _.filter(datasets, {
                 'organisationUnits': [{
@@ -74,7 +54,6 @@ define(["properties", "lodash"], function(properties, _) {
 
         return {
             "create": create,
-            "associateDataSetsToOrgUnit": associateDataSetsToOrgUnit,
             "getAssociatedDatasets": getAssociatedDatasets,
             "setSystemSettings": setSystemSettings,
             "getAll": getAll,
