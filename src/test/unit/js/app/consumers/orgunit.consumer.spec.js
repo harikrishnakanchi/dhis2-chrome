@@ -26,8 +26,10 @@ define(["orgUnitConsumer"], function(OrgunitConsumer) {
 
             orgunitConsumer = new OrgunitConsumer(orgunitService);
             message = {
-                data: payload,
-                type: "createOrgUnit"
+                data: {
+                    data: payload,
+                    type: "createOrgUnit"
+                }
             };
 
         });

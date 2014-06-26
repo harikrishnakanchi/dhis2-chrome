@@ -34,7 +34,16 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
                 $scope.saveFailure = true;
             };
 
-            return orgUnitService.create([newOrgUnit]).then(onSuccess, onError);
+            var saveToDhis = function(data) {
+                return $hustle.publish({
+                    "data": data,
+                    "type": "createOrgUnit"
+                }, "dataValues");
+            };
+
+            return orgUnitRepository.save([newOrgUnit])
+                .then(saveToDhis)
+                .then(onSuccess, onError);
         };
 
         $scope.reset = function() {

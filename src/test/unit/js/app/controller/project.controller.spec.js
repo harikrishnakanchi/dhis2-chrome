@@ -23,7 +23,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     return utils.getPromise(q, {});
                 }
             };
-            orgUnitRepo = jasmine.createSpyObj({}, ['save']);
+            orgUnitRepo = {
+                'save': function() {}
+            };
 
             userService = {
                 "getAllProjectUsers": function() {
@@ -70,12 +72,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 'id': 'Id1',
                 'level': 2,
             };
-
-            spyOn(orgUnitService, 'create').and.returnValue(utils.getPromise(q, orgUnitId));
-            spyOn(location, 'hash');
-
-            scope.save(newOrgUnit, parent);
-            scope.$apply();
 
             var expectedNewOrgUnit = [{
                 id: orgUnitId,
@@ -144,13 +140,24 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 }],
             }];
 
-            expect(orgUnitService.create).toHaveBeenCalledWith(expectedNewOrgUnit);
+            spyOn(orgUnitRepo, 'save').and.returnValue(utils.getPromise(q, expectedNewOrgUnit));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(location, 'hash');
+
+            scope.save(newOrgUnit, parent);
+            scope.$apply();
+
+            expect(orgUnitRepo.save).toHaveBeenCalledWith(expectedNewOrgUnit);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: expectedNewOrgUnit,
+                type: "createOrgUnit"
+            }, "dataValues");
         });
 
         it("should display error if saving organization unit fails", function() {
             var newOrgUnit = {};
 
-            spyOn(orgUnitService, 'create').and.returnValue(utils.getRejectedPromise(q, {}));
+            spyOn(orgUnitRepo, 'save').and.returnValue(utils.getRejectedPromise(q, {}));
 
             scope.save(newOrgUnit, parent);
             scope.$apply();

@@ -34,6 +34,13 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
                 });
             });
 
+            var saveToDhis = function(data) {
+                return $hustle.publish({
+                    "data": data,
+                    "type": "createOrgUnit"
+                }, "dataValues");
+            };
+
             var onSuccess = function(data) {
                 if ($scope.$parent.closeEditForm)
                     $scope.$parent.closeEditForm($scope.orgUnit.id, "savedOpUnit");
@@ -43,7 +50,9 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
                 $scope.saveFailure = true;
             };
 
-            orgUnitService.create(newOpUnits).then(onSuccess, onError);
+            return orgUnitRepository.save(newOpUnits)
+                .then(saveToDhis)
+                .then(onSuccess, onError);
         };
 
         $scope.delete = function(index) {

@@ -5,10 +5,10 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
         var scope, timeout, q, location, orgUnitService, anchorScroll, hustle, orgUnitRepo;
 
         beforeEach(module('hustle'));
-        beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
+        beforeEach(mocks.inject(function($rootScope, $hustle, $q, $timeout, $location) {
             scope = $rootScope.$new();
             q = $q;
-            hustle = {};
+            hustle = $hustle;
             timeout = $timeout;
             location = $location;
 
@@ -22,7 +22,9 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                     return utils.getPromise(q, {});
                 }
             };
-            orgUnitRepo = jasmine.createSpyObj({}, ['save']);
+            orgUnitRepo = {
+                save: function() {}
+            };
 
             scope.isEditMode = true;
             scope.orgUnit = {
@@ -63,11 +65,6 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                 'level': '2',
             };
 
-            spyOn(orgUnitService, 'create').and.returnValue(utils.getPromise(q, {}));
-
-            scope.save(newOrgUnit, parent);
-            scope.$apply();
-
             var expectedNewOrgUnit = [{
                 'id': orgUnitId,
                 'name': newOrgUnit.name,
@@ -86,13 +83,23 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                 }]
             }];
 
-            expect(orgUnitService.create).toHaveBeenCalledWith(expectedNewOrgUnit);
+            spyOn(orgUnitRepo, 'save').and.returnValue(utils.getPromise(q, expectedNewOrgUnit));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+
+            scope.save(newOrgUnit, parent);
+            scope.$apply();
+
+            expect(orgUnitRepo.save).toHaveBeenCalledWith(expectedNewOrgUnit);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "data": expectedNewOrgUnit,
+                "type": "createOrgUnit"
+            }, 'dataValues');
         });
 
         it("should display error if saving organization unit fails", function() {
             var newOrgUnit = {};
 
-            spyOn(orgUnitService, 'create').and.returnValue(utils.getRejectedPromise(q, {}));
+            spyOn(orgUnitRepo, 'save').and.returnValue(utils.getRejectedPromise(q, {}));
 
             scope.save(newOrgUnit, parent);
             scope.$apply();

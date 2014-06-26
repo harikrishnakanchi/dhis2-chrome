@@ -2,7 +2,7 @@
 define(["opUnitController", "angularMocks", "utils"], function(OpUnitController, mocks, utils) {
     describe("op unit controller", function() {
 
-        var scope, opUnitController, projectsService, mockOrgStore, db, q, location, _Date, hustle;
+        var scope, opUnitController, orgUnitService, mockOrgStore, db, q, location, _Date, hustle, orgUnitRepo;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -12,11 +12,14 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             hustle = $hustle;
             location = $location;
 
-            projectsService = {
+            orgUnitService = {
                 "create": function() {},
                 "getAll": function() {
                     return utils.getPromise(q, {});
                 }
+            };
+            orgUnitRepo = {
+                'save': function() {}
             };
             mockOrgStore = {
                 upsert: function() {}
@@ -38,7 +41,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 return today;
             };
 
-            opUnitController = new OpUnitController(scope, hustle, projectsService, db, location);
+            opUnitController = new OpUnitController(scope, hustle, orgUnitService, orgUnitRepo, db, location);
         }));
 
         afterEach(function() {
@@ -99,13 +102,6 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 'id': 'ParentId'
             };
 
-            spyOn(location, 'hash');
-
-            spyOn(projectsService, 'create').and.returnValue(utils.getPromise(q, [opUnit1Id, opUnit2Id]));
-
-            scope.save(opUnits);
-            scope.$apply();
-
             var expectedOpUnits = [{
                 id: opUnit1Id,
                 name: opUnit1.name,
@@ -150,7 +146,19 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 }]
             }];
 
-            expect(projectsService.create).toHaveBeenCalledWith(expectedOpUnits);
+            spyOn(location, 'hash');
+
+            spyOn(orgUnitRepo, 'save').and.returnValue(utils.getPromise(q, expectedOpUnits));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+
+            scope.save(opUnits);
+            scope.$apply();
+
+            expect(orgUnitRepo.save).toHaveBeenCalledWith(expectedOpUnits);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: expectedOpUnits,
+                type: "createOrgUnit"
+            }, "dataValues");
         });
 
         it("should set operation unit for view", function() {
@@ -170,7 +178,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             };
             scope.isEditMode = false;
 
-            opUnitController = new OpUnitController(scope, hustle, projectsService, db, location);
+            opUnitController = new OpUnitController(scope, hustle, orgUnitService, orgUnitRepo, db, location);
 
             scope.$apply();
             expect(scope.opUnits[0].name).toEqual('opUnit1');

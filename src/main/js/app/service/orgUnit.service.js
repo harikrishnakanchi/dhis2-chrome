@@ -2,20 +2,9 @@ define(["properties", "lodash"], function(properties, _) {
     return function($http, db) {
 
         var create = function(orgUnitRequest) {
-            var saveToDb = function() {
-                var store = db.objectStore("organisationUnits");
-                return store.upsert(orgUnitRequest);
-            };
-
-            var saveToDhis = function(data) {
-                return $http.post(properties.dhis.url + '/api/metadata', {
-                    'organisationUnits': orgUnitRequest
-                }).then(function() {
-                    return data;
-                });
-            };
-
-            return saveToDb().then(saveToDhis);
+            return $http.post(properties.dhis.url + '/api/metadata', {
+                'organisationUnits': orgUnitRequest
+            });
         };
 
         var associateDataSetsToOrgUnit = function(payload) {

@@ -98,9 +98,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.save = function(modules) {
             var parent = $scope.orgUnit;
             var enrichedModules = {};
+
+
+            var saveToDhis = function(data) {
+                return $hustle.publish({
+                    "data": data,
+                    "type": "createOrgUnit"
+                }, "dataValues");
+            };
+
             var createModules = function() {
                 enrichedModules = orgUnitMapper.mapToModules(modules, parent);
-                return orgUnitService.create(enrichedModules);
+                return orgUnitRepository.save(enrichedModules).then(saveToDhis);
             };
 
             var saveSystemSettings = function() {

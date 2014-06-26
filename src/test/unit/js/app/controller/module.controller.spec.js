@@ -23,7 +23,9 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                 }
             };
 
-            orgUnitRepo = jasmine.createSpyObj({}, ['save']);
+            orgUnitRepo = {
+                'save': function() {}
+            };
 
             mockOrgStore = {
                 upsert: function() {},
@@ -134,7 +136,30 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                 shortName: 'Module1',
             }];
 
-            spyOn(orgUnitService, "create").and.returnValue(utils.getPromise(q, {}));
+            var enrichedModules =
+                [{
+                name: 'Module1',
+                shortName: 'Module1',
+                id: 'f21423b161d',
+                level: NaN,
+                openingDate: '2014-04-01',
+                selectedDataset: undefined,
+                selectedSections: undefined,
+                selectedDataElements: undefined,
+                attributeValues: [{
+                    attribute: {
+                        id: 'a1fa2777924'
+                    },
+                    value: 'Module'
+                }],
+                parent: {
+                    name: 'Project1',
+                    id: 'someid'
+                }
+            }];
+
+            spyOn(orgUnitRepo, "save").and.returnValue(utils.getPromise(q, enrichedModules));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitService, "associateDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitService, "setSystemSettings").and.returnValue(utils.getPromise(q, {}));
 
@@ -143,7 +168,11 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             scope.$apply();
 
             expect(scope.saveFailure).toBe(false);
-            expect(orgUnitService.create).toHaveBeenCalled();
+            expect(orgUnitRepo.save).toHaveBeenCalledWith(enrichedModules);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: enrichedModules,
+                type: "createOrgUnit"
+            }, "dataValues");
             expect(orgUnitService.associateDataSetsToOrgUnit).toHaveBeenCalled();
             expect(orgUnitService.setSystemSettings).toHaveBeenCalled();
         });

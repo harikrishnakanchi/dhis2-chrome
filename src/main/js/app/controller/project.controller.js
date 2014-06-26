@@ -52,7 +52,17 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             };
 
             var dhisProject = new Array(orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit));
-            return orgUnitService.create(dhisProject).then(onSuccess, onError);
+
+            var saveToDhis = function(data) {
+                return $hustle.publish({
+                    "data": data,
+                    "type": "createOrgUnit"
+                }, "dataValues");
+            };
+
+            return orgUnitRepository.save(dhisProject)
+                .then(saveToDhis)
+                .then(onSuccess, onError);
         };
 
         $scope.toggleUserDisabledState = function(user) {

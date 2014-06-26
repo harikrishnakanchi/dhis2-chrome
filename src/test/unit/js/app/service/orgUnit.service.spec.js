@@ -1,5 +1,5 @@
 define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUnitService, mocks, properties, utils) {
-    describe("projects controller", function() {
+    describe("org unit service", function() {
         var http, httpBackend, projectService, db, mockOrgStore, q;
 
         beforeEach(mocks.inject(function($httpBackend, $http, $q) {
@@ -39,12 +39,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
                 }]
             };
 
-            orgUnitService.create(orgUnit).then(function(data) {
-                expect(data).toEqual("someId");
-            });
-
-            expect(db.objectStore).toHaveBeenCalledWith("organisationUnits");
-            expect(mockOrgStore.upsert).toHaveBeenCalledWith(orgUnit);
+            orgUnitService.create(orgUnit);
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();
@@ -114,8 +109,6 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
 
             orgUnitService.create(payload);
 
-            expect(db.objectStore).toHaveBeenCalledWith("organisationUnits");
-            expect(mockOrgStore.upsert).toHaveBeenCalledWith(payload);
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
