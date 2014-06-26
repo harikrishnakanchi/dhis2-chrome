@@ -2,12 +2,14 @@
 define(["opUnitController", "angularMocks", "utils"], function(OpUnitController, mocks, utils) {
     describe("op unit controller", function() {
 
-        var scope, opUnitController, projectsService, mockOrgStore, db, q, location, _Date;
+        var scope, opUnitController, projectsService, mockOrgStore, db, q, location, _Date, hustle;
 
-        beforeEach(mocks.inject(function($rootScope, $q, $location) {
+        beforeEach(module('hustle'));
+        beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
             scope = $rootScope.$new();
             scope.isEditMode = true;
             q = $q;
+            hustle = $hustle;
             location = $location;
 
             projectsService = {
@@ -36,7 +38,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 return today;
             };
 
-            opUnitController = new OpUnitController(scope, projectsService, db, location);
+            opUnitController = new OpUnitController(scope, hustle, projectsService, db, location);
         }));
 
         afterEach(function() {
@@ -168,7 +170,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             };
             scope.isEditMode = false;
 
-            opUnitController = new OpUnitController(scope, projectsService, db, location);
+            opUnitController = new OpUnitController(scope, hustle, projectsService, db, location);
 
             scope.$apply();
             expect(scope.opUnits[0].name).toEqual('opUnit1');

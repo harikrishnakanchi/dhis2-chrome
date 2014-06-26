@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, orgUnitMapper, toTree, properties) {
 
-    return function($scope, orgUnitService, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userService, $modal) {
+    return function($scope, $hustle, orgUnitService, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userService, $modal) {
 
         $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded', 'Coordination', 'Remote Control'].sort();
 

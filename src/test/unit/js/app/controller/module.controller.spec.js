@@ -3,11 +3,13 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
     describe("module controller", function() {
 
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
-            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo;
+            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, hustle;
 
-        beforeEach(mocks.inject(function($rootScope, $q, $location) {
+        beforeEach(module('hustle'));
+        beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
             scope = $rootScope.$new();
             q = $q;
+            hustle = $hustle;
             location = $location;
 
             orgUnitService = {
@@ -76,7 +78,7 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                     return dataElements;
                 return getMockStore(testData.get(storeName));
             });
-            moduleController = new ModuleController(scope, orgUnitService, orgUnitRepo, db, location, q);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, db, location, q);
         }));
 
         afterEach(function() {
@@ -264,7 +266,7 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
 
             spyOn(orgUnitService, "getAssociatedDatasets").and.returnValue(dataSets);
             spyOn(orgUnitService, "getSystemSettings").and.returnValue(utils.getPromise(q, systemSettings));
-            moduleController = new ModuleController(scope, orgUnitService, orgUnitRepo, db, location, q);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, db, location, q);
             scope.$apply();
 
             expect(scope.modules[0].name).toEqual("Mod2");

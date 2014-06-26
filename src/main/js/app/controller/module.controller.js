@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer) {
-    return function($scope, orgUnitService, orgUnitRepository, db, $location, $q) {
+    return function($scope, $hustle, orgUnitService, orgUnitRepository, db, $location, $q) {
         var selectedDataElements = {};
         var selectedSections = {};
         var originalDatasets;

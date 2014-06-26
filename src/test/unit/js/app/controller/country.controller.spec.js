@@ -2,11 +2,13 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
 
     describe("contry controller", function() {
 
-        var scope, timeout, q, location, orgUnitService, anchorScroll;
+        var scope, timeout, q, location, orgUnitService, anchorScroll, hustle, orgUnitRepo;
 
+        beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
             scope = $rootScope.$new();
             q = $q;
+            hustle = {};
             timeout = $timeout;
             location = $location;
 
@@ -20,6 +22,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                     return utils.getPromise(q, {});
                 }
             };
+            orgUnitRepo = jasmine.createSpyObj({}, ['save']);
 
             scope.isEditMode = true;
             scope.orgUnit = {
@@ -27,17 +30,17 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             };
 
             anchorScroll = jasmine.createSpy();
-            countryController = new CountryController(scope, orgUnitService, q, location, timeout, anchorScroll);
+            countryController = new CountryController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll);
         }));
 
         it("should open the opening date datepicker", function() {
+
             var event = {
                 preventDefault: function() {},
                 stopPropagation: function() {}
             };
             spyOn(event, 'preventDefault');
             spyOn(event, 'stopPropagation');
-
 
             scope.openOpeningDate(event);
 
@@ -112,7 +115,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             scope.isEditMode = false;
             scope.$apply();
 
-            countryController = new CountryController(scope, orgUnitService, q, location, timeout, anchorScroll);
+            countryController = new CountryController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });
