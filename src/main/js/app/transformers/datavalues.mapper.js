@@ -1,19 +1,23 @@
 define(["moment"], function(moment) {
-    var mapToDomain = function(dataValues, period, orgUnit, storedBy) {
-        var resultValues = _.flatten(_.map(dataValues, function(values, dataElement) {
-            return _.map(values, function(dataValue, categoryOptionComboId) {
-                return {
-                    "dataElement": dataElement,
-                    "period": period,
-                    "orgUnit": orgUnit,
-                    "storedBy": storedBy,
-                    "categoryOptionCombo": categoryOptionComboId,
-                    "formula": dataValue.formula,
-                    "value": dataValue.value,
-                    "lastUpdated": new Date().toISOString()
-                };
+    var mapToDomain = function(dataValueSets, period, orgUnit, storedBy) {
+        var dataValues = _.map(dataValueSets, function(dataValues, dataSet) {
+            return _.map(dataValues, function(values, dataElement) {
+                return _.map(values, function(dataValue, categoryOptionComboId) {
+                    return {
+                        "dataElement": dataElement,
+                        "period": period,
+                        "dataset": dataSet,
+                        "orgUnit": orgUnit,
+                        "storedBy": storedBy,
+                        "categoryOptionCombo": categoryOptionComboId,
+                        "formula": dataValue.formula,
+                        "value": dataValue.value,
+                        "lastUpdated": new Date().toISOString()
+                    };
+                });
             });
-        }), true);
+        });
+        var resultValues = _.flatten(dataValues, false);
         var nonEmptyValues = _.filter(resultValues, function(de) {
             return de.value !== "";
         });
@@ -23,14 +27,18 @@ define(["moment"], function(moment) {
     };
 
     var mapToView = function(data) {
-        return _.reduce(data.dataValues, function(dataValues, v) {
-            dataValues[v.dataElement] = dataValues[v.dataElement] || {};
-            dataValues[v.dataElement][v.categoryOptionCombo] = {
-                formula: v.formula || v.value,
-                value: v.value
-            };
-            return dataValues;
-        }, {});
+        var dataGroupedByDataSet = _.groupBy(data.dataValues, 'dataset');
+        return _.mapValues(dataGroupedByDataSet, function(dataValues) {
+            var dataValuesGroupedByElement = _.groupBy(dataValues, 'dataElement');
+            return _.mapValues(dataValuesGroupedByElement, function(values) {
+                return _.transform(values, function(acc, v) {
+                    acc[v.categoryOptionCombo] = {
+                        formula: v.formula || v.value,
+                        value: v.value
+                    };
+                }, {});
+            });
+        });
     };
 
     return {

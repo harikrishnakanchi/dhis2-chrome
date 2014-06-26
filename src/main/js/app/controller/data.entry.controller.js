@@ -4,18 +4,18 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         var dataSets, systemSettings;
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
-        $scope.evaluateExpression = function(elementId, option) {
-            if (!$scope.validDataValuePattern.test($scope.dataValues[elementId][option].value))
+        $scope.evaluateExpression = function(dataSetId, elementId, option) {
+            if (!$scope.validDataValuePattern.test($scope.dataValues[dataSetId][elementId][option].value))
                 return;
-            var cellValue = $scope.dataValues[elementId][option].value;
-            $scope.dataValues[elementId][option].formula = cellValue;
-            $scope.dataValues[elementId][option].value = calculateSum(cellValue);
+            var cellValue = $scope.dataValues[dataSetId][elementId][option].value;
+            $scope.dataValues[dataSetId][elementId][option].formula = cellValue;
+            $scope.dataValues[dataSetId][elementId][option].value = calculateSum(cellValue);
         };
 
-        $scope.restoreExpression = function(elementId, option) {
-            if (!$scope.validDataValuePattern.test($scope.dataValues[elementId][option].value))
+        $scope.restoreExpression = function(dataSetId, elementId, option) {
+            if (!$scope.validDataValuePattern.test($scope.dataValues[dataSetId][elementId][option].value))
                 return;
-            $scope.dataValues[elementId][option].value = $scope.dataValues[elementId][option].formula;
+            $scope.dataValues[dataSetId][elementId][option].value = $scope.dataValues[dataSetId][elementId][option].formula;
         };
 
         $scope.getDataSetName = function(id) {
@@ -24,14 +24,15 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             }).name;
         };
 
-        $scope.safeGet = function(dataValues, id, option) {
-            dataValues[id] = dataValues[id] || {};
+        $scope.safeGet = function(dataSetId, dataValues, id, option) {
+            dataValues[dataSetId] = dataValues[dataSetId] || {};
+            dataValues[dataSetId][id] = dataValues[dataSetId][id] || {};
 
-            dataValues[id][option] = dataValues[id][option] || {
+            dataValues[dataSetId][id][option] = dataValues[dataSetId][id][option] || {
                 'formula': '',
                 'value': ''
             };
-            return dataValues[id][option];
+            return dataValues[dataSetId][id][option];
         };
 
         $scope.printWindow = function() {

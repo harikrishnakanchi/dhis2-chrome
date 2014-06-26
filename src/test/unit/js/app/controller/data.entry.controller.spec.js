@@ -268,16 +268,18 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it("should evaluate expression on blur", function() {
             scope.dataValues = {
-                "blah": {
-                    "some": {
-                        "value": "1+9"
+                "abc": {
+                    "blah": {
+                        "some": {
+                            "value": "1+9"
+                        }
                     }
                 }
             };
 
-            scope.evaluateExpression("blah", "some");
+            scope.evaluateExpression("abc", "blah", "some");
 
-            expect(scope.dataValues.blah.some.value).toEqual(10);
+            expect(scope.dataValues.abc.blah.some.value).toEqual(10);
         });
 
         it("should group sections based on datasets", function() {
@@ -437,13 +439,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it("safe get dataValues should initialize data value and option if not present", function() {
             var dataValues = {};
-            var result = scope.safeGet(dataValues, "blah", "someOption");
+            var result = scope.safeGet("abc", dataValues, "blah", "someOption");
 
             expect(dataValues).toEqual({
-                blah: {
-                    someOption: {
-                        formula: '',
-                        value: ''
+                abc: {
+                    blah: {
+                        someOption: {
+                            formula: '',
+                            value: ''
+                        }
                     }
                 }
             });
@@ -455,19 +459,23 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it("safe get dataValues should return if already present", function() {
             var dataValues = {
-                "blah": {
-                    "someOption": "test"
+                "abc": {
+                    "blah": {
+                        "someOption": "test"
+                    }
                 }
             };
 
-            var result = scope.safeGet(dataValues, "blah", "someOption");
+            var result = scope.safeGet("abc", dataValues, "blah", "someOption");
 
             expect(dataValues).toEqual({
-                blah: {
-                    someOption: 'test'
+                abc: {
+                    blah: {
+                        someOption: 'test'
+                    }
                 }
             });
-            expect(result).toEqual(dataValues.blah.someOption);
+            expect(result).toEqual(dataValues.abc.blah.someOption);
         });
 
         it("should fetch data only if period is defined", function() {
@@ -514,11 +522,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 "dataValues": [{
                     "dataElement": "DE_Oedema",
                     "categoryOptionCombo": "32",
-                    "value": "3"
+                    "value": "3",
+                    "dataset": "abbc"
                 }, {
                     "dataElement": "DE_Oedema",
                     "categoryOptionCombo": "33",
-                    "value": "12"
+                    "value": "12",
+                    "dataset": "abbc"
                 }],
                 "blah": "some"
             }));
@@ -527,14 +537,16 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             expect(dataRepository.getDataValues).toHaveBeenCalledWith("2014W14", "mod2");
             expect(scope.dataValues).toEqual({
-                DE_Oedema: {
-                    32: {
-                        formula: '3',
-                        value: '3'
-                    },
-                    33: {
-                        formula: '12',
-                        value: '12'
+                abbc: {
+                    DE_Oedema: {
+                        32: {
+                            formula: '3',
+                            value: '3'
+                        },
+                        33: {
+                            formula: '12',
+                            value: '12'
+                        }
                     }
                 }
             });

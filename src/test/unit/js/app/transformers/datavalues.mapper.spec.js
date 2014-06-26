@@ -5,27 +5,29 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
         beforeEach(mocks.inject(function($injector, $q) {
             q = $q;
             viewModel = {
-                "DE_Oedema": {
-                    "32": {
-                        "value": 3,
-                        "formula": "1+2"
+                123: {
+                    DE_Oedema: {
+                        32: {
+                            formula: '1+2',
+                            value: 3
+                        },
+                        33: {
+                            formula: '12',
+                            value: 12
+                        }
                     },
-                    "33": {
-                        "value": 12,
-                        "formula": "12"
-                    },
-                },
-                "DE_MLT115": {
-                    "32": {
-                        "value": 49,
-                        "formula": "49"
-                    },
-                    "37": {
-                        "value": 67,
-                        "formula": "67"
+                    DE_MLT115: {
+                        32: {
+                            formula: '49',
+                            value: 49
+                        },
+                        37: {
+                            formula: '67',
+                            value: 67
+                        }
                     }
                 }
-            };
+            }
             var _Date = Date;
             var today = new _Date();
             spyOn(window, 'Date').and.returnValue(today);
@@ -40,7 +42,8 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                     "storedBy": "user",
                     "formula": "1+2",
                     "value": 3,
-                    "lastUpdated": today.toISOString()
+                    "lastUpdated": today.toISOString(),
+                    "dataset": "123"
                 }, {
                     "dataElement": "DE_Oedema",
                     "categoryOptionCombo": "33",
@@ -49,7 +52,8 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                     "storedBy": "user",
                     "formula": "12",
                     "value": 12,
-                    "lastUpdated": today.toISOString()
+                    "lastUpdated": today.toISOString(),
+                    "dataset": "123"
                 }, {
                     "dataElement": "DE_MLT115",
                     "categoryOptionCombo": "32",
@@ -58,7 +62,8 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                     "storedBy": "user",
                     "formula": "49",
                     "value": 49,
-                    "lastUpdated": today.toISOString()
+                    "lastUpdated": today.toISOString(),
+                    "dataset": "123"
                 }, {
                     "dataElement": "DE_MLT115",
                     "categoryOptionCombo": "37",
@@ -67,7 +72,8 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                     "storedBy": "user",
                     "formula": "67",
                     "value": 67,
-                    "lastUpdated": today.toISOString()
+                    "lastUpdated": today.toISOString(),
+                    "dataset": "123"
                 }]
             };
         }));
@@ -84,10 +90,12 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
 
         it("should filter out empty values when converting view to domain", function() {
             _.merge(viewModel, {
-                "DE_Podimas": {
-                    "33": {
-                        "formula": "",
-                        "value": ""
+                "123": {
+                    "DE_Podimas": {
+                        "33": {
+                            "formula": "",
+                            "value": ""
+                        }
                     }
                 }
             });
