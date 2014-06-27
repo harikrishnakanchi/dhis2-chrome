@@ -1,12 +1,12 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer) {
-    return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, db, $location, $q) {
+    return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, systemSettingRepository, db, $location, $q) {
         var selectedDataElements = {};
         var selectedSections = {};
-        var originalDatasets;
         var allSections = [];
 
         $scope.isopen = {};
         $scope.modules = [];
+        $scope.originalDatasets = [];
         $scope.isExpanded = [];
 
         var init = function() {
@@ -17,7 +17,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var dataElementsPromise = getAll("dataElements");
 
             var setUpData = function(data) {
-                originalDatasets = data[0];
+                $scope.originalDatasets = data[0];
                 allSections = data[1];
                 $scope.allDatasets = datasetTransformer.enrichDatasets(data);
             };
@@ -95,48 +95,55 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
         };
 
-        $scope.save = function(modules) {
+        var publishMessage = function(data, action) {
+            return $hustle.publish({
+                "data": data,
+                "type": action
+            }, "dataValues");
+        };
+
+        $scope.createModules = function(modules) {
             var parent = $scope.orgUnit;
+            var enrichedModules = orgUnitMapper.mapToModules(modules, parent);
+            return $q.all(orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "createOrgUnit")).then(function() {
+                return enrichedModules;
+            });
+        };
+
+        $scope.excludeDataElements = function(enrichedModules) {
+            var parent = $scope.orgUnit;
+            var systemSettings = systemSettingsTransformer.constructSystemSettings(enrichedModules, parent);
+            var payload = {
+                projectId: parent.id,
+                settings: systemSettings
+            };
+            return $q.all(systemSettingRepository.upsert(payload), publishMessage(payload, "excludeDataElements")).then(function() {
+                return enrichedModules;
+            });
+        };
+
+        $scope.associateDatasets = function(enrichedModules) {
+            var parent = $scope.orgUnit;
+            var datasets = orgUnitMapper.mapToDataSets(enrichedModules, parent, $scope.originalDatasets);
+            return $q.all(dataSetRepository.upsert(datasets), publishMessage(datasets, "associateDataset")).then(function() {
+                return enrichedModules;
+            });
+        };
+
+        $scope.onSuccess = function(data) {
+            $scope.saveFailure = false;
+            if ($scope.$parent.closeEditForm)
+                $scope.$parent.closeEditForm($scope.orgUnit.id, "savedModule");
+        };
+
+        $scope.onError = function(data) {
+            $scope.saveFailure = true;
+        };
+
+
+        $scope.save = function(modules) {
             var enrichedModules = {};
-
-
-            var saveToDhis = function(data, action) {
-                return $hustle.publish({
-                    "data": data,
-                    "type": action
-                }, "dataValues");
-            };
-
-            var createModules = function() {
-                enrichedModules = orgUnitMapper.mapToModules(modules, parent);
-                return orgUnitRepository.save(enrichedModules).then(function(data) {
-                    return saveToDhis(data, "createOrgUnit");
-                });
-            };
-
-            var saveSystemSettings = function() {
-                var systemSettings = systemSettingsTransformer.constructSystemSettings(enrichedModules, parent);
-                return orgUnitService.setSystemSettings(parent.id, systemSettings);
-            };
-
-            var associateDatasets = function() {
-                var datasets = orgUnitMapper.mapToDataSets(modules, parent, originalDatasets);
-                return dataSetRepository.upsert(datasets).then(function(data) {
-                    return saveToDhis(data, "associateDataset");
-                });
-            };
-
-            var onSuccess = function(data) {
-                $scope.saveFailure = false;
-                if ($scope.$parent.closeEditForm)
-                    $scope.$parent.closeEditForm($scope.orgUnit.id, "savedModule");
-            };
-
-            var onError = function(data) {
-                $scope.saveFailure = true;
-            };
-
-            createModules().then(associateDatasets).then(saveSystemSettings).then(onSuccess, onError);
+            $scope.createModules(modules).then($scope.associateDatasets).then($scope.excludeDataElements).then($scope.onSuccess, $scope.onError);
         };
 
         $scope.delete = function(index) {

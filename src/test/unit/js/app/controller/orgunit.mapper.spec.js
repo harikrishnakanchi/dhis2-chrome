@@ -208,6 +208,13 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
             expect(actualModules).toEqual([{
                 name: 'Module1',
+                datasets: [{
+                    'id': 'ds_11',
+                    'name': 'dataset11',
+                }, {
+                    'id': 'ds_12',
+                    'name': 'dataset12'
+                }],
                 shortName: 'Module1',
                 id: '8110fbcb2a4',
                 level: 4,
@@ -227,6 +234,13 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }
             }, {
                 name: 'Module2',
+                datasets: [{
+                    'id': 'ds_21',
+                    'name': 'dataset21',
+                }, {
+                    'id': 'ds_22',
+                    'name': 'dataset22'
+                }],
                 shortName: 'Module2',
                 id: 'c59e050c2a8',
                 level: 4,

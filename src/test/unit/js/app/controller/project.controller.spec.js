@@ -23,9 +23,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     return utils.getPromise(q, {});
                 }
             };
-            orgUnitRepo = {
-                'save': function() {}
-            };
+            orgUnitRepo = utils.getMockRepo(q);
 
             userService = {
                 "getAllProjectUsers": function() {
@@ -140,14 +138,13 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 }],
             }];
 
-            spyOn(orgUnitRepo, 'save').and.returnValue(utils.getPromise(q, expectedNewOrgUnit));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
 
             scope.save(newOrgUnit, parent);
             scope.$apply();
 
-            expect(orgUnitRepo.save).toHaveBeenCalledWith(expectedNewOrgUnit);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: expectedNewOrgUnit,
                 type: "createOrgUnit"
@@ -157,7 +154,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
         it("should display error if saving organization unit fails", function() {
             var newOrgUnit = {};
 
-            spyOn(orgUnitRepo, 'save').and.returnValue(utils.getRejectedPromise(q, {}));
 
             scope.save(newOrgUnit, parent);
             scope.$apply();

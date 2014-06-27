@@ -1,15 +1,16 @@
 define(["dispatcher", "angularMocks"], function(Dispatcher, mocks) {
     describe("dispatcher", function() {
-        var dataValuesConsumer, dispatcher, message, q, scope;
+        var dataValuesConsumer, dispatcher, message, q, scope, systemSettingConsumer;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             dataValuesConsumer = jasmine.createSpyObj({}, ['run']);
             orgUnitConsumer = jasmine.createSpyObj({}, ['run']);
             datasetConsumer = jasmine.createSpyObj({}, ['run']);
+            systemSettingConsumer= jasmine.createSpyObj({}, ['run']);
             message = {};
             q = $q;
             scope = $rootScope.$new();
-            dispatcher = new Dispatcher(q, dataValuesConsumer, orgUnitConsumer, datasetConsumer);
+            dispatcher = new Dispatcher(q, dataValuesConsumer, orgUnitConsumer, datasetConsumer, systemSettingConsumer);
         }));
 
         it("should call data values consumer for uploading data values", function() {
@@ -64,6 +65,15 @@ define(["dispatcher", "angularMocks"], function(Dispatcher, mocks) {
             };
             dispatcher.run(message);
             expect(datasetConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call system setting consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "excludeDataElements"
+            };
+            dispatcher.run(message);
+            expect(systemSettingConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should fail if no hanlder found of payload type", function() {

@@ -50,7 +50,7 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
                 $scope.saveFailure = true;
             };
 
-            return orgUnitRepository.save(newOpUnits)
+            return orgUnitRepository.upsert(newOpUnits)
                 .then(saveToDhis)
                 .then(onSuccess, onError);
         };

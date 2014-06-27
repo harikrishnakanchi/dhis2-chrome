@@ -60,7 +60,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
                 }, "dataValues");
             };
 
-            return orgUnitRepository.save(dhisProject)
+            return orgUnitRepository.upsert(dhisProject)
                 .then(saveToDhis)
                 .then(onSuccess, onError);
         };

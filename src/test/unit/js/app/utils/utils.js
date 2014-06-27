@@ -33,9 +33,18 @@ define([], function() {
         };
     };
 
+    var getMockRepo = function(q) {
+        return {
+            upsert: jasmine.createSpy("upsert").and.callFake(function(data) {
+                return getPromise(q, data);
+            })
+        };
+    };
+
     return {
         'getPromise': getPromise,
         'getRejectedPromise': getRejectedPromise,
-        'getMockDB': getMockDB
+        'getMockDB': getMockDB,
+        'getMockRepo': getMockRepo
     };
 });

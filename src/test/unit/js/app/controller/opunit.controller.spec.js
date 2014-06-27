@@ -18,9 +18,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                     return utils.getPromise(q, {});
                 }
             };
-            orgUnitRepo = {
-                'save': function() {}
-            };
+            orgUnitRepo = utils.getMockRepo(q);
             mockOrgStore = {
                 upsert: function() {}
             };
@@ -148,13 +146,12 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
 
             spyOn(location, 'hash');
 
-            spyOn(orgUnitRepo, 'save').and.returnValue(utils.getPromise(q, expectedOpUnits));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
             scope.save(opUnits);
             scope.$apply();
 
-            expect(orgUnitRepo.save).toHaveBeenCalledWith(expectedOpUnits);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnits);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: expectedOpUnits,
                 type: "createOrgUnit"

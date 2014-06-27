@@ -119,6 +119,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
                 level: parseInt(moduleParent.level) + 1,
                 openingDate: moment().format("YYYY-MM-DD"),
                 selectedDataset: module.selectedDataset,
+                datasets: module.datasets,
                 selectedSections: module.selectedSections,
                 selectedDataElements: module.selectedDataElements,
                 attributeValues: [{

@@ -1,4 +1,4 @@
-define(["consumers", "dataValuesConsumer", "orgUnitConsumer", "dispatcher", "consumerRegistry", "datasetConsumer"], function(consumers, dataValuesConsumer, orgUnitConsumer, dispatcher, consumerRegistry, datasetConsumer) {
+define(["consumers", "dataValuesConsumer", "orgUnitConsumer", "dispatcher", "consumerRegistry", "datasetConsumer", "systemSettingConsumer"], function(consumers, dataValuesConsumer, orgUnitConsumer, dispatcher, consumerRegistry, datasetConsumer, systemSettingConsumer) {
     describe("consumers", function() {
         var app;
         beforeEach(function() {
@@ -11,7 +11,8 @@ define(["consumers", "dataValuesConsumer", "orgUnitConsumer", "dispatcher", "con
             expect(app.service).toHaveBeenCalledWith("dataValuesConsumer", ["dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "$q", "approvalService", dataValuesConsumer]);
             expect(app.service).toHaveBeenCalledWith("orgUnitConsumer", ["orgUnitService", orgUnitConsumer]);
             expect(app.service).toHaveBeenCalledWith("datasetConsumer", ["datasetService", datasetConsumer]);
-            expect(app.service).toHaveBeenCalledWith("dispatcher", ["$q", "dataValuesConsumer", "orgUnitConsumer", "datasetConsumer", dispatcher]);
+            expect(app.service).toHaveBeenCalledWith("systemSettingConsumer", ["systemSettingService", systemSettingConsumer]);
+            expect(app.service).toHaveBeenCalledWith("dispatcher", ["$q", "dataValuesConsumer", "orgUnitConsumer", "datasetConsumer", "systemSettingConsumer", dispatcher]);
             expect(app.service).toHaveBeenCalledWith("consumerRegistry", ["$hustle", "$q", "dispatcher", consumerRegistry]);
         });
     });

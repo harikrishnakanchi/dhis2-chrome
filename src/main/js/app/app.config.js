@@ -52,6 +52,7 @@ require.config({
         "dataService": "app/service/data.service",
         "orgUnitService": "app/service/orgUnit.service",
         "datasetService": "app/service/dataset.service",
+        "systemSettingService": "app/service/system.setting.service",
         "userService": "app/service/user.service",
         "approvalService": "app/service/approval.service",
 
@@ -59,6 +60,7 @@ require.config({
         "repositories": "app/repository/repositories",
         "dataRepository": "app/repository/data.repository",
         "dataSetRepository": "app/repository/dataset.repository",
+        "systemSettingRepository": "app/repository/system.setting.repository",
         "userPreferenceRepository": "app/repository/userpreference.repository",
         "orgUnitRepository": "app/repository/orgunit.repository",
 

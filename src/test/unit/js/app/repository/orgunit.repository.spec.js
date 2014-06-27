@@ -24,7 +24,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 "level": 1
             }];
 
-            orgUnitRepository.save(orgUnit).then(function(data) {
+            orgUnitRepository.upsert(orgUnit).then(function(data) {
                 expect(data).toEqual(orgUnit);
             });
 

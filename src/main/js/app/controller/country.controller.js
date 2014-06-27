@@ -41,7 +41,7 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
                 }, "dataValues");
             };
 
-            return orgUnitRepository.save([newOrgUnit])
+            return orgUnitRepository.upsert([newOrgUnit])
                 .then(saveToDhis)
                 .then(onSuccess, onError);
         };

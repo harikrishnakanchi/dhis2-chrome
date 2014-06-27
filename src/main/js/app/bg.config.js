@@ -18,6 +18,7 @@ require.config({
         "metadataService": "app/service/metadata.service",
         "orgUnitService": "app/service/orgUnit.service",
         "datasetService": "app/service/dataset.service",
+        "systemSettingService": "app/service/system.setting.service",
         "services": "app/service/bg.services",
 
         //Repositories
@@ -36,6 +37,7 @@ require.config({
         "dataValuesConsumer": "app/consumer/datavalues.consumer",
         "orgUnitConsumer": "app/consumer/orgunit.consumer",
         "datasetConsumer": "app/consumer/dataset.consumer",
+        "systemSettingConsumer": "app/consumer/system.setting.consumer",
         "dispatcher": "app/consumer/dispatcher",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",

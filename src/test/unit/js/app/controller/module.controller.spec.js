@@ -1,43 +1,42 @@
 /*global Date:true*/
+
+
 define(["moduleController", "angularMocks", "utils", "testData"], function(ModuleController, mocks, utils, testData) {
     describe("module controller", function() {
 
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
-            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, hustle, dataSetRepo;
+            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, hustle, dataSetRepo, systemSettingRepo;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
             scope = $rootScope.$new();
             q = $q;
             hustle = $hustle;
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+
             location = $location;
 
             orgUnitService = {
-                "create": function() {},
                 "getAssociatedDatasets": function() {},
-                "associateDataSetsToOrgUnit": function() {},
-                "setSystemSettings": function() {},
                 "getSystemSettings": function() {},
                 "getAll": function() {
                     return utils.getPromise(q, {});
                 }
             };
 
-            orgUnitRepo = {
-                'save': function() {}
-            };
-
-            dataSetRepo = {
-                'upsert': function() {}
-            };
+            orgUnitRepo = utils.getMockRepo(q);
+            dataSetRepo = utils.getMockRepo(q);
+            systemSettingRepo = utils.getMockRepo(q);
 
             mockOrgStore = {
                 upsert: function() {},
                 getAll: function() {}
             };
+
             db = {
                 objectStore: function() {}
             };
+
             scope.orgUnit = {
                 id: "blah"
             };
@@ -84,12 +83,13 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                     return dataElements;
                 return getMockStore(testData.get(storeName));
             });
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, db, location, q);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
         }));
 
         afterEach(function() {
             Date = _Date;
         });
+
 
         it('should filter in new data models when adding new modules', function() {
             scope.$apply();
@@ -119,7 +119,58 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             expect(scope.modules[2].name).toEqual('Module4');
         });
 
-        it("should save the modules and the associated datasets", function() {
+
+        it('should exclude data elements', function() {
+
+            var projectId = 1;
+
+            var modules = [{
+                name: "test1",
+                id: projectId,
+                selectedDataElements: {
+                    "123456": true,
+                    "123457": false,
+                    "123458": true,
+                    "123459": true,
+                    "123452": false,
+                    "123450": true,
+                    "123451": true,
+                }
+            }];
+
+            scope.orgUnit = {
+                name: "test1",
+                id: projectId
+            };
+
+            var expectedSystemSettings = {
+                "excludedDataElements": {
+                    "1": ["123452", "123457"]
+                }
+            };
+
+            var expectedPayload = {
+                projectId: projectId,
+                settings: expectedSystemSettings
+            };
+
+            var expectedHustleMessage = {
+                data: expectedPayload,
+                type: "excludeDataElements"
+            };
+
+            spyOn(scope, "createModules").and.returnValue(utils.getPromise(q, modules));
+            spyOn(scope, "associateDatasets").and.returnValue(utils.getPromise(q, modules));
+
+            scope.save(modules);
+            scope.$apply();
+
+            expect(scope.saveFailure).toBe(false);
+            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedPayload);
+            expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
+        });
+
+        it("should create module", function() {
             scope.orgUnit = {
                 "name": "Project1",
                 "id": "someid"
@@ -140,6 +191,10 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             var enrichedModules =
                 [{
                 name: 'Module1',
+                datasets: [{
+                    'id': 'DS_OPD',
+                    'name': 'dataset11',
+                }],
                 shortName: 'Module1',
                 id: 'f21423b161d',
                 level: NaN,
@@ -159,23 +214,81 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                 }
             }];
 
-            spyOn(orgUnitRepo, "save").and.returnValue(utils.getPromise(q, enrichedModules));
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-            spyOn(dataSetRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+            scope.save(modules);
+            scope.$apply();
 
+            expect(scope.saveFailure).toBe(false);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedModules);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: enrichedModules,
+                type: "createOrgUnit"
+            }, "dataValues");
+        });
+
+        it("should associate data sets to module", function() {
+
+            scope.originalDatasets = [{
+                'id': 'ds_11',
+                'name': 'dataset11',
+            }, {
+                'id': 'ds_12',
+                'name': 'dataset12'
+            }];
+
+            scope.orgUnit = {
+                'id': 'Project1Id',
+                'name': 'Project1'
+            };
+
+            var modules = [{
+                'name': "Module1",
+                'datasets': [{
+                    'id': 'ds_11',
+                    'name': 'dataset11',
+                }, {
+                    'id': 'ds_12',
+                    'name': 'dataset12'
+                }]
+            }, {
+                'name': "Module2",
+                'datasets': [{
+                    'id': 'ds_11',
+                    'name': 'dataset21',
+                }]
+            }];
+
+            var expectedDatasets = [{
+                id: 'ds_11',
+                name: 'dataset11',
+                organisationUnits: [{
+                    name: 'Module1',
+                    id: '8110fbcb2a4'
+                }, {
+                    name: 'Module2',
+                    id: 'c59e050c2a8'
+                }]
+            }, {
+                id: 'ds_12',
+                name: 'dataset12',
+                organisationUnits: [{
+                    name: 'Module1',
+                    id: '8110fbcb2a4'
+                }]
+            }];
+
+            spyOn(scope, "createModules").and.returnValue(utils.getPromise(q, modules));
+            spyOn(scope, "excludeDataElements").and.returnValue(utils.getPromise(q, modules));
 
             scope.save(modules);
             scope.$apply();
 
             expect(scope.saveFailure).toBe(false);
-            expect(orgUnitRepo.save).toHaveBeenCalledWith(enrichedModules);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: enrichedModules,
-                type: "createOrgUnit"
+                data: expectedDatasets,
+                type: "associateDataset"
             }, "dataValues");
 
-            expect(dataSetRepo.upsert).toHaveBeenCalled();
-            expect(hustle.publish).toHaveBeenCalled();
+            expect(dataSetRepo.upsert).toHaveBeenCalledWith(expectedDatasets);
         });
 
         it("should set datasets associated with module for view", function() {
@@ -296,12 +409,11 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
 
             spyOn(orgUnitService, "getAssociatedDatasets").and.returnValue(dataSets);
             spyOn(orgUnitService, "getSystemSettings").and.returnValue(utils.getPromise(q, systemSettings));
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, db, location, q);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
             scope.$apply();
 
             expect(scope.modules[0].name).toEqual("Mod2");
             expect(scope.modules[0]).toEqual(expectedModule);
-
         });
 
         it("should return true if datasets for modules not selected", function() {
