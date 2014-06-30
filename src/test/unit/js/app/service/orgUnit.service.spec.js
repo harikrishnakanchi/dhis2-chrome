@@ -157,28 +157,6 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             expect(actualDatasets).toEqual([dataset1, dataset2]);
         });
 
-        it("should save system settings to indexedDB and dhis", function() {
-            var data = {
-                "moduleId1": ["test1", "test2"],
-                "moduleId2": ["test1", "test2"]
-            };
-
-            var indexedDBPayload = {
-                "key": "test",
-                "value": data
-            };
-
-            var projectId = "test";
-
-            orgUnitService.setSystemSettings(projectId, data);
-
-            expect(db.objectStore).toHaveBeenCalledWith("systemSettings");
-            expect(mockOrgStore.upsert).toHaveBeenCalledWith(indexedDBPayload);
-
-            httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/" + projectId, data).respond(200, "ok");
-            httpBackend.flush();
-        });
-
         it("should get all org units", function() {
             var someOrgUnits = [{
                 "a": "b"
