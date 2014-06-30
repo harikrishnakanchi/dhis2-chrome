@@ -90,6 +90,7 @@ define(["moment", "lodash"], function(moment, _) {
                     return;
 
                 var saveAllLevelOneApprovalData = function(data) {
+                    console.debug("Storing approval data");
                     return approvalService.saveLevelOneApprovalData(data);
                 };
 
@@ -99,6 +100,7 @@ define(["moment", "lodash"], function(moment, _) {
                 .then(updateApprovalData);
         };
         var uploadApprovalData = function(data) {
+            console.debug("Uploading approval data");
             return approvalService.markAsComplete(data.dataSets, data.period, data.orgUnit, data.storedBy, data.date);
         };
 
