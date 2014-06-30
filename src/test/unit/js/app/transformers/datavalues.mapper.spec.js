@@ -27,7 +27,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                         }
                     }
                 }
-            }
+            };
             var _Date = Date;
             var today = new _Date();
             spyOn(window, 'Date').and.returnValue(today);

@@ -55,7 +55,7 @@ gulp.task('ft', ['update-webdriver', 'start-http'], function() {
 });
 
 gulp.task('lint', function() {
-    return gulp.src(['./src/main/js/app/**/*.js', './src/test/js/app/**/*.js'])
+    return gulp.src(['./src/main/js/app/**/*.js', './src/test/**/js/app/**/*.js'])
         .pipe(jshint())
         .pipe(jshint.reporter(stylish))
         .pipe(jshint.reporter('fail'));

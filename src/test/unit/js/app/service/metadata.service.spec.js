@@ -1,6 +1,6 @@
 define(["metadataService", "properties", "utils", "angularMocks"], function(MetadataService, properties, utils) {
     describe("Metadata service", function() {
-        var httpBackend, http, db, q, mockStore, category1, data, systemSettings, translations;;
+        var httpBackend, http, db, q, mockStore, category1, data, systemSettings, translations;
         var today = "2014-03-24T09:02:49.870Z";
         var yesterday = "2014-03-23T09:02:49.870Z";
         var tomorrow = "2014-03-25T09:02:49.870Z";

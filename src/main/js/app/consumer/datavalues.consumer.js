@@ -82,23 +82,21 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var downloadApprovalData = function() {
-            var getAllLevelOneApprovalData = function(data) {
+            var updateApprovalData = function(data) {
                 var userOrgUnitIds = data[0];
                 var allDataSets = _.pluck(data[1], "id");
 
                 if (userOrgUnitIds.length === 0)
-                    return $q.reject("No org units for this user");
+                    return;
 
-                return approvalService.getAllLevelOneApprovalData(userOrgUnitIds, allDataSets);
+                var saveAllLevelOneApprovalData = function(data) {
+                    return approvalService.saveLevelOneApprovalData(data);
+                };
+
+                return approvalService.getAllLevelOneApprovalData(userOrgUnitIds, allDataSets).then(saveAllLevelOneApprovalData);
             };
-
-            var saveAllLevelOneApprovalData = function(data) {
-                return approvalService.saveLevelOneApprovalData(data);
-            };
-
             return $q.all([getAllOrgUnits(), dataSetRepository.getAll()])
-                .then(getAllLevelOneApprovalData)
-                .then(saveAllLevelOneApprovalData);
+                .then(updateApprovalData);
         };
         var uploadApprovalData = function(data) {
             return approvalService.markAsComplete(data.dataSets, data.period, data.orgUnit, data.storedBy, data.date);

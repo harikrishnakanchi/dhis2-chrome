@@ -13,5 +13,5 @@ define([], function() {
             "addListener": addListener,
             "sendMessage": sendMessage
         };
-    }
-})
+    };
+});

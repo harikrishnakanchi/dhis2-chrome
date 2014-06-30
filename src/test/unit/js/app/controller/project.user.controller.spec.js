@@ -78,7 +78,7 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                 "name": "blah",
                 "id": "blah",
                 "lastname": "blah",
-            }
+            };
 
             scope.reset();
 

@@ -22,7 +22,7 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository"], 
                 };
                 this.compile = function() {
                     return "blah";
-                }
+                };
                 return this;
             };
             db = {

@@ -10,6 +10,6 @@ define(["lodash"], function(_) {
             return store.upsert(dataSets).then(function(id) {
                 return dataSets;
             });
-        }
+        };
     };
 });

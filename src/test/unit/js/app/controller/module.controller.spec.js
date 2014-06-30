@@ -282,7 +282,7 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                         }]
                     }]
                 }
-            }
+            };
 
             scope.orgUnit = {
                 "name": "Mod2",
@@ -371,7 +371,7 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                 }
             };
 
-            module.selectedSections["sec1"] = false;
+            module.selectedSections.sec1 = false;
             scope.changeSectionSelection(module, section);
             expect(module).toEqual(expectedModule);
         });
@@ -410,9 +410,9 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
                 }
             };
 
-            module.selectedDataElements["test1"] = false;
-            module.selectedDataElements["test2"] = false;
-            module.selectedDataElements["test3"] = false;
+            module.selectedDataElements.test1 = false;
+            module.selectedDataElements.test2 = false;
+            module.selectedDataElements.test3 = false;
             scope.changeDataElementSelection(module, section);
             expect(module).toEqual(expectedModule);
         });
@@ -439,8 +439,8 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             };
             scope.selectDataSet(module, dataset);
             expect(module.selectedDataset).toEqual(dataset);
-            expect(scope.isExpanded['Id1']).toEqual(true);
-            expect(scope.isExpanded['Id2']).toEqual(false);
+            expect(scope.isExpanded.Id1).toEqual(true);
+            expect(scope.isExpanded.Id2).toEqual(false);
         });
 
         it("should select a dataset", function() {
@@ -465,8 +465,8 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             };
             scope.selectDataSet(module, dataset);
             expect(module.selectedDataset).toEqual(dataset);
-            expect(scope.isExpanded['Id1']).toEqual(true);
-            expect(scope.isExpanded['Id2']).toEqual(false);
+            expect(scope.isExpanded.Id1).toEqual(true);
+            expect(scope.isExpanded.Id2).toEqual(false);
         });
 
         it("should return true if no section is selected from each dataset", function() {

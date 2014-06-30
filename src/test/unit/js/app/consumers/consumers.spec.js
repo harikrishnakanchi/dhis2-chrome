@@ -14,5 +14,5 @@ define(["consumers", "dataValuesConsumer", "orgUnitConsumer", "dispatcher", "con
             expect(app.service).toHaveBeenCalledWith("dispatcher", ["$q", "dataValuesConsumer", "orgUnitConsumer", "datasetConsumer", dispatcher]);
             expect(app.service).toHaveBeenCalledWith("consumerRegistry", ["$hustle", "$q", "dispatcher", consumerRegistry]);
         });
-    })
-})
+    });
+});

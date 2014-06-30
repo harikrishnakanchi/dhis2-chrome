@@ -214,14 +214,11 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
             });
 
             it("should abort approval data download if no orgunits are found in user pref", function() {
-
-                var userPref = undefined;
-
                 var allDataSets = [{
                     "id": "DS_OPD"
                 }];
 
-                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
+                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
                 spyOn(approvalService, "getAllLevelOneApprovalData");
                 spyOn(approvalService, "saveLevelOneApprovalData");
