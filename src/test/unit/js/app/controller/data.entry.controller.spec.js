@@ -302,6 +302,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it("should submit data values to indexeddb and dhis", function() {
             spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, {}));
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
@@ -324,6 +325,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.$apply();
 
             expect(dataRepository.save).toHaveBeenCalled();
+            expect(dataRepository.unapproveLevelOneData).toHaveBeenCalledWith('2014W14', 'mod2');
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: {
                     ok: 'ok'

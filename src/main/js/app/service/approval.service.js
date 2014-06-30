@@ -1,6 +1,6 @@
 define(["properties", "moment"], function(properties, moment) {
     return function($http, db, $q) {
-        var markAsComplete = function(dataSets, period, orgUnit, storedBy, completionDate) {
+        this.markAsComplete = function(dataSets, period, orgUnit, storedBy, completionDate) {
             return $http.post(properties.dhis.url + "/api/completeDataSetRegistrations", undefined, {
                 params: {
                     "ds": dataSets,
@@ -13,12 +13,12 @@ define(["properties", "moment"], function(properties, moment) {
             });
         };
 
-        var saveCompletionToDB = function(payload) {
+        this.saveCompletionToDB = function(payload) {
             var store = db.objectStore("completeDataSets");
             return store.upsert(payload);
         };
 
-        var getAllLevelOneApprovalData = function(orgUnits, dataSets) {
+        this.getAllLevelOneApprovalData = function(orgUnits, dataSets) {
             var onSuccess = function(response) {
                 var deferred = $q.defer();
                 if (response.data.completeDataSetRegistrationList)
@@ -48,7 +48,7 @@ define(["properties", "moment"], function(properties, moment) {
 
         };
 
-        var saveLevelOneApprovalData = function(completeDataSetRegistrationList) {
+        this.saveLevelOneApprovalData = function(completeDataSetRegistrationList) {
             var registrationsGroupedByPeriodAndOu = _.groupBy(completeDataSetRegistrationList, function(registration) {
                 return [registration.period.id, registration.organisationUnit.id];
             });
@@ -65,13 +65,6 @@ define(["properties", "moment"], function(properties, moment) {
 
             var store = db.objectStore("completeDataSets");
             return store.upsert(payload);
-        };
-
-        return {
-            "markAsComplete": markAsComplete,
-            "saveCompletionToDB": saveCompletionToDB,
-            "getAllLevelOneApprovalData": getAllLevelOneApprovalData,
-            "saveLevelOneApprovalData": saveLevelOneApprovalData
         };
     };
 });

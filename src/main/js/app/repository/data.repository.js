@@ -35,6 +35,21 @@ define(["lodash"], function(_) {
             return store.find([period, orgUnitId]);
         };
 
+        this.unapproveLevelOneData = function(period, orgUnit) {
+            var unapprove = function(data) {
+                var unapprovalsToBeSaved = _.map(data, function(d) {
+                    return _.merge(d, {
+                        "isDeleted": true
+                    });
+                });
+
+                var store = db.objectStore('completeDataSets');
+                return store.upsert(unapprovalsToBeSaved);
+            };
+
+            return this.getCompleteDataValues(period, orgUnit).then(unapprove);
+        };
+
         this.saveAsDraft = function(payload) {
             return this.save(payload, true);
         };

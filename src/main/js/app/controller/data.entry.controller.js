@@ -187,6 +187,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var save = function(asDraft) {
+            var period = getPeriod();
+
             var successPromise = function() {
                 $scope.saveSuccess = asDraft ? true : false;
                 $scope.submitSuccess = !asDraft ? true : false;
@@ -198,12 +200,16 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.submitError = !asDraft ? true : false;
                 $scope.isSubmitted = false;
             };
-            var period = getPeriod();
+
+            var unapproveData = function() {
+                return dataRepository.unapproveLevelOneData(period, $scope.currentModule.id);
+            };
+
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
             if (asDraft) {
                 dataRepository.saveAsDraft(payload).then(successPromise, errorPromise);
             } else {
-                dataRepository.save(payload).then(saveToDhis).then(successPromise, errorPromise);
+                dataRepository.save(payload).then(saveToDhis).then(unapproveData).then(successPromise, errorPromise);
             }
             scrollToTop();
         };

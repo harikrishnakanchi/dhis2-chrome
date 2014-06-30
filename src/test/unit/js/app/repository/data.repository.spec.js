@@ -1,9 +1,11 @@
 define(["dataRepository", "angularMocks", "utils"], function(DataRepository, mocks, utils) {
     describe("data repository", function() {
-        var db, mockStore, dataRepository, dataValues;
-        beforeEach(mocks.inject(function($q) {
+        var q, db, mockStore, dataRepository, dataValues, scope;
+        beforeEach(mocks.inject(function($q, $rootScope) {
+            q = $q;
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
+            scope = $rootScope;
             dataRepository = new DataRepository(mockDB.db);
             dataValues = {
                 dataValues: [{
@@ -51,5 +53,19 @@ define(["dataRepository", "angularMocks", "utils"], function(DataRepository, moc
             expect(mockStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
         });
 
+        it("should unapprove data at level one", function() {
+            mockStore.find.and.returnValue(utils.getPromise(q, [{
+                period: '2014W15'
+            }]));
+
+            dataRepository.unapproveLevelOneData("period", "orgUnitId");
+            scope.$apply();
+
+            expect(mockStore.find).toHaveBeenCalledWith(["period", "orgUnitId"]);
+            expect(mockStore.upsert).toHaveBeenCalledWith([{
+                period: '2014W15',
+                "isDeleted": true
+            }]);
+        });
     });
 });

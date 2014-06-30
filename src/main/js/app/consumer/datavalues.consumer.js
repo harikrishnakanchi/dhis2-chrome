@@ -96,6 +96,7 @@ define(["moment", "lodash"], function(moment, _) {
 
                 return approvalService.getAllLevelOneApprovalData(userOrgUnitIds, allDataSets).then(saveAllLevelOneApprovalData);
             };
+
             return $q.all([getAllOrgUnits(), dataSetRepository.getAll()])
                 .then(updateApprovalData);
         };
