@@ -73,7 +73,6 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
 
 
         return projectOrgUnit;
-
     };
 
     var getChildOrgUnitNames = function(allOrgUnits, parentId) {
@@ -93,7 +92,6 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
 
         return attribute ? attribute.value : undefined;
     };
-
 
     var mapToProjectForView = function(dhisProject) {
         var endDate = getAttributeValue(dhisProject, "prjEndDate");

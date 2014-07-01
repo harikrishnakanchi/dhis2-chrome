@@ -50,9 +50,17 @@ define(["lodash"], function(_) {
         return allDatasets;
     };
 
+    var getAssociatedDatasets = function(orgUnit, datasets) {
+        return _.filter(datasets, {
+            'organisationUnits': [{
+                'id': orgUnit.id
+            }]
+        });
+    };
 
     return {
         "getFilteredDatasets": getFilteredDatasets,
-        "enrichDatasets": enrichDatasets
+        "enrichDatasets": enrichDatasets,
+        "getAssociatedDatasets": getAssociatedDatasets
     };
 });

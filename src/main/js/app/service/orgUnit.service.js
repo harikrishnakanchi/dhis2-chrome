@@ -7,17 +7,8 @@ define(["properties", "lodash"], function(properties, _) {
             });
         };
 
-        var getAssociatedDatasets = function(orgUnit, datasets) {
-            return _.filter(datasets, {
-                'organisationUnits': [{
-                    'id': orgUnit.id
-                }]
-            });
-        };
-
         return {
-            "create": create,
-            "getAssociatedDatasets": getAssociatedDatasets
+            "create": create
         };
     };
 });

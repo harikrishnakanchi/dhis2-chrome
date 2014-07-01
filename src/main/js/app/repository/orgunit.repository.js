@@ -7,8 +7,8 @@ define([], function() {
             });
         };
 
-        var getAll = function(orgUnitType) {
-            var store = db.objectStore(orgUnitType);
+        var getAll = function() {
+            var store = db.objectStore("organisationUnits");
             return store.getAll();
         };
 

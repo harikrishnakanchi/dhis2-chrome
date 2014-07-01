@@ -1,7 +1,7 @@
 /*global Date:true*/
 
 
-define(["moduleController", "angularMocks", "utils", "testData"], function(ModuleController, mocks, utils, testData) {
+define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer"], function(ModuleController, mocks, utils, testData, datasetTransformer) {
     describe("module controller", function() {
 
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
@@ -402,7 +402,7 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
 
             scope.isEditMode = false;
 
-            spyOn(orgUnitService, "getAssociatedDatasets").and.returnValue(dataSets);
+            spyOn(datasetTransformer, "getAssociatedDatasets").and.returnValue(dataSets);
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, systemSettings));
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
             scope.$apply();

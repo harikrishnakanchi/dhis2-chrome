@@ -37,7 +37,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 };
 
                 var setUpViewMode = function() {
-                    var associatedDatasets = orgUnitService.getAssociatedDatasets($scope.orgUnit, $scope.allDatasets);
+                    var associatedDatasets = datasetTransformer.getAssociatedDatasets($scope.orgUnit, $scope.allDatasets);
                     var systemSettingsPromise = systemSettingRepository.getAllWithProjectId($scope.orgUnit.parent.id);
                     systemSettingsPromise.then(function(systemSetting) {
                         var datasets = datasetTransformer.getFilteredDatasets(associatedDatasets, systemSetting, $scope.orgUnit.id);
