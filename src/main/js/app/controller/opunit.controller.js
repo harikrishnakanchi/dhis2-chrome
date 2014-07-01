@@ -1,4 +1,4 @@
-define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, orgUnitMapper) {
+define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
     return function($scope, $hustle, orgUnitRepository, db, $location) {
         $scope.opUnits = [{
             'openingDate': moment().format("YYYY-MM-DD")
@@ -16,7 +16,7 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
                 var opUnitType = opUnit.type;
                 opUnit = _.omit(opUnit, 'type');
                 return _.merge(opUnit, {
-                    'id': md5(opUnit.name + parent.id).substr(0, 11),
+                    'id': dhisId.get(opUnit.name + parent.id),
                     'shortName': opUnit.name,
                     'level': parseInt(parent.level) + 1,
                     'parent': _.pick(parent, "name", "id"),

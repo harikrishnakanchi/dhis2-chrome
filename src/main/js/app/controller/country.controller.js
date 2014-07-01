@@ -1,4 +1,4 @@
-define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, orgUnitMapper) {
+define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
     return function($scope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll) {
 
         $scope.thisDate = moment().format("YYYY-MM-DD");
@@ -11,7 +11,7 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
 
         $scope.save = function(orgUnit, parentOrgUnit) {
             newOrgUnit = {
-                'id': md5(orgUnit.name + parentOrgUnit.id).substr(0, 11),
+                'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
                 'name': orgUnit.name,
                 'level': parseInt(parentOrgUnit.level) + 1,
                 'shortName': orgUnit.name,
