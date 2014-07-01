@@ -48,6 +48,7 @@
     "userDisableSuccess": "User disabled successfully.",
     "userEnableSuccess": "User enabled successfully.",
     "dataSubmittedForApproval": "Data submitted for approval.",
+    "reapprovalConfirmationMessage": "Data will be resent for approval. Are you sure?",
     "noDataForApproval": "No data available for approval.",
     "yesLabel": "Yes",
     "cancelLabel": "Cancel",

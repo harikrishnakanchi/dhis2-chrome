@@ -41,6 +41,7 @@ define(["lodash"], function(_) {
 
         this.unapproveLevelOneData = function(period, orgUnit) {
             var unapprove = function(data) {
+                if (!data) return;
                 data.isDeleted = true;
                 var store = db.objectStore('completeDataSets');
                 return store.upsert(data);

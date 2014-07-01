@@ -70,5 +70,14 @@ define(["dataRepository", "angularMocks", "utils"], function(DataRepository, moc
                 "isDeleted": true
             });
         });
+
+        it("should not approve if data is not available for approval", function() {
+            mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+
+            dataRepository.unapproveLevelOneData("period", "orgUnitId");
+            scope.$apply();
+
+            expect(mockStore.upsert).not.toHaveBeenCalled();
+        });
     });
 });

@@ -109,7 +109,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.submit = function() {
-            save(false);
+            if ($scope.isApproved) {
+                showModal(function() {
+                    save(false);
+                }, $scope.resourceBundle.reapprovalConfirmationMessage);
+            } else {
+                save(false);
+            }
         };
 
         $scope.saveAsDraft = function() {
@@ -117,15 +123,16 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.firstLevelApproval = function() {
+            showModal(markDataAsComplete, $scope.resourceBundle.dataApprovalConfirmationMessage);
+        };
+
+        var showModal = function(okCallback, message) {
+            $scope.modalMessage = message;
             var modalInstance = $modal.open({
-                templateUrl: 'templates/approve.dialog.html',
+                templateUrl: 'templates/confirm.dialog.html',
                 controller: 'confirmDialogController',
                 scope: $scope
             });
-
-            var okCallback = function() {
-                markDataAsComplete();
-            };
 
             modalInstance.result.then(okCallback);
         };

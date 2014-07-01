@@ -39,6 +39,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 $setPristine: function() {}
             };
 
+            scope.resourceBundle = {
+                "dataApprovalConfirmationMessage": ""
+            };
+
             var getMockStore = function(data) {
                 var getAll = function() {
                     return utils.getPromise(q, data);
@@ -369,6 +373,34 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.submitError).toBe(false);
             expect(scope.saveError).toBe(false);
             expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
+        });
+
+        it("should warn the user when data will have to be reapproved", function() {
+            spyOn(dataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {
+                "blah": "moreBlah"
+            }));
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
+
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope);
+
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+
+            scope.$apply();
+            scope.submit();
+
+            expect(fakeModal.open).toHaveBeenCalled();
         });
 
         it("should let the user know of failures when saving the data to indexedDB ", function() {

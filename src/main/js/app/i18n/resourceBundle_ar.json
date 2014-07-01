@@ -48,6 +48,7 @@
     "userDisableSuccess": "مستخدم تعطيل بنجاح.",
     "userEnableSuccess": "تمكين المستخدم بنجاح.",
     "dataSubmittedForApproval": "قدمت بيانات للموافقة عليها.",
+    "reapprovalConfirmationMessage": "Data will be resent for approval. Are you sure?",
     "noDataForApproval": "لا توجد بيانات متاحة للموافقة عليها.",
     "yesLabel": "نعم",
     "cancelLabel": "إلغاء",
