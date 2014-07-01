@@ -1,8 +1,9 @@
 define(["dhisId"], function(dhisId) {
     describe("DHIS Id Gen", function() {
         it("should generate id", function() {
-            var id = dhisId.get("FooBar");
-            expect(id).toEqual("f32a26e2a3a");
+            expect(dhisId.get("FooBar")).toEqual("3858f62230a");
+            expect(dhisId.get("FOOBAR")).toEqual("3858f62230a");
+            expect(dhisId.get(undefined)).toEqual(undefined);
         });
     });
 });

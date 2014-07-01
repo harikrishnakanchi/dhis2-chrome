@@ -40,6 +40,7 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
             };
             var expectedUserPayload = {
                 "username": "proj_1_blah",
+                "id": '8521092d463',
                 "surname": "LNU",
                 "firstName": "FNU",
                 "userCredentials": {

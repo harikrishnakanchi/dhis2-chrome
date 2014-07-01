@@ -105,7 +105,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var result = orgUnitMapper.mapToProjectForDhis(orgUnit, parentOrgUnit);
 
             var expectedResult = {
-                id: '1ef081fea77',
+                id: '131658d54b1',
                 name: 'Org1',
                 level: 3,
                 shortName: 'Org1',
@@ -216,7 +216,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     'name': 'dataset12'
                 }],
                 shortName: 'Module1',
-                id: '8110fbcb2a4',
+                id: 'ac1bbd0985e',
                 level: 4,
                 openingDate: "2010-01-01",
                 selectedDataset: undefined,
@@ -242,7 +242,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     'name': 'dataset22'
                 }],
                 shortName: 'Module2',
-                id: 'c59e050c2a8',
+                id: 'cccf1dda360',
                 level: 4,
                 openingDate: "2010-01-01",
                 selectedDataset: undefined,
@@ -318,17 +318,17 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 name: 'dataset11',
                 organisationUnits: [{
                     name: 'Module1',
-                    id: '8110fbcb2a4'
+                    id: 'ac1bbd0985e'
                 }, {
                     name: 'Module2',
-                    id: 'c59e050c2a8'
+                    id: 'cccf1dda360'
                 }]
             }, {
                 id: 'ds_12',
                 name: 'dataset12',
                 organisationUnits: [{
                     name: 'Module1',
-                    id: '8110fbcb2a4'
+                    id: 'ac1bbd0985e'
                 }]
             }];
 

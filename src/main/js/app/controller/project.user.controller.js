@@ -1,4 +1,4 @@
-define([], function() {
+define(["dhisId"], function(dhisId) {
     return function($scope, $hustle, userRepository) {
 
         var allRoles = [{
@@ -30,6 +30,7 @@ define([], function() {
         $scope.save = function(projectUser) {
             var userPayload = {
                 "username": projectUser.username.toLowerCase(),
+                "id": dhisId.get(projectUser.username),
                 "surname": "LNU",
                 "firstName": "FNU",
                 "userCredentials": {
