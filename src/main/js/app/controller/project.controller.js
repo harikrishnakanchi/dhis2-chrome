@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, orgUnitMapper, toTree, properties) {
 
-    return function($scope, $hustle, orgUnitService, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal) {
+    return function($scope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal) {
 
         $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded', 'Coordination', 'Remote Control'].sort();
 
@@ -86,7 +86,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
                 user.userCredentials.disabled = $scope.isUserToBeDisabled;
                 return userRepository.upsert(user)
                     .then(function(data) {
-                    return publishMessage(data, "updateUser");
+                        return publishMessage(data, "updateUser");
                     });
             };
 
@@ -125,7 +125,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
 
         var prepareEditForm = function() {
             $scope.reset();
-            orgUnitService.getAll("organisationUnits").then(function(allOrgUnits) {
+            orgUnitRepository.getAll().then(function(allOrgUnits) {
                 $scope.peerProjects = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
             });
         };

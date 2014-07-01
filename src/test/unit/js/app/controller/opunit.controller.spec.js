@@ -2,7 +2,7 @@
 define(["opUnitController", "angularMocks", "utils"], function(OpUnitController, mocks, utils) {
     describe("op unit controller", function() {
 
-        var scope, opUnitController, orgUnitService, mockOrgStore, db, q, location, _Date, hustle, orgUnitRepo;
+        var scope, opUnitController, mockOrgStore, db, q, location, _Date, hustle, orgUnitRepo;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -12,12 +12,6 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             hustle = $hustle;
             location = $location;
 
-            orgUnitService = {
-                "create": function() {},
-                "getAll": function() {
-                    return utils.getPromise(q, {});
-                }
-            };
             orgUnitRepo = utils.getMockRepo(q);
             mockOrgStore = {
                 upsert: function() {}
@@ -39,7 +33,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 return today;
             };
 
-            opUnitController = new OpUnitController(scope, hustle, orgUnitService, orgUnitRepo, db, location);
+            opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location);
         }));
 
         afterEach(function() {
@@ -175,7 +169,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             };
             scope.isEditMode = false;
 
-            opUnitController = new OpUnitController(scope, hustle, orgUnitService, orgUnitRepo, db, location);
+            opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location);
 
             scope.$apply();
             expect(scope.opUnits[0].name).toEqual('opUnit1');

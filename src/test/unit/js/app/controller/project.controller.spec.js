@@ -2,7 +2,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
     describe("project controller tests", function() {
 
-        var scope, timeout, q, location, orgUnitService, anchorScroll, orgunitMapper, userRepository,
+        var scope, timeout, q, location, anchorScroll, orgunitMapper, userRepository,
             fakeModal, orgUnitRepo, hustle;
 
         beforeEach(module('hustle'));
@@ -17,12 +17,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 getChildOrgUnitNames: function() {}
             };
 
-            orgUnitService = {
-                "create": function() {},
-                "getAll": function() {
-                    return utils.getPromise(q, {});
-                }
-            };
             orgUnitRepo = utils.getMockRepo(q);
 
             userRepository = {
@@ -50,7 +44,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             };
 
             anchorScroll = jasmine.createSpy();
-            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
+            projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
         }));
 
         it("should save project in dhis", function() {
@@ -283,7 +277,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
             scope.isEditMode = false;
 
-            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
+            projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });
@@ -344,7 +338,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             }];
             spyOn(userRepository, "getAllProjectUsers").and.returnValue(utils.getPromise(q, users));
 
-            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
+            projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
             scope.$apply();
 
             expect(scope.projectUsers).toEqual(expectedUsers);
@@ -366,7 +360,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             spyOn(fakeModal, 'open').and.returnValue({
                 result: utils.getRejectedPromise(q, {})
             });
-            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
+            projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
             var user = {
                 id: '123',
                 name: "blah blah",
@@ -385,7 +379,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 result: utils.getPromise(q, {})
             });
 
-            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
+            projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
 
             var user = {
                 id: '123',

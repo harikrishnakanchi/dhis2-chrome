@@ -7,8 +7,14 @@ define([], function() {
             });
         };
 
+        var getAll = function(orgUnitType) {
+            var store = db.objectStore(orgUnitType);
+            return store.getAll();
+        };
+
         return {
-            "upsert": upsert
+            "upsert": upsert,
+            "getAll": getAll
         };
     };
 });

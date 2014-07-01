@@ -30,7 +30,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                             selectedDataElements[dataElement.id] = true;
                         });
                     });
-                    orgUnitService.getAll("organisationUnits").then(function(allOrgUnits) {
+                    orgUnitRepository.getAll().then(function(allOrgUnits) {
                         $scope.allModules = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
                     });
                     $scope.addModules();
@@ -38,7 +38,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
                 var setUpViewMode = function() {
                     var associatedDatasets = orgUnitService.getAssociatedDatasets($scope.orgUnit, $scope.allDatasets);
-                    var systemSettingsPromise = orgUnitService.getSystemSettings($scope.orgUnit.parent.id);
+                    var systemSettingsPromise = systemSettingRepository.getAllWithProjectId($scope.orgUnit.parent.id);
                     systemSettingsPromise.then(function(systemSetting) {
                         var datasets = datasetTransformer.getFilteredDatasets(associatedDatasets, systemSetting, $scope.orgUnit.id);
                         $scope.modules.push({

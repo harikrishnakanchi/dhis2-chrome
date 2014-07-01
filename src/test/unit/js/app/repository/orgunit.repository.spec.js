@@ -1,21 +1,17 @@
 define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepository, utils, mocks) {
     describe("Org Unit Repository specs", function() {
-        var mockOrgStore, db, orgUnitRepository, q;
+        var mockOrgStore, mockDb, orgUnitRepository, q, orgUnits;
+
         beforeEach(mocks.inject(function($q) {
             q = $q;
-
-            mockOrgStore = {
-                upsert: function() {},
-                getAll: function() {}
-            };
-            db = {
-                objectStore: function() {}
-            };
-
-            spyOn(db, "objectStore").and.returnValue(mockOrgStore);
-            spyOn(mockOrgStore, "upsert").and.returnValue(utils.getPromise(q, "someId"));
-
-            orgUnitRepository = new OrgUnitRepository(db);
+            orgUnits = [{
+                "a": "b"
+            }, {
+                "c": "d"
+            }];
+            mockDb = utils.getMockDB(q, {}, orgUnits);
+            mockOrgStore = mockDb.objectStore;
+            orgUnitRepository = new OrgUnitRepository(mockDb.db);
         }));
 
         it("should save org hierarchy", function() {
@@ -27,9 +23,14 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             orgUnitRepository.upsert(orgUnit).then(function(data) {
                 expect(data).toEqual(orgUnit);
             });
-
-            expect(db.objectStore).toHaveBeenCalledWith("organisationUnits");
             expect(mockOrgStore.upsert).toHaveBeenCalledWith(orgUnit);
+        });
+
+        it("should get all org units", function() {
+            orgUnitRepository.getAll("someOrgUnit").then(function(results) {
+                expect(results).toEqual(orgUnits);
+            });
+            expect(mockOrgStore.getAll).toHaveBeenCalled();
         });
     });
 });

@@ -1,5 +1,5 @@
 define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, orgUnitMapper) {
-    return function($scope, $hustle, orgUnitService, orgUnitRepository, $q, $location, $timeout, $anchorScroll) {
+    return function($scope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll) {
 
         $scope.thisDate = moment().format("YYYY-MM-DD");
 
@@ -64,7 +64,7 @@ define(["lodash", "md5", "moment", "orgUnitMapper"], function(_, md5, moment, or
 
         var prepareEditForm = function() {
             $scope.reset();
-            orgUnitService.getAll("organisationUnits").then(function(allOrgUnits) {
+            orgUnitRepository.getAll().then(function(allOrgUnits) {
                 $scope.allCountries = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
             });
         };

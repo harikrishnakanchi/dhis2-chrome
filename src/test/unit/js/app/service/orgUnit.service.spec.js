@@ -156,18 +156,5 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
 
             expect(actualDatasets).toEqual([dataset1, dataset2]);
         });
-
-        it("should get all org units", function() {
-            var someOrgUnits = [{
-                "a": "b"
-            }, {
-                "c": "d"
-            }];
-            spyOn(mockOrgStore, "getAll").and.returnValue(utils.getPromise(q, someOrgUnits));
-            orgUnitService.getAll("someOrgUnit").then(function(results) {
-                expect(results).toEqual(someOrgUnits);
-            });
-        });
-
     });
 });

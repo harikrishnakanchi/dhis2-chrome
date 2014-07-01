@@ -27,5 +27,13 @@ define(["systemSettingRepository", "angularMocks", "utils"], function(SystemSett
             };
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedPayload);
         });
+
+        it("should find all system settings given a project id", function() {
+            var projectId = "12445";
+            repo.getAllWithProjectId(projectId).then(function(data) {
+                expect(data).toEqual({});
+            });
+            expect(mockStore.find).toHaveBeenCalledWith(projectId);
+        });
     });
 });

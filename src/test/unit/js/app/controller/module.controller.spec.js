@@ -18,15 +18,12 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
 
             orgUnitService = {
                 "getAssociatedDatasets": function() {},
-                "getSystemSettings": function() {},
-                "getAll": function() {
-                    return utils.getPromise(q, {});
-                }
             };
 
             orgUnitRepo = utils.getMockRepo(q);
             dataSetRepo = utils.getMockRepo(q);
             systemSettingRepo = utils.getMockRepo(q);
+            systemSettingRepo.getAllWithProjectId = function() {};
 
             mockOrgStore = {
                 upsert: function() {},
@@ -90,7 +87,6 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             Date = _Date;
         });
 
-
         it('should filter in new data models when adding new modules', function() {
             scope.$apply();
 
@@ -118,7 +114,6 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             expect(scope.modules[1].name).toEqual('Module2');
             expect(scope.modules[2].name).toEqual('Module4');
         });
-
 
         it('should exclude data elements', function() {
 
@@ -408,12 +403,13 @@ define(["moduleController", "angularMocks", "utils", "testData"], function(Modul
             scope.isEditMode = false;
 
             spyOn(orgUnitService, "getAssociatedDatasets").and.returnValue(dataSets);
-            spyOn(orgUnitService, "getSystemSettings").and.returnValue(utils.getPromise(q, systemSettings));
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, systemSettings));
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
             scope.$apply();
 
             expect(scope.modules[0].name).toEqual("Mod2");
             expect(scope.modules[0]).toEqual(expectedModule);
+            expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith("test");
         });
 
         it("should return true if datasets for modules not selected", function() {

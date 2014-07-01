@@ -2,7 +2,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
 
     describe("contry controller", function() {
 
-        var scope, timeout, q, location, orgUnitService, anchorScroll, hustle, orgUnitRepo;
+        var scope, timeout, q, location, anchorScroll, hustle, orgUnitRepo;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $hustle, $q, $timeout, $location) {
@@ -16,12 +16,6 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                 getChildOrgUnitNames: function() {}
             };
 
-            orgUnitService = {
-                "create": function() {},
-                "getAll": function() {
-                    return utils.getPromise(q, {});
-                }
-            };
             orgUnitRepo = utils.getMockRepo(q);
 
             scope.isEditMode = true;
@@ -30,7 +24,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             };
 
             anchorScroll = jasmine.createSpy();
-            countryController = new CountryController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll);
+            countryController = new CountryController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll);
         }));
 
         it("should open the opening date datepicker", function() {
@@ -118,7 +112,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             scope.isEditMode = false;
             scope.$apply();
 
-            countryController = new CountryController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll);
+            countryController = new CountryController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });

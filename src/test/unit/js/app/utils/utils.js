@@ -33,11 +33,12 @@ define([], function() {
         };
     };
 
-    var getMockRepo = function(q) {
+    var getMockRepo = function(q, allResults) {
         return {
             upsert: jasmine.createSpy("upsert").and.callFake(function(data) {
                 return getPromise(q, data);
-            })
+            }),
+            getAll: jasmine.createSpy("getAll").and.returnValue(getPromise(q, allResults))
         };
     };
 

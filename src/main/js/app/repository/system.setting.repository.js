@@ -6,9 +6,15 @@ define(["lodash"], function(_) {
                 "key": systemSettings.projectId,
                 "value": systemSettings.settings
             };
-            return store.upsert(payload).then(function(){
+            return store.upsert(payload).then(function() {
                 return payload;
             });
         };
+
+        this.getAllWithProjectId = function(parentId) {
+            var store = db.objectStore("systemSettings");
+            return store.find(parentId);
+        };
+
     };
 });
