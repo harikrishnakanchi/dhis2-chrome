@@ -13,13 +13,13 @@ define([], function() {
         return deferred.promise;
     };
 
-    var getMockDB = function(q) {
+    var getMockDB = function(q, findResult, allResult) {
         var mockStore = {
             upsert: jasmine.createSpy("upsert").and.callFake(function(data) {
                 return getPromise(q, data);
             }),
-            find: jasmine.createSpy("find"),
-            getAll: jasmine.createSpy("getAll")
+            find: jasmine.createSpy("find").and.returnValue(getPromise(q, findResult)),
+            getAll: jasmine.createSpy("getAll").and.returnValue(getPromise(q, allResult))
         };
         var db = {
             "objectStore": jasmine.createSpy("objectStore").and.callFake(function() {

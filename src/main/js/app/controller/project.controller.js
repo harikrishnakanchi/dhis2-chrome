@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, orgUnitMapper, toTree, properties) {
 
-    return function($scope, $hustle, orgUnitService, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userService, $modal) {
+    return function($scope, $hustle, orgUnitService, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal) {
 
         $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded', 'Coordination', 'Remote Control'].sort();
 
@@ -40,6 +40,13 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             };
         };
 
+        var publishMessage = function(data, action) {
+            return $hustle.publish({
+                "data": data,
+                "type": action
+            }, "dataValues");
+        };
+
         $scope.save = function(newOrgUnit, parentOrgUnit) {
 
             var onSuccess = function(data) {
@@ -53,15 +60,10 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
 
             var dhisProject = new Array(orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit));
 
-            var saveToDhis = function(data) {
-                return $hustle.publish({
-                    "data": data,
-                    "type": "createOrgUnit"
-                }, "dataValues");
-            };
-
             return orgUnitRepository.upsert(dhisProject)
-                .then(saveToDhis)
+                .then(function(data) {
+                    return publishMessage(data, "createOrgUnit");
+                })
                 .then(onSuccess, onError);
         };
 
@@ -81,8 +83,13 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             };
 
             var okConfirmation = function() {
-                return userService.toggleDisabledState(user, $scope.isUserToBeDisabled);
+                user.userCredentials.disabled = $scope.isUserToBeDisabled;
+                return userRepository.upsert(user)
+                    .then(function(data) {
+                    return publishMessage(data, "updateUser");
+                    });
             };
+
             modalInstance.result.then(okConfirmation).then(function() {
                 $scope.userStateSuccessfullyToggled = true;
                 $timeout(onTimeOut, properties.messageTimeout);
@@ -126,7 +133,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         var prepareView = function() {
             $scope.reset();
             $scope.newOrgUnit = orgUnitMapper.mapToProjectForView($scope.orgUnit);
-            userService.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForView);
+            userRepository.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForView);
         };
 
         var init = function() {

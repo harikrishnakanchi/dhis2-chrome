@@ -1,5 +1,5 @@
 define([], function() {
-    return function($q, dataValuesConsumer, orgUnitConsumer, datasetConsumer, systemSettingConsumer) {
+    return function($q, dataValuesConsumer, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer) {
         this.run = function(message) {
             switch (message.data.type) {
                 case "uploadDataValues":
@@ -13,6 +13,10 @@ define([], function() {
                     return datasetConsumer.run(message);
                 case "excludeDataElements":
                     return systemSettingConsumer.run(message);
+                case "createUser":
+                    return createUserConsumer.run(message);
+                case "updateUser":
+                    return updateUserConsumer.run(message);
                 default:
                     return $q.reject();
             }

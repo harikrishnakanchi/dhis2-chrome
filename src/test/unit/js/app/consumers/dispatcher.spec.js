@@ -1,16 +1,18 @@
 define(["dispatcher", "angularMocks"], function(Dispatcher, mocks) {
     describe("dispatcher", function() {
-        var dataValuesConsumer, dispatcher, message, q, scope, systemSettingConsumer;
+        var dataValuesConsumer, dispatcher, message, q, scope, systemSettingConsumer, createUserConsumer, updateUserConsumer;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             dataValuesConsumer = jasmine.createSpyObj({}, ['run']);
             orgUnitConsumer = jasmine.createSpyObj({}, ['run']);
             datasetConsumer = jasmine.createSpyObj({}, ['run']);
-            systemSettingConsumer= jasmine.createSpyObj({}, ['run']);
+            systemSettingConsumer = jasmine.createSpyObj({}, ['run']);
+            createUserConsumer = jasmine.createSpyObj({}, ['run']);
+            updateUserConsumer = jasmine.createSpyObj({}, ['run']);
             message = {};
             q = $q;
             scope = $rootScope.$new();
-            dispatcher = new Dispatcher(q, dataValuesConsumer, orgUnitConsumer, datasetConsumer, systemSettingConsumer);
+            dispatcher = new Dispatcher(q, dataValuesConsumer, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer);
         }));
 
         it("should call data values consumer for uploading data values", function() {
@@ -89,5 +91,23 @@ define(["dispatcher", "angularMocks"], function(Dispatcher, mocks) {
             scope.$apply();
         });
 
+
+        it("should call create user consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "createUser"
+            };
+            dispatcher.run(message);
+            expect(createUserConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call update user consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "updateUser"
+            };
+            dispatcher.run(message);
+            expect(updateUserConsumer.run).toHaveBeenCalledWith(message);
+        });
     });
 });

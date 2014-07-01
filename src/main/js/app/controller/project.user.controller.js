@@ -1,5 +1,5 @@
 define([], function() {
-    return function($scope, userService) {
+    return function($scope, $hustle, userRepository) {
 
         var allRoles = [{
             "id": "8d32f0f1336",
@@ -18,7 +18,7 @@ define([], function() {
             $scope.userNameMatchExpr = new RegExp($scope.userNamePrefix + "(.)+", "i");
 
             $scope.userRoles = allRoles;
-            userService.getAllUsernames().then(function(data) {
+            userRepository.getAllUsernames().then(function(data) {
                 $scope.existingUsers = data;
             });
         };
@@ -46,6 +46,13 @@ define([], function() {
                 }]
             };
 
+            var publishMessage = function(data, action) {
+                return $hustle.publish({
+                    "data": data,
+                    "type": action
+                }, "dataValues");
+            };
+
             var onSuccess = function(data) {
                 $scope.saveFailure = false;
                 if ($scope.$parent.closeEditForm)
@@ -58,8 +65,9 @@ define([], function() {
                 $scope.saveFailure = true;
                 return error;
             };
-
-            userService.create(userPayload).then(onSuccess, onFailure);
+            userRepository.upsert(userPayload).then(function() {
+                return publishMessage(userPayload, "createUser");
+            }).then(onSuccess, onFailure);
         };
 
         init();

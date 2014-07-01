@@ -1,16 +1,13 @@
 define(["projectUserController", "angularMocks", "utils"], function(ProjectUserController, mocks, utils) {
 
     describe("projectUserControllerspec", function() {
-        var scope, projectUserController, userService, q;
+        var scope, projectUserController, q, userRepository, hustle;
 
-        beforeEach(mocks.inject(function($rootScope, $q) {
+        beforeEach(module('hustle'));
+        beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
             scope = $rootScope.$new();
             q = $q;
-            userService = {
-                'create': function() {},
-                'getAllProjectUsers': function() {},
-                'getAllUsernames': function() {}
-            };
+            hustle = $hustle;
 
             scope.orgUnit = {
                 "name": "Proj 1",
@@ -24,9 +21,12 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                     "value": "PRJ"
                 }]
             };
+            userRepository = utils.getMockRepo(q);
+            userRepository.getAllUsernames = function() {};
 
-            spyOn(userService, "getAllUsernames").and.returnValue(utils.getPromise(q, []));
-            projectUserController = new ProjectUserController(scope, userService);
+            spyOn(userRepository, "getAllUsernames").and.returnValue(utils.getPromise(q, {}));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            projectUserController = new ProjectUserController(scope, hustle, userRepository);
         }));
 
         it("should create user", function() {
@@ -55,19 +55,22 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                     "name": scope.orgUnit.name
                 }]
             };
-            spyOn(userService, "create").and.returnValue(utils.getPromise(q, {}));
+
+            var payload = {
+                data: expectedUserPayload,
+                type: "createUser"
+            };
 
             scope.save(user);
             scope.$apply();
 
-            expect(userService.create).toHaveBeenCalledWith(expectedUserPayload);
+            expect(userRepository.upsert).toHaveBeenCalledWith(expectedUserPayload);
+            expect(hustle.publish).toHaveBeenCalledWith(payload, "dataValues");
             expect(scope.saveFailure).toEqual(false);
         });
 
         it("should determine username prefix and return validate username", function() {
             var specifiedUserName = "prj_afdssd";
-
-            projectUserController = new ProjectUserController(scope, userService);
 
             expect(scope.userNamePrefix).toEqual("prj_");
             expect(scope.userNameMatchExpr.test(specifiedUserName)).toEqual(true);

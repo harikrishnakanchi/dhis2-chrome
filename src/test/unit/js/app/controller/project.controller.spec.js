@@ -2,7 +2,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
     describe("project controller tests", function() {
 
-        var scope, timeout, q, location, orgUnitService, anchorScroll, orgunitMapper, userService,
+        var scope, timeout, q, location, orgUnitService, anchorScroll, orgunitMapper, userRepository,
             fakeModal, orgUnitRepo, hustle;
 
         beforeEach(module('hustle'));
@@ -25,12 +25,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             };
             orgUnitRepo = utils.getMockRepo(q);
 
-            userService = {
-                "getAllProjectUsers": function() {
+            userRepository = {
+                "upsert": function() {
                     return utils.getPromise(q, [{}]);
                 },
-                "toggleDisabledState": function() {
-                    return utils.getPromise(q, "");
+                "getAllProjectUsers": function() {
+                    return utils.getPromise(q, [{}]);
                 }
             };
 
@@ -50,7 +50,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             };
 
             anchorScroll = jasmine.createSpy();
-            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userService);
+            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
         }));
 
         it("should save project in dhis", function() {
@@ -283,7 +283,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
 
             scope.isEditMode = false;
 
-            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userService);
+            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });
@@ -342,9 +342,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     }]
                 }
             }];
-            spyOn(userService, "getAllProjectUsers").and.returnValue(utils.getPromise(q, users));
+            spyOn(userRepository, "getAllProjectUsers").and.returnValue(utils.getPromise(q, users));
 
-            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userService);
+            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
             scope.$apply();
 
             expect(scope.projectUsers).toEqual(expectedUsers);
@@ -366,7 +366,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             spyOn(fakeModal, 'open').and.returnValue({
                 result: utils.getRejectedPromise(q, {})
             });
-            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userService, fakeModal);
+            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
             var user = {
                 id: '123',
                 name: "blah blah",
@@ -384,9 +384,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             spyOn(fakeModal, 'open').and.returnValue({
                 result: utils.getPromise(q, {})
             });
-            spyOn(userService, 'toggleDisabledState').and.returnValue(utils.getPromise(q, {}));
 
-            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userService, fakeModal);
+            projectController = new ProjectController(scope, hustle, orgUnitService, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
+
             var user = {
                 id: '123',
                 name: "blah blah",
@@ -394,10 +394,27 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     disabled: false
                 }
             };
-            scope.toggleUserDisabledState(user, true);
+
+            var expectedUser = {
+                id: '123',
+                name: "blah blah",
+                userCredentials: {
+                    disabled: true
+                }
+            };
+
+            var expectedMessage = {
+                data: user,
+                type: 'updateUser'
+            };
+            spyOn(userRepository, "upsert").and.returnValue(utils.getPromise(q, user));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            scope.toggleUserDisabledState(user);
             scope.$apply();
 
             expect(scope.userStateSuccessfullyToggled).toBe(true);
+            expect(userRepository.upsert).toHaveBeenCalledWith(expectedUser);
+            expect(hustle.publish).toHaveBeenCalledWith(expectedMessage, "dataValues");
         });
 
     });

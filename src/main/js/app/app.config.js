@@ -64,6 +64,7 @@ require.config({
         "systemSettingRepository": "app/repository/system.setting.repository",
         "userPreferenceRepository": "app/repository/userpreference.repository",
         "orgUnitRepository": "app/repository/orgunit.repository",
+        "userRepository": "app/repository/user.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",

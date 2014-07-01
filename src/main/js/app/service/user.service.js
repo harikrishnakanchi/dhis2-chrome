@@ -1,61 +1,17 @@
 define(["properties", "lodash"], function(properties, _) {
     return function($http, db) {
         var create = function(user) {
-            var saveToDb = function() {
-                var dhisUser = _.cloneDeep(user);
-                dhisUser.userCredentials = _.omit(dhisUser.userCredentials, "password");
-
-                var store = db.objectStore("users");
-                return store.upsert(dhisUser);
-            };
-
-            var saveToDhis = function(data) {
-                return $http.post(properties.dhis.url + '/api/users', user).then(function() {
-                    return data;
-                });
-            };
-
-            return saveToDb().then(saveToDhis);
-        };
-
-        var getAllUsernames = function() {
-            var store = db.objectStore("users");
-            return store.getAll().then(function(users) {
-                var userCredentials = _.pluck(users, "userCredentials");
-                return _.pluck(userCredentials, "username");
+            return $http.post(properties.dhis.url + '/api/users', user).then(function(data) {
+                return data;
             });
         };
 
-        var getAllProjectUsers = function(project) {
-
-            var filterProjectUsers = function(allUsers) {
-                return _.filter(allUsers, {
-                    "organisationUnits": [{
-                        'id': project.id
-                    }]
-                });
-            };
-
-            var store = db.objectStore("users");
-            return store.getAll().then(filterProjectUsers);
-        };
-
-        var toggleDisabledState = function(user, shouldDisable) {
-            var saveToDb = function() {
-                var userStore = db.objectStore("users");
-                return userStore.find(user.userCredentials.username.toLowerCase())
-                    .then(function(user) {
-                        user.userCredentials.disabled = shouldDisable;
-                        return userStore.upsert(user);
-                    });
-            };
-
+        var update = function(user) {
             var deleteUserPayload = function() {
                 var payload = {
                     "userCredentials": user.userCredentials,
                     "organisationUnits": user.organisationUnits,
                 };
-                payload.userCredentials.disabled = shouldDisable;
                 return payload;
             };
 
@@ -65,14 +21,12 @@ define(["properties", "lodash"], function(properties, _) {
                 });
             };
 
-            return saveToDb().then(saveToDhis);
+            return saveToDhis(user);
         };
 
         return {
             "create": create,
-            "getAllProjectUsers": getAllProjectUsers,
-            "getAllUsernames": getAllUsernames,
-            "toggleDisabledState": toggleDisabledState
+            "update": update
         };
     };
 });

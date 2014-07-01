@@ -8,13 +8,13 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('dataEntryController', ['$scope', '$q', '$hustle', '$indexedDB', 'dataRepository', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', 'approvalService', dataEntryController]);
             app.controller('orgUnitContoller', ['$scope', '$indexedDB', '$q', '$location', '$timeout', '$anchorScroll', orgUnitContoller]);
             app.controller('opUnitController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', '$indexedDB', '$location', opUnitController]);
-            app.controller('moduleController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', 'dataSetRepository','systemSettingRepository', '$indexedDB', '$location', '$q', moduleController]);
-            app.controller('projectController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', 'userService', '$modal', projectController]);
+            app.controller('moduleController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', 'dataSetRepository', 'systemSettingRepository', '$indexedDB', '$location', '$q', moduleController]);
+            app.controller('projectController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', 'userRepository', '$modal', projectController]);
             app.controller('mainController', ['$scope', '$rootScope', 'ngI18nResourceBundle', '$indexedDB', 'userPreferenceRepository', 'dhisMonitor', mainController]);
             app.controller('loginController', ['$scope', '$rootScope', '$location', '$indexedDB', '$q', '$hustle', 'userPreferenceRepository', loginController]);
             app.controller('countryController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', countryController]);
             app.controller('confirmDialogController', ['$scope', '$modalInstance', confirmDialogController]);
-            app.controller('projectUserController', ['$scope', 'userService', projectUserController]);
+            app.controller('projectUserController', ['$scope', '$hustle', 'userRepository', projectUserController]);
         };
         return {
             init: init

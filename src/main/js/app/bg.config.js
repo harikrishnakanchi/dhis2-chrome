@@ -20,6 +20,7 @@ require.config({
         "orgUnitService": "app/service/orgUnit.service",
         "datasetService": "app/service/dataset.service",
         "systemSettingService": "app/service/system.setting.service",
+        "userService": "app/service/user.service",
         "services": "app/service/bg.services",
 
         //Repositories
@@ -39,6 +40,8 @@ require.config({
         "orgUnitConsumer": "app/consumer/orgunit.consumer",
         "datasetConsumer": "app/consumer/dataset.consumer",
         "systemSettingConsumer": "app/consumer/system.setting.consumer",
+        "createUserConsumer": "app/consumer/create.user.consumer",
+        "updateUserConsumer": "app/consumer/update.user.consumer",
         "dispatcher": "app/consumer/dispatcher",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
