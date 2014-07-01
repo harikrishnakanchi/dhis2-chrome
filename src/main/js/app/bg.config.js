@@ -53,7 +53,8 @@ require.config({
         "failureStrategyFactory": "app/queue/failure.strategy.factory",
 
         //Utils
-        "chromeRuntime": "app/utils/chrome.runtime"
+        "chromeRuntime": "app/utils/chrome.runtime",
+        "dhisId": "app/utils/dhis.id"
     },
     shim: {
         'angular': {

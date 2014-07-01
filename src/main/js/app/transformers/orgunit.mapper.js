@@ -1,9 +1,9 @@
-define(["lodash", "md5", "moment"], function(_, md5, moment) {
+define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
 
     var mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
 
         var projectOrgUnit = {
-            'id': md5(orgUnit.name + parentOrgUnit.id).substr(0, 11),
+            'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
             'name': orgUnit.name,
             'level': parseInt(parentOrgUnit.level) + 1,
             'shortName': orgUnit.name,
@@ -113,7 +113,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             return {
                 name: module.name,
                 shortName: module.name,
-                id: md5(module.name + moduleParent.id).substr(0, 11),
+                id: dhisId.get(module.name + moduleParent.id),
                 level: parseInt(moduleParent.level) + 1,
                 openingDate: moment().format("YYYY-MM-DD"),
                 selectedDataset: module.selectedDataset,
@@ -152,7 +152,7 @@ define(["lodash", "md5", "moment"], function(_, md5, moment) {
             var intoOrgUnits = function(module) {
                 return {
                     "name": module.name,
-                    "id": md5(module.name + moduleParent.id).substr(0, 11)
+                    "id": dhisId.get(module.name + moduleParent.id)
                 };
             };
 

@@ -1,4 +1,4 @@
-define(["toTree", "lodash", "md5", "moment", "properties"], function(toTree, _, md5, moment, properties) {
+define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment, properties) {
     return function($scope, db, $q, $location, $timeout, $anchorScroll) {
         var templateUrlMap = {
             'Company': 'templates/partials/company-form.html',
