@@ -16,7 +16,8 @@
         "moment": null,
         "js-md5": null,
         "hustle": "https://github.com/orthecreedence/hustle.git",
-        "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git"
+        "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git",
+        "ramda": null
     },
     "devDependencies": {
         "angular-mocks": null
