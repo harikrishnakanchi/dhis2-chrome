@@ -1,6 +1,6 @@
 define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "approvalService"],
     function(DataValuesConsumer, mocks, properties, utils, DataService, DataRepository, DataSetRepository, UserPreferenceRepository, ApprovalService) {
-        describe("data values service", function() {
+        describe("data values consumer", function() {
 
             var dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, scope, allDataSets, userPref, dataValuesConsumer, message, approvalService;
 
@@ -327,31 +327,30 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(dataService.save).toHaveBeenCalledWith(dataValuesToUpload);
             });
 
-            xit("should not run data values if org units is not present", function() {
-                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, []));
-                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
-                spyOn(dataRepository, "save");
-                spyOn(dataService, "downloadAllData").and.returnValue(utils.getPromise(q, []));
-
+            it("should not download data values if org units is not present", function() {
+                userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, {}));
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
                 dataValuesConsumer.run(message);
                 scope.$apply();
 
-                expect(userPreferenceRepository.getAll).toHaveBeenCalled();
-                expect(dataSetRepository.getAll).toHaveBeenCalled();
                 expect(dataService.downloadAllData).not.toHaveBeenCalled();
             });
 
-            xit("should not run data values if dataSets is not present", function() {
-                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
-                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, []));
-                spyOn(dataRepository, "save");
-                spyOn(dataService, "downloadAllData").and.returnValue(utils.getPromise(q, []));
+            it("should not download data values if dataSets is not present", function() {
+                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, {}));
 
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
                 dataValuesConsumer.run(message);
                 scope.$apply();
 
-                expect(userPreferenceRepository.getAll).toHaveBeenCalled();
-                expect(dataSetRepository.getAll).toHaveBeenCalled();
                 expect(dataService.downloadAllData).not.toHaveBeenCalled();
             });
 
@@ -371,14 +370,12 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     "id": "DS_OPD"
                 }];
 
-                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
-                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
-                spyOn(approvalService, "getAllLevelOneApprovalData").and.returnValue(utils.getPromise(q, completionData));
-                spyOn(approvalService, "saveLevelOneApprovalData");
-
+                userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, userPref));
+                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, allDataSets));
+                approvalService.getAllLevelOneApprovalData.and.returnValue(utils.getPromise(q, completionData));
                 dataValuesConsumer.run({
                     "data": {
-                        "type": "downloadApprovalData"
+                        "type": "downloadData"
                     }
                 });
                 scope.$apply();
