@@ -79,5 +79,33 @@ define(["dataRepository", "angularMocks", "utils"], function(DataRepository, moc
 
             expect(mockStore.upsert).not.toHaveBeenCalled();
         });
+
+        it("should get data values by periods and orgunits", function() {
+            mockStore.each.and.returnValue(utils.getPromise(q, [{
+                "orgUnit": "ou1",
+                "period": "2014W02"
+            }, {
+                "orgUnit": "ou1",
+                "period": "2014W02"
+            }, {
+                "orgUnit": "ou3",
+                "period": "2014W02"
+            }]));
+
+            var actualDataValues;
+            dataRepository.getDataValuesForPeriodsOrgUnits("2014W02", "2014W03", ["ou1", "ou2"]).then(function(dataValues) {
+                actualDataValues = dataValues;
+            });
+
+            scope.$apply();
+
+            expect(actualDataValues).toEqual([{
+                "orgUnit": "ou1",
+                "period": "2014W02"
+            }, {
+                "orgUnit": "ou1",
+                "period": "2014W02"
+            }]);
+        });
     });
 });

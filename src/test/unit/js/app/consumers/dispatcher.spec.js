@@ -27,16 +27,7 @@ define(["dispatcher", "angularMocks"], function(Dispatcher, mocks) {
         it("should call data values consumer for downloading data values ", function() {
             message.data = {
                 "data": {},
-                "type": "downloadDataValues"
-            };
-            dispatcher.run(message);
-            expect(dataValuesConsumer.run).toHaveBeenCalledWith(message);
-        });
-
-        it("should call data values consumer for downloading approval data", function() {
-            message.data = {
-                "data": {},
-                "type": "downloadApprovalData"
+                "type": "downloadData"
             };
             dispatcher.run(message);
             expect(dataValuesConsumer.run).toHaveBeenCalledWith(message);

@@ -9,6 +9,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
         },
         "projectDataSync": {
             "intervalInMinutes": 1,
+            "numWeeksToSync": 4
         },
         "dhisPing": {
             "url": url + "/favicon.ico",

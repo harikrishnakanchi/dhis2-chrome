@@ -1,48 +1,12 @@
-define(["moment", "lodash"], function(moment, _) {
+define(["moment", "properties", "lodash"], function(moment, properties, _) {
     return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q, approvalService) {
         var getAllDataValues = function(vals) {
             var orgUnitIds = vals[0];
             var allDataSets = vals[1];
-            return orgUnitIds.length > 0 && allDataSets.length > 0 ? dataService.downloadAllData(orgUnitIds, allDataSets) : [];
+            return $q.when(orgUnitIds.length > 0 && allDataSets.length > 0 ? dataService.downloadAllData(orgUnitIds, allDataSets) : []);
         };
 
-        var hasConflict = function(dataToUpload, downloadedData) {
-            var isBefore = function(date1, date2) {
-                var d1 = moment(date1);
-                var d2 = moment(date2);
-                return d1.isBefore(d2);
-            };
-
-            return _.any(dataToUpload, function(udv) {
-                return _.any(downloadedData, function(ddv) {
-                    return udv.dataElement === ddv.dataElement &&
-                        udv.period === ddv.period &&
-                        udv.orgUnit === ddv.orgUnit &&
-                        udv.categoryOptionCombo === ddv.categoryOptionCombo &&
-                        isBefore(udv.lastUpdated, ddv.lastUpdated);
-                });
-            });
-        };
-
-        var merge = function(dataToUpload, downloadedData) {
-            var concatenatedDataValues = dataToUpload.dataValues.concat(downloadedData.dataValues || []);
-            var dataValuesUnion = _.transform(concatenatedDataValues, function(acc, dv) {
-                var alreadyPresent = _.any(acc, {
-                    "dataElement": dv.dataElement,
-                    "period": dv.period,
-                    "orgUnit": dv.orgUnit,
-                    "categoryOptionCombo": dv.categoryOptionCombo
-                });
-                if (!alreadyPresent) {
-                    acc.push(dv);
-                }
-            }, []);
-            return {
-                "dataValues": dataValuesUnion
-            };
-        };
-
-        var getAllOrgUnits = function() {
+        var getUserOrgUnits = function() {
             return userPreferenceRepository.getAll().then(function(userPreferences) {
                 userPreferences = userPreferences || [];
                 return _.map(_.flatten(_.map(userPreferences, "orgUnits")), function(o) {
@@ -51,13 +15,63 @@ define(["moment", "lodash"], function(moment, _) {
             });
         };
 
-        var downloadDataValues = function() {
-            var saveAllDataValues = function(data) {
-                console.debug("Storing data values : ", data);
-                return dataRepository.save(data);
+        var downloadData = function() {
+            var downloadApprovalData = function(metadata) {
+                var userOrgUnitIds = metadata[0];
+                var allDataSets = _.pluck(metadata[1], "id");
+
+                if (userOrgUnitIds.length === 0) return;
+
+                var saveAllLevelOneApprovalData = function(data) {
+                    console.debug("Storing approval data");
+                    return approvalService.saveLevelOneApprovalData(data);
+                };
+
+                return approvalService.getAllLevelOneApprovalData(userOrgUnitIds, allDataSets).then(saveAllLevelOneApprovalData);
             };
 
-            return $q.all([getAllOrgUnits(), dataSetRepository.getAll()]).then(getAllDataValues).then(saveAllDataValues);
+            var downloadDataValues = function(metadata) {
+                var getPeriod = function(m) {
+                    return m.year() + "W" + m.isoWeek();
+                };
+
+                var dataValuesEquals = function(d1, d2) {
+                    return d1.dataElement === d2.dataElement && d1.period === d2.period && d1.orgUnit === d2.orgUnit && d1.categoryOptionCombo === d2.categoryOptionCombo;
+                };
+
+                var saveAllDataValues = function(data) {
+                    var dataValuesFromDhis = data.dataValues;
+                    var userOrgUnitIds = metadata[0];
+                    var startPeriod = getPeriod(moment());
+                    var endPeriod = getPeriod(moment().isoWeek(properties.projectDataSync.numWeeksToSync));
+                    return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, userOrgUnitIds).then(function(dataValuesFromDb) {
+                        var mergedData = merge(_.flatten(dataValuesFromDb, "dataValues"), dataValuesFromDhis, dataValuesEquals);
+                        return dataRepository.save({
+                            "dataValues": mergedData
+                        });
+                    });
+                };
+
+                return getAllDataValues(metadata).then(saveAllDataValues);
+            };
+
+            return $q.all([getUserOrgUnits(), dataSetRepository.getAll()]).then(function(metadata) {
+                return $q.all([downloadDataValues(metadata), downloadApprovalData(metadata)]);
+            });
+        };
+
+        var merge = function(list1, list2, equalsPred) {
+            equalsPred = _.curry(equalsPred);
+            return _.transform(list2, function(acc, ele) {
+                var resultIndex = _.findIndex(acc, equalsPred(ele));
+                if (resultIndex >= 0) {
+                    if (ele.lastUpdated > acc[resultIndex].lastUpdated) {
+                        acc[resultIndex] = ele;
+                    }
+                } else {
+                    acc.push(ele);
+                }
+            }, list1);
         };
 
         var uploadDataValues = function(dataToUpload) {
@@ -78,28 +92,9 @@ define(["moment", "lodash"], function(moment, _) {
             };
 
             var dataValues = [];
-            return $q.all([getAllOrgUnits(), dataSetRepository.getAll()]).then(getAllDataValues).then(saveAllDataValues).then(uploadData);
+            return $q.all([getUserOrgUnits(), dataSetRepository.getAll()]).then(getAllDataValues).then(saveAllDataValues).then(uploadData);
         };
 
-        var downloadApprovalData = function() {
-            var updateApprovalData = function(data) {
-                var userOrgUnitIds = data[0];
-                var allDataSets = _.pluck(data[1], "id");
-
-                if (userOrgUnitIds.length === 0)
-                    return;
-
-                var saveAllLevelOneApprovalData = function(data) {
-                    console.debug("Storing approval data");
-                    return approvalService.saveLevelOneApprovalData(data);
-                };
-
-                return approvalService.getAllLevelOneApprovalData(userOrgUnitIds, allDataSets).then(saveAllLevelOneApprovalData);
-            };
-
-            return $q.all([getAllOrgUnits(), dataSetRepository.getAll()])
-                .then(updateApprovalData);
-        };
         var uploadApprovalData = function(data) {
             console.debug("Uploading approval data");
             return approvalService.markAsComplete(data.dataSets, data.period, data.orgUnit, data.storedBy, data.date);
@@ -109,8 +104,7 @@ define(["moment", "lodash"], function(moment, _) {
             var payload = message.data;
             var action = {
                 "uploadDataValues": uploadDataValues,
-                "downloadDataValues": downloadDataValues,
-                "downloadApprovalData": downloadApprovalData,
+                "downloadData": downloadData,
                 "uploadApprovalData": uploadApprovalData
             };
 

@@ -13,18 +13,36 @@ define([], function() {
         return deferred.promise;
     };
 
-    var getMockDB = function(q, findResult, allResult) {
+    var getMockDB = function(q, findResult, allResult, eachResult) {
         var mockStore = {
             upsert: jasmine.createSpy("upsert").and.callFake(function(data) {
                 return getPromise(q, data);
             }),
             find: jasmine.createSpy("find").and.returnValue(getPromise(q, findResult)),
-            getAll: jasmine.createSpy("getAll").and.returnValue(getPromise(q, allResult))
+            getAll: jasmine.createSpy("getAll").and.returnValue(getPromise(q, allResult)),
+            each: jasmine.createSpy("each").and.returnValue(getPromise(q, eachResult)),
         };
+        var queryBuilder = function() {
+            this.$index = function() {
+                return this;
+            };
+            this.$eq = function(v) {
+                return this;
+            };
+            this.$between = function(v) {
+                return this;
+            };
+            this.compile = function() {
+                return "blah";
+            };
+            return this;
+        };
+
         var db = {
             "objectStore": jasmine.createSpy("objectStore").and.callFake(function() {
                 return mockStore;
-            })
+            }),
+            "queryBuilder": queryBuilder
         };
 
         return {

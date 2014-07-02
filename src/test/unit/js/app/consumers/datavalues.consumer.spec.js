@@ -8,14 +8,6 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 q = $q;
                 scope = $rootScope.$new();
 
-                dataService = new DataService();
-                dataRepository = new DataRepository();
-                dataSetRepository = new DataSetRepository();
-                userPreferenceRepository = new UserPreferenceRepository();
-                approvalService = new ApprovalService();
-
-                dataValuesConsumer = new DataValuesConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, approvalService);
-
                 userPref = [{
                     "orgUnits": [{
                         "id": "org_0"
@@ -26,31 +18,252 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     "id": "DS_OPD"
                 }];
 
-                message = {
-                    "data": {
-                        "type": "downloadDataValues"
-                    }
+                userPreferenceRepository = {
+                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, userPref))
                 };
 
+                dataSetRepository = {
+                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, allDataSets))
+                };
+
+                dataRepository = {
+                    "getDataValuesForPeriodsOrgUnits": jasmine.createSpy("getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, {})),
+                    "save": jasmine.createSpy("save")
+                };
+
+                dataService = {
+                    "downloadAllData": jasmine.createSpy("downloadAllData").and.returnValue(utils.getPromise(q, [])),
+                    "save": jasmine.createSpy("save")
+                };
+
+                approvalService = {
+                    "getAllLevelOneApprovalData": jasmine.createSpy("getAllLevelOneApprovalData").and.returnValue(utils.getPromise(q, {})),
+                    "saveLevelOneApprovalData": jasmine.createSpy("saveLevelOneApprovalData")
+                };
+
+                dataValuesConsumer = new DataValuesConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, approvalService);
             }));
 
-            it("should download data values if org units and datasets are present and there is no data to upload", function() {
-                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
-                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
-                spyOn(dataRepository, "save");
-                spyOn(dataService, "downloadAllData").and.returnValue(utils.getPromise(q, []));
-                spyOn(dataService, "save");
+            it("should download data values from dhis based on user preferences and dataset metadata", function() {
+
+                userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, [{
+                    "orgUnits": [{
+                        "id": "ou1"
+                    }]
+                }]));
+
+                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [{
+                    "id": "ds1"
+                }]));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
 
                 dataValuesConsumer.run(message);
                 scope.$apply();
 
                 expect(userPreferenceRepository.getAll).toHaveBeenCalled();
                 expect(dataSetRepository.getAll).toHaveBeenCalled();
-                expect(dataService.downloadAllData).toHaveBeenCalled();
-                expect(dataService.save).not.toHaveBeenCalled();
+                expect(dataService.downloadAllData).toHaveBeenCalledWith(['ou1'], [{
+                    id: 'ds1'
+                }]);
             });
 
-            it("should upload datavalues if data to upload has no conflicts and save merged data values to idb", function() {
+            it("should save the same data back to indexeddb if no data is available in dhis", function() {
+
+                dataService.downloadAllData.and.returnValue(utils.getPromise(q, []));
+
+                var dbDataValues = [{
+                    "orgUnit": "MSF_0",
+                    "period": "2014W11",
+                    "dataValues": [{
+                        "dataElement": "DE1",
+                        "period": "2014W11",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-27T09:00:00.120Z",
+                        "value": 5
+                    }]
+                }, {
+                    "orgUnit": "MSF_0",
+                    "period": "2014W12",
+                    "dataValues": [{
+                        "dataElement": "DE1",
+                        "period": "2014W12",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-27T09:00:00.120Z",
+                        "value": 1
+                    }]
+                }];
+
+                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbDataValues));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
+
+                dataValuesConsumer.run(message);
+                scope.$apply();
+
+                var expected = {
+                    "dataValues": [{
+                        "dataElement": "DE1",
+                        "period": "2014W11",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-27T09:00:00.120Z",
+                        "value": 5
+                    }, {
+                        "dataElement": "DE1",
+                        "period": "2014W12",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-27T09:00:00.120Z",
+                        "value": 1
+                    }]
+                };
+
+                expect(dataRepository.save).toHaveBeenCalledWith(expected);
+            });
+
+            it("should save downloaded data to indexeddb if no data already exists in db", function() {
+
+                var dhisDataValues = {
+                    "dataValues": [{
+                        "dataElement": "DE1",
+                        "period": "2014W11",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-27T09:00:00.120Z",
+                        "value": 5
+                    }, {
+                        "dataElement": "DE2",
+                        "period": "2014W11",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-27T09:00:00.120Z",
+                        "value": 10
+                    }]
+                };
+
+                dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
+
+                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
+
+                dataValuesConsumer.run(message);
+                scope.$apply();
+
+                var expected = {
+                    "dataValues": [{
+                        "dataElement": "DE1",
+                        "period": "2014W11",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-27T09:00:00.120Z",
+                        "value": 5
+                    }, {
+                        "dataElement": "DE2",
+                        "period": "2014W11",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-27T09:00:00.120Z",
+                        "value": 10
+                    }]
+                };
+
+                expect(dataRepository.save).toHaveBeenCalledWith(expected);
+            });
+
+            it("should merge dhisData with existing db data and save to indexeddb", function() {
+                var dhisDataValues = {
+                    "dataValues": [{
+                        "dataElement": "DE1",
+                        "period": "2014W12",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-27T09:00:00.120Z",
+                        "value": 2
+                    }, {
+                        "dataElement": "DE2",
+                        "period": "2014W12",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-20T09:00:00.120Z",
+                        "value": 1
+                    }]
+                };
+
+                var dbDataValues = [{
+                    "orgUnit": "MSF_0",
+                    "period": "2014W12",
+                    "dataValues": [{
+                        "dataElement": "DE1",
+                        "period": "2014W12",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-24T09:00:00.120Z",
+                        "value": 1
+                    }]
+                }, {
+                    "orgUnit": "MSF_0",
+                    "period": "2014W12",
+                    "dataValues": [{
+                        "dataElement": "DE2",
+                        "period": "2014W12",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-25T09:00:00.120Z",
+                        "value": 2
+                    }]
+                }];
+
+                dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
+
+                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbDataValues));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
+
+                dataValuesConsumer.run(message);
+                scope.$apply();
+
+                var expectedDataValues = {
+                    "dataValues": [{
+                        "dataElement": "DE1",
+                        "period": "2014W12",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-27T09:00:00.120Z",
+                        "value": 2
+                    }, {
+                        "dataElement": "DE2",
+                        "period": "2014W12",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-25T09:00:00.120Z",
+                        "value": 2
+                    }]
+                };
+
+                expect(dataRepository.save).toHaveBeenCalledWith(expectedDataValues);
+            });
+
+            xit("should upload datavalues if data to upload has no conflicts and save merged data values to idb", function() {
                 var dataValuesToUpload = {
                     "dataValues": [{
                         "id": 1,
@@ -114,46 +327,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(dataService.save).toHaveBeenCalledWith(dataValuesToUpload);
             });
 
-            it("should download but not upload datavalues if data to upload has conflicts", function() {
-                var dataValuesToUpload = {
-                    "dataValues": [{
-                        "id": 1,
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T08:25:37.120Z"
-                    }]
-                };
-                var downloadedDataValues = {
-                    "dataValues": [{
-                        "id": 1,
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z"
-                    }]
-                };
-                message.data.data = dataValuesToUpload;
-                message.data.type = "uploadDataValues";
-
-                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
-                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
-                spyOn(dataRepository, "save");
-                spyOn(dataService, "downloadAllData").and.returnValue(utils.getPromise(q, downloadedDataValues));
-                spyOn(dataService, "save");
-
-                dataValuesConsumer.run(message);
-                scope.$apply();
-
-                expect(userPreferenceRepository.getAll).toHaveBeenCalled();
-                expect(dataSetRepository.getAll).toHaveBeenCalled();
-                expect(dataService.downloadAllData).toHaveBeenCalled();
-                expect(dataService.save).not.toHaveBeenCalled();
-            });
-
-            it("should not run data values if org units is not present", function() {
+            xit("should not run data values if org units is not present", function() {
                 spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
                 spyOn(dataRepository, "save");
@@ -167,7 +341,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(dataService.downloadAllData).not.toHaveBeenCalled();
             });
 
-            it("should not run data values if dataSets is not present", function() {
+            xit("should not run data values if dataSets is not present", function() {
                 spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
                 spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, []));
                 spyOn(dataRepository, "save");
@@ -181,7 +355,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(dataService.downloadAllData).not.toHaveBeenCalled();
             });
 
-            it("should download approval data", function() {
+            xit("should download approval data", function() {
 
                 var completionData = {
                     "blah": true
@@ -213,7 +387,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(approvalService.saveLevelOneApprovalData).toHaveBeenCalledWith(completionData);
             });
 
-            it("should abort approval data download if no orgunits are found in user pref", function() {
+            xit("should abort approval data download if no orgunits are found in user pref", function() {
                 var allDataSets = [{
                     "id": "DS_OPD"
                 }];

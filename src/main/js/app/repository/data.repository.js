@@ -30,6 +30,16 @@ define(["lodash"], function(_) {
             return store.find([period, orgUnitId]);
         };
 
+        this.getDataValuesForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
+            var store = db.objectStore('dataValues');
+            var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
+            return store.each(query).then(function(dataValues) {
+                return _.filter(dataValues, function(dv) {
+                    return _.contains(orgUnits, dv.orgUnit);
+                });
+            });
+        };
+
         this.getCompleteDataValues = function(period, orgUnitId) {
             var filterSoftDeletedApprovals = function(d) {
                 return d && d.isDeleted ? undefined : d;

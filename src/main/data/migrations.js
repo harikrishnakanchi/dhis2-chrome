@@ -33,7 +33,8 @@ define([], function() {
     };
 
     var create_datavalues_store = function(db, tx) {
-        create_store_with_key("dataValues", ["period", "orgUnit"], db);
+        var dataValueStore = create_store_with_key("dataValues", ["period", "orgUnit"], db);
+        create_index(dataValueStore, "by_period", "period", false);
     };
 
     var add_organisation_units_and_level_store = function(db, tx) {

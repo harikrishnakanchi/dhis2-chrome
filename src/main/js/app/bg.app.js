@@ -43,11 +43,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         console.log("Starting project data sync");
 
                         $hustle.publish({
-                            "type": "downloadDataValues"
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadApprovalData"
+                            "type": "downloadData"
                         }, "dataValues");
                     };
 

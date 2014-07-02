@@ -3,8 +3,7 @@ define([], function() {
         this.run = function(message) {
             switch (message.data.type) {
                 case "uploadDataValues":
-                case "downloadDataValues":
-                case "downloadApprovalData":
+                case "downloadData":
                 case "uploadApprovalData":
                     return dataValuesConsumer.run(message);
                 case "createOrgUnit":

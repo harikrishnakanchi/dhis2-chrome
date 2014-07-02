@@ -26,7 +26,7 @@ define(["dashboardController", "angularMocks", "utils"], function(DashboardContr
             expect(scope.isSyncRunning).toEqual(false);
             expect(scope.isSyncDone).toEqual(true);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "downloadDataValues"
+                "type": "downloadData"
             }, "dataValues");
         });
     });

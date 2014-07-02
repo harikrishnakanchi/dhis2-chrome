@@ -10,15 +10,11 @@
                     $scope.isSyncDone = true;
                 };
 
-                var downloadDataValues = $hustle.publish({
-                    "type": "downloadDataValues"
+                var downloadData = $hustle.publish({
+                    "type": "downloadData"
                 }, "dataValues");
 
-                var downloadApprovalData = $hustle.publish({
-                    "type": "downloadApprovalData"
-                }, "dataValues");
-
-                return $q.all([downloadDataValues, downloadApprovalData]).then(onSuccess);
+                return downloadData.then(onSuccess);
             };
         };
     });
