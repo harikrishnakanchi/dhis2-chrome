@@ -28,7 +28,7 @@ define(["md5"], function(md5) {
 
         var downloadDataValues = function() {
             return $hustle.publish({
-                "type": "downloadDataValues"
+                "type": "downloadData"
             }, "dataValues");
         };
 
