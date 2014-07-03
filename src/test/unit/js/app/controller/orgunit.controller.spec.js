@@ -8,7 +8,13 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 'id': id,
                 'name': name,
                 'level': level,
-                'parent': parent
+                'parent': parent,
+                'attributeValues': [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "country"
+                }]
             };
         };
 
@@ -40,7 +46,13 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 id: 1
             },
             'children': [],
-            'collapsed': true
+            'collapsed': true,
+            'attributeValues': [{
+                "attribute": {
+                    "id": "a1fa2777924"
+                },
+                "value": "country"
+            }]
         };
 
         var expectedOrgUnitTree = [{
@@ -49,7 +61,13 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             'level': 1,
             'parent': null,
             'children': [child],
-            'collapsed': true
+            'collapsed': true,
+            'attributeValues': [{
+                "attribute": {
+                    "id": "a1fa2777924"
+                },
+                "value": "country"
+            }]
         }];
 
         beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout, $anchorScroll) {
@@ -121,6 +139,12 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 parent: {
                     id: 1
                 },
+                'attributeValues': [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "country"
+                }],
                 children: [],
                 selected: true,
                 collapsed: false
@@ -159,6 +183,21 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 5: 'Operation Unit / Module',
                 6: 'Module'
             });
+        });
+
+        it("should close edit form and select the newly created orgunit", function() {
+            var successMessage = "saved successfully";
+            var expectedSelectedNode = expectedOrgUnitTree[0];
+            expectedSelectedNode.collapsed = false;
+            expectedSelectedNode.selected = true;
+            scope.closeEditForm({
+                "id": 1
+            }, successMessage);
+            scope.$apply();
+
+            expect(scope.message).toEqual(successMessage);
+            expect(scope.showMessage).toBe(true);
+            expect(scope.state.currentNode).toEqual(expectedSelectedNode);
         });
 
         it("should show the selected organisation unit details", function() {
