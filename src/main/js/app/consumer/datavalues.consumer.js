@@ -75,24 +75,18 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
         };
 
         var uploadDataValues = function(dataToUpload) {
-            var saveAllDataValues = function(data) {
-                console.debug("Storing data values : ", data);
-                if (hasConflict(dataToUpload.dataValues, data.dataValues)) {
-                    console.debug("Conflicting data values : ", data, dataToUpload);
-                    dataRepository.save(data);
-                    return $q.reject("");
-                } else {
-                    data = merge(dataToUpload, data);
-                }
-                return dataRepository.save(data);
+            var preparePayload = function() {
+                var dataValues = dataToUpload.dataValues[0];
+                return dataRepository.getDataValues(dataValues.period, dataValues.orgUnit).then(function(data) {
+                    return data;
+                });
             };
 
-            var uploadData = function() {
-                return dataService.save(dataToUpload);
+            var uploadData = function(data) {
+                return dataService.save(data);
             };
 
-            var dataValues = [];
-            return $q.all([getUserOrgUnits(), dataSetRepository.getAll()]).then(getAllDataValues).then(saveAllDataValues).then(uploadData);
+            return downloadData().then(preparePayload).then(uploadData);
         };
 
         var uploadApprovalData = function(data) {
@@ -107,7 +101,6 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                 "downloadData": downloadData,
                 "uploadApprovalData": uploadApprovalData
             };
-
             return action[payload.type](payload.data);
         };
     };

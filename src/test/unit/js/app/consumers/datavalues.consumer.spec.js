@@ -27,6 +27,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 };
 
                 dataRepository = {
+                    "getDataValues": jasmine.createSpy("getDataValues").and.returnValue(utils.getPromise(q, {})),
                     "getDataValuesForPeriodsOrgUnits": jasmine.createSpy("getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, {})),
                     "save": jasmine.createSpy("save")
                 };
@@ -263,70 +264,6 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(dataRepository.save).toHaveBeenCalledWith(expectedDataValues);
             });
 
-            xit("should upload datavalues if data to upload has no conflicts and save merged data values to idb", function() {
-                var dataValuesToUpload = {
-                    "dataValues": [{
-                        "id": 1,
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:25:37.120Z"
-                    }]
-                };
-                var downloadedDataValues = {
-                    "dataValues": [{
-                        "id": 1,
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z"
-                    }, {
-                        "id": 2,
-                        "dataElement": "DE2",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C2",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z"
-                    }]
-                };
-                var mergedDataValues = {
-                    "dataValues": [{
-                        "id": 1,
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:25:37.120Z"
-                    }, {
-                        "id": 2,
-                        "dataElement": "DE2",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C2",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z"
-                    }]
-                };
-                message.data.data = dataValuesToUpload;
-                message.data.type = "uploadDataValues";
-
-                spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, userPref));
-                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
-                spyOn(dataRepository, "save");
-                spyOn(dataService, "downloadAllData").and.returnValue(utils.getPromise(q, downloadedDataValues));
-                spyOn(dataService, "save");
-
-                dataValuesConsumer.run(message);
-                scope.$apply();
-
-                expect(userPreferenceRepository.getAll).toHaveBeenCalled();
-                expect(dataSetRepository.getAll).toHaveBeenCalled();
-                expect(dataService.downloadAllData).toHaveBeenCalled();
-                expect(dataRepository.save).toHaveBeenCalledWith(mergedDataValues);
-                expect(dataService.save).toHaveBeenCalledWith(dataValuesToUpload);
-            });
-
             it("should not download data values if org units is not present", function() {
                 userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, {}));
                 message = {
@@ -403,6 +340,58 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
 
                 expect(approvalService.getAllLevelOneApprovalData).not.toHaveBeenCalled();
                 expect(approvalService.saveLevelOneApprovalData).not.toHaveBeenCalled();
+            });
+
+            it("should upload data to DHIS", function() {
+                var dbDataValues = {
+                    "orgUnit": "MSF_0",
+                    "period": "2014W12",
+                    "dataValues": [{
+                        "dataElement": "DE1",
+                        "period": "2014W12",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-24T09:00:00.120Z",
+                        "value": 1
+                    }, {
+                        "dataElement": "DE2",
+                        "period": "2014W12",
+                        "orgUnit": "MSF_0",
+                        "categoryOptionCombo": "C1",
+                        "lastUpdated": "2014-05-24T09:00:00.120Z",
+                        "value": 2
+                    }]
+                };
+
+                dataRepository.getDataValues.and.returnValue(utils.getPromise(q, dbDataValues));
+
+                message = {
+                    "data": {
+                        "data": {
+                            "dataValues": [{
+                                "dataElement": "DE1",
+                                "period": "2014W12",
+                                "orgUnit": "MSF_0",
+                                "categoryOptionCombo": "C1",
+                                "lastUpdated": "2014-05-24T09:00:00.120Z",
+                                "value": 1
+                            }, {
+                                "dataElement": "DE2",
+                                "period": "2014W12",
+                                "orgUnit": "MSF_0",
+                                "categoryOptionCombo": "C1",
+                                "lastUpdated": "2014-05-24T09:00:00.120Z",
+                                "value": 2
+                            }]
+                        },
+                        "type": "uploadDataValues"
+                    }
+                };
+
+                dataValuesConsumer.run(message);
+                scope.$apply();
+
+                expect(dataService.save).toHaveBeenCalledWith(dbDataValues);
             });
         });
     });
