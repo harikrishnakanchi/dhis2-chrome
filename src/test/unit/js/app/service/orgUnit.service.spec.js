@@ -26,11 +26,36 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.verifyNoOutstandingRequest();
         });
 
-        it("should save organization unit in dhis", function() {
+        it("should save organization units in dhis", function() {
             var orgUnit = [{
                 "id": "org_0",
                 "level": 1
+            }, {
+                "id": "org_1",
+                "level": 1
             }];
+
+            var expectedPayload = {
+                organisationUnits: [{
+                    id: 'org_0',
+                    level: 1
+                }, {
+                    "id": "org_1",
+                    "level": 1
+                }]
+            };
+
+            orgUnitService.create(orgUnit);
+
+            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
+            httpBackend.flush();
+        });
+
+        it("should save organization unit in dhis", function() {
+            var orgUnit = {
+                "id": "org_0",
+                "level": 1
+            };
 
             var expectedPayload = {
                 organisationUnits: [{

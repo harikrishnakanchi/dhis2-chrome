@@ -47,7 +47,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
         };
 
-        $scope.closeEditForm = function(selectedNodeId, message) {
+        $scope.closeEditForm = function(selectedNode, message) {
             if (message) {
                 $scope.showMessage = true;
                 $scope.message = message;
@@ -55,7 +55,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
                     $scope.showMessage = false;
                 }, properties.messageTimeout);
             }
-            $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
+            $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNode.id));
         };
 
         var scrollToTop = function() {

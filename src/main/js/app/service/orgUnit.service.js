@@ -3,7 +3,7 @@ define(["properties", "lodash"], function(properties, _) {
 
         var create = function(orgUnitRequest) {
             return $http.post(properties.dhis.url + '/api/metadata', {
-                'organisationUnits': orgUnitRequest
+                'organisationUnits': angular.isArray(orgUnitRequest) ? orgUnitRequest : [orgUnitRequest]
             });
         };
 

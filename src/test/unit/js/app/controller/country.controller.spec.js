@@ -57,7 +57,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                 'level': '2',
             };
 
-            var expectedNewOrgUnit = [{
+            var expectedNewOrgUnit = {
                 'id': orgUnitId,
                 'name': newOrgUnit.name,
                 'level': 3,
@@ -73,7 +73,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                     },
                     'value': "Country"
                 }]
-            }];
+            };
 
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 

@@ -65,7 +65,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 'level': 2,
             };
 
-            var expectedNewOrgUnit = [{
+            var expectedNewOrgUnit = {
                 id: orgUnitId,
                 name: newOrgUnit.name,
                 shortName: newOrgUnit.name,
@@ -130,7 +130,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                     },
                     "value": moment(newOrgUnit.endDate).format("YYYY-MM-DD")
                 }],
-            }];
+            };
 
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');

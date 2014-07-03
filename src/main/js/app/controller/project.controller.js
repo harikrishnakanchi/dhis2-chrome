@@ -44,7 +44,9 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             return $hustle.publish({
                 "data": data,
                 "type": action
-            }, "dataValues");
+            }, "dataValues").then(function() {
+                return data;
+            });
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
@@ -58,7 +60,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
                 $scope.saveFailure = true;
             };
 
-            var dhisProject = new Array(orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit));
+            var dhisProject = orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit);
 
             return orgUnitRepository.upsert(dhisProject)
                 .then(function(data) {

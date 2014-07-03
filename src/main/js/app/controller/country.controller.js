@@ -38,10 +38,12 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 return $hustle.publish({
                     "data": data,
                     "type": "createOrgUnit"
-                }, "dataValues");
+                }, "dataValues").then(function() {
+                    return data;
+                });
             };
 
-            return orgUnitRepository.upsert([newOrgUnit])
+            return orgUnitRepository.upsert(newOrgUnit)
                 .then(saveToDhis)
                 .then(onSuccess, onError);
         };

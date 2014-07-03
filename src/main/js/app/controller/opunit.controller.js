@@ -43,7 +43,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
 
             var onSuccess = function(data) {
                 if ($scope.$parent.closeEditForm)
-                    $scope.$parent.closeEditForm($scope.orgUnit.id, "savedOpUnit");
+                    $scope.$parent.closeEditForm($scope.orgUnit, "savedOpUnit");
             };
 
             var onError = function(data) {

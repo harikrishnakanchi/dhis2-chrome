@@ -133,7 +133,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.onSuccess = function(data) {
             $scope.saveFailure = false;
             if ($scope.$parent.closeEditForm)
-                $scope.$parent.closeEditForm($scope.orgUnit.id, "savedModule");
+                $scope.$parent.closeEditForm($scope.orgUnit, "savedModule");
         };
 
         $scope.onError = function(data) {
