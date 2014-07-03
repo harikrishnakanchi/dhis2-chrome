@@ -157,7 +157,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var markAllDataAsComplete = function() {
-                return approvalService.saveCompletionToDB(dataForApproval);
+                return approvalService.save(dataForApproval);
             };
 
             var saveToDhis = function() {

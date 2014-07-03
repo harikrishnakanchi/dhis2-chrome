@@ -793,7 +793,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 result: utils.getPromise(q, {})
             });
             spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
-            spyOn(approvalService, "saveCompletionToDB").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalService, "save").and.returnValue(utils.getPromise(q, {}));
 
             var _Date = Date;
             spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
@@ -823,7 +823,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.firstLevelApproval();
             scope.$apply();
 
-            expect(approvalService.saveCompletionToDB).toHaveBeenCalledWith(data);
+            expect(approvalService.save).toHaveBeenCalledWith(data);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": data,
                 "type": 'uploadApprovalData'
@@ -841,7 +841,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 result: utils.getPromise(q, {})
             });
             spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
-            spyOn(approvalService, "saveCompletionToDB").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalService, "save").and.returnValue(utils.getPromise(q, {}));
 
             var _Date = Date;
             spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
@@ -880,7 +880,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 result: utils.getPromise(q, {})
             });
             spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
-            spyOn(approvalService, "saveCompletionToDB").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalService, "save").and.returnValue(utils.getPromise(q, {}));
 
             var _Date = Date;
             spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));

@@ -38,8 +38,8 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 };
 
                 approvalService = {
-                    "getAllLevelOneApprovalData": jasmine.createSpy("getAllLevelOneApprovalData").and.returnValue(utils.getPromise(q, {})),
-                    "saveLevelOneApprovalData": jasmine.createSpy("saveLevelOneApprovalData")
+                    "getAllLevelOneApprovalData": jasmine.createSpy("getAllLevelOneApprovalData").and.returnValue(utils.getPromise(q, [])),
+                    "save": jasmine.createSpy("save")
                 };
 
                 dataValuesConsumer = new DataValuesConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, approvalService);
@@ -318,18 +318,18 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 scope.$apply();
 
                 expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalledWith(["org_0"], ["DS_OPD"]);
-                expect(approvalService.saveLevelOneApprovalData).toHaveBeenCalledWith(completionData);
+                expect(approvalService.save).toHaveBeenCalledWith(completionData);
             });
 
             xit("should abort approval data download if no orgunits are found in user pref", function() {
-                var allDataSets = [{
+            var allDataSets = [{
                     "id": "DS_OPD"
                 }];
 
                 spyOn(userPreferenceRepository, "getAll").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDataSets));
                 spyOn(approvalService, "getAllLevelOneApprovalData");
-                spyOn(approvalService, "saveLevelOneApprovalData");
+                spyOn(approvalService, "save");
 
                 dataValuesConsumer.run({
                     "data": {
@@ -339,7 +339,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 scope.$apply();
 
                 expect(approvalService.getAllLevelOneApprovalData).not.toHaveBeenCalled();
-                expect(approvalService.saveLevelOneApprovalData).not.toHaveBeenCalled();
+                expect(approvalService.save).not.toHaveBeenCalled();
             });
 
             it("should upload data to DHIS", function() {

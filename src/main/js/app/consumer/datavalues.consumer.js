@@ -24,7 +24,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
 
                 var saveAllLevelOneApprovalData = function(data) {
                     console.debug("Storing approval data");
-                    return approvalService.saveLevelOneApprovalData(data);
+                    return approvalService.save(data);
                 };
 
                 return approvalService.getAllLevelOneApprovalData(userOrgUnitIds, allDataSets).then(saveAllLevelOneApprovalData);

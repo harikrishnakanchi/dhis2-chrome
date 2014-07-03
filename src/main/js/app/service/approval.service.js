@@ -13,16 +13,28 @@ define(["properties", "moment"], function(properties, moment) {
             });
         };
 
-        this.saveCompletionToDB = function(payload) {
-            var store = db.objectStore("completeDataSets");
-            return store.upsert(payload);
-        };
-
         this.getAllLevelOneApprovalData = function(orgUnits, dataSets) {
+
+            var transform = function(completeDataSetRegistrationList) {
+                var registrationsGroupedByPeriodAndOu = _.groupBy(completeDataSetRegistrationList, function(registration) {
+                    return [registration.period.id, registration.organisationUnit.id];
+                });
+
+                return _.map(registrationsGroupedByPeriodAndOu, function(item) {
+                    return {
+                        'period': _.pluck(item, 'period')[0].id,
+                        'orgUnit': _.pluck(item, 'organisationUnit')[0].id,
+                        'storedBy': _.pluck(item, 'storedBy')[0],
+                        'date': _.pluck(item, 'date')[0],
+                        'dataSets': _.pluck(_.pluck(item, 'dataSet'), 'id')
+                    };
+                });
+            };
+
             var onSuccess = function(response) {
                 var deferred = $q.defer();
                 if (response.data.completeDataSetRegistrationList)
-                    deferred.resolve(response.data.completeDataSetRegistrationList);
+                    deferred.resolve(transform(response.data.completeDataSetRegistrationList));
                 else
                     deferred.resolve([]);
                 return deferred.promise;
@@ -45,24 +57,9 @@ define(["properties", "moment"], function(properties, moment) {
                     "children": true
                 }
             }).then(onSuccess, onFailure);
-
         };
 
-        this.saveLevelOneApprovalData = function(completeDataSetRegistrationList) {
-            var registrationsGroupedByPeriodAndOu = _.groupBy(completeDataSetRegistrationList, function(registration) {
-                return [registration.period.id, registration.organisationUnit.id];
-            });
-
-            var payload = _.map(registrationsGroupedByPeriodAndOu, function(item) {
-                return {
-                    'period': _.pluck(item, 'period')[0].id,
-                    'orgUnit': _.pluck(item, 'organisationUnit')[0].id,
-                    'storedBy': _.pluck(item, 'storedBy')[0],
-                    'date': _.pluck(item, 'date')[0],
-                    'dataSets': _.pluck(_.pluck(item, 'dataSet'), 'id')
-                };
-            });
-
+        this.save = function(payload) {
             var store = db.objectStore("completeDataSets");
             return store.upsert(payload);
         };

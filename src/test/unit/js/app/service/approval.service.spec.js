@@ -32,65 +32,96 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
         });
 
-        it("should mark data as complete in db", function() {
-
-            var _Date = Date;
-            spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
-
-            var data = {
-                dataSets: [],
-                period: '2014W14',
-                orgUnit: 'mod2',
-                storedBy: 'dataentryuser',
-                date: moment().toISOString()
-            };
-
-            var approvalService = new ApprovalService(http, db, q);
-            approvalService.saveCompletionToDB(data);
-
-            expect(mockStore.upsert).toHaveBeenCalledWith(data);
-
-        });
-
         it("should get complete datasets", function() {
-            var dataSets = ["170b8c", "d5e53"];
-            var orgUnits = ["c484c9", "9b86d"];
+            var dataSets = ["d1", "d2"];
+            var orgUnits = ["ou1", "ou2"];
             var endDate = moment().format("YYYY-MM-DD");
 
-            httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations?children=true&dataSet=170b8c&dataSet=d5e53&endDate=" + endDate + "&orgUnit=c484c9&orgUnit=9b86d&startDate=1900-01-01").respond(200, "ok");
-
-            approvalService = new ApprovalService(http, db, q);
-            approvalService.getAllLevelOneApprovalData(orgUnits, dataSets);
-
-            httpBackend.flush();
-        });
-
-
-        it("should get save complete datasets", function() {
-            var completionRegistrationFor = function(dataSets, period, completedDate) {
-                return _.map(dataSets, function(ds) {
-                    return {
-                        "dataSet": {
-                            "id": ds,
-                        },
-                        "period": {
-                            "id": period,
-                        },
-                        "organisationUnit": {
-                            "id": "ou1",
-                        },
-                        "date": completedDate,
-                        "storedBy": "testproj_approver_l1"
-                    };
-                });
+            var dhisApprovalData = {
+                "completeDataSetRegistrationList": [{
+                    "dataSet": {
+                        "id": "d1"
+                    },
+                    "period": {
+                        "id": "2014W01"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "date": "2014-01-03T00:00:00.000+0000",
+                    "lastModifiedTime": "2014-01-03T00:00:00.000+0000",
+                    "storedBy": "testproj_approver_l1"
+                }, {
+                    "dataSet": {
+                        "id": "d2"
+                    },
+                    "period": {
+                        "id": "2014W01"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "date": "2014-01-03T00:00:00.000+0000",
+                    "lastModifiedTime": "2014-01-03T00:00:00.000+0000",
+                    "storedBy": "testproj_approver_l1"
+                }, {
+                    "dataSet": {
+                        "id": "d1"
+                    },
+                    "period": {
+                        "id": "2014W02"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "date": "2014-01-10T00:00:00.000+0000",
+                    "lastModifiedTime": "2014-01-10T00:00:00.000+0000",
+                    "storedBy": "testproj_approver_l1"
+                }, {
+                    "dataSet": {
+                        "id": "d2"
+                    },
+                    "period": {
+                        "id": "2014W02"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "date": "2014-01-10T00:00:00.000+0000",
+                    "lastModifiedTime": "2014-01-10T00:00:00.000+0000",
+                    "storedBy": "testproj_approver_l1"
+                }]
             };
 
-            var dataSets = ["d1", "d2", "d3"];
-            var completeDataSetRegistrationList = [];
-            completeDataSetRegistrationList = completeDataSetRegistrationList.concat(completionRegistrationFor(dataSets, "2014W01", moment("2010-01-01").toDate()));
-            completeDataSetRegistrationList = completeDataSetRegistrationList.concat(completionRegistrationFor(dataSets, "2014W02", moment("2010-01-07").toDate()));
+            httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations?children=true&dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnit=ou1&orgUnit=ou2&startDate=1900-01-01").respond(200, dhisApprovalData);
 
-            var expectedData = [{
+            var actualApprovalData;
+            approvalService = new ApprovalService(http, db, q);
+            approvalService.getAllLevelOneApprovalData(orgUnits, dataSets).then(function(data) {
+                actualApprovalData = data;
+            });
+
+            httpBackend.flush();
+
+            var expectedApprovalData = [{
+                "period": "2014W01",
+                "orgUnit": "ou1",
+                "storedBy": "testproj_approver_l1",
+                "date": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2"]
+            }, {
+                "period": "2014W02",
+                "orgUnit": "ou1",
+                "storedBy": "testproj_approver_l1",
+                "date": "2014-01-10T00:00:00.000+0000",
+                "dataSets": ["d1", "d2"]
+            }];
+
+            expect(actualApprovalData).toEqual(expectedApprovalData);
+        });
+
+        it("should get save complete datasets", function() {
+            var completeDataSetRegistrationList = [{
                 "orgUnit": "ou1",
                 "period": "2014W01",
                 "storedBy": "testproj_approver_l1",
@@ -105,10 +136,10 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             }];
 
             approvalService = new ApprovalService(http, db, q);
-            approvalService.saveLevelOneApprovalData(completeDataSetRegistrationList);
+            approvalService.save(completeDataSetRegistrationList);
 
             expect(db.objectStore).toHaveBeenCalledWith("completeDataSets");
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedData);
+            expect(mockStore.upsert).toHaveBeenCalledWith(completeDataSetRegistrationList);
         });
     });
 });
