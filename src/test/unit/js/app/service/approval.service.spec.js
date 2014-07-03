@@ -119,27 +119,5 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
             expect(actualApprovalData).toEqual(expectedApprovalData);
         });
-
-        it("should get save complete datasets", function() {
-            var completeDataSetRegistrationList = [{
-                "orgUnit": "ou1",
-                "period": "2014W01",
-                "storedBy": "testproj_approver_l1",
-                "date": moment("2010-01-01").toDate(),
-                "dataSets": ["d1", "d2", "d3"]
-            }, {
-                "orgUnit": "ou1",
-                "period": "2014W02",
-                "storedBy": "testproj_approver_l1",
-                "date": moment("2010-01-07").toDate(),
-                "dataSets": ["d1", "d2", "d3"]
-            }];
-
-            approvalService = new ApprovalService(http, db, q);
-            approvalService.save(completeDataSetRegistrationList);
-
-            expect(db.objectStore).toHaveBeenCalledWith("completeDataSets");
-            expect(mockStore.upsert).toHaveBeenCalledWith(completeDataSetRegistrationList);
-        });
     });
 });

@@ -26,6 +26,7 @@ require.config({
         //Repositories
         "repositories": "app/repository/bg.repositories",
         "dataRepository": "app/repository/data.repository",
+        "approvalDataRepository": "app/repository/approval.data.repository",
         "dataSetRepository": "app/repository/dataset.repository",
         "userPreferenceRepository": "app/repository/userpreference.repository",
 

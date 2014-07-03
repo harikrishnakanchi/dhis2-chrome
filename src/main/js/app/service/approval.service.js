@@ -58,10 +58,5 @@ define(["properties", "moment"], function(properties, moment) {
                 }
             }).then(onSuccess, onFailure);
         };
-
-        this.save = function(payload) {
-            var store = db.objectStore("completeDataSets");
-            return store.upsert(payload);
-        };
     };
 });

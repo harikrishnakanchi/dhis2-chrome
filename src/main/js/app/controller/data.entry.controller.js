@@ -1,6 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-
-    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalService) {
+    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository) {
         var dataSets, systemSettings;
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -40,7 +39,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var initDataEntryForm = function() {
-            dataRepository.getCompleteDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
+            approvalDataRepository.getCompleteDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
                 if (_.isEmpty(data)) {
                     $scope.isApproved = false || $scope.approveSuccess;
                 } else {
@@ -157,7 +156,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var markAllDataAsComplete = function() {
-                return approvalService.save(dataForApproval);
+                return approvalDataRepository.save(dataForApproval);
             };
 
             var saveToDhis = function() {
@@ -209,7 +208,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var unapproveData = function() {
-                return dataRepository.unapproveLevelOneData(period, $scope.currentModule.id);
+                return approvalDataRepository.unapproveLevelOneData(period, $scope.currentModule.id);
             };
 
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);

@@ -322,7 +322,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
             });
 
             xit("should abort approval data download if no orgunits are found in user pref", function() {
-            var allDataSets = [{
+                var allDataSets = [{
                     "id": "DS_OPD"
                 }];
 
