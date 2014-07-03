@@ -57,7 +57,7 @@ define(["dhisId"], function(dhisId) {
             var onSuccess = function(data) {
                 $scope.saveFailure = false;
                 if ($scope.$parent.closeEditForm)
-                    $scope.$parent.closeEditForm($scope.orgUnit.id, "savedUser");
+                    $scope.$parent.closeEditForm($scope.orgUnit, "savedUser");
                 return data;
             };
 

@@ -1,5 +1,5 @@
 define(["loginController", "angularMocks", "utils", "userPreferenceRepository"], function(LoginController, mocks, utils, UserPreferenceRepository) {
-    describe("dashboard controller", function() {
+    describe("login controller", function() {
         var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, userPreferenceStore, userPreferenceRepository, hustle;
 
         beforeEach(module("hustle"));
@@ -87,7 +87,7 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
                 orgUnits: []
             });
             expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "downloadDataValues"
+                "type": "downloadData"
             }, "dataValues");
         });
 
@@ -113,7 +113,7 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             expect(rootScope.currentUser.userCredentials.username).toEqual('someprojectuser');
             expect(rootScope.isLoggedIn).toEqual(true);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "downloadDataValues"
+                "type": "downloadData"
             }, "dataValues");
             expect(location.path).toHaveBeenCalledWith("/dashboard");
             expect(scope.invalidCredentials).toEqual(false);
