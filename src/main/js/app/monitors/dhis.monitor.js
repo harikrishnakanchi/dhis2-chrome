@@ -87,6 +87,7 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
 
         chromeRuntime.addListener("dhisOffline", onDhisOffline);
         chromeRuntime.addListener("dhisOnline", onDhisOnline);
+        chromeRuntime.addListener("checkNow", checkNow);
 
         return {
             "start": start,

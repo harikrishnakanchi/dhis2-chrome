@@ -41,7 +41,7 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
                     $indexedDBProvider.connection('msf')
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
-}).dbReady(function(data) {
+                        }).dbReady(function(data) {
                             if (chrome.runtime) {
                                 chrome.runtime.sendMessage("migrationComplete");
                             }

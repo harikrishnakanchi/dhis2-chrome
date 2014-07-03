@@ -1,105 +1,42 @@
-define(["httpInterceptor", "angularMocks", "properties"], function(HttpInterceptor, mocks, properties) {
+define(["httpInterceptor", "angularMocks", "properties", "chromeRuntime"], function(HttpInterceptor, mocks, properties, chromeRuntime) {
     describe("httpInterceptor", function() {
         var rootScope, q, httpInterceptor;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             q = $q;
             rootScope = $rootScope;
-            httpInterceptor = new HttpInterceptor($rootScope, $q);
+            httpInterceptor = new HttpInterceptor(rootScope, q, chromeRuntime);
         }));
 
-        it("should set loading to true for http request", function() {
-            httpInterceptor.request({
-                'url': "http://www.google.com"
-            });
-            expect(rootScope.loading).toEqual(true);
-            expect(rootScope.pendingRequests).toEqual(1);
-        });
-
-        it("should not handle template requests", function() {
-            httpInterceptor.request({
-                'url': "templates/something"
-            });
-            expect(rootScope.loading).toEqual();
-            expect(rootScope.pendingRequests).toEqual(0);
-        });
-
-        it("should set loading to false if there are no pending requests", function() {
-            rootScope.pendingRequests = 1;
-            rootScope.loading = true;
-
-            httpInterceptor.response({
-                "config": {
-                    "url": "templates123/blah"
-                }
-            });
-
-            expect(rootScope.loading).toEqual(false);
-            expect(rootScope.pendingRequests).toEqual(0);
-        });
-
-        it("should not handle template request responses", function() {
-            rootScope.pendingRequests = 1;
-            rootScope.loading = true;
-
-            httpInterceptor.response({
-                "config": {
-                    "url": "templates/blah"
-                }
-            });
-
-            expect(rootScope.loading).toEqual(true);
-            expect(rootScope.pendingRequests).toEqual(1);
-        });
-
-        it("should not change loading if there are pending requests", function() {
-            rootScope.pendingRequests = 2;
-            rootScope.loading = true;
-
-            httpInterceptor.response({
-                "config": {
-                    "url": "someurl"
-                }
-            });
-
-            expect(rootScope.loading).toEqual(true);
-            expect(rootScope.pendingRequests).toEqual(1);
-        });
-
-        it("should set loading to false if there are pending requests for error response", function() {
+        it("should check for connectivity in case of timeout", function() {
             spyOn(q, "reject");
-
-            var httpInterceptor = new HttpInterceptor(rootScope, q);
+            var httpInterceptor = new HttpInterceptor(rootScope, q, chromeRuntime);
             var rejection = {
                 "config": {
-                    "url": "someurl"
-                }
+                    "url": "templates/blah"
+                },
+                "status": 0
             };
-            rootScope.pendingRequests = 1;
-            rootScope.loading = true;
 
+            spyOn(chromeRuntime, "sendMessage");
             httpInterceptor.responseError(rejection);
-
-            expect(rootScope.loading).toEqual(false);
-            expect(rootScope.pendingRequests).toEqual(0);
+            expect(chromeRuntime.sendMessage).toHaveBeenCalledWith("checkNow");
             expect(q.reject).toHaveBeenCalledWith(rejection);
         });
 
-        it("should not handle template request response errors", function() {
+        it("should not proxy dhis ping requests", function() {
             spyOn(q, "reject");
-            var httpInterceptor = new HttpInterceptor(rootScope, q);
+            var httpInterceptor = new HttpInterceptor(rootScope, q, chromeRuntime);
             var rejection = {
                 "config": {
-                    "url": "templates/blah"
-                }
+                    "url": properties.dhisPing.url + "?sdfgdsfgsdfg"
+                },
+                "status": 0
             };
-            rootScope.pendingRequests = 1;
-            rootScope.loading = true;
 
+            spyOn(chromeRuntime, "sendMessage");
             httpInterceptor.responseError(rejection);
-
-            expect(rootScope.loading).toEqual(true);
-            expect(rootScope.pendingRequests).toEqual(1);
+            expect(chromeRuntime.sendMessage).not.toHaveBeenCalled();
             expect(q.reject).toHaveBeenCalledWith(rejection);
         });
 
@@ -112,5 +49,6 @@ define(["httpInterceptor", "angularMocks", "properties"], function(HttpIntercept
             var expectedConfig = httpInterceptor.request(config);
             expect(expectedConfig.headers.Authorization).toEqual(properties.dhis.auth_header);
         });
+
     });
 });
