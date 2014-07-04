@@ -3,6 +3,7 @@ define(["properties", "chromeRuntime"], function(properties, chromeRuntime) {
         $rootScope.pendingRequests = 0;
         return {
             'request': function(config) {
+                config.timeout = properties.http.timeout;
                 if (config.url.indexOf(properties.dhis.url) === 0) {
                     config.headers.Authorization = properties.dhis.auth_header;
                 }

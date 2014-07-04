@@ -40,10 +40,11 @@ define(["httpInterceptor", "angularMocks", "properties", "chromeRuntime"], funct
             expect(q.reject).toHaveBeenCalledWith(rejection);
         });
 
-        it("should set authorization header for http request", function() {
+        it("should set authorization header and timeout for http request", function() {
             var config = {
                 'url': properties.dhis.url,
-                'headers': {}
+                'headers': {},
+                'timeout': properties.http.timeout
             };
 
             var expectedConfig = httpInterceptor.request(config);
