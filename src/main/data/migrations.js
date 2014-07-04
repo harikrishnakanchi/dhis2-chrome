@@ -87,6 +87,7 @@ define([], function() {
 
     var add_complete_datasets_store = function(db, tx) {
         var completeDataSetsStore = create_store_with_key("completeDataSets", ["period", "orgUnit"], db);
+        create_index(completeDataSetsStore, "by_period", "period", false);
     };
 
     return [add_object_stores,

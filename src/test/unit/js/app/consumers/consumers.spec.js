@@ -9,7 +9,7 @@ define(["consumers", "dataValuesConsumer", "orgUnitConsumer", "dispatcher", "con
             });
             it("should register consumers with angular", function() {
                 consumers.init(app);
-                expect(app.service).toHaveBeenCalledWith("dataValuesConsumer", ["dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "$q", "approvalService", dataValuesConsumer]);
+                expect(app.service).toHaveBeenCalledWith("dataValuesConsumer", ["dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "$q", "approvalService", "approvalDataRepository", dataValuesConsumer]);
                 expect(app.service).toHaveBeenCalledWith("orgUnitConsumer", ["orgUnitService", orgUnitConsumer]);
                 expect(app.service).toHaveBeenCalledWith("datasetConsumer", ["datasetService", datasetConsumer]);
                 expect(app.service).toHaveBeenCalledWith("systemSettingConsumer", ["systemSettingService", systemSettingConsumer]);

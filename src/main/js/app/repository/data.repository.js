@@ -40,8 +40,6 @@ define(["lodash"], function(_) {
             });
         };
 
-
-
         this.saveAsDraft = function(payload) {
             return this.save(payload, true);
         };

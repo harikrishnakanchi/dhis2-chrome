@@ -65,5 +65,49 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
 
             expect(mockStore.upsert).not.toHaveBeenCalled();
         });
+
+        it("should get data values by periods and orgunits", function() {
+            mockStore.each.and.returnValue(utils.getPromise(q, [{
+                "orgUnit": "ou1",
+                "period": "2014W01",
+                "storedBy": "testproj_approver_l1",
+                "date": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"]
+            }, {
+                "orgUnit": "ou1",
+                "period": "2014W02",
+                "storedBy": "testproj_approver_l1",
+                "date": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"]
+            }, {
+                "orgUnit": "ou3",
+                "period": "2014W01",
+                "storedBy": "testproj_approver_l1",
+                "date": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"]
+            }]));
+
+            var actualDataValues;
+            approvalDataRepository.getApprovalDataForPeriodsOrgUnits("2014W01", "2014W02", ["ou1", "ou2"]).then(function(approvalData) {
+                actualDataValues = approvalData;
+            });
+
+            scope.$apply();
+
+            expect(actualDataValues).toEqual([{
+                "orgUnit": "ou1",
+                "period": "2014W01",
+                "storedBy": "testproj_approver_l1",
+                "date": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"]
+            }, {
+                "orgUnit": "ou1",
+                "period": "2014W02",
+                "storedBy": "testproj_approver_l1",
+                "date": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"]
+            }]);
+        });
+
     });
 });

@@ -1,49 +1,83 @@
 define(["moment", "properties", "lodash"], function(moment, properties, _) {
-    return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q, approvalService) {
-        var getAllDataValues = function(vals) {
-            var orgUnitIds = vals[0];
-            var allDataSets = vals[1];
-            return $q.when(orgUnitIds.length > 0 && allDataSets.length > 0 ? dataService.downloadAllData(orgUnitIds, allDataSets) : []);
-        };
-
-        var getUserOrgUnits = function() {
-            return userPreferenceRepository.getAll().then(function(userPreferences) {
-                userPreferences = userPreferences || [];
-                return _.map(_.flatten(_.map(userPreferences, "orgUnits")), function(o) {
-                    return o.id;
-                });
-            });
-        };
+    return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q, approvalService, approvalDataRepository) {
 
         var downloadData = function() {
+            var getPeriod = function(m) {
+                return m.year() + "W" + m.isoWeek();
+            };
+
+            var getUserOrgUnits = function() {
+                return userPreferenceRepository.getAll().then(function(userPreferences) {
+                    userPreferences = userPreferences || [];
+                    return _.map(_.flatten(_.map(userPreferences, "orgUnits")), function(o) {
+                        return o.id;
+                    });
+                });
+            };
+
+            var merge = function(list1, list2, equalsPred, lastUpdateDateProperty) {
+                lastUpdateDateProperty = lastUpdateDateProperty || "lastUpdated";
+                equalsPred = _.curry(equalsPred);
+                return _.transform(list2, function(acc, ele) {
+                    var resultIndex = _.findIndex(acc, equalsPred(ele));
+                    if (resultIndex >= 0) {
+                        if (ele[lastUpdateDateProperty] > acc[resultIndex][lastUpdateDateProperty]) {
+                            acc[resultIndex] = ele;
+                        }
+                    } else {
+                        acc.push(ele);
+                    }
+                }, list1);
+            };
+
             var downloadApprovalData = function(metadata) {
                 var userOrgUnitIds = metadata[0];
                 var allDataSets = _.pluck(metadata[1], "id");
 
-                if (userOrgUnitIds.length === 0) return;
+                if (userOrgUnitIds.length === 0 || allDataSets.length === 0) return;
 
-                var saveAllLevelOneApprovalData = function(data) {
-                    console.debug("Storing approval data");
-                    return approvalService.save(data);
+                var saveAllLevelOneApprovalData = function(dhisApprovalData) {
+
+                    if (_.isEmpty(dhisApprovalData))
+                        return;
+                    var startPeriod = getPeriod(moment());
+                    var endPeriod = getPeriod(moment().isoWeek(properties.projectDataSync.numWeeksToSync));
+
+                    var equalsPred = function(obj1, obj2) {
+                        return obj1.period === obj2.period && obj1.orgUnit === obj2.orgUnit;
+                    };
+
+                    approvalDataRepository.getCompleteApprovalDataForPeriods(startPeriod, endPeriod, userOrgUnitIds).then(function(dbApprovalData) {
+                        var mergedData = merge(dhisApprovalData, dbApprovalData, equalsPred, "date");
+                        return approvalDataRepository.save(mergedData);
+                    });
                 };
 
                 return approvalService.getAllLevelOneApprovalData(userOrgUnitIds, allDataSets).then(saveAllLevelOneApprovalData);
             };
 
             var downloadDataValues = function(metadata) {
-                var getPeriod = function(m) {
-                    return m.year() + "W" + m.isoWeek();
-                };
 
                 var dataValuesEquals = function(d1, d2) {
                     return d1.dataElement === d2.dataElement && d1.period === d2.period && d1.orgUnit === d2.orgUnit && d1.categoryOptionCombo === d2.categoryOptionCombo;
                 };
 
+                var getAllDataValues = function(vals) {
+                    var orgUnitIds = vals[0];
+                    var allDataSets = vals[1];
+                    return $q.when(orgUnitIds.length > 0 && allDataSets.length > 0 ? dataService.downloadAllData(orgUnitIds, allDataSets) : []);
+                };
+
                 var saveAllDataValues = function(data) {
+
+                    if (_.isEmpty(data))
+                        return;
+
                     var dataValuesFromDhis = data.dataValues;
                     var userOrgUnitIds = metadata[0];
-                    var startPeriod = getPeriod(moment());
-                    var endPeriod = getPeriod(moment().isoWeek(properties.projectDataSync.numWeeksToSync));
+                    var m = moment();
+                    var startPeriod = getPeriod(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
+                    var endPeriod = getPeriod(moment());
                     return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, userOrgUnitIds).then(function(dataValuesFromDb) {
                         var mergedData = merge(_.flatten(dataValuesFromDb, "dataValues"), dataValuesFromDhis, dataValuesEquals);
                         return dataRepository.save({
@@ -64,20 +98,6 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             downloadData();
         };
 
-        var merge = function(list1, list2, equalsPred) {
-            equalsPred = _.curry(equalsPred);
-            return _.transform(list2, function(acc, ele) {
-                var resultIndex = _.findIndex(acc, equalsPred(ele));
-                if (resultIndex >= 0) {
-                    if (ele.lastUpdated > acc[resultIndex].lastUpdated) {
-                        acc[resultIndex] = ele;
-                    }
-                } else {
-                    acc.push(ele);
-                }
-            }, list1);
-        };
-
         var uploadDataValues = function(dataToUpload) {
             var preparePayload = function() {
                 var dataValues = dataToUpload.dataValues[0];
@@ -94,8 +114,15 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
         };
 
         var uploadApprovalData = function(data) {
-            console.debug("Uploading approval data");
-            return approvalService.markAsComplete(data.dataSets, data.period, data.orgUnit, data.storedBy, data.date);
+            var preparePayload = function() {
+                return approvalDataRepository.getCompleteDataValues(data.period, data.orgUnit);
+            };
+
+            var upload = function(payload) {
+                return approvalService.markAsComplete(payload.dataSets, payload.period, payload.orgUnit, payload.storedBy, payload.date);
+            };
+
+            return downloadData().then(preparePayload).then(upload);
         };
 
         this.run = function(message) {

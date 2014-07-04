@@ -31,7 +31,6 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             approvalService.markAsComplete(["170b8cd5e53"], "2014W01", "17yugc", "testproj_approver_l1", moment().toISOString());
 
             httpBackend.flush();
-
         });
 
         it("should get complete datasets", function() {

@@ -24,5 +24,16 @@ define([], function() {
 
             return this.getCompleteDataValues(period, orgUnit).then(unapprove);
         };
+
+        this.getApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
+            var store = db.objectStore('completeDataSets');
+            var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
+            return store.each(query).then(function(approvalData) {
+                return _.filter(approvalData, function(ad) {
+                    return _.contains(orgUnits, ad.orgUnit);
+                });
+            });
+        };
+
     };
 });
