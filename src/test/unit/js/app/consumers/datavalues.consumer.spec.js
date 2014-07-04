@@ -46,7 +46,6 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
             }));
 
             it("should download data values from dhis based on user preferences and dataset metadata", function() {
-
                 userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, [{
                     "orgUnits": [{
                         "id": "ou1"
@@ -66,6 +65,37 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 dataValuesConsumer.run(message);
                 scope.$apply();
 
+                expect(userPreferenceRepository.getAll).toHaveBeenCalled();
+                expect(dataSetRepository.getAll).toHaveBeenCalled();
+                expect(dataService.downloadAllData).toHaveBeenCalledWith(['ou1'], [{
+                    id: 'ds1'
+                }]);
+            });
+
+            it("should fire and forget download data value calls", function() {
+                userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, [{
+                    "orgUnits": [{
+                        "id": "ou1"
+                    }]
+                }]));
+                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [{
+                    "id": "ds1"
+                }]));
+                dataService.downloadAllData.and.returnValue(utils.getRejectedPromise(q, {}));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
+                var success = jasmine.createSpy("success");
+                var failure = jasmine.createSpy("failure");
+
+                q.when(dataValuesConsumer.run(message)).then(success, failure);
+                scope.$apply();
+
+                expect(success).toHaveBeenCalled();
+                expect(failure).not.toHaveBeenCalled();
                 expect(userPreferenceRepository.getAll).toHaveBeenCalled();
                 expect(dataSetRepository.getAll).toHaveBeenCalled();
                 expect(dataService.downloadAllData).toHaveBeenCalledWith(['ou1'], [{

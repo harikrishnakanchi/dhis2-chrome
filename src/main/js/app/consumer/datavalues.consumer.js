@@ -60,6 +60,10 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             });
         };
 
+        var processDownloadMessage = function() {
+            downloadData();
+        };
+
         var merge = function(list1, list2, equalsPred) {
             equalsPred = _.curry(equalsPred);
             return _.transform(list2, function(acc, ele) {
@@ -98,7 +102,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             var payload = message.data;
             var action = {
                 "uploadDataValues": uploadDataValues,
-                "downloadData": downloadData,
+                "downloadData": processDownloadMessage,
                 "uploadApprovalData": uploadApprovalData
             };
             return action[payload.type](payload.data);
