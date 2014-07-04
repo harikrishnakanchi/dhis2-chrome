@@ -40,14 +40,6 @@ define(["properties", "moment"], function(properties, moment) {
                 return deferred.promise;
             };
 
-            var onFailure = function(response) {
-                var deferred = $q.defer();
-                deferred.reject({
-                    "message": "Error fetching data from server."
-                });
-                return deferred.promise;
-            };
-
             return $http.get(properties.dhis.url + '/api/completeDataSetRegistrations', {
                 "params": {
                     "dataSet": dataSets,
@@ -56,7 +48,7 @@ define(["properties", "moment"], function(properties, moment) {
                     "orgUnit": orgUnits,
                     "children": true
                 }
-            }).then(onSuccess, onFailure);
+            }).then(onSuccess);
         };
     };
 });

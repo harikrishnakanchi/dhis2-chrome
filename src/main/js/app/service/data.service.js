@@ -6,13 +6,6 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
                 return response.data;
             };
 
-            var onError = function(response) {
-                var deferred = $q.defer();
-                deferred.reject({
-                    "message": "Error fetching data from server."
-                });
-                return deferred.promise;
-            };
 
             return $http.get(properties.dhis.url + '/api/dataValueSets', {
                 "params": {
@@ -22,7 +15,7 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
                     "startDate": "1900-01-01",
                     "endDate": today
                 }
-            }).then(onSuccess, onError);
+            }).then(onSuccess);
         };
 
         this.save = function(payload) {

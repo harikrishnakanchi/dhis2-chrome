@@ -1,6 +1,6 @@
 define(["approvalService", "angularMocks", "properties", "utils", "moment", "lodash"], function(ApprovalService, mocks, properties, utils, moment, _) {
     describe("approval service", function() {
-        var http, httpBackend, db, q, mockStore;
+        var http, httpBackend, db, q, mockStore, dataSets, orgUnits;
 
         beforeEach(mocks.inject(function($injector) {
             http = $injector.get('$http');
@@ -11,6 +11,8 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             var mockDB = utils.getMockDB(q);
             db = mockDB.db;
             mockStore = mockDB.objectStore;
+            dataSets = ["d1", "d2"];
+            orgUnits = ["ou1", "ou2"];
         }));
 
         afterEach(function() {
@@ -33,8 +35,6 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
         });
 
         it("should get complete datasets", function() {
-            var dataSets = ["d1", "d2"];
-            var orgUnits = ["ou1", "ou2"];
             var endDate = moment().format("YYYY-MM-DD");
 
             var dhisApprovalData = {
@@ -119,5 +119,16 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
             expect(actualApprovalData).toEqual(expectedApprovalData);
         });
+
+        it("should return a failure http promise if download all data fails", function() {
+            httpBackend.expectGET().respond(500, {});
+            approvalService = new ApprovalService(http, db, q);
+            approvalService.getAllLevelOneApprovalData(orgUnits, dataSets).then(function(data) {
+                expect(data.status).toBe(500);
+            });
+
+            httpBackend.flush();
+        });
+
     });
 });

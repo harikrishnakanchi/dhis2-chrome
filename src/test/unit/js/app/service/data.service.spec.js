@@ -76,7 +76,7 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
             httpBackend.expectGET().respond(500, {});
             var dataService = new DataService(http, q);
             dataService.downloadAllData('company_0').then(undefined, function(data) {
-                expect(data.message).toBeDefined();
+                expect(data.status).toBe(500);
             });
 
             httpBackend.flush();
