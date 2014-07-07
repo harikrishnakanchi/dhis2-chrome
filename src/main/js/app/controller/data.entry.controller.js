@@ -208,7 +208,15 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var unapproveData = function() {
-                return approvalDataRepository.unapproveLevelOneData(period, $scope.currentModule.id);
+                var saveApprovalToDhis = function(approvalData) {
+                    if (!approvalData) return;
+                    return $hustle.publish({
+                        "data": approvalData,
+                        "type": "uploadApprovalData"
+                    }, "dataValues");
+                };
+
+                return approvalDataRepository.unapproveLevelOneData(period, $scope.currentModule.id).then(saveApprovalToDhis);
             };
 
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);

@@ -34,12 +34,42 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
             expect(mockStore.upsert).toHaveBeenCalledWith(completeDataSetRegistrationList);
         });
 
-        it("should get the complete data values", function() {
+        it("should get the approval data", function() {
             mockStore.find.and.returnValue(utils.getPromise(q, {
                 period: '2014W15'
             }));
-            approvalDataRepository.getCompleteDataValues('period', 'orgUnitId');
+            approvalDataRepository.getLevelOneApprovalData('period', 'orgUnitId');
             expect(mockStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
+        });
+
+        it("should get the complete data values", function() {
+            var approvalData = {
+                period: '2014W15'
+            };
+            mockStore.find.and.returnValue(utils.getPromise(q, approvalData));
+
+            var actualApprovalData;
+            approvalDataRepository.getCompleteDataValues('period', 'orgUnitId').then(function(data) {
+                actualApprovalData = data;
+            });
+            scope.$apply();
+
+            expect(mockStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
+            expect(actualApprovalData).toEqual(approvalData);
+        });
+
+        it("should get the complete data values and filter out deleted approvals", function() {
+            var approvalData;
+            mockStore.find.and.returnValue(utils.getPromise(q, {
+                period: '2014W15',
+                isDeleted: true
+            }));
+
+            approvalDataRepository.getCompleteDataValues('period', 'orgUnitId').then(function(data) {
+                approvalData = data;
+            });
+            scope.$apply();
+            expect(approvalData).toBe(undefined);
         });
 
         it("should unapprove data at level one", function() {
@@ -88,7 +118,7 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
             }]));
 
             var actualDataValues;
-            approvalDataRepository.getApprovalDataForPeriodsOrgUnits("2014W01", "2014W02", ["ou1", "ou2"]).then(function(approvalData) {
+            approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits("2014W01", "2014W02", ["ou1", "ou2"]).then(function(approvalData) {
                 actualDataValues = approvalData;
             });
 

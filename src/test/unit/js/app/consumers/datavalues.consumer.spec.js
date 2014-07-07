@@ -33,8 +33,8 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 };
 
                 approvalDataRepository = {
-                    "getCompleteDataValues": jasmine.createSpy("getCompleteDataValues").and.returnValue(utils.getPromise(q, {})),
-                    "getApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
+                    "getLevelOneApprovalData": jasmine.createSpy("getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {})),
+                    "getLevelOneApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getLevelOneApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
                     "save": jasmine.createSpy("save")
                 };
 
@@ -46,7 +46,8 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 approvalService = {
                     "getAllLevelOneApprovalData": jasmine.createSpy("getAllLevelOneApprovalData").and.returnValue(utils.getPromise(q, [])),
                     "save": jasmine.createSpy("save"),
-                    "markAsComplete": jasmine.createSpy("markAsComplete")
+                    "markAsComplete": jasmine.createSpy("markAsComplete"),
+                    "markAsIncomplete": jasmine.createSpy("markAsIncomplete")
                 };
 
                 dataValuesConsumer = new DataValuesConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, approvalService, approvalDataRepository);
@@ -127,7 +128,6 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 }]);
             });
 
-
             it("should not download data values if dataSets is not present", function() {
                 dataSetRepository.getAll.and.returnValue(utils.getPromise(q, {}));
 
@@ -154,7 +154,9 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 scope.$apply();
 
                 expect(dataRepository.getDataValuesForPeriodsOrgUnits).toHaveBeenCalledWith("2014W24", "2014W27", ["org_0"]);
+                expect(dataRepository.getLevelOneApprovalDataForPeriodsOrgUnits).toHaveBeenCalledWith("2014W24", "2014W27", ["org_0"]);
             });
+
 
             it("should not save to indexeddb if no data is available in dhis", function() {
                 dataService.downloadAllData.and.returnValue(utils.getPromise(q, []));
@@ -327,7 +329,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     "dataSets": ["d1", "d2", "d3"]
                 };
 
-                approvalDataRepository.getCompleteDataValues.and.returnValue(utils.getPromise(q, dbData));
+                approvalDataRepository.getLevelOneApprovalData.and.returnValue(utils.getPromise(q, dbData));
                 message = {
                     "data": {
                         "type": "downloadData"
@@ -413,7 +415,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 }];
 
                 approvalService.getAllLevelOneApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
-                approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbApprovalData));
+                approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbApprovalData));
 
                 message = {
                     "data": {
@@ -482,8 +484,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
             });
 
             it("should upload approval data to DHIS", function() {
-
-                approvalDataRepository.getCompleteDataValues.and.callFake(function(period, orgUnit) {
+                approvalDataRepository.getLevelOneApprovalData.and.callFake(function(period, orgUnit) {
                     if (period === "2014W12" && orgUnit === "ou1")
                         return utils.getPromise(q, {
                             "orgUnit": "ou1",
@@ -515,6 +516,41 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(dataService.downloadAllData).toHaveBeenCalled();
                 expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalled();
                 expect(approvalService.markAsComplete).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1', 'testproj_approver_l1', '2014-05-24T09:00:00.120Z');
+            });
+
+            it("should unapprove data if it has changed", function() {
+                approvalDataRepository.getLevelOneApprovalData.and.callFake(function(period, orgUnit) {
+                    if (period === "2014W12" && orgUnit === "ou1")
+                        return utils.getPromise(q, {
+                            "orgUnit": "ou1",
+                            "period": "2014W12",
+                            "storedBy": "testproj_approver_l1",
+                            "date": "2014-05-24T09:00:00.120Z",
+                            "isDeleted": true,
+                            "dataSets": ["d1", "d2"]
+                        });
+
+                    return utils.getPromise(q, undefined);
+                });
+
+                message = {
+                    "data": {
+                        "data": {
+                            "dataSets": ["d1", "d2"],
+                            "period": '2014W12',
+                            "orgUnit": 'ou1',
+                            "isDeleted": true
+                        },
+                        "type": "uploadApprovalData"
+                    }
+                };
+
+                dataValuesConsumer.run(message);
+                scope.$apply();
+
+                expect(dataService.downloadAllData).toHaveBeenCalled();
+                expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalled();
+                expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1');
             });
         });
     });

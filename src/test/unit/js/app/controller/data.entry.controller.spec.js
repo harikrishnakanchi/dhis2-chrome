@@ -306,7 +306,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
         it("should submit data values to indexeddb and dhis", function() {
             spyOn(approvalDataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
-            spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, undefined));
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
@@ -336,6 +336,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 },
                 type: 'uploadDataValues'
             }, 'dataValues');
+
             expect(scope.submitSuccess).toBe(true);
             expect(scope.saveSuccess).toBe(false);
             expect(scope.submitError).toBe(false);
@@ -620,7 +621,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             expect(scope.preventNavigation).toEqual(true);
             expect(location.url).toHaveBeenCalled();
-
         });
 
         it('should not prevent navigation if data entry form is not dirty', function() {
@@ -630,7 +630,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.$apply();
 
             expect(scope.preventNavigation).toEqual(false);
-
         });
 
         it("should return true if current week is selected", function() {
@@ -674,7 +673,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(isDatasetOpen[id]).toBe(undefined);
         });
 
-        it("should print", function() {
+        it("should print tally sheet", function() {
             spyOn(window, "print");
             scope.printWindow();
 
@@ -911,6 +910,48 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.approveSuccess).toBe(true);
             expect(scope.approveError).toBe(false);
             expect(scope.isApproved).toEqual(true);
+        });
+
+        it("should unapprove data if edited after approval", function() {
+            spyOn(approvalDataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, {
+                "foo": "bar"
+            }));
+            spyOn(scope.dataentryForm, '$setPristine');
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+            spyOn(hustle, "publish");
+
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository);
+
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+
+            scope.submit();
+            scope.$apply();
+
+            expect(dataRepository.save).toHaveBeenCalled();
+            expect(approvalDataRepository.unapproveLevelOneData).toHaveBeenCalledWith('2014W14', 'mod2');
+            expect(hustle.publish.calls.argsFor(0)).toEqual([{
+                data: {
+                    ok: 'ok'
+                },
+                type: 'uploadDataValues'
+            }, 'dataValues']);
+            expect(hustle.publish.calls.argsFor(1)).toEqual([{
+                data: {
+                    "foo": "bar"
+                },
+                type: 'uploadApprovalData'
+            }, 'dataValues']);
         });
     });
 });

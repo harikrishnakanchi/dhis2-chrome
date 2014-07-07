@@ -14,18 +14,25 @@ define([], function() {
             return store.find([period, orgUnitId]).then(filterSoftDeletedApprovals);
         };
 
+        this.getLevelOneApprovalData = function(period, orgUnitId) {
+            var store = db.objectStore('completeDataSets');
+            return store.find([period, orgUnitId]);
+        };
+
         this.unapproveLevelOneData = function(period, orgUnit) {
             var unapprove = function(data) {
                 if (!data) return;
                 data.isDeleted = true;
                 var store = db.objectStore('completeDataSets');
-                return store.upsert(data);
+                return store.upsert(data).then(function() {
+                    return data;
+                });
             };
 
             return this.getCompleteDataValues(period, orgUnit).then(unapprove);
         };
 
-        this.getApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
+        this.getLevelOneApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
             var store = db.objectStore('completeDataSets');
             var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
             return store.each(query).then(function(approvalData) {

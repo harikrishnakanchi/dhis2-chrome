@@ -50,5 +50,16 @@ define(["properties", "moment"], function(properties, moment) {
                 }
             }).then(onSuccess);
         };
+
+        this.markAsIncomplete = function(dataSets, period, orgUnit) {
+            return $http.delete(properties.dhis.url + "/api/completeDataSetRegistrations", {
+                params: {
+                    "ds": dataSets,
+                    "pe": period,
+                    "ou": orgUnit,
+                    "multiOu": true
+                }
+            });
+        };
     };
 });

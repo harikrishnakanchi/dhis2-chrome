@@ -40,14 +40,18 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
 
                     if (_.isEmpty(dhisApprovalData))
                         return;
-                    var startPeriod = getPeriod(moment());
-                    var endPeriod = getPeriod(moment().isoWeek(properties.projectDataSync.numWeeksToSync));
+
+                    var m = moment();
+                    var startPeriod = getPeriod(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
+                    var endPeriod = getPeriod(moment());
+
+                    var moduleIds = _.unique(_.pluck(dhisApprovalData, "orgUnit"));
 
                     var equalsPred = function(obj1, obj2) {
                         return obj1.period === obj2.period && obj1.orgUnit === obj2.orgUnit;
                     };
 
-                    approvalDataRepository.getApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, userOrgUnitIds).then(function(dbApprovalData) {
+                    approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(dbApprovalData) {
                         var mergedData = merge(dhisApprovalData, dbApprovalData, equalsPred, "date");
                         return approvalDataRepository.save(mergedData);
                     });
@@ -74,11 +78,14 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                         return;
 
                     var dataValuesFromDhis = data.dataValues;
-                    var userOrgUnitIds = metadata[0];
+
                     var m = moment();
                     var startPeriod = getPeriod(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
                     var endPeriod = getPeriod(moment());
-                    return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, userOrgUnitIds).then(function(dataValuesFromDb) {
+
+                    var moduleIds = _.unique(_.pluck(dataValuesFromDhis, "orgUnit"));
+
+                    return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(dataValuesFromDb) {
                         var mergedData = merge(_.flatten(dataValuesFromDb, "dataValues"), dataValuesFromDhis, dataValuesEquals);
                         return dataRepository.save({
                             "dataValues": mergedData
@@ -115,10 +122,13 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
 
         var uploadApprovalData = function(data) {
             var preparePayload = function() {
-                return approvalDataRepository.getCompleteDataValues(data.period, data.orgUnit);
+                return approvalDataRepository.getLevelOneApprovalData(data.period, data.orgUnit);
             };
 
             var upload = function(payload) {
+                if (payload.isDeleted) {
+                    return approvalService.markAsIncomplete(payload.dataSets, payload.period, payload.orgUnit);
+                }
                 return approvalService.markAsComplete(payload.dataSets, payload.period, payload.orgUnit, payload.storedBy, payload.date);
             };
 

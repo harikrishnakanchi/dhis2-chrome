@@ -21,7 +21,6 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
         });
 
         it("should mark data as complete in dhis", function() {
-
             var _Date = Date;
             spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
 
@@ -129,5 +128,14 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             httpBackend.flush();
         });
 
+        it("should mark data as incomplete in dhis", function() {
+            httpBackend.expectDELETE(properties.dhis.url + "/api/completeDataSetRegistrations?ds=170b8cd5e53&multiOu=true&ou=17yugc&pe=2014W01")
+                .respond(200, "ok");
+
+            var approvalService = new ApprovalService(http, db, q);
+            approvalService.markAsIncomplete(["170b8cd5e53"], "2014W01", "17yugc");
+
+            httpBackend.flush();
+        });
     });
 });
