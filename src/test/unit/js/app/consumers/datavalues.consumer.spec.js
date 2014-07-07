@@ -34,7 +34,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
 
                 approvalDataRepository = {
                     "getCompleteDataValues": jasmine.createSpy("getCompleteDataValues").and.returnValue(utils.getPromise(q, {})),
-                    "getCompleteApprovalDataForPeriods": jasmine.createSpy("getCompleteApprovalDataForPeriods").and.returnValue(utils.getPromise(q, [])),
+                    "getApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
                     "save": jasmine.createSpy("save")
                 };
 
@@ -413,7 +413,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 }];
 
                 approvalService.getAllLevelOneApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
-                approvalDataRepository.getCompleteApprovalDataForPeriods.and.returnValue(utils.getPromise(q, dbApprovalData));
+                approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbApprovalData));
 
                 message = {
                     "data": {

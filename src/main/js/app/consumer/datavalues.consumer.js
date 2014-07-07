@@ -47,7 +47,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                         return obj1.period === obj2.period && obj1.orgUnit === obj2.orgUnit;
                     };
 
-                    approvalDataRepository.getCompleteApprovalDataForPeriods(startPeriod, endPeriod, userOrgUnitIds).then(function(dbApprovalData) {
+                    approvalDataRepository.getApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, userOrgUnitIds).then(function(dbApprovalData) {
                         var mergedData = merge(dhisApprovalData, dbApprovalData, equalsPred, "date");
                         return approvalDataRepository.save(mergedData);
                     });
