@@ -9,6 +9,8 @@ define(["properties", "lodash"], function(properties, _) {
         var update = function(user) {
             var deleteUserPayload = function() {
                 var payload = {
+                    "firstName": user.firstName,
+                    "surname": user.surname,
                     "userCredentials": user.userCredentials,
                     "organisationUnits": user.organisationUnits,
                 };

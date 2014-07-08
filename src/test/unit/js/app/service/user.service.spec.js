@@ -43,7 +43,7 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
             var user = {
                 "id": 1,
                 "firstName": "test1",
-                "lastName": "test1last",
+                "surname": "test1last",
                 "userCredentials": {
                     "username": "someone@example.com",
                     "password": "blah",
@@ -53,6 +53,8 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
             };
 
             var expectedPayload = {
+                "firstName": "test1",
+                "surname": "test1last",
                 "userCredentials": user.userCredentials,
                 "organisationUnits": user.organisationUnits,
             };
