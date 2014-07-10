@@ -35,12 +35,14 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
         };
 
         var onDhisOnline = function() {
+            console.debug("calling online handlers", onlineEventHandlers);
             _.each(onlineEventHandlers, function(handler) {
                 handler.call({});
             });
         };
 
         var onDhisOffline = function() {
+            console.debug("calling offline handlers", offlineEventHandlers);
             _.each(offlineEventHandlers, function(handler) {
                 handler.call({});
             });
