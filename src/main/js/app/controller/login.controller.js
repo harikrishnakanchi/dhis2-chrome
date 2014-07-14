@@ -1,4 +1,4 @@
-define(["md5"], function(md5) {
+define(["md5", "lodash"], function(md5, _) {
     return function($scope, $rootScope, $location, db, $q, $hustle, userPreferenceRepository) {
         var getUser = function() {
             var userStore = db.objectStore("users");
@@ -32,6 +32,10 @@ define(["md5"], function(md5) {
             }, "dataValues");
         };
 
+        var hasOnlyMsfAsOrgUnit = function() {
+            return $rootScope.currentUser.organisationUnits.length === 1 && $rootScope.currentUser.organisationUnits[0].name === "MSF";
+        };
+
         var authenticateOrPromptUserForPassword = function(data) {
             var user = data[0];
             var userCredentials = data[1];
@@ -50,7 +54,11 @@ define(["md5"], function(md5) {
                 then(saveUserPreferences).
                 then(downloadDataValues).
                 then(function() {
-                    $location.path("/dashboard");
+                    if (_.isEmpty($rootScope.currentUser.organisationUnits) || hasOnlyMsfAsOrgUnit()) {
+                        $location.path("/selectproject");
+                    } else {
+                        $location.path("/dashboard");
+                    }
                 });
             }
         };

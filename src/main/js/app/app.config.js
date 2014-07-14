@@ -43,6 +43,7 @@ require.config({
         "countryController": "app/controller/country.controller",
         "confirmDialogController": "app/controller/confirm.dialog.controller",
         "projectUserController": "app/controller/project.user.controller",
+        "selectProjectController": "app/controller/select.project.controller",
 
         //Directives
         "directives": "app/directive/directives",

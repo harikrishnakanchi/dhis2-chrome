@@ -67,6 +67,8 @@
     "printTallySheetBtnValue": "Print Tally Sheet",
     "weekLabel": "Week",
     "yearLabel": "Year",
-    "monthLabel": "Month"
-
+    "monthLabel": "Month",
+    "chooseProjectLabel": "Select a Project",
+    "selectProject": "Select a project",
+    "errorProject": "Error saving the preferences. Please try again later."
 }

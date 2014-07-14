@@ -34,6 +34,10 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
                         templateUrl: 'templates/orgunits.html',
                         controller: 'orgUnitContoller'
                     }).
+                    when('/selectproject', {
+                        templateUrl: 'templates/select.project.html',
+                        controller: 'selectProjectController'
+                    }).
                     otherwise({
                         redirectTo: '/dashboard'
                     });

@@ -19,11 +19,15 @@
           <li><p class="navbar-text" ng-show="isDhisOnline">Online</p></li>
           <li><p class="navbar-text" ng-show="!isDhisOnline">Offline</p></li>
           <li class="active" ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a></li>
-                    <li>
+          <li>
             <select id="languageSelectButton" ng-model="currentUser.locale" ng-if="currentUser" class="input-sm"> 
               <option value="en">English</option>
               <option dir="rtl" lang="fr" value="fr">Français</option>
               <option dir="rtl" lang="ar" value="ar">العربية</option>
+            </select>
+          </li>
+          <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Superuser']))">
+            <select name="project" ng-model="currentUserProject" ng-options="p.parent.name + ' - ' + p.name + ' (' + p.code +')' for p in projects" ng-change="saveUser()">
             </select>
           </li>
         </ul>

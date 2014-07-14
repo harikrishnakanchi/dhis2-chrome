@@ -1,20 +1,40 @@
 define([], function() {
     return function(db) {
-        var upsert = function(payload) {
+        this.upsert = function(payload) {
             var store = db.objectStore("organisationUnits");
             return store.upsert(payload).then(function() {
                 return payload;
             });
         };
 
-        var getAll = function() {
+        this.getAll = function() {
             var store = db.objectStore("organisationUnits");
             return store.getAll();
         };
 
-        return {
-            "upsert": upsert,
-            "getAll": getAll
+        this.getAllProjects = function() {
+            var getAttributeValue = function(orgUnit, attrCode) {
+                return _.find(orgUnit.attributeValues, {
+                    "attribute": {
+                        "code": attrCode
+                    }
+                }).value;
+            };
+
+            var filterProjects = function(orgUnits) {
+                return _.filter(orgUnits, function(orgUnit) {
+                    return getAttributeValue(orgUnit, "Type") === "Project";
+                });
+            };
+
+            var mapProjectCode = function(orgUnits) {
+                return _.map(orgUnits, function(orgUnit) {
+                    orgUnit.code = getAttributeValue(orgUnit, "projCode");
+                    return orgUnit;
+                });
+            };
+
+            return this.getAll().then(filterProjects).then(mapProjectCode);
         };
     };
 });

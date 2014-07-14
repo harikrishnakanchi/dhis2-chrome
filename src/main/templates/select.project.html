@@ -1,0 +1,24 @@
+<div ng-show="saveFailed" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
+<form name="form" class="form-horizontal" role="form" novalidate  ng-submit="save()">
+	<ul>
+		<li class="form-group">
+			<label class="col-sm-4 control-label" for="project">Project</label>
+			<div class="col-sm-8">
+				<span class="nullable">
+					<select name="project" ng-model="project" ng-options="p.parent.name + ' - ' + p.name + ' (' + p.code +')' for p in projects" required>
+						<option value="">{{ resourceBundle.chooseProjectLabel }}</option>
+					</select>
+				</span>
+				<div ng-show="form.project.$dirty &amp;&amp; form.project.$invalid">
+					<span ng-show="form.project.$error.required" class="errortxt">{{ resourceBundle.selectProject }}</span>
+				</div>
+			</div>
+		</li>
+
+		<li class="form-group">
+			<div class="col-sm-8 col-sm-offset-4">
+				<input type="submit" ng-disabled="form.$invalid" class="btn btn-main" >
+			</div>
+		</li>
+	</ul>
+</form>

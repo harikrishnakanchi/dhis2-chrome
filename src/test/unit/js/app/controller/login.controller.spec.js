@@ -1,6 +1,6 @@
 define(["loginController", "angularMocks", "utils", "userPreferenceRepository"], function(LoginController, mocks, utils, UserPreferenceRepository) {
     describe("login controller", function() {
-        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, userPreferenceStore, userPreferenceRepository, hustle;
+        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, userPreferenceStore, userPreferenceRepository, hustle, fakeUserStoreSpy;
 
         beforeEach(module("hustle"));
 
@@ -40,12 +40,16 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
                     return userPreferenceStore;
             });
 
-            spyOn(fakeUserStore, 'find').and.callFake(function(username) {
+            fakeUserStoreSpy = spyOn(fakeUserStore, 'find');
+            fakeUserStoreSpy.and.callFake(function(username) {
                 return utils.getPromise(q, {
                     "id": "xYRvx4y7Gm9",
                     "userCredentials": {
                         "username": username
-                    }
+                    },
+                    "organisationUnits": [{
+                        "id": 123
+                    }]
                 });
             });
 
@@ -81,6 +85,36 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             expect(rootScope.isLoggedIn).toEqual(true);
             expect(location.path).toHaveBeenCalledWith("/dashboard");
             expect(scope.invalidCredentials).toEqual(false);
+            expect(userPreferenceRepository.save).toHaveBeenCalledWith({
+                username: 'admin',
+                locale: undefined,
+                orgUnits: [{
+                    "id": 123
+                }]
+            });
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "type": "downloadData"
+            }, "dataValues");
+        });
+
+
+        it("should login admin user with valid credentials and redirect to select project page if no project present", function() {
+            scope.username = "Admin";
+            scope.password = "password";
+            fakeUserStoreSpy.and.callFake(function(username) {
+                return utils.getPromise(q, {
+                    "id": "xYRvx4y7Gm9",
+                    "userCredentials": {
+                        "username": username
+                    }
+                });
+            });
+
+            scope.login();
+            scope.$apply();
+
+            expect(rootScope.isLoggedIn).toEqual(true);
+            expect(location.path).toHaveBeenCalledWith("/selectproject");
             expect(userPreferenceRepository.save).toHaveBeenCalledWith({
                 username: 'admin',
                 locale: undefined,
