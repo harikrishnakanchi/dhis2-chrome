@@ -17,6 +17,10 @@ define([], function() {
             return userPreferenceRepository.save(userPreferences);
         };
 
+        $scope.getFormattedOption = function(project) {
+            return project.parent.name + ' - ' + project.name + ' (' + project.code + ')';
+        };
+
         $scope.save = function() {
             $rootScope.currentUser.organisationUnits.push({
                 "id": $scope.project.id,
@@ -32,6 +36,10 @@ define([], function() {
             };
 
             return userRepository.upsert($rootScope.currentUser).then(saveUserPreferences).then(onSuccess, onFailure);
+        };
+
+        $scope.skip = function() {
+            return $location.path("/dashboard");
         };
 
         init();

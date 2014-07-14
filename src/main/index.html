@@ -27,7 +27,8 @@
             </select>
           </li>
           <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Superuser']))">
-            <select name="project" ng-model="currentUserProject" ng-options="p.parent.name + ' - ' + p.name + ' (' + p.code +')' for p in projects" ng-change="saveUser()">
+            <select name="project" ng-model="currentUserProject" ng-options="getFormattedOption(p) for p in projects | orderBy:getFormattedOption" ng-change="saveUser()">
+              <option value="">{{ resourceBundle.chooseProjectLabel }}</option>
             </select>
           </li>
         </ul>

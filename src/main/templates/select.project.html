@@ -5,7 +5,7 @@
 			<label class="col-sm-4 control-label" for="project">Project</label>
 			<div class="col-sm-8">
 				<span class="nullable">
-					<select name="project" ng-model="project" ng-options="p.parent.name + ' - ' + p.name + ' (' + p.code +')' for p in projects" required>
+					<select name="project" ng-model="project" ng-options="getFormattedOption(p) for p in projects  | orderBy:getFormattedOption" required>
 						<option value="">{{ resourceBundle.chooseProjectLabel }}</option>
 					</select>
 				</span>
@@ -18,6 +18,11 @@
 		<li class="form-group">
 			<div class="col-sm-8 col-sm-offset-4">
 				<input type="submit" ng-disabled="form.$invalid" class="btn btn-main" >
+			</div>
+		</li>
+		<li class="form-group">
+			<div class="col-sm-8 col-sm-offset-4">
+				<input type="button" ng-click="skip()" class="btn btn-main" value="Skip" >
 			</div>
 		</li>
 	</ul>

@@ -16,6 +16,10 @@ define(["lodash"], function(_) {
             return hasUserLoggedIn && isAdmin && $location.path() !== "/selectproject";
         };
 
+        $scope.getFormattedOption = function(project) {
+            return project.parent.name + ' - ' + project.name + ' (' + project.code + ')';
+        };
+
         $rootScope.$watch("currentUser.locale", function() {
             var getResourceBundle = function(locale, shouldFetchTranslations) {
                 var fetchResourceBundleFromDb = function() {
@@ -47,8 +51,10 @@ define(["lodash"], function(_) {
         });
 
         $scope.saveUser = function() {
+            var oldProject = $scope.oldUserProject || {};
+
             $rootScope.currentUser.organisationUnits = _.reject($rootScope.currentUser.organisationUnits, {
-                "id": $scope.oldUserProject.id
+                "id": oldProject.id
             });
 
             $rootScope.currentUser.organisationUnits.push({
@@ -69,18 +75,18 @@ define(["lodash"], function(_) {
             if ($rootScope.currentUser && !$scope.oldUserProject) {
                 var orgUnits = filterOutMsfOrgUnit($rootScope.currentUser.organisationUnits);
                 $scope.oldUserProject = orgUnits[0];
-                if ($scope.oldUserProject) {
-                    var assignCurrentProject = function() {
+                var assignCurrentProject = function() {
+                    if ($scope.oldUserProject) {
                         $scope.oldUserProject = _.find($scope.projects, {
                             "id": $scope.oldUserProject.id
                         });
                         $scope.currentUserProject = $scope.oldUserProject;
-                    };
+                    }
+                };
 
-                    orgUnitRepository.getAllProjects().then(function(orgUnits) {
-                        $scope.projects = orgUnits;
-                    }).then(assignCurrentProject);
-                }
+                orgUnitRepository.getAllProjects().then(function(orgUnits) {
+                    $scope.projects = orgUnits;
+                }).then(assignCurrentProject);
             }
         }, true);
 

@@ -54,5 +54,10 @@ define(["selectProjectController", "angularMocks", "orgUnitRepository", "userRep
                 expect(userPreferenceRepository.save).not.toHaveBeenCalled();
                 expect(scope.saveFailed).toBeTruthy();
             });
+
+            it("should be able to skip to dashboard", function() {
+                scope.skip();
+                expect(location.path()).toEqual("/dashboard");
+            });
         });
     });
