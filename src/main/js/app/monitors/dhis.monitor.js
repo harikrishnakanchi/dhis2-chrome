@@ -20,17 +20,13 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
                 "timeout": 1000 * properties.dhisPing.timeoutInSeconds
             }).then(function(response) {
                 console.log("DHIS is accessible");
-                if (isDhisOnline === undefined || isDhisOnline === false) {
-                    isDhisOnline = true;
-                    chromeRuntime.sendMessage("dhisOnline");
-                }
+                isDhisOnline = true;
+                chromeRuntime.sendMessage("dhisOnline");
             }).
-            catch (function(response) {
+            catch(function(response) {
                 console.log("DHIS is not accessible");
-                if (isDhisOnline === undefined || isDhisOnline === true) {
-                    isDhisOnline = false;
-                    chromeRuntime.sendMessage("dhisOffline");
-                }
+                isDhisOnline = false;
+                chromeRuntime.sendMessage("dhisOffline");
             });
         };
 
