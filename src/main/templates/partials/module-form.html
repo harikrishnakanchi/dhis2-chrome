@@ -60,14 +60,15 @@
 							<div name="left-side" class="content left">
 								<ul>
 									<li ng-repeat="dataset in module.datasets">
-										<h5 ng-click="selectDataSet(module, dataset)" ng-class="{sel: dataset === module.selectedDataset}">{{dataset.name}}</h5>
+										<span ng-click="selectDataSet(module, dataset)" ng-class="{sel: dataset === module.selectedDataset}">{{dataset.name}}</span>
 									</li>
 								</ul>
 							</div>
 							<div name="right-side" class="content right">
 								<div ng-repeat="section in module.selectedDataset.sections">
 									<div class="collapse-head" style="position:relative">
-										<h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]" style="background:#ccc;display:block;padding:10px;cursor:pointer;">{{section.name}} </h5>
+										<h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">
+										<i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isExpanded[section.id], 'glyphicon-chevron-right': !isExpanded[section.id]}"></i>{{section.name}} </h5>
 									</div>
 									<div collapse="shouldCollapse(section,module.selectedDataset.sections)">
 										<ul>

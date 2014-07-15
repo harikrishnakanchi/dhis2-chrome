@@ -36,8 +36,52 @@ header{
 .navbar-nav.navbar-right:last-child {
 margin-right: 0px!important;
 }
+
+.online{
+	position: relative;
+	padding-left:20px;
+	&:after{
+	    -webkit-border-radius: 50%;
+	    -moz-border-radius: 50%;
+	    -ms-border-radius: 50%;
+	    -o-border-radius: 50%;
+		border-radius: 50%;
+		content: " ";
+		background: #06CC36;
+		display: block;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0px;
+		margin: auto;
+		height: 14px;
+		width: 14px;
+	}
+}
+.offline{
+	position: relative;
+	padding-left:20px;
+	&:after{
+	    -webkit-border-radius: 50%;
+	    -moz-border-radius: 50%;
+	    -ms-border-radius: 50%;
+	    -o-border-radius: 50%;
+		border-radius: 50%;
+		content: " ";
+		background: #f00;
+		display: block;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0px;
+		margin: auto;
+		height: 14px;
+		width: 14px;
+	}
+}
+
 .exp-coll-group{
-	margin-top: 20px;
+
 	.panel-default > .panel-heading {
 color: #000;
 background-color: #afe6ee;
@@ -80,6 +124,32 @@ border-radius:0;
 }
 
 //data entry
+.dataentrypage{
+	.panel-title{
+		font-weight:400;
+		a{
+			color:#fff;
+			.glyphicon {
+				margin-right: 10px;
+			}
+		}
+	}
+	.panel-body{
+	.panel-title{
+		a{
+			color:#000;
+		}
+	}	
+
+	}
+}
+
+.dataentrypage{
+input[type="text"]{
+	height:24px;
+	padding:3px 6px;2
+}
+}
 
 //tabs styles
 
@@ -469,11 +539,10 @@ table td:first-child span{
 		width:270px;
 		float:left;
 		border:1px solid #ccc;
-		padding:10px 20px;
+		padding:10px;
 		.sel{
 			background: #e8c735;
 			margin: 0;
-			padding: 7px 10px;
 		}
 	}
 	.left , .right{
@@ -481,6 +550,11 @@ table td:first-child span{
 			margin: 0;
 			li{
 				margin:0;
+				span{
+					display:block;
+					padding:5px 10px;
+				}
+
 			}
 		}
 	}
@@ -488,6 +562,21 @@ table td:first-child span{
 		margin-right: 20px;
 		margin-left: 4px;
 		margin-bottom: 20px;
+	}
+	.right{
+		h5{
+			padding:8px 10px 8px 33px;
+			position: relative;
+			background:#ccc;
+			.glyphicon{
+				position: absolute;
+				top:9px;
+				left:10px;
+			}
+		}
+		ul{
+			margin-left: 33px;
+		}
 	}
 }
 

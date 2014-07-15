@@ -15,10 +15,11 @@
       <div class="container">
         <a class="navbar-brand" href="#/dashboard"><img src="img/logo.png" alt="" title="DHIS" id="logoImg"></a>
         <ul class="nav navbar-nav navbar-right">
+          <li><a  href="#/dashboard">Home</a></li>
+          <li ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a></li>
           <li><p class="navbar-text" id="loggedInUser"> {{currentUser.userCredentials.username}} </p></li>
-          <li><p class="navbar-text" ng-show="isDhisOnline">Online</p></li>
-          <li><p class="navbar-text" ng-show="!isDhisOnline">Offline</p></li>
-          <li class="active" ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a></li>
+          <li><p class="navbar-text online" ng-show="isDhisOnline">  Online</p></li>
+          <li><p class="navbar-text offline" ng-show="!isDhisOnline">Offline</p></li>
           <li>
             <select id="languageSelectButton" ng-model="currentUser.locale" ng-if="currentUser" class="input-sm"> 
               <option value="en">English</option>

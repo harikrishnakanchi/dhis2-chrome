@@ -11,7 +11,7 @@
         <div class="well" ng-repeat="opUnit in opUnits">
                 <input type="button" class="btn-delete" ng-hide="$first" ng-click="delete($index)" value="X Delete"/>
                 <ul>
-                    <li>
+                    <li class="form-group">
                         <label for="opUnitType" class="col-sm-4 col-md-4 control-label">Operation unit name</label>
                         <div class="col-sm-8 col-md-8 form-inline">
                             <div class="radio-inline">
@@ -25,7 +25,7 @@
                             </div>
                         </div>
                     </li>
-                    <li>
+                    <li class="form-group">
                         <label for="opUnitName" class="col-sm-4 col-md-4 control-label">Name of the unit</label>
                         <div class="col-sm-4">
                             <input type="text" class="form-control" name="opUnitName" id="opUnitName" placeholder="Operation Unit Name" ng-model="opUnit.name" not-in="allOpUnits" required ng-disabled="!isEditMode">
