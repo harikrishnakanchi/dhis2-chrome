@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository) {
+    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository, $timeout) {
         var dataSets, systemSettings;
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -35,7 +35,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.printWindow = function() {
-            $window.print();
+            $scope.printingTallySheet = true;
+            $timeout(function() {
+                $window.print();
+            }, 0);
         };
 
         var initDataEntryForm = function() {

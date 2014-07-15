@@ -2,13 +2,14 @@
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "approvalDataRepository"], function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, ApprovalDataRepository) {
     describe("dataEntryController ", function() {
         var scope, db, q, location, anchorScroll, dataEntryController, rootScope, approvalStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
-            orgUnits, window, approvalStoreSpy, hustle, dataRepository, approvalDataRepository;
+            orgUnits, window, approvalStoreSpy, hustle, dataRepository, approvalDataRepository, timeout;
 
         beforeEach(module('hustle'));
-        beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window) {
+        beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
             q = $q;
             hustle = $hustle;
             window = $window;
+            timeout = $timeout;
             location = $location;
             anchorScroll = $anchorScroll;
             rootScope = $rootScope;
@@ -117,7 +118,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 open: function(object) {}
             };
 
-            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository);
+            dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout);
         }));
 
         it("should initialize modules", function() {
@@ -673,10 +674,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(isDatasetOpen[id]).toBe(undefined);
         });
 
-        it("should print tally sheet", function() {
+        it("should render all panels completely and print tally sheet in the next tick", function() {
             spyOn(window, "print");
-            scope.printWindow();
 
+            scope.printWindow();
+            timeout.flush();
+
+            expect(scope.printingTallySheet).toBeTruthy();
             expect(window.print).toHaveBeenCalled();
         });
 
