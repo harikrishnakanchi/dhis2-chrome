@@ -6,7 +6,6 @@
 			<div class="col-sm-8">
 				<span class="nullable">
 					<select name="project" ng-model="project" ng-options="getFormattedOption(p) for p in projects  | orderBy:getFormattedOption" required>
-						<option value="">{{ resourceBundle.chooseProjectLabel }}</option>
 					</select>
 				</span>
 				<div ng-show="form.project.$dirty &amp;&amp; form.project.$invalid">
