@@ -52,54 +52,6 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeRuntime", "mockChrome"], 
             expect(callback).toHaveBeenCalled();
         });
 
-        it("should not raise online event if already online", function() {
-
-            var callback = jasmine.createSpy();
-
-            httpBackend.expect("HEAD").respond(200, utils.getPromise(q, "ok"));
-            var dhisMonitor = new DhisMonitor(http);
-
-            dhisMonitor.online(function() {
-                callback();
-            });
-
-            dhisMonitor.start();
-
-            httpBackend.expect("HEAD").respond(200, utils.getPromise(q, "ok"));
-            dhisMonitor.checkNow();
-
-            httpBackend.flush();
-
-            expect(dhisMonitor.isOnline()).toBe(true);
-            expect(callback.calls.count()).toBe(1);
-        });
-
-        it("should not raise offline event if already offline", function() {
-
-            var callback = jasmine.createSpy();
-
-            httpBackend.expect("HEAD").respond(200, utils.getPromise(q, "ok"));
-            var dhisMonitor = new DhisMonitor(http);
-
-            dhisMonitor.offline(function() {
-                callback();
-            });
-
-            dhisMonitor.start();
-
-            httpBackend.expect("HEAD").respond(0, utils.getPromise(q, {}));
-            dhisMonitor.checkNow();
-
-            httpBackend.expect("HEAD").respond(0, utils.getPromise(q, {}));
-            dhisMonitor.checkNow();
-
-            httpBackend.flush();
-
-            expect(dhisMonitor.isOnline()).toBe(false);
-            expect(callback.calls.count()).toBe(1);
-        });
-
-
         it("should raise offline if offline on startup", function() {
             var onlineCallback = jasmine.createSpy();
             var offlineCallback = jasmine.createSpy();
