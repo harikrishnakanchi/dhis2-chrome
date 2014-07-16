@@ -57,14 +57,18 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     });
                     chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
 
+                    console.log("Registering hustle consumers");
+                    consumerRegistry.register();
+
+
                     dhisMonitor.online(function() {
-                        console.log("Registering hustle consumers");
-                        consumerRegistry.register();
+                        console.log("Starting all hustle consumers");
+                        consumerRegistry.startAllConsumers();
                     });
 
                     dhisMonitor.offline(function() {
-                        console.log("De-registering hustle consumers");
-                        consumerRegistry.deregister();
+                        console.log("Stopping all hustle consumers");
+                        consumerRegistry.stopAllConsumers();
                     });
 
                     dhisMonitor.start()

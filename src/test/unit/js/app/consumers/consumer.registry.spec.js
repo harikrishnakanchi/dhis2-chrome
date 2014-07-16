@@ -18,26 +18,28 @@ define(["consumerRegistry", "angularMocks", "hustleModule", "utils"], function(C
 
         it("should register and start consumers", function() {
             spyOn(hustle, "registerConsumer");
+
             consumerRegistry.register();
+
             expect(hustle.registerConsumer).toHaveBeenCalledWith(dataValueConsumer.run, "dataValues");
         });
 
-        it("should deregister consumers", function() {
+        it("should stop all consumers", function() {
             spyOn(hustle, "registerConsumer").and.returnValue(utils.getPromise(q, consumer));
+
             consumerRegistry.register();
             scope.$apply();
-
-            consumerRegistry.deregister();
+            consumerRegistry.stopAllConsumers();
 
             expect(consumer.stop).toHaveBeenCalled();
         });
 
-        it("should start consumers if already registered", function() {
+        it("should start all consumers", function() {
             spyOn(hustle, "registerConsumer").and.returnValue(utils.getPromise(q, consumer));
-            consumerRegistry.register();
-            scope.$apply();
 
             consumerRegistry.register();
+            scope.$apply();
+            consumerRegistry.startAllConsumers();
 
             expect(consumer.start).toHaveBeenCalled();
         });
