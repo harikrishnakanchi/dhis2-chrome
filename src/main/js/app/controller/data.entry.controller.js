@@ -44,9 +44,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         var initDataEntryForm = function() {
             approvalDataRepository.getCompleteDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
                 if (_.isEmpty(data)) {
-                    $scope.isApproved = false || $scope.approveSuccess;
+                    $scope.isCompleted = false || $scope.approveSuccess;
                 } else {
-                    $scope.isApproved = true;
+                    $scope.isCompleted = true;
                 }
             });
 
@@ -111,7 +111,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.submit = function() {
-            if ($scope.isApproved) {
+            if ($scope.isCompleted) {
                 showModal(function() {
                     save(false);
                 }, $scope.resourceBundle.reapprovalConfirmationMessage);
@@ -128,6 +128,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             showModal(markDataAsComplete, $scope.resourceBundle.dataApprovalConfirmationMessage);
         };
 
+        $scope.secondLevelApproval = function() {
+            showModal(markDataAsApproved, $scope.resourceBundle.dataApprovalConfirmationMessage);
+        };
+
         var showModal = function(okCallback, message) {
             $scope.modalMessage = message;
             var modalInstance = $modal.open({
@@ -139,6 +143,27 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             modalInstance.result.then(okCallback);
         };
 
+        var approveData = function(approvalData, approvalFn, approvalType) {
+            var onSuccess = function() {
+                $scope.approveSuccess = true;
+                $scope.approveError = false;
+            };
+
+            var onError = function() {
+                $scope.approveSuccess = false;
+                $scope.approveError = true;
+            };
+
+            var saveToDhis = function() {
+                return $hustle.publish({
+                    "data": approvalData,
+                    "type": approvalType
+                }, "dataValues");
+            };
+
+            return approvalFn(approvalData).then(saveToDhis).then(onSuccess, onError).finally(scrollToTop);
+        };
+
         var markDataAsComplete = function() {
             var dataForApproval = {
                 "dataSets": _.keys($scope.currentGroupedSections),
@@ -147,31 +172,20 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 "storedBy": $scope.currentUser.userCredentials.username,
                 "date": moment().toISOString()
             };
-            var onSuccess = function() {
-                $scope.approveSuccess = true;
-                $scope.approveError = false;
-                initDataEntryForm();
-            };
 
-            var onError = function() {
-                $scope.approveSuccess = false;
-                $scope.approveError = true;
-            };
-
-            var markAllDataAsComplete = function() {
-                return approvalDataRepository.save(dataForApproval);
-            };
-
-            var saveToDhis = function() {
-                return $hustle.publish({
-                    "data": dataForApproval,
-                    "type": "uploadApprovalData"
-                }, "dataValues");
-            };
-
-            markAllDataAsComplete().then(saveToDhis).then(onSuccess, onError).
-            finally(scrollToTop);
+            return approveData(dataForApproval, approvalDataRepository.saveLevelOneApproval, "uploadApprovalData");
         };
+
+        var markDataAsApproved = function() {
+            var dataForApproval = {
+                "dataSets": _.keys($scope.currentGroupedSections),
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
+            };
+
+            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalDataForL2");
+        };
+
 
         $scope.isCurrentWeekSelected = function(week) {
             var today = moment().format("YYYY-MM-DD");

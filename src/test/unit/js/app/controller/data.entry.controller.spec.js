@@ -796,7 +796,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 result: utils.getPromise(q, {})
             });
             spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
-            spyOn(approvalDataRepository, "save").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalDataRepository, "saveLevelOneApproval").and.returnValue(utils.getPromise(q, {}));
 
             var _Date = Date;
             spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
@@ -826,14 +826,14 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.firstLevelApproval();
             scope.$apply();
 
-            expect(approvalDataRepository.save).toHaveBeenCalledWith(data);
+            expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(data);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": data,
                 "type": 'uploadApprovalData'
             }, 'dataValues');
             expect(scope.approveSuccess).toBe(true);
             expect(scope.approveError).toBe(false);
-            expect(scope.isApproved).toEqual(true);
+            expect(scope.isCompleted).toEqual(true);
         });
 
         it("should not submit data for approval", function() {
@@ -844,7 +844,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 result: utils.getPromise(q, {})
             });
             spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
-            spyOn(approvalDataRepository, "save").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalDataRepository, "saveLevelOneApproval").and.returnValue(utils.getPromise(q, {}));
 
             var _Date = Date;
             spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
@@ -873,21 +873,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             }, 'dataValues');
             expect(scope.approveSuccess).toBe(false);
             expect(scope.approveError).toBe(true);
-            expect(scope.isApproved).toEqual(false);
+            expect(scope.isCompleted).toEqual(false);
         });
 
-        it("should mark data as approved if proccessed", function() {
+        it("should mark data as complete if proccessed", function() {
             spyOn(approvalDataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, 'abc'));
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-            spyOn(fakeModal, "open").and.returnValue({
-                result: utils.getPromise(q, {})
-            });
             spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
-            spyOn(approvalDataRepository, "save").and.returnValue(utils.getPromise(q, {}));
-
-            var _Date = Date;
-            spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
-
             scope.currentModule = {
                 id: 'mod2',
                 parent: {
@@ -898,12 +889,24 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.week = {
                 "weekNumber": 14
             };
+
+            var _Date = Date;
+            spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
+
+            scope.$apply();
+
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
+            spyOn(approvalDataRepository, "saveLevelOneApproval").and.returnValue(utils.getPromise(q, {}));
+
             scope.firstLevelApproval();
             scope.$apply();
 
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: {
-                    dataSets: [],
+                    dataSets: ['Vacc'],
                     period: '2014W14',
                     orgUnit: 'mod2',
                     storedBy: 'dataentryuser',
@@ -913,7 +916,48 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             }, 'dataValues');
             expect(scope.approveSuccess).toBe(true);
             expect(scope.approveError).toBe(false);
-            expect(scope.isApproved).toEqual(true);
+            expect(scope.isCompleted).toEqual(true);
+        });
+
+        it("should mark data as approved if proccessed", function() {
+            spyOn(approvalDataRepository, "getCompleteDataValues").and.returnValue(utils.getPromise(q, 'abc'));
+            spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+
+            var _Date = Date;
+            spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
+
+            scope.$apply();
+
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
+            spyOn(approvalDataRepository, "saveLevelTwoApproval").and.returnValue(utils.getPromise(q, {}));
+
+            scope.secondLevelApproval();
+            scope.$apply();
+
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: {
+                    dataSets: ['Vacc'],
+                    period: '2014W14',
+                    orgUnit: 'mod2'
+                },
+                type: 'uploadApprovalDataForL2'
+            }, 'dataValues');
+            expect(scope.approveSuccess).toBe(true);
+            expect(scope.approveError).toBe(false);
+            expect(scope.isCompleted).toEqual(true);
         });
 
         it("should unapprove data if edited after approval", function() {

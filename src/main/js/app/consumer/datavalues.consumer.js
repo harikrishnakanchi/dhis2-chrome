@@ -53,7 +53,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
 
                     approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(dbApprovalData) {
                         var mergedData = merge(dhisApprovalData, dbApprovalData, equalsPred, "date");
-                        return approvalDataRepository.save(mergedData);
+                        return approvalDataRepository.saveLevelOneApproval(mergedData);
                     });
                 };
 

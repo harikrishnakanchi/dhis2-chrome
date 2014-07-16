@@ -35,7 +35,8 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 approvalDataRepository = {
                     "getLevelOneApprovalData": jasmine.createSpy("getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {})),
                     "getLevelOneApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getLevelOneApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
-                    "save": jasmine.createSpy("save")
+                    "saveLevelOneApproval": jasmine.createSpy("saveLevelOneApproval"),
+                    "saveLevelTwoApproval": jasmine.createSpy("saveLevelTwoApproval")
                 };
 
                 dataService = {
@@ -45,7 +46,8 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
 
                 approvalService = {
                     "getAllLevelOneApprovalData": jasmine.createSpy("getAllLevelOneApprovalData").and.returnValue(utils.getPromise(q, [])),
-                    "save": jasmine.createSpy("save"),
+                    "saveLevelOneApproval": jasmine.createSpy("saveLevelOneApproval"),
+                    "saveLevelTwoApproval": jasmine.createSpy("saveLevelTwoApproval"),
                     "markAsComplete": jasmine.createSpy("markAsComplete"),
                     "markAsIncomplete": jasmine.createSpy("markAsIncomplete")
                 };
@@ -339,7 +341,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 dataValuesConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.save).not.toHaveBeenCalled();
+                expect(approvalDataRepository.saveLevelOneApproval).not.toHaveBeenCalled();
             });
 
             it("should save downloaded approval data to idb if approval data doesn't exist in idb", function() {
@@ -368,7 +370,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 dataValuesConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.save).toHaveBeenCalledWith(dhisApprovalData);
+                expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(dhisApprovalData);
             });
 
             it("should merge dhis approval data and idb approval data based on last modified time", function() {
@@ -426,7 +428,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 dataValuesConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.save).toHaveBeenCalledWith(expectedApprovalData);
+                expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(expectedApprovalData);
             });
 
             it("should upload data to DHIS", function() {

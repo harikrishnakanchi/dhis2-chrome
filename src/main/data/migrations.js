@@ -86,8 +86,12 @@ define([], function() {
     };
 
     var add_complete_datasets_store = function(db, tx) {
-        var completeDataSetsStore = create_store_with_key("completeDataSets", ["period", "orgUnit"], db);
+        var completeDataSetsStore = create_store_with_key("completedDataSets", ["period", "orgUnit"], db);
         create_index(completeDataSetsStore, "by_period", "period", false);
+    };
+
+    var add_approval_datasets_store = function(db, tx) {
+        create_store_with_key("approvedDataSets", ["period", "orgUnit"], db);
     };
 
     return [add_object_stores,
@@ -101,5 +105,7 @@ define([], function() {
         add_translation_store,
         add_system_settings_store,
         add_user_preference_store,
-        add_complete_datasets_store];
+        add_complete_datasets_store,
+        add_approval_datasets_store
+    ];
 });

@@ -1,7 +1,12 @@
 define([], function() {
     return function(db) {
-        this.save = function(payload) {
-            var store = db.objectStore("completeDataSets");
+        this.saveLevelOneApproval = function(payload) {
+            var store = db.objectStore("completedDataSets");
+            return store.upsert(payload);
+        };
+
+        this.saveLevelTwoApproval = function(payload) {
+            var store = db.objectStore("approvedDataSets");
             return store.upsert(payload);
         };
 
@@ -10,12 +15,12 @@ define([], function() {
                 return d && d.isDeleted ? undefined : d;
             };
 
-            var store = db.objectStore('completeDataSets');
+            var store = db.objectStore('completedDataSets');
             return store.find([period, orgUnitId]).then(filterSoftDeletedApprovals);
         };
 
         this.getLevelOneApprovalData = function(period, orgUnitId) {
-            var store = db.objectStore('completeDataSets');
+            var store = db.objectStore('completedDataSets');
             return store.find([period, orgUnitId]);
         };
 
@@ -23,7 +28,7 @@ define([], function() {
             var unapprove = function(data) {
                 if (!data) return;
                 data.isDeleted = true;
-                var store = db.objectStore('completeDataSets');
+                var store = db.objectStore('completedDataSets');
                 return store.upsert(data).then(function() {
                     return data;
                 });
@@ -33,7 +38,7 @@ define([], function() {
         };
 
         this.getLevelOneApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
-            var store = db.objectStore('completeDataSets');
+            var store = db.objectStore('completedDataSets');
             var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
             return store.each(query).then(function(approvalData) {
                 return _.filter(approvalData, function(ad) {

@@ -28,10 +28,28 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
                 "dataSets": ["d1", "d2", "d3"]
             }];
 
-            approvalDataRepository.save(completeDataSetRegistrationList);
+            approvalDataRepository.saveLevelOneApproval(completeDataSetRegistrationList);
 
-            expect(db.objectStore).toHaveBeenCalledWith("completeDataSets");
+            expect(db.objectStore).toHaveBeenCalledWith("completedDataSets");
             expect(mockStore.upsert).toHaveBeenCalledWith(completeDataSetRegistrationList);
+        });
+
+
+        it("should save approvals", function() {
+            var approvedDataSets = [{
+                "orgUnit": "ou1",
+                "period": "2014W01",
+                "dataSets": ["d1", "d2", "d3"]
+            }, {
+                "orgUnit": "ou1",
+                "period": "2014W02",
+                "dataSets": ["d1", "d2", "d3"]
+            }];
+
+            approvalDataRepository.saveLevelTwoApproval(approvedDataSets);
+
+            expect(db.objectStore).toHaveBeenCalledWith("approvedDataSets");
+            expect(mockStore.upsert).toHaveBeenCalledWith(approvedDataSets);
         });
 
         it("should get the approval data", function() {
