@@ -7,6 +7,9 @@ define(["dhisId"], function(dhisId) {
         }, {
             "id": "a276eebf9df",
             "name": "Approver - Level 1"
+        }, {
+            "id": "cb4uEzD2fMS",
+            "name": "Approver - Level 2",
         }];
 
         var init = function() {
