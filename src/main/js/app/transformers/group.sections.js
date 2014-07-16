@@ -50,6 +50,7 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
             return s.key === parentId;
         });
         var filteredSections = _.map(sections, function(section) {
+            section = _.clone(section);
             section.dataElements = _.filter(section.dataElements, function(dataElement) {
                 var excludedList = systemSetting ? systemSetting.value.excludedDataElements : undefined;
                 return excludedList ? !_.contains(excludedList[moduleId], dataElement.id) : true;
