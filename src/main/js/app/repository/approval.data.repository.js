@@ -37,6 +37,11 @@ define([], function() {
             return this.getCompleteDataValues(period, orgUnit).then(unapprove);
         };
 
+        this.getLevelTwoApprovalData = function(period, orgUnitId) {
+            var store = db.objectStore('approvedDataSets');
+            return store.find([period, orgUnitId]);
+        };
+
         this.getLevelOneApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
             var store = db.objectStore('completedDataSets');
             var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
@@ -46,6 +51,5 @@ define([], function() {
                 });
             });
         };
-
     };
 });

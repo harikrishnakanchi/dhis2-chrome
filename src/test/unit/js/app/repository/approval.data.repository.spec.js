@@ -52,11 +52,25 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
             expect(mockStore.upsert).toHaveBeenCalledWith(approvedDataSets);
         });
 
+        it("should get level two approval data", function() {
+            mockStore.find.and.returnValue(utils.getPromise(q, {
+                period: '2014W15'
+            }));
+
+            approvalDataRepository.getLevelTwoApprovalData('period', 'orgUnitId');
+
+            expect(db.objectStore).toHaveBeenCalledWith("approvedDataSets");
+            expect(mockStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
+        });
+
         it("should get the approval data", function() {
             mockStore.find.and.returnValue(utils.getPromise(q, {
                 period: '2014W15'
             }));
+
             approvalDataRepository.getLevelOneApprovalData('period', 'orgUnitId');
+
+            expect(db.objectStore).toHaveBeenCalledWith("completedDataSets");
             expect(mockStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
         });
 
