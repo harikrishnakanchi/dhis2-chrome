@@ -37,7 +37,8 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     "getLevelTwoApprovalData": jasmine.createSpy("getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {})),
                     "getLevelOneApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getLevelOneApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
                     "saveLevelOneApproval": jasmine.createSpy("saveLevelOneApproval"),
-                    "saveLevelTwoApproval": jasmine.createSpy("saveLevelTwoApproval")
+                    "saveLevelTwoApproval": jasmine.createSpy("saveLevelTwoApproval"),
+                    "deleteLevelOneApproval": jasmine.createSpy("deleteLevelOneApproval")
                 };
 
                 dataService = {
@@ -246,7 +247,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(dataRepository.save).toHaveBeenCalledWith(expected);
             });
 
-            it("should merge dhisData with existing db data and save to indexeddb", function() {
+            it("should merge dhisData with existing db data, clear approvals where necessary, do the laundry and save to indexeddb", function() {
                 var dhisDataValues = {
                     "dataValues": [{
                         "dataElement": "DE1",
@@ -320,6 +321,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }]
                 };
 
+                expect(approvalDataRepository.deleteLevelOneApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
                 expect(dataRepository.save).toHaveBeenCalledWith(expectedDataValues);
             });
 

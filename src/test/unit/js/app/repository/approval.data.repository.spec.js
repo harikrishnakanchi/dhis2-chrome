@@ -34,6 +34,12 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
             expect(mockStore.upsert).toHaveBeenCalledWith(completeDataSetRegistrationList);
         });
 
+        it("should delete complete registrations", function() {
+            approvalDataRepository.deleteLevelOneApproval("2014W01", "ou1");
+
+            expect(db.objectStore).toHaveBeenCalledWith("completedDataSets");
+            expect(mockStore.delete).toHaveBeenCalledWith(["2014W01", "ou1"]);
+        });
 
         it("should save approvals", function() {
             var approvedDataSets = [{

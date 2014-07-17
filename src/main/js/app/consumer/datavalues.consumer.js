@@ -61,7 +61,6 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             };
 
             var downloadDataValues = function(metadata) {
-
                 var dataValuesEquals = function(d1, d2) {
                     return d1.dataElement === d2.dataElement && d1.period === d2.period && d1.orgUnit === d2.orgUnit && d1.categoryOptionCombo === d2.categoryOptionCombo;
                 };
@@ -72,8 +71,27 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                     return $q.when(orgUnitIds.length > 0 && allDataSets.length > 0 ? dataService.downloadAllData(orgUnitIds, allDataSets) : []);
                 };
 
-                var saveAllDataValues = function(data) {
+                var clearApprovals = function(mergedData, originalData) {
+                    var orgUnitAndPeriod = function(dataValue) {
+                        return dataValue.orgUnit + dataValue.period;
+                    };
 
+                    var groupedMergedData = _.groupBy(mergedData, orgUnitAndPeriod);
+                    var groupedOriginalData = _.groupBy(originalData, orgUnitAndPeriod);
+
+                    var deleteApprovals = [];
+                    for (var data in groupedOriginalData) {
+                        if (groupedMergedData[data] && !_.isEqual(groupedMergedData[data], groupedOriginalData[data])) {
+                            var firstDataValue = groupedOriginalData[data][0];
+                            var deleteApproval = approvalDataRepository.deleteLevelOneApproval(firstDataValue.period, firstDataValue.orgUnit);
+                            deleteApprovals.push(deleteApproval);
+                        }
+                    }
+
+                    return $q.all(deleteApprovals);
+                };
+
+                var saveAllDataValues = function(data) {
                     if (_.isEmpty(data))
                         return;
 
@@ -87,8 +105,10 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
 
                     return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(dataValuesFromDb) {
                         var mergedData = merge(_.flatten(dataValuesFromDb, "dataValues"), dataValuesFromDhis, dataValuesEquals);
-                        return dataRepository.save({
-                            "dataValues": mergedData
+                        return clearApprovals(mergedData, dataValuesFromDb).then(function() {
+                            return dataRepository.save({
+                                "dataValues": mergedData
+                            });
                         });
                     });
                 };
