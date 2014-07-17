@@ -508,7 +508,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                             storedBy: 'testproj_approver_l1',
                             date: "2014-05-24T09:00:00.120Z"
                         },
-                        "type": "uploadApprovalData"
+                        "type": "uploadCompletionData"
                     }
                 };
 
@@ -543,7 +543,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                             "orgUnit": 'ou1',
                             "isDeleted": true
                         },
-                        "type": "uploadApprovalData"
+                        "type": "uploadCompletionData"
                     }
                 };
 

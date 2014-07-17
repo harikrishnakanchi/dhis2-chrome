@@ -173,7 +173,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 "date": moment().toISOString()
             };
 
-            return approveData(dataForApproval, approvalDataRepository.saveLevelOneApproval, "uploadApprovalData");
+            return approveData(dataForApproval, approvalDataRepository.saveLevelOneApproval, "uploadCompletionData");
         };
 
         var markDataAsApproved = function() {
@@ -229,7 +229,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     if (!approvalData) return;
                     return $hustle.publish({
                         "data": approvalData,
-                        "type": "uploadApprovalData"
+                        "type": "uploadCompletionData"
                     }, "dataValues");
                 };
 

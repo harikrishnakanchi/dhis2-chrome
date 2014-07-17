@@ -36,7 +36,7 @@ define(["dispatcher", "angularMocks"], function(Dispatcher, mocks) {
         it("should call data values consumer for uploading approval data", function() {
             message.data = {
                 "data": {},
-                "type": "uploadApprovalData"
+                "type": "uploadCompletionData"
             };
             dispatcher.run(message);
             expect(dataValuesConsumer.run).toHaveBeenCalledWith(message);

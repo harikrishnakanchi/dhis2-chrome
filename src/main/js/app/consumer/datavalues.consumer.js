@@ -120,7 +120,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             return downloadData().then(preparePayload).then(uploadData);
         };
 
-        var uploadApprovalData = function(data) {
+        var uploadCompletionData = function(data) {
             var preparePayload = function() {
                 return approvalDataRepository.getLevelOneApprovalData(data.period, data.orgUnit);
             };
@@ -140,7 +140,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             var action = {
                 "uploadDataValues": uploadDataValues,
                 "downloadData": processDownloadMessage,
-                "uploadApprovalData": uploadApprovalData
+                "uploadCompletionData": uploadCompletionData
             };
             return action[payload.type](payload.data);
         };

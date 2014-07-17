@@ -829,7 +829,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(data);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": data,
-                "type": 'uploadApprovalData'
+                "type": 'uploadCompletionData'
             }, 'dataValues');
             expect(scope.approveSuccess).toBe(true);
             expect(scope.approveError).toBe(false);
@@ -869,7 +869,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     storedBy: 'dataentryuser',
                     date: moment().toISOString()
                 },
-                type: 'uploadApprovalData'
+                type: 'uploadCompletionData'
             }, 'dataValues');
             expect(scope.approveSuccess).toBe(false);
             expect(scope.approveError).toBe(true);
@@ -912,7 +912,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     storedBy: 'dataentryuser',
                     date: moment().toISOString()
                 },
-                type: 'uploadApprovalData'
+                type: 'uploadCompletionData'
             }, 'dataValues');
             expect(scope.approveSuccess).toBe(true);
             expect(scope.approveError).toBe(false);
@@ -998,7 +998,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 data: {
                     "foo": "bar"
                 },
-                type: 'uploadApprovalData'
+                type: 'uploadCompletionData'
             }, 'dataValues']);
         });
     });

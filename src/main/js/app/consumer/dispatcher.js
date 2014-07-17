@@ -4,7 +4,7 @@ define([], function() {
             switch (message.data.type) {
                 case "uploadDataValues":
                 case "downloadData":
-                case "uploadApprovalData":
+                case "uploadCompletionData":
                     return dataValuesConsumer.run(message);
                 case "createOrgUnit":
                     return orgUnitConsumer.run(message);
