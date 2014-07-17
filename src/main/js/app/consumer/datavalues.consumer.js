@@ -83,8 +83,10 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                     for (var data in groupedOriginalData) {
                         if (groupedMergedData[data] && !_.isEqual(groupedMergedData[data], groupedOriginalData[data])) {
                             var firstDataValue = groupedOriginalData[data][0];
-                            var deleteApproval = approvalDataRepository.deleteLevelOneApproval(firstDataValue.period, firstDataValue.orgUnit);
-                            deleteApprovals.push(deleteApproval);
+                            var deleteFirstLevelApproval = approvalDataRepository.deleteLevelOneApproval(firstDataValue.period, firstDataValue.orgUnit);
+                            var deleteSecondLevelApproval = approvalDataRepository.deleteLevelTwoApproval(firstDataValue.period, firstDataValue.orgUnit);
+                            deleteApprovals.push(deleteFirstLevelApproval);
+                            deleteApprovals.push(deleteSecondLevelApproval);
                         }
                     }
 
@@ -146,6 +148,8 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             };
 
             var upload = function(payload) {
+                if (!payload)
+                    return;
                 if (payload.status === "NEW")
                     return approvalService.markAsComplete(payload.dataSets, payload.period, payload.orgUnit, payload.storedBy, payload.date);
                 if (payload.status === "DELETED")
@@ -161,6 +165,8 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             };
 
             var upload = function(payload) {
+                if (!payload)
+                    return;
                 return approvalService.markAsApproved(payload.dataSets, payload.period, payload.orgUnit);
             };
 

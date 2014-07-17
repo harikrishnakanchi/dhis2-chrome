@@ -15,6 +15,11 @@ define([], function() {
             return store.delete([period, orgUnitId]);
         };
 
+        this.deleteLevelTwoApproval = function(period, orgUnitId) {
+            var store = db.objectStore("approvedDataSets");
+            return store.delete([period, orgUnitId]);
+        };
+
         this.getCompleteDataValues = function(period, orgUnitId) {
             var filterSoftDeletedApprovals = function(d) {
                 return d && d.status === "DELETED" ? undefined : d;

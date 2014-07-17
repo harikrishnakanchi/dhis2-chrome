@@ -38,7 +38,8 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     "getLevelOneApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getLevelOneApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
                     "saveLevelOneApproval": jasmine.createSpy("saveLevelOneApproval"),
                     "saveLevelTwoApproval": jasmine.createSpy("saveLevelTwoApproval"),
-                    "deleteLevelOneApproval": jasmine.createSpy("deleteLevelOneApproval")
+                    "deleteLevelOneApproval": jasmine.createSpy("deleteLevelOneApproval"),
+                    "deleteLevelTwoApproval": jasmine.createSpy("deleteLevelTwoApproval")
                 };
 
                 dataService = {
@@ -322,6 +323,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 };
 
                 expect(approvalDataRepository.deleteLevelOneApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
+                expect(approvalDataRepository.deleteLevelTwoApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
                 expect(dataRepository.save).toHaveBeenCalledWith(expectedDataValues);
             });
 
