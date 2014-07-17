@@ -30,7 +30,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                 }, list1);
             };
 
-            var downloadApprovalData = function(metadata) {
+            var downloadCompletionData = function(metadata) {
                 var userOrgUnitIds = metadata[0];
                 var allDataSets = _.pluck(metadata[1], "id");
 
@@ -97,7 +97,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             };
 
             return $q.all([getUserOrgUnits(), dataSetRepository.getAll()]).then(function(metadata) {
-                return $q.all([downloadDataValues(metadata), downloadApprovalData(metadata)]);
+                return $q.all([downloadDataValues(metadata), downloadCompletionData(metadata)]);
             });
         };
 
@@ -135,12 +135,25 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             return downloadData().then(preparePayload).then(upload);
         };
 
+        var uploadApprovalData = function(data) {
+            var preparePayload = function() {
+                return approvalDataRepository.getLevelTwoApprovalData(data.period, data.orgUnit);
+            };
+
+            var upload = function(payload) {
+                return approvalService.markAsApproved(payload.dataSets, payload.period, payload.orgUnit);
+            };
+
+            return downloadData().then(preparePayload).then(upload);
+        };
+
         this.run = function(message) {
             var payload = message.data;
             var action = {
                 "uploadDataValues": uploadDataValues,
                 "downloadData": processDownloadMessage,
-                "uploadCompletionData": uploadCompletionData
+                "uploadCompletionData": uploadCompletionData,
+                "uploadApprovalData": uploadApprovalData
             };
             return action[payload.type](payload.data);
         };

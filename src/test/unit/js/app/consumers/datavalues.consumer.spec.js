@@ -34,6 +34,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
 
                 approvalDataRepository = {
                     "getLevelOneApprovalData": jasmine.createSpy("getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {})),
+                    "getLevelTwoApprovalData": jasmine.createSpy("getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {})),
                     "getLevelOneApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getLevelOneApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
                     "saveLevelOneApproval": jasmine.createSpy("saveLevelOneApproval"),
                     "saveLevelTwoApproval": jasmine.createSpy("saveLevelTwoApproval")
@@ -46,9 +47,11 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
 
                 approvalService = {
                     "getAllLevelOneApprovalData": jasmine.createSpy("getAllLevelOneApprovalData").and.returnValue(utils.getPromise(q, [])),
+                    "getAllLevelTwoApprovalData": jasmine.createSpy("getAllLevelTwoApprovalData").and.returnValue(utils.getPromise(q, [])),
                     "saveLevelOneApproval": jasmine.createSpy("saveLevelOneApproval"),
                     "saveLevelTwoApproval": jasmine.createSpy("saveLevelTwoApproval"),
                     "markAsComplete": jasmine.createSpy("markAsComplete"),
+                    "markAsApproved": jasmine.createSpy("markAsApproved"),
                     "markAsIncomplete": jasmine.createSpy("markAsIncomplete")
                 };
 
@@ -486,6 +489,37 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
             });
 
             it("should upload approval data to DHIS", function() {
+                approvalDataRepository.getLevelTwoApprovalData.and.callFake(function(period, orgUnit) {
+                    if (period === "2014W12" && orgUnit === "ou1")
+                        return utils.getPromise(q, {
+                            "orgUnit": "ou1",
+                            "period": "2014W12",
+                            "dataSets": ["d1", "d2"]
+                        });
+
+                    return utils.getPromise(q, undefined);
+                });
+
+                message = {
+                    "data": {
+                        "data": {
+                            dataSets: ["d1", "d2"],
+                            period: '2014W12',
+                            orgUnit: 'ou1'
+                        },
+                        "type": "uploadApprovalData"
+                    }
+                };
+
+                dataValuesConsumer.run(message);
+                scope.$apply();
+
+                // expect(dataService.downloadAllData).toHaveBeenCalled();
+                // expect(approvalService.getAllLevelTwoApprovalData).toHaveBeenCalled();
+                expect(approvalService.markAsApproved).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1');
+            });
+
+            it("should upload completion data to DHIS", function() {
                 approvalDataRepository.getLevelOneApprovalData.and.callFake(function(period, orgUnit) {
                     if (period === "2014W12" && orgUnit === "ou1")
                         return utils.getPromise(q, {

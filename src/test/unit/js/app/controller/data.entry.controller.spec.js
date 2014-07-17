@@ -953,7 +953,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     period: '2014W14',
                     orgUnit: 'mod2'
                 },
-                type: 'uploadApprovalDataForL2'
+                type: 'uploadApprovalData'
             }, 'dataValues');
             expect(scope.approveSuccess).toBe(true);
             expect(scope.approveError).toBe(false);

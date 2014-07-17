@@ -161,7 +161,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 }, "dataValues");
             };
 
-            return approvalFn(approvalData).then(saveToDhis).then(onSuccess, onError).finally(scrollToTop);
+            return approvalFn(approvalData).then(saveToDhis).then(onSuccess, onError).
+            finally(scrollToTop);
         };
 
         var markDataAsComplete = function() {
@@ -183,7 +184,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 "orgUnit": $scope.currentModule.id
             };
 
-            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalDataForL2");
+            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData");
         };
 
 

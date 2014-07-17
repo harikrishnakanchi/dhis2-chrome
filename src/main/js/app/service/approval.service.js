@@ -13,8 +13,17 @@ define(["properties", "moment"], function(properties, moment) {
             });
         };
 
-        this.getAllLevelOneApprovalData = function(orgUnits, dataSets) {
+        this.markAsApproved = function(dataSets, period, orgUnit) {
+            return $http.post(properties.dhis.url + "/api/dataApprovals", undefined, {
+                params: {
+                    "ds": dataSets,
+                    "pe": period,
+                    "ou": orgUnit
+                }
+            });
+        };
 
+        this.getAllLevelOneApprovalData = function(orgUnits, dataSets) {
             var transform = function(completeDataSetRegistrationList) {
                 var registrationsGroupedByPeriodAndOu = _.groupBy(completeDataSetRegistrationList, function(registration) {
                     return [registration.period.id, registration.organisationUnit.id];

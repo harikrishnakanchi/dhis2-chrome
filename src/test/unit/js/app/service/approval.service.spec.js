@@ -32,6 +32,15 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             httpBackend.flush();
         });
 
+        it("should mark data as complete in dhis", function() {
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals?ds=170b8cd5e53&ou=17yugc&pe=2014W01").respond(200, "ok");
+
+            var approvalService = new ApprovalService(http, db, q);
+            approvalService.markAsApproved(["170b8cd5e53"], "2014W01", "17yugc");
+
+            httpBackend.flush();
+        });
+
         it("should get complete datasets", function() {
             var endDate = moment().format("YYYY-MM-DD");
 

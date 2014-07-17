@@ -5,6 +5,7 @@ define([], function() {
                 case "uploadDataValues":
                 case "downloadData":
                 case "uploadCompletionData":
+                case "uploadApprovalData":
                     return dataValuesConsumer.run(message);
                 case "createOrgUnit":
                     return orgUnitConsumer.run(message);
