@@ -527,7 +527,8 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                             "period": "2014W12",
                             "storedBy": "testproj_approver_l1",
                             "date": "2014-05-24T09:00:00.120Z",
-                            "dataSets": ["d1", "d2"]
+                            "dataSets": ["d1", "d2"],
+                            "status": "NEW"
                         });
 
                     return utils.getPromise(q, undefined);
@@ -562,7 +563,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                             "period": "2014W12",
                             "storedBy": "testproj_approver_l1",
                             "date": "2014-05-24T09:00:00.120Z",
-                            "isDeleted": true,
+                            "status": "DELETED",
                             "dataSets": ["d1", "d2"]
                         });
 
@@ -575,7 +576,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                             "dataSets": ["d1", "d2"],
                             "period": '2014W12',
                             "orgUnit": 'ou1',
-                            "isDeleted": true
+                            "status": "DELETED"
                         },
                         "type": "uploadCompletionData"
                     }

@@ -801,11 +801,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             var _Date = Date;
             spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
             var data = {
-                dataSets: [],
-                period: '2014W14',
-                orgUnit: 'mod2',
-                storedBy: 'dataentryuser',
-                date: moment().toISOString()
+                "dataSets": [],
+                "period": '2014W14',
+                "orgUnit": 'mod2',
+                "storedBy": 'dataentryuser',
+                "date": moment().toISOString(),
+                "status": "NEW"
             };
             scope.currentModule = {
                 id: 'mod2',
@@ -867,7 +868,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     period: '2014W14',
                     orgUnit: 'mod2',
                     storedBy: 'dataentryuser',
-                    date: moment().toISOString()
+                    date: moment().toISOString(),
+                    status: "NEW"
                 },
                 type: 'uploadCompletionData'
             }, 'dataValues');
@@ -910,7 +912,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     period: '2014W14',
                     orgUnit: 'mod2',
                     storedBy: 'dataentryuser',
-                    date: moment().toISOString()
+                    date: moment().toISOString(),
+                    status: "NEW"
                 },
                 type: 'uploadCompletionData'
             }, 'dataValues');

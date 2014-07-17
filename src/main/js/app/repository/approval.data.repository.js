@@ -12,7 +12,7 @@ define([], function() {
 
         this.getCompleteDataValues = function(period, orgUnitId) {
             var filterSoftDeletedApprovals = function(d) {
-                return d && d.isDeleted ? undefined : d;
+                return d && d.status === "DELETED" ? undefined : d;
             };
 
             var store = db.objectStore('completedDataSets');
@@ -27,7 +27,7 @@ define([], function() {
         this.unapproveLevelOneData = function(period, orgUnit) {
             var unapprove = function(data) {
                 if (!data) return;
-                data.isDeleted = true;
+                data.status = "DELETED";
                 var store = db.objectStore('completedDataSets');
                 return store.upsert(data).then(function() {
                     return data;

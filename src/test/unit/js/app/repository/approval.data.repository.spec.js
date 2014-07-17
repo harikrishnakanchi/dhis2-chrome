@@ -94,7 +94,7 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
             var approvalData;
             mockStore.find.and.returnValue(utils.getPromise(q, {
                 period: '2014W15',
-                isDeleted: true
+                "status": "DELETED"
             }));
 
             approvalDataRepository.getCompleteDataValues('period', 'orgUnitId').then(function(data) {
@@ -115,7 +115,7 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
             expect(mockStore.find).toHaveBeenCalledWith(["period", "orgUnitId"]);
             expect(mockStore.upsert).toHaveBeenCalledWith({
                 period: '2014W15',
-                "isDeleted": true
+                "status": "DELETED"
             });
         });
 

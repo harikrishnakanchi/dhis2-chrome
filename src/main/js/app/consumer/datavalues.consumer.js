@@ -126,10 +126,10 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             };
 
             var upload = function(payload) {
-                if (payload.isDeleted) {
+                if (payload.status === "NEW")
+                    return approvalService.markAsComplete(payload.dataSets, payload.period, payload.orgUnit, payload.storedBy, payload.date);
+                if (payload.status === "DELETED")
                     return approvalService.markAsIncomplete(payload.dataSets, payload.period, payload.orgUnit);
-                }
-                return approvalService.markAsComplete(payload.dataSets, payload.period, payload.orgUnit, payload.storedBy, payload.date);
             };
 
             return downloadData().then(preparePayload).then(upload);

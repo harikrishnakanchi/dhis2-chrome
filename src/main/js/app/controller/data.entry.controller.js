@@ -171,7 +171,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 "period": getPeriod(),
                 "orgUnit": $scope.currentModule.id,
                 "storedBy": $scope.currentUser.userCredentials.username,
-                "date": moment().toISOString()
+                "date": moment().toISOString(),
+                "status": "NEW"
             };
 
             return approveData(dataForApproval, approvalDataRepository.saveLevelOneApproval, "uploadCompletionData");
