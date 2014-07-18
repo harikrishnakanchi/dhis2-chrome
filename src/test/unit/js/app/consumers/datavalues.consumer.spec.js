@@ -384,44 +384,56 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 var dbApprovalData = [{
                     "orgUnit": "ou1",
                     "period": "2014W01",
-                    "storedBy": "testproj_approver_l1",
-                    "date": "2014-01-03T00:00:00.000+0000",
-                    "dataSets": ["d1", "d2", "d3"]
-                }, {
-                    "orgUnit": "ou1",
-                    "period": "2014W02",
                     "storedBy": "testproj_approver2_l1",
                     "date": "2014-01-10T00:00:00.000+0000",
                     "dataSets": ["d1", "d2", "d3"]
+                }, {
+                    "orgUnit": "ou1",
+                    "period": "2014W03",
+                    "storedBy": "testproj_approver2_l1",
+                    "date": "2014-01-10T00:00:00.000+0000",
+                    "dataSets": ["d1", "d2", "d3"],
+                    "status": "NEW"
+                }, {
+                    "orgUnit": "ou1",
+                    "period": "2014W04",
+                    "storedBy": "testproj_approver2_l1",
+                    "date": "2014-01-10T00:00:00.000+0000",
+                    "dataSets": ["d1", "d2", "d3"],
+                    "status": "DELETED"
+                }, {
+                    "orgUnit": "ou1",
+                    "period": "2014W06",
+                    "storedBy": "testproj_approver2_l1",
+                    "date": "2014-01-10T00:00:00.000+0000",
+                    "dataSets": ["d1", "d2", "d3"],
                 }];
+
+                var dhisApprovalWithDifferentData = {
+                    "orgUnit": "ou1",
+                    "period": "2014W06",
+                    "storedBy": "testproj_approver3_l1",
+                    "date": "2014-01-10T00:00:00.000+0000",
+                    "dataSets": ["d1", "d2", "d3"],
+                };
+                var dhisNewApproval = {
+                    "period": "2014W05",
+                    "orgUnit": "ou1",
+                    "storedBy": "testproj_approver_l1",
+                    "date": "2014-01-05T00:00:00.000+0000",
+                    "dataSets": ["d1", "d2"]
+                };
 
                 var dhisApprovalData = [{
-                    "period": "2014W01",
-                    "orgUnit": "ou1",
-                    "storedBy": "testproj_approver_l1",
-                    "date": "2014-01-05T00:00:00.000+0000",
-                    "dataSets": ["d1", "d2"]
-                }, {
-                    "period": "2014W02",
-                    "orgUnit": "ou1",
-                    "storedBy": "testproj_approver_l1",
-                    "date": "2014-01-05T00:00:00.000+0000",
-                    "dataSets": ["d1", "d2"]
-                }];
-
-                var expectedApprovalData = [{
-                    "period": "2014W01",
-                    "orgUnit": "ou1",
-                    "storedBy": "testproj_approver_l1",
-                    "date": "2014-01-05T00:00:00.000+0000",
-                    "dataSets": ["d1", "d2"]
-                }, {
-                    "orgUnit": "ou1",
-                    "period": "2014W02",
-                    "storedBy": "testproj_approver2_l1",
-                    "date": "2014-01-10T00:00:00.000+0000",
-                    "dataSets": ["d1", "d2", "d3"]
-                }];
+                        "period": "2014W04",
+                        "orgUnit": "ou1",
+                        "storedBy": "testproj_approver_l1",
+                        "date": "2014-01-05T00:00:00.000+0000",
+                        "dataSets": ["d1", "d2"]
+                    },
+                    dhisNewApproval,
+                    dhisApprovalWithDifferentData
+                ];
 
                 approvalService.getAllLevelOneApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
                 approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbApprovalData));
@@ -435,7 +447,11 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 dataValuesConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(expectedApprovalData);
+                expect(approvalDataRepository.deleteLevelOneApproval).toHaveBeenCalledWith("2014W01", "ou1");
+                expect(approvalDataRepository.deleteLevelOneApproval).not.toHaveBeenCalledWith("2014W03", "ou1");
+                expect(approvalDataRepository.deleteLevelOneApproval).not.toHaveBeenCalledWith("2014W04", "ou1");
+                expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(dhisApprovalWithDifferentData);
+                expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith([dhisNewApproval]);
             });
 
             it("should upload data to DHIS", function() {
