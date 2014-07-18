@@ -13,30 +13,29 @@ define(["uploadCompletionDataConsumer", "angularMocks", "approvalService", "appr
 
 
             it("should upload completion data to DHIS", function() {
+
+                var completeData = {
+                    "orgUnit": "ou1",
+                    "period": "2014W12",
+                    "storedBy": "testproj_approver_l1",
+                    "date": "2014-05-24T09:00:00.120Z",
+                    "dataSets": ["d1", "d2"],
+                    "status": "NEW"
+                };
+
                 spyOn(approvalDataRepository, "getLevelOneApprovalData").and.callFake(function(period, orgUnit) {
                     if (period === "2014W12" && orgUnit === "ou1")
-                        return utils.getPromise(q, {
-                            "orgUnit": "ou1",
-                            "period": "2014W12",
-                            "storedBy": "testproj_approver_l1",
-                            "date": "2014-05-24T09:00:00.120Z",
-                            "dataSets": ["d1", "d2"],
-                            "status": "NEW"
-                        });
+                        return utils.getPromise(q, completeData);
 
                     return utils.getPromise(q, undefined);
                 });
-                spyOn(approvalService, "markAsComplete");
+
+                spyOn(approvalDataRepository, "saveLevelOneApproval");
+                spyOn(approvalService, "markAsComplete").and.returnValue(utils.getPromise(q, {}));
 
                 message = {
                     "data": {
-                        "data": {
-                            dataSets: ["d1", "d2"],
-                            period: '2014W12',
-                            orgUnit: 'ou1',
-                            storedBy: 'testproj_approver_l1',
-                            date: "2014-05-24T09:00:00.120Z"
-                        },
+                        "data": completeData,
                         "type": "uploadCompletionData"
                     }
                 };
@@ -45,6 +44,7 @@ define(["uploadCompletionDataConsumer", "angularMocks", "approvalService", "appr
                 scope.$apply();
 
                 expect(approvalService.markAsComplete).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1', 'testproj_approver_l1', '2014-05-24T09:00:00.120Z');
+                expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(_.omit(completeData, "status"));
             });
 
             it("should unapprove data if it has changed", function() {
@@ -62,7 +62,8 @@ define(["uploadCompletionDataConsumer", "angularMocks", "approvalService", "appr
                     return utils.getPromise(q, undefined);
                 });
 
-                spyOn(approvalService, "markAsIncomplete");
+                spyOn(approvalDataRepository, "deleteLevelOneApproval");
+                spyOn(approvalService, "markAsIncomplete").and.returnValue(utils.getPromise(q, {}));
 
                 message = {
                     "data": {
@@ -80,6 +81,7 @@ define(["uploadCompletionDataConsumer", "angularMocks", "approvalService", "appr
                 scope.$apply();
 
                 expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1');
+                expect(approvalDataRepository.deleteLevelOneApproval).toHaveBeenCalledWith('2014W12', 'ou1');
             });
         });
     });
