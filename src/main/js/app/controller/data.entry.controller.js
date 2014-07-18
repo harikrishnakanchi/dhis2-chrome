@@ -42,12 +42,12 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var initDataEntryForm = function() {
-            approvalDataRepository.getCompleteDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
-                if (_.isEmpty(data)) {
-                    $scope.isCompleted = false || $scope.approveSuccess;
-                } else {
-                    $scope.isCompleted = true;
-                }
+            approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                $scope.isCompleted = !_.isEmpty(data);
+            });
+
+            approvalDataRepository.getLevelTwoApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                $scope.isApproved = !_.isEmpty(data);
             });
 
             dataRepository.getDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
@@ -111,7 +111,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.submit = function() {
-            if ($scope.isCompleted) {
+            if ($scope.isCompleted || $scope.isApproved) {
                 showModal(function() {
                     save(false);
                 }, $scope.resourceBundle.reapprovalConfirmationMessage);

@@ -20,18 +20,13 @@ define([], function() {
             return store.delete([period, orgUnitId]);
         };
 
-        this.getCompleteDataValues = function(period, orgUnitId) {
+        this.getLevelOneApprovalData = function(period, orgUnitId, shouldFilterSoftDeletes) {
             var filterSoftDeletedApprovals = function(d) {
-                return d && d.status === "DELETED" ? undefined : d;
+                return shouldFilterSoftDeletes && d && d.status === "DELETED" ? undefined : d;
             };
 
             var store = db.objectStore('completedDataSets');
             return store.find([period, orgUnitId]).then(filterSoftDeletedApprovals);
-        };
-
-        this.getLevelOneApprovalData = function(period, orgUnitId) {
-            var store = db.objectStore('completedDataSets');
-            return store.find([period, orgUnitId]);
         };
 
         this.unapproveLevelOneData = function(period, orgUnit) {
@@ -44,7 +39,7 @@ define([], function() {
                 });
             };
 
-            return this.getCompleteDataValues(period, orgUnit).then(unapprove);
+            return this.getLevelOneApprovalData(period, orgUnit, true).then(unapprove);
         };
 
         this.getLevelTwoApprovalData = function(period, orgUnitId) {

@@ -94,7 +94,7 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
             mockStore.find.and.returnValue(utils.getPromise(q, approvalData));
 
             var actualApprovalData;
-            approvalDataRepository.getCompleteDataValues('period', 'orgUnitId').then(function(data) {
+            approvalDataRepository.getLevelOneApprovalData('period', 'orgUnitId', true).then(function(data) {
                 actualApprovalData = data;
             });
             scope.$apply();
@@ -110,7 +110,7 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
                 "status": "DELETED"
             }));
 
-            approvalDataRepository.getCompleteDataValues('period', 'orgUnitId').then(function(data) {
+            approvalDataRepository.getLevelOneApprovalData('period', 'orgUnitId', true).then(function(data) {
                 approvalData = data;
             });
             scope.$apply();
