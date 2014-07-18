@@ -16,6 +16,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
         var merge = function(list1, list2, equalsPred, lastUpdateDateProperty) {
             lastUpdateDateProperty = lastUpdateDateProperty || "lastUpdated";
             equalsPred = _.curry(equalsPred);
+            var mergedList = _.clone(list1);
             return _.transform(list2, function(acc, ele) {
                 var resultIndex = _.findIndex(acc, equalsPred(ele));
                 if (resultIndex >= 0) {
@@ -25,7 +26,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                 } else {
                     acc.push(ele);
                 }
-            }, list1);
+            }, mergedList);
         };
 
         var downloadCompletionData = function(metadata) {
@@ -128,8 +129,9 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
 
                 var moduleIds = _.unique(_.pluck(dataValuesFromDhis, "orgUnit"));
 
-                return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(dataValuesFromDb) {
-                    var mergedData = merge(_.flatten(dataValuesFromDb, "dataValues"), dataValuesFromDhis, dataValuesEquals);
+                return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(dataValues) {
+                    var dataValuesFromDb = _.flatten(dataValues, "dataValues");
+                    var mergedData = merge(dataValuesFromDb, dataValuesFromDhis, dataValuesEquals);
                     return clearApprovals(mergedData, dataValuesFromDb).then(function() {
                         return dataRepository.save({
                             "dataValues": mergedData

@@ -1,6 +1,6 @@
 define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "approvalService", "moment"],
     function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DataSetRepository, UserPreferenceRepository, ApprovalService, moment) {
-        describe("data values consumer", function() {
+        describe("download data consumer", function() {
 
             var dataService, dataRepository, approvalDataRepository, dataSetRepository, userPreferenceRepository, q, scope, allDataSets, userPref, downloadDataConsumer, message, approvalService;
 
@@ -290,7 +290,6 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     }]
                 };
 
-                expect(approvalDataRepository.deleteLevelOneApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
                 expect(approvalDataRepository.deleteLevelTwoApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
                 expect(dataRepository.save).toHaveBeenCalledWith(expectedDataConsumer);
             });
