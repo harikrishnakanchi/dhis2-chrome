@@ -1,8 +1,8 @@
-define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "approvalService", "moment"],
-    function(DataValuesConsumer, mocks, properties, utils, DataService, DataRepository, DataSetRepository, UserPreferenceRepository, ApprovalService, moment) {
+define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "approvalService", "moment"],
+    function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DataSetRepository, UserPreferenceRepository, ApprovalService, moment) {
         describe("data values consumer", function() {
 
-            var dataService, dataRepository, approvalDataRepository, dataSetRepository, userPreferenceRepository, q, scope, allDataSets, userPref, dataValuesConsumer, message, approvalService;
+            var dataService, dataRepository, approvalDataRepository, dataSetRepository, userPreferenceRepository, q, scope, allDataSets, userPref, downloadDataConsumer, message, approvalService;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
@@ -57,7 +57,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     "markAsIncomplete": jasmine.createSpy("markAsIncomplete")
                 };
 
-                dataValuesConsumer = new DataValuesConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, approvalService, approvalDataRepository);
+                downloadDataConsumer = new DownloadDataConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, approvalService, approvalDataRepository);
             }));
 
             it("should download data values and approval data from dhis based on user preferences and dataset metadata", function() {
@@ -77,7 +77,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }
                 };
 
-                dataValuesConsumer.run(message);
+                downloadDataConsumer.run(message);
                 scope.$apply();
 
                 expect(userPreferenceRepository.getAll).toHaveBeenCalled();
@@ -97,42 +97,11 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                         "type": "downloadData"
                     }
                 };
-                dataValuesConsumer.run(message);
+                downloadDataConsumer.run(message);
                 scope.$apply();
 
                 expect(dataService.downloadAllData).not.toHaveBeenCalled();
                 expect(approvalService.getAllLevelOneApprovalData).not.toHaveBeenCalled();
-            });
-
-            it("should fire and forget download data value calls", function() {
-                userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, [{
-                    "orgUnits": [{
-                        "id": "ou1"
-                    }]
-                }]));
-                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [{
-                    "id": "ds1"
-                }]));
-                dataService.downloadAllData.and.returnValue(utils.getRejectedPromise(q, {}));
-
-                message = {
-                    "data": {
-                        "type": "downloadData"
-                    }
-                };
-                var success = jasmine.createSpy("success");
-                var failure = jasmine.createSpy("failure");
-
-                q.when(dataValuesConsumer.run(message)).then(success, failure);
-                scope.$apply();
-
-                expect(success).toHaveBeenCalled();
-                expect(failure).not.toHaveBeenCalled();
-                expect(userPreferenceRepository.getAll).toHaveBeenCalled();
-                expect(dataSetRepository.getAll).toHaveBeenCalled();
-                expect(dataService.downloadAllData).toHaveBeenCalledWith(['ou1'], [{
-                    id: 'ds1'
-                }]);
             });
 
             it("should not download data values if dataSets is not present", function() {
@@ -143,7 +112,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                         "type": "downloadData"
                     }
                 };
-                dataValuesConsumer.run(message);
+                downloadDataConsumer.run(message);
                 scope.$apply();
 
                 expect(dataService.downloadAllData).not.toHaveBeenCalled();
@@ -157,13 +126,12 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }
                 };
 
-                dataValuesConsumer.run(message);
+                downloadDataConsumer.run(message);
                 scope.$apply();
 
                 expect(dataRepository.getDataValuesForPeriodsOrgUnits).toHaveBeenCalledWith("2014W24", "2014W27", ["org_0"]);
                 expect(dataRepository.getLevelOneApprovalDataForPeriodsOrgUnits).toHaveBeenCalledWith("2014W24", "2014W27", ["org_0"]);
             });
-
 
             it("should not save to indexeddb if no data is available in dhis", function() {
                 dataService.downloadAllData.and.returnValue(utils.getPromise(q, []));
@@ -189,7 +157,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }
                 };
 
-                dataValuesConsumer.run(message);
+                downloadDataConsumer.run(message);
                 scope.$apply();
 
                 expect(dataRepository.save).not.toHaveBeenCalled();
@@ -224,7 +192,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }
                 };
 
-                dataValuesConsumer.run(message);
+                downloadDataConsumer.run(message);
                 scope.$apply();
 
                 var expected = {
@@ -301,10 +269,10 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }
                 };
 
-                dataValuesConsumer.run(message);
+                downloadDataConsumer.run(message);
                 scope.$apply();
 
-                var expectedDataValues = {
+                var expectedDataConsumer = {
                     "dataValues": [{
                         "dataElement": "DE1",
                         "period": "2014W12",
@@ -324,7 +292,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
 
                 expect(approvalDataRepository.deleteLevelOneApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
                 expect(approvalDataRepository.deleteLevelTwoApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
-                expect(dataRepository.save).toHaveBeenCalledWith(expectedDataValues);
+                expect(dataRepository.save).toHaveBeenCalledWith(expectedDataConsumer);
             });
 
             it("should not save to indexeddb if no approval data is available in dhis", function() {
@@ -345,7 +313,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }
                 };
 
-                dataValuesConsumer.run(message);
+                downloadDataConsumer.run(message);
                 scope.$apply();
 
                 expect(approvalDataRepository.saveLevelOneApproval).not.toHaveBeenCalled();
@@ -374,7 +342,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }
                 };
 
-                dataValuesConsumer.run(message);
+                downloadDataConsumer.run(message);
                 scope.$apply();
 
                 expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(dhisApprovalData);
@@ -444,7 +412,7 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                     }
                 };
 
-                dataValuesConsumer.run(message);
+                downloadDataConsumer.run(message);
                 scope.$apply();
 
                 expect(approvalDataRepository.deleteLevelOneApproval).toHaveBeenCalledWith("2014W01", "ou1");
@@ -452,162 +420,6 @@ define(["dataValuesConsumer", "angularMocks", "properties", "utils", "dataServic
                 expect(approvalDataRepository.deleteLevelOneApproval).not.toHaveBeenCalledWith("2014W04", "ou1");
                 expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(dhisApprovalWithDifferentData);
                 expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith([dhisNewApproval]);
-            });
-
-            it("should upload data to DHIS", function() {
-                var dbDataValues = {
-                    "orgUnit": "MSF_0",
-                    "period": "2014W12",
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-24T09:00:00.120Z",
-                        "value": 1
-                    }, {
-                        "dataElement": "DE2",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-24T09:00:00.120Z",
-                        "value": 2
-                    }]
-                };
-
-                dataRepository.getDataValues.and.returnValue(utils.getPromise(q, dbDataValues));
-
-                message = {
-                    "data": {
-                        "data": {
-                            "dataValues": [{
-                                "dataElement": "DE1",
-                                "period": "2014W12",
-                                "orgUnit": "MSF_0",
-                                "categoryOptionCombo": "C1",
-                                "lastUpdated": "2014-05-24T09:00:00.120Z",
-                                "value": 1
-                            }, {
-                                "dataElement": "DE2",
-                                "period": "2014W12",
-                                "orgUnit": "MSF_0",
-                                "categoryOptionCombo": "C1",
-                                "lastUpdated": "2014-05-24T09:00:00.120Z",
-                                "value": 2
-                            }]
-                        },
-                        "type": "uploadDataValues"
-                    }
-                };
-
-                dataValuesConsumer.run(message);
-                scope.$apply();
-
-                expect(dataService.downloadAllData).toHaveBeenCalled();
-                expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalled();
-                expect(dataService.save).toHaveBeenCalledWith(dbDataValues);
-            });
-
-            it("should upload approval data to DHIS", function() {
-                approvalDataRepository.getLevelTwoApprovalData.and.callFake(function(period, orgUnit) {
-                    if (period === "2014W12" && orgUnit === "ou1")
-                        return utils.getPromise(q, {
-                            "orgUnit": "ou1",
-                            "period": "2014W12",
-                            "dataSets": ["d1", "d2"]
-                        });
-
-                    return utils.getPromise(q, undefined);
-                });
-
-                message = {
-                    "data": {
-                        "data": {
-                            dataSets: ["d1", "d2"],
-                            period: '2014W12',
-                            orgUnit: 'ou1'
-                        },
-                        "type": "uploadApprovalData"
-                    }
-                };
-
-                dataValuesConsumer.run(message);
-                scope.$apply();
-
-                // expect(dataService.downloadAllData).toHaveBeenCalled();
-                // expect(approvalService.getAllLevelTwoApprovalData).toHaveBeenCalled();
-                expect(approvalService.markAsApproved).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1');
-            });
-
-            it("should upload completion data to DHIS", function() {
-                approvalDataRepository.getLevelOneApprovalData.and.callFake(function(period, orgUnit) {
-                    if (period === "2014W12" && orgUnit === "ou1")
-                        return utils.getPromise(q, {
-                            "orgUnit": "ou1",
-                            "period": "2014W12",
-                            "storedBy": "testproj_approver_l1",
-                            "date": "2014-05-24T09:00:00.120Z",
-                            "dataSets": ["d1", "d2"],
-                            "status": "NEW"
-                        });
-
-                    return utils.getPromise(q, undefined);
-                });
-
-                message = {
-                    "data": {
-                        "data": {
-                            dataSets: ["d1", "d2"],
-                            period: '2014W12',
-                            orgUnit: 'ou1',
-                            storedBy: 'testproj_approver_l1',
-                            date: "2014-05-24T09:00:00.120Z"
-                        },
-                        "type": "uploadCompletionData"
-                    }
-                };
-
-                dataValuesConsumer.run(message);
-                scope.$apply();
-
-                expect(dataService.downloadAllData).toHaveBeenCalled();
-                expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalled();
-                expect(approvalService.markAsComplete).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1', 'testproj_approver_l1', '2014-05-24T09:00:00.120Z');
-            });
-
-            it("should unapprove data if it has changed", function() {
-                approvalDataRepository.getLevelOneApprovalData.and.callFake(function(period, orgUnit) {
-                    if (period === "2014W12" && orgUnit === "ou1")
-                        return utils.getPromise(q, {
-                            "orgUnit": "ou1",
-                            "period": "2014W12",
-                            "storedBy": "testproj_approver_l1",
-                            "date": "2014-05-24T09:00:00.120Z",
-                            "status": "DELETED",
-                            "dataSets": ["d1", "d2"]
-                        });
-
-                    return utils.getPromise(q, undefined);
-                });
-
-                message = {
-                    "data": {
-                        "data": {
-                            "dataSets": ["d1", "d2"],
-                            "period": '2014W12',
-                            "orgUnit": 'ou1',
-                            "status": "DELETED"
-                        },
-                        "type": "uploadCompletionData"
-                    }
-                };
-
-                dataValuesConsumer.run(message);
-                scope.$apply();
-
-                expect(dataService.downloadAllData).toHaveBeenCalled();
-                expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalled();
-                expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1');
             });
         });
     });

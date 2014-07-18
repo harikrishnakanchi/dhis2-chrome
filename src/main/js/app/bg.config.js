@@ -37,7 +37,10 @@ require.config({
         //consumers
         "consumers": "app/consumer/consumers",
         "consumerRegistry": "app/consumer/consumer.registry",
-        "dataValuesConsumer": "app/consumer/datavalues.consumer",
+        "downloadDataConsumer": "app/consumer/download.data.consumer",
+        "uploadDataConsumer": "app/consumer/upload.data.consumer",
+        "uploadCompletionDataConsumer": "app/consumer/upload.completion.data.consumer",
+        "uploadApprovalDataConsumer": "app/consumer/upload.approval.data.consumer",
         "orgUnitConsumer": "app/consumer/orgunit.consumer",
         "datasetConsumer": "app/consumer/dataset.consumer",
         "systemSettingConsumer": "app/consumer/system.setting.consumer",

@@ -1,12 +1,22 @@
 define([], function() {
-    return function($q, dataValuesConsumer, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer) {
+    return function($q, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer) {
         this.run = function(message) {
             switch (message.data.type) {
-                case "uploadDataValues":
                 case "downloadData":
+                    downloadDataConsumer.run(message);
+                    break;
+                case "uploadDataValues":
+                    return downloadDataConsumer.run(message).then(function() {
+                        return uploadDataConsumer.run(message);
+                    });
                 case "uploadCompletionData":
+                    return downloadDataConsumer.run(message).then(function() {
+                        return uploadCompletionDataConsumer.run(message);
+                    });
                 case "uploadApprovalData":
-                    return dataValuesConsumer.run(message);
+                    return downloadDataConsumer.run(message).then(function() {
+                        return uploadApprovalDataConsumer.run(message);
+                    });
                 case "createOrgUnit":
                     return orgUnitConsumer.run(message);
                 case "associateDataset":
