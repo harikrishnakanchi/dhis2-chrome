@@ -309,6 +309,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {}));
             spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {}));
             spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, undefined));
+            spyOn(approvalDataRepository, "unapproveLevelTwoData").and.returnValue(utils.getPromise(q, undefined));
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
@@ -331,7 +332,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             scope.$apply();
 
             expect(dataRepository.save).toHaveBeenCalled();
-            expect(approvalDataRepository.unapproveLevelOneData).toHaveBeenCalledWith('2014W14', 'mod2');
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: {
                     ok: 'ok'
@@ -1026,12 +1026,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(scope.isApproved).toBeTruthy();
         });
 
-        it("should unapprove data if edited after approval", function() {
-            spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {}));
-            spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {}));
+        it("should mark as incomplete if data edited after completion", function() {
+            spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {
+                "foo": "bar"
+            }));
+            spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, undefined));
             spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, {
                 "foo": "bar"
             }));
+            spyOn(approvalDataRepository, "unapproveLevelTwoData").and.returnValue(utils.getPromise(q, undefined));
             spyOn(scope.dataentryForm, '$setPristine');
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
@@ -1062,6 +1065,70 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 type: 'uploadDataValues'
             }, 'dataValues']);
             expect(hustle.publish.calls.argsFor(1)).toEqual([{
+                data: {
+                    "foo": "bar"
+                },
+                type: 'uploadCompletionData'
+            }, 'dataValues']);
+        });
+
+        it("should mark as unapproved and incomplete if data edited after approval", function() {
+            spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {
+                "foo": "bar"
+            }));
+
+            spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {
+                "blah": "moreBlah"
+            }));
+
+            spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, {
+                "foo": "bar"
+            }));
+
+            spyOn(approvalDataRepository, "unapproveLevelTwoData").and.returnValue(utils.getPromise(q, {
+                "blah": "moreBlah"
+            }));
+
+            spyOn(scope.dataentryForm, '$setPristine');
+            spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
+            spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+            spyOn(hustle, "publish");
+
+            var dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository);
+
+            scope.currentModule = {
+                id: 'mod2',
+                parent: {
+                    id: 'parent'
+                }
+            };
+            scope.year = 2014;
+            scope.week = {
+                "weekNumber": 14
+            };
+
+            scope.submit();
+            scope.$apply();
+
+            expect(dataRepository.save).toHaveBeenCalled();
+            expect(approvalDataRepository.unapproveLevelOneData).toHaveBeenCalledWith('2014W14', 'mod2');
+            expect(approvalDataRepository.unapproveLevelTwoData).toHaveBeenCalledWith('2014W14', 'mod2');
+
+            expect(hustle.publish.calls.argsFor(0)).toEqual([{
+                data: {
+                    ok: 'ok'
+                },
+                type: 'uploadDataValues'
+            }, 'dataValues']);
+
+            expect(hustle.publish.calls.argsFor(1)).toEqual([{
+                data: {
+                    "blah": "moreBlah"
+                },
+                type: 'uploadApprovalData'
+            }, 'dataValues']);
+
+            expect(hustle.publish.calls.argsFor(2)).toEqual([{
                 data: {
                     "foo": "bar"
                 },

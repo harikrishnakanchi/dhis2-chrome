@@ -227,7 +227,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var unapproveData = function() {
-                var saveApprovalToDhis = function(approvalData) {
+                var saveCompletionToDhis = function(approvalData) {
                     if (!approvalData) return;
                     return $hustle.publish({
                         "data": approvalData,
@@ -235,7 +235,23 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     }, "dataValues");
                 };
 
-                return approvalDataRepository.unapproveLevelOneData(period, $scope.currentModule.id).then(saveApprovalToDhis);
+                var saveApprovalToDhis = function(approvalData) {
+                    if (!approvalData) return;
+                    return $hustle.publish({
+                        "data": approvalData,
+                        "type": "uploadApprovalData"
+                    }, "dataValues");
+                };
+
+                var unapproveLevelOne = function() {
+                    return approvalDataRepository.unapproveLevelOneData(period, $scope.currentModule.id).then(saveCompletionToDhis);
+                };
+
+                var unapproveLevelTwo = function() {
+                    return approvalDataRepository.unapproveLevelTwoData(period, $scope.currentModule.id).then(saveApprovalToDhis);
+                };
+
+                return unapproveLevelTwo().then(unapproveLevelOne);
             };
 
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);

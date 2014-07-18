@@ -42,9 +42,26 @@ define([], function() {
             return this.getLevelOneApprovalData(period, orgUnit, true).then(unapprove);
         };
 
-        this.getLevelTwoApprovalData = function(period, orgUnitId) {
+        this.unapproveLevelTwoData = function(period, orgUnit) {
+            var unapprove = function(data) {
+                if (!data) return;
+                data.status = "DELETED";
+                var store = db.objectStore('approvedDataSets');
+                return store.upsert(data).then(function() {
+                    return data;
+                });
+            };
+
+            return this.getLevelTwoApprovalData(period, orgUnit, true).then(unapprove);
+        };
+
+        this.getLevelTwoApprovalData = function(period, orgUnitId, shouldFilterSoftDeletes) {
+            var filterSoftDeletedApprovals = function(d) {
+                return shouldFilterSoftDeletes && d && d.status === "DELETED" ? undefined : d;
+            };
+
             var store = db.objectStore('approvedDataSets');
-            return store.find([period, orgUnitId]);
+            return store.find([period, orgUnitId]).then(filterSoftDeletedApprovals);
         };
 
         this.getLevelOneApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {

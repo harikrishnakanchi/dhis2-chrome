@@ -76,6 +76,19 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
             expect(mockStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
         });
 
+        it("should get the filtered approval data", function() {
+            mockStore.find.and.returnValue(utils.getPromise(q, {
+                period: '2014W15',
+                status: 'DELETED'
+            }));
+
+            approvalDataRepository.getLevelOneApprovalData('period', 'orgUnitId', true).then(function(data) {
+                expect(data).toBeUndefined();
+            });
+
+            scope.$apply();
+        });
+
         it("should get the approval data", function() {
             mockStore.find.and.returnValue(utils.getPromise(q, {
                 period: '2014W15'
@@ -115,6 +128,21 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
             });
             scope.$apply();
             expect(approvalData).toBe(undefined);
+        });
+
+        it("should unapprove data at level two", function() {
+            mockStore.find.and.returnValue(utils.getPromise(q, {
+                period: '2014W15'
+            }));
+
+            approvalDataRepository.unapproveLevelTwoData("period", "orgUnitId");
+            scope.$apply();
+
+            expect(mockStore.find).toHaveBeenCalledWith(["period", "orgUnitId"]);
+            expect(mockStore.upsert).toHaveBeenCalledWith({
+                period: '2014W15',
+                "status": "DELETED"
+            });
         });
 
         it("should unapprove data at level one", function() {
