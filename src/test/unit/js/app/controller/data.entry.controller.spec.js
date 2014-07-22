@@ -994,7 +994,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     period: '2014W14',
                     orgUnit: 'mod2',
                     status: "NEW",
-                    isApproved: true
+                    isApproved: true,
+                    createdByUsername: scope.currentUser.userCredentials.username,
+                    createdDate: moment().toISOString(),
                 },
                 type: 'uploadApprovalData'
             }, 'dataValues');

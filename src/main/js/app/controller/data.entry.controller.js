@@ -183,6 +183,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 "dataSets": _.keys($scope.currentGroupedSections),
                 "period": getPeriod(),
                 "orgUnit": $scope.currentModule.id,
+                "createdByUsername": $scope.currentUser.userCredentials.username,
+                "createdDate": moment().toISOString(),
                 "isApproved": true,
                 "status": "NEW"
             };

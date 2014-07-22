@@ -33,10 +33,9 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
         });
 
         it("should mark data as complete in dhis", function() {
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals?ds=170b8cd5e53&ou=17yugc&pe=2014W01").respond(200, "ok");
-
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals?ab=currentUserName&ad=2014-01-01&ds=170b8cd5e53&ou=17yugc&pe=2014W01").respond(200, "ok");
             var approvalService = new ApprovalService(http, db, q);
-            approvalService.markAsApproved(["170b8cd5e53"], "2014W01", "17yugc");
+            approvalService.markAsApproved(["170b8cd5e53"], "2014W01", "17yugc", "currentUserName", "2014-01-01");
 
             httpBackend.flush();
         });
@@ -316,6 +315,15 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
             var approvalService = new ApprovalService(http, db, q);
             approvalService.markAsIncomplete(["170b8cd5e53"], "2014W01", "17yugc");
+
+            httpBackend.flush();
+        });
+
+        it("should mark data as unapproved in dhis", function() {
+            httpBackend.expectDELETE(properties.dhis.url + "/api/dataApprovals?ds=170b8cd5e53&ou=17yugc&pe=2014W01").respond(200, "ok");
+
+            var approvalService = new ApprovalService(http, db, q);
+            approvalService.markAsUnapproved(["170b8cd5e53"], "2014W01", "17yugc");
 
             httpBackend.flush();
         });

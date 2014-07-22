@@ -13,8 +13,20 @@ define(["properties", "moment"], function(properties, moment) {
             });
         };
 
-        this.markAsApproved = function(dataSets, period, orgUnit) {
+        this.markAsApproved = function(dataSets, period, orgUnit, approvedBy, approvalDate) {
             return $http.post(properties.dhis.url + "/api/dataApprovals", undefined, {
+                params: {
+                    "ds": dataSets,
+                    "pe": period,
+                    "ou": orgUnit,
+                    "ab": approvedBy,
+                    "ad": approvalDate
+                }
+            });
+        };
+
+        this.markAsUnapproved = function(dataSets, period, orgUnit) {
+            return $http.delete(properties.dhis.url + "/api/dataApprovals", {
                 params: {
                     "ds": dataSets,
                     "pe": period,
