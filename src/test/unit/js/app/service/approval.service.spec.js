@@ -94,7 +94,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     "organisationUnit": {
                         "id": "ou1"
                     },
-                    "date": "2014-01-10T00:00:00.000+0000",
+                    "date": "2014-01-10z",
                     "lastModifiedTime": "2014-01-10T00:00:00.000+0000",
                     "storedBy": "testproj_approver_l1"
                 }]
@@ -127,14 +127,133 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             expect(actualApprovalData).toEqual(expectedApprovalData);
         });
 
-        it("should return a failure http promise if download all data fails", function() {
-            httpBackend.expectGET().respond(500, {});
+        it("should get level two approval data", function() {
+            var endDate = moment().format("YYYY-MM-DD");
+
+            var dhisApprovalData = {
+                "dataApprovalStateResponses": [{
+                    "dataSet": {
+                        "id": "d1"
+                    },
+                    "period": {
+                        "id": "2014W01"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "state": "APPROVED_ELSEWHERE",
+                    "mayApprove": false,
+                    "mayUnapprove": false,
+                    "mayAccept": false,
+                    "mayUnaccept": false
+                }, {
+                    "dataSet": {
+                        "id": "d2"
+                    },
+                    "period": {
+                        "id": "2014W01"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "state": "APPROVED_ELSEWHERE",
+                    "mayApprove": false,
+                    "mayUnapprove": false,
+                    "mayAccept": false,
+                    "mayUnaccept": false
+                }, {
+                    "dataSet": {
+                        "id": "d1"
+                    },
+                    "period": {
+                        "id": "2014W02"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "state": "APPROVED_HERE",
+                    "mayApprove": true,
+                    "mayUnapprove": true,
+                    "mayAccept": true,
+                    "mayUnaccept": true
+                }, {
+                    "dataSet": {
+                        "id": "d2"
+                    },
+                    "period": {
+                        "id": "2014W02"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "state": "APPROVED_HERE",
+                    "mayApprove": true,
+                    "mayUnapprove": true,
+                    "mayAccept": true,
+                    "mayUnaccept": true
+                }]
+            };
+
+            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnit=ou1&orgUnit=ou2&startDate=1900-01-01").respond(200, dhisApprovalData);
+
+            var actualApprovalData;
             approvalService = new ApprovalService(http, db, q);
-            approvalService.getAllLevelOneApprovalData(orgUnits, dataSets).then(function(data) {
-                expect(data.status).toBe(500);
+            approvalService.getAllLevelTwoApprovalData(orgUnits, dataSets).then(function(data) {
+                actualApprovalData = data;
             });
 
             httpBackend.flush();
+
+            var expectedApprovalData = [{
+                "period": "2014W01",
+                "orgUnit": "ou1",
+                "dataSets": ["d1", "d2"],
+                "state": "APPROVED_ELSEWHERE",
+                "mayApprove": false,
+                "mayUnapprove": false,
+                "mayAccept": false,
+                "mayUnaccept": false
+            }, {
+                "period": "2014W02",
+                "orgUnit": "ou1",
+                "dataSets": ["d1", "d2"],
+                "state": "APPROVED_HERE",
+                "mayApprove": true,
+                "mayUnapprove": true,
+                "mayAccept": true,
+                "mayUnaccept": true
+            }];
+
+            expect(actualApprovalData).toEqual(expectedApprovalData);
+        });
+
+        it("should return a failure http promise if download approval level two data fails", function() {
+            httpBackend.expectGET().respond(500, {});
+            approvalService = new ApprovalService(http, db, q);
+
+            var status;
+            approvalService.getAllLevelTwoApprovalData(orgUnits, dataSets).then(undefined, function(data) {
+                status = data.status;
+            });
+
+            httpBackend.flush();
+
+            expect(status).toBe(500);
+        });
+
+
+        it("should return a failure http promise if download all data fails", function() {
+            httpBackend.expectGET().respond(500, {});
+            approvalService = new ApprovalService(http, db, q);
+
+            var status;
+            approvalService.getAllLevelOneApprovalData(orgUnits, dataSets).then(undefined, function(data) {
+                status = data.status;
+            });
+
+            httpBackend.flush();
+
+            expect(status).toBe(500);
         });
 
         it("should mark data as incomplete in dhis", function() {
