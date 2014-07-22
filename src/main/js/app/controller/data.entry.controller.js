@@ -182,7 +182,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var dataForApproval = {
                 "dataSets": _.keys($scope.currentGroupedSections),
                 "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id
+                "orgUnit": $scope.currentModule.id,
+                "isApproved": true,
+                "status": "NEW"
             };
 
             return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData");

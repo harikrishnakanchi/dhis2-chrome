@@ -45,6 +45,7 @@ define([], function() {
         this.unapproveLevelTwoData = function(period, orgUnit) {
             var unapprove = function(data) {
                 if (!data) return;
+                data.isApproved = false;
                 data.status = "DELETED";
                 var store = db.objectStore('approvedDataSets');
                 return store.upsert(data).then(function() {
@@ -66,6 +67,16 @@ define([], function() {
 
         this.getLevelOneApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
             var store = db.objectStore('completedDataSets');
+            var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
+            return store.each(query).then(function(approvalData) {
+                return _.filter(approvalData, function(ad) {
+                    return _.contains(orgUnits, ad.orgUnit);
+                });
+            });
+        };
+
+        this.getLevelTwoApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
+            var store = db.objectStore('approvedDataSets');
             var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
             return store.each(query).then(function(approvalData) {
                 return _.filter(approvalData, function(ad) {

@@ -141,7 +141,8 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
             expect(mockStore.find).toHaveBeenCalledWith(["period", "orgUnitId"]);
             expect(mockStore.upsert).toHaveBeenCalledWith({
                 period: '2014W15',
-                "status": "DELETED"
+                "status": "DELETED",
+                isApproved: false
             });
         });
 
@@ -209,6 +210,75 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
                 "storedBy": "testproj_approver_l1",
                 "date": "2014-01-03T00:00:00.000+0000",
                 "dataSets": ["d1", "d2", "d3"]
+            }]);
+        });
+
+        it("should get level two approval data by periods and orgunits", function() {
+            mockStore.each.and.returnValue(utils.getPromise(q, [{
+                "orgUnit": "ou1",
+                "period": "2014W01",
+                "createdByUsername": "testproj_approver_l1",
+                "createdDate": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"],
+                "isAccepted": true,
+                "isApproved": true
+            }, {
+                "orgUnit": "ou1",
+                "period": "2014W02",
+                "createdByUsername": "testproj_approver_l1",
+                "createdDate": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"],
+                "isAccepted": false,
+                "isApproved": true
+            }, {
+                "orgUnit": "ou2",
+                "period": "2014W02",
+                "createdByUsername": "testproj_approver_l1",
+                "createdDate": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"],
+                "isAccepted": false,
+                "isApproved": true
+            }, {
+                "orgUnit": "ou3",
+                "period": "2014W01",
+                "createdByUsername": "testproj_approver_l1",
+                "createdDate": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"],
+                "isAccepted": false,
+                "isApproved": true
+            }]));
+
+            var actualDataValues;
+            approvalDataRepository.getLevelTwoApprovalDataForPeriodsOrgUnits("2014W01", "2014W02", ["ou1", "ou2"]).then(function(approvalData) {
+                actualDataValues = approvalData;
+            });
+
+            scope.$apply();
+
+            expect(actualDataValues).toEqual([{
+                "orgUnit": "ou1",
+                "period": "2014W01",
+                "createdByUsername": "testproj_approver_l1",
+                "createdDate": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"],
+                "isAccepted": true,
+                "isApproved": true
+            }, {
+                "orgUnit": "ou1",
+                "period": "2014W02",
+                "createdByUsername": "testproj_approver_l1",
+                "createdDate": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"],
+                "isAccepted": false,
+                "isApproved": true
+            }, {
+                "orgUnit": "ou2",
+                "period": "2014W02",
+                "createdByUsername": "testproj_approver_l1",
+                "createdDate": "2014-01-03T00:00:00.000+0000",
+                "dataSets": ["d1", "d2", "d3"],
+                "isAccepted": false,
+                "isApproved": true
             }]);
         });
 

@@ -65,18 +65,34 @@ define(["properties", "moment"], function(properties, moment) {
                 var approvalDataGroupedByPeriodAndOu = _.groupBy(dataApprovalStateResponses, function(approvalData) {
                     return [approvalData.period.id, approvalData.organisationUnit.id];
                 });
-                return _.map(approvalDataGroupedByPeriodAndOu, function(item) {
-                    return {
-                        'period': _.pluck(item, 'period')[0].id,
-                        'orgUnit': _.pluck(item, 'organisationUnit')[0].id,
-                        'dataSets': _.pluck(_.pluck(item, 'dataSet'), 'id'),
-                        'state': _.pluck(item, 'state')[0],
-                        "mayApprove": _.pluck(item, 'mayApprove')[0],
-                        "mayUnapprove": _.pluck(item, 'mayUnapprove')[0],
-                        "mayAccept": _.pluck(item, 'mayAccept')[0],
-                        "mayUnaccept": _.pluck(item, 'mayUnaccept')[0]
-                    };
-                });
+
+                return _.transform(approvalDataGroupedByPeriodAndOu, function(acc, item) {
+                    var isApproved = false;
+                    var isAccepted = false;
+
+                    switch (_.pluck(item, 'state')[0]) {
+                        case "APPROVED_HERE":
+                        case "APPROVED_ELSEWHERE":
+                            isApproved = true;
+                            break;
+                        case "ACCEPTED_HERE":
+                        case "ACCEPTED_ELSEWHERE":
+                            isApproved = true;
+                            isAccepted = true;
+                            break;
+                    }
+
+                    if (isApproved || isAccepted)
+                        acc.push({
+                            'period': _.pluck(item, 'period')[0].id,
+                            'orgUnit': _.pluck(item, 'organisationUnit')[0].id,
+                            'dataSets': _.pluck(_.pluck(item, 'dataSet'), 'id'),
+                            "isApproved": isApproved,
+                            "isAccepted": isAccepted,
+                            "createdByUsername": _.pluck(item, 'createdByUsername')[0],
+                            "createdDate": _.pluck(item, 'createdDate')[0]
+                        });
+                }, []);
             };
 
             var onSuccess = function(response) {

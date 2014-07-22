@@ -142,6 +142,8 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "ou1"
                     },
                     "state": "APPROVED_ELSEWHERE",
+                    "createdByUsername": "admin",
+                    "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": false,
                     "mayUnapprove": false,
                     "mayAccept": false,
@@ -157,6 +159,8 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "ou1"
                     },
                     "state": "APPROVED_ELSEWHERE",
+                    "createdByUsername": "admin",
+                    "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": false,
                     "mayUnapprove": false,
                     "mayAccept": false,
@@ -172,21 +176,57 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "ou1"
                     },
                     "state": "APPROVED_HERE",
+                    "createdByUsername": "admin",
+                    "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": true,
                     "mayUnapprove": true,
                     "mayAccept": true,
                     "mayUnaccept": true
                 }, {
                     "dataSet": {
-                        "id": "d2"
+                        "id": "d1"
                     },
                     "period": {
-                        "id": "2014W02"
+                        "id": "2014W03"
                     },
                     "organisationUnit": {
                         "id": "ou1"
                     },
-                    "state": "APPROVED_HERE",
+                    "state": "ACCEPTED_HERE",
+                    "createdByUsername": "admin",
+                    "createdDate": "2014-07-21T12:08:05.311+0000",
+                    "mayApprove": true,
+                    "mayUnapprove": true,
+                    "mayAccept": true,
+                    "mayUnaccept": true
+                }, {
+                    "dataSet": {
+                        "id": "d1"
+                    },
+                    "period": {
+                        "id": "2014W04"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "state": "ACCEPTED_ELSEWHERE",
+                    "createdByUsername": "admin",
+                    "createdDate": "2014-07-21T12:08:05.311+0000",
+                    "mayApprove": true,
+                    "mayUnapprove": true,
+                    "mayAccept": true,
+                    "mayUnaccept": true
+                }, {
+                    "dataSet": {
+                        "id": "d1"
+                    },
+                    "period": {
+                        "id": "2014W05"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "state": "UNAPPROVED_READY",
                     "mayApprove": true,
                     "mayUnapprove": true,
                     "mayAccept": true,
@@ -208,20 +248,34 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "period": "2014W01",
                 "orgUnit": "ou1",
                 "dataSets": ["d1", "d2"],
-                "state": "APPROVED_ELSEWHERE",
-                "mayApprove": false,
-                "mayUnapprove": false,
-                "mayAccept": false,
-                "mayUnaccept": false
+                "isApproved": true,
+                "isAccepted": false,
+                "createdByUsername": "admin",
+                "createdDate": "2014-07-21T12:08:05.311+0000"
             }, {
                 "period": "2014W02",
                 "orgUnit": "ou1",
-                "dataSets": ["d1", "d2"],
-                "state": "APPROVED_HERE",
-                "mayApprove": true,
-                "mayUnapprove": true,
-                "mayAccept": true,
-                "mayUnaccept": true
+                "dataSets": ["d1"],
+                "isApproved": true,
+                "isAccepted": false,
+                "createdByUsername": "admin",
+                "createdDate": "2014-07-21T12:08:05.311+0000"
+            }, {
+                "period": "2014W03",
+                "orgUnit": "ou1",
+                "dataSets": ["d1"],
+                "isApproved": true,
+                "isAccepted": true,
+                "createdByUsername": "admin",
+                "createdDate": "2014-07-21T12:08:05.311+0000"
+            }, {
+                "period": "2014W04",
+                "orgUnit": "ou1",
+                "dataSets": ["d1"],
+                "isApproved": true,
+                "isAccepted": true,
+                "createdByUsername": "admin",
+                "createdDate": "2014-07-21T12:08:05.311+0000"
             }];
 
             expect(actualApprovalData).toEqual(expectedApprovalData);

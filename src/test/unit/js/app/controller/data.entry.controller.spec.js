@@ -992,7 +992,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 data: {
                     dataSets: ['Vacc'],
                     period: '2014W14',
-                    orgUnit: 'mod2'
+                    orgUnit: 'mod2',
+                    status: "NEW",
+                    isApproved: true
                 },
                 type: 'uploadApprovalData'
             }, 'dataValues');

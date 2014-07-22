@@ -91,7 +91,8 @@ define([], function() {
     };
 
     var add_approval_datasets_store = function(db, tx) {
-        create_store_with_key("approvedDataSets", ["period", "orgUnit"], db);
+        var approvalDataSetsStore = create_store_with_key("approvedDataSets", ["period", "orgUnit"], db);
+        create_index(approvalDataSetsStore, "by_period", "period", false);
     };
 
     return [add_object_stores,
