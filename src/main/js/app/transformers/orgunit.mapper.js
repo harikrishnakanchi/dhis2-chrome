@@ -11,7 +11,9 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             'parent': _.pick(parentOrgUnit, "name", "id"),
             'attributeValues': [{
                 'attribute': {
-                    id: "a1fa2777924"
+                    "code": "Type",
+                    "name": "Type",
+                    "id": "a1fa2777924"
                 },
                 value: "Project"
             }]

@@ -69,6 +69,8 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                 },
                 'attributeValues': [{
                     'attribute': {
+                        'code': 'Type',
+                        'name': 'Type',
                         'id': "a1fa2777924"
                     },
                     'value': "Country"

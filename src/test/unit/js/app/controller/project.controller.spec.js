@@ -77,6 +77,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 },
                 "attributeValues": [{
                     'attribute': {
+                        code: 'Type',
+                        name: 'Type',
                         id: "a1fa2777924"
                     },
                     value: "Project"

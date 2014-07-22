@@ -19,7 +19,9 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 'parent': _.pick(parentOrgUnit, "name", "id"),
                 'attributeValues': [{
                     'attribute': {
-                        id: "a1fa2777924"
+                        "code": "Type",
+                        "name": "Type",
+                        "id": "a1fa2777924"
                     },
                     value: "Country"
                 }]

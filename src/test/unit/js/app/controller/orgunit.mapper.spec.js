@@ -116,6 +116,8 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 },
                 attributeValues: [{
                     attribute: {
+                        code: 'Type',
+                        name: 'Type',
                         id: 'a1fa2777924'
                     },
                     value: 'Project'
