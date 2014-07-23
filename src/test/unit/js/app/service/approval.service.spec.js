@@ -230,6 +230,23 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     "mayUnapprove": true,
                     "mayAccept": true,
                     "mayUnaccept": true
+                }, {
+                    "dataSet": {
+                        "id": "d2"
+                    },
+                    "period": {
+                        "id": "2014W05"
+                    },
+                    "organisationUnit": {
+                        "id": "ou1"
+                    },
+                    "state": "APPROVED_HERE",
+                    "createdByUsername": "msfadmin",
+                    "createdDate": "2014-07-21T12:08:05.311+0000",
+                    "mayApprove": true,
+                    "mayUnapprove": true,
+                    "mayAccept": true,
+                    "mayUnaccept": true
                 }]
             };
 
@@ -275,7 +292,17 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "isAccepted": true,
                 "createdByUsername": "msfadmin",
                 "createdDate": "2014-07-21T12:08:05.311+0000"
+            }, {
+                "period": "2014W05",
+                "orgUnit": "ou1",
+                "dataSets": ["d2"],
+                "isApproved": true,
+                "isAccepted": false,
+                "createdByUsername": "msfadmin",
+                "createdDate": "2014-07-21T12:08:05.311+0000"
             }];
+
+
 
             expect(actualApprovalData).toEqual(expectedApprovalData);
         });

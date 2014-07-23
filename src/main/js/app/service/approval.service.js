@@ -74,35 +74,49 @@ define(["properties", "moment"], function(properties, moment) {
 
         this.getAllLevelTwoApprovalData = function(orgUnits, dataSets) {
             var transform = function(dataApprovalStateResponses) {
+
                 var approvalDataGroupedByPeriodAndOu = _.groupBy(dataApprovalStateResponses, function(approvalData) {
                     return [approvalData.period.id, approvalData.organisationUnit.id];
                 });
 
-                return _.transform(approvalDataGroupedByPeriodAndOu, function(acc, item) {
+                return _.transform(approvalDataGroupedByPeriodAndOu, function(acc, groupedItems) {
+
                     var isApproved = false;
                     var isAccepted = false;
+                    var createdBy;
+                    var createdOn;
 
-                    switch (_.pluck(item, 'state')[0]) {
-                        case "APPROVED_HERE":
-                        case "APPROVED_ELSEWHERE":
-                            isApproved = true;
-                            break;
-                        case "ACCEPTED_HERE":
-                        case "ACCEPTED_ELSEWHERE":
-                            isApproved = true;
-                            isAccepted = true;
-                            break;
-                    }
+                    var dataSets = [];
 
-                    if (isApproved || isAccepted)
+                    _.each(groupedItems, function(item) {
+                        switch (item.state) {
+                            case "APPROVED_HERE":
+                            case "APPROVED_ELSEWHERE":
+                                isApproved = true;
+                                dataSets.push(item.dataSet);
+                                createdBy = item.createdByUsername;
+                                createdOn = item.createdDate;
+                                break;
+                            case "ACCEPTED_HERE":
+                            case "ACCEPTED_ELSEWHERE":
+                                isApproved = true;
+                                isAccepted = true;
+                                dataSets.push(item.dataSet);
+                                createdBy = item.createdByUsername;
+                                createdOn = item.createdDate;
+                                break;
+                        }
+                    });
+
+                    if (!_.isEmpty(dataSets) && (isApproved || isAccepted))
                         acc.push({
-                            'period': _.pluck(item, 'period')[0].id,
-                            'orgUnit': _.pluck(item, 'organisationUnit')[0].id,
-                            'dataSets': _.pluck(_.pluck(item, 'dataSet'), 'id'),
+                            'period': _.pluck(groupedItems, 'period')[0].id,
+                            'orgUnit': _.pluck(groupedItems, 'organisationUnit')[0].id,
+                            'dataSets': _.pluck(dataSets, 'id'),
                             "isApproved": isApproved,
                             "isAccepted": isAccepted,
-                            "createdByUsername": _.pluck(item, 'createdByUsername')[0],
-                            "createdDate": _.pluck(item, 'createdDate')[0]
+                            "createdByUsername": createdBy,
+                            "createdDate": createdOn
                         });
                 }, []);
             };

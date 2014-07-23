@@ -90,7 +90,7 @@ define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approv
                 uploadApprovalDataConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1', "foobar", "2014-01-01");
+                expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1');
                 expect(approvalDataRepository.deleteLevelTwoApproval).toHaveBeenCalledWith('2014W12', 'ou1');
             });
         });

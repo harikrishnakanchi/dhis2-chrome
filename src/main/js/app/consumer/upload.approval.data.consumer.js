@@ -19,7 +19,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                 var deleteLocally = function() {
                     return approvalDataRepository.deleteLevelTwoApproval(payload.period, payload.orgUnit);
                 };
-                return approvalService.markAsUnapproved(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate).then(deleteLocally);
+                return approvalService.markAsUnapproved(payload.dataSets, payload.period, payload.orgUnit).then(deleteLocally);
             };
 
             var commands = {
