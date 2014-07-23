@@ -208,13 +208,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             }
         });
 
-        var saveToDhis = function(data) {
-            return $hustle.publish({
-                "data": data,
-                "type": "uploadDataValues"
-            }, "dataValues");
-        };
-
         var save = function(asDraft) {
             var period = getPeriod();
 
@@ -230,7 +223,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.isSubmitted = false;
             };
 
-            var unapproveData = function() {
+            var saveToDhis = function(data) {
+                return $hustle.publish({
+                    "data": data,
+                    "type": "uploadDataValues"
+                }, "dataValues");
+            };
+
+            var unapproveData = function(payload) {
                 var saveCompletionToDhis = function(approvalData) {
                     if (!approvalData) return;
                     return $hustle.publish({
@@ -255,14 +255,16 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     return approvalDataRepository.unapproveLevelTwoData(period, $scope.currentModule.id).then(saveApprovalToDhis);
                 };
 
-                return unapproveLevelTwo().then(unapproveLevelOne);
+                return unapproveLevelTwo().then(unapproveLevelOne).then(function() {
+                    return payload;
+                });
             };
 
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
             if (asDraft) {
                 dataRepository.saveAsDraft(payload).then(successPromise, errorPromise);
             } else {
-                dataRepository.save(payload).then(saveToDhis).then(unapproveData).then(successPromise, errorPromise);
+                dataRepository.save(payload).then(unapproveData).then(saveToDhis).then(successPromise, errorPromise);
             }
             scrollToTop();
         };

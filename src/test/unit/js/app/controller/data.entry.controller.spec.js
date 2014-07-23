@@ -443,6 +443,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
         it("should let the user know of failures when saving to queue ", function() {
             spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {}));
             spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalDataRepository, "unapproveLevelTwoData").and.returnValue(utils.getPromise(q, {}));
             spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
             spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
             spyOn(hustle, "publish").and.returnValue(saveErrorPromise);
@@ -1064,15 +1066,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             expect(approvalDataRepository.unapproveLevelOneData).toHaveBeenCalledWith('2014W14', 'mod2');
             expect(hustle.publish.calls.argsFor(0)).toEqual([{
                 data: {
-                    ok: 'ok'
-                },
-                type: 'uploadDataValues'
-            }, 'dataValues']);
-            expect(hustle.publish.calls.argsFor(1)).toEqual([{
-                data: {
                     "foo": "bar"
                 },
                 type: 'uploadCompletionData'
+            }, 'dataValues']);
+            expect(hustle.publish.calls.argsFor(1)).toEqual([{
+                data: {
+                    ok: 'ok'
+                },
+                type: 'uploadDataValues'
             }, 'dataValues']);
         });
 
@@ -1120,24 +1122,25 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             expect(hustle.publish.calls.argsFor(0)).toEqual([{
                 data: {
-                    ok: 'ok'
-                },
-                type: 'uploadDataValues'
-            }, 'dataValues']);
-
-            expect(hustle.publish.calls.argsFor(1)).toEqual([{
-                data: {
                     "blah": "moreBlah"
                 },
                 type: 'uploadApprovalData'
             }, 'dataValues']);
 
-            expect(hustle.publish.calls.argsFor(2)).toEqual([{
+            expect(hustle.publish.calls.argsFor(1)).toEqual([{
                 data: {
                     "foo": "bar"
                 },
                 type: 'uploadCompletionData'
             }, 'dataValues']);
+
+            expect(hustle.publish.calls.argsFor(2)).toEqual([{
+                data: {
+                    ok: 'ok'
+                },
+                type: 'uploadDataValues'
+            }, 'dataValues']);
+
         });
     });
 });
