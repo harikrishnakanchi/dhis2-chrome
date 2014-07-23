@@ -89,5 +89,13 @@ define(["lodash"], function(_) {
             $rootScope.isLoggedIn = false;
             $rootScope.currentUser = undefined;
         };
+
+        var init = function() {
+            orgUnitRepository.getAllProjects().then(function(orgUnits) {
+                $scope.projects = orgUnits;
+            });
+        };
+
+        init();
     };
 });

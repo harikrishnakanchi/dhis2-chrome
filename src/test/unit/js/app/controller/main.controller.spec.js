@@ -1,7 +1,7 @@
 define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "userRepository"],
     function(MainController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, UserRepository) {
         describe("main controller", function() {
-            var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, db,
+            var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, getAllProjectsSpy, db,
                 translationStore, userPreferenceRepository, location, orgUnitRepository, userRepository;
 
             beforeEach(mocks.inject(function($rootScope, $q, $location) {
@@ -57,9 +57,23 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 spyOn(db, 'objectStore').and.callFake(function(storeName) {
                     return translationStore;
                 });
+                getAllProjectsSpy = spyOn(orgUnitRepository, "getAllProjects");
+                getAllProjectsSpy.and.returnValue(utils.getPromise(q, []));
 
                 mainController = new MainController(scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository);
             }));
+
+            it("should load projects", function() {
+                var projectList = [{
+                    "blah": "moreBlah"
+                }];
+
+                getAllProjectsSpy.and.returnValue(utils.getPromise(q, projectList));
+                mainController = new MainController(scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository);
+                scope.$apply();
+
+                expect(scope.projects).toEqual(projectList);
+            });
 
             it("should logout user", function() {
                 rootScope.isLoggedIn = true;
