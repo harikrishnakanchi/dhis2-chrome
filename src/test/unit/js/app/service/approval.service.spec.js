@@ -233,7 +233,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 }]
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnit=ou1&orgUnit=ou2&startDate=1900-01-01").respond(200, dhisApprovalData);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnits=ou1&orgUnits=ou2&startDate=1900-01-01").respond(200, dhisApprovalData);
 
             var actualApprovalData;
             approvalService = new ApprovalService(http, db, q);

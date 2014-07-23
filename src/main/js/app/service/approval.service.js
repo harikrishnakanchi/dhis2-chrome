@@ -121,7 +121,8 @@ define(["properties", "moment"], function(properties, moment) {
                     "dataSet": dataSets,
                     "startDate": "1900-01-01",
                     "endDate": moment().format("YYYY-MM-DD"),
-                    "orgUnit": orgUnits
+                    "orgUnits": orgUnits,
+                    "children": true
                 }
             }).then(onSuccess);
         };
