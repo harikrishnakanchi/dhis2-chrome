@@ -7,7 +7,7 @@ define(["md5", "lodash"], function(md5, _) {
 
         var getUserCredentials = function() {
             var userCredentialsStore = db.objectStore("localUserCredentials");
-            var username = $scope.username.toLowerCase() === "admin" ? "admin" : "project_user";
+            var username = $scope.username.toLowerCase() === "msfadmin" ? "msfadmin" : "project_user";
             return userCredentialsStore.find(username);
         };
 

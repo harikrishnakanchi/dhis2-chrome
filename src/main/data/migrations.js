@@ -53,13 +53,13 @@ define([], function() {
     var add_admin_user_to_local_cred_store = function(db, tx) {
         var credStore = tx.objectStore("localUserCredentials");
         credStore.add({
-            'username': 'admin',
-            'password': 'f6b30a5547c4062f915aafd3e4e6453a'
+            "username": "msfadmin",
+            "password": "f6b30a5547c4062f915aafd3e4e6453a"
         });
         var userStore = tx.objectStore("users");
         userStore.add({
             "userCredentials": {
-                "username": "admin",
+                "username": "msfadmin",
                 "userAuthorityGroups": [{
                     "name": "Superuser",
                 }],
@@ -71,8 +71,8 @@ define([], function() {
     var add_project_user_to_local_cred_store = function(db, tx) {
         var userStore = tx.objectStore("localUserCredentials");
         userStore.add({
-            'username': 'project_user',
-            'password': 'caa63a86bbc63b2ae67ef0a069db7fb9'
+            "username": "project_user",
+            "password": "caa63a86bbc63b2ae67ef0a069db7fb9"
         });
     };
 

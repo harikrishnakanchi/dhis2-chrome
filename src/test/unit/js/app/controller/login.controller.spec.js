@@ -54,9 +54,9 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             });
 
             spyOn(fakeUserCredentialsStore, 'find').and.callFake(function(username) {
-                if (username === "admin")
+                if (username === "msfadmin")
                     return utils.getPromise(q, {
-                        "username": "admin",
+                        "username": "msfadmin",
                         "password": "5f4dcc3b5aa765d61d8327deb882cf99"
                     });
                 return utils.getPromise(q, {
@@ -73,20 +73,20 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
         }));
 
         it("should login admin user with valid credentials and redirect to dashboard", function() {
-            scope.username = "Admin";
+            scope.username = "MSFAdmin";
             scope.password = "password";
 
             scope.login();
             scope.$apply();
 
-            expect(fakeUserStore.find).toHaveBeenCalledWith("admin");
-            expect(fakeUserCredentialsStore.find).toHaveBeenCalledWith("admin");
-            expect(rootScope.currentUser.userCredentials.username).toEqual('admin');
+            expect(fakeUserStore.find).toHaveBeenCalledWith("msfadmin");
+            expect(fakeUserCredentialsStore.find).toHaveBeenCalledWith("msfadmin");
+            expect(rootScope.currentUser.userCredentials.username).toEqual("msfadmin");
             expect(rootScope.isLoggedIn).toEqual(true);
             expect(location.path).toHaveBeenCalledWith("/dashboard");
             expect(scope.invalidCredentials).toEqual(false);
             expect(userPreferenceRepository.save).toHaveBeenCalledWith({
-                username: 'admin',
+                username: "msfadmin",
                 locale: undefined,
                 orgUnits: [{
                     "id": 123
@@ -99,7 +99,7 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
 
 
         it("should login admin user with valid credentials and redirect to select project page if no project present", function() {
-            scope.username = "Admin";
+            scope.username = "MSFAdmin";
             scope.password = "password";
             fakeUserStoreSpy.and.callFake(function(username) {
                 return utils.getPromise(q, {
@@ -116,7 +116,7 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             expect(rootScope.isLoggedIn).toEqual(true);
             expect(location.path).toHaveBeenCalledWith("/selectproject");
             expect(userPreferenceRepository.save).toHaveBeenCalledWith({
-                username: 'admin',
+                username: "msfadmin",
                 locale: undefined,
                 orgUnits: []
             });
@@ -125,8 +125,8 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             }, "dataValues");
         });
 
-        it("should not login admin user with invalid password", function() {
-            scope.username = "admin";
+        it("should not login msfadmin user with invalid password", function() {
+            scope.username = "msfadmin";
             scope.password = "password1234";
 
             scope.login();

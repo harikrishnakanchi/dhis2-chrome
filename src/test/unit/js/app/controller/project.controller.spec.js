@@ -351,7 +351,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 "name": "anyname",
             };
             scope.currentUser = {
-                'id': 'admin'
+                "id": "msfadmin"
             };
             scope.setUserProject();
 

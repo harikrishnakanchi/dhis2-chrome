@@ -141,7 +141,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "ou1"
                     },
                     "state": "APPROVED_ELSEWHERE",
-                    "createdByUsername": "admin",
+                    "createdByUsername": "msfadmin",
                     "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": false,
                     "mayUnapprove": false,
@@ -158,7 +158,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "ou1"
                     },
                     "state": "APPROVED_ELSEWHERE",
-                    "createdByUsername": "admin",
+                    "createdByUsername": "msfadmin",
                     "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": false,
                     "mayUnapprove": false,
@@ -175,7 +175,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "ou1"
                     },
                     "state": "APPROVED_HERE",
-                    "createdByUsername": "admin",
+                    "createdByUsername": "msfadmin",
                     "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": true,
                     "mayUnapprove": true,
@@ -192,7 +192,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "ou1"
                     },
                     "state": "ACCEPTED_HERE",
-                    "createdByUsername": "admin",
+                    "createdByUsername": "msfadmin",
                     "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": true,
                     "mayUnapprove": true,
@@ -209,7 +209,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "ou1"
                     },
                     "state": "ACCEPTED_ELSEWHERE",
-                    "createdByUsername": "admin",
+                    "createdByUsername": "msfadmin",
                     "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": true,
                     "mayUnapprove": true,
@@ -249,7 +249,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "dataSets": ["d1", "d2"],
                 "isApproved": true,
                 "isAccepted": false,
-                "createdByUsername": "admin",
+                "createdByUsername": "msfadmin",
                 "createdDate": "2014-07-21T12:08:05.311+0000"
             }, {
                 "period": "2014W02",
@@ -257,7 +257,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "dataSets": ["d1"],
                 "isApproved": true,
                 "isAccepted": false,
-                "createdByUsername": "admin",
+                "createdByUsername": "msfadmin",
                 "createdDate": "2014-07-21T12:08:05.311+0000"
             }, {
                 "period": "2014W03",
@@ -265,7 +265,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "dataSets": ["d1"],
                 "isApproved": true,
                 "isAccepted": true,
-                "createdByUsername": "admin",
+                "createdByUsername": "msfadmin",
                 "createdDate": "2014-07-21T12:08:05.311+0000"
             }, {
                 "period": "2014W04",
@@ -273,7 +273,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "dataSets": ["d1"],
                 "isApproved": true,
                 "isAccepted": true,
-                "createdByUsername": "admin",
+                "createdByUsername": "msfadmin",
                 "createdDate": "2014-07-21T12:08:05.311+0000"
             }];
 
