@@ -66,14 +66,8 @@ define(["lodash"], function(_) {
         };
 
         $rootScope.$watch("currentUser.organisationUnits", function() {
-            var filterOutMsfOrgUnit = function(orgUnits) {
-                return _.reject(orgUnits, function(orgUnit) {
-                    return orgUnit.name === "MSF";
-                });
-            };
-
             if ($rootScope.currentUser && !$scope.oldUserProject) {
-                var orgUnits = filterOutMsfOrgUnit($rootScope.currentUser.organisationUnits);
+                var orgUnits = $rootScope.currentUser.organisationUnits;
                 $scope.oldUserProject = orgUnits[0];
                 var assignCurrentProject = function() {
                     if ($scope.oldUserProject) {

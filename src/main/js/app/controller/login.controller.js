@@ -32,10 +32,6 @@ define(["md5", "lodash"], function(md5, _) {
             }, "dataValues");
         };
 
-        var hasOnlyMsfAsOrgUnit = function() {
-            return $rootScope.currentUser.organisationUnits.length === 1 && $rootScope.currentUser.organisationUnits[0].name === "MSF";
-        };
-
         var authenticateOrPromptUserForPassword = function(data) {
             var user = data[0];
             var userCredentials = data[1];
@@ -54,7 +50,7 @@ define(["md5", "lodash"], function(md5, _) {
                 then(saveUserPreferences).
                 then(downloadDataValues).
                 then(function() {
-                    if (_.isEmpty($rootScope.currentUser.organisationUnits) || hasOnlyMsfAsOrgUnit()) {
+                    if (_.isEmpty($rootScope.currentUser.organisationUnits)) {
                         $location.path("/selectproject");
                     } else {
                         $location.path("/dashboard");
