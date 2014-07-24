@@ -22,10 +22,17 @@ define([], function() {
         };
 
         $scope.save = function() {
-            $rootScope.currentUser.organisationUnits.push({
-                "id": $scope.project.id,
-                "name": $scope.project.name
-            });
+
+            if ($rootScope.currentUser.organisationUnits === undefined)
+                $rootScope.currentUser.organisationUnits = [{
+                    "id": $scope.project.id,
+                    "name": $scope.project.name
+                }];
+            else
+                $rootScope.currentUser.organisationUnits.push({
+                    "id": $scope.project.id,
+                    "name": $scope.project.name
+                });
 
             var onSuccess = function() {
                 return $location.path("/dashboard");
