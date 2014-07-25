@@ -39,10 +39,9 @@
 				<div class="exp-coll-group">
 					<accordion close-others="false">
 						<accordion-group ng-repeat="section in sections" is-open="isopen[section.id]" ng-form="sectionForm">
-						<div>
-							<ul>
-								<li  class='alert alert-danger' ng-show='sectionForm.$error.pattern'>{{resourceBundle.invalidExpression}}</li>
-							</ul>
+						<div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
+							<p>{{resourceBundle.invalidExpression}}</p>
+							
 						</div>
 
 						<accordion-heading>
