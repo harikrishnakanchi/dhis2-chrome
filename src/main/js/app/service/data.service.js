@@ -1,6 +1,6 @@
 define(["lodash", "properties", "moment"], function(_, properties, moment) {
     return function($http, $q) {
-        this.downloadAllData = function(orgUnits, dataSets) {
+        this.downloadAllData = function(orgUnitIds, dataSetIds) {
             var today = moment().format("YYYY-MM-DD");
             var onSuccess = function(response) {
                 return response.data;
@@ -9,9 +9,9 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
 
             return $http.get(properties.dhis.url + '/api/dataValueSets', {
                 "params": {
-                    "orgUnit": orgUnits,
+                    "orgUnit": orgUnitIds,
                     "children": true,
-                    "dataSet": _.map(dataSets, "id"),
+                    "dataSet": dataSetIds,
                     "startDate": "1900-01-01",
                     "endDate": today
                 }

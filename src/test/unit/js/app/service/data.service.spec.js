@@ -43,23 +43,20 @@ define(["dataService", "angularMocks", "properties", "moment", "utils", "testDat
             var dataService = new DataService(http, q);
             var expectedDataSets =
                 [{
-                period: '2014W18',
-                dataValues: [{
-                    "dataElement": "b9634a78271",
-                    "period": "2014W18",
-                    "orgUnit": "c484c99b86d",
-                    "categoryOptionCombo": "h48rgCOjDTg",
-                    "value": "12",
-                    "storedBy": "service.account",
-                    "followUp": false
-                }],
-                orgUnit: 'c484c99b86d'
-            }];
-            var dataSets = [{
-                "id": "DS_OPD"
-            }, {
-                "id": "Vacc"
-            }];
+                    period: '2014W18',
+                    dataValues: [{
+                        "dataElement": "b9634a78271",
+                        "period": "2014W18",
+                        "orgUnit": "c484c99b86d",
+                        "categoryOptionCombo": "h48rgCOjDTg",
+                        "value": "12",
+                        "storedBy": "service.account",
+                        "followUp": false
+                    }],
+                    orgUnit: 'c484c99b86d'
+                }];
+
+            var dataSets = ["DS_OPD", "Vacc"];
 
             var today = moment().format("YYYY-MM-DD");
             httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, expectedDataSets);

@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository, $timeout) {
+    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository, $timeout, orgunitRepository) {
         var dataSets, systemSettings;
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -47,7 +47,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             });
 
             approvalDataRepository.getLevelTwoApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
-                $scope.isApproved = !_.isEmpty(data);
+                $scope.isApproved = !_.isEmpty(data) && data.isApproved;
+                $scope.isAccepted = !_.isEmpty(data) && data.isAccepted;
             });
 
             dataRepository.getDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
@@ -327,39 +328,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             return data;
         };
 
-        var setAvailableModules = function(orgUnits) {
-            var getUserModules = function(modules) {
-                return _.filter(modules, function(module) {
-                    return _.any($rootScope.currentUser.organisationUnits, {
-                        'id': module.parent.id
-                    });
-                });
-            };
-
-            var getModulesUnderOpUnits = function(allModules) {
-                var filteredModules = [];
-                _.forEach(allModules, function(module) {
-                    var moduleParents = _.filter(orgUnits, {
-                        'id': module.parent.id,
-                        'attributeValues': [{
-                            'attribute': {
-                                id: "a1fa2777924"
-                            },
-                            value: "Operation Unit"
-                        }]
-                    });
-                    var modules = getUserModules(moduleParents);
-                    if (!_.isEmpty(modules))
-                        filteredModules.push(module);
-                });
-                return filteredModules;
-            };
-
-            var allModules = orgUnitMapper.filterModules(orgUnits);
-            $scope.modules = getUserModules(allModules);
-
-            $scope.modules = $scope.modules.concat(getModulesUnderOpUnits(allModules));
-            return orgUnits;
+        var setAvailableModules = function() {
+            orgunitRepository.getAllModulesInProjects(_.pluck($rootScope.currentUser.organisationUnits, "id")).then(function(modules) {
+                $scope.modules = modules;
+            });
         };
 
         var init = function() {
@@ -372,10 +344,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var categoriesPromise = getAll("categories");
             var categoryOptionCombosPromise = getAll("categoryOptionCombos");
             var systemSettingsPromise = getAll('systemSettings');
-            var getOrgUnits = getAll('organisationUnits');
             var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, systemSettingsPromise]);
             getAllData.then(setData).then(transformDataSet);
-            getOrgUnits.then(setAvailableModules);
+            setAvailableModules();
         };
 
         init();

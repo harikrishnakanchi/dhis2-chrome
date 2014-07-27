@@ -2,28 +2,24 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
     function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DataSetRepository, UserPreferenceRepository, ApprovalService, moment) {
         describe("download data consumer", function() {
 
-            var dataService, dataRepository, approvalDataRepository, dataSetRepository, userPreferenceRepository, q, scope, allDataSets, userPref, downloadDataConsumer, message, approvalService;
+            var dataService, dataRepository, approvalDataRepository, dataSetRepository, userPreferenceRepository, q, scope, downloadDataConsumer, message, approvalService, orgUnitRepository;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
                 scope = $rootScope.$new();
 
-                userPref = [{
-                    "orgUnits": [{
-                        "id": "org_0"
-                    }]
-                }];
-
-                allDataSets = [{
-                    "id": "DS_OPD"
-                }];
-
                 userPreferenceRepository = {
-                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, userPref))
+                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [{
+                        "orgUnits": [{
+                            "id": "org_0"
+                        }]
+                    }]))
                 };
 
                 dataSetRepository = {
-                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, allDataSets))
+                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [{
+                        "id": "DS_OPD"
+                    }]))
                 };
 
                 dataRepository = {
@@ -43,6 +39,10 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "deleteLevelTwoApproval": jasmine.createSpy("deleteLevelTwoApproval")
                 };
 
+                orgUnitRepository = {
+                    "getAllModulesInProjects": jasmine.createSpy("getAllModulesInProjects").and.returnValue(utils.getPromise(q, ["mod1"])),
+                };
+
                 dataService = {
                     "downloadAllData": jasmine.createSpy("downloadAllData").and.returnValue(utils.getPromise(q, [])),
                     "save": jasmine.createSpy("save")
@@ -58,15 +58,38 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "markAsIncomplete": jasmine.createSpy("markAsIncomplete")
                 };
 
-                downloadDataConsumer = new DownloadDataConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, approvalService, approvalDataRepository);
+                downloadDataConsumer = new DownloadDataConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, approvalService, approvalDataRepository, orgUnitRepository);
             }));
 
             it("should download data values and approval data from dhis based on user preferences and dataset metadata", function() {
                 userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, [{
                     "orgUnits": [{
-                        "id": "ou1"
+                        "id": "pro1Id",
+                        "name": "Pro1"
+                    }, {
+                        "id": "pro2Id",
+                        "name": "Pro2"
+                    }]
+                }, {
+                    "orgUnits": [{
+                        "id": "pro3Id",
+                        "name": "Pro3"
+                    }]
+                }, {
+                    "orgUnits": [{
+                        "id": "pro1Id",
+                        "name": "Pro1"
                     }]
                 }]));
+
+                orgUnitRepository.getAllModulesInProjects.and.returnValue(utils.getPromise(q, [{
+                    "id": "mod1"
+                }, {
+                    "id": "mod2"
+                }, {
+                    "id": "mod3"
+                }]));
+
 
                 dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [{
                     "id": "ds1"
@@ -83,17 +106,15 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 expect(userPreferenceRepository.getAll).toHaveBeenCalled();
                 expect(dataSetRepository.getAll).toHaveBeenCalled();
+                expect(orgUnitRepository.getAllModulesInProjects).toHaveBeenCalledWith(['pro1Id', 'pro2Id', 'pro3Id']);
 
-                expect(dataService.downloadAllData).toHaveBeenCalledWith(['ou1'], [{
-                    id: 'ds1'
-                }]);
-
-                expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalledWith(["ou1"], ["ds1"]);
-                expect(approvalService.getAllLevelTwoApprovalData).toHaveBeenCalledWith(["ou1"], ["ds1"]);
+                expect(dataService.downloadAllData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ['ds1']);
+                expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
+                expect(approvalService.getAllLevelTwoApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
             });
 
             it("should not download data values if org units is not present", function() {
-                userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, {}));
+                userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, []));
                 message = {
                     "data": {
                         "type": "downloadData"

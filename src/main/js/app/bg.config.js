@@ -29,6 +29,7 @@ require.config({
         "approvalDataRepository": "app/repository/approval.data.repository",
         "dataSetRepository": "app/repository/dataset.repository",
         "userPreferenceRepository": "app/repository/userpreference.repository",
+        "orgUnitRepository": "app/repository/orgunit.repository",
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",

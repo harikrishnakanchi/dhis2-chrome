@@ -12,6 +12,64 @@ define([], function() {
             return store.getAll();
         };
 
+        this.getAllModulesInProjects = function(projectIds) {
+            return this.getAll().then(function(allOrgUnits) {
+                var isOfType = function(orgUnit, type) {
+                    return _.any(orgUnit.attributeValues, {
+                        attribute: {
+                            id: "a1fa2777924"
+                        },
+                        value: type
+                    });
+                };
+
+                var filterModules = function(orgUnits) {
+                    var populateDisplayName = function(module) {
+                        var parent = _.find(orgUnits, {
+                            'id': module.parent.id
+                        });
+                        return _.merge(module, {
+                            displayName: isOfType(parent, "Operation Unit") ? parent.name + " - " + module.name : module.name
+                        });
+                    };
+
+                    var modules = _.filter(orgUnits, function(orgUnit) {
+                        return isOfType(orgUnit, "Module");
+                    });
+                    return _.map(modules, populateDisplayName);
+                };
+
+                var getModulesForOrgUnits = function(modules) {
+                    return _.filter(modules, function(module) {
+                        return _.contains(projectIds, module.parent.id);
+                    });
+                };
+
+                var getModulesUnderOpUnitsForOrgUnits = function(allModules) {
+                    var filteredModules = [];
+                    _.forEach(allModules, function(module) {
+                        var moduleParents = _.filter(allOrgUnits, {
+                            'id': module.parent.id,
+                            'attributeValues': [{
+                                'attribute': {
+                                    id: "a1fa2777924"
+                                },
+                                value: "Operation Unit"
+                            }]
+                        });
+
+                        var modules = getModulesForOrgUnits(moduleParents);
+                        if (!_.isEmpty(modules))
+                            filteredModules.push(module);
+                    });
+                    return filteredModules;
+                };
+
+                var allModules = filterModules(allOrgUnits);
+                return (getModulesForOrgUnits(allModules)).concat(getModulesUnderOpUnitsForOrgUnits(allModules));
+            });
+        };
+
         this.getAllProjects = function() {
             var getAttributeValue = function(orgUnit, attrCode) {
                 return _.find(orgUnit.attributeValues, {
