@@ -808,21 +808,32 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.isSubmitted).toBe(true);
             });
 
-            it("should submit data for approval", function() {
-                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, [{}]));
-                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {}));
+            it("should submit data for first level approval", function() {
+                var levelOneApprovalDataSaved = false;
+                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.callFake(function() {
+                    if (levelOneApprovalDataSaved)
+                        return utils.getPromise(q, {
+                            "blah": "moreBlah"
+                        });
+                    return utils.getPromise(q, undefined);
+                });
+                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, undefined));
 
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
                 spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
-                spyOn(approvalDataRepository, "saveLevelOneApproval").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "saveLevelOneApproval").and.callFake(function() {
+                    levelOneApprovalDataSaved = true;
+                    return utils.getPromise(q, {});
+                });
 
                 var _Date = Date;
                 spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
+
                 var data = {
-                    "dataSets": [],
+                    "dataSets": ['Vacc'],
                     "period": '2014W14',
                     "orgUnit": 'mod2',
                     "storedBy": 'dataentryuser',
@@ -845,6 +856,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.week = {
                     "weekNumber": 14
                 };
+                scope.$apply();
+
                 scope.firstLevelApproval();
                 scope.$apply();
 
@@ -968,8 +981,18 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             });
 
             it("should mark data as approved if proccessed", function() {
-                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, 'abc'));
-                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {}));
+                var levelTwoApprovalDataSaved = false;
+                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {
+                "blah": "moreBlah"
+                }));
+                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.callFake(function() {
+                    if (levelTwoApprovalDataSaved)
+                        return utils.getPromise(q, {
+                            "isApproved": true
+                        });
+                    return utils.getPromise(q, undefined);
+                });
+
                 spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
                 scope.currentModule = {
                     id: 'mod2',
@@ -991,7 +1014,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
-                spyOn(approvalDataRepository, "saveLevelTwoApproval").and.returnValue(utils.getPromise(q, {}));
+
+                spyOn(approvalDataRepository, "saveLevelTwoApproval").and.callFake(function() {
+                    levelTwoApprovalDataSaved = true;
+                    return utils.getPromise(q, {
+                        "blah": "moreBlah"
+                    });
+                });
 
                 scope.secondLevelApproval();
                 scope.$apply();
@@ -1011,6 +1040,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.approveSuccess).toBe(true);
                 expect(scope.approveError).toBe(false);
                 expect(scope.isCompleted).toEqual(true);
+                expect(scope.isApproved).toEqual(true);
             });
 
             it("should show a message if data is already approved", function() {

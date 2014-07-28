@@ -148,6 +148,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var onSuccess = function() {
                 $scope.approveSuccess = true;
                 $scope.approveError = false;
+                initDataEntryForm();
             };
 
             var onError = function() {
