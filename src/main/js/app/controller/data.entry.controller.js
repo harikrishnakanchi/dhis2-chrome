@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository, $timeout, orgunitRepository) {
+    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository, $timeout, orgUnitRepository) {
         var dataSets, systemSettings;
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -329,7 +329,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var setAvailableModules = function() {
-            orgunitRepository.getAllModulesInProjects(_.pluck($rootScope.currentUser.organisationUnits, "id")).then(function(modules) {
+            orgUnitRepository.getAllModulesInProjects(_.pluck($rootScope.currentUser.organisationUnits, "id")).then(function(modules) {
                 $scope.modules = modules;
             });
         };
