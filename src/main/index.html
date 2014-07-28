@@ -27,7 +27,7 @@
             </select>
           </li>
           <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Superuser']))">
-            <select name="project" ng-model="currentUserProject" ng-options="getFormattedOption(p) for p in projects | orderBy:getFormattedOption" ng-change="saveUser()">
+            <select name="project" class="select_project input-sm" ng-model="currentUserProject" ng-options="getFormattedOption(p) for p in projects | orderBy:getFormattedOption" ng-change="saveUser()">
             </select>
           </li>
         </ul>
