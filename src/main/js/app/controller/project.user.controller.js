@@ -47,6 +47,10 @@ define(["dhisId"], function(dhisId) {
                 "organisationUnits": [{
                     "id": $scope.orgUnit.id,
                     "name": $scope.orgUnit.name
+                }],
+                "dataViewOrganisationUnits": [{
+                    "id": $scope.orgUnit.id,
+                    "name": $scope.orgUnit.name
                 }]
             };
 

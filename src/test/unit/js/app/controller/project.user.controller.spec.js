@@ -54,6 +54,10 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                 "organisationUnits": [{
                     "id": scope.orgUnit.id,
                     "name": scope.orgUnit.name
+                }],
+                "dataViewOrganisationUnits": [{
+                    "id": scope.orgUnit.id,
+                    "name": scope.orgUnit.name
                 }]
             };
 
