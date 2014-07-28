@@ -61,9 +61,8 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['metadataService', 'dhisMonitor', '$rootScope', '$location',
-                function(metadataService, dhisMonitor, $rootScope, $location) {
-                    metadataService.loadMetadataFromFile();
+            app.run(['dhisMonitor', '$rootScope', '$location',
+                function(dhisMonitor, $rootScope, $location) {
                     $rootScope.$on('$routeChangeStart', function(e, newUrl, oldUrl) {
                         if (!$rootScope.isLoggedIn) {
                             $location.path("/login");

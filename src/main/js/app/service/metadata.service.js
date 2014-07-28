@@ -109,7 +109,7 @@ define(["properties", "lodash"], function(properties, _) {
         };
 
         this.loadMetadataFromFile = function() {
-            getLastUpdatedTime()
+            return getLastUpdatedTime()
                 .then(loadMetadata);
         };
 

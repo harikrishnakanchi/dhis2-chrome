@@ -10,7 +10,7 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('opUnitController', ['$scope', '$hustle', 'orgUnitRepository', '$indexedDB', '$location', opUnitController]);
             app.controller('moduleController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', 'dataSetRepository', 'systemSettingRepository', '$indexedDB', '$location', '$q', moduleController]);
             app.controller('projectController', ['$scope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', 'userRepository', '$modal', projectController]);
-            app.controller('mainController', ['$scope', '$location', '$rootScope', 'ngI18nResourceBundle', '$indexedDB', 'userPreferenceRepository', 'orgUnitRepository', 'userRepository', mainController]);
+            app.controller('mainController', ['$scope', '$location', '$rootScope', 'ngI18nResourceBundle', '$indexedDB', 'userPreferenceRepository', 'orgUnitRepository', 'userRepository', "metadataService", mainController]);
             app.controller('loginController', ['$scope', '$rootScope', '$location', '$indexedDB', '$q', '$hustle', 'userPreferenceRepository', loginController]);
             app.controller('countryController', ['$scope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', countryController]);
             app.controller('confirmDialogController', ['$scope', '$modalInstance', confirmDialogController]);

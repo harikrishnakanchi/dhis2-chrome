@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $location, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository) {
+    return function($scope, $location, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository, metadataService) {
         var oldUserProject;
         $scope.projects = [];
 
@@ -91,8 +91,10 @@ define(["lodash"], function(_) {
         };
 
         var init = function() {
-            orgUnitRepository.getAllProjects().then(function(orgUnits) {
-                $scope.projects = orgUnits;
+            metadataService.loadMetadataFromFile().then(function() {
+                orgUnitRepository.getAllProjects().then(function(orgUnits) {
+                    $scope.projects = orgUnits;
+                });
             });
         };
 
