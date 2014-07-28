@@ -1,5 +1,14 @@
 define([], function() {
     return function(db) {
+        var isOfType = function(orgUnit, type) {
+            return _.any(orgUnit.attributeValues, {
+                attribute: {
+                    id: "a1fa2777924"
+                },
+                value: type
+            });
+        };
+
         this.upsert = function(payload) {
             var store = db.objectStore("organisationUnits");
             return store.upsert(payload).then(function() {
@@ -8,44 +17,38 @@ define([], function() {
         };
 
         this.getAll = function() {
+
+            var populateDisplayName = function(allOrgUnits, orgUnit) {
+                var parent = _.find(allOrgUnits, {
+                    'id': orgUnit.parent ? orgUnit.parent.id : undefined
+                });
+                return _.merge(orgUnit, {
+                    displayName: parent && isOfType(parent, "Operation Unit") ? parent.name + " - " + orgUnit.name : orgUnit.name
+                });
+            };
+
             var store = db.objectStore("organisationUnits");
-            return store.getAll();
+            return store.getAll().then(function(allOrgUnits) {
+                return _.map(allOrgUnits, _.curry(populateDisplayName)(allOrgUnits));
+            });
         };
 
         this.getAllModulesInProjects = function(projectIds) {
             return this.getAll().then(function(allOrgUnits) {
-                var isOfType = function(orgUnit, type) {
-                    return _.any(orgUnit.attributeValues, {
-                        attribute: {
-                            id: "a1fa2777924"
-                        },
-                        value: type
-                    });
-                };
 
                 var filterModules = function(orgUnits) {
-                    var populateDisplayName = function(module) {
-                        var parent = _.find(orgUnits, {
-                            'id': module.parent.id
-                        });
-                        return _.merge(module, {
-                            displayName: isOfType(parent, "Operation Unit") ? parent.name + " - " + module.name : module.name
-                        });
-                    };
-
-                    var modules = _.filter(orgUnits, function(orgUnit) {
+                    return _.filter(orgUnits, function(orgUnit) {
                         return isOfType(orgUnit, "Module");
                     });
-                    return _.map(modules, populateDisplayName);
                 };
 
-                var getModulesForOrgUnits = function(modules) {
+                var getModulesUnderOrgUnits = function(modules) {
                     return _.filter(modules, function(module) {
                         return _.contains(projectIds, module.parent.id);
                     });
                 };
 
-                var getModulesUnderOpUnitsForOrgUnits = function(allModules) {
+                var getModulesUnderOpUnits = function(allModules) {
                     var filteredModules = [];
                     _.forEach(allModules, function(module) {
                         var moduleParents = _.filter(allOrgUnits, {
@@ -58,7 +61,7 @@ define([], function() {
                             }]
                         });
 
-                        var modules = getModulesForOrgUnits(moduleParents);
+                        var modules = getModulesUnderOrgUnits(moduleParents);
                         if (!_.isEmpty(modules))
                             filteredModules.push(module);
                     });
@@ -66,7 +69,7 @@ define([], function() {
                 };
 
                 var allModules = filterModules(allOrgUnits);
-                return (getModulesForOrgUnits(allModules)).concat(getModulesUnderOpUnitsForOrgUnits(allModules));
+                return (getModulesUnderOrgUnits(allModules)).concat(getModulesUnderOpUnits(allModules));
             });
         };
 

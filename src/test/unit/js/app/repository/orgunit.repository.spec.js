@@ -13,12 +13,53 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
             orgUnits = [{
-                "a": "b"
+                "id": "0",
+                "name": "MSF"
             }, {
-                "c": "d"
+                "id": "c1",
+                "name": "country1",
+                "parent": {
+                    "id": "0",
+                    "name": "MSF"
+                }
+            }, {
+                "id": "p1",
+                "name": "project1",
+                "parent": {
+                    "id": "c1",
+                    "name": "country1"
+                }
+            }, {
+                "id": "m1",
+                "name": "module1",
+                "parent": {
+                    "id": "p1",
+                    "name": "project1"
+                }
+            }, {
+                "id": "op1",
+                "name": "opUnit1",
+                "attributeValues": [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "Operation Unit"
+                }],
+                "parent": {
+                    "id": "p1",
+                    "name": "project"
+                }
+            }, {
+                "id": "m2",
+                "name": "module2",
+                "parent": {
+                    "id": "op1",
+                    "name": "opUnit1"
+                }
             }];
             scope = $rootScope.$new();
-            mockDb = utils.getMockDB(q, {}, orgUnits);
+
+            mockDb = utils.getMockDB(q, {}, _.clone(orgUnits, true));
             mockOrgStore = mockDb.objectStore;
             orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
         }));
@@ -36,10 +77,32 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
         });
 
         it("should get all org units", function() {
+            var allOrgUnits;
+
             orgUnitRepository.getAll().then(function(results) {
-                expect(results).toEqual(orgUnits);
+                allOrgUnits = results;
             });
+            scope.$apply();
             expect(mockOrgStore.getAll).toHaveBeenCalled();
+
+            expect(allOrgUnits[0]).toEqual(_.merge(orgUnits[0], {
+                "displayName": "MSF"
+            }));
+            expect(allOrgUnits[1]).toEqual(_.merge(orgUnits[1], {
+                "displayName": "country1"
+            }));
+            expect(allOrgUnits[2]).toEqual(_.merge(orgUnits[2], {
+                "displayName": "project1"
+            }));
+            expect(allOrgUnits[3]).toEqual(_.merge(orgUnits[3], {
+                "displayName": "module1"
+            }));
+            expect(allOrgUnits[4]).toEqual(_.merge(orgUnits[4], {
+                "displayName": "opUnit1"
+            }));
+            expect(allOrgUnits[5]).toEqual(_.merge(orgUnits[5], {
+                "displayName": "opUnit1 - module2"
+            }));
         });
 
         it("should get all projects", function() {
@@ -68,14 +131,14 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
         it("should get all modules for given org units", function() {
             var modules = [];
             var project1 = {
-                'name': 'prj1',
-                'displayName': 'prj1',
-                'id': 'prj1',
-                'parent': {
+                "name": "prj1",
+                "displayName": "prj1",
+                "id": "prj1",
+                "parent": {
                     id: "cnt1"
                 },
-                'attributeValues': [{
-                    'attribute': {
+                "attributeValues": [{
+                    "attribute": {
                         id: "a1fa2777924"
                     },
                     value: "Project"
@@ -83,14 +146,14 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             };
 
             var project2 = {
-                'name': 'prj2',
-                'displayName': 'prj2',
-                'id': 'prj2',
-                'parent': {
+                "name": "prj2",
+                "displayName": "prj2",
+                "id": "prj2",
+                "parent": {
                     id: "cnt1"
                 },
-                'attributeValues': [{
-                    'attribute': {
+                "attributeValues": [{
+                    "attribute": {
                         id: "a1fa2777924"
                     },
                     value: "Project"
@@ -98,14 +161,14 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             };
 
             var project3 = {
-                'name': 'prj3',
-                'displayName': 'prj3',
-                'id': 'prj3',
-                'parent': {
+                "name": "prj3",
+                "displayName": "prj3",
+                "id": "prj3",
+                "parent": {
                     id: "cnt1"
                 },
-                'attributeValues': [{
-                    'attribute': {
+                "attributeValues": [{
+                    "attribute": {
                         id: "a1fa2777924"
                     },
                     value: "Project"
@@ -113,14 +176,14 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             };
 
             var module1 = {
-                'name': 'mod1',
-                'displayName': 'mod1',
-                'id': 'mod1',
-                'parent': {
+                "name": "mod1",
+                "displayName": "mod1",
+                "id": "mod1",
+                "parent": {
                     id: "prj1"
                 },
-                'attributeValues': [{
-                    'attribute': {
+                "attributeValues": [{
+                    "attribute": {
                         id: "a1fa2777924"
                     },
                     value: "Module"
@@ -128,14 +191,14 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             };
 
             var opunit1 = {
-                'name': 'opunit1',
-                'displayName': 'opunit1',
-                'id': 'opunit1',
-                'parent': {
+                "name": "opunit1",
+                "displayName": "opunit1",
+                "id": "opunit1",
+                "parent": {
                     id: "prj2"
                 },
-                'attributeValues': [{
-                    'attribute': {
+                "attributeValues": [{
+                    "attribute": {
                         id: "a1fa2777924"
                     },
                     value: "Operation Unit"
@@ -143,14 +206,14 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             };
 
             var module2 = {
-                'name': 'mod2',
-                'displayName': 'mod2',
-                'id': 'mod2',
-                'parent': {
+                "name": "mod2",
+                "displayName": "mod2",
+                "id": "mod2",
+                "parent": {
                     id: "opunit1"
                 },
-                'attributeValues': [{
-                    'attribute': {
+                "attributeValues": [{
+                    "attribute": {
                         id: "a1fa2777924"
                     },
                     value: "Module"
@@ -158,20 +221,52 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             };
 
             var module3 = {
-                'name': 'mod3',
-                'displayName': 'mod3',
-                'id': 'mod3',
-                'parent': {
+                "name": "mod3",
+                "displayName": "mod3",
+                "id": "mod3",
+                "parent": {
                     id: "prj3"
                 },
-                'attributeValues': [{
-                    'attribute': {
+                "attributeValues": [{
+                    "attribute": {
                         id: "a1fa2777924"
                     },
                     value: "Module"
                 }]
             };
-            var allOrgUnits = [project1, project2, project3, module1, module2, module3, opunit1];
+
+
+            var opunit2 = {
+                "name": "opunit2",
+                "displayName": "opunit2",
+                "id": "opunit2",
+                "parent": {
+                    id: "prj3"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        id: "a1fa2777924"
+                    },
+                    value: "Operation Unit"
+                }]
+            };
+
+            var module4 = {
+                "name": "mod4",
+                "displayName": "mod4",
+                "id": "mod4",
+                "parent": {
+                    id: "opunit2"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        id: "a1fa2777924"
+                    },
+                    value: "Module"
+                }]
+            };
+
+            var allOrgUnits = [project1, project2, project3, module1, module2, module3, module4, opunit1, opunit2];
             mockDb = utils.getMockDB(q, {}, allOrgUnits);
 
             orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
