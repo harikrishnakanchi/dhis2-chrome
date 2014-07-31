@@ -226,6 +226,8 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 selectedDataElements: undefined,
                 attributeValues: [{
                     attribute: {
+                        code: "Type",
+                        name: "Type",
                         id: 'a1fa2777924'
                     },
                     value: 'Module'
@@ -252,6 +254,8 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 selectedDataElements: undefined,
                 attributeValues: [{
                     attribute: {
+                        code: "Type",
+                        name: "Type",
                         id: 'a1fa2777924'
                     },
                     value: 'Module'

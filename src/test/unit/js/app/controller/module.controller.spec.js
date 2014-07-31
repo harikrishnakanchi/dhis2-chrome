@@ -185,29 +185,31 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var enrichedModules =
                 [{
-                name: 'Module1',
-                datasets: [{
-                    'id': 'DS_OPD',
-                    'name': 'dataset11',
-                }],
-                shortName: 'Module1',
-                id: 'dba40b71577',
-                level: NaN,
-                openingDate: '2014-04-01',
-                selectedDataset: undefined,
-                selectedSections: undefined,
-                selectedDataElements: undefined,
-                attributeValues: [{
-                    attribute: {
-                        id: 'a1fa2777924'
-                    },
-                    value: 'Module'
-                }],
-                parent: {
-                    name: 'Project1',
-                    id: 'someid'
-                }
-            }];
+                    name: 'Module1',
+                    datasets: [{
+                        'id': 'DS_OPD',
+                        'name': 'dataset11',
+                    }],
+                    shortName: 'Module1',
+                    id: 'dba40b71577',
+                    level: NaN,
+                    openingDate: '2014-04-01',
+                    selectedDataset: undefined,
+                    selectedSections: undefined,
+                    selectedDataElements: undefined,
+                    attributeValues: [{
+                        attribute: {
+                            code: "Type",
+                            name: "Type",
+                            id: 'a1fa2777924'
+                        },
+                        value: 'Module'
+                    }],
+                    parent: {
+                        name: 'Project1',
+                        id: 'someid'
+                    }
+                }];
 
             scope.save(modules);
             scope.$apply();

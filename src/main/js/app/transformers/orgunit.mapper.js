@@ -124,7 +124,9 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 selectedDataElements: module.selectedDataElements,
                 attributeValues: [{
                     attribute: {
-                        id: "a1fa2777924"
+                        "code": "Type",
+                        "name": "Type",
+                        "id": "a1fa2777924"
                     },
                     value: "Module"
                 }],
