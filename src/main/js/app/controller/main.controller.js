@@ -88,6 +88,8 @@ define(["lodash"], function(_) {
             $scope.oldUserProject = undefined;
             $rootScope.isLoggedIn = false;
             $rootScope.currentUser = undefined;
+            $scope.currentUserProject = undefined;
+            $scope.oldUserProject = undefined;
         };
 
         var init = function() {
