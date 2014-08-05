@@ -24,7 +24,16 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             var _Date = Date;
             spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/completeDataSetRegistrations?cd=2014-05-30T12:43:54.972Z&ds=170b8cd5e53&multiOu=true&ou=17yugc&pe=2014W01&sb=testproj_approver_l1").respond(200, "ok");
+            var expectedPayload = [{
+                "ds": "170b8cd5e53",
+                "pe": "2014W01",
+                "ou": "17yugc",
+                "sb": "testproj_approver_l1",
+                "cd": "2014-05-30T12:43:54.972Z",
+                "multiOu": true
+            }];
+
+            httpBackend.expectPOST(properties.dhis.url + "/api/completeDataSetRegistrations", expectedPayload).respond(200, "ok");
 
             var approvalService = new ApprovalService(http, db, q);
             approvalService.markAsComplete(["170b8cd5e53"], "2014W01", "17yugc", "testproj_approver_l1", moment().toISOString());
@@ -41,6 +50,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
         });
 
         it("should get complete datasets", function() {
+            var startDate = moment().subtract(4, "week").format("YYYY-MM-DD");
             var endDate = moment().format("YYYY-MM-DD");
 
             var dhisApprovalData = {
@@ -99,7 +109,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 }]
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations?children=true&dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnit=ou1&orgUnit=ou2&startDate=1900-01-01").respond(200, dhisApprovalData);
+            httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations?children=true&dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnit=ou1&orgUnit=ou2&startDate=" + startDate).respond(200, dhisApprovalData);
 
             var actualApprovalData;
             approvalService = new ApprovalService(http, db, q);
@@ -127,6 +137,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
         });
 
         it("should get level two approval data", function() {
+            var startDate = moment().subtract(4, "week").format("YYYY-MM-DD");
             var endDate = moment().format("YYYY-MM-DD");
 
             var dhisApprovalData = {
@@ -250,7 +261,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 }]
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnits=ou1&orgUnits=ou2&startDate=1900-01-01").respond(200, dhisApprovalData);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnits=ou1&orgUnits=ou2&startDate=" + startDate).respond(200, dhisApprovalData);
 
             var actualApprovalData;
             approvalService = new ApprovalService(http, db, q);

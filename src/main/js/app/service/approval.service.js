@@ -1,16 +1,18 @@
-define(["properties", "moment"], function(properties, moment) {
+define(["properties", "moment", "lodash"], function(properties, moment, _) {
     return function($http, db, $q) {
         this.markAsComplete = function(dataSets, period, orgUnit, storedBy, completionDate) {
-            return $http.post(properties.dhis.url + "/api/completeDataSetRegistrations", undefined, {
-                params: {
-                    "ds": dataSets,
+            var payload = _.transform(dataSets, function(result, ds) {
+                result.push({
+                    "ds": ds,
                     "pe": period,
                     "ou": orgUnit,
                     "sb": storedBy,
                     "cd": completionDate,
                     "multiOu": true
-                }
+                });
             });
+
+            return $http.post(properties.dhis.url + "/api/completeDataSetRegistrations", payload);
         };
 
         this.markAsApproved = function(dataSets, period, orgUnit, approvedBy, approvalDate) {
@@ -61,11 +63,14 @@ define(["properties", "moment"], function(properties, moment) {
                 return deferred.promise;
             };
 
+            var endDate = moment().format("YYYY-MM-DD");
+            var startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
+
             return $http.get(properties.dhis.url + '/api/completeDataSetRegistrations', {
                 "params": {
                     "dataSet": dataSets,
-                    "startDate": "1900-01-01",
-                    "endDate": moment().format("YYYY-MM-DD"),
+                    "startDate": startDate,
+                    "endDate": endDate,
                     "orgUnit": orgUnits,
                     "children": true
                 }
@@ -130,11 +135,15 @@ define(["properties", "moment"], function(properties, moment) {
                 return deferred.promise;
             };
 
+            var endDate = moment().format("YYYY-MM-DD");
+            var startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
+
+
             return $http.get(properties.dhis.url + '/api/dataApprovals/status', {
                 "params": {
                     "dataSet": dataSets,
-                    "startDate": "1900-01-01",
-                    "endDate": moment().format("YYYY-MM-DD"),
+                    "startDate": startDate,
+                    "endDate": endDate,
                     "orgUnits": orgUnits,
                     "children": true
                 }
