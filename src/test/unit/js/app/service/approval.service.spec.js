@@ -33,7 +33,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "multiOu": true
             }];
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/completeDataSetRegistrations", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(properties.dhis.url + "/api/completeDataSetRegistrations/multiple", expectedPayload).respond(200, "ok");
 
             var approvalService = new ApprovalService(http, db, q);
             approvalService.markAsComplete(["170b8cd5e53"], "2014W01", "17yugc", "testproj_approver_l1", moment().toISOString());
@@ -51,7 +51,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "ad": "2014-01-01"
             }];
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals/multiple", expectedPayload).respond(200, "ok");
             var approvalService = new ApprovalService(http, db, q);
             approvalService.markAsApproved(["170b8cd5e53"], "2014W01", "17yugc", "currentUserName", "2014-01-01");
 
@@ -270,7 +270,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 }]
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnits=ou1&orgUnits=ou2&startDate=" + startDate).respond(200, dhisApprovalData);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&ds=d1&ds=d2&endDate=" + endDate + "&ou=ou1&ou=ou2&startDate=" + startDate).respond(200, dhisApprovalData);
 
             var actualApprovalData;
             approvalService = new ApprovalService(http, db, q);

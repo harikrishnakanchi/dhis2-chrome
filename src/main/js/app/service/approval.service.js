@@ -12,7 +12,7 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
                 });
             });
 
-            return $http.post(properties.dhis.url + "/api/completeDataSetRegistrations", payload);
+            return $http.post(properties.dhis.url + "/api/completeDataSetRegistrations/multiple", payload);
         };
 
         this.markAsApproved = function(dataSets, period, orgUnit, approvedBy, approvalDate) {
@@ -26,7 +26,7 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
                 });
             });
 
-            return $http.post(properties.dhis.url + "/api/dataApprovals", payload);
+            return $http.post(properties.dhis.url + "/api/dataApprovals/multiple", payload);
         };
 
         this.markAsUnapproved = function(dataSets, period, orgUnit) {
@@ -143,10 +143,10 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
 
             return $http.get(properties.dhis.url + '/api/dataApprovals/status', {
                 "params": {
-                    "dataSet": dataSets,
+                    "ds": dataSets,
                     "startDate": startDate,
                     "endDate": endDate,
-                    "orgUnits": orgUnits,
+                    "ou": orgUnits,
                     "children": true
                 }
             }).then(onSuccess);
