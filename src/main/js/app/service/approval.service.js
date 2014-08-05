@@ -16,15 +16,17 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
         };
 
         this.markAsApproved = function(dataSets, period, orgUnit, approvedBy, approvalDate) {
-            return $http.post(properties.dhis.url + "/api/dataApprovals", undefined, {
-                params: {
-                    "ds": dataSets,
+            var payload = _.transform(dataSets, function(result, ds) {
+                result.push({
+                    "ds": ds,
                     "pe": period,
                     "ou": orgUnit,
                     "ab": approvedBy,
                     "ad": approvalDate
-                }
+                });
             });
+
+            return $http.post(properties.dhis.url + "/api/dataApprovals", payload);
         };
 
         this.markAsUnapproved = function(dataSets, period, orgUnit) {

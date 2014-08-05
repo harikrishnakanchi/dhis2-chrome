@@ -41,8 +41,17 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             httpBackend.flush();
         });
 
-        it("should mark data as complete in dhis", function() {
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals?ab=currentUserName&ad=2014-01-01&ds=170b8cd5e53&ou=17yugc&pe=2014W01").respond(200, "ok");
+        it("should mark data as approved in dhis", function() {
+
+            var expectedPayload = [{
+                "ds": "170b8cd5e53",
+                "pe": "2014W01",
+                "ou": "17yugc",
+                "ab": "currentUserName",
+                "ad": "2014-01-01"
+            }];
+
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals", expectedPayload).respond(200, "ok");
             var approvalService = new ApprovalService(http, db, q);
             approvalService.markAsApproved(["170b8cd5e53"], "2014W01", "17yugc", "currentUserName", "2014-01-01");
 
@@ -50,7 +59,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
         });
 
         it("should get complete datasets", function() {
-            var startDate = moment().subtract(4, "week").format("YYYY-MM-DD");
+            var startDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
             var endDate = moment().format("YYYY-MM-DD");
 
             var dhisApprovalData = {
@@ -137,7 +146,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
         });
 
         it("should get level two approval data", function() {
-            var startDate = moment().subtract(4, "week").format("YYYY-MM-DD");
+            var startDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
             var endDate = moment().format("YYYY-MM-DD");
 
             var dhisApprovalData = {
