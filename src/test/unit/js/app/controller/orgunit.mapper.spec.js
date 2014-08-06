@@ -3,7 +3,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
         it("should convert project from DHIS to project for view", function() {
             var dhisProject = {
-                "id": "a4acf9115a7",
+                "id": "aa4acf9115a",
                 "name": 'Org1',
                 "level": 3,
                 "shortName": 'Org1',
@@ -105,7 +105,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var result = orgUnitMapper.mapToProjectForDhis(orgUnit, parentOrgUnit);
 
             var expectedResult = {
-                id: '131658d54b1',
+                id: 'a131658d54b',
                 name: 'Org1',
                 level: 3,
                 shortName: 'Org1',
@@ -218,7 +218,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     'name': 'dataset12'
                 }],
                 shortName: 'Module1',
-                id: 'ac1bbd0985e',
+                id: 'aac1bbd0985',
                 level: 4,
                 openingDate: "2010-01-01",
                 selectedDataset: undefined,
@@ -246,7 +246,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     'name': 'dataset22'
                 }],
                 shortName: 'Module2',
-                id: 'cccf1dda360',
+                id: 'acccf1dda36',
                 level: 4,
                 openingDate: "2010-01-01",
                 selectedDataset: undefined,
@@ -324,17 +324,17 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 name: 'dataset11',
                 organisationUnits: [{
                     name: 'Module1',
-                    id: 'ac1bbd0985e'
+                    id: 'aac1bbd0985'
                 }, {
                     name: 'Module2',
-                    id: 'cccf1dda360'
+                    id: 'acccf1dda36'
                 }]
             }, {
                 id: 'ds_12',
                 name: 'dataset12',
                 organisationUnits: [{
                     name: 'Module1',
-                    id: 'ac1bbd0985e'
+                    id: 'aac1bbd0985'
                 }]
             }];
 

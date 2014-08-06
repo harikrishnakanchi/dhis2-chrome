@@ -191,7 +191,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                         'name': 'dataset11',
                     }],
                     shortName: 'Module1',
-                    id: 'dba40b71577',
+                    id: 'adba40b7157',
                     level: NaN,
                     openingDate: '2014-04-01',
                     selectedDataset: undefined,
@@ -259,17 +259,17 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 name: 'dataset11',
                 organisationUnits: [{
                     name: 'Module1',
-                    id: 'ac1bbd0985e'
+                    id: 'aac1bbd0985'
                 }, {
                     name: 'Module2',
-                    id: 'cccf1dda360'
+                    id: 'acccf1dda36'
                 }]
             }, {
                 id: 'ds_12',
                 name: 'dataset12',
                 organisationUnits: [{
                     name: 'Module1',
-                    id: 'ac1bbd0985e'
+                    id: 'aac1bbd0985'
                 }]
             }];
 

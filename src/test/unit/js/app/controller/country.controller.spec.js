@@ -44,7 +44,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
         });
 
         it("should save country in dhis", function() {
-            var orgUnitId = '131658d54b1';
+            var orgUnitId = 'a131658d54b';
 
             var newOrgUnit = {
                 'name': 'Org1',
