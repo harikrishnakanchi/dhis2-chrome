@@ -17,7 +17,7 @@ define([], function() {
                     return downloadDataConsumer.run(message).then(function() {
                         return uploadApprovalDataConsumer.run(message);
                     });
-                case "createOrgUnit":
+                case "upsertOrgUnit":
                     return orgUnitConsumer.run(message);
                 case "associateDataset":
                     return datasetConsumer.run(message);

@@ -218,7 +218,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedModules);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: enrichedModules,
-                type: "createOrgUnit"
+                type: "upsertOrgUnit"
             }, "dataValues");
         });
 

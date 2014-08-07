@@ -148,7 +148,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnits);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: expectedOpUnits,
-                type: "createOrgUnit"
+                type: "upsertOrgUnit"
             }, "dataValues");
         });
 

@@ -105,7 +105,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.createModules = function(modules) {
             var parent = $scope.orgUnit;
             var enrichedModules = orgUnitMapper.mapToModules(modules, parent);
-            return $q.all(orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "createOrgUnit")).then(function() {
+            return $q.all(orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")).then(function() {
                 return enrichedModules;
             });
         };

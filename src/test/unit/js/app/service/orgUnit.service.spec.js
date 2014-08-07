@@ -45,7 +45,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
                 }]
             };
 
-            orgUnitService.create(orgUnit);
+            orgUnitService.upsert(orgUnit);
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();
@@ -64,7 +64,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
                 }]
             };
 
-            orgUnitService.create(orgUnit);
+            orgUnitService.upsert(orgUnit);
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();
@@ -132,7 +132,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
                 "organisationUnits": payload
             };
 
-            orgUnitService.create(payload);
+            orgUnitService.upsert(payload);
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();

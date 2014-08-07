@@ -1,25 +1,14 @@
 define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
-
-    var mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
-
-        var projectOrgUnit = {
-            'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
-            'name': orgUnit.name,
-            'level': parseInt(parentOrgUnit.level) + 1,
-            'shortName': orgUnit.name,
-            'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
-            'parent': _.pick(parentOrgUnit, "name", "id"),
-            'attributeValues': [{
-                'attribute': {
-                    "code": "Type",
-                    "name": "Type",
-                    "id": "a1fa2777924"
-                },
-                value: "Project"
-            }]
-        };
-
-        projectOrgUnit.attributeValues.push({
+    var buildProjectAttributeValues = function(orgUnit) {
+        var attributeValues = [{
+            'attribute': {
+                "code": "Type",
+                "name": "Type",
+                "id": "a1fa2777924"
+            },
+            value: "Project"
+        }];
+        attributeValues.push({
             "attribute": {
                 "code": "prjCon",
                 "name": "Context",
@@ -64,7 +53,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         });
 
         if (orgUnit.endDate)
-            projectOrgUnit.attributeValues.push({
+            attributeValues.push({
                 "attribute": {
                     "code": "prjEndDate",
                     "name": "End date",
@@ -73,6 +62,26 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "value": moment(orgUnit.endDate).format("YYYY-MM-DD")
             });
 
+        return attributeValues;
+    };
+
+    var mapToExistingProject = function(newProject, existingProject) {
+        existingProject.openingDate = moment(newProject.openingDate).format("YYYY-MM-DD");
+        existingProject.attributeValues = buildProjectAttributeValues(newProject);
+        return existingProject;
+    };
+
+    var mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
+
+        var projectOrgUnit = {
+            'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
+            'name': orgUnit.name,
+            'level': parseInt(parentOrgUnit.level) + 1,
+            'shortName': orgUnit.name,
+            'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
+            'parent': _.pick(parentOrgUnit, "name", "id"),
+            'attributeValues': buildProjectAttributeValues(orgUnit)
+        };
 
         return projectOrgUnit;
     };
@@ -95,7 +104,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return attribute ? attribute.value : undefined;
     };
 
-    var mapToProjectForView = function(dhisProject) {
+    var mapToProjectForEdit = function(dhisProject) {
         var endDate = getAttributeValue(dhisProject, "prjEndDate");
         return {
             'name': dhisProject.name,
@@ -195,9 +204,10 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
 
     return {
         "mapToProjectForDhis": mapToProjectForDhis,
-        "mapToProjectForView": mapToProjectForView,
+        "mapToProjectForEdit": mapToProjectForEdit,
         "mapToModules": mapToModules,
         'mapToDataSets': mapToDataSets,
+        'mapToExistingProject': mapToExistingProject,
         "getChildOrgUnitNames": getChildOrgUnitNames,
         "filterModules": filterModules
     };

@@ -49,8 +49,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             });
         };
 
-        $scope.save = function(newOrgUnit, parentOrgUnit) {
-
+        var saveToDbAndPublishMessage = function(dhisProject) {
             var onSuccess = function(data) {
                 if ($scope.$parent.closeNewForm)
                     $scope.$parent.closeNewForm(data, "savedProject");
@@ -60,13 +59,21 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
                 $scope.saveFailure = true;
             };
 
-            var dhisProject = orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit);
-
             return orgUnitRepository.upsert(dhisProject)
                 .then(function(data) {
-                    return publishMessage(data, "createOrgUnit");
+                    return publishMessage(data, "upsertOrgUnit");
                 })
                 .then(onSuccess, onError);
+        };
+
+        $scope.update = function(newOrgUnit, orgUnit) {
+            var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
+            saveToDbAndPublishMessage(dhisProject);
+        };
+
+        $scope.save = function(newOrgUnit, parentOrgUnit) {
+            var dhisProject = orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit);
+            saveToDbAndPublishMessage(dhisProject);
         };
 
         $scope.toggleUserDisabledState = function(user) {
@@ -114,7 +121,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             $anchorScroll();
         };
 
-        var setProjectUsersForView = function(projectUsers) {
+        var setProjectUsersForEdit = function(projectUsers) {
             $scope.projectUsers = [];
             _.each(projectUsers, function(user) {
                 var roles = user.userCredentials.userAuthorityGroups.map(function(role) {
@@ -132,17 +139,17 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             });
         };
 
-        var prepareView = function() {
+        var prepareEditForm = function() {
             $scope.reset();
-            $scope.newOrgUnit = orgUnitMapper.mapToProjectForView($scope.orgUnit);
-            userRepository.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForView);
+            $scope.newOrgUnit = orgUnitMapper.mapToProjectForEdit($scope.orgUnit);
+            userRepository.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForEdit);
         };
 
         var init = function() {
             if ($scope.isNewMode)
                 prepareNewForm();
             else
-                prepareView();
+                prepareEditForm();
         };
 
         init();

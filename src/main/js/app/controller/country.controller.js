@@ -39,7 +39,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             var saveToDhis = function(data) {
                 return $hustle.publish({
                     "data": data,
-                    "type": "createOrgUnit"
+                    "type": "upsertOrgUnit"
                 }, "dataValues").then(function() {
                     return data;
                 });

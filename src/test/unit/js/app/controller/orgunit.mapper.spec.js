@@ -64,7 +64,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }]
             };
 
-            var result = orgUnitMapper.mapToProjectForView(dhisProject);
+            var result = orgUnitMapper.mapToProjectForEdit(dhisProject);
 
             var expectedResult = {
                 'name': dhisProject.name,
@@ -406,6 +406,96 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var actualModules = orgUnitMapper.filterModules(organisationUnits);
 
             expect(actualModules).toEqual([expectedModule1, expectedModule2]);
+        });
+
+        it("should map to existing project", function() {
+            var project = {
+                'name': 'Project1',
+                'id': 'id1',
+                'children': [{
+                    'id': "123"
+                }]
+            };
+
+            var newProject = {
+                'name': 'Org1',
+                'openingDate': moment("2010-01-01").toDate(),
+                'context': "val2",
+                'location': "val3",
+                'projectType': "val4",
+                'endDate': moment("2011-01-01").toDate(),
+                'populationType': "val6",
+                'projectCode': 'AB001',
+                'event': 'Other'
+            };
+
+            var projectToBeSaved = orgUnitMapper.mapToExistingProject(newProject, project);
+
+            expect(projectToBeSaved).toEqual({
+                name: 'Project1',
+                id: 'id1',
+                children: [{
+                    id: '123'
+                }],
+                openingDate: '2010-01-01',
+                attributeValues: [{
+                    attribute: {
+                        code: 'Type',
+                        name: 'Type',
+                        id: 'a1fa2777924'
+                    },
+                    value: 'Project'
+                }, {
+                    attribute: {
+                        code: 'prjCon',
+                        name: 'Context',
+                        id: 'Gy8V8WeGgYs'
+                    },
+                    value: 'val2'
+                }, {
+                    attribute: {
+                        code: 'prjLoc',
+                        name: 'Location',
+                        id: 'CaQPMk01JB8'
+                    },
+                    value: 'val3'
+                }, {
+                    attribute: {
+                        code: 'prjType',
+                        name: 'Type of project',
+                        id: 'bnbnSvRdFYo'
+                    },
+                    value: 'val4'
+                }, {
+                    attribute: {
+                        code: 'prjPopType',
+                        name: 'Type of population',
+                        id: 'Byx9QE6IvXB'
+                    },
+                    value: 'val6'
+                }, {
+                    attribute: {
+                        code: 'projCode',
+                        name: 'Project Code',
+                        id: 'fa5e00d5cd2'
+                    },
+                    value: 'AB001'
+                }, {
+                    attribute: {
+                        code: 'event',
+                        name: 'Event',
+                        id: 'a4ecfc70574'
+                    },
+                    value: 'Other'
+                }, {
+                    attribute: {
+                        code: 'prjEndDate',
+                        name: 'End date',
+                        id: 'ZbUuOnEmVs5'
+                    },
+                    value: '2011-01-01'
+                }]
+            });
         });
     });
 });

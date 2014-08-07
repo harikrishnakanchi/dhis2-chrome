@@ -91,7 +91,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should call org units consumer", function() {
             message.data = {
                 "data": {},
-                "type": "createOrgUnit"
+                "type": "upsertOrgUnit"
             };
             dispatcher.run(message);
             expect(orgUnitConsumer.run).toHaveBeenCalledWith(message);

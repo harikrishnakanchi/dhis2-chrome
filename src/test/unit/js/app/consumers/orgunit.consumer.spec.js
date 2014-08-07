@@ -22,13 +22,13 @@ define(["orgUnitConsumer"], function(OrgunitConsumer) {
                     "value": "val1"
                 }]
             }];
-            orgunitService = jasmine.createSpyObj({}, ['create']);
+            orgunitService = jasmine.createSpyObj({}, ['upsert']);
 
             orgunitConsumer = new OrgunitConsumer(orgunitService);
             message = {
                 data: {
                     data: payload,
-                    type: "createOrgUnit"
+                    type: "upsertOrgUnit"
                 }
             };
 
@@ -36,7 +36,7 @@ define(["orgUnitConsumer"], function(OrgunitConsumer) {
 
         it("should create org unit", function() {
             orgunitConsumer.run(message);
-            expect(orgunitService.create).toHaveBeenCalledWith(payload);
+            expect(orgunitService.upsert).toHaveBeenCalledWith(payload);
         });
 
     });

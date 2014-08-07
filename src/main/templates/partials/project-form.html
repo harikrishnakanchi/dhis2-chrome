@@ -1,6 +1,6 @@
 <div ng-controller="projectController">
 	<div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
-	<form name="createForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
+	<form name="createForm" class="form-horizontal" role="form" novalidate>
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 ng-if="isNewMode" class="panel-title">Create Project</h3>
@@ -30,39 +30,39 @@
 					<li class="form-group">
 						<label for="newOrgUnitLocation" class="col-sm-4 col-md-4  control-label">Location</label>
 						<div class="col-sm-6 col-md-6" >
-							<input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitLocation" id="newOrgUnitLocation" ng-model="newOrgUnit.location"/>
+							<input type="text" class="form-control" name="newOrgUnitLocation" id="newOrgUnitLocation" ng-model="newOrgUnit.location"/>
 						</div>
 					</li>
 					<li class="form-group">
 						<label for="newOrgUnitProjectType" class="col-sm-4 col-md-4  control-label">Type of project</label>
 						<div class="col-sm-6 col-md-6" >
-							<select ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitProjectType" id="newOrgUnitProjectType" ng-model="newOrgUnit.projectType" ng-options="o as o for o in allProjectTypes">
+							<select type="text" class="form-control" name="newOrgUnitProjectType" id="newOrgUnitProjectType" ng-model="newOrgUnit.projectType" ng-options="o as o for o in allProjectTypes">
 							</select>
 						</div>
 					</li>
 					<li class="form-group">
 						<label for="newOrgUnitContext" class="col-sm-4 col-md-4 control-label">Context</label>
 						<div class="col-sm-6 col-md-6" >
-							<select ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" ng-options="o as o for o in allContexts"></select>
+							<select type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" ng-options="o as o for o in allContexts"></select>
 						</div>
 					</li>
 					<li class="form-group">
 						<label for="newOrgUnitPopType" class="col-sm-4 col-md-4 control-label">Type of population</label>
 						<div class="col-sm-6 col-md-6" >
-							<select ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" ng-options="o as o for o in allPopTypes"></select>
+							<select type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" ng-options="o as o for o in allPopTypes"></select>
 						</div>
 					</li>
 					<li class="form-group">
 						<label for="newOrgUnitEvent" class="col-sm-4 col-md-4 control-label">Event</label>
 						<div class="col-sm-6 col-md-6" >
-							<select ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitEvent" id="newOrgUnitEvent" ng-model="newOrgUnit.event" ng-options="e as e for e in allEvents"></select>
+							<select type="text" class="form-control" name="newOrgUnitEvent" id="newOrgUnitEvent" ng-model="newOrgUnit.event" ng-options="e as e for e in allEvents"></select>
 						</div>
 					</li>
 					
 					<li class="form-group">
 						<label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
 						<div class="col-sm-6 col-md-6" >
-							<input type="date" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" ng-disabled="!isNewMode" required>
+							<input type="date" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required>
 							<div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid || isAfterMaxDate()">
 								<span ng-show="createForm.newOrgUnitOpeningDate.$error.required"class="errortxt">{{resourceBundle.openingDateValidation}}</span>
 								<span ng-show="isAfterMaxDate()" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
@@ -72,12 +72,13 @@
 					<li class="form-group">
 						<label for="newOrgUnitEndDate" class="col-sm-4 col-md-4 control-label">End Date</label>
 						<div class="col-sm-6 col-md-6" >
-							<input type="date" min={{thisDate}} name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate" ng-disabled="!isNewMode">
+							<input type="date" min={{thisDate}} name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate">
 						</div>
 					</li>
-					<li ng-if="isNewMode">
+					<li>
 						<div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
-							<input type="submit" class="btn btn-main" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Save"/>
+							<input type="button" class="btn btn-main" ng-if="isNewMode" ng-click="save(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Save"/>
+							<input type="button" class="btn btn-main" ng-if="!isNewMode" ng-click="update(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Update"/>
 							<input type="button" class="btn" ng-click="reset()" value="Reset">
 						</div>
 					</li>

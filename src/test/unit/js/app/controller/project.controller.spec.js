@@ -1,8 +1,8 @@
-define(["projectController", "angularMocks", "utils", "lodash", "moment"], function(ProjectController, mocks, utils, _, moment) {
+define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper) {
 
     describe("project controller tests", function() {
 
-        var scope, timeout, q, location, anchorScroll, orgunitMapper, userRepository,
+        var scope, timeout, q, location, anchorScroll, userRepository,
             fakeModal, orgUnitRepo, hustle;
 
         beforeEach(module('hustle'));
@@ -12,10 +12,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             q = $q;
             timeout = $timeout;
             location = $location;
-
-            orgUnitMapper = {
-                getChildOrgUnitNames: function() {}
-            };
 
             orgUnitRepo = utils.getMockRepo(q);
 
@@ -48,92 +44,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
         }));
 
         it("should save project in dhis", function() {
-            var orgUnitId = 'a131658d54b';
-
-            var newOrgUnit = {
-                'name': 'Org1',
-                'location': 'Some Location',
-                'openingDate': moment().toDate(),
-                'endDate': moment().add('days', 7).toDate(),
-                'projectCode': 'AB001',
-                'event': 'Other'
-            };
-
-            var parent = {
-                'name': 'Name1',
-                'id': 'Id1',
-                'level': 2,
-            };
 
             var expectedNewOrgUnit = {
-                id: orgUnitId,
-                name: newOrgUnit.name,
-                shortName: newOrgUnit.name,
-                level: 3,
-                openingDate: moment(newOrgUnit.openingDate).format("YYYY-MM-DD"),
-                parent: {
-                    id: parent.id,
-                    name: parent.name,
-                },
-                "attributeValues": [{
-                    'attribute': {
-                        code: 'Type',
-                        name: 'Type',
-                        id: "a1fa2777924"
-                    },
-                    value: "Project"
-                }, {
-                    "attribute": {
-                        "code": "prjCon",
-                        "name": "Context",
-                        "id": "Gy8V8WeGgYs"
-                    },
-                    "value": newOrgUnit.context
-                }, {
-                    "attribute": {
-                        "code": "prjLoc",
-                        "name": "Location",
-                        "id": "CaQPMk01JB8"
-                    },
-                    "value": newOrgUnit.location
-                }, {
-                    "attribute": {
-                        "code": "prjType",
-                        "name": "Type of project",
-                        "id": "bnbnSvRdFYo"
-                    },
-                    "value": newOrgUnit.projectType
-                }, {
-                    "attribute": {
-                        "code": "prjPopType",
-                        "name": "Type of population",
-                        "id": "Byx9QE6IvXB"
-                    },
-                    "value": newOrgUnit.populationType
-                }, {
-                    "attribute": {
-                        "code": "projCode",
-                        "name": "Project Code",
-                        "id": "fa5e00d5cd2"
-                    },
-                    "value": newOrgUnit.projectCode
-                }, {
-                    "attribute": {
-                        "code": "event",
-                        "name": "Event",
-                        "id": "a4ecfc70574"
-                    },
-                    "value": newOrgUnit.event
-                }, {
-                    "attribute": {
-                        "code": "prjEndDate",
-                        "name": "End date",
-                        "id": "ZbUuOnEmVs5"
-                    },
-                    "value": moment(newOrgUnit.endDate).format("YYYY-MM-DD")
-                }],
+                "id": "blah"
             };
 
+            spyOn(orgUnitMapper, "mapToProjectForDhis").and.returnValue(expectedNewOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
 
@@ -143,15 +59,43 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: expectedNewOrgUnit,
-                type: "createOrgUnit"
+                type: "upsertOrgUnit"
             }, "dataValues");
         });
 
         it("should display error if saving organization unit fails", function() {
-            var newOrgUnit = {};
+            spyOn(hustle, "publish").and.returnValue(utils.getRejectedPromise(q, {}));
 
+            scope.save({}, {});
+            scope.$apply();
 
-            scope.save(newOrgUnit, parent);
+            expect(scope.saveFailure).toEqual(true);
+        });
+
+        it("should update project", function() {
+            var expectedNewOrgUnit = {
+                "id": "blah"
+            };
+
+            spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(expectedNewOrgUnit);
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(location, 'hash');
+
+            scope.update({}, {});
+            scope.$apply();
+
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: expectedNewOrgUnit,
+                type: "upsertOrgUnit"
+            }, "dataValues");
+
+        });
+
+        it("should display error if updating organization unit fails", function() {
+            spyOn(hustle, "publish").and.returnValue(utils.getRejectedPromise(q, {}));
+
+            scope.update(newOrgUnit, parent);
             scope.$apply();
 
             expect(scope.saveFailure).toEqual(true);

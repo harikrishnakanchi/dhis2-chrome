@@ -85,7 +85,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedNewOrgUnit,
-                "type": "createOrgUnit"
+                "type": "upsertOrgUnit"
             }, 'dataValues');
         });
 
