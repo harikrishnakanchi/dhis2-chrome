@@ -28,8 +28,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             };
 
             var onSuccess = function(data) {
-                if ($scope.$parent.closeEditForm)
-                    $scope.$parent.closeEditForm(data, "savedCountry");
+                if ($scope.$parent.closeNewForm)
+                    $scope.$parent.closeNewForm(data, "savedCountry");
             };
 
             var onError = function() {
@@ -66,7 +66,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             $anchorScroll();
         };
 
-        var prepareEditForm = function() {
+        var prepareNewForm = function() {
             $scope.reset();
             orgUnitRepository.getAll().then(function(allOrgUnits) {
                 $scope.allCountries = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
@@ -80,8 +80,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         };
 
         var init = function() {
-            if ($scope.isEditMode)
-                prepareEditForm();
+            if ($scope.isNewMode)
+                prepareNewForm();
             else
                 prepareView();
         };

@@ -7,7 +7,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
             scope = $rootScope.$new();
-            scope.isEditMode = true;
+            scope.isNewMode = true;
             q = $q;
             hustle = $hustle;
             location = $location;
@@ -41,7 +41,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
         });
 
         it('should add new op units', function() {
-            scope.isEditMode = false;
+            scope.isNewMode = false;
             scope.$apply();
             var orginalOpUnitLen = scope.opUnits.length;
             scope.addOpUnits();
@@ -59,7 +59,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 'name': 'opUnit4'
             }];
 
-            scope.isEditMode = false;
+            scope.isNewMode = false;
             scope.$apply();
 
             scope.delete(2);
@@ -167,7 +167,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                     "value": "Operation Unit"
                 }]
             };
-            scope.isEditMode = false;
+            scope.isNewMode = false;
 
             opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location);
 

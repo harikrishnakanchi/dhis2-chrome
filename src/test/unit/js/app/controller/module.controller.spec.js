@@ -69,7 +69,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 'name': 'SomeName',
                 'id': 'someId'
             };
-            scope.isEditMode = true;
+            scope.isNewMode = true;
 
             spyOn(db, 'objectStore').and.callFake(function(storeName) {
                 if (storeName === "dataSets")
@@ -402,7 +402,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }
             };
 
-            scope.isEditMode = false;
+            scope.isNewMode = false;
 
             spyOn(datasetTransformer, "getAssociatedDatasets").and.returnValue(dataSets);
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, systemSettings));

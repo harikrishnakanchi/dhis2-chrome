@@ -52,8 +52,8 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         $scope.save = function(newOrgUnit, parentOrgUnit) {
 
             var onSuccess = function(data) {
-                if ($scope.$parent.closeEditForm)
-                    $scope.$parent.closeEditForm(data, "savedProject");
+                if ($scope.$parent.closeNewForm)
+                    $scope.$parent.closeNewForm(data, "savedProject");
             };
 
             var onError = function() {
@@ -125,7 +125,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             });
         };
 
-        var prepareEditForm = function() {
+        var prepareNewForm = function() {
             $scope.reset();
             orgUnitRepository.getAll().then(function(allOrgUnits) {
                 $scope.peerProjects = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
@@ -139,8 +139,8 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         };
 
         var init = function() {
-            if ($scope.isEditMode)
-                prepareEditForm();
+            if ($scope.isNewMode)
+                prepareNewForm();
             else
                 prepareView();
         };

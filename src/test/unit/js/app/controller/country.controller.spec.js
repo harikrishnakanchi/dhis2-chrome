@@ -18,7 +18,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
 
             orgUnitRepo = utils.getMockRepo(q);
 
-            scope.isEditMode = true;
+            scope.isNewMode = true;
             scope.orgUnit = {
                 id: "blah"
             };
@@ -111,7 +111,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                 'openingDate': scope.orgUnit.openingDate,
             };
 
-            scope.isEditMode = false;
+            scope.isNewMode = false;
             scope.$apply();
 
             countryController = new CountryController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll);

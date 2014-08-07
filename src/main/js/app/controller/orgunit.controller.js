@@ -47,7 +47,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
         };
 
-        $scope.closeEditForm = function(selectedNode, message) {
+        $scope.closeNewForm = function(selectedNode, message) {
             if (message) {
                 $scope.showMessage = true;
                 $scope.message = message;
@@ -79,14 +79,14 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             scrollToTop();
         };
 
-        $scope.openInEditMode = function(type) {
+        $scope.openInNewMode = function(type) {
             $scope.templateUrl = templateUrlMap[type] + '?' + moment().format("X");
-            $scope.isEditMode = true;
+            $scope.isNewMode = true;
         };
 
         $scope.openInViewMode = function(type) {
             $scope.templateUrl = templateUrlMap[type] + '?' + moment().format("X");
-            $scope.isEditMode = false;
+            $scope.isNewMode = false;
         };
 
         init();

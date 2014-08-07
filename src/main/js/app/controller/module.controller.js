@@ -23,7 +23,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             };
 
             var setUpForm = function() {
-                var setUpEditMode = function() {
+                var setUpNewMode = function() {
                     _.each(allSections, function(section) {
                         selectedSections[section.id] = true;
                         _.each(section.dataElements, function(dataElement) {
@@ -49,8 +49,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                     });
                 };
 
-                if ($scope.isEditMode) {
-                    setUpEditMode();
+                if ($scope.isNewMode) {
+                    setUpNewMode();
                 } else {
                     setUpViewMode();
                 }
@@ -132,8 +132,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.onSuccess = function(data) {
             $scope.saveFailure = false;
-            if ($scope.$parent.closeEditForm)
-                $scope.$parent.closeEditForm($scope.orgUnit, "savedModule");
+            if ($scope.$parent.closeNewForm)
+                $scope.$parent.closeNewForm($scope.orgUnit, "savedModule");
         };
 
         $scope.onError = function(data) {

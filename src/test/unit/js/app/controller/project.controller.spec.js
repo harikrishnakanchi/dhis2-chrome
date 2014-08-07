@@ -28,7 +28,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 }
             };
 
-            scope.isEditMode = true;
+            scope.isNewMode = true;
             scope.orgUnit = {
                 id: "blah"
             };
@@ -277,7 +277,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
                 'projectCode': 'RU118'
             };
 
-            scope.isEditMode = false;
+            scope.isNewMode = false;
 
             projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
 
@@ -288,7 +288,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment"], funct
             scope.orgUnit = {
                 "name": "anyname",
             };
-            scope.isEditMode = false;
+            scope.isNewMode = false;
             var users = [{
                 'userCredentials': {
                     'username': 'foobar',

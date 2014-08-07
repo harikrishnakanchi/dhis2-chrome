@@ -42,8 +42,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             };
 
             var onSuccess = function(data) {
-                if ($scope.$parent.closeEditForm)
-                    $scope.$parent.closeEditForm($scope.orgUnit, "savedOpUnit");
+                if ($scope.$parent.closeNewForm)
+                    $scope.$parent.closeNewForm($scope.orgUnit, "savedOpUnit");
             };
 
             var onError = function(data) {
@@ -60,7 +60,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         };
 
         var init = function() {
-            if (!$scope.isEditMode) {
+            if (!$scope.isNewMode) {
                 $scope.opUnits = [{
                     'name': $scope.orgUnit.name,
                     'type': _.find($scope.orgUnit.attributeValues, {

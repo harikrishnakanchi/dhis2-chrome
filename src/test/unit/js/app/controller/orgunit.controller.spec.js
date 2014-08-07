@@ -185,12 +185,12 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             });
         });
 
-        it("should close edit form and select the newly created orgunit", function() {
+        it("should close new form and select the newly created orgunit", function() {
             var successMessage = "saved successfully";
             var expectedSelectedNode = expectedOrgUnitTree[0];
             expectedSelectedNode.collapsed = false;
             expectedSelectedNode.selected = true;
-            scope.closeEditForm({
+            scope.closeNewForm({
                 "id": 1
             }, successMessage);
             scope.$apply();
@@ -237,18 +237,18 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             expect(anchorScroll).toHaveBeenCalled();
         });
 
-        it("should set the template url to be displayed for edit mode", function() {
-            scope.openInEditMode('Country');
+        it("should set the template url to be displayed for New mode", function() {
+            scope.openInNewMode('Country');
 
             expect(scope.templateUrl.split('?')[0]).toEqual('templates/partials/country-form.html');
-            expect(scope.isEditMode).toEqual(true);
+            expect(scope.isNewMode).toEqual(true);
         });
 
         it("should set the template url for view mode", function() {
             scope.openInViewMode('Module');
 
             expect(scope.templateUrl.split('?')[0]).toEqual('templates/partials/module-form.html');
-            expect(scope.isEditMode).toEqual(false);
+            expect(scope.isNewMode).toEqual(false);
         });
 
     });
