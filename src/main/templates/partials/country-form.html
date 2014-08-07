@@ -3,8 +3,8 @@
 	<div class="panel panel-default">
   	<div class="panel-heading">
 
-		<h3 ng-if="isEditMode" class="panel-title">Create Country</h3>		
-		<h3 ng-if="!isEditMode" class="panel-title">Country Details</h3>
+		<h3 ng-if="isNewMode" class="panel-title">Create Country</h3>		
+		<h3 ng-if="!isNewMode" class="panel-title">Country Details</h3>
 	</div>
 	<div class="panel-body">
 	<form name="createForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
@@ -12,7 +12,7 @@
 			<li class="form-group">
 				<label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label">Name</label>
 				<div class="col-sm-6" >
-					<input ng-disabled="!isEditMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required not-in="allCountries" />
+					<input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required not-in="allCountries" />
 					<div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
 						<span ng-show="createForm.newOrgUnitName.$error.required"class="errortxt">{{resourceBundle.nameValidation}}</span>
 						<span ng-show="createForm.newOrgUnitName.$error.isWithin" class="errortxt">{{resourceBundle.countryExists}}</span>
@@ -32,7 +32,7 @@
 						</p>
 					</div>
 			</li>
-			<li ng-if="isEditMode">
+			<li ng-if="isNewMode">
 				<div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
 				<input type="submit" class="btn btn-main" ng-disabled="createForm.$invalid || isAfterMaxDate()" value="Save"/>
 				<input type="button" class="btn btn-default" ng-click="reset()" value="Reset">
