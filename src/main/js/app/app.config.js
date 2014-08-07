@@ -11,7 +11,7 @@ require.config({
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
-        "moment": "lib/moment/min/moment-with-langs",
+        "moment": "lib/moment/min/moment-with-locales",
         "hustle": "lib/hustle/hustle",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
 
