@@ -104,8 +104,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
         it("should reset form", function() {
             scope.newOrgUnit = {
                 'id': '123',
-                'openingDate': moment().add('days', -7).toDate(),
-                'endDate': moment().add('days', 7).toDate(),
+                'openingDate': moment().add(-7, 'days').toDate(),
+                'endDate': moment().add(7, 'days').toDate(),
             };
             scope.saveFailure = true;
 

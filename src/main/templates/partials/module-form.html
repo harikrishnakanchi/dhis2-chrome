@@ -7,9 +7,9 @@
 		</div>
 	</div>
 	<div class="panel-body">
-		<form class="form-horizontal" name="form" role="form" ng-submit="save(modules)" novalidate>
+		<form class="form-horizontal" name="form" role="form" novalidate>
 			<div class="well" ng-repeat="module in modules">
-				<input type="button" class="btn-delete" ng-hide="$first || !isNewMode" ng-click="delete($index)" value="X Delete">
+				<input type="button" class="btn-delete" ng-hide="$first || !isNewMode" ng-click="deleteModule($index)" value="X Delete">
 				<ul>
 					<li class="form-group">
 						<label for="moduleName" class="col-sm-4 col-md-4 control-label">Module name</label>
@@ -26,7 +26,7 @@
 						<label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-hide="isNewMode">Services</label>
 					</li>
 					<li class="form-group">
-						<div class="col-sm-12" ng-show="isNewMode">
+						<div class="col-sm-12">
 							<section class="module-details">
 								<div class="add-item-ctrl">
 									<div ng-show="areDatasetsNotSelected([module])">
@@ -35,18 +35,18 @@
 									<multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isNewMode" on-right-item-select="selectDataSet(module, item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
 								</div>
 								<div class="details" ng-show="module.selectedDataset.sections.length > 0">
-								<span ng-show="areNoSectionsSelectedForDataset(module, module.selectedDataset)">{{resourceBundle.selectDatasetSection}}</span> 
+								<span ng-show="areNoSectionsSelectedForDataset(module.selectedDataset)">{{resourceBundle.selectDatasetSection}}</span> 
 								<h4 ng-class="{cur: true}">{{module.selectedDataset.name}}</h4>
 								<div ng-repeat="section in module.selectedDataset.sections">
 									<div class="collapse-head">
 										<h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">{{section.name}}</h5>
-										<input type="checkbox" ng-change="changeSectionSelection(module, section)" ng-model="module.selectedSections[section.id]">
+										<input type="checkbox" ng-disabled="updateDisabled" ng-change="changeSectionSelection(section)" ng-model="getSection(module.selectedDataset, section.id)['isIncluded']">
 									</div>
 									<div collapse="!isExpanded[section.id]" class="collapse-body">
 										<ul>
 											<li ng-repeat="element in section.dataElements">
 												<label>
-													<input type="checkbox" ng-model="module.selectedDataElements[element.id]" ng-change="changeDataElementSelection(module, section)"> {{element.formName}}
+													<input type="checkbox" ng-disabled="updateDisabled" ng-model="getDataElement(section, element.id)['isIncluded']" ng-change="changeDataElementSelection(section)"> {{element.formName}}
 												</label>
 											</li>
 										</ul>
@@ -55,38 +55,13 @@
 								</div>
 							</section>
 						</div>
-						<div ng-show="!isNewMode">
-							<section class="view-module-details">
-							<div name="left-side" class="content left">
-								<ul>
-									<li ng-repeat="dataset in module.datasets">
-										<span ng-click="selectDataSet(module, dataset)" ng-class="{sel: dataset === module.selectedDataset}">{{dataset.name}}</span>
-									</li>
-								</ul>
-							</div>
-							<div name="right-side" class="content right">
-								<div ng-repeat="section in module.selectedDataset.sections">
-									<div class="collapse-head" style="position:relative">
-										<h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">
-										<i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isExpanded[section.id], 'glyphicon-chevron-right': !isExpanded[section.id]}"></i>{{section.name}} </h5>
-									</div>
-									<div collapse="shouldCollapse(section,module.selectedDataset.sections)">
-										<ul>
-											<li ng-repeat="element in section.dataElements">
-												<label>
-													{{element.formName}}
-												</label>
-											</li>
-										</ul>
-									</div>
-								</div>
-							</div>
 						</section>
 						</div>
 					</li>
 				</ul>
 			</div>
-			<input type="submit" class="btn btn-main pull-right" ng-disabled="form.$invalid || areDatasetsNotSelected(modules) || areNoSectionsSelected(modules)" ng-if="isNewMode" value="Save"/>
+			<input type="button" class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid || areDatasetsNotSelected(modules) || areNoSectionsSelected(modules)" value="Save" ng-if="isNewMode"/>
+			<input type="button" class="btn btn-main pull-right" ng-click="update(modules)" ng-disabled="form.$invalid || areDatasetsNotSelected(modules) || areNoSectionsSelected(modules)" value="Update" ng-if="!isNewMode &amp;&amp; !updateDisabled"/>
 		</form>
 		
 	</div>

@@ -1,31 +1,11 @@
 define(["lodash"], function(_) {
-    var getFilteredDatasets = function(allDatasets, systemSetting, orgUnitId) {
-        systemSettingValue = systemSetting ? systemSetting.value : {};
-        allDatasets = _.map(allDatasets, function(dataset) {
-            dataset.sections = _.map(dataset.sections, function(section) {
-                section.dataElements = _.filter(section.dataElements, function(dataElement) {
-                    var excludedList = systemSettingValue.excludedDataElements;
-                    return excludedList ? !_.contains(excludedList[orgUnitId], dataElement.id) : true;
-                });
-                return section;
-            });
-            return dataset;
-        });
 
-        return _.map(allDatasets, function(dataset) {
-            dataset.sections = _.filter(dataset.sections, function(section) {
-                return section.dataElements.length > 0;
-            });
-            return dataset;
-        });
-    };
+    var enrichDatasets = function(allDatasets, allSections, allDataElements, moduleId, excludedDataElements) {
+        allDatasets = _.cloneDeep(allDatasets);
+        allSections = _.cloneDeep(allSections);
+        allDataElements = _.cloneDeep(allDataElements);
 
-    var enrichDatasets = function(data) {
-        var allDatasets = _.cloneDeep(data[0]);
-        var sections = data[1];
-        var allDataElements = data[2];
-
-        var groupedSections = _.groupBy(sections, function(section) {
+        var groupedSections = _.groupBy(allSections, function(section) {
             return section.dataSet.id;
         });
 
@@ -37,16 +17,23 @@ define(["lodash"], function(_) {
             return dataElement;
         };
 
-        _.each(sections, function(section) {
+        _.each(allSections, function(section) {
             section.dataElements = _.map(section.dataElements, function(dataElement) {
+                dataElement.isIncluded = moduleId && excludedDataElements ? !_.contains(excludedDataElements[moduleId], dataElement.id) : true;
                 return addFormNameToDataElement(dataElement);
             });
         });
 
         _.each(allDatasets, function(dataset) {
             dataset.dataElements = [];
-            dataset.sections = groupedSections[dataset.id];
+            dataset.sections = _.map(groupedSections[dataset.id], function(section) {
+                section.isIncluded = _.any(section.dataElements, {
+                    "isIncluded": true
+                });
+                return section;
+            });
         });
+
         return allDatasets;
     };
 
@@ -59,7 +46,6 @@ define(["lodash"], function(_) {
     };
 
     return {
-        "getFilteredDatasets": getFilteredDatasets,
         "enrichDatasets": enrichDatasets,
         "getAssociatedDatasets": getAssociatedDatasets
     };

@@ -1,24 +1,14 @@
 define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer, testData, _) {
     describe("dataset", function() {
 
-        var datasets, sections, dataelements, data, expectedEnrichedDatasets, systemSettings, expectedFilteredDatasets, enrichedDatasets;
+        it("should enrich datasets", function() {
 
-        beforeEach(function() {
-
+            var datasets, sections, dataelements;
             datasets = testData.get("dataSets");
             sections = testData.get("sections");
             dataelements = testData.get("dataElements");
-            data = [datasets, sections, dataelements];
-            systemSettings = {
-                'key': 'someKey',
-                'value': {
-                    excludedDataElements: {
-                        "mod1": ['DE3']
-                    }
-                }
 
-            };
-            expectedEnrichedDatasets = [{
+            var expectedEnrichedDatasets = [{
                 name: 'OPD',
                 id: 'DS_OPD',
                 organisationUnits: [{
@@ -38,17 +28,21 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                         name: 'OPD',
                         id: 'DS_OPD'
                     },
+                    isIncluded: true,
                     dataElements: [{
                         id: 'DE1',
                         name: 'DE1 - ITFC',
+                        isIncluded: true,
                         formName: 'DE1'
                     }, {
                         id: 'DE2',
                         name: 'DE2 - ITFC',
+                        isIncluded: true,
                         formName: 'DE2'
                     }, {
                         id: 'DE4',
                         name: 'DE4 - ITFC',
+                        isIncluded: true,
                         formName: 'DE4'
                     }]
                 }, {
@@ -57,9 +51,11 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                         name: 'OPD',
                         id: 'DS_OPD'
                     },
+                    isIncluded: true,
                     dataElements: [{
                         id: 'DE1',
                         name: 'DE1 - ITFC',
+                        isIncluded: true,
                         formName: 'DE1'
                     }]
                 }]
@@ -83,86 +79,22 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                         name: 'Vaccination',
                         id: 'Vacc'
                     },
+                    isIncluded: false,
                     dataElements: [{
                         id: 'DE3',
                         name: 'DE3 - ITFC',
+                        isIncluded: false,
                         formName: 'DE3'
                     }]
                 }]
             }];
 
-            expectedFilteredDatasets = [{
-                name: 'OPD',
-                id: 'DS_OPD',
-                organisationUnits: [{
-                    id: 'mod1'
-                }],
-                attributeValues: [{
-                    attribute: {
-                        id: 'wFC6joy3I8Q',
-                        code: 'isNewDataModel'
-                    },
-                    value: 'false'
-                }],
-                dataElements: [],
-                sections: [{
-                    id: 'Sec1',
-                    dataSet: {
-                        name: 'OPD',
-                        id: 'DS_OPD'
-                    },
-                    dataElements: [{
-                        id: 'DE1',
-                        name: 'DE1 - ITFC',
-                        formName: 'DE1'
-                    }, {
-                        id: 'DE2',
-                        name: 'DE2 - ITFC',
-                        formName: 'DE2'
-                    }, {
-                        id: 'DE4',
-                        name: 'DE4 - ITFC',
-                        formName: 'DE4'
-                    }]
-                }, {
-                    id: 'Sec2',
-                    dataSet: {
-                        name: 'OPD',
-                        id: 'DS_OPD'
-                    },
-                    dataElements: [{
-                        id: 'DE1',
-                        name: 'DE1 - ITFC',
-                        formName: 'DE1'
-                    }]
-                }]
-            }, {
-                name: 'Vaccination',
-                id: 'Vacc',
-                organisationUnits: [{
-                    id: 'mod2'
-                }],
-                attributeValues: [{
-                    attribute: {
-                        id: 'wFC6joy3I8Q',
-                        code: 'isNewDataModel'
-                    },
-                    value: 'true'
-                }],
-                dataElements: [],
-                sections: []
-            }];
-
-            enrichedDatasets = _.cloneDeep(expectedEnrichedDatasets);
+            expect(datasetTransformer.enrichDatasets(datasets, sections, dataelements, "mod2", {
+                "mod2": ['DE3'],
+                "mod3": ['DE3']
+            })).toEqual(expectedEnrichedDatasets);
         });
 
-        it("should enrich datasets", function() {
-            expect(datasetTransformer.enrichDatasets(data)).toEqual(expectedEnrichedDatasets);
-        });
-
-        it("should get filtered datasets", function() {
-            expect(datasetTransformer.getFilteredDatasets(enrichedDatasets, systemSettings, "mod1")).toEqual(expectedFilteredDatasets);
-        });
 
         it("should get datasets associated with org units", function() {
 

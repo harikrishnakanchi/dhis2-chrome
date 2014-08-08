@@ -1,97 +1,86 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer) {
     return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, systemSettingRepository, db, $location, $q) {
-        var selectedDataElements = {};
-        var selectedSections = {};
-        var allSections = [];
 
         $scope.isopen = {};
         $scope.modules = [];
         $scope.originalDatasets = [];
         $scope.isExpanded = [];
 
+        var isNewDataModel = function(ds) {
+            var attr = _.find(ds.attributeValues, {
+                "attribute": {
+                    "code": 'isNewDataModel'
+                }
+            });
+            return attr.value === 'true';
+        };
+
         var init = function() {
-            var leftPanedatasets = [];
-
-            var dataSetPromise = getAll('dataSets');
-            var sectionPromise = getAll("sections");
-            var dataElementsPromise = getAll("dataElements");
-
             var setUpData = function(data) {
                 $scope.originalDatasets = data[0];
-                allSections = data[1];
-                $scope.allDatasets = datasetTransformer.enrichDatasets(data);
+                var excludedDataElements = data[3] && data[3].value && data[3].value.excludedDataElements ? data[3].value.excludedDataElements : {};
+                $scope.allDatasets = datasetTransformer.enrichDatasets(data[0], data[1], data[2], $scope.orgUnit.id, excludedDataElements);
+
             };
 
             var setUpForm = function() {
                 var setUpNewMode = function() {
-                    _.each(allSections, function(section) {
-                        selectedSections[section.id] = true;
-                        _.each(section.dataElements, function(dataElement) {
-                            selectedDataElements[dataElement.id] = true;
-                        });
-                    });
                     orgUnitRepository.getAll().then(function(allOrgUnits) {
                         $scope.allModules = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
                     });
+
                     $scope.addModules();
                 };
 
-                var setUpViewMode = function() {
+                var setUpEditMode = function() {
                     var associatedDatasets = datasetTransformer.getAssociatedDatasets($scope.orgUnit, $scope.allDatasets);
-                    var systemSettingsPromise = systemSettingRepository.getAllWithProjectId($scope.orgUnit.parent.id);
-                    systemSettingsPromise.then(function(systemSetting) {
-                        var datasets = datasetTransformer.getFilteredDatasets(associatedDatasets, systemSetting, $scope.orgUnit.id);
-                        $scope.modules.push({
-                            'name': $scope.orgUnit.name,
-                            'datasets': datasets,
-                            'selectedDataset': datasets[0]
+                    var nonAssociatedDatasets = _.reject($scope.allDatasets, function(d) {
+                        return !isNewDataModel(d) || _.any(associatedDatasets, {
+                            "id": d.id
                         });
                     });
+
+                    $scope.modules.push({
+                        'id': $scope.orgUnit.id,
+                        'name': $scope.orgUnit.name,
+                        'allDatasets': nonAssociatedDatasets,
+                        'datasets': associatedDatasets,
+                        'selectedDataset': associatedDatasets[0]
+                    });
+
+                    $scope.updateDisabled = !_.all(associatedDatasets, isNewDataModel);
                 };
 
                 if ($scope.isNewMode) {
                     setUpNewMode();
                 } else {
-                    setUpViewMode();
+                    setUpEditMode();
                 }
             };
 
-            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise]);
+            var getAll = function(storeName) {
+                var store = db.objectStore(storeName);
+                return store.getAll();
+            };
+
+            var dataSetPromise = getAll('dataSets');
+            var sectionPromise = getAll("sections");
+            var dataElementsPromise = getAll("dataElements");
+            var systemSettingsPromise = systemSettingRepository.getAllWithProjectId($scope.orgUnit.parent.id);
+
+            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, systemSettingsPromise]);
             getAllData.then(setUpData).then(setUpForm);
         };
 
-        var initDataElementSelection = function(module, sections) {
-            _.each(sections, function(section) {
-                module.selectedSections[section.id] = true;
-                _.each(section.dataElements, function(dataElement) {
-                    module.selectedDataElements[dataElement.id] = true;
-                });
+        $scope.getSection = function(selectedDataSet, sectionId) {
+            return _.find(selectedDataSet.sections, {
+                "id": sectionId
             });
         };
 
-        var getAll = function(storeName) {
-            var store = db.objectStore(storeName);
-            return store.getAll();
-        };
-
-        $scope.addModules = function() {
-            var isNewDataModel = function(ds) {
-                var attr = _.find(ds.attributeValues, {
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    }
-                });
-                return attr.value === 'true';
-            };
-            var newDataModels = _.filter($scope.allDatasets, isNewDataModel);
-
-            $scope.modules.push({
-                'openingDate': moment().format("YYYY-MM-DD"),
-                'datasets': [],
-                'allDatasets': _.cloneDeep(newDataModels, true),
-                'selectedDataset': {},
-                'selectedSections': _.cloneDeep(selectedSections),
-                'selectedDataElements': _.cloneDeep(selectedDataElements)
+        $scope.getDataElement = function(section, dataElementId) {
+            return _.find(section.dataElements, {
+                "id": dataElementId
             });
         };
 
@@ -110,12 +99,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
         };
 
-        $scope.excludeDataElements = function(enrichedModules) {
-            var parent = $scope.orgUnit;
-            var systemSettings = systemSettingsTransformer.constructSystemSettings(enrichedModules, parent);
+        $scope.excludeDataElements = function(projectId, enrichedModules) {
+            var systemSettings = systemSettingsTransformer.constructSystemSettings(enrichedModules);
             var payload = {
-                projectId: parent.id,
-                settings: systemSettings
+                "projectId": projectId,
+                "settings": systemSettings
             };
             return $q.all(systemSettingRepository.upsert(payload), publishMessage(payload, "excludeDataElements")).then(function() {
                 return enrichedModules;
@@ -140,13 +128,24 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             $scope.saveFailure = true;
         };
 
-
         $scope.save = function(modules) {
-            var enrichedModules = {};
-            $scope.createModules(modules).then($scope.associateDatasets).then($scope.excludeDataElements).then($scope.onSuccess, $scope.onError);
+            $scope.createModules(modules).then($scope.associateDatasets).then(_.curry($scope.excludeDataElements)($scope.orgUnit.id)).then($scope.onSuccess, $scope.onError);
         };
 
-        $scope.delete = function(index) {
+        $scope.update = function(modules) {
+            $scope.excludeDataElements($scope.orgUnit.parent.id, modules).then($scope.onSuccess, $scope.onError);
+        };
+
+        $scope.addModules = function() {
+            $scope.modules.push({
+                'openingDate': moment().format("YYYY-MM-DD"),
+                'datasets': [],
+                'allDatasets': _.filter($scope.allDatasets, isNewDataModel),
+                'selectedDataset': {}
+            });
+        };
+
+        $scope.deleteModule = function(index) {
             $scope.modules.splice(index, 1);
         };
 
@@ -158,32 +157,30 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.areNoSectionsSelected = function(modules) {
             return _.any(modules, function(module) {
-                return _.any(module.datasets, function(set) {
-                    return _.all(set.sections, function(section) {
-                        return !module.selectedSections[section.id];
-                    });
+                return _.any(module.datasets, function(dataSet) {
+                    return $scope.areNoSectionsSelectedForDataset(dataSet);
                 });
             });
         };
 
-        $scope.areNoSectionsSelectedForDataset = function(module, dataset) {
+        $scope.areNoSectionsSelectedForDataset = function(dataset) {
             return _.all(dataset.sections, function(section) {
-                return module.selectedSections && !module.selectedSections[section.id];
+                return _.all(section.dataElements, {
+                    "isIncluded": false
+                });
             });
         };
 
-        $scope.changeSectionSelection = function(module, section) {
+        $scope.changeSectionSelection = function(section) {
             _.each(section.dataElements, function(dataElement) {
-                module.selectedDataElements[dataElement.id] = module.selectedSections[section.id];
+                dataElement.isIncluded = section.isIncluded;
             });
         };
 
-        $scope.changeDataElementSelection = function(module, section) {
-            var selected = false;
-            _.each(section.dataElements, function(dataElement) {
-                selected = selected || module.selectedDataElements[dataElement.id];
+        $scope.changeDataElementSelection = function(section) {
+            section.isIncluded = _.any(section.dataElements, {
+                "isIncluded": true
             });
-            module.selectedSections[section.id] = selected;
         };
 
         $scope.selectDataSet = function(module, item) {
@@ -196,16 +193,14 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.discardDataSet = function(module, items) {
             _.each(items, function(dataset) {
-                initDataElementSelection(module, dataset.sections);
+                _.each(dataset.sections, function(section) {
+                    section.isIncluded = true;
+                    _.each(section.dataElements, function(dataElement) {
+                        dataElement.isIncluded = true;
+                    });
+                });
             });
             module.selectedDataset = undefined;
-        };
-
-        $scope.shouldCollapse = function(current, allSections) {
-            if ($scope.isExpanded[current.id] === undefined && allSections[0].id === current.id) {
-                $scope.isExpanded[current.id] = true;
-            }
-            return !$scope.isExpanded[current.id];
         };
 
         init();

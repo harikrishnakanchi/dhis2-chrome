@@ -129,8 +129,6 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 openingDate: moment().format("YYYY-MM-DD"),
                 selectedDataset: module.selectedDataset,
                 datasets: module.datasets,
-                selectedSections: module.selectedSections,
-                selectedDataElements: module.selectedDataElements,
                 attributeValues: [{
                     attribute: {
                         "code": "Type",

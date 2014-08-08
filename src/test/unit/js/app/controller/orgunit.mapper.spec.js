@@ -222,8 +222,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 level: 4,
                 openingDate: "2010-01-01",
                 selectedDataset: undefined,
-                selectedSections: undefined,
-                selectedDataElements: undefined,
                 attributeValues: [{
                     attribute: {
                         code: "Type",
@@ -250,8 +248,6 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 level: 4,
                 openingDate: "2010-01-01",
                 selectedDataset: undefined,
-                selectedSections: undefined,
-                selectedDataElements: undefined,
                 attributeValues: [{
                     attribute: {
                         code: "Type",

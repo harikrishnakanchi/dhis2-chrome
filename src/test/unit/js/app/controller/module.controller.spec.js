@@ -1,9 +1,6 @@
 /*global Date:true*/
-
-
 define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer"], function(ModuleController, mocks, utils, testData, datasetTransformer) {
     describe("module controller", function() {
-
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
             dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, hustle, dataSetRepo, systemSettingRepo;
 
@@ -34,9 +31,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 objectStore: function() {}
             };
 
-            scope.orgUnit = {
-                id: "blah"
-            };
             _Date = Date;
             todayStr = "2014-04-01";
             today = new Date(todayStr);
@@ -67,7 +61,10 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             scope.orgUnit = {
                 'name': 'SomeName',
-                'id': 'someId'
+                'id': 'someId',
+                "parent": {
+                    "id": "blah1"
+                }
             };
             scope.isNewMode = true;
 
@@ -107,7 +104,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 'name': 'Module4'
             }];
 
-            scope.delete(2);
+            scope.deleteModule(2);
             scope.$apply();
 
             expect(scope.modules[0].name).toEqual('Module1');
@@ -122,15 +119,20 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var modules = [{
                 name: "test1",
                 id: projectId,
-                selectedDataElements: {
-                    "123456": true,
-                    "123457": false,
-                    "123458": true,
-                    "123459": true,
-                    "123452": false,
-                    "123450": true,
-                    "123451": true,
-                }
+                datasets: [{
+                    sections: [{
+                        dataElements: [{
+                            "id": "1",
+                            "isIncluded": false
+                        }, {
+                            "id": "2",
+                            "isIncluded": true
+                        }, {
+                            "id": "3",
+                            "isIncluded": false
+                        }]
+                    }]
+                }]
             }];
 
             scope.orgUnit = {
@@ -140,7 +142,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var expectedSystemSettings = {
                 "excludedDataElements": {
-                    "1": ["123452", "123457"]
+                    "1": ["1", "3"]
                 }
             };
 
@@ -195,8 +197,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     level: NaN,
                     openingDate: '2014-04-01',
                     selectedDataset: undefined,
-                    selectedSections: undefined,
-                    selectedDataElements: undefined,
                     attributeValues: [{
                         attribute: {
                             code: "Type",
@@ -278,7 +278,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             scope.save(modules);
             scope.$apply();
-
             expect(scope.saveFailure).toBe(false);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: expectedDatasets,
@@ -288,139 +287,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(dataSetRepo.upsert).toHaveBeenCalledWith(expectedDatasets);
         });
 
-        it("should set datasets associated with module for view", function() {
+        it("should set datasets associated with module for edit", function() {
 
-            var dataSets = [{
-                name: 'OPD',
-                id: 'DS_OPD',
-                organisationUnits: [{
-                    id: 'Module1'
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "id": "wFC6joy3I8Q",
-                        "name": "currentDataModel",
-                        "created": "2014-05-30T09:38:35.398+0000",
-                        "lastUpdated": "2014-05-30T09:38:35.398+0000"
-                    },
-                    "value": "true"
-                }],
-                sections: [{
-                    id: 'Sec1',
-                    dataSet: {
-                        id: "Module1"
-                    },
-                    dataElements: [{
-                        id: 'DE1',
-                        name: 'DE1 - ITFC'
-                    }, {
-                        id: 'DE2',
-                        name: 'DE2 - ITFC'
-                    }, {
-                        id: 'DE4',
-                        name: 'DE4 - ITFC'
-                    }]
-                }]
-            }];
-
-            var systemSettings = {
-                "key": "123",
-                "value": {
-                    "excludedDataElements": {
-                        "Mod2Id": ['DE4']
-                    }
-                }
-            };
-
-            var expectedModule = {
-                name: 'Mod2',
-                datasets: [{
-                    name: 'OPD',
-                    id: 'DS_OPD',
-                    organisationUnits: [{
-                        id: 'Module1'
-                    }],
-                    attributeValues: [{
-                        attribute: {
-                            id: 'wFC6joy3I8Q',
-                            name: 'currentDataModel',
-                            created: '2014-05-30T09:38:35.398+0000',
-                            lastUpdated: '2014-05-30T09:38:35.398+0000'
-                        },
-                        value: 'true'
-                    }],
-                    sections: [{
-                        id: 'Sec1',
-                        dataSet: {
-                            id: 'Module1'
-                        },
-                        dataElements: [{
-                            id: 'DE1',
-                            name: 'DE1 - ITFC'
-                        }, {
-                            id: 'DE2',
-                            name: 'DE2 - ITFC'
-                        }]
-                    }]
-                }],
-                selectedDataset: {
-                    name: 'OPD',
-                    id: 'DS_OPD',
-                    organisationUnits: [{
-                        id: 'Module1'
-                    }],
-                    attributeValues: [{
-                        attribute: {
-                            id: 'wFC6joy3I8Q',
-                            name: 'currentDataModel',
-                            created: '2014-05-30T09:38:35.398+0000',
-                            lastUpdated: '2014-05-30T09:38:35.398+0000'
-                        },
-                        value: 'true'
-                    }],
-                    sections: [{
-                        id: 'Sec1',
-                        dataSet: {
-                            id: 'Module1'
-                        },
-                        dataElements: [{
-                            id: 'DE1',
-                            name: 'DE1 - ITFC'
-                        }, {
-                            id: 'DE2',
-                            name: 'DE2 - ITFC'
-                        }]
-                    }]
-                }
-            };
-
-            scope.orgUnit = {
-                "name": "Mod2",
-                "id": "Mod2Id",
-                "parent": {
-                    id: "test"
-                }
-            };
-
-            scope.isNewMode = false;
-
-            spyOn(datasetTransformer, "getAssociatedDatasets").and.returnValue(dataSets);
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, systemSettings));
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
-            scope.$apply();
-
-            expect(scope.modules[0].name).toEqual("Mod2");
-            expect(scope.modules[0]).toEqual(expectedModule);
-            expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith("test");
-        });
-
-        it("should return true if datasets for modules not selected", function() {
-            var modules = [{
-                'name': "Module1",
-                'datasets': []
-            }];
-
-            expect(scope.areDatasetsNotSelected(modules)).toEqual(true);
         });
 
         it("should return false if datasets for modules are selected", function() {
@@ -448,17 +316,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should de-select all data elements if the section containing it is de-selected", function() {
-            var module = {
-                "selectedDataElements": {
-                    "test1": true,
-                    "test2": true,
-                    "test3": true
-                },
-                "selectedSections": {
-                    "sec1": true
-                }
-            };
-
             var section = {
                 'id': "sec1",
                 "dataElements": [{
@@ -467,37 +324,30 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     'id': "test2"
                 }, {
                     'id': "test3"
-                }]
+                }],
+                isIncluded: false
             };
 
-            var expectedModule = {
-                "selectedDataElements": {
-                    "test1": false,
-                    "test2": false,
-                    "test3": false
-                },
-                "selectedSections": {
-                    "sec1": false
-                }
+            var expectedSection = {
+                id: 'sec1',
+                dataElements: [{
+                    id: 'test1',
+                    isIncluded: false
+                }, {
+                    id: 'test2',
+                    isIncluded: false
+                }, {
+                    id: 'test3',
+                    isIncluded: false
+                }],
+                isIncluded: false
             };
 
-            module.selectedSections.sec1 = false;
-            scope.changeSectionSelection(module, section);
-            expect(module).toEqual(expectedModule);
+            scope.changeSectionSelection(section);
+            expect(section).toEqual(expectedSection);
         });
 
         it("should de-select the section if all data elements under it are de-selected", function() {
-            var module = {
-                "selectedDataElements": {
-                    "test1": true,
-                    "test2": true,
-                    "test3": true
-                },
-                "selectedSections": {
-                    "sec1": true
-                }
-            };
-
             var section = {
                 'id': "sec1",
                 "dataElements": [{
@@ -509,61 +359,28 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             };
 
-            var expectedModule = {
-                "selectedDataElements": {
-                    "test1": false,
-                    "test2": false,
-                    "test3": false
-                },
-                "selectedSections": {
-                    "sec1": false
-                }
-            };
-
-            module.selectedDataElements.test1 = false;
-            module.selectedDataElements.test2 = false;
-            module.selectedDataElements.test3 = false;
-            scope.changeDataElementSelection(module, section);
-            expect(module).toEqual(expectedModule);
-        });
-
-        it("should select a dataset", function() {
-            var module = {
-                "selectedDataElements": {
-                    "test1": true,
-                    "test2": true,
-                    "test3": true
-                },
-                "selectedSections": {
-                    "sec1": true
-                }
-            };
-            var dataset = {
-                name: "Malaria",
-                id: "dataset_1",
-                sections: [{
-                    'id': 'Id1'
+            var expectedSection = {
+                id: 'sec1',
+                dataElements: [{
+                    id: 'test1'
                 }, {
-                    'id': 'Id2'
-                }]
+                    id: 'test2'
+                }, {
+                    id: 'test3'
+                }],
+                isIncluded: false
             };
-            scope.selectDataSet(module, dataset);
-            expect(module.selectedDataset).toEqual(dataset);
-            expect(scope.isExpanded.Id1).toEqual(true);
-            expect(scope.isExpanded.Id2).toEqual(false);
+
+            scope.changeDataElementSelection(section);
+            expect(section).toEqual(expectedSection);
         });
 
         it("should select a dataset", function() {
+
             var module = {
-                "selectedDataElements": {
-                    "test1": true,
-                    "test2": true,
-                    "test3": true
-                },
-                "selectedSections": {
-                    "sec1": true
-                }
+                "id": "mod1"
             };
+
             var dataset = {
                 name: "Malaria",
                 id: "dataset_1",
@@ -581,16 +398,24 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should return true if no section is selected from each dataset", function() {
             var module = {
-                "selectedSections": {
-                    "someId": true
-                },
-                "datasets": [{
+                datasets: [{
                     "sections": [{
                         "name": "section1",
-                        "id": "section_1"
+                        "id": "section_1",
+                        "dataElements": [{
+                            "id": "de1",
+                            "isIncluded": false
+                        }, {
+                            "id": "de2",
+                            "isIncluded": false
+                        }]
                     }, {
                         "name": "section2",
-                        "id": "section_2"
+                        "id": "section_2",
+                        "dataElements": [{
+                            "id": "de3",
+                            "isIncluded": false
+                        }]
                     }]
                 }]
             };
@@ -599,23 +424,26 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should return false if any one section is selected from each dataset", function() {
+
             var module = {
-                "selectedSections": {
-                    "section_1": true,
-                    "section_3": true
-                },
-                "datasets": [{
+                datasets: [{
                     "sections": [{
                         "name": "section1",
-                        "id": "section_1"
+                        "id": "section_1",
+                        "dataElements": [{
+                            "id": "de1",
+                            "isIncluded": true
+                        }, {
+                            "id": "de2",
+                            "isIncluded": true
+                        }]
                     }, {
                         "name": "section2",
-                        "id": "section_2"
-                    }]
-                }, {
-                    "sections": [{
-                        "name": "section3",
-                        "id": "section_3"
+                        "id": "section_2",
+                        "dataElements": [{
+                            "id": "de3",
+                            "isIncluded": false
+                        }]
                     }]
                 }]
             };
@@ -624,68 +452,55 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should return true if no section is selected for dataset", function() {
+
             var dataset = {
                 "sections": [{
                     "name": "section1",
-                    "id": "section_1"
+                    "id": "section_1",
+                    "dataElements": [{
+                        "id": "de1",
+                        "isIncluded": false
+                    }, {
+                        "id": "de2",
+                        "isIncluded": false
+                    }]
                 }, {
                     "name": "section2",
-                    "id": "section_2"
+                    "id": "section_2",
+                    "dataElements": [{
+                        "id": "de3",
+                        "isIncluded": false
+                    }]
                 }]
             };
 
-            var module = {
-                "selectedSections": {
-                    "someId": true
-                },
-            };
-
-            expect(scope.areNoSectionsSelectedForDataset(module, dataset)).toEqual(true);
+            expect(scope.areNoSectionsSelectedForDataset(dataset)).toEqual(true);
         });
 
         it("should return false if any one section is selected for dataset", function() {
+
             var dataset = {
                 "sections": [{
                     "name": "section1",
-                    "id": "section_1"
+                    "id": "section_1",
+                    "dataElements": [{
+                        "id": "de1",
+                        "isIncluded": true
+                    }, {
+                        "id": "de2",
+                        "isIncluded": false
+                    }]
                 }, {
                     "name": "section2",
-                    "id": "section_2"
+                    "id": "section_2",
+                    "dataElements": [{
+                        "id": "de3",
+                        "isIncluded": false
+                    }]
                 }]
             };
 
-            var module = {
-                "selectedSections": {
-                    "section_1": true
-                },
-            };
-
-            expect(scope.areNoSectionsSelectedForDataset(module, dataset)).toEqual(false);
-        });
-
-        it("should not collapse the first section", function() {
-            var currentSection = {
-                "name": "test",
-                "id": 2,
-                "lastName": "testing"
-            };
-
-            var allSections = [{
-                "name": "test",
-                "id": 2
-            }, {
-                "name": "test1",
-                "id": 3
-            }, {
-                "name": "test2",
-                "id": 4
-            }];
-
-            scope.shouldCollapse(currentSection, allSections);
-
-            expect(scope.isExpanded[2]).toEqual(true);
-            expect(scope.isExpanded[3]).toEqual(undefined);
-            expect(scope.isExpanded[4]).toEqual(undefined);
+            expect(scope.areNoSectionsSelectedForDataset(dataset)).toEqual(false);
         });
     });
 });

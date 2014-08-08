@@ -3,37 +3,32 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
 
         var modules, parent, expectedSystemSettings;
 
-
-        beforeEach(function() {
-
+        it("should construct system settings", function() {
             modules = [{
-                name: "test1",
-                id: 1,
-                selectedDataElements: {
-                    "123456": true,
-                    "123457": false,
-                    "123458": true,
-                    "123459": true,
-                    "123452": false,
-                    "123450": true,
-                    "123451": true,
-                }
+                name: "mod1 name",
+                id: "mod1",
+                datasets: [{
+                    sections: [{
+                        dataElements: [{
+                            "id": "1",
+                            "isIncluded": true
+                        }, {
+                            "id": "2",
+                            "isIncluded": false
+                        }, {
+                            "id": "3",
+                            "isIncluded": true
+                        }]
+                    }]
+                }]
             }];
-
-            parent = {
-                name: "testParent",
-                id: 1
-            };
 
             expectedSystemSettings = {
                 "excludedDataElements": {
-                    "1": ["123452", "123457"]
+                    "mod1": ["2"]
                 }
             };
-        });
-
-        it("should construct system settings", function() {
-            expect(systemSettingsTransformer.constructSystemSettings(modules, parent)).toEqual(expectedSystemSettings);
+            expect(systemSettingsTransformer.constructSystemSettings(modules)).toEqual(expectedSystemSettings);
         });
     });
 });
