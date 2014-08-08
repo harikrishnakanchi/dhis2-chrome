@@ -279,18 +279,16 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             it("should evaluate expression on blur", function() {
                 scope.dataValues = {
-                    "abc": {
                         "blah": {
                             "some": {
                                 "value": "1+9"
                             }
                         }
-                    }
                 };
 
-                scope.evaluateExpression("abc", "blah", "some");
+                scope.evaluateExpression("blah", "some");
 
-                expect(scope.dataValues.abc.blah.some.value).toEqual(10);
+                expect(scope.dataValues.blah.some.value).toEqual(10);
             });
 
             it("should group sections based on datasets", function() {
@@ -489,15 +487,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             it("safe get dataValues should initialize data value and option if not present", function() {
                 var dataValues = {};
-                var result = scope.safeGet("abc", dataValues, "blah", "someOption");
+                var result = scope.safeGet(dataValues, "blah", "someOption");
 
                 expect(dataValues).toEqual({
-                    abc: {
-                        blah: {
-                            someOption: {
-                                formula: '',
-                                value: ''
-                            }
+                    blah: {
+                        someOption: {
+                            formula: '',
+                            value: ''
                         }
                     }
                 });
@@ -509,23 +505,19 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             it("safe get dataValues should return if already present", function() {
                 var dataValues = {
-                    "abc": {
-                        "blah": {
-                            "someOption": "test"
-                        }
+                    "blah": {
+                        "someOption": "test"
                     }
                 };
 
-                var result = scope.safeGet("abc", dataValues, "blah", "someOption");
+                var result = scope.safeGet(dataValues, "blah", "someOption");
 
                 expect(dataValues).toEqual({
-                    abc: {
-                        blah: {
-                            someOption: 'test'
-                        }
+                    blah: {
+                        someOption: 'test'
                     }
                 });
-                expect(result).toEqual(dataValues.abc.blah.someOption);
+                expect(result).toEqual(dataValues.blah.someOption);
             });
 
             it("should fetch data only if period is defined", function() {
@@ -549,7 +541,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     'id': 'Mod1'
                 };
                 spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
-
                 scope.$apply();
 
                 expect(dataRepository.getDataValues).toHaveBeenCalledWith('2014W14', 'Mod1');
@@ -589,16 +580,14 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
                 expect(dataRepository.getDataValues).toHaveBeenCalledWith("2014W14", "mod2");
                 expect(scope.dataValues).toEqual({
-                    abbc: {
-                        DE_Oedema: {
-                            32: {
-                                formula: '3',
-                                value: '3'
-                            },
-                            33: {
-                                formula: '12',
-                                value: '12'
-                            }
+                    DE_Oedema: {
+                        32: {
+                            formula: '3',
+                            value: '3'
+                        },
+                        33: {
+                            formula: '12',
+                            value: '12'
                         }
                     }
                 });
