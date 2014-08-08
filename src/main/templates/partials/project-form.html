@@ -106,7 +106,8 @@
 						<td> {{user.userCredentials.username}}</td>
 						<td> {{user.roles}}</td>
 						<td>
-						<a href="" title="Delete" class="delete" ng-click="toggleUserDisabledState(user)">
+
+						<a href="" title="Delete" class="delete" ng-if="user.roles != 'Superuser'" ng-click="toggleUserDisabledState(user)">
 							<span class="glyphicon glyphicon-remove" ng-show="!user.userCredentials.disabled"></span>
 							<span class="glyphicon glyphicon-ok" ng-show="user.userCredentials.disabled"></span>
 						</a> 
