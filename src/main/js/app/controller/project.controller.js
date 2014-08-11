@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, orgUnitMapper, toTree, properties) {
 
-    return function($scope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal) {
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal) {
 
         $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded', 'Coordination', 'Remote Control'].sort();
 
@@ -50,7 +50,10 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         };
 
         var saveToDbAndPublishMessage = function(dhisProject) {
+            
+
             var onSuccess = function(data) {
+                $rootScope.$broadcast('resetProjects');
                 if ($scope.$parent.closeNewForm)
                     $scope.$parent.closeNewForm(data, "savedProject");
             };

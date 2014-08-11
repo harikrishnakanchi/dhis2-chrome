@@ -65,22 +65,26 @@ define(["lodash"], function(_) {
             return userRepository.upsert($rootScope.currentUser).then(saveUserPreferences);
         };
 
+        var resetProjects = function() {
+            var assignCurrentProject = function() {
+                if ($scope.oldUserProject) {
+                    $scope.oldUserProject = _.find($scope.projects, {
+                        "id": $scope.oldUserProject.id
+                    });
+                    $scope.currentUserProject = $scope.oldUserProject;
+                }
+            };
+
+            orgUnitRepository.getAllProjects().then(function(orgUnits) {
+                $scope.projects = orgUnits;
+            }).then(assignCurrentProject);
+        };
+
         $rootScope.$watch("currentUser.organisationUnits", function() {
             if ($rootScope.currentUser && !$scope.oldUserProject) {
                 var orgUnits = $rootScope.currentUser.organisationUnits;
                 $scope.oldUserProject = orgUnits[0];
-                var assignCurrentProject = function() {
-                    if ($scope.oldUserProject) {
-                        $scope.oldUserProject = _.find($scope.projects, {
-                            "id": $scope.oldUserProject.id
-                        });
-                        $scope.currentUserProject = $scope.oldUserProject;
-                    }
-                };
-
-                orgUnitRepository.getAllProjects().then(function(orgUnits) {
-                    $scope.projects = orgUnits;
-                }).then(assignCurrentProject);
+                resetProjects();
             }
         }, true);
 
@@ -92,12 +96,10 @@ define(["lodash"], function(_) {
             $scope.oldUserProject = undefined;
         };
 
+        $rootScope.$on('resetProjects', resetProjects);
+
         var init = function() {
-            metadataService.loadMetadataFromFile().then(function() {
-                orgUnitRepository.getAllProjects().then(function(orgUnits) {
-                    $scope.projects = orgUnits;
-                });
-            });
+            metadataService.loadMetadataFromFile().then(resetProjects);
         };
 
         init();

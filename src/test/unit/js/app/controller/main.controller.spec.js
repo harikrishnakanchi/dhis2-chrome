@@ -139,13 +139,20 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                         "id": "123"
                     }]
                 };
-                scope.currentUserProject = {
+                var current = {
                     "id": 321,
                     "name": "Prj1"
                 };
-                scope.oldUserProject = {
+                var old = {
                     "id": "123"
                 };
+                
+                scope.currentUserProject = current;
+                scope.oldUserProject = old;
+                
+                var projectList = [current , old];
+                getAllProjectsSpy.and.returnValue(utils.getPromise(q, projectList));
+
                 spyOn(userRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(userPreferenceRepository, "save");
 
@@ -153,11 +160,11 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 scope.$apply();
 
                 expect(userRepository.upsert).toHaveBeenCalledWith(rootScope.currentUser);
-                expect(rootScope.currentUser.organisationUnits).toEqual([scope.currentUserProject]);
+                expect(rootScope.currentUser.organisationUnits).toEqual([current]);
                 expect(userPreferenceRepository.save).toHaveBeenCalledWith({
                     "username": '1',
                     "locale": "en",
-                    "orgUnits": [scope.currentUserProject]
+                    "orgUnits": [current]
                 });
             });
 

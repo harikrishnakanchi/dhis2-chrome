@@ -3,11 +3,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
     describe("project controller tests", function() {
 
         var scope, timeout, q, location, anchorScroll, userRepository,
-            fakeModal, orgUnitRepo, hustle;
+            fakeModal, orgUnitRepo, hustle, rootScope;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
             scope = $rootScope.$new();
+            rootScope = $rootScope;
             hustle = $hustle;
             q = $q;
             timeout = $timeout;
@@ -40,27 +41,29 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             };
 
             anchorScroll = jasmine.createSpy();
-            projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
         }));
 
-        it("should save project in dhis", function() {
-
+        it("should save project in dhis", function(done) {
             var expectedNewOrgUnit = {
                 "id": "blah"
             };
-
             spyOn(orgUnitMapper, "mapToProjectForDhis").and.returnValue(expectedNewOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
+            rootScope.$on('resetProjects', function() {
+                expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    data: expectedNewOrgUnit,
+                    type: "upsertOrgUnit"
+                }, "dataValues");
 
+                done();
+            });
             scope.save(newOrgUnit, parent);
             scope.$apply();
+            rootScope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                data: expectedNewOrgUnit,
-                type: "upsertOrgUnit"
-            }, "dataValues");
         });
 
         it("should display error if saving organization unit fails", function() {
@@ -223,7 +226,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             scope.isNewMode = false;
 
-            projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });
@@ -284,7 +287,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             }];
             spyOn(userRepository, "getAllProjectUsers").and.returnValue(utils.getPromise(q, users));
 
-            projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
             scope.$apply();
 
             expect(scope.projectUsers).toEqual(expectedUsers);
@@ -306,7 +309,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             spyOn(fakeModal, 'open').and.returnValue({
                 result: utils.getRejectedPromise(q, {})
             });
-            projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
             var user = {
                 id: '123',
                 name: "blah blah",
@@ -325,7 +328,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 result: utils.getPromise(q, {})
             });
 
-            projectController = new ProjectController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
 
             var user = {
                 id: '123',
