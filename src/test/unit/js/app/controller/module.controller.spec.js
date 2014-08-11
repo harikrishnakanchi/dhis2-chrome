@@ -288,7 +288,67 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should set datasets associated with module for edit", function() {
+            scope.orgUnit = {
+                "id": "mod2",
+                "parent": {
+                    "id": "par1"
+                }
+            };
+            scope.isNewMode = false;
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
 
+            scope.$apply();
+
+            expect(scope.modules[0].datasets.length).toEqual(1);
+            expect(scope.modules[0].allDatasets.length).toEqual(0);
+            expect(scope.modules[0].selectedDataset).toEqual(scope.modules[0].datasets[0]);
+        });
+
+        it("should update module", function() {
+            scope.orgUnit = {
+                "id": "mod2",
+                "parent": {
+                    "id": "par1"
+                }
+            };
+            scope.isNewMode = false;
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
+            spyOn(scope, "excludeDataElements").and.returnValue(utils.getPromise(q, []));
+
+            scope.update(scope.modules);
+            scope.$apply();
+
+            expect(scope.excludeDataElements).toHaveBeenCalledWith('par1', scope.modules);
+        });
+
+        it("should exclude modules", function() {
+            var modules = [{
+                "id": "mod1"
+            }];
+
+            scope.excludeDataElements("proj1", modules);
+
+            var expectedSystemSettings = {
+                projectId: 'proj1',
+                settings: {
+                    excludedDataElements: {
+                        mod1: []
+                    }
+                }
+            };
+            var expectedMessage = {
+                data: {
+                    projectId: 'proj1',
+                    settings: {
+                        excludedDataElements: {
+                            mod1: []
+                        }
+                    }
+                },
+                type: 'excludeDataElements'
+            };
+            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettings);
+            expect(hustle.publish).toHaveBeenCalledWith(expectedMessage, 'dataValues');
         });
 
         it("should return false if datasets for modules are selected", function() {
