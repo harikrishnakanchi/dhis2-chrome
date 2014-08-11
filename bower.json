@@ -5,7 +5,7 @@
     "keywords": ["dhis2"],
     "dependencies": {
         "requirejs": null,
-        "q": "1.0.0",
+        "q": "1.0.1",
         "angular": null,
         "angular-resource": null,
         "angular-indexedDB": "https://github.com/DWB-eHealth/angular-indexedDB.git",

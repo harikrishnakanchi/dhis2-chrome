@@ -24,7 +24,7 @@
 
 					<div class="col-sm-6 col-md-6">
 						<p class="input-group">
-						<div><input type="date" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required></div>
+						<div><input type="date" ng-disabled="!isNewMode" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required></div>
 						<div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid || isAfterMaxDate()">
 							<span ng-show="createForm.newOrgUnitOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
 							<span ng-show="isAfterMaxDate()" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
