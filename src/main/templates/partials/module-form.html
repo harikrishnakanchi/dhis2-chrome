@@ -62,6 +62,7 @@
 			</div>
 			<input type="button" class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid || areDatasetsNotSelected(modules) || areNoSectionsSelected(modules)" value="Save" ng-if="isNewMode"/>
 			<input type="button" class="btn btn-main pull-right" ng-click="update(modules)" ng-disabled="form.$invalid || areDatasetsNotSelected(modules) || areNoSectionsSelected(modules)" value="Update" ng-if="!isNewMode &amp;&amp; !updateDisabled"/>
+			<input type="button" class="btn btn-main pull-right" ng-click="disable(modules)"  value="Disable" ng-if="!isNewMode &amp;&amp; !updateDisabled"/>
 		</form>
 		
 	</div>

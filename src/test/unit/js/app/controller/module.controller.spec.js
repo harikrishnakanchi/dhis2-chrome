@@ -562,5 +562,38 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             expect(scope.areNoSectionsSelectedForDataset(dataset)).toEqual(false);
         });
+
+        it("should disable modules", function() {
+            var modules = [{
+                name: "test1",
+                id: "projectId",
+                datasets: [],
+                attributeValues: []
+            }];
+
+            var expectedModules = [{
+                name: "test1",
+                id: "projectId",
+                datasets: [],
+                attributeValues: [{
+                    attribute: {
+                        code: 'isDisabled',
+                        name: 'Is Disabled',
+                        id: 'HLcCYZ1pPQx'
+                    },
+                    value: true
+                }]
+            }];
+            var expectedHustleMessage = {
+                data: expectedModules,
+                type: "upsertOrgUnit"
+            };
+
+
+            scope.disable(modules);
+
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModules);
+            expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
+        });
     });
 });

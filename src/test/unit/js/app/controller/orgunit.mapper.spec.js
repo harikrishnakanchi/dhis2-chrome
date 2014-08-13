@@ -432,7 +432,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }],
             };
 
-            var payload = orgUnitMapper.disableOrgUnitPayload([module]);
+            var payload = orgUnitMapper.disable([module]);
             expect(payload).toEqual([expectedModule]);
         });
 

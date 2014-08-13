@@ -99,6 +99,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
         };
 
+        $scope.disable = function(modules) {
+            var payload = orgUnitMapper.disable(modules);
+            orgUnitRepository.upsert(payload);
+            return publishMessage(modules, "upsertOrgUnit");
+        };
+
         $scope.excludeDataElements = function(projectId, enrichedModules) {
             var systemSettings = systemSettingsTransformer.constructSystemSettings(enrichedModules);
             var payload = {

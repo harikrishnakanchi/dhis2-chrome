@@ -65,7 +65,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return attributeValues;
     };
 
-    this.disableOrgUnitPayload = function(modules) {
+    this.disable = function(modules) {
         var attributeValue = {
             'attribute': {
                 "code": "isDisabled",
