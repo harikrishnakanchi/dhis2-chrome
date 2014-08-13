@@ -4,7 +4,7 @@
 <div ng-show="submitSuccess" class="alert alert-success">{{resourceBundle.dataSubmittedForApproval}}</div>
 <div ng-show="(approveSuccess || isCompleted) &amp;&amp; !isAccepted" class="alert alert-success" ng-if="hasRoles(['Approver - Level 1'])">{{resourceBundle.firstLevelApproveSuccess}}</div>
 <div ng-show="(approveSuccess || isApproved) &amp;&amp; !isAccepted" class="alert alert-success" ng-if="hasRoles(['Approver - Level 2'])">{{resourceBundle.secondLevelApproveSuccess}}</div>
-<div ng-show="isAccepted" class="alert alert-success">{{resourceBundle.thirdLevelApproveSuccess}}</div>
+<div ng-show="isAccepted &amp;&amp; week" class="alert alert-success">{{resourceBundle.thirdLevelApproveSuccess}}</div>
 <div ng-show="saveError" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
 <div ng-show="submitError" class="alert alert-danger">{{resourceBundle.dataSubmitFailure}}</div>
 <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
