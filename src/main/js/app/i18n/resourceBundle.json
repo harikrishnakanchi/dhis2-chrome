@@ -15,6 +15,7 @@
     "thirdLevelApproveSuccess": "Data approved at third level.",
     "dataApprovalConfirmationMessage": "Are you sure you want to approve?",
     "dataApproveFailure": "Error approving data. Please try again later",
+    "chooseWeek": "Please choose a week to enter data.",
     "syncRunning": "Data sync initiated. Please wait.",
     "syncComplete": "Data sync completed successfully.",
     "openingDateValidation": "Opening Date is required.",
