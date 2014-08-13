@@ -65,13 +65,29 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return attributeValues;
     };
 
-    var mapToExistingProject = function(newProject, existingProject) {
+    this.disableOrgUnitPayload = function(modules) {
+        var attributeValue = {
+            'attribute': {
+                "code": "isDisabled",
+                "name": "Is Disabled",
+                "id": "HLcCYZ1pPQx"
+            },
+            value: true
+        };
+
+        return _.map(modules, function(module) {
+            module.attributeValues.push(attributeValue);
+            return module;
+        });
+    };
+
+    this.mapToExistingProject = function(newProject, existingProject) {
         existingProject.openingDate = moment(newProject.openingDate).format("YYYY-MM-DD");
         existingProject.attributeValues = buildProjectAttributeValues(newProject);
         return existingProject;
     };
 
-    var mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
+    this.mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
 
         var projectOrgUnit = {
             'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
@@ -86,7 +102,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return projectOrgUnit;
     };
 
-    var getChildOrgUnitNames = function(allOrgUnits, parentId) {
+    this.getChildOrgUnitNames = function(allOrgUnits, parentId) {
         return _.pluck(_.filter(allOrgUnits, {
             parent: {
                 id: parentId,
@@ -104,7 +120,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return attribute ? attribute.value : undefined;
     };
 
-    var mapToProjectForEdit = function(dhisProject) {
+    this.mapToProjectForEdit = function(dhisProject) {
         var endDate = getAttributeValue(dhisProject, "prjEndDate");
         return {
             'name': dhisProject.name,
@@ -119,7 +135,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         };
     };
 
-    var mapToModules = function(modules, moduleParent) {
+    this.mapToModules = function(modules, moduleParent) {
         var result = _.map(modules, function(module) {
             return {
                 name: module.name,
@@ -146,7 +162,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return result;
     };
 
-    var mapToDataSets = function(modules, moduleParent, originalDatasets) {
+    this.mapToDataSets = function(modules, moduleParent, originalDatasets) {
         var currentDatasets = _.filter(originalDatasets, function(ds) {
             return _.any(modules, {
                 "datasets": [{
@@ -183,7 +199,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         });
     };
 
-    var filterModules = function(orgUnits) {
+    this.filterModules = function(orgUnits) {
         var populateDisplayName = function(module) {
             var parent = _.find(orgUnits, {
                 'id': module.parent.id
@@ -200,13 +216,5 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return _.map(modules, populateDisplayName);
     };
 
-    return {
-        "mapToProjectForDhis": mapToProjectForDhis,
-        "mapToProjectForEdit": mapToProjectForEdit,
-        "mapToModules": mapToModules,
-        'mapToDataSets': mapToDataSets,
-        'mapToExistingProject': mapToExistingProject,
-        "getChildOrgUnitNames": getChildOrgUnitNames,
-        "filterModules": filterModules
-    };
+    return this;
 });
