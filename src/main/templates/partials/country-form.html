@@ -1,45 +1,48 @@
 <div  ng-controller="countryController">
+	<div class="top-actions" ng-if="!isNewMode">
+		<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Project" ng-click="openInNewMode('Project')" />
+	</div>
+	<div ng-show="showMessage" class="alert alert-success">{{ resourceBundle[message] }}</div>
 	<div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorCountry }}</div>
 	<div class="panel panel-default">
-  	<div class="panel-heading">
-
-		<h3 ng-if="isNewMode" class="panel-title">Create Country</h3>		
-		<h3 ng-if="!isNewMode" class="panel-title">Country Details</h3>
-	</div>
-	<div class="panel-body">
-	<form name="createForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
-		<ul>
-			<li class="form-group">
-				<label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label">Name</label>
-				<div class="col-sm-6" >
-					<input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required not-in="allCountries" />
-					<div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
-						<span ng-show="createForm.newOrgUnitName.$error.required"class="errortxt">{{resourceBundle.nameValidation}}</span>
-						<span ng-show="createForm.newOrgUnitName.$error.isWithin" class="errortxt">{{resourceBundle.countryExists}}</span>
-					</div>
-				</div>
-			</li>
-			<li class="form-group">
-				<label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
-
-					<div class="col-sm-6 col-md-6">
-						<p class="input-group">
-						<div><input type="date" ng-disabled="!isNewMode" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required></div>
-						<div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid || isAfterMaxDate()">
-							<span ng-show="createForm.newOrgUnitOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
-							<span ng-show="isAfterMaxDate()" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
+		<div class="panel-heading">
+			<h3 ng-if="isNewMode" class="panel-title">Create Country</h3>		
+			<h3 ng-if="!isNewMode" class="panel-title">Country Details</h3>
+		</div>
+		<div class="panel-body">
+			<form name="createForm" class="form-horizontal" role="form" novalidate  ng-submit="save(newOrgUnit, orgUnit)">
+				<ul>
+					<li class="form-group">
+						<label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label">Name</label>
+						<div class="col-sm-6" >
+							<input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required not-in="allCountries" />
+							<div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
+								<span ng-show="createForm.newOrgUnitName.$error.required"class="errortxt">{{resourceBundle.nameValidation}}</span>
+								<span ng-show="createForm.newOrgUnitName.$error.isWithin" class="errortxt">{{resourceBundle.countryExists}}</span>
+							</div>
 						</div>
-						</p>
-					</div>
-			</li>
-			<li ng-if="isNewMode">
-				<div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
-				<input type="submit" class="btn btn-main" ng-disabled="createForm.$invalid || isAfterMaxDate()" value="Save"/>
-				<input type="button" class="btn btn-default" ng-click="reset()" value="Reset">
-			</div>
-			</li>
-		</ul>
-	</form>
+					</li>
+					<li class="form-group">
+						<label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
+
+						<div class="col-sm-6 col-md-6">
+							<p class="input-group">
+								<div><input type="date" ng-disabled="!isNewMode" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required></div>
+								<div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid || isAfterMaxDate()">
+									<span ng-show="createForm.newOrgUnitOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
+									<span ng-show="isAfterMaxDate()" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
+								</div>
+							</p>
+						</div>
+					</li>
+					<li ng-if="isNewMode">
+						<div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
+							<input type="submit" class="btn btn-main" ng-disabled="createForm.$invalid || isAfterMaxDate()" value="Save"/>
+							<input type="button" class="btn btn-default" ng-click="reset()" value="Reset">
+						</div>
+					</li>
+				</ul>
+			</form>
+		</div>
 	</div>
-</div>
 </div>

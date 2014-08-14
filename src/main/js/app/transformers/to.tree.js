@@ -21,6 +21,7 @@ define(["lodash"], function(_) {
                     return item.parent && item.parent.id === parent.id;
                 };
                 parent.children = _.sortBy(_.filter(everyOne, isLegitimateChild), 'name');
+                parent.selected = false;
                 parent.collapsed = true;
                 return parent;
             };

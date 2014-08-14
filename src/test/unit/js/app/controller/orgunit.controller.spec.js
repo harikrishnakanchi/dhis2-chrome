@@ -2,7 +2,7 @@
 define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnitController, mocks, utils, _) {
     describe("projects controller", function() {
         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits,
-            orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll;
+            orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll, expectedOrgUnitTree, child;
         var getOrgUnit = function(id, name, level, parent) {
             return {
                 'id': id,
@@ -38,39 +38,41 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             'name': 'Module'
         }];
 
-        var child = {
-            'id': 2,
-            'name': 'ocp',
-            'level': 2,
-            'parent': {
-                id: 1
-            },
-            'children': [],
-            'collapsed': true,
-            'attributeValues': [{
-                "attribute": {
-                    "id": "a1fa2777924"
-                },
-                "value": "country"
-            }]
-        };
-
-        var expectedOrgUnitTree = [{
-            'id': 1,
-            'name': 'msf',
-            'level': 1,
-            'parent': null,
-            'children': [child],
-            'collapsed': true,
-            'attributeValues': [{
-                "attribute": {
-                    "id": "a1fa2777924"
-                },
-                "value": "country"
-            }]
-        }];
-
         beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout, $anchorScroll) {
+            child = {
+                'id': 2,
+                'name': 'ocp',
+                'level': 2,
+                'parent': {
+                    id: 1
+                },
+                'children': [],
+                'collapsed': true,
+                'selected': false,
+                'attributeValues': [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "country"
+                }]
+            };
+
+            expectedOrgUnitTree = [{
+                'id': 1,
+                'name': 'msf',
+                'level': 1,
+                'parent': null,
+                'children': [child],
+                'collapsed': true,
+                'selected': false,
+                'attributeValues': [{
+                    "attribute": {
+                        "id": "a1fa2777924"
+                    },
+                    "value": "country"
+                }]
+            }];
+
             q = $q;
             allOrgUnits = [getOrgUnit(1, 'msf', 1, null), getOrgUnit(2, 'ocp', 2, {
                 id: 1

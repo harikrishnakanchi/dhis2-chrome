@@ -48,7 +48,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         'datasets': associatedDatasets,
                         'selectedDataset': associatedDatasets[0]
                     });
-
+                    
                     var isDisabled = _.find($scope.orgUnit.attributeValues, {
                         "attribute": {
                             "code": "isDisabled"
@@ -108,9 +108,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.disable = function(orgUnit) {
             var payload = orgUnitMapper.disable(orgUnit);
-            orgUnitRepository.upsert(payload);
             $scope.isDisabled = true;
-            return publishMessage(orgUnit, "upsertOrgUnit");
+            $q.all([orgUnitRepository.upsert(payload), publishMessage(orgUnit, "upsertOrgUnit")]).then(function() {
+                if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(orgUnit);
+            });
         };
 
         $scope.excludeDataElements = function(projectId, enrichedModules) {

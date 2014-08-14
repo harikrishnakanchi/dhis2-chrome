@@ -586,6 +586,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should disable modules", function() {
+            scope.$parent.closeNewForm = jasmine.createSpy();
             var module = {
                 name: "test1",
                 id: "projectId",
@@ -613,9 +614,11 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
 
             scope.disable(module);
+            scope.$apply();
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
+            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(module);
             expect(scope.isDisabled).toEqual(true);
         });
     });

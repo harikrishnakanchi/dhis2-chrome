@@ -76,6 +76,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         };
 
         var disableOrgUnit = function(orgUnit) {
+            orgUnit.attributeValues = _.reject(orgUnit.attributeValues, {"attribute": {"code": "isDisabled"}});
             orgUnit.attributeValues.push(attributeValue);
             return orgUnit;
         };

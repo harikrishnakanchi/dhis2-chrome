@@ -407,7 +407,14 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
         it("should disable orgUnit", function() {
             var module = {
                 'name': 'Module1',
-                'attributeValues': [],
+                'attributeValues': [{
+                    "attribute": {
+                        "code": "isDisabled",
+                        "name": "Is Disabled",
+                        "id": "HLcCYZ1pPQx"
+                    },
+                    "value": false
+                }],
             };
 
             var expectedModule = {

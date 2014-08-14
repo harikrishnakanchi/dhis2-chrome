@@ -1,4 +1,10 @@
 <div ng-controller="projectController">
+	<div class="top-actions" ng-if="!isNewMode">
+		<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Operation Unit" ng-click="openInNewMode('Operation Unit')" />
+		<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Module" ng-click="openInNewMode('Module')" />
+		<input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />
+	</div>
+	<div ng-show="showMessage" class="alert alert-success">{{ resourceBundle[message] }}</div>
 	<div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
 	<form name="createForm" class="form-horizontal" role="form" novalidate>
 		<div class="panel panel-default">
@@ -65,7 +71,7 @@
 							</select>
 						</div>
 					</li>
-					
+
 					<li class="form-group">
 						<label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
 						<div class="col-sm-6 col-md-6" >
@@ -114,10 +120,10 @@
 						<td> {{user.roles}}</td>
 						<td>
 
-						<a href="" title="Delete" class="delete" ng-if="user.roles != 'Superuser'" ng-click="toggleUserDisabledState(user)">
-							<span class="glyphicon glyphicon-remove" ng-show="!user.userCredentials.disabled"></span>
-							<span class="glyphicon glyphicon-ok" ng-show="user.userCredentials.disabled"></span>
-						</a> 
+							<a href="" title="Delete" class="delete" ng-if="user.roles != 'Superuser'" ng-click="toggleUserDisabledState(user)">
+								<span class="glyphicon glyphicon-remove" ng-show="!user.userCredentials.disabled"></span>
+								<span class="glyphicon glyphicon-ok" ng-show="user.userCredentials.disabled"></span>
+							</a> 
 						</td>
 					</tr>
 				</tbody>

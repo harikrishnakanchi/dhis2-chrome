@@ -18,14 +18,12 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         var selectCurrentNode = function(transformedOrgUnits) {
-            if (!transformedOrgUnits.selectedNode)
-                return;
-
+            if (!transformedOrgUnits.selectedNode) return;
             $scope.state = {
                 "currentNode": transformedOrgUnits.selectedNode
             };
-            $scope.onOrgUnitSelect(transformedOrgUnits.selectedNode);
             $scope.saveSuccess = true;
+            $scope.onOrgUnitSelect(transformedOrgUnits.selectedNode);
             $timeout(function() {
                 $scope.saveSuccess = false;
             }, properties.messageTimeout);

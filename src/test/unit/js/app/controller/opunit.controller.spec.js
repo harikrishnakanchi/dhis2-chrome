@@ -2,7 +2,7 @@
 define(["opUnitController", "angularMocks", "utils"], function(OpUnitController, mocks, utils) {
     describe("op unit controller", function() {
 
-        var scope, opUnitController, mockOrgStore, db, q, location, _Date, hustle, orgUnitRepo;
+        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -13,15 +13,6 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             location = $location;
 
             orgUnitRepo = utils.getMockRepo(q);
-            mockOrgStore = {
-                upsert: function() {}
-            };
-            db = {
-                objectStore: function(store) {
-                    return mockOrgStore;
-                }
-            };
-
             scope.orgUnit = {
                 id: "blah"
             };
@@ -33,7 +24,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 return today;
             };
 
-            opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, db, location);
         }));
 
         afterEach(function() {
@@ -42,10 +33,13 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
 
         it('should add new op units', function() {
             scope.isNewMode = false;
+
             scope.$apply();
             var orginalOpUnitLen = scope.opUnits.length;
             scope.addOpUnits();
+
             expect(scope.opUnits.length).toBe(orginalOpUnitLen + 1);
+            expect(scope.isDisabled).toBeFalsy();
         });
 
         it('should delete operation unit', function() {
@@ -95,46 +89,50 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             };
 
             var expectedOpUnits = [{
-                id: opUnit1Id,
-                name: opUnit1.name,
-                shortName: opUnit1.name,
+                name: 'OpUnit1',
                 openingDate: today,
+                id: 'a823e522c15',
+                shortName: 'OpUnit1',
                 level: 5,
                 parent: {
-                    id: scope.orgUnit.id,
-                    name: scope.orgUnit.name
+                    name: 'Parent',
+                    id: 'ParentId'
                 },
                 attributeValues: [{
                     attribute: {
-                        id: "52ec8ccaf8f"
+                        id: '52ec8ccaf8f',
+                        code: 'opUnitType'
                     },
-                    value: opUnit1.type
+                    value: 'Hospital'
                 }, {
-                    "attribute": {
-                        "id": "a1fa2777924"
+                    attribute: {
+                        id: 'a1fa2777924',
+                        code: 'Type'
                     },
-                    "value": "Operation Unit"
+                    value: 'Operation Unit'
                 }]
             }, {
-                id: opUnit2Id,
-                name: opUnit2.name,
-                shortName: opUnit2.name,
+                name: 'OpUnit2',
                 openingDate: today,
+                id: 'a764a0f84af',
+                shortName: 'OpUnit2',
                 level: 5,
                 parent: {
-                    id: scope.orgUnit.id,
-                    name: scope.orgUnit.name
+                    name: 'Parent',
+                    id: 'ParentId'
                 },
                 attributeValues: [{
                     attribute: {
-                        id: "52ec8ccaf8f"
+                        id: '52ec8ccaf8f',
+                        code: 'opUnitType'
                     },
-                    value: opUnit2.type
+                    value: 'Community'
                 }, {
-                    "attribute": {
-                        "id": "a1fa2777924"
+                    attribute: {
+                        id: 'a1fa2777924',
+                        code: 'Type'
                     },
-                    "value": "Operation Unit"
+                    value: 'Operation Unit'
                 }]
             }];
 
@@ -157,7 +155,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 'name': 'opUnit1',
                 "attributeValues": [{
                     "attribute": {
-                        "id": "52ec8ccaf8f"
+                        "code": "opUnitType"
                     },
                     "value": "Health Center"
                 }, {
@@ -174,9 +172,34 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             scope.$apply();
             expect(scope.opUnits[0].name).toEqual('opUnit1');
             expect(scope.opUnits[0].type).toEqual('Health Center');
+            expect(scope.isDisabled).toBeFalsy();
+        });
+
+        it("should disable disable button for opunit", function() {
+            scope.orgUnit = {
+                'name': 'opUnit1',
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "opUnitType"
+                    },
+                    "value": "Health Center"
+                }, {
+                    "attribute": {
+                        "code": "isDisabled"
+                    },
+                    "value": true
+                }]
+            };
+            scope.isNewMode = false;
+
+            opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location);
+
+            scope.$apply();
+            expect(scope.isDisabled).toBeTruthy();
         });
 
         it("should disable opunit and all its modules", function() {
+            scope.$parent.closeNewForm =  jasmine.createSpy();
             var opunit = {
                 name: "opunit1",
                 id: "opunit1",
@@ -195,7 +218,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
 
             var modulesUnderOpunit = [module];
 
-            var expectedOrgUnits= [{
+            var expectedOrgUnits = [{
                 name: "mod1",
                 id: "mod1",
                 attributeValues: [{
@@ -226,13 +249,15 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 data: expectedOrgUnits,
                 type: "upsertOrgUnit"
             };
-            orgUnitRepo.getAllModulesInProjects = jasmine.createSpy("getAllModulesInProjects").and.returnValue(modulesUnderOpunit);
+            orgUnitRepo.getAllModulesInProjects = jasmine.createSpy("getAllModulesInProjects").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             spyOn(hustle, "publish");
 
             scope.disable(opunit);
+            scope.$apply();
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnits);
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
+            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(opunit);
             expect(scope.isDisabled).toEqual(true);
         });
     });

@@ -19,7 +19,8 @@ define(["toTree"], function(toTree) {
                     id: 1
                 },
                 'children': [],
-                'collapsed': true
+                'collapsed': true,
+                'selected': false
             };
             child2 = {
                 'id': 3,
@@ -29,7 +30,8 @@ define(["toTree"], function(toTree) {
                     id: 1
                 },
                 'children': [],
-                'collapsed': true
+                'collapsed': true,
+                'selected': false
             };
             expectedOrgUnitTree = [{
                 'id': 1,
@@ -37,7 +39,8 @@ define(["toTree"], function(toTree) {
                 'level': 1,
                 'parent': null,
                 'children': [child2, child1],
-                'collapsed': true
+                'collapsed': true,
+                'selected': false
             }];
 
             allOrgUnits = [getOrgUnit(1, 'msf', 1, null), getOrgUnit(2, 'ocp', 2, {
@@ -76,6 +79,7 @@ define(["toTree"], function(toTree) {
             expect(tree.rootNodes[0].collapsed).toEqual(false);
             expect(tree.rootNodes[0].children[0].collapsed).toEqual(false);
             expect(tree.rootNodes[0].children[1].collapsed).toEqual(true);
+
         });
     });
 });

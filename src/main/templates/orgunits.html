@@ -1,36 +1,26 @@
 <section class="panel org-units main-columns">
 
-		<div class="treeview-col">
-			<button class="toggle">
-				<span></span>	
-			</button>
-			<div class="treeview-cont">
+	<div class="treeview-col">
+		<button class="toggle">
+			<span></span>	
+		</button>
+		<div class="treeview-cont">
 
-				<div class="content">
-					<treeview
-					tree-model="organisationUnits"
-					node-id="id"
-					node-label="name"
-					node-children="children"
-					on-node-select="onOrgUnitSelect"
-					state="state"
-					/>
-				</div>
+			<div class="content">
+				<treeview
+				tree-model="organisationUnits"
+				node-id="id"
+				node-label="name"
+				node-children="children"
+				on-node-select="onOrgUnitSelect"
+				state="state"
+				/>
 			</div>
 		</div>
-		<div class="main-content">
-			<div class="top-actions" ng-if="!isNewMode">
-				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Country" ng-if="getOrgUnitType(orgUnit) == 'Operational Center'" ng-click="openInNewMode('Country')" />
-				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Project" ng-if="getOrgUnitType(orgUnit) == 'Country'" ng-click="openInNewMode('Project')" />
-				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Operation Unit" ng-if="getOrgUnitType(orgUnit) == 'Project'" ng-click="openInNewMode('Operation Unit')" />
-				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Module" ng-if="getOrgUnitType(orgUnit) == 'Project' || getOrgUnitType(orgUnit) == 'Operation Unit'" ng-click="openInNewMode('Module')" />
-				<input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-if="getOrgUnitType(orgUnit) == 'Project'" 
-				ng-click="openInNewMode('User')" />
-			</div>
-			<div ng-show="showMessage" class="alert alert-success">{{ resourceBundle[message] }}</div>
-			<div ng-include="templateUrl">
-			</div>
+	</div>
+	<div class="main-content">
+		<div ng-include="templateUrl">
 		</div>
-
+	</div>
 </section>
 <script>
