@@ -152,19 +152,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 };
 
                 var expectedModules = [{
-                    'name': 'mod1',
-                    'displayName': 'mod1',
-                    'id': 'mod1',
-                    'parent': {
-                        id: "proj_1"
-                    },
-                    'attributeValues': [{
-                        'attribute': {
-                            id: "a1fa2777924"
-                        },
-                        value: "Module"
-                    }]
-                }, {
                     'name': 'mod2',
                     'displayName': 'mod2',
                     'id': 'mod2',
@@ -176,6 +163,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                             id: "a1fa2777924"
                         },
                         value: "Module"
+                    }, {
+                        'attribute': {
+                            code: "isDisabled"
+                        },
+                        value: false
                     }]
                 }, {
                     'name': 'modunderopunit',
@@ -189,11 +181,36 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                             id: "a1fa2777924"
                         },
                         value: "Module"
+                    }, {
+                        'attribute': {
+                            code: "isDisabled"
+                        },
+                        value: false
                     }]
                 }];
 
+                var allModules = [{
+                    'name': 'mod1',
+                    'displayName': 'mod1',
+                    'id': 'mod1',
+                    'parent': {
+                        id: "proj_1"
+                    },
+                    'attributeValues': [{
+                        'attribute': {
+                            id: "a1fa2777924"
+                        },
+                        value: "Module"
+                    }, {
+                        'attribute': {
+                            code: "isDisabled"
+                        },
+                        value: true
+                    }]
+                }].concat(expectedModules);
+
                 orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, expectedModules));
+                spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, allModules));
 
                 dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository);
                 scope.$apply();

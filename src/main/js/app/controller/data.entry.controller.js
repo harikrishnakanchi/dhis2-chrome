@@ -330,7 +330,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         var setAvailableModules = function() {
             orgUnitRepository.getAllModulesInProjects(_.pluck($rootScope.currentUser.organisationUnits, "id")).then(function(modules) {
-                $scope.modules = modules;
+                $scope.modules = _.reject(modules, function(module) {
+                    var isDisabledAttribute = _.find(module.attributeValues, {
+                        'attribute': {
+                            'code': 'isDisabled'
+                        }
+                    });
+                    return isDisabledAttribute && isDisabledAttribute.value;
+                });
             });
         };
 
