@@ -72,5 +72,6 @@
     "monthLabel": "Month",
     "chooseProjectLabel": "Select a Project",
     "selectProject": "Select a project",
-    "errorProject": "Error saving the preferences. Please try again later."
+    "errorProject": "Error saving the preferences. Please try again later.",
+    "disableOrgUnitConfirmationMessage": "Organisation unit will be disabled. Are you sure?"
 }

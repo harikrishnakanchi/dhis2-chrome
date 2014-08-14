@@ -1,5 +1,5 @@
 define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
-    return function($scope, $q, $hustle, orgUnitRepository, db, $location) {
+    return function($scope, $q, $hustle, orgUnitRepository, db, $location, $modal) {
         $scope.isDisabled = false;
         $scope.opUnits = [{
             'openingDate': moment().format("YYYY-MM-DD")
@@ -62,7 +62,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             $scope.opUnits.splice(index, 1);
         };
 
-        $scope.disable = function(orgUnit) {
+        var disableOpunit = function(orgUnit) {
             return orgUnitRepository.getAllModulesInProjects([orgUnit.id]).then(function(orgUnitsToDisable) {
                 orgUnitsToDisable.push(orgUnit);
                 var payload = orgUnitMapper.disable(orgUnitsToDisable);
@@ -72,6 +72,23 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(orgUnit);
                 });
             });
+        };
+
+        var showModal = function(okCallback, message) {
+            $scope.modalMessage = message;
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/confirm.dialog.html',
+                controller: 'confirmDialogController',
+                scope: $scope
+            });
+
+            modalInstance.result.then(okCallback);
+        };
+
+        $scope.disable = function(orgUnit) {
+            showModal(function() {
+                disableOpunit(orgUnit);
+            }, $scope.resourceBundle.disableOrgUnitConfirmationMessage);
         };
 
         var init = function() {

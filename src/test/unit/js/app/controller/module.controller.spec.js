@@ -2,7 +2,7 @@
 define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer"], function(ModuleController, mocks, utils, testData, datasetTransformer) {
     describe("module controller", function() {
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
-            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, hustle, dataSetRepo, systemSettingRepo;
+            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, hustle, dataSetRepo, systemSettingRepo, fakeModal;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -51,6 +51,16 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 };
             };
 
+            fakeModal = {
+                close: function() {
+                    this.result.confirmCallBack();
+                },
+                dismiss: function(type) {
+                    this.result.cancelCallback(type);
+                },
+                open: function(object) {}
+            };
+
             sectionsdata = testData.get("sections");
             datasetsdata = testData.get("dataSets");
             dataElementsdata = testData.get("dataElements");
@@ -77,7 +87,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     return dataElements;
                 return getMockStore(testData.get(storeName));
             });
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
         }));
 
         afterEach(function() {
@@ -295,7 +305,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }
             };
             scope.isNewMode = false;
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
 
             scope.$apply();
 
@@ -319,7 +329,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             };
             scope.isNewMode = false;
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
 
             scope.$apply();
 
@@ -334,7 +344,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }
             };
             scope.isNewMode = false;
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             spyOn(scope, "excludeDataElements").and.returnValue(utils.getPromise(q, []));
 
             scope.update(scope.modules);
@@ -587,6 +597,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should disable modules", function() {
             scope.$parent.closeNewForm = jasmine.createSpy();
+            scope.resourceBundle = {};
             var module = {
                 name: "test1",
                 id: "projectId",
@@ -611,7 +622,9 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 data: expectedModule,
                 type: "upsertOrgUnit"
             };
-
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
 
             scope.disable(module);
             scope.$apply();

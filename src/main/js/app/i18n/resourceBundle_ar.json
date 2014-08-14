@@ -67,5 +67,6 @@
     "printTallySheetBtnValue": "ورقة الطباعة تالي",
     "weekLabel": "أسبوع",
     "yearLabel": "عام",
-    "monthLabel": "شهر"
+    "monthLabel": "شهر",
+     "disableOrgUnitConfirmationMessage": "Organisation unit will be disabled. Are you sure?"
 }

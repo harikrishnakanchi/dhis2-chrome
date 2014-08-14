@@ -67,5 +67,6 @@
     "printTallySheetBtnValue": "Imprimer la feuille de pointage",
     "weekLabel": "Semaine",
     "yearLabel": "Année",
-    "monthLabel": "Mois"
+    "monthLabel": "Mois",
+    "disableOrgUnitConfirmationMessage": "Organisation unit will be disabled. Are you sure?"
 }

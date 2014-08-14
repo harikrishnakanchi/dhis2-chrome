@@ -2,7 +2,7 @@
 define(["opUnitController", "angularMocks", "utils"], function(OpUnitController, mocks, utils) {
     describe("op unit controller", function() {
 
-        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo;
+        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -23,8 +23,16 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             Date = function() {
                 return today;
             };
-
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, db, location);
+            fakeModal = {
+                close: function() {
+                    this.result.confirmCallBack();
+                },
+                dismiss: function(type) {
+                    this.result.cancelCallback(type);
+                },
+                open: function(object) {}
+            };
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, db, location, fakeModal);
         }));
 
         afterEach(function() {
@@ -167,7 +175,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             };
             scope.isNewMode = false;
 
-            opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location);
+            opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location, fakeModal);
 
             scope.$apply();
             expect(scope.opUnits[0].name).toEqual('opUnit1');
@@ -192,14 +200,15 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             };
             scope.isNewMode = false;
 
-            opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location);
+            opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location, fakeModal);
 
             scope.$apply();
             expect(scope.isDisabled).toBeTruthy();
         });
 
         it("should disable opunit and all its modules", function() {
-            scope.$parent.closeNewForm =  jasmine.createSpy();
+            scope.$parent.closeNewForm = jasmine.createSpy();
+            scope.resourceBundle = {};
             var opunit = {
                 name: "opunit1",
                 id: "opunit1",
@@ -251,6 +260,9 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             };
             orgUnitRepo.getAllModulesInProjects = jasmine.createSpy("getAllModulesInProjects").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             spyOn(hustle, "publish");
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
 
             scope.disable(opunit);
             scope.$apply();

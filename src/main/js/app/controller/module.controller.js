@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer) {
-    return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, systemSettingRepository, db, $location, $q) {
+    return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, systemSettingRepository, db, $location, $q, $modal) {
 
         $scope.isopen = {};
         $scope.modules = [];
@@ -106,12 +106,29 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
         };
 
-        $scope.disable = function(orgUnit) {
+        var disableModule = function(orgUnit) {
             var payload = orgUnitMapper.disable(orgUnit);
             $scope.isDisabled = true;
             $q.all([orgUnitRepository.upsert(payload), publishMessage(orgUnit, "upsertOrgUnit")]).then(function() {
                 if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(orgUnit);
             });
+        };
+
+        var showModal = function(okCallback, message) {
+            $scope.modalMessage = message;
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/confirm.dialog.html',
+                controller: 'confirmDialogController',
+                scope: $scope
+            });
+
+            modalInstance.result.then(okCallback);
+        };
+
+        $scope.disable = function(orgUnit) {
+            showModal(function() {
+                disableModule(orgUnit);
+            }, $scope.resourceBundle.disableOrgUnitConfirmationMessage);
         };
 
         $scope.excludeDataElements = function(projectId, enrichedModules) {
