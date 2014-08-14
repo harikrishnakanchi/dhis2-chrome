@@ -175,5 +175,65 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             expect(scope.opUnits[0].name).toEqual('opUnit1');
             expect(scope.opUnits[0].type).toEqual('Health Center');
         });
+
+        it("should disable opunit and all its modules", function() {
+            var opunit = {
+                name: "opunit1",
+                id: "opunit1",
+                datasets: [],
+                attributeValues: []
+            };
+
+            var module = {
+                name: "mod1",
+                id: "mod1",
+                attributeValues: [],
+                parent: {
+                    id: "opunit1",
+                }
+            };
+
+            var modulesUnderOpunit = [module];
+
+            var expectedOrgUnits= [{
+                name: "mod1",
+                id: "mod1",
+                attributeValues: [{
+                    attribute: {
+                        code: 'isDisabled',
+                        name: 'Is Disabled',
+                        id: 'HLcCYZ1pPQx'
+                    },
+                    value: true
+                }],
+                parent: {
+                    id: "opunit1",
+                }
+            }, {
+                name: "opunit1",
+                id: "opunit1",
+                datasets: [],
+                attributeValues: [{
+                    attribute: {
+                        code: 'isDisabled',
+                        name: 'Is Disabled',
+                        id: 'HLcCYZ1pPQx'
+                    },
+                    value: true
+                }]
+            }];
+            var expectedHustleMessage = {
+                data: expectedOrgUnits,
+                type: "upsertOrgUnit"
+            };
+            orgUnitRepo.getAllModulesInProjects = jasmine.createSpy("getAllModulesInProjects").and.returnValue(modulesUnderOpunit);
+            spyOn(hustle, "publish");
+
+            scope.disable(opunit);
+
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnits);
+            expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
+            expect(scope.isDisabled).toEqual(true);
+        });
     });
 });

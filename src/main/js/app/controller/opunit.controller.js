@@ -10,6 +10,13 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             });
         };
 
+        var saveToDhis = function(data) {
+            return $hustle.publish({
+                "data": data,
+                "type": "upsertOrgUnit"
+            }, "dataValues");
+        };
+
         $scope.save = function(opUnits) {
             var parent = $scope.orgUnit;
             var newOpUnits = _.map(opUnits, function(opUnit) {
@@ -34,13 +41,6 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 });
             });
 
-            var saveToDhis = function(data) {
-                return $hustle.publish({
-                    "data": data,
-                    "type": "upsertOrgUnit"
-                }, "dataValues");
-            };
-
             var onSuccess = function(data) {
                 if ($scope.$parent.closeNewForm)
                     $scope.$parent.closeNewForm($scope.orgUnit, "savedOpUnit");
@@ -57,6 +57,16 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
 
         $scope.delete = function(index) {
             $scope.opUnits.splice(index, 1);
+        };
+
+        $scope.disable = function(orgUnit) {
+            var orgUnitsToDisable = orgUnitRepository.getAllModulesInProjects([orgUnit.id]) || [];
+            orgUnitsToDisable.push(orgUnit);
+            var payload = orgUnitMapper.disable(orgUnitsToDisable);
+            $scope.isDisabled = true;
+            
+            orgUnitRepository.upsert(payload);
+            return saveToDhis(orgUnitsToDisable);
         };
 
         var init = function() {

@@ -404,25 +404,15 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             expect(actualModules).toEqual([expectedModule1, expectedModule2]);
         });
 
-        it("should return disable OorgUnit payload", function() {
+        it("should disable orgUnit", function() {
             var module = {
                 'name': 'Module1',
-                'attributeValues': [{
-                    "attribute": {
-                        "id": "a1fa2777924"
-                    },
-                    "value": "Module"
-                }],
+                'attributeValues': [],
             };
 
             var expectedModule = {
                 'name': 'Module1',
                 'attributeValues': [{
-                    "attribute": {
-                        "id": "a1fa2777924"
-                    },
-                    "value": "Module"
-                }, {
                     "attribute": {
                         "code": "isDisabled",
                         "name": "Is Disabled",
@@ -434,6 +424,41 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
             var payload = orgUnitMapper.disable(module);
             expect(payload).toEqual(expectedModule);
+        });
+
+        it("should disable multiple orgUnits", function() {
+            var modules = [{
+                'name': 'Module1',
+                'attributeValues': [],
+            }, {
+                'name': 'Module2',
+                'attributeValues': [],
+            }];
+
+            var expectedModules = [{
+                'name': 'Module1',
+                'attributeValues': [{
+                    "attribute": {
+                        "code": "isDisabled",
+                        "name": "Is Disabled",
+                        "id": "HLcCYZ1pPQx"
+                    },
+                    "value": true
+                }],
+            }, {
+                'name': 'Module2',
+                'attributeValues': [{
+                    "attribute": {
+                        "code": "isDisabled",
+                        "name": "Is Disabled",
+                        "id": "HLcCYZ1pPQx"
+                    },
+                    "value": true
+                }],
+            }];
+
+            var payload = orgUnitMapper.disable(modules);
+            expect(payload).toEqual(expectedModules);
         });
 
         it("should map to existing project", function() {
