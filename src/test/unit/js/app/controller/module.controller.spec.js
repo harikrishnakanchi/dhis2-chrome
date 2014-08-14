@@ -299,9 +299,31 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             scope.$apply();
 
+            expect(scope.isDisabled).toBeFalsy();
             expect(scope.modules[0].datasets.length).toEqual(1);
             expect(scope.modules[0].allDatasets.length).toEqual(0);
             expect(scope.modules[0].selectedDataset).toEqual(scope.modules[0].datasets[0]);
+        });
+
+        it("should disable update and diable if orgunit is disabled", function() {
+            scope.orgUnit = {
+                "id": "mod2",
+                "parent": {
+                    "id": "par1"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isDisabled"
+                    },
+                    "value": true
+                }]
+            };
+            scope.isNewMode = false;
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q);
+
+            scope.$apply();
+
+            expect(scope.isDisabled).toBeTruthy();
         });
 
         it("should update module", function() {
@@ -564,14 +586,14 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should disable modules", function() {
-            var modules = [{
+            var module = {
                 name: "test1",
                 id: "projectId",
                 datasets: [],
                 attributeValues: []
-            }];
+            };
 
-            var expectedModules = [{
+            var expectedModule = {
                 name: "test1",
                 id: "projectId",
                 datasets: [],
@@ -583,17 +605,18 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     },
                     value: true
                 }]
-            }];
+            };
             var expectedHustleMessage = {
-                data: expectedModules,
+                data: expectedModule,
                 type: "upsertOrgUnit"
             };
 
 
-            scope.disable(modules);
+            scope.disable(module);
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModules);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
+            expect(scope.isDisabled).toEqual(true);
         });
     });
 });

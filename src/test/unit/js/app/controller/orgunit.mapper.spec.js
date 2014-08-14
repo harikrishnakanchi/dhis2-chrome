@@ -404,7 +404,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             expect(actualModules).toEqual([expectedModule1, expectedModule2]);
         });
 
-        it("should return disableOrgUnit payload", function() {
+        it("should return disable OorgUnit payload", function() {
             var module = {
                 'name': 'Module1',
                 'attributeValues': [{
@@ -432,8 +432,8 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }],
             };
 
-            var payload = orgUnitMapper.disable([module]);
-            expect(payload).toEqual([expectedModule]);
+            var payload = orgUnitMapper.disable(module);
+            expect(payload).toEqual(expectedModule);
         });
 
         it("should map to existing project", function() {

@@ -5,6 +5,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.modules = [];
         $scope.originalDatasets = [];
         $scope.isExpanded = [];
+        $scope.isDisabled = false;
 
         var isNewDataModel = function(ds) {
             var attr = _.find(ds.attributeValues, {
@@ -48,6 +49,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         'selectedDataset': associatedDatasets[0]
                     });
 
+                    var isDisabled = _.find($scope.orgUnit.attributeValues, {
+                        "attribute": {
+                            "code": "isDisabled"
+                        }
+                    });
+                    $scope.isDisabled = isDisabled && isDisabled.value;
                     $scope.updateDisabled = !_.all(associatedDatasets, isNewDataModel);
                 };
 
@@ -99,10 +106,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
         };
 
-        $scope.disable = function(modules) {
-            var payload = orgUnitMapper.disable(modules);
+        $scope.disable = function(orgUnit) {
+            var payload = orgUnitMapper.disable(orgUnit);
             orgUnitRepository.upsert(payload);
-            return publishMessage(modules, "upsertOrgUnit");
+            $scope.isDisabled = true;
+            return publishMessage(orgUnit, "upsertOrgUnit");
         };
 
         $scope.excludeDataElements = function(projectId, enrichedModules) {

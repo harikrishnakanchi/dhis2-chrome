@@ -65,7 +65,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return attributeValues;
     };
 
-    this.disable = function(modules) {
+    this.disable = function(orgUnit) {
         var attributeValue = {
             'attribute': {
                 "code": "isDisabled",
@@ -75,10 +75,8 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             value: true
         };
 
-        return _.map(modules, function(module) {
-            module.attributeValues.push(attributeValue);
-            return module;
-        });
+        orgUnit.attributeValues.push(attributeValue);
+        return orgUnit;
     };
 
     this.mapToExistingProject = function(newProject, existingProject) {
