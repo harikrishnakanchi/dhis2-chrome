@@ -4,7 +4,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.isopen = {};
         $scope.modules = [];
         $scope.originalDatasets = [];
-        $scope.isExpanded = [];
+        $scope.isExpanded = {};
         $scope.isDisabled = false;
 
         var isNewDataModel = function(ds) {
@@ -48,14 +48,14 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         'datasets': associatedDatasets,
                         'selectedDataset': associatedDatasets[0]
                     });
-                    
+
                     var isDisabled = _.find($scope.orgUnit.attributeValues, {
                         "attribute": {
                             "code": "isDisabled"
                         }
                     });
                     $scope.isDisabled = isDisabled && isDisabled.value;
-                    $scope.updateDisabled = !_.all(associatedDatasets, isNewDataModel);
+                    $scope.updateDisabled = !_.all(associatedDatasets, isNewDataModel) || $scope.isDisabled;
                 };
 
                 if ($scope.isNewMode) {
@@ -110,7 +110,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var payload = orgUnitMapper.disable(orgUnit);
             $scope.isDisabled = true;
             $q.all([orgUnitRepository.upsert(payload), publishMessage(orgUnit, "upsertOrgUnit")]).then(function() {
-                if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(orgUnit);
+                if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(orgUnit, "disabledModule");
             });
         };
 
@@ -168,12 +168,19 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             $scope.excludeDataElements($scope.orgUnit.parent.id, modules).then($scope.onSuccess, $scope.onError);
         };
 
+        $scope.getIsExpanded = function(module) {
+            module.timestamp = module.timestamp || new Date().getTime();
+            $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
+            return $scope.isExpanded[module.timestamp]; 
+        };
+
         $scope.addModules = function() {
             $scope.modules.push({
                 'openingDate': moment().format("YYYY-MM-DD"),
                 'datasets': [],
-                'allDatasets': _.filter($scope.allDatasets, isNewDataModel),
-                'selectedDataset': {}
+                'allDatasets': _.filter(_.cloneDeep($scope.allDatasets), isNewDataModel),
+                'selectedDataset': {},
+                'timestamp': new Date().getTime()
             });
         };
 
@@ -218,9 +225,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.selectDataSet = function(module, item) {
             module.selectedDataset = item;
             _.each(module.selectedDataset.sections, function(section) {
-                $scope.isExpanded[section.id] = false;
+                $scope.getIsExpanded(module)[section.id] = false;
             });
-            $scope.isExpanded[module.selectedDataset.sections[0].id] = true;
+            $scope.getIsExpanded(module)[module.selectedDataset.sections[0].id] = true;
         };
 
         $scope.discardDataSet = function(module, items) {

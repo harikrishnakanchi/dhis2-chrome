@@ -31,6 +31,8 @@
     "errorProject": "Error creating Project.",
     "projectExists": "Project already exists under this country.",
     "savedOpUnit": "Operation Units saved successfully.",
+    "disabledOpUnit": "Operation Unit disabled successfully.",
+    "disabledModule": "Module disabled successfully.",
     "errorOpUnit": "Error creating Operation Units.",
     "savedModule": "Module(s) saved successfully.",
     "errorModule": "Error creating Module(s).",

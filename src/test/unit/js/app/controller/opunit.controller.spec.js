@@ -269,7 +269,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnits);
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
-            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(opunit);
+            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(opunit, 'disabledOpUnit');
             expect(scope.isDisabled).toEqual(true);
         });
     });

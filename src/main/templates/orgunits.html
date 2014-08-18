@@ -19,6 +19,7 @@
 		</div>
 	</div>
 	<div class="main-content">
+	    <div ng-show="showMessage" class="alert alert-success">{{ resourceBundle[message] }}</div>
 		<div ng-include="templateUrl">
 		</div>
 	</div>

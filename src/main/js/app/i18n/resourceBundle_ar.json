@@ -10,6 +10,8 @@
     "dataSaveFailure": "توفير البيانات خطأ، يرجى المحاولة مرة أخرى في وقت لاحق",
     "dataSubmitSuccess": "قدمت بيانات بنجاح",
     "dataSubmitFailure": "خطأ تقديم البيانات. يرجى المحاولة مرة أخرى في وقت لاحق",
+    "disabledOpUnit": "Operation Unit disabled successfully.",
+    "disabledModule": "Module disabled successfully.",
     "dataApproveSuccess": "سيتم إرسال البيانات للمستوى الثاني من الموافقة",
     "dataApprovalConfirmationMessage": "هل أنت متأكد أنك تريد الموافقة؟",
     "dataApproveFailure": "خطأ الموافقة على البيانات. يرجى المحاولة مرة أخرى في وقت لاحق",

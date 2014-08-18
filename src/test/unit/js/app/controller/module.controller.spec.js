@@ -94,6 +94,17 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             Date = _Date;
         });
 
+        it("should fetch is expanded for a particular module based on timestamp", function () {
+            var module = {"timestamp": "2014-12-22"};
+            expect(scope.getIsExpanded(module)).toEqual({});
+        });
+
+        it("should fetch is expanded for existing modules that don't have a timestamp", function() {
+            var module = {};
+            expect(scope.getIsExpanded(module)).toEqual({});
+            expect(module.timestamp).toEqual(1396310400000);
+        });
+
         it('should filter in new data models when adding new modules', function() {
             scope.$apply();
 
@@ -468,9 +479,10 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should select a dataset", function() {
-
+            var timestamp = "2014-2-23";
             var module = {
-                "id": "mod1"
+                "id": "mod1",
+                "timestamp": timestamp
             };
 
             var dataset = {
@@ -484,8 +496,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
             scope.selectDataSet(module, dataset);
             expect(module.selectedDataset).toEqual(dataset);
-            expect(scope.isExpanded.Id1).toEqual(true);
-            expect(scope.isExpanded.Id2).toEqual(false);
+            expect(scope.isExpanded[timestamp].Id1).toEqual(true);
+            expect(scope.isExpanded[timestamp].Id2).toEqual(false);
         });
 
         it("should return true if no section is selected from each dataset", function() {
@@ -631,7 +643,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
-            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(module);
+            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(module, "disabledModule");
             expect(scope.isDisabled).toEqual(true);
         });
     });

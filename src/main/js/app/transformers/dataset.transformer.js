@@ -38,7 +38,7 @@ define(["lodash"], function(_) {
     };
 
     var getAssociatedDatasets = function(orgUnit, datasets) {
-        return _.filter(datasets, {
+        return _.filter(_.cloneDeep(datasets), {
             'organisationUnits': [{
                 'id': orgUnit.id
             }]

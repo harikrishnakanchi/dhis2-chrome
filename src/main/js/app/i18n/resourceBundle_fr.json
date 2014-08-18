@@ -51,6 +51,8 @@
     "reapprovalConfirmationMessage": "Data will be resent for approval. Are you sure?",
     "noDataForApproval": "Pas de données disponibles pour approbation.",
     "yesLabel": "Oui",
+    "disabledOpUnit": "Operation Unit disabled successfully.",
+    "disabledModule": "Module disabled successfully.",
     "cancelLabel": "Annuler",
     "unsavedDataLabel": "Les données non enregistrées",
     "okLabel": "Bien",

@@ -54,8 +54,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             };
 
             return orgUnitRepository.upsert(newOpUnits)
-                .then(saveToDhis)
-                .then(onSuccess, onError);
+            .then(saveToDhis)
+            .then(onSuccess, onError);
         };
 
         $scope.delete = function(index) {
@@ -69,7 +69,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 $scope.isDisabled = true;
 
                 return $q.all([orgUnitRepository.upsert(payload), saveToDhis(orgUnitsToDisable)]).then(function() {
-                    if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(orgUnit);
+                    if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(orgUnit, "disabledOpUnit");
                 });
             });
         };

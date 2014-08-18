@@ -8,7 +8,7 @@
 	</div>
 	<div class="panel-body">
 		<form class="form-horizontal" name="form" role="form" novalidate>
-			<div class="well" ng-repeat="module in modules">
+			<div class="well" ng-repeat="module in modules"	>
 				<input type="button" class="btn-delete" ng-hide="$first || !isNewMode" ng-click="deleteModule($index)" value="X Delete">
 				<ul>
 					<li class="form-group">
@@ -39,14 +39,14 @@
 								<h4 ng-class="{cur: true}">{{module.selectedDataset.name}}</h4>
 								<div ng-repeat="section in module.selectedDataset.sections">
 									<div class="collapse-head">
-										<h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">{{section.name}}</h5>
+										<h5 ng-click="getIsExpanded(module)[section.id] = !getIsExpanded(module)[section.id]">{{section.name}}</h5>
 										<input type="checkbox" ng-disabled="updateDisabled" ng-change="changeSectionSelection(section)" ng-model="getSection(module.selectedDataset, section.id)['isIncluded']">
 									</div>
-									<div collapse="!isExpanded[section.id]" class="collapse-body">
+									<div collapse="!getIsExpanded(module)[section.id]" class="collapse-body">
 										<ul>
 											<li ng-repeat="element in section.dataElements">
 												<label>
-													<input type="checkbox" ng-disabled="updateDisabled" ng-model="getDataElement(section, element.id)['isIncluded']" ng-change="changeDataElementSelection(section)"> {{element.formName}}
+														<input type="checkbox" ng-disabled="updateDisabled" ng-model="getDataElement(section, element.id)['isIncluded']" ng-change="changeDataElementSelection(section)"> {{element.formName}}
 												</label>
 											</li>
 										</ul>

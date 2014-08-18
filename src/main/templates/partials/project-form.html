@@ -4,7 +4,6 @@
 		<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Module" ng-click="openInNewMode('Module')" />
 		<input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />
 	</div>
-	<div ng-show="showMessage" class="alert alert-success">{{ resourceBundle[message] }}</div>
 	<div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
 	<form name="createForm" class="form-horizontal" role="form" novalidate>
 		<div class="panel panel-default">

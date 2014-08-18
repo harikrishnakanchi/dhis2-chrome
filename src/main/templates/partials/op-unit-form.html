@@ -2,7 +2,6 @@
     <div class="top-actions" ng-if="!isNewMode">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Module" ng-if="!isDisabled" ng-click="openInNewMode('Module')" />
     </div>
-    <div ng-show="showMessage" class="alert alert-success">{{ resourceBundle[message] }}</div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorOpUnit }}</div>
     <div class="panel-heading">
         <h3 class="panel-title">Operation Unit Details</h3>
