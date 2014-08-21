@@ -177,13 +177,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                     "value": "val3"
                 }, {
                     "attribute": {
-                        "code": "prjType",
-                        "name": "Type of project",
-                        "id": "bnbnSvRdFYo"
-                    },
-                    "value": "val4"
-                }, {
-                    "attribute": {
                         "code": "prjEndDate",
                         "name": "End date",
                         "id": "ZbUuOnEmVs5"
@@ -198,18 +191,32 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                     "value": "val6"
                 }, {
                     "attribute": {
-                        "code": "event",
-                        "name": "Event",
-                        "id": "a4ecfc70574"
-                    },
-                    "value": "Armed Conflict: disruption of health systems due to conflict"
-                }, {
-                    "attribute": {
                         "code": "projCode",
                         "name": "Project Code",
                         "id": "fa5e00d5cd2"
                     },
                     "value": "RU118"
+                }, {
+                    attribute: {
+                        code: 'reasonForIntervention',
+                        name: 'Reason For Intervention',
+                        id: 'e7af7f29053'
+                    },
+                    value: 'Armed Conflict'
+                }, {
+                    attribute: {
+                       code: 'modeOfOperation',
+                        name: 'Mode Of Operation',
+                        id: 'a048b89d331'
+                    },
+                    value: 'Direct Operation'
+                }, {
+                    attribute: {
+                        code: 'modelOfManagement',
+                        name: 'Model Of Management',
+                        id: 'd2c3e7993f6'
+                    },
+                    value: 'Collaboration'
                 }]
             };
             var expectedNewOrgUnit = {
@@ -217,11 +224,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 'openingDate': moment("2010-01-01").format("YYYY-MM-DD"),
                 'context': "val2",
                 'location': "val3",
-                'projectType': "val4",
                 'endDate': moment("2011-01-01").format("YYYY-MM-DD"),
                 'populationType': "val6",
-                'event': 'Armed Conflict: disruption of health systems due to conflict',
-                'projectCode': 'RU118'
+                'projectCode': 'RU118',
+                'reasonForIntervention': 'Armed Conflict',
+                'modeOfOperation': 'Direct Operation',
+                'modelOfManagement': 'Collaboration'
             };
 
             scope.isNewMode = false;

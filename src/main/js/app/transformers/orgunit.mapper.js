@@ -24,13 +24,6 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             "value": orgUnit.location
         }, {
             "attribute": {
-                "code": "prjType",
-                "name": "Type of project",
-                "id": "bnbnSvRdFYo"
-            },
-            "value": orgUnit.projectType
-        }, {
-            "attribute": {
                 "code": "prjPopType",
                 "name": "Type of population",
                 "id": "Byx9QE6IvXB"
@@ -45,11 +38,25 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             "value": orgUnit.projectCode
         }, {
             "attribute": {
-                "code": "event",
-                "name": "Event",
-                "id": "a4ecfc70574"
+                "code": "reasonForIntervention",
+                "name": "Reason For Intervention",
+                "id": "e7af7f29053"
             },
-            "value": orgUnit.event
+            "value": orgUnit.reasonForIntervention
+        }, {
+            "attribute": {
+               "code": "modeOfOperation",
+                "name": "Mode Of Operation",
+                "id": "a048b89d331"
+            },
+            "value": orgUnit.modeOfOperation
+        }, {
+            "attribute": {
+                "code": "modelOfManagement",
+                "name": "Model Of Management",
+                "id": "d2c3e7993f6"
+            },
+            "value": orgUnit.modelOfManagement
         });
 
         if (orgUnit.endDate)
@@ -130,11 +137,13 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             'openingDate': moment(dhisProject.openingDate).format("YYYY-MM-DD"),
             'context': getAttributeValue(dhisProject, "prjCon"),
             'location': getAttributeValue(dhisProject, "prjLoc"),
-            'projectType': getAttributeValue(dhisProject, "prjType"),
             'populationType': getAttributeValue(dhisProject, "prjPopType"),
             'endDate': endDate ? moment(endDate).format("YYYY-MM-DD") : undefined,
-            'event': getAttributeValue(dhisProject, "event"),
             'projectCode': getAttributeValue(dhisProject, "projCode"),
+            'reasonForIntervention': getAttributeValue(dhisProject, "reasonForIntervention"),
+            'modeOfOperation': getAttributeValue(dhisProject, "modeOfOperation"),
+            'modelOfManagement': getAttributeValue(dhisProject, "modelOfManagement")
+
         };
     };
 

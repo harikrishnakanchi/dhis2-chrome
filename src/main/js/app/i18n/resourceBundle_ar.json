@@ -70,5 +70,8 @@
     "weekLabel": "أسبوع",
     "yearLabel": "عام",
     "monthLabel": "شهر",
-     "disableOrgUnitConfirmationMessage": "Organisation unit will be disabled. Are you sure?"
+     "disableOrgUnitConfirmationMessage": "Organisation unit will be disabled. Are you sure?",
+    "reasonForIntervention": "Reason For Intervention",
+    "modeOfOperation": "Mode of operation",
+    "modelOfManagement": "Model of management"
 }

@@ -75,5 +75,8 @@
     "chooseProjectLabel": "Select a Project",
     "selectProject": "Select a project",
     "errorProject": "Error saving the preferences. Please try again later.",
-    "disableOrgUnitConfirmationMessage": "Organisation unit will be disabled. Are you sure?"
+    "disableOrgUnitConfirmationMessage": "Organisation unit will be disabled. Are you sure?",
+    "reasonForIntervention": "Reason For Intervention",
+    "modeOfOperation": "Mode of operation",
+    "modelOfManagement": "Model of management"
 }

@@ -39,14 +39,6 @@
 						</div>
 					</li>
 					<li class="form-group">
-						<label for="newOrgUnitProjectType" class="col-sm-4 col-md-4  control-label">Type of project</label>
-						<div class="col-sm-6 col-md-6" >
-							<select type="text" class="form-control" name="newOrgUnitProjectType" id="newOrgUnitProjectType" ng-model="newOrgUnit.projectType" title="{{newOrgUnit.projectType}}" ng-options="o as o for o in allProjectTypes">
-								<option value=""></option>
-							</select>
-						</div>
-					</li>
-					<li class="form-group">
 						<label for="newOrgUnitContext" class="col-sm-4 col-md-4 control-label">Context</label>
 						<div class="col-sm-6 col-md-6" >
 							<select type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" title="{{newOrgUnit.context}}" ng-options="o as o for o in allContexts">
@@ -63,9 +55,25 @@
 						</div>
 					</li>
 					<li class="form-group">
-						<label for="newOrgUnitEvent" class="col-sm-4 col-md-4 control-label">Event</label>
+						<label for="newOrgUnitReasonForIntervention" class="col-sm-4 col-md-4 control-label">Reason for intervention</label>
 						<div class="col-sm-6 col-md-6" >
-							<select type="text" class="form-control" name="newOrgUnitEvent" id="newOrgUnitEvent" ng-model="newOrgUnit.event" title="{{newOrgUnit.event}}" ng-options="e as e for e in allEvents">
+							<select type="text" class="form-control" name="newOrgUnitReasonForIntervention" id="newOrgUnitReasonForIntervention" ng-model="newOrgUnit.reasonForIntervention" title="{{newOrgUnit.reasonForIntervention}}" ng-options="r as r for r in reasonForIntervention">
+								<option value=""></option>
+							</select>
+						</div>
+					</li>
+					<li class="form-group">
+						<label for="newOrgUnitModeOfOperation" class="col-sm-4 col-md-4 control-label">Mode of operation</label>
+						<div class="col-sm-6 col-md-6" >
+							<select type="text" class="form-control" name="newOrgUnitModeOfOperation" id="newOrgUnitModeOfOperation" ng-model="newOrgUnit.modeOfOperation" title="{{newOrgUnit.modeOfOperation}}" ng-options="mode as mode for mode in modeOfOperation">
+								<option value=""></option>
+							</select>
+						</div>
+					</li>
+					<li class="form-group">
+						<label for="newOrgUnitModelOfManagement" class="col-sm-4 col-md-4 control-label">Model of management</label>
+						<div class="col-sm-6 col-md-6" >
+							<select type="text" class="form-control" name="newOrgUnitModelOfManagement" id="newOrgUnitModelOfManagement" ng-model="newOrgUnit.modelOfManagement" title="{{newOrgUnit.modelOfManagement}}" ng-options="model as model for model in modelOfManagement">
 								<option value=""></option>
 							</select>
 						</div>

@@ -2,22 +2,12 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
 
     return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal) {
 
-        $scope.allProjectTypes = ['Direct', 'Indirect', 'Project excluded', 'Coordination', 'Remote Control'].sort();
-
-        $scope.allContexts = ['Armed Conflict', 'Post-Conflict', 'Stable', 'Internal Instability'].sort();
-
-        $scope.allPopTypes = ['Displaced', 'General Population', 'Mixed Displaced/General', 'Victims of Natural Disasters'].sort();
-
-        var allEventsExceptOther = ['Armed Conflict: direct violence towards the civilian population', 'Armed Conflict: disruption of health systems due to conflict',
-            'Armed Conflict: refugees/internally displaced people', 'Population affected by endemics/epidemics',
-            'Population affected by natural disaster', 'Population affected by social violence and health care exclusion',
-            'Victims of armed conflict'
-        ].sort();
-
-        $scope.allEvents = allEventsExceptOther.concat(['Other']);
-
-
+        $scope.allContexts = ['Internal instability', 'Stable', 'Post-conflict', 'Cross-border instability'].sort();
+        $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
         $scope.thisDate = moment().format("YYYY-MM-DD");
+        $scope.reasonForIntervention = ['Armed Conflict', 'Access to health care', 'Natural Disaster', 'Epidemic'].sort();
+        $scope.modeOfOperation = ['Direct operation', 'Remote management', 'Remote operation'].sort();
+        $scope.modelOfManagement = ['Collaboration', 'MSF management'].sort();
 
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
