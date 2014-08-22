@@ -1,6 +1,7 @@
 define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
     return function($scope, $q, $hustle, orgUnitRepository, db, $location, $modal) {
         $scope.isDisabled = false;
+        $scope.hospitalUnitCodes = ['A', 'B1', 'C1', 'C2', 'C3', 'X'];
         $scope.opUnits = [{
             'openingDate': moment().format("YYYY-MM-DD")
         }];
@@ -22,7 +23,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             var parent = $scope.orgUnit;
             var newOpUnits = _.map(opUnits, function(opUnit) {
                 var opUnitType = opUnit.type;
-                opUnit = _.omit(opUnit, 'type');
+                var hospitalUnitCode = opUnit.hospitalUnitCode;
+                opUnit = _.omit(opUnit, ['type','hospitalUnitCode']);
                 return _.merge(opUnit, {
                     'id': dhisId.get(opUnit.name + parent.id),
                     'shortName': opUnit.name,
@@ -40,6 +42,13 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                             "code": "Type"
                         },
                         "value": "Operation Unit"
+                    }, {
+                        "attribute": {
+                            "id": "c6d3c8a7286",
+                            "code": "hospitalUnitCode"
+        
+                        },
+                        "value": hospitalUnitCode
                     }]
                 });
             });
@@ -99,7 +108,12 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                         "attribute": {
                             "code": "opUnitType"
                         }
-                    }).value
+                    }).value,
+                    'hospitalUnitCode': _.find($scope.orgUnit.attributeValues, {
+                        "attribute": {
+                            "code": "hospitalUnitCode"
+                        }
+                    }).value,
                 }];
                 var isDisabled = _.find($scope.orgUnit.attributeValues, {
                     "attribute": {

@@ -81,12 +81,14 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             var opUnit1 = {
                 'name': 'OpUnit1',
                 'type': 'Hospital',
-                'openingDate': today
+                'openingDate': today,
+                'hospitalUnitCode': 'A'
             };
             var opUnit2 = {
                 'name': 'OpUnit2',
                 'type': 'Community',
-                'openingDate': today
+                'openingDate': today,
+                'hospitalUnitCode': 'A'
             };
             var opUnits = [opUnit1, opUnit2];
 
@@ -118,6 +120,12 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                         code: 'Type'
                     },
                     value: 'Operation Unit'
+                }, {
+                    attribute: {
+                        id: 'c6d3c8a7286',
+                        code: 'hospitalUnitCode'
+                    },
+                    value: 'A'
                 }]
             }, {
                 name: 'OpUnit2',
@@ -141,6 +149,12 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                         code: 'Type'
                     },
                     value: 'Operation Unit'
+                }, {
+                    attribute: {
+                        id: 'c6d3c8a7286',
+                        code: 'hospitalUnitCode'
+                    },
+                    value: 'A'
                 }]
             }];
 
@@ -171,6 +185,11 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                         "id": "a1fa2777924"
                     },
                     "value": "Operation Unit"
+                }, {
+                    "attribute": {
+                        "code": "hospitalUnitCode"
+                    },
+                    "value": "B1"
                 }]
             };
             scope.isNewMode = false;
@@ -196,6 +215,11 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                         "code": "isDisabled"
                     },
                     "value": true
+                }, {
+                    "attribute": {
+                        "code": "hospitalUnitCode"
+                    },
+                    "value": "B1"
                 }]
             };
             scope.isNewMode = false;
