@@ -57,9 +57,12 @@
 					<li class="form-group">
 						<label for="newOrgUnitReasonForIntervention" class="col-sm-4 col-md-4 control-label">Reason for intervention</label>
 						<div class="col-sm-6 col-md-6" >
-							<select type="text" class="form-control" name="newOrgUnitReasonForIntervention" id="newOrgUnitReasonForIntervention" ng-model="newOrgUnit.reasonForIntervention" title="{{newOrgUnit.reasonForIntervention}}" ng-options="r as r for r in reasonForIntervention">
+							<select type="text" class="form-control" name="newOrgUnitReasonForIntervention" id="newOrgUnitReasonForIntervention" ng-model="newOrgUnit.reasonForIntervention" title="{{newOrgUnit.reasonForIntervention}}" ng-options="r as r for r in reasonForIntervention" required>
 								<option value=""></option>
 							</select>
+							<div ng-show="createForm.newOrgUnitReasonForIntervention.$dirty &amp;&amp; createForm.newOrgUnitReasonForIntervention.$invalid">
+								<span ng-show="createForm.newOrgUnitReasonForIntervention.$error.required"class="errortxt">{{resourceBundle.reasonForInterventionValidation}}</span>
+							</div>
 						</div>
 					</li>
 					<li class="form-group">
@@ -73,9 +76,12 @@
 					<li class="form-group">
 						<label for="newOrgUnitModelOfManagement" class="col-sm-4 col-md-4 control-label">Model of management</label>
 						<div class="col-sm-6 col-md-6" >
-							<select type="text" class="form-control" name="newOrgUnitModelOfManagement" id="newOrgUnitModelOfManagement" ng-model="newOrgUnit.modelOfManagement" title="{{newOrgUnit.modelOfManagement}}" ng-options="model as model for model in modelOfManagement">
+							<select type="text" class="form-control" name="newOrgUnitModelOfManagement" id="newOrgUnitModelOfManagement" ng-model="newOrgUnit.modelOfManagement" title="{{newOrgUnit.modelOfManagement}}" ng-options="model as model for model in modelOfManagement" required>
 								<option value=""></option>
 							</select>
+							<div ng-show="createForm.newOrgUnitModelOfManagement.$dirty &amp;&amp; createForm.newOrgUnitModelOfManagement.$invalid">
+								<span ng-show="createForm.newOrgUnitModelOfManagement.$error.required"class="errortxt">{{resourceBundle.modelOfManagementValidation}}</span>
+							</div>
 						</div>
 					</li>
 

@@ -78,5 +78,7 @@
     "disableOrgUnitConfirmationMessage": "Organisation unit will be disabled. Are you sure?",
     "reasonForIntervention": "Reason For Intervention",
     "modeOfOperation": "Mode of operation",
-    "modelOfManagement": "Model of management"
+    "modelOfManagement": "Model of management",
+    "modelOfManagementValidation": "Model of management is required",
+    "reasonForInterventionValidation": "Reason for intervention is required"
 }
