@@ -41,6 +41,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var initDataEntryForm = function() {
+            var projectId = $scope.currentModule.parent.id;
+            $scope.projectIsAutoApproved = false;
+            orgUnitRepository.getOrgUnit(projectId).then(function(orgUnit){
+                var project = orgUnitMapper.mapToProject(orgUnit);
+                $scope.projectIsAutoApproved = (project.autoApprove === "true");
+            });
+
             approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
                 $scope.isCompleted = !_.isEmpty(data);
             });
@@ -94,6 +101,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $scope.saveSuccess = false;
             $scope.saveError = false;
             $scope.submitSuccess = false;
+            $scope.submitAndApprovalSuccess = false;
             $scope.submitError = false;
             $scope.approveSuccess = false;
             $scope.approveError = false;
@@ -110,26 +118,104 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             return _.last(headers).length;
         };
 
+        $scope.saveAsDraft = function() {
+            var successPromise = function() {
+                $scope.saveSuccess = true;
+                $scope.submitSuccess = false;
+                initDataEntryForm();
+                scrollToTop();
+            };
+
+            var errorPromise = function() {
+                $scope.saveError = true;
+                $scope.submitError = false;
+                $scope.isSubmitted = false;
+                scrollToTop();
+            };
+
+            save(true).then(successPromise, errorPromise);
+        };        
+
         $scope.submit = function() {
+            var successPromise = function() {
+                $scope.saveSuccess = false;
+                $scope.submitSuccess = true;
+                initDataEntryForm();
+                scrollToTop();
+            };
+
+            var errorPromise = function() {
+                $scope.saveError = false;
+                $scope.submitError = true;
+                $scope.isSubmitted = false;
+                scrollToTop();
+            };
+
             if ($scope.isCompleted || $scope.isApproved) {
                 showModal(function() {
-                    save(false);
+                    save(false).then(successPromise, errorPromise);
                 }, $scope.resourceBundle.reapprovalConfirmationMessage);
             } else {
-                save(false);
+                save(false).then(successPromise, errorPromise);
             }
         };
 
-        $scope.saveAsDraft = function() {
-            save(true);
+        $scope.submitAndApprove = function() {
+            var successPromise = function() {
+                $scope.saveSuccess = false;
+                $scope.submitAndApprovalSuccess = true;
+                initDataEntryForm();
+                scrollToTop();
+            };
+
+            var errorPromise = function() {
+                $scope.saveError = false;
+                $scope.submitError = true;
+                $scope.isSubmitted = false;
+                scrollToTop();
+            };
+
+            if ($scope.isCompleted || $scope.isApproved) {
+                showModal(function() {
+                    save(false).then(markDataAsComplete).then(markDataAsApproved).then(successPromise, errorPromise);
+                }, $scope.resourceBundle.reapprovalConfirmationMessage);
+            } else {
+                save(false).then(markDataAsComplete).then(markDataAsApproved).then(successPromise, errorPromise);
+            }
         };
 
         $scope.firstLevelApproval = function() {
-            showModal(markDataAsComplete, $scope.resourceBundle.dataApprovalConfirmationMessage);
+            var onSuccess = function() {
+                $scope.approveSuccess = true;
+                $scope.approveError = false;
+                initDataEntryForm();
+            };
+
+            var onError = function() {
+                $scope.approveSuccess = false;
+                $scope.approveError = true;
+            };
+
+            showModal(function() {
+                markDataAsComplete().then(onSuccess, onError);
+            }, $scope.resourceBundle.dataApprovalConfirmationMessage);
         };
 
         $scope.secondLevelApproval = function() {
-            showModal(markDataAsApproved, $scope.resourceBundle.dataApprovalConfirmationMessage);
+            var onSuccess = function() {
+                $scope.approveSuccess = true;
+                $scope.approveError = false;
+                initDataEntryForm();
+            };
+
+            var onError = function() {
+                $scope.approveSuccess = false;
+                $scope.approveError = true;
+            };
+
+            showModal(function() {
+                markDataAsApproved().then(onSuccess, onError);
+            }, $scope.resourceBundle.dataApprovalConfirmationMessage);
         };
 
         var showModal = function(okCallback, message) {
@@ -144,17 +230,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var approveData = function(approvalData, approvalFn, approvalType) {
-            var onSuccess = function() {
-                $scope.approveSuccess = true;
-                $scope.approveError = false;
-                initDataEntryForm();
-            };
-
-            var onError = function() {
-                $scope.approveSuccess = false;
-                $scope.approveError = true;
-            };
-
             var saveToDhis = function() {
                 return $hustle.publish({
                     "data": approvalData,
@@ -162,7 +237,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 }, "dataValues");
             };
 
-            return approvalFn(approvalData).then(saveToDhis).then(onSuccess, onError).
+            return approvalFn(approvalData).then(saveToDhis).
             finally(scrollToTop);
         };
 
@@ -212,18 +287,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         var save = function(asDraft) {
             var period = getPeriod();
 
-            var successPromise = function() {
-                $scope.saveSuccess = asDraft ? true : false;
-                $scope.submitSuccess = !asDraft ? true : false;
-                initDataEntryForm();
-            };
-
-            var errorPromise = function() {
-                $scope.saveError = asDraft ? true : false;
-                $scope.submitError = !asDraft ? true : false;
-                $scope.isSubmitted = false;
-            };
-
             var saveToDhis = function(data) {
                 return $hustle.publish({
                     "data": data,
@@ -263,11 +326,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
             if (asDraft) {
-                dataRepository.saveAsDraft(payload).then(successPromise, errorPromise);
+                return dataRepository.saveAsDraft(payload);
             } else {
-                dataRepository.save(payload).then(unapproveData).then(saveToDhis).then(successPromise, errorPromise);
+                return dataRepository.save(payload).then(unapproveData).then(saveToDhis);
             }
-            scrollToTop();
         };
 
         var confirmAndMove = function(okCallback) {

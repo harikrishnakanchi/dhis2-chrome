@@ -33,6 +33,11 @@ define([], function() {
             });
         };
 
+        this.getOrgUnit = function(orgUnitId){
+            var store = db.objectStore("organisationUnits");
+            return store.find(orgUnitId);
+        };
+        
         this.getAllModulesInProjects = function(projectIds) {
             return this.getAll().then(function(allOrgUnits) {
 

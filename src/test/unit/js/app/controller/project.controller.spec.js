@@ -117,6 +117,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             expect(scope.newOrgUnit).toEqual({
                 openingDate: moment().format('YYYY-MM-DD'),
+                autoApprove : 'false'
             });
             expect(scope.saveFailure).toEqual(false);
         });
@@ -128,8 +129,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             };
             spyOn(event, 'preventDefault');
             spyOn(event, 'stopPropagation');
-
-
 
             scope.openOpeningDate(event);
 
@@ -205,7 +204,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                     value: 'Armed Conflict'
                 }, {
                     attribute: {
-                       code: 'modeOfOperation',
+                        code: 'modeOfOperation',
                         name: 'Mode Of Operation',
                         id: 'a048b89d331'
                     },
@@ -217,6 +216,13 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                         id: 'd2c3e7993f6'
                     },
                     value: 'Collaboration'
+                }, {
+                    'attribute': {
+                        'code': 'autoApprove',
+                        'name': 'Auto Approve',
+                        'id': 'e65afaec61d'
+                    },
+                    'value': 'true'
                 }]
             };
             var expectedNewOrgUnit = {
@@ -229,7 +235,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 'projectCode': 'RU118',
                 'reasonForIntervention': 'Armed Conflict',
                 'modeOfOperation': 'Direct Operation',
-                'modelOfManagement': 'Collaboration'
+                'modelOfManagement': 'Collaboration',
+                'autoApprove': 'true'
             };
 
             scope.isNewMode = false;

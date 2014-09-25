@@ -64,6 +64,14 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
         }));
 
+        it("should get orgUnit", function() {
+            var projectId = "proj1";
+            var orgUnit = orgUnitRepository.getOrgUnit(projectId);
+            scope.$apply();
+            
+            expect(mockOrgStore.find).toHaveBeenCalledWith(projectId);
+        });
+
         it("should save org hierarchy", function() {
             var orgUnit = [{
                 "id": "org_0",

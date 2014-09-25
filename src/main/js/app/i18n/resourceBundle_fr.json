@@ -9,6 +9,7 @@
     "dataSaveSuccess": "Les données sauvegardées avec succès",
     "dataSaveFailure": "L'enregistrement des données d'erreur, S'il vous plaît réessayer plus tard",
     "dataSubmitSuccess": "Les données soumises avec succès",
+    "dataSubmitAndApproved": "Les données présentées et approuvées avec succès",
     "dataSubmitFailure": "Erreur soumettre des données. S'il vous plaît réessayer plus tard",
     "dataApproveSuccess": "Les données seront envoyées pour la deuxième niveau d'approbation.",
     "dataApprovalConfirmationMessage": "Etes-vous sûr de vouloir approuver?",

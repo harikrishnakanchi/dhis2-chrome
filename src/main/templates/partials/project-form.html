@@ -101,11 +101,18 @@
 							<input type="date" min={{thisDate}} name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate">
 						</div>
 					</li>
+					<li class="form-group">
+						<label for="newOrgUnitEndDate" class="col-sm-4 col-md-4 control-label">Auto approve?</label>
+						<div class="col-sm-6 col-md-6" >
+							<input type="radio" id="newOrgUnitAutoApproveYes" name="newOrgUnitAutoApprove" ng-model="newOrgUnit.autoApprove" value="true" />&nbsp;<label for="newOrgUnitAutoApproveYes">Yes</label>&nbsp;
+							<input type="radio" id="newOrgUnitAutoApproveNo" name="newOrgUnitAutoApprove" ng-model="newOrgUnit.autoApprove" value="false" />&nbsp;<label for="newOrgUnitAutoApproveNo">No</label>&nbsp;
+						</div>
+					</li>					
 					<li>
 						<div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
 							<input type="button" class="btn btn-main" ng-if="isNewMode" ng-click="save(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Save"/>
 							<input type="button" class="btn btn-main" ng-if="!isNewMode" ng-click="update(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Update"/>
-							<input type="button" class="btn" ng-click="reset()" ng-if="isNewMode" value="Reset">
+							<input type="button" class="btn" ng-click="reset()" ng-if="isNewMode" value="Reset" />
 						</div>
 					</li>
 				</ul>

@@ -57,6 +57,13 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "id": "d2c3e7993f6"
             },
             "value": orgUnit.modelOfManagement
+        }, {
+            "attribute": {
+                "code": "autoApprove",
+                "name": "Auto Approve",
+                "id": "e65afaec61d"
+            },
+            "value": orgUnit.autoApprove
         });
 
         if (orgUnit.endDate)
@@ -130,8 +137,9 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return attribute ? attribute.value : undefined;
     };
 
-    this.mapToProjectForEdit = function(dhisProject) {
+    this.mapToProject = function(dhisProject) {
         var endDate = getAttributeValue(dhisProject, "prjEndDate");
+        var autoApprove = getAttributeValue(dhisProject, "autoApprove"); 
         return {
             'name': dhisProject.name,
             'openingDate': moment(dhisProject.openingDate).format("YYYY-MM-DD"),
@@ -142,8 +150,8 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             'projectCode': getAttributeValue(dhisProject, "projCode"),
             'reasonForIntervention': getAttributeValue(dhisProject, "reasonForIntervention"),
             'modeOfOperation': getAttributeValue(dhisProject, "modeOfOperation"),
-            'modelOfManagement': getAttributeValue(dhisProject, "modelOfManagement")
-
+            'modelOfManagement': getAttributeValue(dhisProject, "modelOfManagement"),
+            'autoApprove':  autoApprove === undefined ? "false" : autoApprove
         };
     };
 

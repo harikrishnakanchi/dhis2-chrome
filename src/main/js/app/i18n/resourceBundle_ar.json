@@ -9,6 +9,7 @@
     "dataSaveSuccess": "حفظ البيانات بنجاح",
     "dataSaveFailure": "توفير البيانات خطأ، يرجى المحاولة مرة أخرى في وقت لاحق",
     "dataSubmitSuccess": "قدمت بيانات بنجاح",
+    "dataSubmitAndApproved": "قدمت البيانات وافقت بنجاح",
     "dataSubmitFailure": "خطأ تقديم البيانات. يرجى المحاولة مرة أخرى في وقت لاحق",
     "disabledOpUnit": "Operation Unit disabled successfully.",
     "disabledModule": "Module disabled successfully.",

@@ -2,8 +2,9 @@
 define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "approvalDataRepository", "orgUnitRepository"],
     function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, ApprovalDataRepository, OrgUnitRepository) {
         describe("dataEntryController ", function() {
-            var scope, db, q, location, anchorScroll, dataEntryController, rootScope, approvalStore, saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
-                orgUnits, window, approvalStoreSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository;
+            var scope, db, q, location, anchorScroll, dataEntryController, rootScope, approvalStore,
+                saveSuccessPromise, saveErrorPromise, dataEntryFormMock,
+                orgUnits, window, approvalStoreSpy, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -20,6 +21,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 approvalDataRepository = new ApprovalDataRepository();
 
                 orgUnitRepository = new OrgUnitRepository();
+                getOrgUnitSpy = spyOn(orgUnitRepository, "getOrgUnit");
+                getOrgUnitSpy.and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, []));
 
                 var queryBuilder = function() {
@@ -296,11 +299,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             it("should evaluate expression on blur", function() {
                 scope.dataValues = {
-                        "blah": {
-                            "some": {
-                                "value": "1+9"
-                            }
+                    "blah": {
+                        "some": {
+                            "value": "1+9"
                         }
+                    }
                 };
 
                 scope.evaluateExpression("blah", "some");
@@ -555,7 +558,10 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     "weekNumber": 14
                 };
                 scope.currentModule = {
-                    'id': 'Mod1'
+                    'id': 'Mod1',
+                    'parent': {
+                        'id': 'proj1'
+                    }
                 };
                 spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
                 scope.$apply();
@@ -631,6 +637,40 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
                 expect(_.keys(scope.currentGroupedSections)).toEqual(['DS_OPD']);
                 expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
+            });
+
+            it("should display the correct submit option for auto approved projects", function() {
+                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {}));
+
+                spyOn(scope.dataentryForm, '$setPristine');
+                spyOn(dataRepository, "getDataValues").and.returnValue(getDataValuesPromise);
+
+                getOrgUnitSpy.and.returnValue(utils.getPromise(q, {
+                    "id": "proj1",
+                    "attributeValues": [{
+                        'attribute': {
+                            'code': 'autoApprove',
+                            'name': 'Auto Approve',
+                            'id': 'e65afaec61d'
+                        },
+                        'value': 'true'
+                    }]
+                }));
+
+                scope.week = {
+                    "weekNumber": 14
+                };
+                scope.currentModule = {
+                    'id': 'mod1',
+                    parent: {
+                        id: 'parent'
+                    }
+                };
+
+                scope.$apply();
+
+                expect(scope.projectIsAutoApproved).toBeTruthy();
             });
 
             it('should prevent navigation if data entry form is dirty', function() {
@@ -877,6 +917,107 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.isCompleted).toEqual(true);
             });
 
+            it("should submit data for auto approval", function() {
+                var levelOneApprovalDataSaved = false;
+                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.callFake(function() {
+                    if (levelOneApprovalDataSaved)
+                        return utils.getPromise(q, {
+                            "blah": "moreBlah"
+                        });
+                    return utils.getPromise(q, undefined);
+                });
+                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, undefined));
+
+                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+                spyOn(fakeModal, "open").and.returnValue({
+                    result: utils.getPromise(q, {})
+                });
+                spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
+
+                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+                spyOn(approvalDataRepository, "saveLevelOneApproval").and.callFake(function() {
+                    levelOneApprovalDataSaved = true;
+                    return utils.getPromise(q, {});
+                });
+
+                spyOn(approvalDataRepository, "saveLevelTwoApproval").and.callFake(function() {
+                    levelTwoApprovalDataSaved = true;
+                    return utils.getPromise(q, {
+                        "blah": "moreBlah"
+                    });
+                });
+
+                var _Date = Date;
+                spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
+
+                getOrgUnitSpy.and.returnValue(utils.getPromise(q, {
+                    "id": "proj1",
+                    "attributeValues": [{
+                        'attribute': {
+                            'code': 'autoApprove',
+                            'name': 'Auto Approve',
+                            'id': 'e65afaec61d'
+                        },
+                        'value': 'true'
+                    }]
+                }));
+
+                scope.currentModule = {
+                    id: 'mod2',
+                    parent: {
+                        id: 'parent'
+                    }
+                };
+                scope.currentModule = {
+                    id: 'mod2',
+                    parent: {
+                        id: 'parent'
+                    }
+                };
+                scope.year = 2014;
+                scope.week = {
+                    "weekNumber": 14
+                };
+                scope.$apply();
+
+                scope.submitAndApprove();
+                scope.$apply();
+
+
+                var l1ApprovalPayload = {
+                    "dataSets": ['Vacc'],
+                    "period": '2014W14',
+                    "orgUnit": 'mod2',
+                    "storedBy": 'dataentryuser',
+                    "date": moment().toISOString(),
+                    "status": "NEW"
+                };
+
+                expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(l1ApprovalPayload);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": l1ApprovalPayload,
+                    "type": 'uploadCompletionData'
+                }, 'dataValues');
+
+                var l2ApprovalPayload = {
+                    "dataSets": ['Vacc'],
+                    "period": '2014W14',
+                    "orgUnit": 'mod2',
+                    "createdByUsername": 'dataentryuser',
+                    "createdDate": '2014-05-30T12:43:54.972Z',
+                    "isApproved": true,
+                    "status": 'NEW'
+                };
+
+                expect(approvalDataRepository.saveLevelTwoApproval).toHaveBeenCalledWith(l2ApprovalPayload);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": l2ApprovalPayload,
+                    "type": 'uploadApprovalData'
+                }, 'dataValues');
+
+                expect(scope.submitAndApprovalSuccess).toBe(true);
+            });
+
             it("should not submit data for approval", function() {
                 spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {}));
@@ -989,7 +1130,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             it("should mark data as approved if proccessed", function() {
                 var levelTwoApprovalDataSaved = false;
                 spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {
-                "blah": "moreBlah"
+                    "blah": "moreBlah"
                 }));
                 spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.callFake(function() {
                     if (levelTwoApprovalDataSaved)

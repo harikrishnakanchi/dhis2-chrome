@@ -56,7 +56,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     value: 'Armed Conflict'
                 }, {
                     attribute: {
-                       code: 'modeOfOperation',
+                        code: 'modeOfOperation',
                         name: 'Mode Of Operation',
                         id: 'a048b89d331'
                     },
@@ -68,10 +68,17 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         id: 'd2c3e7993f6'
                     },
                     value: 'Collaboration'
+                }, {
+                    'attribute': {
+                        'code': 'autoApprove',
+                        'name': 'Auto Approve',
+                        'id': 'e65afaec61d'
+                    },
+                    'value': 'true'
                 }]
             };
 
-            var result = orgUnitMapper.mapToProjectForEdit(dhisProject);
+            var result = orgUnitMapper.mapToProject(dhisProject);
 
             var expectedResult = {
                 'name': dhisProject.name,
@@ -83,7 +90,48 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 'projectCode': 'RU118',
                 'reasonForIntervention': 'Armed Conflict',
                 'modeOfOperation': 'Direct Operation',
-                'modelOfManagement': 'Collaboration'
+                'modelOfManagement': 'Collaboration',
+                'autoApprove': 'true'
+            };
+
+            expect(result).toEqual(expectedResult);
+        });
+
+        it("should set autoApprove to false if the attribute does not exist in dhis", function() {
+            var dhisProject = {
+                "id": "aa4acf9115a",
+                "name": 'Org1',
+                "level": 3,
+                "shortName": 'Org1',
+                "openingDate": "2010-01-01",
+                "parent": {
+                    "name": "name1",
+                    "id": "id1"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "projCode",
+                        "name": "Project Code",
+                        "id": "fa5e00d5cd2"
+                    },
+                    "value": "RU118"
+                }]
+            };
+
+            var result = orgUnitMapper.mapToProject(dhisProject);
+
+            var expectedResult = {
+                'name': dhisProject.name,
+                'openingDate': moment(dhisProject.openingDate).format("YYYY-MM-DD"),
+                'context': undefined,
+                'location': undefined,
+                'populationType': undefined,
+                'endDate': undefined,
+                'projectCode': 'RU118',
+                'reasonForIntervention': undefined,
+                'modeOfOperation': undefined,
+                'modelOfManagement': undefined,
+                'autoApprove': 'false'
             };
 
             expect(result).toEqual(expectedResult);
@@ -101,7 +149,8 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 'projectCode': 'AB001',
                 'reasonForIntervention': 'Armed Conflict',
                 'modeOfOperation': 'Direct Operation',
-                'modelOfManagement': 'Collaboration'
+                'modelOfManagement': 'Collaboration',
+                'autoApprove': 'true'
             };
 
             var parentOrgUnit = {
@@ -167,7 +216,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     value: 'Armed Conflict'
                 }, {
                     attribute: {
-                       code: 'modeOfOperation',
+                        code: 'modeOfOperation',
                         name: 'Mode Of Operation',
                         id: 'a048b89d331'
                     },
@@ -179,6 +228,13 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         id: 'd2c3e7993f6'
                     },
                     value: 'Collaboration'
+                }, {
+                    'attribute': {
+                        'code': 'autoApprove',
+                        'name': 'Auto Approve',
+                        'id': 'e65afaec61d'
+                    },
+                    'value': 'true'
                 }, {
                     attribute: {
                         code: 'prjEndDate',
@@ -503,7 +559,8 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 'projectCode': 'AB001',
                 'reasonForIntervention': 'Armed Conflict',
                 'modeOfOperation': 'Direct Operation',
-                'modelOfManagement': 'Collaboration'
+                'modelOfManagement': 'Collaboration',
+                'autoApprove': 'true'
             };
 
             var projectToBeSaved = orgUnitMapper.mapToExistingProject(newProject, project);
@@ -559,7 +616,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     value: 'Armed Conflict'
                 }, {
                     attribute: {
-                       code: 'modeOfOperation',
+                        code: 'modeOfOperation',
                         name: 'Mode Of Operation',
                         id: 'a048b89d331'
                     },
@@ -571,6 +628,13 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         id: 'd2c3e7993f6'
                     },
                     value: 'Collaboration'
+                }, {
+                    attribute: {
+                        code: 'autoApprove',
+                        name: 'Auto Approve',
+                        id: 'e65afaec61d'
+                    },
+                    value: 'true'
                 }, {
                     attribute: {
                         code: 'prjEndDate',

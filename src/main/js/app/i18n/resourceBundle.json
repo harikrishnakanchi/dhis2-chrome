@@ -9,6 +9,7 @@
     "dataSaveSuccess": "Data saved successfully",
     "dataSaveFailure": "Error saving data, Please try again later",
     "dataSubmitSuccess": "Data submitted successfully",
+    "dataSubmitAndApproved":"Data submitted and auto-approved successfully",
     "dataSubmitFailure": "Error submitting data. Please try again later",
     "firstLevelApproveSuccess": "Data sent for second level of approval.",
     "secondLevelApproveSuccess": "Data sent for third level of approval.",

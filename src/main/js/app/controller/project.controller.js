@@ -26,7 +26,8 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         $scope.reset = function() {
             $scope.saveFailure = false;
             $scope.newOrgUnit = {
-                'openingDate': moment().format("YYYY-MM-DD")
+                'openingDate': moment().format("YYYY-MM-DD"),
+                'autoApprove': 'false'
             };
         };
 
@@ -134,7 +135,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
 
         var prepareEditForm = function() {
             $scope.reset();
-            $scope.newOrgUnit = orgUnitMapper.mapToProjectForEdit($scope.orgUnit);
+            $scope.newOrgUnit = orgUnitMapper.mapToProject($scope.orgUnit);
             userRepository.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForEdit);
         };
 
