@@ -154,44 +154,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     }]
                 };
 
-                var expectedModules = [{
-                    'name': 'mod2',
-                    'displayName': 'mod2',
-                    'id': 'mod2',
-                    'parent': {
-                        id: "proj_1"
-                    },
-                    'attributeValues': [{
-                        'attribute': {
-                            id: "a1fa2777924"
-                        },
-                        value: "Module"
-                    }, {
-                        'attribute': {
-                            code: "isDisabled"
-                        },
-                        value: false
-                    }]
-                }, {
-                    'name': 'modunderopunit',
-                    'displayName': 'opunitUnderPrj - modunderopunit',
-                    'id': 'mod11',
-                    'parent': {
-                        id: "opunit1"
-                    },
-                    'attributeValues': [{
-                        'attribute': {
-                            id: "a1fa2777924"
-                        },
-                        value: "Module"
-                    }, {
-                        'attribute': {
-                            code: "isDisabled"
-                        },
-                        value: false
-                    }]
-                }];
-
                 var allModules = [{
                     'name': 'mod1',
                     'displayName': 'mod1',
@@ -208,9 +170,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                         'attribute': {
                             code: "isDisabled"
                         },
-                        value: true
+                        value: false
                     }]
-                }].concat(expectedModules);
+                }];
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, allModules));
@@ -218,7 +180,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 dataEntryController = new DataEntryController(scope, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository);
                 scope.$apply();
 
-                expect(scope.modules).toEqual(expectedModules);
+                expect(scope.modules).toEqual(allModules);
             });
 
             it("should return the sum of the list ", function() {

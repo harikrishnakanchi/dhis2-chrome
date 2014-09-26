@@ -38,7 +38,7 @@ define([], function() {
             return store.find(orgUnitId);
         };
         
-        this.getAllModulesInProjects = function(projectIds) {
+        this.getAllModulesInProjects = function(projectIds, rejectDisabled) {
             return this.getAll().then(function(allOrgUnits) {
 
                 var filterModules = function(orgUnits) {
@@ -73,7 +73,21 @@ define([], function() {
                     return filteredModules;
                 };
 
+                var filterDisabled = function(modules) {
+                    return _.reject(modules, function(module) {
+                        var isDisabledAttribute = _.find(module.attributeValues, {
+                            'attribute': {
+                                'code': 'isDisabled'
+                            }
+                        });
+                        return isDisabledAttribute && isDisabledAttribute.value;
+                    });
+                };
+
                 var allModules = filterModules(allOrgUnits);
+                if (rejectDisabled) {
+                    allModules = filterDisabled(allModules);
+                }
                 return (getModulesUnderOrgUnits(allModules)).concat(getModulesUnderOpUnits(allModules));
             });
         };
