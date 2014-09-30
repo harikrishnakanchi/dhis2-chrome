@@ -90,7 +90,12 @@ require.config({
 
         //Utils
         "chromeRuntime": "app/utils/chrome.runtime",
-        "dhisId": "app/utils/dhis.id"
+        "dhisId": "app/utils/dhis.id",
+
+        //Helpers
+        "helpers": "app/helpers/helpers",
+        "approvalHelper": "app/helpers/approval.helper"
+
     },
     shim: {
         "ng-i18n": {

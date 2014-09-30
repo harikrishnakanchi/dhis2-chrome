@@ -1,4 +1,4 @@
-define(["dataService", "angularMocks", "properties", "moment", "utils", "testData"], function(DataService, mocks, properties, moment, utils, testData) {
+define(["dataService", "angularMocks", "properties", "moment", "testData"], function(DataService, mocks, properties, moment, testData) {
     describe("dataService", function() {
         var httpBackend, http, dataSetStore, dataValuesStore;
 

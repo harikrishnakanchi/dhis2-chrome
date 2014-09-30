@@ -1,8 +1,8 @@
-define(["angular", "Q", "services", "directives", "controllers", "repositories", "migrator", "migrations", "properties", "httpInterceptor", "failureStrategyFactory", "monitors",
+define(["angular", "Q", "services", "directives", "controllers", "repositories", "migrator", "migrations", "properties", "httpInterceptor", "failureStrategyFactory", "monitors",  "helpers",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals"
     ],
-    function(angular, Q, services, directives, controllers, repositories, migrator, migrations, properties, httpInterceptor, failureStrategyFactory, monitors) {
+    function(angular, Q, services, directives, controllers, repositories, migrator, migrations, properties, httpInterceptor, failureStrategyFactory, monitors, helpers) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal",
@@ -13,6 +13,7 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
             controllers.init(app);
             repositories.init(app);
             monitors.init(app);
+            helpers.init(app);
 
             app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider',

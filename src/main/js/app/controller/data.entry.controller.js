@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository, $timeout, orgUnitRepository) {
+    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository, $timeout, orgUnitRepository, approvalHelper) {
         var dataSets, systemSettings;
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -189,10 +189,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
             if ($scope.isCompleted || $scope.isApproved) {
                 showModal(function() {
-                    save(false).then(markDataAsComplete).then(markDataAsApproved).then(successPromise, errorPromise);
+                    save(false).then(approvalHelper.markDataAsComplete).then(approvalHelper.markDataAsApproved).then(successPromise, errorPromise);
                 }, $scope.resourceBundle.reapprovalConfirmationMessage);
             } else {
-                save(false).then(markDataAsComplete).then(markDataAsApproved).then(successPromise, errorPromise);
+                save(false).then(approvalHelper.markDataAsComplete).then(approvalHelper.markDataAsApproved).then(successPromise, errorPromise);
             }
         };
 
@@ -209,7 +209,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             showModal(function() {
-                markDataAsComplete().then(onSuccess, onError);
+                var data = {
+                    "dataSets": _.keys($scope.currentGroupedSections),
+                    "period": getPeriod(),
+                    "orgUnit": $scope.currentModule.id,
+                    "storedBy": $scope.currentUser.userCredentials.username
+                };
+
+                approvalHelper.markDataAsComplete(data).then(onSuccess, onError).finally(scrollToTop);
             }, $scope.resourceBundle.dataApprovalConfirmationMessage);
         };
 
@@ -226,7 +233,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             showModal(function() {
-                markDataAsApproved().then(onSuccess, onError);
+                var data = {
+                    "dataSets": _.keys($scope.currentGroupedSections),
+                    "period": getPeriod(),
+                    "orgUnit": $scope.currentModule.id,
+                    "storedBy": $scope.currentUser.userCredentials.username
+                };
+
+                approvalHelper.markDataAsApproved(data).then(onSuccess, onError).finally(scrollToTop);
             }, $scope.resourceBundle.dataApprovalConfirmationMessage);
         };
 
@@ -240,46 +254,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
             modalInstance.result.then(okCallback);
         };
-
-        var approveData = function(approvalData, approvalFn, approvalType) {
-            var saveToDhis = function() {
-                return $hustle.publish({
-                    "data": approvalData,
-                    "type": approvalType
-                }, "dataValues");
-            };
-
-            return approvalFn(approvalData).then(saveToDhis).
-            finally(scrollToTop);
-        };
-
-        var markDataAsComplete = function() {
-            var dataForApproval = {
-                "dataSets": _.keys($scope.currentGroupedSections),
-                "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id,
-                "storedBy": $scope.currentUser.userCredentials.username,
-                "date": moment().toISOString(),
-                "status": "NEW"
-            };
-
-            return approveData(dataForApproval, approvalDataRepository.saveLevelOneApproval, "uploadCompletionData");
-        };
-
-        var markDataAsApproved = function() {
-            var dataForApproval = {
-                "dataSets": _.keys($scope.currentGroupedSections),
-                "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id,
-                "createdByUsername": $scope.currentUser.userCredentials.username,
-                "createdDate": moment().toISOString(),
-                "isApproved": true,
-                "status": "NEW"
-            };
-
-            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData");
-        };
-
 
         $scope.isCurrentWeekSelected = function(week) {
             var today = moment().format("YYYY-MM-DD");
@@ -340,7 +314,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             if (asDraft) {
                 return dataRepository.saveAsDraft(payload);
             } else {
-                return dataRepository.save(payload).then(unapproveData).then(saveToDhis);
+                return dataRepository.save(payload).then(unapproveData).then(saveToDhis).then(function() {
+                    return {
+                        "dataSets": _.keys($scope.currentGroupedSections),
+                        "period": getPeriod(),
+                        "orgUnit": $scope.currentModule.id,
+                        "storedBy": $scope.currentUser.userCredentials.username
+                    };
+                });
             }
         };
 

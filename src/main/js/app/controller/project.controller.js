@@ -41,8 +41,6 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         };
 
         var saveToDbAndPublishMessage = function(dhisProject) {
-            
-
             var onSuccess = function(data) {
                 $rootScope.$broadcast('resetProjects');
                 if ($scope.$parent.closeNewForm)
