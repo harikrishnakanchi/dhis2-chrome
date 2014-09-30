@@ -21,8 +21,18 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 approvalDataRepository = new ApprovalDataRepository();
 
                 orgUnitRepository = new OrgUnitRepository();
+                var parentProject = {
+                    'id': 'parent',
+                    'attributeValues': [{
+                        'attribute': {
+                            'code': 'Type',
+                            'name': 'Type',
+                        },
+                        'value': 'Project'
+                    }]
+                };
                 getOrgUnitSpy = spyOn(orgUnitRepository, "getOrgUnit");
-                getOrgUnitSpy.and.returnValue(utils.getPromise(q, []));
+                getOrgUnitSpy.and.returnValue(utils.getPromise(q, parentProject));
                 spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, []));
 
                 var queryBuilder = function() {
@@ -617,6 +627,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                             'id': 'e65afaec61d'
                         },
                         'value': 'true'
+                    }, {
+                        'attribute': {
+                            'code': 'Type',
+                            'name': 'Type',
+                        },
+                        'value': 'Project'
                     }]
                 }));
 
@@ -921,6 +937,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                             'id': 'e65afaec61d'
                         },
                         'value': 'true'
+                    }, {
+                        'attribute': {
+                            'code': 'Type',
+                            'name': 'Type',
+                        },
+                        'value': 'Project'
                     }]
                 }));
 

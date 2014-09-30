@@ -127,7 +127,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         }), 'name');
     };
 
-    var getAttributeValue = function(dhisProject, code) {
+    this.getAttributeValue = function(dhisProject, code) {
         var attribute = _.find(dhisProject.attributeValues, {
             'attribute': {
                 'code': code
@@ -138,19 +138,19 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
     };
 
     this.mapToProject = function(dhisProject) {
-        var endDate = getAttributeValue(dhisProject, "prjEndDate");
-        var autoApprove = getAttributeValue(dhisProject, "autoApprove"); 
+        var endDate = self.getAttributeValue(dhisProject, "prjEndDate");
+        var autoApprove = self.getAttributeValue(dhisProject, "autoApprove"); 
         return {
             'name': dhisProject.name,
             'openingDate': moment(dhisProject.openingDate).format("YYYY-MM-DD"),
-            'context': getAttributeValue(dhisProject, "prjCon"),
-            'location': getAttributeValue(dhisProject, "prjLoc"),
-            'populationType': getAttributeValue(dhisProject, "prjPopType"),
+            'context': self.getAttributeValue(dhisProject, "prjCon"),
+            'location': self.getAttributeValue(dhisProject, "prjLoc"),
+            'populationType': self.getAttributeValue(dhisProject, "prjPopType"),
             'endDate': endDate ? moment(endDate).format("YYYY-MM-DD") : undefined,
-            'projectCode': getAttributeValue(dhisProject, "projCode"),
-            'reasonForIntervention': getAttributeValue(dhisProject, "reasonForIntervention"),
-            'modeOfOperation': getAttributeValue(dhisProject, "modeOfOperation"),
-            'modelOfManagement': getAttributeValue(dhisProject, "modelOfManagement"),
+            'projectCode': self.getAttributeValue(dhisProject, "projCode"),
+            'reasonForIntervention': self.getAttributeValue(dhisProject, "reasonForIntervention"),
+            'modeOfOperation': self.getAttributeValue(dhisProject, "modeOfOperation"),
+            'modelOfManagement': self.getAttributeValue(dhisProject, "modelOfManagement"),
             'autoApprove':  autoApprove === undefined ? "false" : autoApprove
         };
     };

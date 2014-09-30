@@ -41,11 +41,23 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var initDataEntryForm = function() {
-            var projectId = $scope.currentModule.parent.id;
+            var getParentProjectId = function(parentId) {
+                return orgUnitRepository.getOrgUnit(parentId).then(function(parentOrgUnit) {
+                    var type = orgUnitMapper.getAttributeValue(parentOrgUnit, "Type");
+                    if (type === 'Project') {
+                        return parentOrgUnit.id;
+                    } else {
+                        return getParentProjectId(parentOrgUnit.parent.id);
+                    }
+                });
+            };
+
             $scope.projectIsAutoApproved = false;
-            orgUnitRepository.getOrgUnit(projectId).then(function(orgUnit){
-                var project = orgUnitMapper.mapToProject(orgUnit);
-                $scope.projectIsAutoApproved = (project.autoApprove === "true");
+            getParentProjectId($scope.currentModule.parent.id).then(function(parentProjectId) {
+                orgUnitRepository.getOrgUnit(parentProjectId).then(function(orgUnit) {
+                    var project = orgUnitMapper.mapToProject(orgUnit);
+                    $scope.projectIsAutoApproved = (project.autoApprove === "true");
+                });
             });
 
             approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
@@ -134,7 +146,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             save(true).then(successPromise, errorPromise);
-        };        
+        };
 
         $scope.submit = function() {
             var successPromise = function() {
