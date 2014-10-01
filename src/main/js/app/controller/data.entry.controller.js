@@ -1,5 +1,7 @@
-define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment) {
-    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository, $timeout, orgUnitRepository, approvalHelper) {
+define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
+    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository, 
+        $timeout, orgUnitRepository, approvalHelper) {
+
         var dataSets, systemSettings;
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -76,11 +78,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.isDataFormInitialized = true;
             });
 
-            var datasetsAssociatedWithModule = _.pluck(_.filter(dataSets, {
-                'organisationUnits': [{
-                    'id': $scope.currentModule.id
-                }]
-            }), 'id');
+            var datasetsAssociatedWithModule = _.pluck(datasetTransformer.getAssociatedDatasets($scope.currentModule, dataSets), 'id');
 
             $scope.currentGroupedSections = _.pick($scope.groupedSections, datasetsAssociatedWithModule);
             var selectedDatasets = _.keys($scope.currentGroupedSections);

@@ -884,10 +884,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.$apply();
 
                 expect(approvalHelper.markDataAsComplete).toHaveBeenCalledWith(data);
-                // expect(hustle.publish).toHaveBeenCalledWith({
-                //     "data": data,
-                //     "type": 'uploadCompletionData'
-                // }, 'dataValues');
                 expect(scope.approveSuccess).toBe(true);
                 expect(scope.approveError).toBe(false);
                 expect(scope.isCompleted).toEqual(true);
