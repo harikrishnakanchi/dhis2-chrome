@@ -34,7 +34,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 };
 
                 var setUpEditMode = function() {
-                    var associatedDatasets = datasetTransformer.getAssociatedDatasets($scope.orgUnit, $scope.allDatasets);
+                    var associatedDatasets = datasetTransformer.getAssociatedDatasets($scope.orgUnit.id, $scope.allDatasets);
                     var nonAssociatedDatasets = _.reject($scope.allDatasets, function(d) {
                         return !isNewDataModel(d) || _.any(associatedDatasets, {
                             "id": d.id
@@ -171,7 +171,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.getIsExpanded = function(module) {
             module.timestamp = module.timestamp || new Date().getTime();
             $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
-            return $scope.isExpanded[module.timestamp]; 
+            return $scope.isExpanded[module.timestamp];
         };
 
         $scope.addModules = function() {

@@ -1,9 +1,7 @@
-define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper) {
-
+define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "approvalHelper"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, ApprovalHelper) {
     describe("project controller tests", function() {
-
         var scope, timeout, q, location, anchorScroll, userRepository,
-            fakeModal, orgUnitRepo, hustle, rootScope;
+            fakeModal, orgUnitRepo, hustle, rootScope, approvalHelper;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
@@ -13,6 +11,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             q = $q;
             timeout = $timeout;
             location = $location;
+            approvalHelper = new ApprovalHelper();
 
             orgUnitRepo = utils.getMockRepo(q);
 
@@ -41,7 +40,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             };
 
             anchorScroll = jasmine.createSpy();
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, approvalHelper);
         }));
 
         it("should save project in dhis", function(done) {
@@ -92,7 +91,31 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 data: expectedNewOrgUnit,
                 type: "upsertOrgUnit"
             }, "dataValues");
+        });
 
+        it("should approve existing data for project if autoApprove is set to true", function() {
+            var orgUnit = {
+                "id": "blah"
+            };
+            var newOrgUnit = {
+                "id": "blah",
+                "autoApprove": true
+            };
+
+            spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(newOrgUnit);
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalHelper, "autoApproveExistingData").and.returnValue(utils.getPromise(q, {}));
+            spyOn(location, 'hash');
+
+            scope.update(newOrgUnit, orgUnit);
+            scope.$apply();
+
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(newOrgUnit);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: newOrgUnit,
+                type: "upsertOrgUnit"
+            }, "dataValues");
+            expect(approvalHelper.autoApproveExistingData).toHaveBeenCalled();
         });
 
         it("should display error if updating organization unit fails", function() {
@@ -117,7 +140,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             expect(scope.newOrgUnit).toEqual({
                 openingDate: moment().format('YYYY-MM-DD'),
-                autoApprove : 'false'
+                autoApprove: 'false'
             });
             expect(scope.saveFailure).toEqual(false);
         });

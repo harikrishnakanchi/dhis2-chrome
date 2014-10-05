@@ -95,7 +95,6 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
             })).toEqual(expectedEnrichedDatasets);
         });
 
-
         it("should get datasets associated with org units", function() {
 
             var dataset1 = {
@@ -135,11 +134,10 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
 
             var datasets = [dataset1, dataset2];
 
-            var actualDatasets = datasetTransformer.getAssociatedDatasets(orgUnit, datasets);
+            var actualDatasets = datasetTransformer.getAssociatedDatasets(orgUnit.id, datasets);
 
             expect(actualDatasets).toEqual([dataset1, dataset2]);
         });
-
     });
 
 });

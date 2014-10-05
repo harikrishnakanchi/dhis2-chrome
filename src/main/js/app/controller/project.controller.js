@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, orgUnitMapper, toTree, properties) {
 
-    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal) {
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal, approvalHelper) {
 
         $scope.allContexts = ['Internal instability', 'Stable', 'Post-conflict', 'Cross-border instability'].sort();
         $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
@@ -45,6 +45,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
                 $rootScope.$broadcast('resetProjects');
                 if ($scope.$parent.closeNewForm)
                     $scope.$parent.closeNewForm(data, "savedProject");
+                return dhisProject;
             };
 
             var onError = function() {
@@ -60,7 +61,13 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
 
         $scope.update = function(newOrgUnit, orgUnit) {
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
-            saveToDbAndPublishMessage(dhisProject);
+            saveToDbAndPublishMessage(dhisProject).then(function(data) {
+                if (newOrgUnit.autoApprove) {
+                    return approvalHelper.autoApproveExistingData(data);
+                } else {
+                    return data;
+                }
+            });
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {

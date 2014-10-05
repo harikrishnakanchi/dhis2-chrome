@@ -27,7 +27,8 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "maxretries": 5
         },
         "messageTimeout": 5000,
-        "devMode": true
+        "devMode": true,
+        "weeksForAutoApprove":8
     };
 
     return _.merge(properties, overrides);
