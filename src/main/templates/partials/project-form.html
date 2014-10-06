@@ -111,7 +111,7 @@
 					<li>
 						<div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
 							<input type="button" class="btn btn-main" ng-if="isNewMode" ng-click="save(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Save"/>
-							<input type="button" class="btn btn-main" ng-if="!isNewMode" ng-click="update(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Update"/>
+							<input type="button" class="btn btn-main" ng-if="!isNewMode" ng-click="update(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate() || !createForm.$dirty" value="Update"/>
 							<input type="button" class="btn" ng-click="reset()" ng-if="isNewMode" value="Reset" />
 						</div>
 					</li>
