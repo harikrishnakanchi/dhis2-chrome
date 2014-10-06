@@ -52,7 +52,7 @@ define(["properties", "datasetTransformer", "moment"], function(properties, data
 
                 var filterDraftData = function(data) {
                     return _.filter(data, function(datum) {
-                        return datum.dataValues[0].isDraft != true;
+                        return datum.dataValues[0].isDraft !== true;
                     });
                 };
 
@@ -78,7 +78,7 @@ define(["properties", "datasetTransformer", "moment"], function(properties, data
                 return _.map(orgUnitsToApprove, function(orgUnitId, i) {
                     var associatedDatasets = _.pluck(datasetTransformer.getAssociatedDatasets(orgUnitId, allDatasets), 'id');
                     return _.map(submittedPeriodsPerProject[i].period, function(pe) {
-                        return approvalData = {
+                        return {
                             "dataSets": associatedDatasets,
                             "period": pe,
                             "orgUnit": orgUnitId,
