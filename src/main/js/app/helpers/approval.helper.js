@@ -82,7 +82,7 @@ define(["properties", "datasetTransformer", "moment"], function(properties, data
                             "dataSets": associatedDatasets,
                             "period": pe,
                             "orgUnit": orgUnitId,
-                            "storedBy": $rootScope.currentUser.userCredentials.username
+                            "storedBy": "service.account"
                         };
                     });
                 });
@@ -99,7 +99,7 @@ define(["properties", "datasetTransformer", "moment"], function(properties, data
                 .then(generateApprovalData)
                 .then(autoApprove)
                 .then(function(data) {
-                    console.log(data);
+                    return data;
                 });
         };
 
