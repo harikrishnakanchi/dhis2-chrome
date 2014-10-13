@@ -40,35 +40,33 @@ define(["properties", "datasetTransformer", "moment"], function(properties, data
             return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData");
         };
 
-        var autoApproveExistingData = function(orgUnit) {
-            var orgUnitId = orgUnit.id;
+        var getSubmittedPeriodsForProject = function(modules) {
+            var m = moment();
+            var endPeriod = m.year() + "W" + m.isoWeek();
 
-            var getSubmittedPeriodsForProject = function(orgUnitId) {
-                var m = moment();
-                var endPeriod = m.year() + "W" + m.isoWeek();
+            m = m.subtract(properties.weeksForAutoApprove, 'week');
+            var startPeriod = m.year() + "W" + m.isoWeek();
 
-                m = m.subtract(properties.weeksForAutoApprove, 'week');
-                var startPeriod = m.year() + "W" + m.isoWeek();
-
-                var filterDraftData = function(data) {
-                    return _.filter(data, function(datum) {
-                        return datum.dataValues[0].isDraft !== true;
-                    });
-                };
-
-                return orgUnitRepository.getAllModulesInProjects([orgUnitId], false).then(function(modules) {
-                    return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, _.pluck(modules, "id")).then(function(data) {
-                        data = filterDraftData(data);
-                        var dataValuesByOrgUnit = _.groupBy(data, 'orgUnit');
-                        return _.map(_.keys(dataValuesByOrgUnit), function(orgUnitId) {
-                            return {
-                                "orgUnitId": orgUnitId,
-                                "period": _.pluck(dataValuesByOrgUnit[orgUnitId], "period")
-                            };
-                        });
-                    });
+            var filterDraftData = function(data) {
+                return _.filter(data, function(datum) {
+                    return datum.dataValues[0].isDraft !== true;
                 });
             };
+
+            return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, _.pluck(modules, "id")).then(function(data) {
+                data = filterDraftData(data);
+                var dataValuesByOrgUnit = _.groupBy(data, 'orgUnit');
+                return _.map(_.keys(dataValuesByOrgUnit), function(moduleId) {
+                    return {
+                        "orgUnitId": moduleId,
+                        "period": _.pluck(dataValuesByOrgUnit[moduleId], "period")
+                    };
+                });
+            });
+        };
+
+        var autoApproveExistingData = function(orgUnit) {
+            var orgUnitId = orgUnit.id;
 
             var generateApprovalData = function(data) {
                 var submittedPeriodsPerProject = data[0];
@@ -95,12 +93,14 @@ define(["properties", "datasetTransformer", "moment"], function(properties, data
                 }));
             };
 
-            return $q.all([getSubmittedPeriodsForProject(orgUnitId), dataSetRepository.getAll()])
-                .then(generateApprovalData)
-                .then(autoApprove)
-                .then(function(data) {
-                    return data;
-                });
+            return orgUnitRepository.getAllModulesInProjects([orgUnitId], false).then(function(modules) {
+                return $q.all([getSubmittedPeriodsForProject(modules), dataSetRepository.getAll()])
+                    .then(generateApprovalData)
+                    .then(autoApprove)
+                    .then(function(data) {
+                        return data;
+                    });
+            });
         };
 
         return {
