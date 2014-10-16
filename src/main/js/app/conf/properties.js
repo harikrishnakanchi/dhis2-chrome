@@ -28,7 +28,8 @@ define(['lodash', 'overrides'], function(_, overrides) {
         },
         "messageTimeout": 5000,
         "devMode": true,
-        "weeksForAutoApprove":8
+        "weeksForAutoApprove": 8,
+        "weeksToDisplayStatusInDashboard": 12
     };
 
     return _.merge(properties, overrides);

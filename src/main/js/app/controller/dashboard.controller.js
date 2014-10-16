@@ -1,5 +1,5 @@
 define([], function() {
-    return function($scope, $hustle, $q) {
+    return function($scope, $hustle, $q, $rootScope, approvalHelper) {
         var dataValues = [];
 
         $scope.syncNow = function() {

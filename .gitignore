@@ -4,5 +4,6 @@ src/test/unit/coverage/
 src/main/css
 .DS_Store
 screenShots/*.png
+npm-debug.log
 
 !src/main/js/lib/custom

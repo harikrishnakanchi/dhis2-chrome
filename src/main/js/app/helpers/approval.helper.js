@@ -40,12 +40,120 @@ define(["properties", "datasetTransformer", "moment"], function(properties, data
             return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData");
         };
 
-        var getSubmittedPeriodsForProject = function(modules) {
-            var m = moment();
-            var endPeriod = m.year() + "W" + m.isoWeek();
+        var autoApproveExistingData = function(orgUnit) {
+            var orgUnitId = orgUnit.id;
 
-            m = m.subtract(properties.weeksForAutoApprove, 'week');
-            var startPeriod = m.year() + "W" + m.isoWeek();
+            var generateApprovalPayload = function(data) {
+                var submittedPeriodsPerModule = data[0];
+                var allDatasets = data[1];
+                var orgUnitsToApprove = _.pluck(submittedPeriodsPerModule, "orgUnitId");
+
+                return _.map(orgUnitsToApprove, function(orgUnitId, i) {
+                    var associatedDatasets = _.pluck(datasetTransformer.getAssociatedDatasets(orgUnitId, allDatasets), 'id');
+                    return _.map(submittedPeriodsPerModule[i].period, function(pe) {
+                        return {
+                            "dataSets": associatedDatasets,
+                            "period": pe,
+                            "orgUnit": orgUnitId,
+                            "storedBy": "service.account"
+                        };
+                    });
+                });
+            };
+
+            var autoApprove = function(data) {
+                data = _.flatten(data);
+                return $q.all(_.map(data, function(datum) {
+                    return markDataAsComplete(datum).then(markDataAsApproved);
+                }));
+            };
+
+            return orgUnitRepository.getAllModulesInProjects([orgUnitId], false).then(function(modules) {
+                return $q.all([getSubmittedPeriodsForModules(modules, properties.weeksForAutoApprove), dataSetRepository.getAll()])
+                    .then(generateApprovalPayload)
+                    .then(autoApprove)
+                    .then(function(data) {
+                        return data;
+                    });
+            });
+        };
+
+        var getApprovalStatus = function(orgUnitId) {
+            var getStatus = function(modules, submittedPeriods, dataSetCompletePeriods, approvalData) {
+
+                var findIndex = function(array, orgUnitId) {
+                    return _.findIndex(array, function(obj) {
+                        return obj.orgUnitId === orgUnitId;
+                    });
+                };
+
+                var isSubmitted = function(submittedPeriods, orgUnitId, period) {
+                    var index = findIndex(submittedPeriods, orgUnitId);
+                    return index > -1 ? _.contains(submittedPeriods[index].period, period) : false;
+                };
+
+                var isComplete = function(dataSetCompletePeriods, orgUnitId, period) {
+                    var index = findIndex(dataSetCompletePeriods, orgUnitId);
+                    return index > -1 ? _.contains(dataSetCompletePeriods[index].period, period) : false;
+                };
+
+                var getApprovalLevel = function(approvalData, orgUnitId, period) {
+                    if (approvalData[orgUnitId]) {
+                        var data = _.find(approvalData[orgUnitId], {
+                            "period": period
+                        }) || {};
+
+                        if (data.isAccepted) {
+                            return 3;
+                        } else if (data.isApproved) {
+                            return 2;
+                        }
+                    }
+                };
+
+                return _.map(modules, function(mod) {
+                    var status = _.map(_.range(moment().isoWeek() - properties.weeksToDisplayStatusInDashboard, moment().isoWeek()), function(weekNum) {
+                        var period = getPeriod(moment(weekNum, "week"));
+                        var submitted = isSubmitted(submittedPeriods, mod.id, period);
+                        var approvalLevel = isComplete(dataSetCompletePeriods, mod.id, period) ? 1 : undefined;
+                        approvalLevel = getApprovalLevel(approvalData, mod.id, period) || approvalLevel;
+
+                        return {
+                            "period": period,
+                            "submitted": submitted,
+                            "approvalLevel": approvalLevel
+                        };
+                    });
+
+                    return {
+                        "moduleId": mod.id,
+                        "moduleName": mod.name,
+                        "status": status
+                    };
+                });
+            };
+
+            return orgUnitRepository.getAllModulesInProjects([orgUnitId], false).then(function(modules) {
+                return $q.all([
+                    getSubmittedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard),
+                    getLevelOneApprovedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard),
+                    getLevelTwoAndThreeApprovedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard)
+                ]).then(function(data) {
+                    var submittedPeriods = data[0];
+                    var dataSetCompletePeriods = data[1];
+                    var approvalData = data[2];
+                    return getStatus(modules, submittedPeriods, dataSetCompletePeriods, approvalData);
+                });
+            });
+        };
+
+        var getPeriod = function(m) {
+            return m.year() + "W" + m.isoWeek();
+        };
+
+        var getSubmittedPeriodsForModules = function(modules, numOfWeeks) {
+            var endPeriod = getPeriod(moment());
+            var startPeriod = getPeriod(moment().subtract(numOfWeeks, 'week'));
 
             var filterDraftData = function(data) {
                 return _.filter(data, function(datum) {
@@ -65,48 +173,35 @@ define(["properties", "datasetTransformer", "moment"], function(properties, data
             });
         };
 
-        var autoApproveExistingData = function(orgUnit) {
-            var orgUnitId = orgUnit.id;
+        var getLevelOneApprovedPeriodsForModules = function(modules, numOfWeeks) {
+            var endPeriod = getPeriod(moment());
+            var startPeriod = getPeriod(moment().subtract(numOfWeeks, 'week'));
 
-            var generateApprovalData = function(data) {
-                var submittedPeriodsPerProject = data[0];
-                var allDatasets = data[1];
-                var orgUnitsToApprove = _.pluck(submittedPeriodsPerProject, "orgUnitId");
-
-                return _.map(orgUnitsToApprove, function(orgUnitId, i) {
-                    var associatedDatasets = _.pluck(datasetTransformer.getAssociatedDatasets(orgUnitId, allDatasets), 'id');
-                    return _.map(submittedPeriodsPerProject[i].period, function(pe) {
-                        return {
-                            "dataSets": associatedDatasets,
-                            "period": pe,
-                            "orgUnit": orgUnitId,
-                            "storedBy": "service.account"
-                        };
-                    });
+            return approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, _.pluck(modules, "id")).then(function(data) {
+                var approvalDataByOrgUnit = _.groupBy(data, 'orgUnit');
+                return _.map(_.keys(approvalDataByOrgUnit), function(moduleId) {
+                    return {
+                        "orgUnitId": moduleId,
+                        "period": _.pluck(approvalDataByOrgUnit[moduleId], "period")
+                    };
                 });
-            };
+            });
+        };
 
-            var autoApprove = function(data) {
-                data = _.flatten(data);
-                return $q.all(_.map(data, function(datum) {
-                    return markDataAsComplete(datum).then(markDataAsApproved);
-                }));
-            };
+        var getLevelTwoAndThreeApprovedPeriodsForModules = function(modules, numOfWeeks) {
+            var endPeriod = getPeriod(moment());
+            var startPeriod = getPeriod(moment().subtract(numOfWeeks, 'week'));
 
-            return orgUnitRepository.getAllModulesInProjects([orgUnitId], false).then(function(modules) {
-                return $q.all([getSubmittedPeriodsForProject(modules), dataSetRepository.getAll()])
-                    .then(generateApprovalData)
-                    .then(autoApprove)
-                    .then(function(data) {
-                        return data;
-                    });
+            return approvalDataRepository.getLevelTwoApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, _.pluck(modules, "id")).then(function(data) {
+                return _.groupBy(data, 'orgUnit');
             });
         };
 
         return {
             "markDataAsComplete": markDataAsComplete,
             "markDataAsApproved": markDataAsApproved,
-            "autoApproveExistingData": autoApproveExistingData
+            "autoApproveExistingData": autoApproveExistingData,
+            "getApprovalStatus": getApprovalStatus
         };
     };
 });

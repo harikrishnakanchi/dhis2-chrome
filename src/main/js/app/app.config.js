@@ -12,6 +12,7 @@ require.config({
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
         "moment": "lib/moment/min/moment-with-locales",
+        "timecop": "lib/timecop/timecop-0.1.1",
         "hustle": "lib/hustle/hustle",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
 
