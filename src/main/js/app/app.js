@@ -64,7 +64,7 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
 
             app.run(['dhisMonitor', '$rootScope', '$location',
                 function(dhisMonitor, $rootScope, $location) {
-                    $rootScope.$on('$routeChangeStart', function(e, newUrl, oldUrl) {
+                    $rootScope.$on('$locationChangeStart', function(e, newUrl, oldUrl) {
                         if (!$rootScope.isLoggedIn) {
                             $location.path("/login");
                         }
