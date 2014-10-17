@@ -6,10 +6,10 @@
     "dependencies": {
         "requirejs": null,
         "q": "1.0.1",
-        "angular": null,
-        "angular-resource": null,
+        "angular": "1.2.26",
+        "angular-resource": "1.2.26",
         "angular-indexedDB": "https://github.com/DWB-eHealth/angular-indexedDB.git",
-        "angular-route": null,
+        "angular-route": "1.2.26",
         "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
         "lodash": null,
         "angularjs-directives": "https://github.com/DWB-eHealth/angularjs-directives.git",
@@ -21,6 +21,6 @@
         "timecop": null
     },
     "devDependencies": {
-        "angular-mocks": null
+        "angular-mocks": "1.2.26"
     }
 }
