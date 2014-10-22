@@ -9,7 +9,7 @@
     "dataSaveSuccess": "Data saved successfully",
     "dataSaveFailure": "Error saving data, Please try again later",
     "dataSubmitSuccess": "Data submitted successfully",
-    "dataSubmitAndApproved":"Data submitted and auto-approved successfully",
+    "dataSubmitAndApproved": "Data submitted and auto-approved successfully",
     "dataSubmitFailure": "Error submitting data. Please try again later",
     "firstLevelApproveSuccess": "Data sent for second level of approval.",
     "secondLevelApproveSuccess": "Data sent for third level of approval.",
@@ -80,6 +80,11 @@
     "reasonForIntervention": "Reason For Intervention",
     "modeOfOperation": "Mode of operation",
     "modelOfManagement": "Model of management",
+    "levelLabel": "Level ",
     "modelOfManagementValidation": "Model of management is required",
-    "reasonForInterventionValidation": "Reason for intervention is required"
+    "reasonForInterventionValidation": "Reason for intervention is required",
+    "itemsAwaitingDataSubmissionLabel": "Items awaiting data submission",
+    "itemsAwaitingApprovalAtUserLevelLabel": "Items awaiting approval from you",
+    "itemsAwaitingApprovalAtOtherLevelLabel": "Items awaiting approval at other levels",
+    "itemsAwaitingApproval": "Items awaiting approval"
 }

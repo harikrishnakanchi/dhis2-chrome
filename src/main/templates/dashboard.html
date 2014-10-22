@@ -14,11 +14,11 @@
             <form>
 
                 <table class="table table-bordered" ng-if="itemsAwaitingSubmission.length > 0">
-                    <caption>Items awaiting data submission</caption>
+                    <caption>{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</caption>
                     <thead>
                         <tr>
-                            <th>Module</th>
-                            <th>Week</th>
+                            <th>{{resourceBundle.moduleLabel}}</th>
+                            <th>{{resourceBundle.weekLabel}}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,11 +37,11 @@
                 </table>
 
                 <table class="table table-bordered" ng-if="itemsAwaitingApprovalAtUserLevel.length > 0">
-                    <caption>Items awaiting approval from you</caption>
+                    <caption>{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</caption>
                     <thead>
                         <tr>
-                            <th>Module</th>
-                            <th>Week</th>
+                            <th>{{resourceBundle.moduleLabel}}</th>
+                            <th>{{resourceBundle.weekLabel}}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -59,11 +59,12 @@
                 </table>
 
                 <table class="table table-bordered" ng-if="itemsAwaitingApprovalAtOtherLevels.length > 0">
-                    <caption>Items awaiting approval at other levels</caption>
+                    <caption ng-if="userApprovalLevel">{{resourceBundle.itemsAwaitingApprovalAtOtherLevelLabel}}</caption>
+                    <caption ng-if="!userApprovalLevel">{{resourceBundle.itemsAwaitingApproval}}</caption>
                     <thead>
                         <tr>
-                            <th>Module</th>
-                            <th>Week</th>
+                            <th>{{resourceBundle.moduleLabel}}</th>
+                            <th>{{resourceBundle.weekLabel}}</th>
                             <th>Awaiting Approval At</th>
                         </tr>
                     </thead>
@@ -81,7 +82,7 @@
                             <td>
                                 <ul>
                                     <li ng-repeat="status in item.status">
-                                        Level {{status.nextApprovalLevel}}
+                                        {{resourceBundle.levelLabel}} {{status.nextApprovalLevel}}
                                     </li>
                                 </ul>
                             </td>
