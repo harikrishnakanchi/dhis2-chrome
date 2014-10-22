@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
-    return function($scope, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
+    return function($scope, $routeParams, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, approvalHelper) {
 
         var dataSets, systemSettings;
@@ -53,7 +53,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     }
                 });
             };
-
             $scope.projectIsAutoApproved = false;
             getParentProjectId($scope.currentModule.parent.id).then(function(parentProjectId) {
                 orgUnitRepository.getOrgUnit(parentProjectId).then(function(orgUnit) {
@@ -382,12 +381,40 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var setAvailableModules = function() {
-            orgUnitRepository.getAllModulesInProjects(_.pluck($rootScope.currentUser.organisationUnits, "id"), true).then(function(modules) {
+            return orgUnitRepository.getAllModulesInProjects(_.pluck($rootScope.currentUser.organisationUnits, "id"), true).then(function(modules) {
                 $scope.modules = modules;
             });
         };
 
+        var setInitialModuleAndWeek = function() {
+            var setSelectedModule = function(moduleId) {
+                $scope.currentModule = _.find($scope.modules, function(module) {
+                    return module.id === moduleId;
+                });
+            };
+
+            var setSelectedWeek = function(period) {
+                period = period.split(" - ");
+                var m = moment(period[1]);
+
+                $scope.year = m.year();
+                $scope.month = m.month();
+                $scope.week = {
+                    "weekNumber": parseInt(period[0].substring(1)),
+                    "startOfWeek": period[1],
+                    "endOfWeek": period[2]
+                };
+            };
+
+            if ($routeParams.module && $routeParams.week) {
+                setSelectedModule($routeParams.module);
+                setSelectedWeek($routeParams.week);
+            }
+            $scope.loading = false;
+        };
+
         var init = function() {
+            $scope.loading = true;
             $scope.resetForm();
             $location.hash('top');
             var dataSetPromise = getAll('dataSets');
@@ -398,8 +425,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var categoryOptionCombosPromise = getAll("categoryOptionCombos");
             var systemSettingsPromise = getAll('systemSettings');
             var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, systemSettingsPromise]);
-            getAllData.then(setData).then(transformDataSet);
-            setAvailableModules();
+            getAllData.then(setData).then(transformDataSet).then(setAvailableModules).then(setInitialModuleAndWeek);
         };
 
         init();

@@ -1,4 +1,4 @@
-define(["angular", "Q", "services", "directives", "controllers", "repositories", "migrator", "migrations", "properties", "httpInterceptor", "failureStrategyFactory", "monitors",  "helpers",
+define(["angular", "Q", "services", "directives", "controllers", "repositories", "migrator", "migrations", "properties", "httpInterceptor", "failureStrategyFactory", "monitors", "helpers",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals"
     ],
@@ -16,8 +16,9 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
             helpers.init(app);
 
             app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
-            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider',
-                function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider) {
+            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider',
+                function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider) {
+                    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
                     $routeProvider.
                     when('/dashboard', {
                         templateUrl: 'templates/dashboard.html',
@@ -27,7 +28,7 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
                         templateUrl: 'templates/login.html',
                         controller: 'loginController'
                     }).
-                    when('/data-entry', {
+                    when('/data-entry/:module?/:week?', {
                         templateUrl: 'templates/data-entry.html',
                         controller: 'dataEntryController'
                     }).

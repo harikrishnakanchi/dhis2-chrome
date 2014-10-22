@@ -24,7 +24,9 @@
 			</li>
 		</ul>
 </div>
-
+<div class="loading" ng-show="loading">
+     <img src="img/ajax-loader.gif" class="spinner" />
+</div>
 <section class="panel tab-panel" ng-if="week &amp;&amp; currentModule">
 <div class="alert alert-success" ng-if="!submitSuccess &amp;&amp; !submitAndApprovalSuccess &amp;&amp; isSubmitted &amp;&amp; !isAccepted &amp;&amp; hasRoles(['Data entry user'])" >{{resourceBundle.dataSubmittedForApproval}}</div>
 <div class="alert alert-danger" ng-if="isDataFormInitialized &amp;&amp; !isSubmitted &amp;&amp; hasRoles(['Approver - Level 1'])" >{{resourceBundle.noDataForApproval}}</div>

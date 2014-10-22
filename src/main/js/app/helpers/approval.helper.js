@@ -111,17 +111,24 @@ define(["properties", "datasetTransformer", "moment"], function(properties, data
                     }
                 };
 
+                var getNextApprovalLevel = function(currentApprovalLevel, submitted) {
+                    if (!currentApprovalLevel && submitted) return 1;
+                    return currentApprovalLevel < 3 ? currentApprovalLevel + 1 : undefined;
+                };
+
                 return _.map(modules, function(mod) {
-                    var status = _.map(_.range(moment().isoWeek() - properties.weeksToDisplayStatusInDashboard, moment().isoWeek()), function(weekNum) {
-                        var period = getPeriod(moment(weekNum, "week"));
+                    var status = _.map(_.range(properties.weeksToDisplayStatusInDashboard, 0, -1), function(i) {
+                        var period = getPeriod(moment().isoWeek(moment().isoWeek() - i));
                         var submitted = isSubmitted(submittedPeriods, mod.id, period);
                         var approvalLevel = isComplete(dataSetCompletePeriods, mod.id, period) ? 1 : undefined;
                         approvalLevel = getApprovalLevel(approvalData, mod.id, period) || approvalLevel;
 
+                        var nextApprovalLevel = getNextApprovalLevel(approvalLevel, submitted);
+
                         return {
                             "period": period,
                             "submitted": submitted,
-                            "approvalLevel": approvalLevel
+                            "nextApprovalLevel": nextApprovalLevel
                         };
                     });
 

@@ -1,9 +1,95 @@
 <!-- temporary styling -->
 <div style="margin:30px;">
-	<a id="linkToDataEntry" ng-if="hasRoles(['Data entry user'])" href="#/data-entry" class="btn btn-default">{{ resourceBundle.dataEntryLabel }}</a>
-	<a id="linkToDataApproval" ng-if="hasRoles(['Approver - Level 1', 'Approver - Level 2'])" href="#/data-entry" class="btn btn-default">{{ resourceBundle.approveDataLabel }}</a>
-	<a id="linkToProjects" ng-if="hasRoles(['Superuser'])" href="#/projects" class="btn btn-default">{{ resourceBundle.projectsLabel }}</a>
-	<a id="linkToDownloadData" ng-if="hasRoles(['Superuser', 'Data entry user', 'Approver - Level 1', 'Approver - Level 2'])" href="" ng-click="syncNow()" class="btn btn-default">{{ resourceBundle.downloadDataLabel }}</a>
-	<span ng-show="isSyncRunning">{{resourceBundle.syncRunning}}</span>
-	<span ng-show="isSyncDone">{{resourceBundle.syncComplete}}</span>
+    <a id="linkToDataEntry" ng-if="hasRoles(['Data entry user'])" href="#/data-entry" class="btn btn-default">{{ resourceBundle.dataEntryLabel }}</a>
+    <a id="linkToDataApproval" ng-if="hasRoles(['Approver - Level 1', 'Approver - Level 2'])" href="#/data-entry" class="btn btn-default">{{ resourceBundle.approveDataLabel }}</a>
+    <a id="linkToProjects" ng-if="hasRoles(['Superuser'])" href="#/projects" class="btn btn-default">{{ resourceBundle.projectsLabel }}</a>
+    <a id="linkToDownloadData" ng-if="hasRoles(['Superuser', 'Data entry user', 'Approver - Level 1', 'Approver - Level 2'])" href="" ng-click="syncNow()" class="btn btn-default">{{ resourceBundle.downloadDataLabel }}</a>
+    <span ng-show="isSyncRunning">{{resourceBundle.syncRunning}}</span>
+    <span ng-show="isSyncDone">{{resourceBundle.syncComplete}}</span>
+    <div>
+        <div class="loading" ng-show="loading">
+            <img src="img/ajax-loader.gif" class="spinner" />
+        </div>
+        <div>
+            <form>
+
+                <table class="table table-bordered" ng-if="itemsAwaitingSubmission.length > 0">
+                    <caption>Items awaiting data submission</caption>
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Week</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in itemsAwaitingSubmission">
+                            <td>{{item.moduleName}}</td>
+                            <td>
+                                <ul>
+                                    <li ng-repeat="status in item.status">
+                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}" ng-if="!userApprovalLevel">{{formatPeriods(status.period)}}</a>
+                                        <span ng-if="userApprovalLevel">{{formatPeriods(status.period)}}</span>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table table-bordered" ng-if="itemsAwaitingApprovalAtUserLevel.length > 0">
+                    <caption>Items awaiting approval from you</caption>
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Week</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in itemsAwaitingApprovalAtUserLevel">
+                            <td>{{item.moduleName}}</td>
+                            <td>
+                                <ul>
+                                    <li ng-repeat="status in item.status">
+                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}">{{formatPeriods(status.period)}}</a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table table-bordered" ng-if="itemsAwaitingApprovalAtOtherLevels.length > 0">
+                    <caption>Items awaiting approval at other levels</caption>
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Week</th>
+                            <th>Awaiting Approval At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in itemsAwaitingApprovalAtOtherLevels">
+                            <td>{{item.moduleName}}</td>
+                            <td>
+                                <ul>
+                                    <li ng-repeat="status in item.status">
+                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}" ng-if="!userApprovalLevel">{{formatPeriods(status.period)}}</a>
+                                        <span ng-if="userApprovalLevel">{{formatPeriods(status.period)}}</span>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li ng-repeat="status in item.status">
+                                        Level {{status.nextApprovalLevel}}
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </form>
+        </div>
+    </div>
 </div>

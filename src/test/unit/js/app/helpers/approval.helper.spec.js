@@ -169,105 +169,105 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     "moduleId": "123",
                     "moduleName": "mod1",
                     "status": [{
-                        "period": "2014W9",
-                        "submitted": false,
-                        "approvalLevel": undefined
-                    }, {
                         "period": "2014W10",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W11",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W12",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W13",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W14",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W15",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W16",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W17",
                         "submitted": true,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": 1
                     }, {
                         "period": "2014W18",
                         "submitted": true,
-                        "approvalLevel": 1
+                        "nextApprovalLevel": 2
                     }, {
                         "period": "2014W19",
                         "submitted": true,
-                        "approvalLevel": 2
+                        "nextApprovalLevel": 3
                     }, {
                         "period": "2014W20",
                         "submitted": true,
-                        "approvalLevel": 3
+                        "nextApprovalLevel": undefined
+                    }, {
+                        "period": "2014W21",
+                        "submitted": false,
+                        "nextApprovalLevel": undefined
                     }]
                 }, {
                     "moduleId": "234",
                     "moduleName": "mod2",
                     "status": [{
-                        "period": "2014W9",
-                        "submitted": false,
-                        "approvalLevel": undefined
-                    }, {
                         "period": "2014W10",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W11",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W12",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W13",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W14",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W15",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W16",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W17",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W18",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W19",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W20",
                         "submitted": false,
-                        "approvalLevel": undefined
+                        "nextApprovalLevel": undefined
+                    }, {
+                        "period": "2014W21",
+                        "submitted": false,
+                        "nextApprovalLevel": undefined
                     }]
                 }];
 
