@@ -13,6 +13,28 @@
         <div>
             <form>
 
+                <table class="table table-bordered" ng-if="itemsAwaitingApprovalAtUserLevel.length > 0">
+                    <caption>{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</caption>
+                    <thead>
+                        <tr>
+                            <th>{{resourceBundle.moduleLabel}}</th>
+                            <th>{{resourceBundle.weekLabel}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in itemsAwaitingApprovalAtUserLevel">
+                            <td>{{item.moduleName}}</td>
+                            <td>
+                                <ul>
+                                    <li ng-repeat="status in item.status">
+                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}">{{formatPeriods(status.period)}}</a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
                 <table class="table table-bordered" ng-if="itemsAwaitingSubmission.length > 0">
                     <caption>{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</caption>
                     <thead>
@@ -29,28 +51,6 @@
                                     <li ng-repeat="status in item.status">
                                         <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}" ng-if="!userApprovalLevel">{{formatPeriods(status.period)}}</a>
                                         <span ng-if="userApprovalLevel">{{formatPeriods(status.period)}}</span>
-                                    </li>
-                                </ul>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <table class="table table-bordered" ng-if="itemsAwaitingApprovalAtUserLevel.length > 0">
-                    <caption>{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</caption>
-                    <thead>
-                        <tr>
-                            <th>{{resourceBundle.moduleLabel}}</th>
-                            <th>{{resourceBundle.weekLabel}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="item in itemsAwaitingApprovalAtUserLevel">
-                            <td>{{item.moduleName}}</td>
-                            <td>
-                                <ul>
-                                    <li ng-repeat="status in item.status">
-                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}">{{formatPeriods(status.period)}}</a>
                                     </li>
                                 </ul>
                             </td>
