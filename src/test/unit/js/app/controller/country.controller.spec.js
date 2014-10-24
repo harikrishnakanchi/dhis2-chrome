@@ -103,7 +103,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
             scope.newOrgUnit = {};
             scope.orgUnit = {
                 "name": "anyname",
-                "openingDate": "YYYY-MM-DD",
+                "openingDate": new Date("2014-05-05"),
             };
 
             var expectedNewOrgUnit = {

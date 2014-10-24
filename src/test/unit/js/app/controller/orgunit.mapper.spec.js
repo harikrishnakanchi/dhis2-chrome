@@ -82,11 +82,11 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
             var expectedResult = {
                 'name': dhisProject.name,
-                'openingDate': moment(dhisProject.openingDate).format("YYYY-MM-DD"),
+                'openingDate': moment(dhisProject.openingDate).toDate(),
                 'context': "val2",
                 'location': "val3",
                 'populationType': "val5",
-                'endDate': moment("2011-01-01").format("YYYY-MM-DD"),
+                'endDate': moment("2011-01-01").toDate(),
                 'projectCode': 'RU118',
                 'reasonForIntervention': 'Armed Conflict',
                 'modeOfOperation': 'Direct Operation',
@@ -122,7 +122,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
             var expectedResult = {
                 'name': dhisProject.name,
-                'openingDate': moment(dhisProject.openingDate).format("YYYY-MM-DD"),
+                'openingDate': moment(dhisProject.openingDate).toDate(),
                 'context': undefined,
                 'location': undefined,
                 'populationType': undefined,

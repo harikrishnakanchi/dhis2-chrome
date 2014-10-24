@@ -45,7 +45,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             "value": orgUnit.reasonForIntervention
         }, {
             "attribute": {
-               "code": "modeOfOperation",
+                "code": "modeOfOperation",
                 "name": "Mode Of Operation",
                 "id": "a048b89d331"
             },
@@ -90,7 +90,11 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         };
 
         var disableOrgUnit = function(orgUnit) {
-            orgUnit.attributeValues = _.reject(orgUnit.attributeValues, {"attribute": {"code": "isDisabled"}});
+            orgUnit.attributeValues = _.reject(orgUnit.attributeValues, {
+                "attribute": {
+                    "code": "isDisabled"
+                }
+            });
             orgUnit.attributeValues.push(attributeValue);
             return orgUnit;
         };
@@ -139,19 +143,19 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
 
     this.mapToProject = function(dhisProject) {
         var endDate = self.getAttributeValue(dhisProject, "prjEndDate");
-        var autoApprove = self.getAttributeValue(dhisProject, "autoApprove"); 
+        var autoApprove = self.getAttributeValue(dhisProject, "autoApprove");
         return {
             'name': dhisProject.name,
-            'openingDate': moment(dhisProject.openingDate).format("YYYY-MM-DD"),
+            'openingDate': moment(dhisProject.openingDate).toDate(),
             'context': self.getAttributeValue(dhisProject, "prjCon"),
             'location': self.getAttributeValue(dhisProject, "prjLoc"),
             'populationType': self.getAttributeValue(dhisProject, "prjPopType"),
-            'endDate': endDate ? moment(endDate).format("YYYY-MM-DD") : undefined,
+            'endDate': endDate ? moment(endDate).toDate() : undefined,
             'projectCode': self.getAttributeValue(dhisProject, "projCode"),
             'reasonForIntervention': self.getAttributeValue(dhisProject, "reasonForIntervention"),
             'modeOfOperation': self.getAttributeValue(dhisProject, "modeOfOperation"),
             'modelOfManagement': self.getAttributeValue(dhisProject, "modelOfManagement"),
-            'autoApprove':  autoApprove === undefined ? "false" : autoApprove
+            'autoApprove': autoApprove === undefined ? "false" : autoApprove
         };
     };
 

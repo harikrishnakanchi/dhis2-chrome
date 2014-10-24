@@ -53,7 +53,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         $scope.reset = function() {
             $scope.saveFailure = false;
             $scope.newOrgUnit = {
-                'openingDate': moment().format("YYYY-MM-DD"),
+                'openingDate': moment().toDate(),
             };
         };
 
@@ -76,7 +76,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         var prepareView = function() {
             $scope.reset();
             $scope.newOrgUnit.name = $scope.orgUnit.name;
-            $scope.newOrgUnit.openingDate = $scope.orgUnit.openingDate;
+            $scope.newOrgUnit.openingDate = moment($scope.orgUnit.openingDate).toDate();
         };
 
         var init = function() {

@@ -62,7 +62,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             scope.save(newOrgUnit, parent);
             scope.$apply();
             rootScope.$apply();
-
         });
 
         it("should display error if saving organization unit fails", function() {
@@ -250,10 +249,10 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             };
             var expectedNewOrgUnit = {
                 'name': scope.orgUnit.name,
-                'openingDate': moment("2010-01-01").format("YYYY-MM-DD"),
+                'openingDate': moment("2010-01-01").toDate(),
                 'context': "val2",
                 'location': "val3",
-                'endDate': moment("2011-01-01").format("YYYY-MM-DD"),
+                'endDate': moment("2011-01-01").toDate(),
                 'populationType': "val6",
                 'projectCode': 'RU118',
                 'reasonForIntervention': 'Armed Conflict',
