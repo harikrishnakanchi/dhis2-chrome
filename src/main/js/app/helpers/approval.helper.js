@@ -1,4 +1,4 @@
-define(["properties", "datasetTransformer", "moment"], function(properties, datasetTransformer, moment) {
+define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"], function(properties, datasetTransformer, moment, approvalDataTransformer) {
     return function($hustle, $q, $rootScope, orgUnitRepository, dataSetRepository, approvalDataRepository, dataRepository) {
         var approveData = function(approvalData, approvalFn, approvalType) {
             var saveToDhis = function() {
@@ -43,34 +43,15 @@ define(["properties", "datasetTransformer", "moment"], function(properties, data
         var autoApproveExistingData = function(orgUnit) {
             var orgUnitId = orgUnit.id;
 
-            var generateApprovalPayload = function(data) {
-                var submittedPeriodsPerModule = data[0];
-                var allDatasets = data[1];
-                var orgUnitsToApprove = _.pluck(submittedPeriodsPerModule, "orgUnitId");
-
-                return _.map(orgUnitsToApprove, function(orgUnitId, i) {
-                    var associatedDatasets = _.pluck(datasetTransformer.getAssociatedDatasets(orgUnitId, allDatasets), 'id');
-                    return _.map(submittedPeriodsPerModule[i].period, function(pe) {
-                        return {
-                            "dataSets": associatedDatasets,
-                            "period": pe,
-                            "orgUnit": orgUnitId,
-                            "storedBy": "service.account"
-                        };
-                    });
-                });
-            };
-
             var autoApprove = function(data) {
-                data = _.flatten(data);
-                return $q.all(_.map(data, function(datum) {
+                var approvalData = approvalDataTransformer.generateBulkApprovalData(data[0], data[1], "service.account");
+                return $q.all(_.map(approvalData, function(datum) {
                     return markDataAsComplete(datum).then(markDataAsApproved);
                 }));
             };
 
             return orgUnitRepository.getAllModulesInProjects([orgUnitId], false).then(function(modules) {
                 return $q.all([getSubmittedPeriodsForModules(modules, properties.weeksForAutoApprove), dataSetRepository.getAll()])
-                    .then(generateApprovalPayload)
                     .then(autoApprove)
                     .then(function(data) {
                         return data;

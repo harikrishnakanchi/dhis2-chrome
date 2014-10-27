@@ -78,6 +78,7 @@ require.config({
         "systemSettingsTransformer": "app/transformers/system.settings.transformer",
         "datasetTransformer": "app/transformers/dataset.transformer",
         "groupSections": "app/transformers/group.sections",
+        "approvalDataTransformer": "app/transformers/approval.data.transformer",
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",
