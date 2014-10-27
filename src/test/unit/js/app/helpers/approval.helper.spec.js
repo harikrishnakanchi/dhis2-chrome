@@ -284,5 +284,79 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
 
                 scope.$apply();
             });
+
+            it('should auto approve existing data for project', function() {
+                var modules = [{
+                    "id": "123",
+                    "name": "mod1"
+                }, {
+                    "id": "234",
+                    "name": "mod2"
+                }];
+
+                var project = {
+                    "id": "456"
+                };
+
+                var dataValues = [{
+                    "period": "2014W17",
+                    "orgUnit": "123",
+                    "dataValues": [{
+                        "categoryOptionCombo": "co123",
+                        "dataElement": "de123",
+                        "orgUnit": "123",
+                        "period": "2014W17",
+                        "value": 9
+                    }]
+                }];
+
+                var allDatasets = [{
+                    "id": "ds1",
+                    "name": "Dataset1",
+                    "organisationUnits": [{
+                        "id": "123",
+                        "name": "mod1"
+                    }]
+                }];
+
+                var l1ApprovalData = {
+                    "dataSets": ['ds1'],
+                    "period": '2014W17',
+                    "orgUnit": '123',
+                    "storedBy": 'service.account',
+                    "date": '2014-05-30T12:43:54.972Z',
+                    "status": 'NEW'
+                };
+
+                var l2ApprovalData = {
+                    "dataSets": ['ds1'],
+                    "period": '2014W17',
+                    "orgUnit": '123',
+                    "createdByUsername": 'service.account',
+                    "createdDate": '2014-05-30T12:43:54.972Z',
+                    "isApproved": true,
+                    "status": 'NEW'
+                };
+
+                spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, modules));
+                spyOn(dataRepository, "getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, dataValues));
+                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
+                spyOn(approvalHelper, "markDataAsComplete");
+
+                approvalHelper.autoApproveExistingData(project);
+                scope.$apply();
+
+                expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(l1ApprovalData);
+                expect(hustle.publish.calls.argsFor(0)).toEqual([{
+                    "data": l1ApprovalData,
+                    "type": "uploadCompletionData"
+                }, "dataValues"]);
+
+                expect(approvalDataRepository.saveLevelTwoApproval).toHaveBeenCalledWith(l2ApprovalData);
+                expect(hustle.publish.calls.argsFor(1)).toEqual([{
+                    "data": l2ApprovalData,
+                    "type": "uploadApprovalData"
+                }, "dataValues"]);
+            });
         });
     });
