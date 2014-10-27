@@ -161,11 +161,18 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"]
             });
         };
 
+        var filterDeletedData = function(data) {
+            return _.filter(data, function(datum) {
+                return datum.status !== "DELETED";
+            });
+        };
+
         var getLevelOneApprovedPeriodsForModules = function(modules, numOfWeeks) {
             var endPeriod = getPeriod(moment());
             var startPeriod = getPeriod(moment().subtract(numOfWeeks, 'week'));
 
             return approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, _.pluck(modules, "id")).then(function(data) {
+                data = filterDeletedData(data);
                 var approvalDataByOrgUnit = _.groupBy(data, 'orgUnit');
                 return _.map(_.keys(approvalDataByOrgUnit), function(moduleId) {
                     return {
@@ -181,6 +188,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"]
             var startPeriod = getPeriod(moment().subtract(numOfWeeks, 'week'));
 
             return approvalDataRepository.getLevelTwoApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, _.pluck(modules, "id")).then(function(data) {
+                data = filterDeletedData(data);
                 return _.groupBy(data, 'orgUnit');
             });
         };
