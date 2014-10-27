@@ -11,8 +11,9 @@
             <img src="img/ajax-loader.gif" class="spinner" />
         </div>
         <div>
-            <form>
-
+            <div ng-show="approveSuccess" class="alert alert-success">{{resourceBundle.dataApprovalSuccessful}}</div>
+            <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
+            <form name="approvalForm">
                 <table class="table table-bordered" ng-if="itemsAwaitingApprovalAtUserLevel.length > 0">
                     <caption>{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</caption>
                     <thead>
@@ -27,14 +28,22 @@
                             <td>
                                 <ul>
                                     <li ng-repeat="status in item.status">
+                                        <input type="checkbox" ng-model="status.shouldBeApproved">
                                         <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}">{{formatPeriods(status.period)}}</a>
                                     </li>
                                 </ul>
                             </td>
                         </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <input type="submit" ng-disabled="!areApprovalItemsSelected()" value="{{resourceBundle.approveBtnValue}}" class="btn btn-default" ng-click="bulkApprove()">
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
-
+            </form>
+            <form>
                 <table class="table table-bordered" ng-if="itemsAwaitingSubmission.length > 0">
                     <caption>{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</caption>
                     <thead>
@@ -73,7 +82,7 @@
                             <td>{{item.moduleName}}</td>
                             <td>
                                 <ul>
-                                    <li ng-repeat="status in item.status">
+                                    <li ng-repeat="status in item.status | orderBy:'period'">
                                         <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}" ng-if="!userApprovalLevel">{{formatPeriods(status.period)}}</a>
                                         <span ng-if="userApprovalLevel">{{formatPeriods(status.period)}}</span>
                                     </li>
@@ -81,7 +90,7 @@
                             </td>
                             <td>
                                 <ul>
-                                    <li ng-repeat="status in item.status">
+                                    <li ng-repeat="status in item.status | orderBy:'period'">
                                         {{resourceBundle.levelLabel}} {{status.nextApprovalLevel}}
                                     </li>
                                 </ul>

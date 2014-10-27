@@ -86,5 +86,6 @@
     "itemsAwaitingDataSubmissionLabel": "Items awaiting data submission",
     "itemsAwaitingApprovalAtUserLevelLabel": "Items awaiting approval from you",
     "itemsAwaitingApprovalAtOtherLevelLabel": "Items awaiting approval at other levels",
-    "itemsAwaitingApproval": "Items awaiting approval"
+    "itemsAwaitingApproval": "Items awaiting approval",
+    "dataApprovalSuccessful": "Data Approved successfully"
 }

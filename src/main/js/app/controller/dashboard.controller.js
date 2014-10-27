@@ -1,5 +1,5 @@
-define(["moment", "lodash"], function(moment, _) {
-    return function($scope, $hustle, $q, $rootScope, approvalHelper) {
+define(["moment", "approvalDataTransformer", "properties", "lodash"], function(moment, approvalDataTransformer, properties, _) {
+    return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout) {
         var dataValues = [];
 
         $scope.syncNow = function() {
@@ -22,6 +22,121 @@ define(["moment", "lodash"], function(moment, _) {
             var week = period.substring(4);
             m = moment(year + "-" + week);
             return "W" + m.isoWeek() + " - " + m.startOf("isoWeek").format("YYYY-MM-DD") + " - " + m.endOf("isoWeek").format("YYYY-MM-DD");
+        };
+
+        $scope.areApprovalItemsSelected = function() {
+            return filterItemsToBeApproved().length > 0;
+        };
+
+        $scope.bulkApprove = function() {
+            var itemsToBeApproved = filterItemsToBeApproved();
+
+            var moveApprovedItemsToNextLevel = function() {
+                var incrementApprovalLevel = function(status) {
+                    status = _.map(status, function(s) {
+                        s.nextApprovalLevel = s.nextApprovalLevel < 3 ? s.nextApprovalLevel + 1 : undefined;
+                        return s;
+                    });
+
+                    return _.filter(status, function(s) {
+                        return s.nextApprovalLevel !== undefined;
+                    });
+                };
+                _.each(itemsToBeApproved, function(approvedItem) {
+                    approvedItem.status = incrementApprovalLevel(approvedItem.status);
+                    var existingOtherLevelItem = _.find($scope.itemsAwaitingApprovalAtOtherLevels, function(otherLevelItem) {
+                        return approvedItem.moduleId === otherLevelItem.moduleId;
+                    });
+
+                    if (!existingOtherLevelItem) {
+                        $scope.itemsAwaitingApprovalAtOtherLevels.push(approvedItem);
+                    } else {
+                        existingOtherLevelItem.status = existingOtherLevelItem.status.concat(approvedItem.status);
+                    }
+                });
+            };
+
+            var getPeriodsToBeApproved = function() {
+                return _.map(itemsToBeApproved, function(item) {
+                    return {
+                        "orgUnitId": item.moduleId,
+                        "period": _.pluck(item.status, "period")
+                    };
+                });
+            };
+
+            var getApprovalFunction = function() {
+                if ($scope.userApprovalLevel == 1)
+                    return approvalHelper.markDataAsComplete;
+                if ($scope.userApprovalLevel == 2)
+                    return approvalHelper.markDataAsApproved;
+            };
+
+            var successPromise = function(data) {
+                $scope.itemsAwaitingApprovalAtUserLevel = filterItems($scope.itemsAwaitingApprovalAtUserLevel, false);
+                moveApprovedItemsToNextLevel();
+                $scope.approveSuccess = true;
+                $scope.approveError = false;
+
+                $timeout(function() {
+                    $scope.approveSuccess = false;
+                }, properties.messageTimeout);
+
+                return data;
+            };
+
+            var errorPromise = function(data) {
+                $scope.approveSuccess = false;
+                $scope.approveError = true;
+
+                $timeout(function() {
+                    $scope.approveError = false;
+                }, properties.messageTimeout);
+
+                return data;
+            };
+
+            var showModal = function(okCallback, message) {
+                $scope.modalMessage = message;
+                var modalInstance = $modal.open({
+                    templateUrl: 'templates/confirm.dialog.html',
+                    controller: 'confirmDialogController',
+                    scope: $scope
+                });
+
+                modalInstance.result.then(approve);
+            };
+
+            var approve = function() {
+                return dataSetRepository.getAll().then(function(dataSets) {
+                    var bulkApprovalData = approvalDataTransformer.generateBulkApprovalData(getPeriodsToBeApproved(), dataSets, $rootScope.currentUser.userCredentials.username);
+                    var approvalFunction = getApprovalFunction();
+
+                    return $q.all(_.map(bulkApprovalData, function(datum) {
+                        return approvalFunction(datum);
+                    })).then(successPromise, errorPromise);
+                });
+            };
+
+            showModal(approve, $scope.resourceBundle.dataApprovalConfirmationMessage);
+        };
+
+        var filterItems = function(items, withSelectedItems) {
+            items = _.map(items, function(item) {
+                item.status = _.filter(item.status, function(status) {
+                    status.shouldBeApproved = status.shouldBeApproved ? status.shouldBeApproved : false;
+                    return status.shouldBeApproved === withSelectedItems;
+                });
+                return item;
+            });
+
+            return _.filter(items, function(item) {
+                return item.status.length > 0;
+            });
+        };
+
+        var filterItemsToBeApproved = function() {
+            return filterItems(_.cloneDeep($scope.itemsAwaitingApprovalAtUserLevel), true);
         };
 
         var init = function() {

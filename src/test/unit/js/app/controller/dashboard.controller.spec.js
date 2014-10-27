@@ -1,20 +1,47 @@
-define(["dashboardController", "angularMocks", "utils", "approvalHelper"], function(DashboardController, mocks, utils, ApprovalHelper) {
+define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataSetRepository"], function(DashboardController, mocks, utils, ApprovalHelper, DataSetRepository) {
     describe("dashboard controller", function() {
-        var q, rootScope, db, hustle, dashboardController, approvalHelper;
+        var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, dataSetRepository;
 
         beforeEach(module("hustle"));
 
-        beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
+        beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout) {
             q = $q;
             scope = $rootScope.$new();
             hustle = $hustle;
             rootScope = $rootScope;
+            timeout = $timeout;
+
+            var allDatasets = [{
+                "id": "DS1",
+                "name": "Dataset1",
+                "organisationUnits": [{
+                    "id": "123",
+                    "name": "mod1"
+                }, {
+                    "id": "456",
+                    "name": "mod2"
+                }]
+            }];
+
+            fakeModal = {
+                close: function() {
+                    this.result.confirmCallBack();
+                },
+                dismiss: function(type) {
+                    this.result.cancelCallback(type);
+                },
+                open: function(object) {}
+            };
 
             approvalHelper = new ApprovalHelper();
+            dataSetRepository = new DataSetRepository();
+            spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
+            spyOn(fakeModal, 'open').and.returnValue({
+                result: utils.getPromise(q, {})
+            });
 
-            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper);
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
         }));
-
 
         it("should fetch and display all organisation units", function() {
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
@@ -55,7 +82,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper"], funct
             };
 
             spyOn(approvalHelper, "getApprovalStatus").and.returnValue(utils.getPromise(q, {}));
-            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper);
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
 
             scope.$apply();
 
@@ -140,13 +167,102 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper"], funct
             }];
 
             spyOn(approvalHelper, "getApprovalStatus").and.returnValue(utils.getPromise(q, approvalStatusData));
-            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper);
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
 
             scope.$apply();
 
             expect(scope.itemsAwaitingSubmission).toEqual(itemsAwaitingSubmission);
             expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(itemsAwaitingApprovalAtUserLevel);
             expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual(itemsAwaitingApprovalAtOtherLevels);
+        });
+
+        it("should approve selected items", function() {
+            spyOn(approvalHelper, "markDataAsComplete");
+            scope.resourceBundle = {
+                "dataApprovalConfirmationMessage": "mssg"
+            };
+
+            scope.itemsAwaitingApprovalAtUserLevel = [{
+                "moduleId": "123",
+                "moduleName": "mod1",
+                "status": [{
+                    "period": "2014W17",
+                    "submitted": true,
+                    "nextApprovalLevel": 1
+                }, {
+                    "period": "2014W18",
+                    "submitted": true,
+                    "nextApprovalLevel": 1,
+                    "shouldBeApproved": true
+                }]
+            }, {
+                "moduleId": "456",
+                "moduleName": "mod2",
+                "status": [{
+                    "period": "2014W17",
+                    "submitted": true,
+                    "nextApprovalLevel": 1,
+                    "shouldBeApproved": true
+                }, {
+                    "period": "2014W18",
+                    "submitted": true,
+                    "nextApprovalLevel": 1,
+                    "shouldBeApproved": true
+                }]
+            }];
+
+            var expectedItemsAwaitingApprovalAtUserLevel = [{
+                "moduleId": "123",
+                "moduleName": "mod1",
+                "status": [{
+                    "period": "2014W17",
+                    "submitted": true,
+                    "nextApprovalLevel": 1,
+                    "shouldBeApproved": false
+                }]
+            }];
+
+            var expectedItemsAwaitingApprovalAtOtherLevels = [{
+                "moduleId": "123",
+                "moduleName": "mod1",
+                "status": [{
+                    "period": "2014W18",
+                    "submitted": true,
+                    "nextApprovalLevel": 2,
+                    "shouldBeApproved": true
+                }]
+            }, {
+                "moduleId": "456",
+                "moduleName": "mod2",
+                "status": [{
+                    "period": "2014W17",
+                    "submitted": true,
+                    "nextApprovalLevel": 2,
+                    "shouldBeApproved": true
+                }, {
+                    "period": "2014W18",
+                    "submitted": true,
+                    "nextApprovalLevel": 2,
+                    "shouldBeApproved": true
+                }]
+            }];
+
+            rootScope.currentUser = {
+                "userCredentials": {
+                    "username": "prj_approver_l1"
+                }
+            };
+
+            scope.userApprovalLevel = 1;
+            scope.itemsAwaitingApprovalAtOtherLevels = [];
+
+            scope.bulkApprove();
+
+            scope.$apply();
+
+            expect(approvalHelper.markDataAsComplete).toHaveBeenCalled();
+            expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
+            expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual(expectedItemsAwaitingApprovalAtOtherLevels);
         });
     });
 });
