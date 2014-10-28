@@ -89,10 +89,12 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
             it('should get approval status', function() {
                 var modules = [{
                     "id": "123",
-                    "name": "mod1"
+                    "name": "mod1",
+                    "parent":{"name": "parent"}
                 }, {
                     "id": "234",
-                    "name": "mod2"
+                    "name": "mod2",
+                    "parent":{"name": "parent"}
                 }];
 
                 var dataValues = [{
@@ -179,7 +181,7 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
 
                 var expectedStatus = [{
                     "moduleId": "123",
-                    "moduleName": "mod1",
+                    "moduleName": "parent - mod1",
                     "status": [{
                         "period": "2014W10",
                         "submitted": false,
@@ -231,7 +233,7 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     }]
                 }, {
                     "moduleId": "234",
-                    "moduleName": "mod2",
+                    "moduleName": "parent - mod2",
                     "status": [{
                         "period": "2014W10",
                         "submitted": false,
