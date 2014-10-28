@@ -222,7 +222,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                         attribute: {
                             code: "Type",
                             name: "Type",
-                            id: 'a1fa2777924'
                         },
                         value: 'Module'
                     }],
@@ -624,8 +623,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 attributeValues: [{
                     attribute: {
                         code: 'isDisabled',
-                        name: 'Is Disabled',
-                        id: 'HLcCYZ1pPQx'
+                        name: 'Is Disabled'
                     },
                     value: true
                 }]

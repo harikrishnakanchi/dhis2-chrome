@@ -15,64 +15,55 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 "attributeValues": [{
                     "attribute": {
                         "code": "prjCon",
-                        "name": "Context",
-                        "id": "Gy8V8WeGgYs"
+                        "name": "Context"
                     },
                     "value": "val2"
                 }, {
                     "attribute": {
                         "code": "prjLoc",
-                        "name": "Location",
-                        "id": "CaQPMk01JB8"
+                        "name": "Location"
                     },
                     "value": "val3"
                 }, {
                     "attribute": {
                         "code": "prjPopType",
-                        "name": "Type of population",
-                        "id": "Byx9QE6IvXB"
+                        "name": "Type of population"
                     },
                     "value": "val5"
                 }, {
                     "attribute": {
                         "code": "prjEndDate",
-                        "name": "End date",
-                        "id": "ZbUuOnEmVs5"
+                        "name": "End date"
                     },
                     "value": "2011-01-01"
                 }, {
                     "attribute": {
                         "code": "projCode",
-                        "name": "Project Code",
-                        "id": "fa5e00d5cd2"
+                        "name": "Project Code"
                     },
                     "value": "RU118"
                 }, {
                     attribute: {
                         code: 'reasonForIntervention',
-                        name: 'Reason For Intervention',
-                        id: 'e7af7f29053'
+                        name: 'Reason For Intervention'
                     },
                     value: 'Armed Conflict'
                 }, {
                     attribute: {
                         code: 'modeOfOperation',
-                        name: 'Mode Of Operation',
-                        id: 'a048b89d331'
+                        name: 'Mode Of Operation'
                     },
                     value: 'Direct Operation'
                 }, {
                     attribute: {
                         code: 'modelOfManagement',
-                        name: 'Model Of Management',
-                        id: 'd2c3e7993f6'
+                        name: 'Model Of Management'
                     },
                     value: 'Collaboration'
                 }, {
                     'attribute': {
                         'code': 'autoApprove',
-                        'name': 'Auto Approve',
-                        'id': 'e65afaec61d'
+                        'name': 'Auto Approve'
                     },
                     'value': 'true'
                 }]
@@ -111,8 +102,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 "attributeValues": [{
                     "attribute": {
                         "code": "projCode",
-                        "name": "Project Code",
-                        "id": "fa5e00d5cd2"
+                        "name": "Project Code"
                     },
                     "value": "RU118"
                 }]
@@ -175,71 +165,61 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 attributeValues: [{
                     attribute: {
                         code: 'Type',
-                        name: 'Type',
-                        id: 'a1fa2777924'
+                        name: 'Type'
                     },
                     value: 'Project'
                 }, {
                     attribute: {
                         code: 'prjCon',
-                        name: 'Context',
-                        id: 'Gy8V8WeGgYs'
+                        name: 'Context'
                     },
                     value: 'val2'
                 }, {
                     attribute: {
                         code: 'prjLoc',
-                        name: 'Location',
-                        id: 'CaQPMk01JB8'
+                        name: 'Location'
                     },
                     value: 'val3'
                 }, {
                     attribute: {
                         code: 'prjPopType',
-                        name: 'Type of population',
-                        id: 'Byx9QE6IvXB'
+                        name: 'Type of population'
                     },
                     value: 'val6'
                 }, {
                     attribute: {
                         code: 'projCode',
-                        name: 'Project Code',
-                        id: 'fa5e00d5cd2'
+                        name: 'Project Code'
                     },
                     value: 'AB001'
                 }, {
                     attribute: {
                         code: 'reasonForIntervention',
-                        name: 'Reason For Intervention',
-                        id: 'e7af7f29053'
+                        name: 'Reason For Intervention'
                     },
                     value: 'Armed Conflict'
                 }, {
                     attribute: {
                         code: 'modeOfOperation',
-                        name: 'Mode Of Operation',
-                        id: 'a048b89d331'
+                        name: 'Mode Of Operation'
                     },
                     value: 'Direct Operation'
                 }, {
                     attribute: {
                         code: 'modelOfManagement',
-                        name: 'Model Of Management',
-                        id: 'd2c3e7993f6'
+                        name: 'Model Of Management'
                     },
                     value: 'Collaboration'
                 }, {
                     'attribute': {
                         'code': 'autoApprove',
-                        'name': 'Auto Approve',
-                        'id': 'e65afaec61d'
+                        'name': 'Auto Approve'
                     },
                     'value': 'true'
                 }, {
                     attribute: {
                         code: 'prjEndDate',
-                        name: 'End date',
-                        id: 'ZbUuOnEmVs5'
+                        name: 'End date'
                     },
                     value: '2011-01-01'
                 }]
@@ -297,8 +277,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 attributeValues: [{
                     attribute: {
                         code: "Type",
-                        name: "Type",
-                        id: 'a1fa2777924'
+                        name: "Type"
                     },
                     value: 'Module'
                 }],
@@ -323,8 +302,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 attributeValues: [{
                     attribute: {
                         code: "Type",
-                        name: "Type",
-                        id: 'a1fa2777924'
+                        name: "Type"
                     },
                     value: 'Module'
                 }],
@@ -482,8 +460,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 'attributeValues': [{
                     "attribute": {
                         "code": "isDisabled",
-                        "name": "Is Disabled",
-                        "id": "HLcCYZ1pPQx"
+                        "name": "Is Disabled"
                     },
                     "value": false
                 }],
@@ -494,8 +471,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 'attributeValues': [{
                     "attribute": {
                         "code": "isDisabled",
-                        "name": "Is Disabled",
-                        "id": "HLcCYZ1pPQx"
+                        "name": "Is Disabled"
                     },
                     "value": true
                 }],
@@ -519,8 +495,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 'attributeValues': [{
                     "attribute": {
                         "code": "isDisabled",
-                        "name": "Is Disabled",
-                        "id": "HLcCYZ1pPQx"
+                        "name": "Is Disabled"
                     },
                     "value": true
                 }],
@@ -529,8 +504,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 'attributeValues': [{
                     "attribute": {
                         "code": "isDisabled",
-                        "name": "Is Disabled",
-                        "id": "HLcCYZ1pPQx"
+                        "name": "Is Disabled"
                     },
                     "value": true
                 }],
@@ -575,71 +549,61 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 attributeValues: [{
                     attribute: {
                         code: 'Type',
-                        name: 'Type',
-                        id: 'a1fa2777924'
+                        name: 'Type'
                     },
                     value: 'Project'
                 }, {
                     attribute: {
                         code: 'prjCon',
-                        name: 'Context',
-                        id: 'Gy8V8WeGgYs'
+                        name: 'Context'
                     },
                     value: 'val2'
                 }, {
                     attribute: {
                         code: 'prjLoc',
-                        name: 'Location',
-                        id: 'CaQPMk01JB8'
+                        name: 'Location'
                     },
                     value: 'val3'
                 }, {
                     attribute: {
                         code: 'prjPopType',
-                        name: 'Type of population',
-                        id: 'Byx9QE6IvXB'
+                        name: 'Type of population'
                     },
                     value: 'val6'
                 }, {
                     attribute: {
                         code: 'projCode',
-                        name: 'Project Code',
-                        id: 'fa5e00d5cd2'
+                        name: 'Project Code'
                     },
                     value: 'AB001'
                 }, {
                     attribute: {
                         code: 'reasonForIntervention',
-                        name: 'Reason For Intervention',
-                        id: 'e7af7f29053'
+                        name: 'Reason For Intervention'
                     },
                     value: 'Armed Conflict'
                 }, {
                     attribute: {
                         code: 'modeOfOperation',
-                        name: 'Mode Of Operation',
-                        id: 'a048b89d331'
+                        name: 'Mode Of Operation'
                     },
                     value: 'Direct Operation'
                 }, {
                     attribute: {
                         code: 'modelOfManagement',
-                        name: 'Model Of Management',
-                        id: 'd2c3e7993f6'
+                        name: 'Model Of Management'
                     },
                     value: 'Collaboration'
                 }, {
                     attribute: {
                         code: 'autoApprove',
-                        name: 'Auto Approve',
-                        id: 'e65afaec61d'
+                        name: 'Auto Approve'
                     },
                     value: 'true'
                 }, {
                     attribute: {
                         code: 'prjEndDate',
-                        name: 'End date',
-                        id: 'ZbUuOnEmVs5'
+                        name: 'End date'
                     },
                     value: '2011-01-01'
                 }]

@@ -65,7 +65,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             if (!_.isEmpty(orgUnit)) {
                 return _.find(orgUnit.attributeValues, {
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "Type"
                     }
                 }).value;
             }

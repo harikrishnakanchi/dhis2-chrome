@@ -257,8 +257,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 attributeValues: [{
                     attribute: {
                         code: 'isDisabled',
-                        name: 'Is Disabled',
-                        id: 'HLcCYZ1pPQx'
+                        name: 'Is Disabled'
                     },
                     value: true
                 }],
@@ -272,8 +271,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 attributeValues: [{
                     attribute: {
                         code: 'isDisabled',
-                        name: 'Is Disabled',
-                        id: 'HLcCYZ1pPQx'
+                        name: 'Is Disabled'
                     },
                     value: true
                 }]

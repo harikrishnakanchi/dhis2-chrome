@@ -1,6 +1,6 @@
 /*global Date:true*/
 define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnitController, mocks, utils, _) {
-    describe("projects controller", function() {
+    describe("org unit controller", function() {
         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits,
             orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll, expectedOrgUnitTree, child;
         var getOrgUnit = function(id, name, level, parent) {
@@ -11,7 +11,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 'parent': parent,
                 'attributeValues': [{
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "Type"
                     },
                     "value": "country"
                 }]
@@ -51,7 +51,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 'selected': false,
                 'attributeValues': [{
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "Type"
                     },
                     "value": "country"
                 }]
@@ -67,7 +67,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 'selected': false,
                 'attributeValues': [{
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "Type"
                     },
                     "value": "country"
                 }]
@@ -143,7 +143,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 },
                 'attributeValues': [{
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "Type"
                     },
                     "value": "country"
                 }],
@@ -208,7 +208,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 'level': 1,
                 "attributeValues": [{
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "Type"
                     },
                     "value": "Company"
                 }]
@@ -225,7 +225,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 'level': 1,
                 "attributeValues": [{
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "Type"
                     },
                     "value": "Company"
                 }]
