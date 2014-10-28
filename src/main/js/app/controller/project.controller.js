@@ -4,7 +4,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
 
         $scope.allContexts = ['Internal instability', 'Stable', 'Post-conflict', 'Cross-border instability'].sort();
         $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
-        $scope.thisDate = moment().format("YYYY-MM-DD");
+        $scope.thisDate = moment().toDate();
         $scope.reasonForIntervention = ['Armed Conflict', 'Access to health care', 'Natural Disaster', 'Epidemic'].sort();
         $scope.modeOfOperation = ['Direct operation', 'Remote management', 'Remote operation'].sort();
         $scope.modelOfManagement = ['Collaboration', 'MSF management'].sort();
@@ -26,7 +26,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         $scope.reset = function() {
             $scope.saveFailure = false;
             $scope.newOrgUnit = {
-                'openingDate': moment().format("YYYY-MM-DD"),
+                'openingDate': moment().toDate(),
                 'autoApprove': 'false'
             };
         };

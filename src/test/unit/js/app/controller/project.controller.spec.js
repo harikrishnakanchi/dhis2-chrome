@@ -138,7 +138,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             scope.$apply();
 
             expect(scope.newOrgUnit).toEqual({
-                openingDate: moment().format('YYYY-MM-DD'),
+                openingDate: moment().toDate(),
                 autoApprove: 'false'
             });
             expect(scope.saveFailure).toEqual(false);
@@ -396,7 +396,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             expect(userRepository.upsert).toHaveBeenCalledWith(expectedUser);
             expect(hustle.publish).toHaveBeenCalledWith(expectedMessage, "dataValues");
         });
-
     });
 
 });
