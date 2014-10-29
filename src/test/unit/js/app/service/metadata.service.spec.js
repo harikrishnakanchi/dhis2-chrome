@@ -57,6 +57,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
         it("should fetch all metadata from file the first time", function() {
             var findCall = 0;
             setupLocalFileHttpRequest(today);
+            httpBackend.expectGET("/data/organisationUnits.json").respond(200, {});
             httpBackend.expectGET("/data/systemSettings.json").respond(200, {});
             httpBackend.expectGET("/data/translations.json").respond(200, {});
             spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, undefined));
@@ -70,7 +71,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 type: 'metaData',
                 lastUpdatedTime: today
             });
-            expect(mockStore.upsert.calls.count()).toEqual(4);
+            expect(mockStore.upsert.calls.count()).toEqual(5);
         });
 
         it("should not upsert metaData if import has already happened one time", function() {
@@ -91,6 +92,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 "Accept": "application/json, text/plain, */*"
             };
             httpBackend.expectGET(properties.dhis.url + "/api/metaData?lastUpdated=2014-03-24T09:02:49.870Z").respond(200, data);
+            httpBackend.expectGET(properties.dhis.url + "/api/organisationUnits?fields=:all&paging=false").respond(200, data);
             httpBackend.expectGET(properties.dhis.url + "/api/systemSettings", headers).respond(200, systemSettings);
             httpBackend.expectGET(properties.dhis.url + "/api/translations", headers).respond(200, translations);
 
@@ -120,7 +122,6 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 id: 'blah',
                 locale: 'es'
             }]);
-
         });
 
         it("should pull all metadata if syncing for the first time", function() {
@@ -128,6 +129,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 "Accept": "application/json, text/plain, */*"
             };
             httpBackend.expectGET(properties.dhis.url + "/api/metaData").respond(200, data);
+            httpBackend.expectGET(properties.dhis.url + "/api/organisationUnits?fields=:all&paging=false").respond(200, data);
             httpBackend.expectGET(properties.dhis.url + "/api/systemSettings", headers).respond(200, systemSettings);
             httpBackend.expectGET(properties.dhis.url + "/api/translations", headers).respond(200, translations);
 

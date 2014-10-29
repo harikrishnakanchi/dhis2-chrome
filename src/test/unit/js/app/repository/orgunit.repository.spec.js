@@ -150,6 +150,10 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Project"
+                }],
+                "children": [{
+                    "id": "mod1",
+                    "name": "mod1"
                 }]
             };
 
@@ -165,6 +169,10 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Project"
+                }],
+                "children": [{
+                    "id": "opunit1",
+                    "name": "opunit1"
                 }]
             };
 
@@ -180,6 +188,13 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Project"
+                }],
+                "children": [{
+                    "id": "mod3",
+                    "name": "mod3"
+                }, {
+                    "id": "opunit2",
+                    "name": "opunit2"
                 }]
             };
 
@@ -195,7 +210,8 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Module"
-                }]
+                }],
+                "children": []
             };
 
             var opunit1 = {
@@ -210,6 +226,10 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Operation Unit"
+                }],
+                "children": [{
+                    "id": "mod2",
+                    "name": "mod2"
                 }]
             };
 
@@ -225,7 +245,8 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Module"
-                }]
+                }],
+                "children": []
             };
 
             var module3 = {
@@ -240,7 +261,8 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Module"
-                }]
+                }],
+                "children": []
             };
 
 
@@ -256,6 +278,10 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Operation Unit"
+                }],
+                "children": [{
+                    "id": "mod4",
+                    "name": "mod4"
                 }]
             };
 
@@ -271,7 +297,8 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Module"
-                }]
+                }],
+                "children": []
             };
 
             var allOrgUnits = [project1, project2, project3, module1, module2, module3, module4, opunit1, opunit2];
@@ -302,6 +329,10 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Project"
+                }],
+                "children": [{
+                    "id": "mod1",
+                    "name": "mod1"
                 }]
             };
 
@@ -317,6 +348,10 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Project"
+                }],
+                "children": [{
+                    "id": "opunit1",
+                    "name": "opunit1"
                 }]
             };
 
@@ -332,6 +367,13 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Project"
+                }],
+                "children": [{
+                    "id": "mod3",
+                    "name": "mod3"
+                }, {
+                    "id": "opunit2",
+                    "name": "opunit2"
                 }]
             };
 
@@ -348,11 +390,12 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                     },
                     value: "Module"
                 }, {
-                    'attribute': {
-                        'code': 'isDisabled'
+                    "attribute": {
+                        "code": "isDisabled"
                     },
                     value: true
-                }]
+                }],
+                "children": []
             };
 
             var opunit1 = {
@@ -367,6 +410,10 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Operation Unit"
+                }],
+                "children": [{
+                    "id": "mod2",
+                    "name": "mod2"
                 }]
             };
 
@@ -382,7 +429,8 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Module"
-                }]
+                }],
+                "children": []
             };
 
             var module3 = {
@@ -397,7 +445,8 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Module"
-                }]
+                }],
+                "children": []
             };
 
 
@@ -413,6 +462,10 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Operation Unit"
+                }],
+                "children": [{
+                    "id": "mod4",
+                    "name": "mod4"
                 }]
             };
 
@@ -428,7 +481,8 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                         id: "a1fa2777924"
                     },
                     value: "Module"
-                }]
+                }],
+                "children": []
             };
 
             var allOrgUnits = [project1, project2, project3, module1, module2, module3, module4, opunit1, opunit2];

@@ -33,6 +33,9 @@ env=$3
 metadata_url=$2"/api/metadata.json"
 metadata_dest="src/main/data/metadata.json"
 
+orgunit_url=$2"/api/organisationUnits.json?fields=:all&paging=false"
+orgunit_dest="src/main/data/organisationUnits.json"
+
 systemsettings_url=$2"/api/systemSettings.json"
 systemsettings_dest="src/main/data/systemSettings.json"
 
@@ -40,6 +43,7 @@ translations_url=$2"/api/translations.json"
 translations_dest="src/main/data/translations.json"
 
 do_curl $metadata_url $metadata_dest
+do_curl $orgunit_url $orgunit_dest
 do_curl $systemsettings_url $systemsettings_dest
 do_curl $translations_url $translations_dest
 

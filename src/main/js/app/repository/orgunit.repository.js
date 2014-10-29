@@ -33,44 +33,22 @@ define([], function() {
             });
         };
 
-        this.getOrgUnit = function(orgUnitId){
+        this.getOrgUnit = function(orgUnitId) {
             var store = db.objectStore("organisationUnits");
             return store.find(orgUnitId);
         };
-        
+
         this.getAllModulesInProjects = function(projectIds, rejectDisabled) {
             return this.getAll().then(function(allOrgUnits) {
-
-                var filterModules = function(orgUnits) {
-                    return _.filter(orgUnits, function(orgUnit) {
-                        return isOfType(orgUnit, "Module");
-                    });
-                };
-
-                var getModulesUnderOrgUnits = function(modules) {
-                    return _.filter(modules, function(module) {
-                        return _.contains(projectIds, module.parent.id);
-                    });
-                };
-
-                var getModulesUnderOpUnits = function(allModules) {
-                    var filteredModules = [];
-                    _.forEach(allModules, function(module) {
-                        var moduleParents = _.filter(allOrgUnits, {
-                            'id': module.parent.id,
-                            'attributeValues': [{
-                                'attribute': {
-                                    id: "a1fa2777924"
-                                },
-                                value: "Operation Unit"
-                            }]
-                        });
-
-                        var modules = getModulesUnderOrgUnits(moduleParents);
-                        if (!_.isEmpty(modules))
-                            filteredModules.push(module);
-                    });
-                    return filteredModules;
+                var getChildModules = function(orgUnitId) {
+                    return _.flatten(_.transform(allOrgUnits[orgUnitId][0].children, function(acc, child) {
+                        child = allOrgUnits[child.id][0];
+                        if (isOfType(child, "Module")) {
+                            acc.push(child);
+                        } else {
+                            acc.push(getChildModules(child.id));
+                        }
+                    }));
                 };
 
                 var filterDisabled = function(modules) {
@@ -84,11 +62,15 @@ define([], function() {
                     });
                 };
 
-                var allModules = filterModules(allOrgUnits);
+                allOrgUnits = _.groupBy(allOrgUnits, "id");
+                var allChildModules = _.flatten(_.transform(projectIds, function(acc, projectId) {
+                    acc.push(getChildModules(projectId));
+                }));
+
                 if (rejectDisabled) {
-                    allModules = filterDisabled(allModules);
+                    allChildModules = filterDisabled(allChildModules);
                 }
-                return (getModulesUnderOrgUnits(allModules)).concat(getModulesUnderOpUnits(allModules));
+                return allChildModules;
             });
         };
 
