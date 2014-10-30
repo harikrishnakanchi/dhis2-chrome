@@ -34,8 +34,7 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                 username: "ProJ_1_Blah",
                 password: "P@ssw0rd",
                 userRole: {
-                    name: 'SomeRole',
-                    id: 'someId'
+                    name: 'SomeRole'
                 }
             };
             var expectedUserPayload = {
@@ -46,8 +45,7 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                 "userCredentials": {
                     "username": "proj_1_blah",
                     "userAuthorityGroups": [{
-                        "name": user.userRole.name,
-                        "id": user.userRole.id
+                        "name": user.userRole.name
                     }],
                     "password": "msfuser",
                 },

@@ -2,13 +2,10 @@ define(["dhisId"], function(dhisId) {
     return function($scope, $hustle, userRepository) {
 
         var allRoles = [{
-            "id": "8d32f0f1336",
             "name": "Data entry user"
         }, {
-            "id": "a276eebf9df",
             "name": "Approver - Level 1"
         }, {
-            "id": "cb4uEzD2fMS",
             "name": "Approver - Level 2",
         }];
 
@@ -39,8 +36,7 @@ define(["dhisId"], function(dhisId) {
                 "userCredentials": {
                     "username": projectUser.username.toLowerCase(),
                     "userAuthorityGroups": [{
-                        "name": projectUser.userRole.name,
-                        "id": projectUser.userRole.id
+                        "name": projectUser.userRole.name
                     }],
                     "password": "msfuser",
                 },
