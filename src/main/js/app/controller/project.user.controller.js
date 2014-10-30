@@ -4,9 +4,9 @@ define(["dhisId"], function(dhisId) {
         var allRoles = [{
             "name": "Data entry user"
         }, {
-            "name": "Approver - Level 1"
+            "name": "Project Level Approver"
         }, {
-            "name": "Approver - Level 2",
+            "name": "Coordination Level Approver",
         }];
 
         var init = function() {

@@ -72,7 +72,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
                     "username": "dataentryuser",
                     "userAuthorityGroups": [{
                         "id": "hxNB8lleCsl",
-                        "name": 'Approver - Level 1'
+                        "name": 'Project Level Approver'
                     }]
                 },
                 "organisationUnits": [{
@@ -97,7 +97,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
                     "username": "dataentryuser",
                     "userAuthorityGroups": [{
                         "id": "hxNB8lleCsl",
-                        "name": 'Approver - Level 1'
+                        "name": 'Project Level Approver'
                     }]
                 },
                 "organisationUnits": [{
@@ -306,7 +306,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
         });
 
-        it("should de-select select all option if one of the weeks are unchecked", function(){
+        it("should de-select select all option if one of the weeks are unchecked", function() {
             scope.weeks.approveAllItems = true;
 
             scope.toggleSelectAllOption(false);
@@ -314,7 +314,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             expect(scope.weeks.approveAllItems).toBe(false);
         });
 
-        it("should check the select all checkbox , when all the weeks are selected", function(){
+        it("should check the select all checkbox , when all the weeks are selected", function() {
             scope.weeks.approveAllItems = false;
 
             scope.itemsAwaitingApprovalAtUserLevel = [{

@@ -2,7 +2,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
     return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout) {
         var dataValues = [];
         $scope.weeks = {
-            "approveAllItems" : false
+            "approveAllItems": false
         };
 
         $scope.syncNow = function() {
@@ -28,14 +28,13 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
         };
 
         $scope.toggleSelectAllOption = function(status) {
-            if(status === false){
+            if (status === false) {
                 $scope.weeks.approveAllItems = false;
-            }
-            else {
+            } else {
                 var selectWeekFlag = true;
-                _.forEach($scope.itemsAwaitingApprovalAtUserLevel, function(item){
-                    _.forEach(item.status,function(status){
-                        if(status.shouldBeApproved === false)
+                _.forEach($scope.itemsAwaitingApprovalAtUserLevel, function(item) {
+                    _.forEach(item.status, function(status) {
+                        if (status.shouldBeApproved === false)
                             selectWeekFlag = false;
                     });
                     $scope.weeks.approveAllItems = selectWeekFlag;
@@ -44,8 +43,8 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
         };
 
         $scope.toggleAllItemsAwaitingApproval = function() {
-            _.forEach($scope.itemsAwaitingApprovalAtUserLevel,function(item){
-                _.forEach(item.status,function(status){
+            _.forEach($scope.itemsAwaitingApprovalAtUserLevel, function(item) {
+                _.forEach(item.status, function(status) {
                     status.shouldBeApproved = $scope.weeks.approveAllItems;
                 });
             });
@@ -210,13 +209,13 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
 
             var getUserApprovalLevel = function() {
                 var getApproverLevelFromRole = function(roleName) {
-                    if (roleName === "Approver - Level 1") return 1;
-                    if (roleName === "Approver - Level 2") return 2;
-                    if (roleName === "Approver - Level 3") return 3;
+                    if (roleName === "Project Level Approver") return 1;
+                    if (roleName === "Coordination Level Approver") return 2;
+                    if (roleName === "Desk Level Approver") return 3;
                 };
 
                 var approvalRole = _.filter($rootScope.currentUser.userCredentials.userAuthorityGroups, function(role) {
-                    return role.name.indexOf("Approver - Level") > -1;
+                    return role.name.indexOf("Approver") > -1;
                 });
 
                 return approvalRole[0] ? getApproverLevelFromRole(approvalRole[0].name) : undefined;
