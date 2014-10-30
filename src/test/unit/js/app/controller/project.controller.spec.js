@@ -1,4 +1,4 @@
-define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "approvalHelper"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, ApprovalHelper) {
+define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "approvalHelper", "timecop"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, ApprovalHelper, timecop) {
     describe("project controller tests", function() {
         var scope, timeout, q, location, anchorScroll, userRepository,
             fakeModal, orgUnitRepo, hustle, rootScope, approvalHelper;
@@ -40,8 +40,17 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             };
 
             anchorScroll = jasmine.createSpy();
+
+            Timecop.install();
+            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
+
             projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, approvalHelper);
         }));
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
 
         it("should save project in dhis", function(done) {
             var expectedNewOrgUnit = {
