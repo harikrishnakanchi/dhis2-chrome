@@ -19,16 +19,19 @@
                     <thead>
                         <tr>
                             <th>{{resourceBundle.moduleLabel}}</th>
-                            <th>{{resourceBundle.weekLabel}}</th>
+                            <th ng-model="weeks">
+                                <input type="checkbox" ng-model="weeks.approveAllItems" ng-change="toggleAllItemsAwaitingApproval()">
+                                {{resourceBundle.weekLabel}}
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="item in itemsAwaitingApprovalAtUserLevel">
+                        <tr ng-repeat="item in itemsAwaitingApprovalAtUserLevel">                            
                             <td>{{item.moduleName}}</td>
                             <td>
                                 <ul>
                                     <li ng-repeat="status in item.status">
-                                        <input type="checkbox" ng-model="status.shouldBeApproved">
+                                        <input type="checkbox" ng-model="status.shouldBeApproved" ng-change="toggleSelectAllOption(status.shouldBeApproved)">
                                         <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}">{{formatPeriods(status.period)}}</a>
                                     </li>
                                 </ul>

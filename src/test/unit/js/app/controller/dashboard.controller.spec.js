@@ -264,5 +264,81 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
             expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual(expectedItemsAwaitingApprovalAtOtherLevels);
         });
+
+        it("should select all weeks awaiting approval if select all checkbox is checked", function() {
+            scope.weeks.approveAllItems = true;
+            scope.itemsAwaitingApprovalAtUserLevel = [{
+                "moduleId": "123",
+                "status": [{
+                    "period": "2014W18",
+                    "shouldBeApproved": false
+                }]
+            }, {
+                "moduleId": "456",
+                "status": [{
+                    "period": "2014W17",
+                    "shouldBeApproved": true
+                }, {
+                    "period": "2014W18",
+                    "shouldBeApproved": false
+                }]
+            }];
+
+            var expectedItemsAwaitingApprovalAtUserLevel = [{
+                "moduleId": "123",
+                "status": [{
+                    "period": "2014W18",
+                    "shouldBeApproved": true
+                }]
+            }, {
+                "moduleId": "456",
+                "status": [{
+                    "period": "2014W17",
+                    "shouldBeApproved": true
+                }, {
+                    "period": "2014W18",
+                    "shouldBeApproved": true
+                }]
+            }];
+
+            scope.toggleAllItemsAwaitingApproval();
+            scope.$apply();
+            expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
+        });
+
+        it("should de-select select all option if one of the weeks are unchecked", function(){
+            scope.weeks.approveAllItems = true;
+
+            scope.toggleSelectAllOption(false);
+            scope.$apply();
+            expect(scope.weeks.approveAllItems).toBe(false);
+        });
+
+        it("should check the select all checkbox , when all the weeks are selected", function(){
+            scope.weeks.approveAllItems = false;
+
+            scope.itemsAwaitingApprovalAtUserLevel = [{
+                "moduleId": "123",
+                "status": [{
+                    "period": "2014W18",
+                    "shouldBeApproved": true
+                }]
+            }, {
+                "moduleId": "456",
+                "status": [{
+                    "period": "2014W17",
+                    "shouldBeApproved": true
+                }, {
+                    "period": "2014W18",
+                    "shouldBeApproved": true
+                }]
+            }];
+
+            scope.toggleSelectAllOption(true);
+            scope.$apply();
+            expect(scope.weeks.approveAllItems).toBe(true);
+
+        });
+
     });
 });

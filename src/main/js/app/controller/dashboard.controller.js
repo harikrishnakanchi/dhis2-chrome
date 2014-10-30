@@ -1,6 +1,9 @@
 define(["moment", "approvalDataTransformer", "properties", "lodash"], function(moment, approvalDataTransformer, properties, _) {
     return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout) {
         var dataValues = [];
+        $scope.weeks = {
+            "approveAllItems" : false
+        };
 
         $scope.syncNow = function() {
             $scope.isSyncRunning = true;
@@ -22,6 +25,30 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
             var week = period.substring(4);
             m = moment(year + "-" + week);
             return "W" + m.isoWeek() + " - " + m.startOf("isoWeek").format("YYYY-MM-DD") + " - " + m.endOf("isoWeek").format("YYYY-MM-DD");
+        };
+
+        $scope.toggleSelectAllOption = function(status) {
+            if(status === false){
+                $scope.weeks.approveAllItems = false;
+            }
+            else {
+                var selectWeekFlag = true;
+                _.forEach($scope.itemsAwaitingApprovalAtUserLevel, function(item){
+                    _.forEach(item.status,function(status){
+                        if(status.shouldBeApproved === false)
+                            selectWeekFlag = false;
+                    });
+                    $scope.weeks.approveAllItems = selectWeekFlag;
+                });
+            }
+        };
+
+        $scope.toggleAllItemsAwaitingApproval = function() {
+            _.forEach($scope.itemsAwaitingApprovalAtUserLevel,function(item){
+                _.forEach(item.status,function(status){
+                    status.shouldBeApproved = $scope.weeks.approveAllItems;
+                });
+            });
         };
 
         $scope.areApprovalItemsSelected = function() {
