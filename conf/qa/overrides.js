@@ -1,10 +1,10 @@
 define([], function() {
     return {
         "dhisPing": {
-            "url": "http://datawhqa.twhosted.com/dhis/favicon.ico"
+            "url": "http://datawhqa2.twhosted.com/dhis/favicon.ico"
         },
         "dhis": {
-            "url": "http://datawhqa.twhosted.com/dhis/"
+            "url": "http://datawhqa2.twhosted.com/dhis/"
         },
         "devMode": false
     };
