@@ -147,6 +147,12 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
             showModal(approve, $scope.resourceBundle.dataApprovalConfirmationMessage);
         };
 
+        $scope.getApprovalLevelName = function(level) {
+            if (level === 1) return "Project Level";
+            if (level === 2) return "Coordination Level";
+            if (level === 3) return "Desk Level";
+        };
+
         var filterItems = function(items, withSelectedItems) {
             items = _.map(items, function(item) {
                 item.status = _.filter(item.status, function(status) {

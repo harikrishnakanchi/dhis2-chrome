@@ -20,13 +20,12 @@
                         <tr>
                             <th>{{resourceBundle.moduleLabel}}</th>
                             <th ng-model="weeks">
-                                <input type="checkbox" ng-model="weeks.approveAllItems" ng-change="toggleAllItemsAwaitingApproval()">
-                                {{resourceBundle.weekLabel}}
+                                <input type="checkbox" ng-model="weeks.approveAllItems" ng-change="toggleAllItemsAwaitingApproval()">{{resourceBundle.weekLabel}}
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="item in itemsAwaitingApprovalAtUserLevel">                            
+                        <tr ng-repeat="item in itemsAwaitingApprovalAtUserLevel">
                             <td>{{item.moduleName}}</td>
                             <td>
                                 <ul>
@@ -94,7 +93,7 @@
                             <td>
                                 <ul>
                                     <li ng-repeat="status in item.status | orderBy:'period'">
-                                        {{resourceBundle.levelLabel}} {{status.nextApprovalLevel}}
+                                        {{getApprovalLevelName(status.nextApprovalLevel)}}
                                     </li>
                                 </ul>
                             </td>
