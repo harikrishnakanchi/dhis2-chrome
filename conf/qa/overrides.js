@@ -4,7 +4,7 @@ define([], function() {
             "url": "http://datawhqa2.twhosted.com/dhis/favicon.ico"
         },
         "dhis": {
-            "url": "http://datawhqa2.twhosted.com/dhis/"
+            "url": "http://datawhqa2.twhosted.com/dhis"
         },
         "devMode": false
     };
