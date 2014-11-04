@@ -22,5 +22,9 @@
     },
     "devDependencies": {
         "angular-mocks": null
+    },
+    "resolutions": {
+        "d3": "~3.4.1",
+        "angular": "1.3.0"
     }
 }
