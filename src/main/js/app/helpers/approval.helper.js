@@ -145,7 +145,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"]
 
             var filterDraftData = function(data) {
                 return _.filter(data, function(datum) {
-                    return datum.dataValues[0].isDraft !== true;
+                    return datum.isDraft !== true;
                 });
             };
 
