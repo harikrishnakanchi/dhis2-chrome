@@ -1,7 +1,7 @@
 define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
     return function($scope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll) {
 
-        $scope.thisDate = moment().format("YYYY-MM-DD");
+        $scope.thisDate = moment().toDate();
 
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -20,12 +20,13 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 'attributeValues': [{
                     'attribute': {
                         "code": "Type",
-                        "name": "Type",
-                        "id": "a1fa2777924"
+                        "name": "Type"
                     },
                     value: "Country"
                 }]
             };
+
+            parentOrgUnit.children.push(newOrgUnit);
 
             var onSuccess = function(data) {
                 if ($scope.$parent.closeNewForm)
@@ -45,9 +46,11 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 });
             };
 
-            return orgUnitRepository.upsert(newOrgUnit)
-                .then(saveToDhis)
-                .then(onSuccess, onError);
+            return orgUnitRepository.upsert(parentOrgUnit).then(function() {
+                return orgUnitRepository.upsert(newOrgUnit)
+                    .then(saveToDhis)
+                    .then(onSuccess, onError);
+            });
         };
 
         $scope.reset = function() {

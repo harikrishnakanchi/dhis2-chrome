@@ -24,7 +24,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             var newOpUnits = _.map(opUnits, function(opUnit) {
                 var opUnitType = opUnit.type;
                 var hospitalUnitCode = opUnit.hospitalUnitCode;
-                opUnit = _.omit(opUnit, ['type','hospitalUnitCode']);
+                opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode']);
                 return _.merge(opUnit, {
                     'id': dhisId.get(opUnit.name + parent.id),
                     'shortName': opUnit.name,
@@ -46,12 +46,14 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                         "attribute": {
                             "id": "c6d3c8a7286",
                             "code": "hospitalUnitCode"
-        
+
                         },
                         "value": hospitalUnitCode
                     }]
                 });
             });
+
+            parent.children = parent.children.concat(newOpUnits);
 
             var onSuccess = function(data) {
                 if ($scope.$parent.closeNewForm)
@@ -62,9 +64,11 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 $scope.saveFailure = true;
             };
 
-            return orgUnitRepository.upsert(newOpUnits)
-            .then(saveToDhis)
-            .then(onSuccess, onError);
+            return orgUnitRepository.upsert(parent).then(function() {
+                return orgUnitRepository.upsert(newOpUnits)
+                    .then(saveToDhis)
+                    .then(onSuccess, onError);
+            });
         };
 
         $scope.delete = function(index) {

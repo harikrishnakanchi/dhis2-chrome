@@ -101,9 +101,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.createModules = function(modules) {
             var parent = $scope.orgUnit;
             var enrichedModules = orgUnitMapper.mapToModules(modules, parent);
-            return $q.all(orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")).then(function() {
-                return enrichedModules;
-            });
+
+            parent.children = parent.children.concat(enrichedModules);
+
+            return $q.all(orgUnitRepository.upsert(parent), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit"))
+                .then(function() {
+                    return enrichedModules;
+                });
         };
 
         var disableModule = function(orgUnit) {

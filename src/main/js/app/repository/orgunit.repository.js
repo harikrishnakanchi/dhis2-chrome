@@ -3,7 +3,7 @@ define([], function() {
         var isOfType = function(orgUnit, type) {
             return _.any(orgUnit.attributeValues, {
                 attribute: {
-                    id: "a1fa2777924"
+                    "code": "Type"
                 },
                 value: type
             });

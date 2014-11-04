@@ -55,6 +55,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                 'name': 'Name1',
                 'id': 'Id1',
                 'level': '2',
+                'children': []
             };
 
             var expectedNewOrgUnit = {
@@ -70,8 +71,7 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                 'attributeValues': [{
                     'attribute': {
                         'code': 'Type',
-                        'name': 'Type',
-                        'id': "a1fa2777924"
+                        'name': 'Type'
                     },
                     'value': "Country"
                 }]
@@ -91,7 +91,12 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
 
         it("should display error if saving organization unit fails", function() {
             var newOrgUnit = {};
-
+            var parent = {
+                'name': 'Name1',
+                'id': 'Id1',
+                'level': '2',
+                'children': []
+            };
 
             scope.save(newOrgUnit, parent);
             scope.$apply();

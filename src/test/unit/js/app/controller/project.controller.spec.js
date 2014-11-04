@@ -1,6 +1,6 @@
 define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "approvalHelper", "timecop"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, ApprovalHelper, timecop) {
     describe("project controller tests", function() {
-        var scope, timeout, q, location, anchorScroll, userRepository,
+        var scope, timeout, q, location, anchorScroll, userRepository, parent,
             fakeModal, orgUnitRepo, hustle, rootScope, approvalHelper;
 
         beforeEach(module('hustle'));
@@ -22,6 +22,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "getAllProjectUsers": function() {
                     return utils.getPromise(q, [{}]);
                 }
+            };
+
+            parent = {
+                "id": "parent",
+                "name": "parent",
+                "children": []
             };
 
             scope.isNewMode = true;
@@ -76,7 +82,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
         it("should display error if saving organization unit fails", function() {
             spyOn(hustle, "publish").and.returnValue(utils.getRejectedPromise(q, {}));
 
-            scope.save({}, {});
+            scope.save({}, parent);
             scope.$apply();
 
             expect(scope.saveFailure).toEqual(true);

@@ -108,7 +108,9 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             expect(allOrgUnits[4]).toEqual(_.merge(orgUnits[4], {
                 "displayName": "opUnit1"
             }));
-            expect(allOrgUnits[5]).toEqual(_.merge(orgUnits[5], {
+            expect(_.merge(allOrgUnits[5], {
+                "displayName": "opUnit1 - module2"
+            })).toEqual(_.merge(orgUnits[5], {
                 "displayName": "opUnit1 - module2"
             }));
         });
@@ -147,7 +149,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Project"
                 }],
@@ -166,7 +168,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Project"
                 }],
@@ -185,7 +187,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Project"
                 }],
@@ -207,7 +209,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Module"
                 }],
@@ -223,7 +225,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Operation Unit"
                 }],
@@ -242,7 +244,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Module"
                 }],
@@ -258,7 +260,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Module"
                 }],
@@ -275,7 +277,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Operation Unit"
                 }],
@@ -294,7 +296,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Module"
                 }],
@@ -326,7 +328,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Project"
                 }],
@@ -345,7 +347,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Project"
                 }],
@@ -364,7 +366,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Project"
                 }],
@@ -386,7 +388,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Module"
                 }, {
@@ -407,7 +409,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Operation Unit"
                 }],
@@ -426,7 +428,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Module"
                 }],
@@ -442,7 +444,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Module"
                 }],
@@ -459,7 +461,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Operation Unit"
                 }],
@@ -478,7 +480,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 },
                 "attributeValues": [{
                     "attribute": {
-                        id: "a1fa2777924"
+                        "code": "Type"
                     },
                     value: "Module"
                 }],

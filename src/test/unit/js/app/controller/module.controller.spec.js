@@ -94,8 +94,10 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             Date = _Date;
         });
 
-        it("should fetch is expanded for a particular module based on timestamp", function () {
-            var module = {"timestamp": "2014-12-22"};
+        it("should fetch is expanded for a particular module based on timestamp", function() {
+            var module = {
+                "timestamp": "2014-12-22"
+            };
             expect(scope.getIsExpanded(module)).toEqual({});
         });
 
@@ -191,7 +193,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         it("should create module", function() {
             scope.orgUnit = {
                 "name": "Project1",
-                "id": "someid"
+                "id": "someid",
+                "children": []
             };
 
             var modules = [{
@@ -206,30 +209,29 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 shortName: 'Module1',
             }];
 
-            var enrichedModules =
-                [{
-                    name: 'Module1',
-                    datasets: [{
-                        'id': 'DS_OPD',
-                        'name': 'dataset11',
-                    }],
-                    shortName: 'Module1',
-                    id: 'adba40b7157',
-                    level: NaN,
-                    openingDate: '2014-04-01',
-                    selectedDataset: undefined,
-                    attributeValues: [{
-                        attribute: {
-                            code: "Type",
-                            name: "Type",
-                        },
-                        value: 'Module'
-                    }],
-                    parent: {
-                        name: 'Project1',
-                        id: 'someid'
-                    }
-                }];
+            var enrichedModules = [{
+                name: 'Module1',
+                datasets: [{
+                    'id': 'DS_OPD',
+                    'name': 'dataset11',
+                }],
+                shortName: 'Module1',
+                id: 'adba40b7157',
+                level: NaN,
+                openingDate: '2014-04-01',
+                selectedDataset: undefined,
+                attributeValues: [{
+                    attribute: {
+                        code: "Type",
+                        name: "Type",
+                    },
+                    value: 'Module'
+                }],
+                parent: {
+                    name: 'Project1',
+                    id: 'someid'
+                }
+            }];
 
             scope.save(modules);
             scope.$apply();
