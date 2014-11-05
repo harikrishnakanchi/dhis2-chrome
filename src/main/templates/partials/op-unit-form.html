@@ -15,7 +15,7 @@
                 <input type="button" class="btn-delete" ng-hide="$first" ng-click="delete($index)" value="X Delete"/>
                 <ul>
                     <li class="form-group">
-                        <label for="opUnitType" class="col-sm-4 col-md-4 control-label">Operation unit name</label>
+                        <label for="opUnitType" class="col-sm-4 col-md-4 control-label">Operation unit type</label>
                         <div class="col-sm-8 col-md-8 form-inline">
                             <div class="radio-inline">
                                 <label for="hospital{{$index+1}}"> <input type="radio" ng-model="opUnit.type" id="hospital{{$index+1}}" value="Hospital" required ng-disabled="!isNewMode"> Hospital </label>
