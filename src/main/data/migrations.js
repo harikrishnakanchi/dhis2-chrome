@@ -13,14 +13,15 @@ define([], function() {
         });
     };
 
-    var create_index = function(store, indexName, key, isUnique) {
+    var create_index = function(store, indexName, key, isUnique, multiEntry) {
         store.createIndex(indexName, key, {
-            "unique": isUnique
+            "unique": isUnique,
+            "multiEntry": multiEntry || false
         });
     };
 
     var add_object_stores = function(db, tx) {
-        const syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections"];
+        const syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "programStages"];
         create_data_store(syncable_types, db);
     };
 
@@ -95,6 +96,11 @@ define([], function() {
         create_index(approvalDataSetsStore, "by_period", "period", false);
     };
 
+    var add_programs_store = function(db ,tx) {
+        var completeDataSetsStore = create_store_with_key("programs", "id", db);
+        create_index(completeDataSetsStore, "by_organisationUnit", "organisationUnits", false, true);
+    };
+
     return [add_object_stores,
         change_log_stores,
         add_organisation_units_and_level_store,
@@ -107,6 +113,7 @@ define([], function() {
         add_system_settings_store,
         add_user_preference_store,
         add_complete_datasets_store,
-        add_approval_datasets_store
+        add_approval_datasets_store,
+        add_programs_store
     ];
 });

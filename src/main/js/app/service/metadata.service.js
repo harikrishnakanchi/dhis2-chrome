@@ -1,15 +1,32 @@
 define(["properties", "lodash"], function(properties, _) {
-    return function($http, db) {
+    return function($http, db, $q) {
         var upsertMetadata = function(data) {
+            var upsertPromises = [];
             _.each(properties.metadata.types, function(type) {
                 var entities = data[type];
                 var store = db.objectStore(type);
                 if (!_.isEmpty(entities))
-                    store.upsert(entities);
+                    upsertPromises.push(store.upsert(entities));
             });
-            return updateChangeLog(data);
+
+            upsertPromises.push(upsertProgramData(data));
+
+            return $q.all(upsertPromises).then(function() {
+                return updateChangeLog(data);
+            });
         };
 
+        var upsertProgramData = function(data) {
+            if (!_.isEmpty(data.programs)) {
+                var programs = _.transform(data.programs, function(acc, ele) {
+                    if(!_.isEmpty(ele.organisationUnits))
+                        ele.organisationUnits = _.pluck(ele.organisationUnits, 'id');
+                    acc.push(ele);
+                });
+                var store = db.objectStore("programs");
+                return store.upsert(programs);
+            }
+        };
 
         var getDataFromResponse = function(response) {
             return response.data;

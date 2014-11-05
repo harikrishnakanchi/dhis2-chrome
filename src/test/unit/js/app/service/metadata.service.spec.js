@@ -14,9 +14,14 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 objectStore: function() {}
             };
             mockStore = {
-                upsert: function() {},
-                find: function() {}
+                upsert: function() {
+                    return utils.getPromise(q, {});
+                },
+                find: function() {
+                    return utils.getPromise(q, undefined);
+                }
             };
+
             data = {
                 "categories": [category1],
                 "created": tomorrow
@@ -60,8 +65,8 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             httpBackend.expectGET("/data/organisationUnits.json").respond(200, {});
             httpBackend.expectGET("/data/systemSettings.json").respond(200, {});
             httpBackend.expectGET("/data/translations.json").respond(200, {});
-            spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, undefined));
-            var metadataService = new MetadataService(http, db);
+
+            var metadataService = new MetadataService(http, db, q);
             metadataService.loadMetadataFromFile();
 
             httpBackend.flush();
@@ -74,12 +79,52 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             expect(mockStore.upsert.calls.count()).toEqual(5);
         });
 
+        it("should trasform and sync program data", function() {
+            var headers = {
+                "Accept": "application/json, text/plain, */*"
+            };
+
+            var data = {
+                "programs": [{
+                    "id": "p1",
+                    "organisationUnits": [{
+                        "id": "1",
+                        "name": "o1"
+                    }, {
+                        "id": "2",
+                        "name": "o2"
+                    }]
+                }, {
+                    "id": "p2"
+                }],
+                "created": tomorrow
+            };
+
+            httpBackend.expectGET(properties.dhis.url + "/api/metaData").respond(200, data);
+            httpBackend.expectGET(properties.dhis.url + "/api/organisationUnits?fields=:all&paging=false").respond(200, {});
+            httpBackend.expectGET(properties.dhis.url + "/api/systemSettings", headers).respond(200, {});
+            httpBackend.expectGET(properties.dhis.url + "/api/translations", headers).respond(200, {});
+
+            var metadataService = new MetadataService(http, db, q);
+            metadataService.sync();
+
+            httpBackend.flush();
+
+            expect(mockStore.upsert).toHaveBeenCalledWith([{
+                "id": "p1",
+                "organisationUnits": ["1", "2"]
+            }, {
+                "id": "p2"
+            }]);
+        });
+
         it("should not upsert metaData if import has already happened one time", function() {
             setupLocalFileHttpRequest(today);
-            spyOn(mockStore, 'find').and.returnValue(utils.getPromise(q, {
+
+            spyOn(mockStore, "find").and.returnValue(utils.getPromise(q, {
                 lastUpdatedTime: tomorrow
             }));
-            var metadataService = new MetadataService(http, db);
+            var metadataService = new MetadataService(http, db, q);
 
             metadataService.loadMetadataFromFile();
             httpBackend.flush();
@@ -100,7 +145,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 "lastUpdatedTime": today
             }));
 
-            var metadataService = new MetadataService(http, db);
+            var metadataService = new MetadataService(http, db, q);
             metadataService.sync();
 
             httpBackend.flush();
@@ -133,9 +178,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             httpBackend.expectGET(properties.dhis.url + "/api/systemSettings", headers).respond(200, systemSettings);
             httpBackend.expectGET(properties.dhis.url + "/api/translations", headers).respond(200, translations);
 
-            spyOn(mockStore, "find").and.returnValue(utils.getPromise(q, undefined));
-
-            var metadataService = new MetadataService(http, db);
+            var metadataService = new MetadataService(http, db, q);
             metadataService.sync();
 
             httpBackend.flush();
