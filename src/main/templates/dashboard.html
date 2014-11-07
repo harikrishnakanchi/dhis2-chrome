@@ -10,7 +10,7 @@
         <div class="loading" ng-show="loading">
             <img src="img/ajax-loader.gif" class="spinner" />
         </div>
-        <div>
+        <div ng-if="hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver'])">
             <div ng-show="approveSuccess" class="alert alert-success">{{resourceBundle.dataApprovalSuccessful}}</div>
             <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
             <form name="approvalForm">

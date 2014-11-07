@@ -40,6 +40,10 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
                 result: utils.getPromise(q, {})
             });
 
+            rootScope.hasRoles = function() {
+                return true;
+            };
+
             dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
         }));
 
