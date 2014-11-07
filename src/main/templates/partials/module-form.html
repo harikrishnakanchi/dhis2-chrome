@@ -21,11 +21,19 @@
                             </div>
                         </div>
                     </li>
-                    <li class="form-group">
+                    <li>
+                        <label for="serviceType" class="col-sm-4 col-md-4 control-label">{{resourceBundle.serviceTypeLabel}}</label>
+                        <select type="text" name="serviceTypeDropDown" id="serviceTypeDropDown" ng-model="serviceType">
+                            <option value=""></option>
+                            <option value="Aggregate">{{resourceBundle.aggregateLabel}}</option>
+                            <option value="Linelist">{{resourceBundle.lineListLabel}}</option>
+                        </select>
+                    </li>
+                    <li class="form-group" ng-if="serviceType==='Aggregate'">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-show="isNewMode">Add service</label>
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-hide="isNewMode">Services</label>
                     </li>
-                    <li class="form-group">
+                    <li class="form-group" ng-if="serviceType==='Aggregate'">
                         <div class="col-sm-12">
                             <section class="module-details">
                                 <div class="add-item-ctrl">

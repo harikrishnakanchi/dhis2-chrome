@@ -88,5 +88,8 @@
     "itemsAwaitingApprovalAtOtherLevelLabel": "Items awaiting approval at other levels",
     "itemsAwaitingApproval": "Items awaiting approval",
     "dataApprovalSuccessful": "Data Approved successfully",
-    "awaitingApprovalAtLabel": "Awaiting Approval At"
+    "awaitingApprovalAtLabel": "Awaiting Approval At",
+    "serviceTypeLabel": "Service Type",
+    "aggregateLabel": "Aggregate",
+    "lineListLabel": "Linelist"
 }
