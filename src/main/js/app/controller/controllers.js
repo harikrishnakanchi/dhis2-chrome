@@ -1,11 +1,11 @@
 define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'moduleController', 'projectController', 'countryController', 'confirmDialogController',
-        'projectUserController', 'selectProjectController', 'aggregateDataEntryController', 'lineListDataEntryController'
+        'projectUserController', 'selectProjectController', 'aggregateDataEntryController', 'lineListDataEntryController', 'programRepository'
     ],
     function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, moduleController, projectController, countryController, confirmDialogController,
-        projectUserController, selectProjectController, aggregateDataEntryController, lineListDataEntryController) {
+        projectUserController, selectProjectController, aggregateDataEntryController, lineListDataEntryController, programRepository) {
         var init = function(app) {
             app.controller('dashboardController', ['$scope', '$hustle', '$q', '$rootScope', 'approvalHelper', 'dataSetRepository', '$modal', '$timeout', dashboardController]);
-            app.controller('dataEntryController', ['$scope', '$routeParams', '$q', '$location', '$rootScope', 'orgUnitRepository', dataEntryController]);
+            app.controller('dataEntryController', ['$scope', '$routeParams', '$q', '$location', '$rootScope', 'orgUnitRepository', 'programRepository', dataEntryController]);
             app.controller('aggregateDataEntryController', ['$scope', '$routeParams', '$q', '$hustle', '$indexedDB', 'dataRepository', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', 'approvalDataRepository', '$timeout', 'orgUnitRepository', 'approvalHelper', aggregateDataEntryController]);
             app.controller('lineListDataEntryController', ['$scope', '$routeParams', '$q', '$hustle', '$indexedDB', 'dataRepository', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', 'approvalDataRepository', '$timeout', 'orgUnitRepository', 'approvalHelper', lineListDataEntryController]);
             app.controller('orgUnitContoller', ['$scope', '$indexedDB', '$q', '$location', '$timeout', '$anchorScroll', orgUnitContoller]);

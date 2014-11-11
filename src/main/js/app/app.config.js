@@ -70,6 +70,7 @@ require.config({
         "userPreferenceRepository": "app/repository/userpreference.repository",
         "orgUnitRepository": "app/repository/orgunit.repository",
         "userRepository": "app/repository/user.repository",
+        "programRepository": "app/repository/program.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",

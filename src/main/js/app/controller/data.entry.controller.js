@@ -1,11 +1,15 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer"],
     function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
-        return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository) {
+        return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository, programRepository) {
 
             $scope.$watchCollection('[week, currentModule]', function() {
                 if ($scope.week && $scope.currentModule) {
-                    $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
-                    //$scope.formTemplateUrl = "templates/partials/line-list-data-entry.html" + '?' + moment().format("X");
+                    programRepository.getProgramsForOrgUnit($scope.currentModule.id).then(function(programs){
+                        if(_.isEmpty(programs))
+                            $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
+                        else
+                            $scope.formTemplateUrl = "templates/partials/line-list-data-entry.html" + '?' + moment().format("X");
+                    });
                 }
             });
 

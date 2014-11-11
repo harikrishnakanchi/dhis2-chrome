@@ -1,5 +1,5 @@
-define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "orgUnitRepository"],
-    function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, OrgUnitRepository) {
+define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "orgUnitRepository", "programRepository"],
+    function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, OrgUnitRepository, ProgramRepository) {
         describe("dataEntryController ", function() {
 
             var scope, rootScope, q, anchorScroll, location, window, timeout, orgUnitRepository, allModules, routeParams;
@@ -61,16 +61,21 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, allModules));
 
+                programRepository = new ProgramRepository();
+                spyOn(programRepository, "getProgramsForOrgUnit").and.returnValue(utils.getPromise(q, []));
+
                 routeParams = {};
             }));
 
             it("should initialize modules", function() {
-                var modules = [{'id': 'mod1'}];
+                var modules = [{
+                    'id': 'mod1'
+                }];
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, modules));
 
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
 
                 expect(scope.modules).toEqual(modules);
@@ -82,7 +87,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     "week": "W31 - 2014-07-28 - 2014-08-03"
                 };
 
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
 
                 expect(scope.week).toEqual({
@@ -94,7 +99,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             });
 
             it("should load the data entry template", function() {
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
 
                 scope.week = {};
@@ -104,8 +109,23 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.formTemplateUrl.indexOf("templates/partials/aggregate-data-entry.html?")).toEqual(0);
             });
 
-            it("should not load the data entry template only if module is undefined", function() {
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+            it("should load the list-list entry template", function() {
+                programRepository = new ProgramRepository();
+                spyOn(programRepository, "getProgramsForOrgUnit").and.returnValue(utils.getPromise(q, [{}]));
+
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
+                scope.$apply();
+
+                scope.week = {};
+                scope.currentModule = {};
+                scope.$apply();
+
+                expect(scope.formTemplateUrl.indexOf("templates/partials/line-list-data-entry.html?")).toEqual(0);
+            });
+
+
+            it("should not load the template only if module is undefined", function() {
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
 
                 scope.week = {};
@@ -115,8 +135,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.formTemplateUrl).toEqual(undefined);
             });
 
-            it("should not load the data entry template only if period is undefined", function() {
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
+            it("should not load the template only if period is undefined", function() {
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
 
                 scope.week = undefined;
