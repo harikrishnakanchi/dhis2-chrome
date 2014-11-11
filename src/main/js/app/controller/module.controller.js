@@ -43,7 +43,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 };
 
                 var setUpEditMode = function() {
-                    $scope.serviceType = isLinelistService() ? "Linelist" : "Aggregate";
                     var associatedDatasets = datasetTransformer.getAssociatedDatasets($scope.orgUnit.id, $scope.allDatasets);
                     var nonAssociatedDatasets = _.reject($scope.allDatasets, function(d) {
                         return !isNewDataModel(d) || _.any(associatedDatasets, {
@@ -56,7 +55,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         'name': $scope.orgUnit.name,
                         'allDatasets': nonAssociatedDatasets,
                         'datasets': associatedDatasets,
-                        'selectedDataset': associatedDatasets[0]
+                        'selectedDataset': associatedDatasets[0],
+                        'service': isLinelistService() ? "Linelist" : "Aggregate",
+                        'program': undefined
                     });
 
                     var isDisabled = _.find($scope.orgUnit.attributeValues, {
@@ -194,7 +195,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 'datasets': [],
                 'allDatasets': _.filter(_.cloneDeep($scope.allDatasets), isNewDataModel),
                 'selectedDataset': {},
-                'timestamp': new Date().getTime()
+                'timestamp': new Date().getTime(),
+                "service": "",
+                "program": undefined
             });
         };
 
