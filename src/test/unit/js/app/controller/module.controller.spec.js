@@ -421,6 +421,26 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(scope.areDatasetsNotSelected(modules)).toEqual(true);
         });
 
+        it("should return false if program for module is selected", function(){
+            var modules = [{
+                'name': "Module1",
+                'program': {"name": "ER Linelist"},
+                'serviceType': "Linelist"
+            }];
+
+            expect(scope.areNoProgramsSelected(modules)).toEqual(false);
+        });
+
+        it("should return true if no program for module is selected", function(){
+            var modules = [{
+                'name': "Module1",
+                'program': {"name": ""},
+                'serviceType': "Linelist"
+            }];
+
+            expect(scope.areNoProgramsSelected(modules)).toEqual(true);
+        });
+
         it("should de-select all data elements if the section containing it is de-selected", function() {
             var section = {
                 'id': "sec1",
