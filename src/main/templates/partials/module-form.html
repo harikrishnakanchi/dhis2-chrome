@@ -23,17 +23,17 @@
                     </li>
                     <li>
                         <label for="service" class="col-sm-4 col-md-4 control-label">{{resourceBundle.serviceLabel}}</label>
-                        <select type="text" name="serviceDropDown" id="serviceDropDown" ng-model="module.service" ng-disabled="!isNewMode" required>
+                        <select type="text" name="serviceDropDown" id="serviceDropDown" ng-model="module.serviceType" ng-disabled="!isNewMode" required>
                             <option value=""></option>
                             <option value="Aggregate">{{resourceBundle.aggregateLabel}}</option>
                             <option value="Linelist">{{resourceBundle.lineListLabel}}</option>
                         </select>
                     </li>
-                    <li class="form-group" ng-if="module.service==='Aggregate'">
+                    <li class="form-group" ng-if="module.serviceType==='Aggregate'">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-show="isNewMode">Add service</label>
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-hide="isNewMode">Services</label>
                     </li>
-                    <li class="form-group" ng-if="module.service==='Aggregate'">
+                    <li class="form-group" ng-if="module.serviceType==='Aggregate'">
                         <div class="col-sm-12">
                             <section class="module-details">
                                 <div class="add-item-ctrl">
@@ -64,10 +64,16 @@
                             </section>
                         </div>
                     </li>
+                    <li class="form-group" ng-if="module.serviceType==='Linelist'">
+                        <label for="program" class="col-sm-4 col-md-4 control-label">{{resourceBundle.selectProgramLabel}}</label> 
+                        <select type="text" name="programsDropDown" id="programsDropDown" ng-model="module.program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
+                           <option value=""></option>
+                        </select>
+                    </li>
                 </ul>
             </div>
-            <input type="button" class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid || areDatasetsNotSelected(modules) || areNoSectionsSelected(modules)" value="Save" ng-if="isNewMode" />
-            <input type="button" class="btn btn-main pull-right" ng-click="update(modules)" ng-disabled="form.$invalid || areDatasetsNotSelected(modules) || areNoSectionsSelected(modules) || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode &amp;&amp; !updateDisabled" />
+            <input type="button" class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules)" value="Save" ng-if="isNewMode" />
+            <input type="button" class="btn btn-main pull-right" ng-click="update(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules) || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode &amp;&amp; !updateDisabled" />
             <input type="button" class="btn btn-main pull-right" ng-click="disable(orgUnit)" value="Disable" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !isDisabled" />
         </form>
     </div>

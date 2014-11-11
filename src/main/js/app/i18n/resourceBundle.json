@@ -89,7 +89,8 @@
     "itemsAwaitingApproval": "Items awaiting approval",
     "dataApprovalSuccessful": "Data Approved successfully",
     "awaitingApprovalAtLabel": "Awaiting Approval At",
-    "serviceLabel": "Service",
+    "serviceLabel": "Service Type",
     "aggregateLabel": "Aggregate",
-    "lineListLabel": "Linelist"
+    "lineListLabel": "Linelist",
+    "selectProgramLabel": "Select Program"
 }

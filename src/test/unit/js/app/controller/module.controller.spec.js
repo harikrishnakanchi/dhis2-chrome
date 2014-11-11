@@ -398,6 +398,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         it("should return false if datasets for modules are selected", function() {
             var modules = [{
                 'name': "Module1",
+                'serviceType': "Aggregate",
                 'datasets': [{
                     'id': 'ds_11',
                     'name': 'dataset11',
@@ -413,7 +414,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         it("should return true if dataset is not selected", function() {
             var modules = [{
                 'name': "Module1",
-                'datasets': []
+                'datasets': [],
+                'serviceType': "Aggregate"
             }];
 
             expect(scope.areDatasetsNotSelected(modules)).toEqual(true);
@@ -503,7 +505,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should return true if no section is selected from each dataset", function() {
             var module = {
-                datasets: [{
+                'serviceType': "Aggregate",
+                'datasets': [{
                     "sections": [{
                         "name": "section1",
                         "id": "section_1",
@@ -531,7 +534,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         it("should return false if any one section is selected from each dataset", function() {
 
             var module = {
-                datasets: [{
+                'serviceType': "Aggregate",
+                'datasets': [{
                     "sections": [{
                         "name": "section1",
                         "id": "section_1",

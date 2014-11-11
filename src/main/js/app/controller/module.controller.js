@@ -21,6 +21,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 $scope.originalDatasets = data[0];
                 var excludedDataElements = data[3] && data[3].value && data[3].value.excludedDataElements ? data[3].value.excludedDataElements : {};
                 $scope.allDatasets = datasetTransformer.enrichDatasets(data[0], data[1], data[2], $scope.orgUnit.id, excludedDataElements);
+                $scope.allPrograms = data[4];
             };
 
             var setUpForm = function() {
@@ -56,7 +57,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         'allDatasets': nonAssociatedDatasets,
                         'datasets': associatedDatasets,
                         'selectedDataset': associatedDatasets[0],
-                        'service': isLinelistService() ? "Linelist" : "Aggregate",
+                        'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
                         'program': undefined
                     });
 
@@ -85,8 +86,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var sectionPromise = getAll("sections");
             var dataElementsPromise = getAll("dataElements");
             var systemSettingsPromise = systemSettingRepository.getAllWithProjectId($scope.orgUnit.parent.id);
+            var programsPromise = getAll("programs");
 
-            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, systemSettingsPromise]);
+            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, systemSettingsPromise, programsPromise]);
             getAllData.then(setUpData).then(setUpForm);
         };
 
@@ -196,8 +198,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 'allDatasets': _.filter(_.cloneDeep($scope.allDatasets), isNewDataModel),
                 'selectedDataset': {},
                 'timestamp': new Date().getTime(),
-                "service": "",
-                "program": undefined
+                "serviceType": "",
+                "program": {
+                    "name": ""
+                }
             });
         };
 
@@ -207,16 +211,26 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.areDatasetsNotSelected = function(modules) {
             return _.any(modules, function(module) {
-                return _.isEmpty(module.datasets);
+                return module.serviceType === "Aggregate" && _.isEmpty(module.datasets);
             });
         };
 
         $scope.areNoSectionsSelected = function(modules) {
             return _.any(modules, function(module) {
                 return _.any(module.datasets, function(dataSet) {
-                    return $scope.areNoSectionsSelectedForDataset(dataSet);
+                    return module.serviceType === "Aggregate" && $scope.areNoSectionsSelectedForDataset(dataSet);
                 });
             });
+        };
+
+        $scope.areNoProgramsSelected = function(modules) {
+            return _.any(modules, function(module) {
+                return module.serviceType === "Linelist" && _.isEmpty(module.program.name);
+            });
+        };
+
+        $scope.shouldDisableSaveOrUpdateButton = function(modules) {
+            return $scope.areDatasetsNotSelected(modules) || $scope.areNoSectionsSelected(modules) || $scope.areNoProgramsSelected(modules);
         };
 
         $scope.areNoSectionsSelectedForDataset = function(dataset) {
