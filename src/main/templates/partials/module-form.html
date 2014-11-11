@@ -23,7 +23,7 @@
                     </li>
                     <li>
                         <label for="serviceType" class="col-sm-4 col-md-4 control-label">{{resourceBundle.serviceTypeLabel}}</label>
-                        <select type="text" name="serviceTypeDropDown" id="serviceTypeDropDown" ng-model="serviceType">
+                        <select type="text" name="serviceTypeDropDown" id="serviceTypeDropDown" ng-model="serviceType" ng-disabled="!isNewMode" required>
                             <option value=""></option>
                             <option value="Aggregate">{{resourceBundle.aggregateLabel}}</option>
                             <option value="Linelist">{{resourceBundle.lineListLabel}}</option>

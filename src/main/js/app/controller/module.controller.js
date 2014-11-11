@@ -21,10 +21,19 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 $scope.originalDatasets = data[0];
                 var excludedDataElements = data[3] && data[3].value && data[3].value.excludedDataElements ? data[3].value.excludedDataElements : {};
                 $scope.allDatasets = datasetTransformer.enrichDatasets(data[0], data[1], data[2], $scope.orgUnit.id, excludedDataElements);
-
             };
 
             var setUpForm = function() {
+                var isLinelistService = function() {
+                    var linelistAttribute = _.find($scope.orgUnit.attributeValues, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        }
+                    });
+
+                    return linelistAttribute ? linelistAttribute.value : false;
+                };
+
                 var setUpNewMode = function() {
                     orgUnitRepository.getAll().then(function(allOrgUnits) {
                         $scope.allModules = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
@@ -34,6 +43,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 };
 
                 var setUpEditMode = function() {
+                    $scope.serviceType = isLinelistService() ? "Linelist" : "Aggregate";
                     var associatedDatasets = datasetTransformer.getAssociatedDatasets($scope.orgUnit.id, $scope.allDatasets);
                     var nonAssociatedDatasets = _.reject($scope.allDatasets, function(d) {
                         return !isNewDataModel(d) || _.any(associatedDatasets, {
