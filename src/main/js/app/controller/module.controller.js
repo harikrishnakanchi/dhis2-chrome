@@ -178,7 +178,25 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.save = function(modules) {
-            $scope.createModules(modules).then($scope.associateDatasets).then(_.curry($scope.excludeDataElements)($scope.orgUnit.id)).then($scope.onSuccess, $scope.onError);
+
+            var categorizeModulesBasedOnServiceType = function() {
+                var lineListModules = [];
+                var aggregateModules = [];
+                _.forEach(modules, function(module) {
+                    if (module.serviceType === 'Linelist')
+                        lineListModules.push(module);
+                    else
+                        aggregateModules.push(module);
+                });
+                return {
+                    'lineListModules': lineListModules,
+                    'aggregateModules': aggregateModules
+                };
+            };
+
+            var categorizedModules = categorizeModulesBasedOnServiceType();
+
+            $scope.createModules(categorizedModules.aggregateModules).then($scope.associateDatasets).then(_.curry($scope.excludeDataElements)($scope.orgUnit.id)).then($scope.onSuccess, $scope.onError);
         };
 
         $scope.update = function(modules) {

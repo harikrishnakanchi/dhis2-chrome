@@ -199,9 +199,16 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var modules = [{
                 'name': "Module1",
+                'serviceType': "Aggregate",
                 'datasets': [{
                     'id': 'DS_OPD',
                     'name': 'dataset11',
+                }]
+            }, {
+                'name': "Module2",
+                'serviceType': "Linelist",
+                'program': [{
+                    'name': 'ER Linelist',
                 }]
             }];
             var moduleList = [{
@@ -226,6 +233,12 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                         name: "Type",
                     },
                     value: 'Module'
+                }, {
+                    attribute: {
+                        code: "isLineListService",
+                        name: "Is Linelist Service"
+                    },
+                    value: false
                 }],
                 parent: {
                     name: 'Project1',

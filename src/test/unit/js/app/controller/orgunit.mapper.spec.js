@@ -237,6 +237,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
             var modules = [{
                 'name': "Module1",
+                'service': "Aggregate",
                 'datasets': [{
                     'id': 'ds_11',
                     'name': 'dataset11',
@@ -246,6 +247,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }]
             }, {
                 'name': "Module2",
+                'service': "Aggregate",
                 'datasets': [{
                     'id': 'ds_21',
                     'name': 'dataset21',
@@ -280,6 +282,12 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         name: "Type"
                     },
                     value: 'Module'
+                }, {
+                    attribute: {
+                        code: "isLineListService",
+                        name: "Is Linelist Service"
+                    },
+                    value: false
                 }],
                 parent: {
                     name: 'Project1',
@@ -305,6 +313,12 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         name: "Type"
                     },
                     value: 'Module'
+                }, {
+                    attribute: {
+                        code: "isLineListService",
+                        name: "Is Linelist Service"
+                    },
+                    value: false
                 }],
                 parent: {
                     name: 'Project1',
