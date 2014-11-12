@@ -59,6 +59,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
         });
 
         it("should save project in dhis", function(done) {
+            var newOrgUnit = {};
             var expectedNewOrgUnit = {
                 "id": "blah"
             };
@@ -66,6 +67,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
             rootScope.$on('resetProjects', function() {
+                expect(orgUnitMapper.mapToProjectForDhis).toHaveBeenCalledWith(newOrgUnit, parent);
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: expectedNewOrgUnit,
@@ -135,7 +137,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
         it("should display error if updating organization unit fails", function() {
             spyOn(hustle, "publish").and.returnValue(utils.getRejectedPromise(q, {}));
 
-            scope.update(newOrgUnit, parent);
+            scope.update({}, parent);
             scope.$apply();
 
             expect(scope.saveFailure).toEqual(true);
