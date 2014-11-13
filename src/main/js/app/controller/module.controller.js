@@ -178,25 +178,21 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.save = function(modules) {
-
-            var categorizeModulesBasedOnServiceType = function() {
-                var lineListModules = [];
-                var aggregateModules = [];
-                _.forEach(modules, function(module) {
-                    if (module.serviceType === 'Linelist')
-                        lineListModules.push(module);
-                    else
-                        aggregateModules.push(module);
+            var getModulesOfServiceType = function(serviceType) {
+                return _.filter(modules, function(m) {
+                    return m.serviceType === serviceType;
                 });
-                return {
-                    'lineListModules': lineListModules,
-                    'aggregateModules': aggregateModules
-                };
             };
 
-            var categorizedModules = categorizeModulesBasedOnServiceType();
+            var saveAggregateModules = function() {
+                var aggregateModules = getModulesOfServiceType("Aggregate");
+                $scope.createModules(aggregateModules)
+                    .then($scope.associateDatasets)
+                    .then(_.curry($scope.excludeDataElements)($scope.orgUnit.id))
+                    .then($scope.onSuccess, $scope.onError);
+            };
 
-            $scope.createModules(categorizedModules.aggregateModules).then($scope.associateDatasets).then(_.curry($scope.excludeDataElements)($scope.orgUnit.id)).then($scope.onSuccess, $scope.onError);
+            saveAggregateModules();
         };
 
         $scope.update = function(modules) {
