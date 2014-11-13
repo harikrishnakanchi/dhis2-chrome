@@ -60,6 +60,7 @@ require.config({
         "systemSettingService": "app/service/system.setting.service",
         "userService": "app/service/user.service",
         "approvalService": "app/service/approval.service",
+        "programService": "app/service/program.service",
 
         //Repositories
         "repositories": "app/repository/repositories",

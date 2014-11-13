@@ -137,7 +137,5 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
-
-
     });
 });

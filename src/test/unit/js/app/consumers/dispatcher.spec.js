@@ -1,6 +1,7 @@
 define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, utils) {
     describe("dispatcher", function() {
-        var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, scope, systemSettingConsumer, createUserConsumer, updateUserConsumer;
+        var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, scope,
+            systemSettingConsumer, createUserConsumer, updateUserConsumer, programConsumer;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -30,11 +31,15 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             updateUserConsumer = {
                 'run': jasmine.createSpy("updateUserConsumer")
             };
+            programConsumer = {
+                'run': jasmine.createSpy("programConsumer")
+            };
             message = {};
             q = $q;
             scope = $rootScope.$new();
             downloadDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
-            dispatcher = new Dispatcher(q, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer);
+            dispatcher = new Dispatcher(q, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
+                downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -145,6 +150,15 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             dispatcher.run(message);
             expect(updateUserConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call program consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "uploadProgram"
+            };
+            dispatcher.run(message);
+            expect(programConsumer.run).toHaveBeenCalledWith(message);
         });
     });
 });

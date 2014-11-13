@@ -21,6 +21,7 @@ require.config({
         "datasetService": "app/service/dataset.service",
         "systemSettingService": "app/service/system.setting.service",
         "userService": "app/service/user.service",
+        "programService": "app/service/program.service",
         "services": "app/service/bg.services",
 
         //Repositories
@@ -47,6 +48,7 @@ require.config({
         "systemSettingConsumer": "app/consumer/system.setting.consumer",
         "createUserConsumer": "app/consumer/create.user.consumer",
         "updateUserConsumer": "app/consumer/update.user.consumer",
+        "programConsumer": "app/consumer/program.consumer",
         "dispatcher": "app/consumer/dispatcher",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
