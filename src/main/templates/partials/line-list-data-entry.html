@@ -3,7 +3,17 @@
      <img src="img/ajax-loader.gif" class="spinner" />
 </div>
 <section class="panel tab-panel">
-{{ title }}<br/>
-	Line List Entry
+	<accordion close-others="false">
+		<accordion-group ng-repeat="program in programs" is-open="true">
+			<accordion-heading>
+				{{program.name}}
+			</accordion-heading>
+			<div ng-repeat="programStage in program.programStages">
+			<ul ng-repeat="de in programStage.programStageDataElements">
+				<li>{{de.dataElement.name}}</li>
+			</ul>
+			</div>
+		</accordion-group>
+	</accordion>
 </section>
 </div>

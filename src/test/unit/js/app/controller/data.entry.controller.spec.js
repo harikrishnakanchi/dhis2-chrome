@@ -107,11 +107,12 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.$apply();
 
                 expect(scope.formTemplateUrl.indexOf("templates/partials/aggregate-data-entry.html?")).toEqual(0);
+                expect(scope.programsInCurrentModule).toBe(undefined);
             });
 
             it("should load the list-list entry template", function() {
                 programRepository = new ProgramRepository();
-                spyOn(programRepository, "getProgramsForOrgUnit").and.returnValue(utils.getPromise(q, [{}]));
+                spyOn(programRepository, "getProgramsForOrgUnit").and.returnValue(utils.getPromise(q, [{'id': 'p1'}]));
 
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
@@ -121,8 +122,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.$apply();
 
                 expect(scope.formTemplateUrl.indexOf("templates/partials/line-list-data-entry.html?")).toEqual(0);
+                expect(scope.programsInCurrentModule).toEqual(['p1']);
             });
-
 
             it("should not load the template only if module is undefined", function() {
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);

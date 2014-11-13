@@ -8,7 +8,7 @@ define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "orgU
             app.service('userPreferenceRepository', ['$indexedDB', userPreferenceRepository]);
             app.service('orgUnitRepository', ['$indexedDB', orgUnitRepository]);
             app.service('userRepository', ['$indexedDB', userRepository]);
-            app.service('programRepository', ['$indexedDB', programRepository]);
+            app.service('programRepository', ['$indexedDB', '$q', programRepository]);
         };
         return {
             init: init

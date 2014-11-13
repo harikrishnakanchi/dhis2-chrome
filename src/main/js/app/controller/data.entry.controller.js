@@ -4,11 +4,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
             $scope.$watchCollection('[week, currentModule]', function() {
                 if ($scope.week && $scope.currentModule) {
-                    programRepository.getProgramsForOrgUnit($scope.currentModule.id).then(function(programs){
-                        if(_.isEmpty(programs))
+                    programRepository.getProgramsForOrgUnit($scope.currentModule.id).then(function(programs) {
+                        if (_.isEmpty(programs)) {
+                            $scope.programsInCurrentModule = undefined;
                             $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
-                        else
+                        } else {
+                            $scope.programsInCurrentModule = _.pluck(programs, "id");
                             $scope.formTemplateUrl = "templates/partials/line-list-data-entry.html" + '?' + moment().format("X");
+                        }
                     });
                 }
             });
