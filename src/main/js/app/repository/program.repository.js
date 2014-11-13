@@ -51,5 +51,6 @@ define(["lodash"], function(_) {
                 .then(enrichProgramStages)
                 .then(enrichDataElements);
         };
+
     };
 });

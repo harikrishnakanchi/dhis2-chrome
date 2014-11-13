@@ -9,9 +9,18 @@
 				{{program.name}}
 			</accordion-heading>
 			<div ng-repeat="programStage in program.programStages">
-			<ul ng-repeat="de in programStage.programStageDataElements">
-				<li>{{de.dataElement.name}}</li>
+			<ul>
+				<li ng-repeat="de in programStage.programStageDataElements">
+					{{de.dataElement.formName}}
+					<input type="text" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="getNgModelFor(dataValues, program.id, programStage.id)[de.dataElement.id]" />
+					<input type="number" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="getNgModelFor(dataValues, program.id, programStage.id)[de.dataElement.id]" />
+					<input type="date" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="getNgModelFor(dataValues, program.id, programStage.id)[de.dataElement.id]" />
+					<select ng-options="o.name as o.name for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="getNgModelFor(dataValues, program.id, programStage.id)[de.dataElement.id]">
+						<option value=""></option>
+					</select>
+				</li>
 			</ul>
+			<input type="button" value="Submit" ng-click="submit(program.id, programStage.id)" />
 			</div>
 		</accordion-group>
 	</accordion>
