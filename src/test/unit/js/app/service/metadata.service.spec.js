@@ -112,7 +112,14 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
 
             expect(mockStore.upsert).toHaveBeenCalledWith([{
                 "id": "p1",
-                "organisationUnits": ["1", "2"]
+                "orgUnitIds": ["1", "2"],
+                "organisationUnits": [{
+                    "id": "1",
+                    "name": "o1"
+                }, {
+                    "id": "2",
+                    "name": "o2"
+                }]
             }, {
                 "id": "p2"
             }]);

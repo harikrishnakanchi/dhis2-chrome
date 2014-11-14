@@ -19,8 +19,8 @@ define(["properties", "lodash"], function(properties, _) {
         var upsertProgramData = function(data) {
             if (!_.isEmpty(data.programs)) {
                 var programs = _.transform(data.programs, function(acc, ele) {
-                    if(!_.isEmpty(ele.organisationUnits))
-                        ele.organisationUnits = _.pluck(ele.organisationUnits, 'id');
+                    if (!_.isEmpty(ele.organisationUnits))
+                        ele.orgUnitIds = _.pluck(ele.organisationUnits, 'id');
                     acc.push(ele);
                 });
                 var store = db.objectStore("programs");

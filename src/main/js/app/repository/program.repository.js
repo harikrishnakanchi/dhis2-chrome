@@ -1,8 +1,8 @@
 define(["lodash"], function(_) {
     return function(db, $q) {
-        this.getProgramsForOrgUnit = function(orgUnit) {
+        this.getProgramsForOrgUnit = function(orgUnitId) {
             var store = db.objectStore("programs");
-            var query = db.queryBuilder().$eq(orgUnit).$index("by_organisationUnit").compile();
+            var query = db.queryBuilder().$eq(orgUnitId).$index("by_organisationUnit").compile();
             return store.each(query);
         };
 

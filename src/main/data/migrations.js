@@ -96,9 +96,9 @@ define([], function() {
         create_index(approvalDataSetsStore, "by_period", "period", false);
     };
 
-    var add_programs_store = function(db ,tx) {
-        var completeDataSetsStore = create_store_with_key("programs", "id", db);
-        create_index(completeDataSetsStore, "by_organisationUnit", "organisationUnits", false, true);
+    var add_programs_store = function(db, tx) {
+        var programStore = create_store_with_key("programs", "id", db);
+        create_index(programStore, "by_organisationUnit", "orgUnitIds", false, true);
     };
 
     return [add_object_stores,
