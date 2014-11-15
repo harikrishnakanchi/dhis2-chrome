@@ -1,5 +1,5 @@
-define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer) {
-    return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, systemSettingRepository, db, $location, $q, $modal) {
+define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer", "programTransformer"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer, programTransformer) {
+    return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, systemSettingRepository, db, $location, $q, $modal, programRepository) {
 
         $scope.isopen = {};
         $scope.modules = [];
@@ -25,6 +25,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             };
 
             var setUpForm = function() {
+                var findAssociatedModule = function() {
+                    return _.find($scope.allPrograms, function(program) {
+                        return _.contains(program.orgUnitIds, $scope.orgUnit.id);
+                    });
+                };
+
                 var isLinelistService = function() {
                     var linelistAttribute = _.find($scope.orgUnit.attributeValues, {
                         "attribute": {
@@ -58,7 +64,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         'datasets': associatedDatasets,
                         'selectedDataset': associatedDatasets[0],
                         'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
-                        'program': undefined
+                        'program': findAssociatedModule()
                     });
 
                     var isDisabled = _.find($scope.orgUnit.attributeValues, {
@@ -177,6 +183,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             $scope.saveFailure = true;
         };
 
+        var associatePrograms = function(programWiseModules, enrichedModules) {
+            var programs = programTransformer.addModules($scope.allPrograms, programWiseModules, enrichedModules);
+            return programRepository.upsert(programs).then(function() {
+                return publishMessage(programs, "uploadProgram");
+            });
+        };
+
         $scope.save = function(modules) {
             var getModulesOfServiceType = function(serviceType) {
                 return _.filter(modules, function(m) {
@@ -186,13 +199,27 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
             var saveAggregateModules = function() {
                 var aggregateModules = getModulesOfServiceType("Aggregate");
-                $scope.createModules(aggregateModules)
+                if (aggregateModules.length === 0) return $q.when([]);
+                return $scope.createModules(aggregateModules)
                     .then($scope.associateDatasets)
                     .then(_.curry($scope.excludeDataElements)($scope.orgUnit.id))
                     .then($scope.onSuccess, $scope.onError);
             };
 
-            saveAggregateModules();
+            var saveLinelistModules = function() {
+                var linelistModules = getModulesOfServiceType("Linelist");
+                if (linelistModules.length === 0) return $q.when([]);
+
+                var programWiseModules = _.groupBy(linelistModules, function(m) {
+                    return m.program.id;
+                });
+
+                return $scope.createModules(linelistModules)
+                    .then(_.curry(associatePrograms)(programWiseModules))
+                    .then($scope.onSuccess, $scope.onError);
+            };
+
+            saveAggregateModules().then(saveLinelistModules);
         };
 
         $scope.update = function(modules) {

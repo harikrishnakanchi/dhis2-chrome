@@ -10,7 +10,7 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('lineListDataEntryController', ['$scope', '$q', '$indexedDB', 'programRepository', lineListDataEntryController]);
             app.controller('orgUnitContoller', ['$scope', '$indexedDB', '$q', '$location', '$timeout', '$anchorScroll', orgUnitContoller]);
             app.controller('opUnitController', ['$scope', '$q', '$hustle', 'orgUnitRepository', '$indexedDB', '$location', '$modal', opUnitController]);
-            app.controller('moduleController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', 'dataSetRepository', 'systemSettingRepository', '$indexedDB', '$location', '$q', '$modal', moduleController]);
+            app.controller('moduleController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', 'dataSetRepository', 'systemSettingRepository', '$indexedDB', '$location', '$q', '$modal', 'programRepository', moduleController]);
             app.controller('projectController', ['$scope', '$rootScope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', 'userRepository', '$modal', 'approvalHelper', projectController]);
             app.controller('mainController', ['$scope', '$location', '$rootScope', 'ngI18nResourceBundle', '$indexedDB', 'userPreferenceRepository', 'orgUnitRepository', 'userRepository', "metadataService", mainController]);
             app.controller('loginController', ['$scope', '$rootScope', '$location', '$indexedDB', '$q', '$hustle', 'userPreferenceRepository', loginController]);

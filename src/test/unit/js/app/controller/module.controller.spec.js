@@ -2,7 +2,7 @@
 define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer"], function(ModuleController, mocks, utils, testData, datasetTransformer) {
     describe("module controller", function() {
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
-            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, hustle, dataSetRepo, systemSettingRepo, fakeModal;
+            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, hustle, dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -21,6 +21,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             dataSetRepo = utils.getMockRepo(q);
             systemSettingRepo = utils.getMockRepo(q);
             systemSettingRepo.getAllWithProjectId = function() {};
+            programsRepo = utils.getMockRepo(q);
 
             mockOrgStore = {
                 upsert: function() {},
@@ -61,6 +62,12 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 open: function(object) {}
             };
 
+            allPrograms = [{
+                'id': 'prog1',
+                'name': 'ER Linelist',
+                'organisationUnits': []
+            }];
+
             sectionsdata = testData.get("sections");
             datasetsdata = testData.get("dataSets");
             dataElementsdata = testData.get("dataElements");
@@ -68,6 +75,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             sections = getMockStore(sectionsdata);
             datasets = getMockStore(datasetsdata);
             dataElements = getMockStore(dataElementsdata);
+            programs = getMockStore(allPrograms);
 
             scope.orgUnit = {
                 'name': 'SomeName',
@@ -85,9 +93,11 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     return sections;
                 if (storeName === "dataElements")
                     return dataElements;
+                if (storeName === "programs")
+                    return programs;
                 return getMockStore(testData.get(storeName));
             });
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo);
         }));
 
         afterEach(function() {
@@ -142,6 +152,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var modules = [{
                 name: "test1",
                 id: projectId,
+                serviceType: "Aggregate",
                 datasets: [{
                     sections: [{
                         dataElements: [{
@@ -190,7 +201,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
         });
 
-        it("should create module", function() {
+        it("should create aggregate and linelist modules", function() {
             scope.orgUnit = {
                 "name": "Project1",
                 "id": "someid",
@@ -207,10 +218,13 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             }, {
                 'name': "Module2",
                 'serviceType': "Linelist",
-                'program': [{
+                'program': {
+                    'id': 'prog1',
                     'name': 'ER Linelist',
-                }]
+                    'organisationUnits': []
+                }
             }];
+
             var moduleList = [{
                 name: 'Module1',
                 shortName: 'Module1',
@@ -246,6 +260,16 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }
             }];
 
+            var programs = [{
+                'id': 'prog1',
+                'name': 'ER Linelist',
+                'organisationUnits': [{
+                    id: 'a1ab18b5fdd',
+                    name: 'Module2'
+                }],
+                "orgUnitIds": ['a1ab18b5fdd']
+            }];
+
             scope.save(modules);
             scope.$apply();
 
@@ -254,6 +278,12 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: enrichedModules,
                 type: "upsertOrgUnit"
+            }, "dataValues");
+
+            expect(programsRepo.upsert).toHaveBeenCalledWith(programs);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: programs,
+                type: "uploadProgram"
             }, "dataValues");
         });
 
@@ -274,6 +304,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var modules = [{
                 'name': "Module1",
+                'serviceType': 'Aggregate',
                 'datasets': [{
                     'id': 'ds_11',
                     'name': 'dataset11',
@@ -283,6 +314,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             }, {
                 'name': "Module2",
+                'serviceType': 'Aggregate',
                 'datasets': [{
                     'id': 'ds_11',
                     'name': 'dataset21',
@@ -434,20 +466,24 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(scope.areDatasetsNotSelected(modules)).toEqual(true);
         });
 
-        it("should return false if program for module is selected", function(){
+        it("should return false if program for module is selected", function() {
             var modules = [{
                 'name': "Module1",
-                'program': {"name": "ER Linelist"},
+                'program': {
+                    "name": "ER Linelist"
+                },
                 'serviceType': "Linelist"
             }];
 
             expect(scope.areNoProgramsSelected(modules)).toEqual(false);
         });
 
-        it("should return true if no program for module is selected", function(){
+        it("should return true if no program for module is selected", function() {
             var modules = [{
                 'name': "Module1",
-                'program': {"name": ""},
+                'program': {
+                    "name": ""
+                },
                 'serviceType': "Linelist"
             }];
 

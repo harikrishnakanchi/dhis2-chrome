@@ -14,7 +14,7 @@ define(["programService", "angularMocks", "properties", "utils"], function(Progr
         });
 
         it("should upload program to dhis", function() {
-            var program = {
+            var programs = [{
                 "id": "id123",
                 "name": "program1",
                 "kind": "SINGLE_EVENT_WITHOUT_REGISTRATION",
@@ -22,11 +22,13 @@ define(["programService", "angularMocks", "properties", "utils"], function(Progr
                     "id": "org1",
                     "name": "org unit 1"
                 }]
-            };
+            }];
 
-            programService.upload(program);
+            programService.upload(programs);
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/programs", program).respond(200, "ok");
+            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", {
+                "programs": programs
+            }).respond(200, "ok");
             httpBackend.flush();
         });
     });
