@@ -1,5 +1,5 @@
 define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer, testData, _) {
-    describe("dataset", function() {
+    describe("datasetTransformer", function() {
 
         it("should enrich datasets", function() {
 

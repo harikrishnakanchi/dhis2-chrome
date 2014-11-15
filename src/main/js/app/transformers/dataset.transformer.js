@@ -3,17 +3,15 @@ define(["lodash"], function(_) {
     var enrichDatasets = function(allDatasets, allSections, allDataElements, moduleId, excludedDataElements) {
         allDatasets = _.cloneDeep(allDatasets);
         allSections = _.cloneDeep(allSections);
-        allDataElements = _.cloneDeep(allDataElements);
+        allDataElements = _.groupBy(allDataElements, "id");
 
         var groupedSections = _.groupBy(allSections, function(section) {
             return section.dataSet.id;
         });
 
         var addFormNameToDataElement = function(dataElement) {
-            var detailedDataElement = _.find(allDataElements, function(d) {
-                return d.id === dataElement.id;
-            });
-            dataElement.formName = detailedDataElement.formName;
+            var detailedDataElement = allDataElements[dataElement.id];
+            dataElement.formName = detailedDataElement[0].formName;
             return dataElement;
         };
 

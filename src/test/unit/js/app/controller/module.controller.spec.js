@@ -359,7 +359,17 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "id": "mod2",
                 "parent": {
                     "id": "par1"
-                }
+                },
+                "dataSets": [{
+                    "id": "ds1",
+                    "name": "dataset1",
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": true
+                    }]
+                }]
             };
             scope.isNewMode = false;
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
@@ -368,7 +378,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             expect(scope.isDisabled).toBeFalsy();
             expect(scope.modules[0].datasets.length).toEqual(1);
-            expect(scope.modules[0].allDatasets.length).toEqual(0);
             expect(scope.modules[0].selectedDataset).toEqual(scope.modules[0].datasets[0]);
         });
 
@@ -378,6 +387,16 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "parent": {
                     "id": "par1"
                 },
+                "dataSets": [{
+                    "id": "ds1",
+                    "name": "dataset1",
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": true
+                    }]
+                }],
                 "attributeValues": [{
                     "attribute": {
                         "code": "isDisabled"
@@ -398,7 +417,17 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "id": "mod2",
                 "parent": {
                     "id": "par1"
-                }
+                },
+                "dataSets": [{
+                    "id": "ds1",
+                    "name": "dataset1",
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": true
+                    }]
+                }]
             };
             scope.isNewMode = false;
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);

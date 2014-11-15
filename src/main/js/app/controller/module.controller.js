@@ -50,7 +50,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 };
 
                 var setUpEditMode = function() {
-                    var associatedDatasets = datasetTransformer.getAssociatedDatasets($scope.orgUnit.id, $scope.allDatasets);
+                    var associatedDatasets = $scope.orgUnit.dataSets;
                     var nonAssociatedDatasets = _.reject($scope.allDatasets, function(d) {
                         return !isNewDataModel(d) || _.any(associatedDatasets, {
                             "id": d.id
