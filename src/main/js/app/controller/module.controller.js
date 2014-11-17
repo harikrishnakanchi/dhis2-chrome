@@ -62,7 +62,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         'name': $scope.orgUnit.name,
                         'allDatasets': nonAssociatedDatasets,
                         'datasets': associatedDatasets,
-                        'selectedDataset': associatedDatasets[0],
+                        'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
                         'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
                         'program': findAssociatedModule()
                     });
