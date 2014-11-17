@@ -38,7 +38,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         }
                     });
 
-                    return linelistAttribute ? linelistAttribute.value : false;
+                    return linelistAttribute ? linelistAttribute.value === 'true' : false;
                 };
 
                 var setUpNewMode = function() {
@@ -50,7 +50,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 };
 
                 var setUpEditMode = function() {
-                    var associatedDatasets = $scope.orgUnit.dataSets;
+                    var associatedDatasets = datasetTransformer.getAssociatedDatasets($scope.orgUnit.id, $scope.allDatasets);
                     var nonAssociatedDatasets = _.reject($scope.allDatasets, function(d) {
                         return !isNewDataModel(d) || _.any(associatedDatasets, {
                             "id": d.id
