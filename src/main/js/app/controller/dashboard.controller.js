@@ -1,6 +1,9 @@
 define(["moment", "approvalDataTransformer", "properties", "lodash"], function(moment, approvalDataTransformer, properties, _) {
     return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout) {
         var dataValues = [];
+        $scope.approveSuccessForLevelOne = false;
+        $scope.approveSuccessForLevelTwo = false;
+        $scope.approveSuccessForLevelThree = false;
         $scope.weeks = {
             "approveAllItems": false
         };
@@ -101,7 +104,19 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
             var successPromise = function(data) {
                 $scope.itemsAwaitingApprovalAtUserLevel = filterItems($scope.itemsAwaitingApprovalAtUserLevel, false);
                 moveApprovedItemsToNextLevel();
-                $scope.approveSuccess = true;
+                if ($scope.userApprovalLevel === 1) {
+                    $scope.approveSuccessForLevelOne = true;
+                    $scope.approveSuccessForLevelTwo = false;
+                    $scope.approveSuccessForLevelThree = false;
+                } else if ($scope.userApprovalLevel === 2) {
+                    $scope.approveSuccessForLevelTwo = true;
+                    $scope.approveSuccessForLevelOne = false;
+                    $scope.approveSuccessForLevelThree = false;
+                } else {
+                    $scope.approveSuccessForLevelOne = false;
+                    $scope.approveSuccessForLevelTwo = false;
+                    $scope.approveSuccessForLevelThree = true;
+                }
                 $scope.approveError = false;
 
                 $timeout(function() {
