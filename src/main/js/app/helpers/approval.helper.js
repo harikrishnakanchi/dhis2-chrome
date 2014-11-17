@@ -121,7 +121,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"]
                 });
             };
 
-            return orgUnitRepository.getAllModulesInProjects([orgUnitId], false).then(function(modules) {
+            return orgUnitRepository.getAllModulesInProjects([orgUnitId], true).then(function(modules) {
                 return $q.all([
                     getSubmittedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard),
                     getLevelOneApprovedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard),
