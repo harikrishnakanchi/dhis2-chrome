@@ -16,6 +16,7 @@
     "dataApproveSuccess": "سيتم إرسال البيانات للمستوى الثاني من الموافقة",
     "dataApprovalConfirmationMessage": "هل أنت متأكد أنك تريد الموافقة؟",
     "dataApproveFailure": "خطأ الموافقة على البيانات. يرجى المحاولة مرة أخرى في وقت لاحق",
+    "lineListEventDate": "Event date",
     "chooseWeek": "الرجاء اختيار في الأسبوع لإدخال البيانات.",
     "syncRunning": "بدأت مزامنة البيانات. يرجى الانتظار.",
     "syncComplete": "الانتهاء مزامنة البيانات بنجاح.",

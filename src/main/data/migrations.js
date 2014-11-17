@@ -101,6 +101,11 @@ define([], function() {
         create_index(programStore, "by_organisationUnit", "orgUnitIds", false, true);
     };
 
+    var add_program_events_store = function(db, tx) {
+        var programEventsStore = create_store_with_key("programEvents", "event", db);
+        create_index(programEventsStore, "by_period_orgunit", ["period", "orgUnit"], false);
+    };
+
     return [add_object_stores,
         change_log_stores,
         add_organisation_units_and_level_store,
@@ -114,6 +119,7 @@ define([], function() {
         add_user_preference_store,
         add_complete_datasets_store,
         add_approval_datasets_store,
-        add_programs_store
+        add_programs_store,
+        add_program_events_store
     ];
 });

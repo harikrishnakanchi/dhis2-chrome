@@ -72,6 +72,7 @@ require.config({
         "orgUnitRepository": "app/repository/orgunit.repository",
         "userRepository": "app/repository/user.repository",
         "programRepository": "app/repository/program.repository",
+        "programEventRepository": "app/repository/program.event.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",

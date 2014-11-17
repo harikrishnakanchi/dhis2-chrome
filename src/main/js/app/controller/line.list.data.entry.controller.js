@@ -1,8 +1,9 @@
-define(["lodash", "moment"], function(_, moment) {
-    return function($scope, $q, db, programRepository) {
+define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
+    return function($scope, $q, $hustle, db, programRepository, programEventRepository) {
 
         var resetForm = function() {
             $scope.dataValues = {};
+            $scope.eventDates = {};
         };
 
         var loadPrograms = function() {
@@ -23,30 +24,46 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
-        var buildPayload = function() {
+        var buildPayloadFromView = function() {
             var newEvents = [];
             _.each($scope.programs, function(p) {
                 _.each(p.programStages, function(ps) {
                     var event = {
-                        'program': programId,
-                        'programStage': programStageId,
+                        'event': dhisId.get(p.id + ps.id + $scope.currentModule.id + moment().format()),
+                        'program': p.id,
+                        'programStage': ps.id,
                         'orgUnit': $scope.currentModule.id,
-                        'eventDate': moment().format("YYYY-MM-DD"),
+                        'eventDate': moment($scope.eventDates[p.id][ps.id]).format("YYYY-MM-DD"),
                         'dataValues': []
                     };
                     _.each(ps.programStageDataElements, function(psde) {
                         event.dataValues.push({
                             "dataElement": psde.dataElement.id,
-                            "value": $scope.dataValues[programId][programStageId][psde.dataElement.id]
+                            "value": $scope.dataValues[p.id][ps.id][psde.dataElement.id]
                         });
                     });
                     newEvents.push(event);
                 });
             });
-            return newEvents;
+            return {
+                'events': newEvents
+            };
         };
 
-        $scope.getNgModelFor = function(dataValues, programId, programStageId) {
+        var saveToDhis = function(data) {
+            // return $hustle.publish({
+            //     "data": data,
+            //     "type": "uploadProgramEvents"
+            // }, "dataValues");
+        };
+
+        $scope.getEventDateNgModel = function(eventDates, programId, programStageId) {
+            eventDates[programId] = eventDates[programId] || {};
+            eventDates[programId][programStageId] = eventDates[programId][programStageId] || new Date();
+            return eventDates[programId];
+        };
+
+        $scope.getDataValueNgModel = function(dataValues, programId, programStageId) {
             dataValues[programId] = dataValues[programId] || {};
             dataValues[programId][programStageId] = dataValues[programId][programStageId] || {};
             return dataValues[programId][programStageId];
@@ -56,11 +73,19 @@ define(["lodash", "moment"], function(_, moment) {
             var optionSet = _.find($scope.optionSets, function(os) {
                 return optionSetId === os.id;
             });
-            return optionSet ? optionSet.options : [];
+
+            var options = optionSet ? optionSet.options : [];
+            _.each(options, function(o) {
+                o.displayName = $scope.resourceBundle[o.id] || o.name;
+            });
+
+            return options;
         };
 
         $scope.submit = function() {
-            var newEventsPayload = buildPayload();
+            var newEventsPayload = buildPayloadFromView();
+            programEventRepository.upsert(newEventsPayload)
+                .then(saveToDhis);
             console.log(JSON.stringify(newEventsPayload));
         };
 

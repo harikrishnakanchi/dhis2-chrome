@@ -14,6 +14,7 @@
     "dataApproveSuccess": "Les données seront envoyées pour la deuxième niveau d'approbation.",
     "dataApprovalConfirmationMessage": "Etes-vous sûr de vouloir approuver?",
     "dataApproveFailure": "Erreur approuver données. S'il vous plaît réessayer plus tard",
+    "lineListEventDate": "Event date",
     "chooseWeek": "S'il vous plaît choisir une semaine pour entrer des données.",
     "syncRunning": "Synchronisation de données initié. S'il vous plaît attendre.",
     "syncComplete": "Synchronisation des données terminée avec succès.",

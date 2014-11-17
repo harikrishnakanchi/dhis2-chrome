@@ -6,16 +6,23 @@
 	<accordion close-others="false">
 		<accordion-group ng-repeat="program in programs" is-open="true">
 			<accordion-heading>
-				{{program.name}}
+				<span ng-if="resourceBundle[program.id]">{{ resourceBundle[program.id] }}</span> 
+				<span ng-if="!resourceBundle[program.id]">{{ program.name }}</span> 
 			</accordion-heading>
+
 			<div ng-repeat="programStage in program.programStages">
 			<ul>
+				<li>
+					{{ resourceBundle["lineListEventDate"] }}
+					<input type="date" ng-model="getEventDateNgModel(eventDates, program.id, programStage.id)[programStage.id]" />
+				</li>
 				<li ng-repeat="de in programStage.programStageDataElements">
-					{{de.dataElement.formName}}
-					<input type="text" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="getNgModelFor(dataValues, program.id, programStage.id)[de.dataElement.id]" />
-					<input type="number" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="getNgModelFor(dataValues, program.id, programStage.id)[de.dataElement.id]" />
-					<input type="date" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="getNgModelFor(dataValues, program.id, programStage.id)[de.dataElement.id]" />
-					<select ng-options="o.name as o.name for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="getNgModelFor(dataValues, program.id, programStage.id)[de.dataElement.id]">
+					<span ng-if="resourceBundle[de.dataElement.id]"> {{ resourceBundle[de.dataElement.id] }}</span> 
+					<span ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</span> 
+					<input type="text" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" />
+					<input type="number" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" />
+					<input type="date" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" />
+					<select ng-options="o.name as o.displayName for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]">
 						<option value=""></option>
 					</select>
 				</li>
