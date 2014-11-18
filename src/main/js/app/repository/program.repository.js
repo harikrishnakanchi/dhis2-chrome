@@ -34,11 +34,13 @@ define(["lodash"], function(_) {
             var enrichDataElements = function(program) {
                 var dataElementsStore = db.objectStore("dataElements");
                 var promises = [];
-                _.each(program.programStages, function(s) {
-                    _.each(s.programStageDataElements, function(sde) {
-                        promises.push(dataElementsStore.find(sde.dataElement.id).then(function(de) {
-                            sde.dataElement = de;
-                        }));
+                _.each(program.programStages, function(stage) {
+                    _.each(stage.programStageSections, function(section) {
+                        _.each(section.programStageDataElements, function(sde) {
+                            promises.push(dataElementsStore.find(sde.dataElement.id).then(function(de) {
+                                sde.dataElement = de;
+                            }));
+                        });
                     });
                 });
 

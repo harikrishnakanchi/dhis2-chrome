@@ -4,6 +4,8 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
         var resetForm = function() {
             $scope.dataValues = {};
             $scope.eventDates = {};
+            $scope.minDateInCurrentPeriod = $scope.week.startOfWeek;
+            $scope.maxDateInCurrentPeriod = $scope.week.endOfWeek;
         };
 
         var loadPrograms = function() {

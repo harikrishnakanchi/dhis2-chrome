@@ -61,53 +61,67 @@ define(["programRepository", "angularMocks", "utils"], function(ProgramRepositor
             var programStage1Data = {
                 'id': 'p1s1',
                 'name': 'ER - Presenting Line List Stage 1',
-                'programStageDataElements': [{
-                    'dataElement': {
-                        'id': 'd1',
-                        'name': 'Arrival Date'
-                    }
-                }, {
-                    'dataElement': {
-                        'id': 'd2',
-                        'name': 'Mode of Arrival'
-                    }
-                }],
                 'programStageSections': [{
                     'id': 'st1',
-                    'name': 'Arrival'
+                    'name': 'Arrival',
+                    'programStageDataElements': [{
+                        'dataElement': {
+                            'id': 'd1',
+                            'name': 'Date'
+                        }
+                    }, {
+                        'dataElement': {
+                            'id': 'd2',
+                            'name': 'Mode of Arrival'
+                        }
+                    }]
                 }, {
                     'id': 'st2',
-                    'name': 'Discharge'
+                    'name': 'Discharge',
+                    'programStageDataElements': [{
+                        'dataElement': {
+                            'id': 'd1',
+                            'name': 'Date'
+                        }
+                    }, {
+                        'dataElement': {
+                            'id': 'd3',
+                            'name': 'Mode of Discharge'
+                        }
+                    }]
                 }]
             };
 
             var programStage2Data = {
                 'id': 'p1s2',
                 'name': 'ER - Presenting Line List Stage 2',
-                'programStageDataElements': [{
-                    'dataElement': {
-                        'id': 'd2',
-                        'name': 'Mode of Arrival'
-                    }
-                }],
                 'programStageSections': [{
-                    'id': 'st1',
-                    'name': 'Arrival'
-                }, {
-                    'id': 'st2',
-                    'name': 'Discharge'
+                    'id': 'st3',
+                    'name': 'Default Section',
+                    'programStageDataElements': [{
+                        'dataElement': {
+                            'id': 'd1',
+                            'name': 'Date'
+                        }
+                    }]
                 }]
             };
 
             var dataElement1Data = {
                 'id': 'd1',
-                'name': 'Arrival Date',
+                'name': 'Date',
                 'type': 'date'
             };
 
             var dataElement2Data = {
                 'id': 'd2',
                 'name': 'Mode of Arrival',
+                'type': 'string'
+            };
+
+            var dataElement3Data = {
+                'id': 'd3',
+                'name': 'Mode of Discharge',
                 'type': 'string'
             };
 
@@ -124,6 +138,8 @@ define(["programRepository", "angularMocks", "utils"], function(ProgramRepositor
                     return utils.getPromise(q, dataElement1Data);
                 if (id === "d2")
                     return utils.getPromise(q, dataElement2Data);
+                if (id === "d3")
+                    return utils.getPromise(q, dataElement3Data);
                 return utils.getPromise(q, undefined);
             });
 
@@ -141,43 +157,53 @@ define(["programRepository", "angularMocks", "utils"], function(ProgramRepositor
                 'programStages': [{
                     'id': 'p1s1',
                     'name': 'ER - Presenting Line List Stage 1',
-                    'programStageDataElements': [{
-                        'dataElement': {
-                            'id': 'd1',
-                            'name': 'Arrival Date',
-                            'type': 'date'
-                        }
-                    }, {
-                        'dataElement': {
-                            'id': 'd2',
-                            'name': 'Mode of Arrival',
-                            'type': 'string'
-                        }
-                    }],
                     'programStageSections': [{
                         'id': 'st1',
-                        'name': 'Arrival'
+                        'name': 'Arrival',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'd1',
+                                'name': 'Date',
+                                'type': 'date'
+                            }
+                        }, {
+                            'dataElement': {
+                                'id': 'd2',
+                                'name': 'Mode of Arrival',
+                                'type': 'string'
+                            }
+                        }]
                     }, {
                         'id': 'st2',
-                        'name': 'Discharge'
+                        'name': 'Discharge',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'd1',
+                                'name': 'Date',
+                                'type': 'date'
+                            }
+                        }, {
+                            'dataElement': {
+                                'id': 'd3',
+                                'name': 'Mode of Discharge',
+                                'type': 'string'
+                            }
+                        }]
                     }]
 
                 }, {
                     'id': 'p1s2',
                     'name': 'ER - Presenting Line List Stage 2',
-                    'programStageDataElements': [{
-                        'dataElement': {
-                            'id': 'd2',
-                            'name': 'Mode of Arrival',
-                            'type': 'string'
-                        }
-                    }],
                     'programStageSections': [{
-                        'id': 'st1',
-                        'name': 'Arrival'
-                    }, {
-                        'id': 'st2',
-                        'name': 'Discharge'
+                        'id': 'st3',
+                        'name': 'Default Section',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'd1',
+                                'name': 'Date',
+                                'type': 'date'
+                            }
+                        }]
                     }]
 
                 }]

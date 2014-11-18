@@ -13,6 +13,11 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
             mockStore = mockDB.objectStore;
 
             scope.resourceBundle = {};
+            scope.week = {
+                "weekNumber": 44,
+                "startOfWeek": "2014-10-27",
+                "endOfWeek": "2014-11-02"
+            };
 
             programRepository = new ProgramRepository();
             programEventRepository = new ProgramEventRepository();
@@ -138,6 +143,21 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
             scope.getEventDateNgModel(eventDates, 'p1', 'ps1');
 
             expect(moment(eventDates.p1.ps1).isSame(moment(), 'days')).toBe(true);
+        });
+
+        it("should set min and max date for selected period", function() {
+
+            scope.week = {
+                "weekNumber": 46,
+                "startOfWeek": "2014-11-10",
+                "endOfWeek": "2014-11-16"
+            };
+
+            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
+            scope.$apply();
+
+            expect(moment(scope.minDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-10");
+            expect(moment(scope.maxDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-16");
         });
     });
 });
