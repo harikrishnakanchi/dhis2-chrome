@@ -159,5 +159,64 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
             expect(moment(scope.minDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-10");
             expect(moment(scope.maxDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-16");
         });
+
+        it("should save event deatils as draft", function() {
+
+            spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+
+            scope.resourceBundle = {
+                'eventSaveSuccess': 'Event saved successfully'
+            };
+            scope.currentModule = {
+                'id': 'ae2a77b82a5'
+            };
+
+            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
+            scope.$apply();
+
+            scope.programs = [{
+                'id': 'Prg1',
+                'programStages': [{
+                    'id': 'PrgStage1'
+                }]
+            }];
+
+            scope.eventDates = {
+                "Prg1": {
+                    "PrgStage1": "2014-11-18T10:34:14.067Z"
+                }
+            };
+
+            scope.dataValues = {
+                "Prg1": {
+                    "PrgStage1": {}
+                }
+            };
+
+            scope.submit(true);
+            scope.$apply();
+
+            var expectedNewEventsPayload = {
+                "events": [{
+                    "event": "EventId",
+                    "program": "Prg1",
+                    "programStage": "PrgStage1",
+                    "orgUnit": "ae2a77b82a5",
+                    "eventDate": "2014-11-18",
+                    "dataValues": []
+                }]
+            };
+
+            var actualPayloadInUpsertCall = programEventRepository.upsert.calls.first().args[0];
+
+            expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
+            expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
+            expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("ae2a77b82a5");
+            expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2014-11-18");
+            expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([]);
+
+            expect(scope.resultMessageType).toEqual("success");
+            expect(scope.resultMessage).toEqual("Event saved successfully");
+        });
     });
 });

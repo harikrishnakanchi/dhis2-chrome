@@ -52,13 +52,6 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
             };
         };
 
-        var saveToDhis = function(data) {
-            // return $hustle.publish({
-            //     "data": data,
-            //     "type": "uploadProgramEvents"
-            // }, "dataValues");
-        };
-
         $scope.getEventDateNgModel = function(eventDates, programId, programStageId) {
             eventDates[programId] = eventDates[programId] || {};
             eventDates[programId][programStageId] = eventDates[programId][programStageId] || new Date();
@@ -84,11 +77,24 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
             return options;
         };
 
-        $scope.submit = function() {
+        var saveToDhis = function(data) {
+            $scope.resultMessageType = "success";
+            $scope.resultMessage = $scope.resourceBundle.eventSubmitSuccess;
+            // return $hustle.publish({
+            //     "data": data,
+            //     "type": "uploadProgramEvents"
+            // }, "dataValues");
+        };
+
+        $scope.submit = function(isDraft) {
             var newEventsPayload = buildPayloadFromView();
-            programEventRepository.upsert(newEventsPayload)
-                .then(saveToDhis);
-            console.log(JSON.stringify(newEventsPayload));
+            programEventRepository.upsert(newEventsPayload).then(function(payload) {
+                $scope.resultMessageType = "success";
+                $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;
+                if (isDraft)
+                    return payload;
+                return saveToDhis(payload);
+            });
         };
 
         var init = function() {
