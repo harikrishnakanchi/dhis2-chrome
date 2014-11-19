@@ -1,14 +1,16 @@
 define([], function() {
     return function(eventService, programEventRepository) {
 
-        var saveAllEvents = function(dhisEventList) {
+        var saveAllEvents = function(dhisEventsJson) {
+
+            var dhisEventList = dhisEventsJson.events;
 
             var mergeAndSave = function(dbEventList) {
-            	if (_.isEmpty(dhisEventList) && _.isEmpty(dbEventList))
+                if (_.isEmpty(dhisEventList) && _.isEmpty(dbEventList))
                     return;
 
                 var updatePromises = [];
-                
+
                 _.each(dbEventList, function(dbEvent) {
                     if (dbEvent.status === "NEW")
                         return;
@@ -17,7 +19,11 @@ define([], function() {
                         "id": dbEvent.event
                     });
 
-                    var updatePromise = dhisEvent ? programEventRepository.upsert(dhisEvent) : programEventRepository.delete(dbEvent.event);
+                    var dhisEventPayload = {
+                        'events': [dhisEvent]
+                    };
+
+                    var updatePromise = dhisEvent ? programEventRepository.upsert(dhisEventPayload) : programEventRepository.delete(dbEvent.event);
                     updatePromises.push(updatePromise);
                 });
 
@@ -26,7 +32,12 @@ define([], function() {
                         "event": dhisEvent.id
                     });
                 });
-                var approvalPromise = programEventRepository.upsert(newApprovals);
+
+                var newApprovalsPayload = {
+                    'events': newApprovals
+                };
+
+                var approvalPromise = programEventRepository.upsert(newApprovalsPayload);
                 updatePromises.push(approvalPromise);
 
                 return $q.all[updatePromises];
