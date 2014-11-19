@@ -15,5 +15,15 @@ define(["moment"], function(moment) {
                 return eventsPayload;
             });
         };
+
+        this.getEvents = function(){
+            var store = db.objectStore("programEvents");
+            return store.getAll();  //TODO: Get recent events
+        };
+
+        this.delete = function(eventId){
+            var store = db.objectStore("programEvents");
+            return store.delete(eventId);
+        };
     };
 });

@@ -22,6 +22,7 @@ require.config({
         "systemSettingService": "app/service/system.setting.service",
         "userService": "app/service/user.service",
         "programService": "app/service/program.service",
+        "eventService": "app/service/event.service",
         "services": "app/service/bg.services",
 
         //Repositories
@@ -49,6 +50,7 @@ require.config({
         "createUserConsumer": "app/consumer/create.user.consumer",
         "updateUserConsumer": "app/consumer/update.user.consumer",
         "programConsumer": "app/consumer/program.consumer",
+        "downloadEventDataConsumer": "app/consumer/download.event.data.consumer",
         "dispatcher": "app/consumer/dispatcher",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",

@@ -80,10 +80,10 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
         var saveToDhis = function(data) {
             $scope.resultMessageType = "success";
             $scope.resultMessage = $scope.resourceBundle.eventSubmitSuccess;
-            // return $hustle.publish({
-            //     "data": data,
-            //     "type": "uploadProgramEvents"
-            // }, "dataValues");
+            return $hustle.publish({
+                "data": data,
+                "type": "uploadProgramEvents"
+            }, "dataValues");
         };
 
         $scope.submit = function(isDraft) {

@@ -30,6 +30,8 @@ define([], function() {
                     return updateUserConsumer.run(message);
                 case "uploadProgram":
                     return programConsumer.run(message);
+                case "uploadProgramEvents":
+                    return downloadEventDataConsumer.run(message);
                 default:
                     return $q.reject();
             }

@@ -61,6 +61,7 @@ require.config({
         "userService": "app/service/user.service",
         "approvalService": "app/service/approval.service",
         "programService": "app/service/program.service",
+        "eventService": "app/service/event.service",
 
         //Repositories
         "repositories": "app/repository/repositories",

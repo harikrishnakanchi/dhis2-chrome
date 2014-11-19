@@ -1,13 +1,13 @@
 define(["programEventRepository", "angularMocks", "utils"], function(ProgramEventRepository, mocks, utils) {
     describe("programEventRepository", function() {
 
-        var scope, q, programEventRepository;
+        var scope, q, programEventRepository, mockDB;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
             scope = $rootScope;
 
-            var mockDB = utils.getMockDB($q);
+            mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
             programEventRepository = new ProgramEventRepository(mockDB.db);
         }));
@@ -32,6 +32,20 @@ define(["programEventRepository", "angularMocks", "utils"], function(ProgramEven
             scope.$apply();
 
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedEventData);
+        });
+
+        it("should delete an event given an id", function(){
+            programEventRepository.delete("eventId");
+            scope.$apply();
+
+            expect(mockStore.delete).toHaveBeenCalledWith("eventId");
+        }); 
+
+        it("should get events", function(){
+            programEventRepository.getEvents();
+            scope.$apply();
+
+            expect(mockStore.getAll).toHaveBeenCalled();
         });
     });
 });
