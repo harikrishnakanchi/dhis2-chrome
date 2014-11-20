@@ -10,26 +10,10 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
 
                 eventService = new EventService();
                 programEventRepository = new ProgramEventRepository();
-                downloadEventDataConsumer = new DownloadEventDataConsumer(eventService, programEventRepository);
+                downloadEventDataConsumer = new DownloadEventDataConsumer(eventService, programEventRepository, q);
             }));
 
-            it("should download events from dhis", function() {
-                spyOn(eventService, "getRecentEvents").and.returnValue(utils.getPromise(q, []));
-                spyOn(programEventRepository, "getEvents").and.returnValue(utils.getPromise(q, []));
-                var message = {
-                    "data": {
-                        "type": "downloadEventData"
-                    }
-                };
-
-                downloadEventDataConsumer.run(message);
-                scope.$apply();
-
-                expect(eventService.getRecentEvents).toHaveBeenCalled();
-            });
-
-
-            xit("should save downloaded events to indexeddb if no data already exists in db", function() {
+            it("should download events from dhis and save them to indexeddb", function() {
                 var dhisEventList = {
                     'events': [{
                         'event': 'e1',
@@ -38,6 +22,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 };
 
                 spyOn(eventService, "getRecentEvents").and.returnValue(utils.getPromise(q, dhisEventList));
+                spyOn(programEventRepository, "getEvents").and.returnValue(utils.getPromise(q, []));
                 spyOn(programEventRepository, "upsert");
 
                 var message = {
@@ -49,91 +34,59 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 downloadEventDataConsumer.run(message);
                 scope.$apply();
 
-                var expectedEventData = [{
-                    'event': 'e1',
-                    'eventDate': '2010-11-07',
-                    'period': '2010W44'
-                }];
-
-                expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventData);
-            });
-
-            xit("should merge dhisData with existing db data, clear approvals where necessary, do the laundry and save to indexeddb", function() {
-                var dhisDataValues = {
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z",
-                        "value": 2
-                    }, {
-                        "dataElement": "DE2",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-20T09:00:00.120Z",
-                        "value": 1
+                var expectedEventPayload = {
+                    events: [{
+                        event: 'e1',
+                        eventDate: '2010-11-07'
                     }]
                 };
 
-                var dbDataValues = [{
-                    "orgUnit": "MSF_0",
-                    "period": "2014W12",
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-24T09:00:00.120Z",
-                        "value": 1
-                    }]
-                }, {
-                    "orgUnit": "MSF_0",
-                    "period": "2014W12",
-                    "dataValues": [{
-                        "dataElement": "DE2",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-25T09:00:00.120Z",
-                        "value": 2
-                    }]
-                }];
+                expect(eventService.getRecentEvents).toHaveBeenCalled();
+                expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventPayload);
+            });
 
-                dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
+            it("should merge dhisEvents with existing indexeddb events, clear events where necessary, and save to indexeddb", function() {
+                var dhisEventPresentInIndexedDB = {
+                    'event': 'e2',
+                    'eventDate': '2010-11-08'
+                };
 
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbDataValues));
+                var dhisEventList = {
+                    'events': [dhisEventPresentInIndexedDB]
+                };
 
-                message = {
+                var dbEventNotPresentInDHIS = {
+                    'event': 'e3',
+                    'eventDate': '2010-11-10'
+                };
+
+                var dbEventPresentInDHIS = {
+                    'event': 'e2',
+                    'eventDate': '2010-10-07'
+                };
+
+                var dbEventList = [dbEventPresentInDHIS, dbEventNotPresentInDHIS];
+
+                spyOn(eventService, "getRecentEvents").and.returnValue(utils.getPromise(q, dhisEventList));
+                spyOn(programEventRepository, "getEvents").and.returnValue(utils.getPromise(q, dbEventList));
+                spyOn(programEventRepository, "delete");
+                spyOn(programEventRepository, "upsert");
+
+                var message = {
                     "data": {
-                        "type": "downloadData"
+                        "type": "downloadEventData"
                     }
                 };
 
-                downloadDataConsumer.run(message);
+                downloadEventDataConsumer.run(message);
                 scope.$apply();
 
-                var expectedDataConsumer = {
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z",
-                        "value": 2
-                    }, {
-                        "dataElement": "DE2",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-25T09:00:00.120Z",
-                        "value": 2
-                    }]
+                var upsertPayload = {
+                    events: [dhisEventPresentInIndexedDB]
                 };
 
-                expect(approvalDataRepository.deleteLevelTwoApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
-                expect(dataRepository.save).toHaveBeenCalledWith(expectedDataConsumer);
+                expect(programEventRepository.upsert).toHaveBeenCalledWith(upsertPayload);
+                expect(programEventRepository.delete).toHaveBeenCalledWith(dbEventNotPresentInDHIS.event);
             });
 
 

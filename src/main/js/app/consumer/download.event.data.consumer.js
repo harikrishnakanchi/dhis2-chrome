@@ -1,5 +1,5 @@
 define([], function() {
-    return function(eventService, programEventRepository) {
+    return function(eventService, programEventRepository, $q) {
 
         var saveAllEvents = function(dhisEventsJson) {
 
@@ -16,7 +16,7 @@ define([], function() {
                         return;
 
                     var dhisEvent = _.find(dhisEventList, {
-                        "id": dbEvent.event
+                        "event": dbEvent.event
                     });
 
                     var dhisEventPayload = {
@@ -29,7 +29,7 @@ define([], function() {
 
                 var newApprovals = _.reject(dhisEventList, function(dhisEvent) {
                     return _.any(dbEventList, {
-                        "event": dhisEvent.id
+                        "event": dhisEvent.event
                     });
                 });
 
