@@ -1,57 +1,62 @@
-define([], function() {
+define(["moment"], function(moment) {
     return function(eventService, programEventRepository, $q) {
 
-        var saveAllEvents = function(dhisEventsJson) {
+        var saveAllEvents = function(response) {
 
-            var dhisEventList = dhisEventsJson.events;
+            var dhisEventList = response[0].events;
+            var dbEventList = response[1];
 
-            var mergeAndSave = function(dbEventList) {
-                if (_.isEmpty(dhisEventList) && _.isEmpty(dbEventList))
+
+            if (_.isEmpty(dhisEventList) && _.isEmpty(dbEventList))
+                return;
+
+            var updatePromises = [];
+
+            _.each(dbEventList, function(dbEvent) {
+                if (dbEvent.status === "NEW")
                     return;
 
-                var updatePromises = [];
-
-                _.each(dbEventList, function(dbEvent) {
-                    if (dbEvent.status === "NEW")
-                        return;
-
-                    var dhisEvent = _.find(dhisEventList, {
-                        "event": dbEvent.event
-                    });
-
-                    var dhisEventPayload = {
-                        'events': [dhisEvent]
-                    };
-
-                    var updatePromise = dhisEvent ? programEventRepository.upsert(dhisEventPayload) : programEventRepository.delete(dbEvent.event);
-                    updatePromises.push(updatePromise);
+                var dhisEvent = _.find(dhisEventList, {
+                    "event": dbEvent.event
                 });
 
-                var newApprovals = _.reject(dhisEventList, function(dhisEvent) {
-                    return _.any(dbEventList, {
-                        "event": dhisEvent.event
-                    });
-                });
-
-                var newApprovalsPayload = {
-                    'events': newApprovals
+                var dhisEventPayload = {
+                    'events': [dhisEvent]
                 };
 
-                var approvalPromise = programEventRepository.upsert(newApprovalsPayload);
-                updatePromises.push(approvalPromise);
+                var updatePromise = dhisEvent ? programEventRepository.upsert(dhisEventPayload) : programEventRepository.delete(dbEvent.event);
+                updatePromises.push(updatePromise);
+            });
 
-                return $q.all[updatePromises];
+            var newEvents = _.reject(dhisEventList, function(dhisEvent) {
+                return _.any(dbEventList, {
+                    "event": dhisEvent.event
+                });
+            });
+
+            var newEventPayload = {
+                'events': newEvents
             };
 
-            programEventRepository.getEvents().then(mergeAndSave);
+            var approvalPromise = programEventRepository.upsert(newEventPayload);
+            updatePromises.push(approvalPromise);
+
+            return $q.all[updatePromises];
+
+
         };
 
         var downloadEventsData = function() {
-            return eventService.getRecentEvents().then(saveAllEvents);
+            return programEventRepository.getLastUpdatedPeriod().then(function(lastUpdatedPeriod) {
+                var year = lastUpdatedPeriod.split("W")[0];
+                var isoWeek = lastUpdatedPeriod.split("W")[1];
+                var startDate = moment().year(year).isoWeek(isoWeek).startOf('week').format("YYYY-MM-DD");
+                return $q.all([eventService.getRecentEvents(startDate), programEventRepository.getEventsFromPeriod(lastUpdatedPeriod)]);
+            });
         };
 
         this.run = function() {
-            return downloadEventsData();
+            return downloadEventsData().then(saveAllEvents);
         };
     };
 });

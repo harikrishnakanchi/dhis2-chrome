@@ -1,6 +1,6 @@
 define([], function() {
     return function($q, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
-        downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer) {
+        downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer, downloadEventDataConsumer) {
         this.run = function(message) {
             switch (message.data.type) {
                 case "downloadData":

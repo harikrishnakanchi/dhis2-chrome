@@ -32,6 +32,7 @@ require.config({
         "dataSetRepository": "app/repository/dataset.repository",
         "userPreferenceRepository": "app/repository/userpreference.repository",
         "orgUnitRepository": "app/repository/orgunit.repository",
+        "programEventRepository": "app/repository/program.event.repository",
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",

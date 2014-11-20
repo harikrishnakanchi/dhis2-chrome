@@ -24,17 +24,22 @@ define([], function() {
             "each": jasmine.createSpy("each").and.returnValue(getPromise(q, eachResult)),
         };
         var queryBuilder = function() {
-            this.$index = function() {
+
+            this.$index = function(index) {
+                this.index = index;
                 return this;
             };
-            this.$eq = function(v) {
+            this.$eq = function(eq) {
+                this.eq = eq;
                 return this;
             };
-            this.$between = function(v) {
+            this.$between = function(betweenX, betweenY) {
+                this.betweenX = betweenX;
+                this.betweenY = betweenY;
                 return this;
             };
             this.compile = function() {
-                return "blah";
+                return this;
             };
             return this;
         };

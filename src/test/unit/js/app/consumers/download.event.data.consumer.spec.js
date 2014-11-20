@@ -17,12 +17,13 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 var dhisEventList = {
                     'events': [{
                         'event': 'e1',
-                        'eventDate': '2010-11-07'
+                        'eventDate': '2014-09-28'
                     }]
                 };
 
+                spyOn(programEventRepository, "getLastUpdatedPeriod").and.returnValue(utils.getPromise(q, "2014W40"));
                 spyOn(eventService, "getRecentEvents").and.returnValue(utils.getPromise(q, dhisEventList));
-                spyOn(programEventRepository, "getEvents").and.returnValue(utils.getPromise(q, []));
+                spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, []));
                 spyOn(programEventRepository, "upsert");
 
                 var message = {
@@ -37,7 +38,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 var expectedEventPayload = {
                     events: [{
                         event: 'e1',
-                        eventDate: '2010-11-07'
+                        eventDate: '2014-09-28'
                     }]
                 };
 
@@ -48,7 +49,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
             it("should merge dhisEvents with existing indexeddb events, clear events where necessary, and save to indexeddb", function() {
                 var dhisEventPresentInIndexedDB = {
                     'event': 'e2',
-                    'eventDate': '2010-11-08'
+                    'eventDate': '2014-09-28'
                 };
 
                 var dhisEventList = {
@@ -57,18 +58,19 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
 
                 var dbEventNotPresentInDHIS = {
                     'event': 'e3',
-                    'eventDate': '2010-11-10'
+                    'eventDate': '2014-09-28'
                 };
 
                 var dbEventPresentInDHIS = {
                     'event': 'e2',
-                    'eventDate': '2010-10-07'
+                    'eventDate': '2014-09-27'
                 };
 
                 var dbEventList = [dbEventPresentInDHIS, dbEventNotPresentInDHIS];
 
+                spyOn(programEventRepository, "getLastUpdatedPeriod").and.returnValue(utils.getPromise(q, "2014W40"));
                 spyOn(eventService, "getRecentEvents").and.returnValue(utils.getPromise(q, dhisEventList));
-                spyOn(programEventRepository, "getEvents").and.returnValue(utils.getPromise(q, dbEventList));
+                spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, dbEventList));
                 spyOn(programEventRepository, "delete");
                 spyOn(programEventRepository, "upsert");
 
