@@ -109,5 +109,16 @@ define(["programEventRepository", "angularMocks", "utils", "moment"], function(P
 
             expect(actualEvents).toEqual(listOfEvents);
         });
+
+        it("should get events for particular period and orgUnit", function(){
+            mockDB = utils.getMockDB(q);
+            mockStore = mockDB.objectStore;
+            programEventRepository = new ProgramEventRepository(mockDB.db);
+            
+            programEventRepository.getEventsForPeriodAndOrgUnit("2014W01", "mod1");
+            scope.$apply();
+
+            expect(mockStore.each.calls.argsFor(0)[0].eq).toEqual([ '2014W01', 'mod1' ] );
+        });
     });
 });

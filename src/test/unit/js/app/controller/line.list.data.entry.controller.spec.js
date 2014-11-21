@@ -18,9 +18,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 "startOfWeek": "2014-10-27",
                 "endOfWeek": "2014-11-02"
             };
+            scope.currentModule = {
+                'id': 'ae2a77b82a5'
+            };
 
             programRepository = new ProgramRepository();
             programEventRepository = new ProgramEventRepository();
+            spyOn(programEventRepository, "getEventsForPeriodAndOrgUnit").and.returnValue(utils.getPromise(q, ['event1', 'event2']));
         }));
 
         it("should load programs into scope on init", function() {
@@ -168,9 +172,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
             scope.resourceBundle = {
                 'eventSaveSuccess': 'Event saved successfully'
             };
-            scope.currentModule = {
-                'id': 'ae2a77b82a5'
-            };
 
             var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
             scope.$apply();
@@ -212,17 +213,12 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
         });
 
         it("should submit event details", function() {
-
             spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-            spyOn(hustle, "publish");
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
 
             scope.resourceBundle = {
                 'eventSaveSuccess': 'Event saved successfully',
                 'eventSubmitSuccess': 'Event submitted succesfully'
-            };
-
-            scope.currentModule = {
-                'id': 'ae2a77b82a5'
             };
 
             var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
@@ -247,6 +243,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 }
             };
 
+
             scope.submit(false);
             scope.$apply();
 
@@ -257,6 +254,14 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
             expect(scope.resultMessageType).toEqual("success");
             expect(scope.resultMessage).toEqual("Event submitted succesfully");
             expect(hustle.publish).toHaveBeenCalled();
+            expect(scope.allEvents).toEqual(['event1', 'event2']);
+        });
+
+        it("should load all events for org unit and period on init", function() {
+            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
+            scope.$apply();
+
+            expect(scope.allEvents).toEqual(['event1', 'event2']);
         });
     });
 });

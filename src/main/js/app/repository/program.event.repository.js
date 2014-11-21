@@ -17,13 +17,10 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         this.getEventsFromPeriod = function(startPeriod) {
-            var endPeriod = moment().year() +"W"+ moment().week();
-
+            var endPeriod = moment().year() + "W" + moment().week();
             var store = db.objectStore('programEvents');
             var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
-            return store.each(query).then(function(eventData) {
-                return eventData;
-            });
+            return store.each(query);
         };
 
         this.getLastUpdatedPeriod = function() {
@@ -39,6 +36,12 @@ define(["moment", "lodash"], function(moment, _) {
         this.delete = function(eventId) {
             var store = db.objectStore("programEvents");
             return store.delete(eventId);
+        };
+
+        this.getEventsForPeriodAndOrgUnit = function(period, orgUnit) {
+            var store = db.objectStore('programEvents');
+            var query = db.queryBuilder().$eq([period, orgUnit]).$index("by_period_orgunit").compile();
+            return store.each(query);
         };
     };
 });

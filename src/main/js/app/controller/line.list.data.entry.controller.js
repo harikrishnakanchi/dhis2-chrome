@@ -6,6 +6,7 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
             $scope.eventDates = {};
             $scope.minDateInCurrentPeriod = $scope.week.startOfWeek;
             $scope.maxDateInCurrentPeriod = $scope.week.endOfWeek;
+            getAllEvents();
         };
 
         var loadPrograms = function() {
@@ -53,6 +54,13 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
             };
         };
 
+        var getAllEvents = function() {
+            var period = $scope.year + "W" + $scope.week.weekNumber;
+            return programEventRepository.getEventsForPeriodAndOrgUnit(period, $scope.currentModule.id).then(function(events) {
+                $scope.allEvents = events;
+            });
+        };
+
         $scope.getEventDateNgModel = function(eventDates, programId, programStageId) {
             eventDates[programId] = eventDates[programId] || {};
             eventDates[programId][programStageId] = eventDates[programId][programStageId] || new Date();
@@ -94,7 +102,9 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
                 $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;
                 if (isDraft)
                     return payload;
-                return saveToDhis(payload);
+                return saveToDhis(payload).then(function(data){
+                    getAllEvents();
+                });
             });
         };
 
