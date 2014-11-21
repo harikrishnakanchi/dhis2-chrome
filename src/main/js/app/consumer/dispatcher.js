@@ -1,6 +1,7 @@
 define([], function() {
     return function($q, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
-        downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer, downloadEventDataConsumer) {
+        downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
+         downloadEventDataConsumer, uploadEventDataConsumer) {
         this.run = function(message) {
             switch (message.data.type) {
                 case "downloadData":
@@ -31,7 +32,9 @@ define([], function() {
                 case "uploadProgram":
                     return programConsumer.run(message);
                 case "uploadProgramEvents":
-                    return downloadEventDataConsumer.run(message);
+                    return downloadEventDataConsumer.run(message).then(function(){
+                        return uploadEventDataConsumer.run(message);
+                    });
                 default:
                     return $q.reject();
             }

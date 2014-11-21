@@ -13,7 +13,7 @@ define(["moment"], function(moment) {
             var updatePromises = [];
 
             _.each(dbEventList, function(dbEvent) {
-                if (dbEvent.status === "NEW")
+                if (dbEvent.localStatus === "NEW")
                     return;
 
                 var dhisEvent = _.find(dhisEventList, {

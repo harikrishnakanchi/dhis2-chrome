@@ -52,6 +52,7 @@ require.config({
         "updateUserConsumer": "app/consumer/update.user.consumer",
         "programConsumer": "app/consumer/program.consumer",
         "downloadEventDataConsumer": "app/consumer/download.event.data.consumer",
+        "uploadEventDataConsumer": "app/consumer/upload.event.data.consumer",
         "dispatcher": "app/consumer/dispatcher",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",

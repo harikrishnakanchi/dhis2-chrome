@@ -5,9 +5,5 @@ define(["properties", "lodash"], function(properties, _) {
                 "programs": programs
             });
         };
-
-        this.upsertEvents = function(eventsPayload) {
-            return $http.post(properties.dhis.url + "/api/events", eventsPayload);
-        };
     };
 });

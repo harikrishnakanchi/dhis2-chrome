@@ -7,7 +7,7 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
             httpBackend = $injector.get('$httpBackend');
             http = $injector.get('$http');
 
-            eventService = new EventService(http);
+            eventService = new EventService(http, q);
         }));
 
         afterEach(function() {
@@ -37,7 +37,60 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
             httpBackend.flush();
         });
 
+        it("should save events", function() {
+            var eventsPayload = {
+                "events": [{
+                    "event": "Event1",
+                    "eventDate": "2001-01-01",
+                    "period": "2001W01",
+                    "localStatus": "NEW"
+                }]
+            };
 
+            var expectedPayload = {
+                "events": [{
+                    "event": "Event1",
+                    "eventDate": "2001-01-01"
+                }]
+            };
+
+
+            eventService.upsertEvents(eventsPayload);
+
+            httpBackend.expectPOST(properties.dhis.url + "/api/events", expectedPayload).respond(200, "ok");
+
+            httpBackend.flush();
+
+        });
+
+        it("should return rejected promise if save events fails", function() {
+            var eventsPayload = {
+                "events": [{
+                    "event": "Event1",
+                    "eventDate": "2001-01-01",
+                    "period": "2001W01",
+                    "localStatus": "NEW"
+                }]
+            };
+
+            var expectedPayload = {
+                "events": [{
+                    "event": "Event1",
+                    "eventDate": "2001-01-01"
+                }]
+            };
+            var status;
+
+            httpBackend.expectPOST(properties.dhis.url + "/api/events", expectedPayload).respond(500, "error");
+
+            eventService.upsertEvents(eventsPayload).then(undefined, function(data){
+                status = data.status;
+            });
+
+            httpBackend.flush();
+             expect(status).toEqual(500);
+
+        });
 
     });
 });

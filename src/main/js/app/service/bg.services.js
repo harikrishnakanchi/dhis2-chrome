@@ -9,7 +9,7 @@ define(["dataService", "metadataService", "approvalService", "orgUnitService", "
             app.service('userService', ['$http', '$indexedDB', userService]);
             app.service('systemSettingService', ['$http', systemSettingService]);
             app.service('programService', ['$http', programService]);
-            app.service('eventService', ['$http', eventService]);
+            app.service('eventService', ['$http', '$q', eventService]);
         };
         return {
             init: init
