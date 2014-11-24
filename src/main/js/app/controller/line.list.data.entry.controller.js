@@ -1,5 +1,6 @@
 define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
-    return function($scope, $q, $hustle, db, programRepository, programEventRepository) {
+    return function($scope, $q, $hustle, db, programRepository, programEventRepository, dataElementRepository) {
+
 
         var resetForm = function() {
             $scope.dataValues = {};
@@ -56,9 +57,46 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
 
         var getAllEvents = function() {
             var period = $scope.year + "W" + $scope.week.weekNumber;
-            return programEventRepository.getEventsForPeriodAndOrgUnit(period, $scope.currentModule.id).then(function(events) {
-                $scope.allEvents = events;
+            return $q.all([programEventRepository.getEventsForPeriodAndOrgUnit(period, $scope.currentModule.id), dataElementRepository.getAll()]).then(function(data) {
+                var events = data[0];
+                var dataElements = data[1];
+
+                var enrichDataElement = function(dataElement) {
+                    var attr = _.find(dataElement.attributeValues, {
+                        "attribute": {
+                            "code": 'showInEventSummary'
+                        }
+                    });
+                    if ((!_.isEmpty(attr)) && attr.value === true) {
+                        dataElement.showInEventSummary = true;
+                    } else {
+                        dataElement.showInEventSummary = false;
+                    }
+                    return dataElement;
+                };
+
+                var enrichEvents = function(events) {
+                    return _.map(events, function(event) {
+                        var dataValues = event.dataValues;
+                        _.forEach(dataValues, function(dataValue) {
+                            _.forEach(enrichedDataElements, function(de) {
+                                if (de.id === dataValue.dataElement) {
+                                    dataValue.showInEventSummary = de.showInEventSummary;
+                                }
+                            });
+                        });
+                        return event;
+                    });
+                };
+
+                var enrichedDataElements = _.map(dataElements, function(dataElement) {
+                    return enrichDataElement(dataElement);
+                });
+
+                $scope.allEvents = enrichEvents(events);
+                return data;
             });
+
         };
 
         $scope.getEventDateNgModel = function(eventDates, programId, programStageId) {
@@ -102,7 +140,7 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
                 $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;
                 if (isDraft)
                     return payload;
-                return saveToDhis(payload).then(function(data){
+                return saveToDhis(payload).then(function(data) {
                     getAllEvents();
                 });
             });

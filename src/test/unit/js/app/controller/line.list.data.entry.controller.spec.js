@@ -1,267 +1,329 @@
-define(["lineListDataEntryController", "angularMocks", "utils", "moment", "programRepository", "programEventRepository"], function(LineListDataEntryController, mocks, utils, moment, ProgramRepository, ProgramEventRepository) {
-    describe("lineListDataEntryController ", function() {
+define(["lineListDataEntryController", "angularMocks", "utils", "moment", "programRepository", "programEventRepository", "dataElementRepository"],
+    function(LineListDataEntryController, mocks, utils, moment, ProgramRepository, ProgramEventRepository, DataElementRepository) {
+        describe("lineListDataEntryController ", function() {
 
-        var scope, q, hustle, programRepository, mockDB, mockStore;
+            var scope, q, hustle, programRepository, mockDB, mockStore, dataElementRepository, dataElements, allEvents;
 
-        beforeEach(module('hustle'));
-        beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
-            scope = $rootScope.$new();
-            q = $q;
-            hustle = $hustle;
+            beforeEach(module('hustle'));
+            beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
+                scope = $rootScope.$new();
+                q = $q;
+                hustle = $hustle;
 
-            mockDB = utils.getMockDB($q);
-            mockStore = mockDB.objectStore;
+                mockDB = utils.getMockDB($q);
+                mockStore = mockDB.objectStore;
 
-            scope.resourceBundle = {};
-            scope.week = {
-                "weekNumber": 44,
-                "startOfWeek": "2014-10-27",
-                "endOfWeek": "2014-11-02"
-            };
-            scope.currentModule = {
-                'id': 'ae2a77b82a5'
-            };
+                scope.resourceBundle = {};
+                scope.week = {
+                    "weekNumber": 44,
+                    "startOfWeek": "2014-10-27",
+                    "endOfWeek": "2014-11-02"
+                };
+                scope.currentModule = {
+                    'id': 'ae2a77b82a5'
+                };
 
-            programRepository = new ProgramRepository();
-            programEventRepository = new ProgramEventRepository();
-            spyOn(programEventRepository, "getEventsForPeriodAndOrgUnit").and.returnValue(utils.getPromise(q, ['event1', 'event2']));
-        }));
+                dataElements = [{
+                    'id': 'de1',
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "showInEventSummary",
+                        },
+                        "value": true
+                    }]
+                }, {
+                    'id': 'de2',
+                }, {
+                    'id': 'de3'
+                }];
 
-        it("should load programs into scope on init", function() {
-            var programAndStageData = {
-                'id': 'p1'
-            };
-            spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, programAndStageData));
+                allEvents = [{
+                    'event': 'event1',
+                    'dataValues': [{
+                        'dataElement': 'de1',
+                        'value': 'a11'
+                    }]
+                }, {
+                    'event': 'event2',
+                    'dataValues': [{
+                        'dataElement': 'de2',
+                        'value': 'b22'
+                    }]
+                }];
 
-            scope.programsInCurrentModule = ['p1'];
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
+                programRepository = new ProgramRepository();
+                programEventRepository = new ProgramEventRepository();
+                dataElementRepository = new DataElementRepository();
+                spyOn(programEventRepository, "getEventsForPeriodAndOrgUnit").and.returnValue(utils.getPromise(q, allEvents));
+                spyOn(dataElementRepository, "getAll").and.returnValue(utils.getPromise(q, dataElements));
+            }));
 
-            expect(programRepository.getProgramAndStages).toHaveBeenCalledWith('p1');
-            expect(scope.programs).toEqual([programAndStageData]);
-        });
+            it("should load programs into scope on init", function() {
+                var programAndStageData = {
+                    'id': 'p1'
+                };
+                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, programAndStageData));
 
-        it("should load all optionSets to scope on init", function() {
-            var optionSets = [{
-                'id': 'os1'
-            }];
-            mockStore.getAll.and.returnValue(utils.getPromise(q, optionSets));
+                scope.programsInCurrentModule = ['p1'];
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
 
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
+                expect(programRepository.getProgramAndStages).toHaveBeenCalledWith('p1');
+                expect(scope.programs).toEqual([programAndStageData]);
+            });
 
-            expect(scope.optionSets).toBe(optionSets);
-        });
+            it("should load all optionSets to scope on init", function() {
+                var optionSets = [{
+                    'id': 'os1'
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, optionSets));
 
-        it("should find optionSets for id", function() {
-            var optionSets = [{
-                'id': 'os1',
-                'options': [{
-                    'id': 'os1o1'
-                }]
-            }, {
-                'id': 'os2',
-                'options': [{
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
+
+                expect(scope.optionSets).toBe(optionSets);
+            });
+
+            it("should find optionSets for id", function() {
+                var optionSets = [{
+                    'id': 'os1',
+                    'options': [{
+                        'id': 'os1o1'
+                    }]
+                }, {
+                    'id': 'os2',
+                    'options': [{
+                        'id': 'os2o1',
+                        'name': 'os2o1 name'
+                    }]
+                }];
+
+                mockStore.getAll.and.returnValue(utils.getPromise(q, optionSets));
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
+
+                expect(scope.getOptionsFor('os2')).toEqual([{
                     'id': 'os2o1',
-                    'name': 'os2o1 name'
-                }]
-            }];
+                    'name': 'os2o1 name',
+                    'displayName': 'os2o1 name'
+                }]);
+            });
 
-            mockStore.getAll.and.returnValue(utils.getPromise(q, optionSets));
+            it("should translate options", function() {
+                scope.resourceBundle = {
+                    'os1o1': 'os1o1 translated name'
+                };
 
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
+                mockStore.getAll.and.returnValue(utils.getPromise(q, [{
+                    'id': 'os1',
+                    'options': [{
+                        'id': 'os1o1',
+                        'name': 'os1o1 name'
+                    }]
+                }]));
 
-            expect(scope.getOptionsFor('os2')).toEqual([{
-                'id': 'os2o1',
-                'name': 'os2o1 name',
-                'displayName': 'os2o1 name'
-            }]);
-        });
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
 
-        it("should translate options", function() {
-            scope.resourceBundle = {
-                'os1o1': 'os1o1 translated name'
-            };
-
-            mockStore.getAll.and.returnValue(utils.getPromise(q, [{
-                'id': 'os1',
-                'options': [{
+                expect(scope.getOptionsFor('os1')).toEqual([{
                     'id': 'os1o1',
-                    'name': 'os1o1 name'
-                }]
-            }]));
+                    'name': 'os1o1 name',
+                    'displayName': 'os1o1 translated name'
+                }]);
 
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
-
-            expect(scope.getOptionsFor('os1')).toEqual([{
-                'id': 'os1o1',
-                'name': 'os1o1 name',
-                'displayName': 'os1o1 translated name'
-            }]);
-
-        });
-
-        it("should update dataValues with new program and stage if not present", function() {
-            var dataValues = {};
-
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
-
-            scope.getDataValueNgModel(dataValues, 'p1', 'ps1');
-
-            expect(dataValues).toEqual({
-                'p1': {
-                    'ps1': {}
-                }
             });
-        });
 
-        it("should change dataValues", function() {
-            var dataValues = {
-                'p1': {
-                    'ps1': {}
-                }
-            };
+            it("should update dataValues with new program and stage if not present", function() {
+                var dataValues = {};
 
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
 
-            scope.getDataValueNgModel(dataValues, 'p1', 'ps2');
+                scope.getDataValueNgModel(dataValues, 'p1', 'ps1');
 
-            expect(dataValues).toEqual({
-                'p1': {
-                    'ps1': {},
-                    'ps2': {}
-                }
+                expect(dataValues).toEqual({
+                    'p1': {
+                        'ps1': {}
+                    }
+                });
             });
-        });
 
-        it("should get eventDates with default set to today", function() {
-            var eventDates = {};
+            it("should change dataValues", function() {
+                var dataValues = {
+                    'p1': {
+                        'ps1': {}
+                    }
+                };
 
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
 
-            scope.getEventDateNgModel(eventDates, 'p1', 'ps1');
+                scope.getDataValueNgModel(dataValues, 'p1', 'ps2');
 
-            expect(moment(eventDates.p1.ps1).isSame(moment(), 'days')).toBe(true);
-        });
+                expect(dataValues).toEqual({
+                    'p1': {
+                        'ps1': {},
+                        'ps2': {}
+                    }
+                });
+            });
 
-        it("should set min and max date for selected period", function() {
+            it("should get eventDates with default set to today", function() {
+                var eventDates = {};
 
-            scope.week = {
-                "weekNumber": 46,
-                "startOfWeek": "2014-11-10",
-                "endOfWeek": "2014-11-16"
-            };
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
 
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
+                scope.getEventDateNgModel(eventDates, 'p1', 'ps1');
 
-            expect(moment(scope.minDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-10");
-            expect(moment(scope.maxDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-16");
-        });
+                expect(moment(eventDates.p1.ps1).isSame(moment(), 'days')).toBe(true);
+            });
 
-        it("should save event details as draft", function() {
+            it("should set min and max date for selected period", function() {
 
-            spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-            spyOn(hustle, "publish");
+                scope.week = {
+                    "weekNumber": 46,
+                    "startOfWeek": "2014-11-10",
+                    "endOfWeek": "2014-11-16"
+                };
 
-            scope.resourceBundle = {
-                'eventSaveSuccess': 'Event saved successfully'
-            };
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
 
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
+                expect(moment(scope.minDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-10");
+                expect(moment(scope.maxDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-16");
+            });
 
-            scope.programs = [{
-                'id': 'Prg1',
-                'programStages': [{
-                    'id': 'PrgStage1'
-                }]
-            }];
+            it("should save event details as draft", function() {
 
-            scope.eventDates = {
-                "Prg1": {
-                    "PrgStage1": "2014-11-18T10:34:14.067Z"
-                }
-            };
+                spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+                spyOn(hustle, "publish");
 
-            scope.dataValues = {
-                "Prg1": {
-                    "PrgStage1": {}
-                }
-            };
+                scope.resourceBundle = {
+                    'eventSaveSuccess': 'Event saved successfully'
+                };
 
-            scope.submit(true);
-            scope.$apply();
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
 
-            var actualPayloadInUpsertCall = programEventRepository.upsert.calls.first().args[0];
+                scope.programs = [{
+                    'id': 'Prg1',
+                    'programStages': [{
+                        'id': 'PrgStage1'
+                    }]
+                }];
 
-            expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
-            expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
-            expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("ae2a77b82a5");
-            expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2014-11-18");
-            expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW");
-            expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([]);
+                scope.eventDates = {
+                    "Prg1": {
+                        "PrgStage1": "2014-11-18T10:34:14.067Z"
+                    }
+                };
 
-            expect(scope.resultMessageType).toEqual("success");
-            expect(scope.resultMessage).toEqual("Event saved successfully");
-            expect(hustle.publish).not.toHaveBeenCalled();
-        });
+                scope.dataValues = {
+                    "Prg1": {
+                        "PrgStage1": {}
+                    }
+                };
 
-        it("should submit event details", function() {
-            spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
+                scope.submit(true);
+                scope.$apply();
 
-            scope.resourceBundle = {
-                'eventSaveSuccess': 'Event saved successfully',
-                'eventSubmitSuccess': 'Event submitted succesfully'
-            };
+                var actualPayloadInUpsertCall = programEventRepository.upsert.calls.first().args[0];
 
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
+                expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
+                expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
+                expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("ae2a77b82a5");
+                expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2014-11-18");
+                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW");
+                expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([]);
 
-            scope.programs = [{
-                'id': 'Prg1',
-                'programStages': [{
-                    'id': 'PrgStage1'
-                }]
-            }];
+                expect(scope.resultMessageType).toEqual("success");
+                expect(scope.resultMessage).toEqual("Event saved successfully");
+                expect(hustle.publish).not.toHaveBeenCalled();
+            });
 
-            scope.eventDates = {
-                "Prg1": {
-                    "PrgStage1": "2014-11-18T10:34:14.067Z"
-                }
-            };
+            it("should submit event details", function() {
+                spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
 
-            scope.dataValues = {
-                "Prg1": {
-                    "PrgStage1": {}
-                }
-            };
+                scope.resourceBundle = {
+                    'eventSaveSuccess': 'Event saved successfully',
+                    'eventSubmitSuccess': 'Event submitted succesfully'
+                };
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
+
+                scope.programs = [{
+                    'id': 'Prg1',
+                    'programStages': [{
+                        'id': 'PrgStage1'
+                    }]
+                }];
+
+                scope.eventDates = {
+                    "Prg1": {
+                        "PrgStage1": "2014-11-18T10:34:14.067Z"
+                    }
+                };
+
+                scope.dataValues = {
+                    "Prg1": {
+                        "PrgStage1": {}
+                    }
+                };
 
 
-            scope.submit(false);
-            scope.$apply();
+                scope.submit(false);
+                scope.$apply();
 
-            var actualPayloadInUpsertCall = programEventRepository.upsert.calls.first().args[0];
+                var actualPayloadInUpsertCall = programEventRepository.upsert.calls.first().args[0];
+                var expectedEvents = [{
+                    event: 'event1',
+                    dataValues: [{
+                        dataElement: 'de1',
+                        value: 'a11',
+                        showInEventSummary: true
+                    }]
+                }, {
+                    event: 'event2',
+                    dataValues: [{
+                        dataElement: 'de2',
+                        value: 'b22',
+                        showInEventSummary: false
+                    }]
+                }];
 
-            expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
+                expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
 
-            expect(scope.resultMessageType).toEqual("success");
-            expect(scope.resultMessage).toEqual("Event submitted succesfully");
-            expect(hustle.publish).toHaveBeenCalled();
-            expect(scope.allEvents).toEqual(['event1', 'event2']);
-        });
+                expect(scope.resultMessageType).toEqual("success");
+                expect(scope.resultMessage).toEqual("Event submitted succesfully");
+                expect(hustle.publish).toHaveBeenCalled();
+                expect(scope.allEvents).toEqual(expectedEvents);
+            });
 
-        it("should load all events for org unit and period on init", function() {
-            var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository);
-            scope.$apply();
+            it("should load all events for org unit and period on init", function() {
+                var expectedEvents = [{
+                    event: 'event1',
+                    dataValues: [{
+                        dataElement: 'de1',
+                        value: 'a11',
+                        showInEventSummary: true
+                    }]
+                }, {
+                    event: 'event2',
+                    dataValues: [{
+                        dataElement: 'de2',
+                        value: 'b22',
+                        showInEventSummary: false
+                    }]
+                }];
 
-            expect(scope.allEvents).toEqual(['event1', 'event2']);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
+
+                expect(scope.allEvents).toEqual(expectedEvents);
+            });
         });
     });
-});

@@ -74,6 +74,7 @@ require.config({
         "userRepository": "app/repository/user.repository",
         "programRepository": "app/repository/program.repository",
         "programEventRepository": "app/repository/program.event.repository",
+        "dataElementRepository": "app/repository/data.element.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
