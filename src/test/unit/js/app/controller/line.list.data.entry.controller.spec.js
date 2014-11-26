@@ -2,7 +2,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
     function(LineListDataEntryController, mocks, utils, moment, ProgramRepository, ProgramEventRepository, DataElementRepository) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, q, hustle, programRepository, mockDB, mockStore, dataElementRepository, dataElements, allEvents;
+            var scope, q, hustle, programRepository, mockDB, mockStore, dataElementRepository, allEvents;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
@@ -23,39 +23,29 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     'id': 'ae2a77b82a5'
                 };
 
-                dataElements = [{
-                    'id': 'de1',
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "showInEventSummary",
-                        },
-                        "value": true
-                    }]
-                }, {
-                    'id': 'de2',
-                }, {
-                    'id': 'de3'
-                }];
-
                 allEvents = [{
-                    'event': 'event1',
-                    'dataValues': [{
-                        'dataElement': 'de1',
-                        'value': 'a11'
+                    event: 'event1',
+                    dataValues: [{
+                        dataElement: 'de1',
+                        value: 'a11',
+                        showInEventSummary: true,
+                        name: 'dataElement1',
                     }]
                 }, {
-                    'event': 'event2',
-                    'dataValues': [{
-                        'dataElement': 'de2',
-                        'value': 'b22'
+                    event: 'event2',
+                    dataValues: [{
+                        dataElement: 'de2',
+                        value: 'b22',
+                        showInEventSummary: false,
+                        name: 'dataElement2',
                     }]
                 }];
 
                 programRepository = new ProgramRepository();
                 programEventRepository = new ProgramEventRepository();
                 dataElementRepository = new DataElementRepository();
-                spyOn(programEventRepository, "getEventsForPeriodAndOrgUnit").and.returnValue(utils.getPromise(q, allEvents));
-                spyOn(dataElementRepository, "getAll").and.returnValue(utils.getPromise(q, dataElements));
+
+                spyOn(programEventRepository, "getEventsFor").and.returnValue(utils.getPromise(q, allEvents));
             }));
 
             it("should load programs into scope on init", function() {
@@ -279,51 +269,20 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 scope.$apply();
 
                 var actualPayloadInUpsertCall = programEventRepository.upsert.calls.first().args[0];
-                var expectedEvents = [{
-                    event: 'event1',
-                    dataValues: [{
-                        dataElement: 'de1',
-                        value: 'a11',
-                        showInEventSummary: true
-                    }]
-                }, {
-                    event: 'event2',
-                    dataValues: [{
-                        dataElement: 'de2',
-                        value: 'b22',
-                        showInEventSummary: false
-                    }]
-                }];
 
                 expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
 
                 expect(scope.resultMessageType).toEqual("success");
                 expect(scope.resultMessage).toEqual("Event submitted succesfully");
                 expect(hustle.publish).toHaveBeenCalled();
-                expect(scope.allEvents).toEqual(expectedEvents);
+                expect(scope.allEvents).toEqual(allEvents);
             });
 
             it("should load all events for org unit and period on init", function() {
-                var expectedEvents = [{
-                    event: 'event1',
-                    dataValues: [{
-                        dataElement: 'de1',
-                        value: 'a11',
-                        showInEventSummary: true
-                    }]
-                }, {
-                    event: 'event2',
-                    dataValues: [{
-                        dataElement: 'de2',
-                        value: 'b22',
-                        showInEventSummary: false
-                    }]
-                }];
-
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
-                expect(scope.allEvents).toEqual(expectedEvents);
+                expect(scope.allEvents).toEqual(allEvents);
             });
         });
     });

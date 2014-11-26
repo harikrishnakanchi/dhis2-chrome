@@ -3,46 +3,100 @@
      <img src="img/ajax-loader.gif" class="spinner" />
 </div>
 <section class="panel tab-panel">
-	<accordion close-others="false">
-		<accordion-group ng-repeat="program in programs" is-open="true">
-			<accordion-heading>
-				<span ng-if="resourceBundle[program.id]">{{ resourceBundle[program.id] }}</span> 
-				<span ng-if="!resourceBundle[program.id]">{{ program.name }}</span> 
-			</accordion-heading>
+	<form name="eventDataEntryForm" id="eventDataEntryForm" class="form-horizontal">
+		<accordion close-others="false">
+			<accordion-group ng-repeat="program in programs" is-open="true">
+				<accordion-heading>
+					<span ng-if="resourceBundle[program.id]">{{ resourceBundle[program.id] }}</span> 
+					<span ng-if="!resourceBundle[program.id]">{{ program.name }}</span> 
+				</accordion-heading>
 
-			<div ng-repeat="programStage in program.programStages">
-				<accordion close-others="false">
-					<accordion-group ng-repeat="section in programStage.programStageSections" is-open="true">
-						<accordion-heading>
-							<span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span> 
-							<span ng-if="!resourceBundle[section.id]">{{ section.name }}</span> 
-						</accordion-heading>
+				<div class="exp-coll-group" ng-repeat="programStage in program.programStages">
+					<accordion close-others="false">
 						<ul>
-							<li>
-								{{ resourceBundle["lineListEventDate"] }}
-								<input type="date" ng-model="getEventDateNgModel(eventDates, program.id, programStage.id)[programStage.id]" required min="{{minDateInCurrentPeriod}}" max="{{maxDateInCurrentPeriod}}" />
-							</li>
-							<li ng-repeat="de in section.programStageDataElements">
-								<span ng-if="resourceBundle[de.dataElement.id]"> {{ resourceBundle[de.dataElement.id] }}</span> 
-								<span ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</span> 
-								<input type="text" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" />
-								<input type="number" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" />
-								<input type="date" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" />
-								<select ng-options="o.name as o.displayName for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]">
-									<option value=""></option>
-								</select>
+							<li class="form-group">
+								<label for="eventDate" class="col-sm-4 col-md-4 control-label">{{ resourceBundle["lineListEventDate"] }}</label>
+								<div class="col-sm-6 col-md-6" >
+									<input name="eventDate" type="date" class="form-control" ng-model="getEventDateNgModel(eventDates, program.id, programStage.id)[programStage.id]" required min="{{minDateInCurrentPeriod}}" max="{{maxDateInCurrentPeriod}}" />
+								</div>
 							</li>
 						</ul>
-					</accordion-group>
-				</accordion>
-			
-			<input type="button" value="Save" ng-click="submit(true)" />
-			<input type="button" value="Submit" ng-click="submit(false)" />
-			</div>
-		</accordion-group>
-	</accordion>
-	<div ng-repeat="event in allEvents">
-		{{event.event}}
-	</div>
+						<accordion-group ng-repeat="section in programStage.programStageSections" is-open="true">
+							<accordion-heading>
+								<span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span> 
+								<span ng-if="!resourceBundle[section.id]">{{ section.name }}</span> 
+							</accordion-heading>
+							<ul>
+								<li class="form-group" ng-repeat="de in section.programStageDataElements">
+									<label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="resourceBundle[de.dataElement.id]">{{ resourceBundle[de.dataElement.id] }}</label>
+									<label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</label>
+									<div class="col-sm-6 col-md-6" >
+										<input type="text" class="form-control" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}"/>
+										<input type="number" class="form-control" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" />
+										<input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" />
+										<select ng-options="o.name as o.displayName for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}">
+											<option value=""></option>
+										</select>
+									</div>
+								</li>
+							</ul>
+						</accordion-group>
+					</accordion>
+					<ul>
+						<li>
+							<div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
+								<input type="button" class="btn btn-main" value="Save" ng-click="submit(true)" />
+								<input type="button" class="btn btn-main" value="Submit" ng-click="submit(false)" />
+							</div>
+						</li>
+					</ul>
+				</div>
+				<div class="panel-default" ng-if="allEvents.length &gt; 0">
+					<div class="panel-heading">
+						<h4 class="panel-title"><a href="">List of Events</a></h4>
+					</div>
+					<div class="panel-body">
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th>Event Date</th>
+									<th ng-repeat= "dataValue in allEvents[0].dataValues" ng-if = "dataValue.showInEventSummary">
+										{{dataValue.formName}}
+									</th>
+									<th></th>
+									<th></th>
+									<th></th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr  ng-repeat="event in allEvents">
+									<td>{{event.eventDate}}</td>
+									<td ng-repeat= "dataValue in event.dataValues" ng-if="dataValue.showInEventSummary">
+										{{dataValue.value}}
+									</td>
+									<td>
+					                    <a href="" id="" title="View" class="view">
+					                        <span class="glyphicon glyphicon-info-sign"></span>
+					                    </a>
+					                </td>
+									<td>
+					                    <a href="" id="" title="Edit" class="edit">
+					                        <span class="glyphicon glyphicon-edit"></span>
+					                    </a>
+					                </td>
+					                <td>
+					                    <a href="" id="" ng-click="" title="Delete" class="delete">
+					                        <span class="glyphicon glyphicon-remove"></span>
+					                    </a>
+					                </td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</accordion-group>
+		</accordion>
+	</form>		
 </section>
 </div>

@@ -103,7 +103,7 @@ define([], function() {
 
     var add_program_events_store = function(db, tx) {
         var programEventsStore = create_store_with_key("programEvents", "event", db);
-        create_index(programEventsStore, "by_period_orgunit", ["period", "orgUnit"], false);
+        create_index(programEventsStore, "by_program_period_orgunit", ["program", "period", "orgUnit"], false);
         create_index(programEventsStore, "by_period", "period", false);
     };
 

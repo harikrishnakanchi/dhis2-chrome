@@ -1,5 +1,5 @@
 define(["moment", "lodash"], function(moment, _) {
-    return function(db) {
+    return function(db, $q) {
 
         var updatePeriod = function(eventsPayload) {
             _.each(eventsPayload.events, function(event) {
@@ -38,10 +38,68 @@ define(["moment", "lodash"], function(moment, _) {
             return store.delete(eventId);
         };
 
-        this.getEventsForPeriodAndOrgUnit = function(period, orgUnit) {
-            var store = db.objectStore('programEvents');
-            var query = db.queryBuilder().$eq([period, orgUnit]).$index("by_period_orgunit").compile();
-            return store.each(query);
+        this.getEventsFor = function(programId, period, orgUnit) {
+
+            var getProgram = function() {
+                var store = db.objectStore('programs');
+                return store.find(programId);
+            };
+
+
+            var getProgramStages = function(program) {
+                var store = db.objectStore('programStages');
+                var programStageIds = _.pluck(program.programStages, "id");
+                return $q.all(_.map(programStageIds, function(programStageId) {
+                    return store.find(programStageId);
+                }));
+            };
+
+            var getDataElements = function(programStages) {
+                var dataElementIds = _.pluck(_.flatten(_.flatten(_.flatten(programStages, 'programStageSections'), 'programStageDataElements'), 'dataElement'), 'id');
+
+                var store = db.objectStore("dataElements");
+                return $q.all(_.map(dataElementIds, function(dataElementId) {
+                    return store.find(dataElementId).then(function(dataElement) {
+                        var attr = _.find(dataElement.attributeValues, {
+                            "attribute": {
+                                "code": 'showInEventSummary'
+                            }
+                        });
+
+                        if ((!_.isEmpty(attr)) && attr.value === "true") {
+                            dataElement.showInEventSummary = true;
+                        } else {
+                            dataElement.showInEventSummary = false;
+                        }
+                        dataElement.dataElement = dataElement.id;
+                        return _.omit(dataElement, ["id", "attributeValues"]);
+                    });
+                }));
+            };
+
+            var getEvents = function() {
+                var store = db.objectStore('programEvents');
+                var query = db.queryBuilder().$eq([programId, period, orgUnit]).$index("by_program_period_orgunit").compile();
+                return store.each(query);
+            };
+
+            return $q.all([getProgram().then(getProgramStages).then(getDataElements), getEvents()]).then(function(data) {
+                var dataElements = data[0];
+                var events = data[1];
+                var dataElementIds = _.pluck(dataElements, "id");
+                return _.map(events, function(programEvent) {
+                    var returnEvent = _.omit(programEvent, "dataValues");
+                    returnEvent.eventDate = moment(returnEvent.eventDate).format("YYYY-MM-DD");
+                    returnEvent.dataValues = _.cloneDeep(dataElements);
+                    _.each(programEvent.dataValues, function(dv) {
+                        _.find(returnEvent.dataValues, {
+                            'dataElement': dv.dataElement
+                        }).value = dv.value;
+                    });
+
+                    return returnEvent;
+                });
+            });
         };
     };
 });
