@@ -74,7 +74,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
                 "lastName": "test1last",
                 "userCredentials": {
                     "username": "dataentryuser",
-                    "userAuthorityGroups": [{
+                    "userRoles": [{
                         "id": "hxNB8lleCsl",
                         "name": 'Project Level Approver'
                     }]
@@ -99,7 +99,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
                 "lastName": "test1last",
                 "userCredentials": {
                     "username": "dataentryuser",
-                    "userAuthorityGroups": [{
+                    "userRoles": [{
                         "id": "hxNB8lleCsl",
                         "name": 'Project Level Approver'
                     }]

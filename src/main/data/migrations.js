@@ -61,7 +61,7 @@ define([], function() {
         userStore.add({
             "userCredentials": {
                 "username": "msfadmin",
-                "userAuthorityGroups": [{
+                "userRoles": [{
                     "name": "Superuser",
                 }],
                 "disabled": false

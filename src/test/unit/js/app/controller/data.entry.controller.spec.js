@@ -18,7 +18,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     "lastName": "test1last",
                     "userCredentials": {
                         "username": "dataentryuser",
-                        "userAuthorityGroups": [{
+                        "userRoles": [{
                             "id": "hxNB8lleCsl",
                             "name": 'Superuser'
                         }, {

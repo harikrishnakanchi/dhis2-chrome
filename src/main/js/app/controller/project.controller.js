@@ -128,7 +128,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         var setProjectUsersForEdit = function(projectUsers) {
             $scope.projectUsers = [];
             _.each(projectUsers, function(user) {
-                var roles = user.userCredentials.userAuthorityGroups.map(function(role) {
+                var roles = user.userCredentials.userRoles.map(function(role) {
                     return role.name;
                 });
                 user.roles = roles.join(", ");

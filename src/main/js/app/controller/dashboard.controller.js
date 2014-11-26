@@ -235,7 +235,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
                     if (roleName === "Desk Level Approver") return 3;
                 };
 
-                var approvalRole = _.filter($rootScope.currentUser.userCredentials.userAuthorityGroups, function(role) {
+                var approvalRole = _.filter($rootScope.currentUser.userCredentials.userRoles, function(role) {
                     return role.name.indexOf("Approver") > -1;
                 });
 

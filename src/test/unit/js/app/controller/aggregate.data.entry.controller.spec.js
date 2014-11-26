@@ -103,7 +103,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "lastName": "test1last",
                     "userCredentials": {
                         "username": "dataentryuser",
-                        "userAuthorityGroups": [{
+                        "userRoles": [{
                             "id": "hxNB8lleCsl",
                             "name": 'Superuser'
                         }, {

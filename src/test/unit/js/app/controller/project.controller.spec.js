@@ -293,7 +293,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             var users = [{
                 'userCredentials': {
                     'username': 'foobar',
-                    'userAuthorityGroups': [{
+                    'userRoles': [{
                         "name": 'Role1',
                         "id": 'Role1Id'
                     }, {
@@ -304,7 +304,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             }, {
                 'userCredentials': {
                     'username': 'blah',
-                    'userAuthorityGroups': [{
+                    'userRoles': [{
                         "name": 'Role1',
                         "id": 'Role1Id'
                     }, {
@@ -318,7 +318,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 'roles': 'Role1, Role2',
                 'userCredentials': {
                     'username': 'foobar',
-                    'userAuthorityGroups': [{
+                    'userRoles': [{
                         "name": 'Role1',
                         "id": 'Role1Id'
                     }, {
@@ -330,7 +330,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 'roles': 'Role1, Role3',
                 'userCredentials': {
                     'username': 'blah',
-                    'userAuthorityGroups': [{
+                    'userRoles': [{
                         "name": 'Role1',
                         "id": 'Role1Id'
                     }, {

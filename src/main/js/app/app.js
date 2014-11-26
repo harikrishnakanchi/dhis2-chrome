@@ -88,7 +88,7 @@ define(["angular", "Q", "services", "directives", "controllers", "repositories",
                         if ($rootScope.currentUser === undefined)
                             return false;
 
-                        return _.any($rootScope.currentUser.userCredentials.userAuthorityGroups, function(userAuth) {
+                        return _.any($rootScope.currentUser.userCredentials.userRoles, function(userAuth) {
                             return _.contains(allowedRoles, userAuth.name);
                         });
                     };

@@ -35,7 +35,7 @@ define(["dhisId"], function(dhisId) {
                 "firstName": "FNU",
                 "userCredentials": {
                     "username": projectUser.username.toLowerCase(),
-                    "userAuthorityGroups": [{
+                    "userRoles": [{
                         "name": projectUser.userRole.name
                     }],
                     "password": "msfuser",

@@ -44,7 +44,7 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                 "firstName": "FNU",
                 "userCredentials": {
                     "username": "proj_1_blah",
-                    "userAuthorityGroups": [{
+                    "userRoles": [{
                         "name": user.userRole.name
                     }],
                     "password": "msfuser",
