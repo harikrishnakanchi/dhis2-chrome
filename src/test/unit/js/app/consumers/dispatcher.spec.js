@@ -20,6 +20,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             orgUnitConsumer = {
                 'run': jasmine.createSpy("orgUnitConsumer")
             };
+            orgUnitGroupConsumer = {
+                'run': jasmine.createSpy("orgUnitGroupConsumer")
+            };
             datasetConsumer = {
                 'run': jasmine.createSpy("datasetConsumer")
             };
@@ -52,7 +55,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadEventDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
-            dispatcher = new Dispatcher(q, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
+            dispatcher = new Dispatcher(q, orgUnitConsumer,orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer);
         }));

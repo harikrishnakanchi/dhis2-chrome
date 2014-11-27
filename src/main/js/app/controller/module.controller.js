@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer", "programTransformer"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer, programTransformer) {
-    return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, systemSettingRepository, db, $location, $q, $modal, programRepository) {
+    return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, systemSettingRepository, db, $location, $q, $modal, programRepository, orgUnitGroupRepository) {
 
         $scope.isopen = {};
         $scope.modules = [];
@@ -121,7 +121,58 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var parent = $scope.orgUnit;
             var enrichedModules = orgUnitMapper.mapToModules(modules, parent);
 
+            var createOrgUnitGroups = function(parent, modules) {
+                var getOrgUnitGroups = function() {
+                    return orgUnitGroupRepository.getAll().then(function(result) {
+                        return result;
+                    });
+                };
+
+                var getAttributes = function(module_t) {
+                    return orgUnitRepository.getProjectAndOpUnitAttributes(module_t).then(function(result) {
+                        return [result, module_t];
+                    });
+                };
+
+                var addModulesToOrgUnitGroups = function(orgUnitGroups) {
+
+                    var addToGroup = function(data) {
+                        var attributes = data[0];
+                        var module_t = data[1];
+                        return _.map(orgUnitGroups, function(orgUnitGroup) {
+                            var res = _.find(attributes, {
+                                'value': orgUnitGroup.name
+                            });
+                            if (res !== undefined) {
+                                orgUnitGroup.organisationUnits.push({
+                                    'id': module_t.id,
+                                    'name': module_t.name
+                                });
+                                return orgUnitGroup;
+                            } else {
+                                return orgUnitGroup;
+                            }
+                        });
+                    };
+
+                    var upsertOrgUnitGroup = function(orgUnitGroups) {
+                        orgUnitGroupRepository.upsert(orgUnitGroups).then(function() {
+                            publishMessage(orgUnitGroups, "upsertOrgUnitGroups").then(function(){
+                                return orgUnitGroups;
+                            });
+                        });
+                    };
+
+                    _.forEach(modules, function(module_t) {
+                        getAttributes(module_t).then(addToGroup).then(upsertOrgUnitGroup);
+                    });
+                };
+
+                getOrgUnitGroups().then(addModulesToOrgUnitGroups);
+            };
+
             parent.children = parent.children.concat(enrichedModules);
+            createOrgUnitGroups(parent, enrichedModules);
 
             return $q.all(orgUnitRepository.upsert(parent), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit"))
                 .then(function() {

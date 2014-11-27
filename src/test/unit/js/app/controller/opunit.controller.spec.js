@@ -82,13 +82,13 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 'name': 'OpUnit1',
                 'type': 'Hospital',
                 'openingDate': today,
-                'hospitalUnitCode': 'A'
+                'hospitalUnitCode': 'Unit Code - A'
             };
             var opUnit2 = {
                 'name': 'OpUnit2',
                 'type': 'Community',
                 'openingDate': today,
-                'hospitalUnitCode': 'A'
+                'hospitalUnitCode': 'Unit Code - A'
             };
             var opUnits = [opUnit1, opUnit2];
 
@@ -126,7 +126,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                         id: 'c6d3c8a7286',
                         code: 'hospitalUnitCode'
                     },
-                    value: 'A'
+                    value: 'Unit Code - A'
                 }]
             }, {
                 name: 'OpUnit2',
@@ -155,7 +155,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                         id: 'c6d3c8a7286',
                         code: 'hospitalUnitCode'
                     },
-                    value: 'A'
+                    value: 'Unit Code - A'
                 }]
             }];
 
@@ -190,7 +190,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                     "attribute": {
                         "code": "hospitalUnitCode"
                     },
-                    "value": "B1"
+                    "value": "Unit Code - B1"
                 }]
             };
             scope.isNewMode = false;
@@ -220,7 +220,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                     "attribute": {
                         "code": "hospitalUnitCode"
                     },
-                    "value": "B1"
+                    "value": "Unit Code - B1"
                 }]
             };
             scope.isNewMode = false;

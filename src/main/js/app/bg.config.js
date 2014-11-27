@@ -24,6 +24,7 @@ require.config({
         "programService": "app/service/program.service",
         "eventService": "app/service/event.service",
         "services": "app/service/bg.services",
+        "orgUnitGroupService": "app/service/orgUnitgroup.service",
 
         //Repositories
         "repositories": "app/repository/bg.repositories",
@@ -33,6 +34,8 @@ require.config({
         "userPreferenceRepository": "app/repository/userpreference.repository",
         "orgUnitRepository": "app/repository/orgunit.repository",
         "programEventRepository": "app/repository/program.event.repository",
+        "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
+
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",
@@ -55,6 +58,7 @@ require.config({
         "uploadEventDataConsumer": "app/consumer/upload.event.data.consumer",
         "deleteEventConsumer": "app/consumer/delete.event.consumer",
         "dispatcher": "app/consumer/dispatcher",
+        "orgUnitGroupConsumer": "app/consumer/orgunitGroup.consumer",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
 

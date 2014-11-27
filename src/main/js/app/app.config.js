@@ -62,6 +62,7 @@ require.config({
         "approvalService": "app/service/approval.service",
         "programService": "app/service/program.service",
         "eventService": "app/service/event.service",
+        "orgUnitGroupService": "app/service/orgUnitgroup.service",
 
         //Repositories
         "repositories": "app/repository/repositories",
@@ -75,6 +76,7 @@ require.config({
         "programRepository": "app/repository/program.repository",
         "programEventRepository": "app/repository/program.event.repository",
         "dataElementRepository": "app/repository/data.element.repository",
+        "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",

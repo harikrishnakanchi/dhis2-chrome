@@ -87,6 +87,12 @@ define(["properties", "lodash"], function(properties, _) {
             return $http.get(url).then(getDataFromResponse);
         };
 
+        var getOrgUnitGroups = function() {
+            var url = properties.dhis.url + "/api/organisationUnitGroups.json?fields=:all&paging=false";
+            console.debug("Fetching " + url);
+            return $http.get(url).then(getDataFromResponse);
+        };
+
         var getLocalSystemSettings = function() {
             console.debug("Fetching /data/systemSettings.json");
             return $http.get("/data/systemSettings.json").then(getDataFromResponse);
@@ -144,6 +150,13 @@ define(["properties", "lodash"], function(properties, _) {
             return store.upsert(data.organisationUnits);
         };
 
+        var upsertOrgunitGroups = function(data) {
+            console.debug("Processing organisationUnitGroups ", data);
+            var store = db.objectStore("orgUnitGroups");
+            return store.upsert(data.organisationUnitGroups);
+        };
+
+
         this.loadMetadataFromFile = function() {
             return getLastUpdatedTime()
                 .then(loadMetadata);
@@ -155,6 +168,8 @@ define(["properties", "lodash"], function(properties, _) {
                 .then(upsertMetadata)
                 .then(getOrgUnits)
                 .then(upsertOrgUnits)
+                .then(getOrgUnitGroups)
+                .then(upsertOrgunitGroups)
                 .then(getSystemSettings)
                 .then(upsertSystemSettings)
                 .then(getTranslations)

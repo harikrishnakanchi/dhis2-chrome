@@ -107,6 +107,10 @@ define([], function() {
         create_index(programEventsStore, "by_period", "period", false);
     };
 
+    var add_org_unit_group_store = function(db, tx) {
+        create_store_with_key("orgUnitGroups", ["id"], db);
+    };
+
     return [add_object_stores,
         change_log_stores,
         add_organisation_units_and_level_store,
@@ -116,6 +120,7 @@ define([], function() {
         add_admin_user_to_local_cred_store,
         add_project_user_to_local_cred_store,
         add_translation_store,
+        add_org_unit_group_store,
         add_system_settings_store,
         add_user_preference_store,
         add_complete_datasets_store,

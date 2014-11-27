@@ -2,7 +2,7 @@
 define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer"], function(ModuleController, mocks, utils, testData, datasetTransformer) {
     describe("module controller", function() {
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
-            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, hustle, dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
+            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -18,6 +18,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             orgUnitRepo = utils.getMockRepo(q);
+            orgunitGroupRepo = utils.getMockRepo(q);
             dataSetRepo = utils.getMockRepo(q);
             systemSettingRepo = utils.getMockRepo(q);
             systemSettingRepo.getAllWithProjectId = function() {};
@@ -97,7 +98,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     return programs;
                 return getMockStore(testData.get(storeName));
             });
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo);
         }));
 
         afterEach(function() {

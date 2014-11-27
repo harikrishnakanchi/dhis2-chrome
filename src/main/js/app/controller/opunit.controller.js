@@ -1,7 +1,7 @@
 define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
     return function($scope, $q, $hustle, orgUnitRepository, db, $location, $modal) {
         $scope.isDisabled = false;
-        $scope.hospitalUnitCodes = ['A', 'B1', 'C1', 'C2', 'C3', 'X'];
+        $scope.hospitalUnitCodes = ['Unit Code - A', 'Unit Code - B1', 'Unit Code - C1', 'Unit Code - C2', 'Unit Code - C3', 'Unit Code - X'];
         $scope.opUnits = [{
             'openingDate': moment().format("YYYY-MM-DD")
         }];

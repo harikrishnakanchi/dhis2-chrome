@@ -74,6 +74,28 @@ define([], function() {
             });
         };
 
+        this.getProjectAndOpUnitAttributes = function(module_t) {
+            var attributes_arr = [];
+
+            var pushAttributeValues = function(attributes) {
+                _.forEach(attributes,function( attribute) {
+                    attributes_arr.push(attribute);
+                });
+            };
+
+            var getAttributes = function(orgUnits) {
+                var opUnit = _.find(orgUnits,{'id': module_t.parent.id});
+                var project = _.find(orgUnits,{'id': opUnit.parent.id});
+
+                pushAttributeValues(opUnit.attributeValues);
+                pushAttributeValues(project.attributeValues);
+
+                return attributes_arr;
+            };
+
+            return this.getAll().then(getAttributes);
+        };
+
         this.getAllProjects = function() {
             var getAttributeValue = function(orgUnit, attrCode) {
                 return _.find(orgUnit.attributeValues, {
