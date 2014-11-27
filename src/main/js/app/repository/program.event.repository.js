@@ -58,7 +58,7 @@ define(["moment", "lodash"], function(moment, _) {
                 return getProgram().then(getProgramStages).then(function(programStages) {
                     var store = db.objectStore("dataElements");
                     var dataElementIds = _.pluck(_.flatten(_.flatten(_.flatten(programStages, 'programStageSections'), 'programStageDataElements'), 'dataElement'), 'id');
-                    
+
                     return $q.all(_.map(dataElementIds, function(dataElementId) {
                         return store.find(dataElementId).then(function(dataElement) {
                             var attr = _.find(dataElement.attributeValues, {
@@ -89,7 +89,7 @@ define(["moment", "lodash"], function(moment, _) {
                 var dataElements = data[0];
                 var events = data[1];
 
-                return _.map(events, function(programEvent) {                    
+                return _.map(events, function(programEvent) {
                     var mappedEvent = _.omit(programEvent, "dataValues");
                     mappedEvent.dataValues = _.cloneDeep(dataElements);
                     _.each(programEvent.dataValues, function(programEventDataValue) {
@@ -98,7 +98,6 @@ define(["moment", "lodash"], function(moment, _) {
                         });
                         mappedEventDataValue.value = programEventDataValue.value;
                     });
-                    console.log(mappedEvent);
                     return mappedEvent;
                 });
             });
