@@ -96,5 +96,7 @@
     "lineListLabel": "Linelist",
     "selectProgramLabel": "Select Program",
     "deleteEventConfirmation": "Are you sure you want to delete this event?",
-    "eventDeleteSuccess": "Event deleted successfully"
+    "eventDeleteSuccess": "Event deleted successfully",
+    "eventSubmitSuccess": "Event submitted successfully",
+    "eventSaveSuccess": "Event saved successfully"
 }

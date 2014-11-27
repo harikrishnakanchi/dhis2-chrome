@@ -7,7 +7,7 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('dashboardController', ['$scope', '$hustle', '$q', '$rootScope', 'approvalHelper', 'dataSetRepository', '$modal', '$timeout', dashboardController]);
             app.controller('dataEntryController', ['$scope', '$routeParams', '$q', '$location', '$rootScope', 'orgUnitRepository', 'programRepository', dataEntryController]);
             app.controller('aggregateDataEntryController', ['$scope', '$routeParams', '$q', '$hustle', '$indexedDB', 'dataRepository', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', 'approvalDataRepository', '$timeout', 'orgUnitRepository', 'approvalHelper', aggregateDataEntryController]);
-            app.controller('lineListDataEntryController', ['$scope', '$q', '$hustle', '$modal', '$timeout', '$indexedDB', 'programRepository', 'programEventRepository', 'dataElementRepository', lineListDataEntryController]);
+            app.controller('lineListDataEntryController', ['$scope', '$q', '$hustle', '$modal', '$timeout', '$location', '$anchorScroll', '$indexedDB', 'programRepository', 'programEventRepository', 'dataElementRepository', lineListDataEntryController]);
             app.controller('orgUnitContoller', ['$scope', '$indexedDB', '$q', '$location', '$timeout', '$anchorScroll', orgUnitContoller]);
             app.controller('opUnitController', ['$scope', '$q', '$hustle', 'orgUnitRepository', '$indexedDB', '$location', '$modal', opUnitController]);
             app.controller('moduleController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', 'dataSetRepository', 'systemSettingRepository', '$indexedDB', '$location', '$q', '$modal', 'programRepository', moduleController]);

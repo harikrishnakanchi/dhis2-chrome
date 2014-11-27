@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
-    return function($scope, $q, $hustle, $modal, $timeout, db, programRepository, programEventRepository, dataElementRepository) {
+    return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository) {
         var resetForm = function() {
             $scope.dataValues = {};
             $scope.eventDates = {};
@@ -99,7 +99,14 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             return options;
         };
 
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
+        };
+
         var saveToDhis = function(data, type) {
+            $scope.resultMessageType = "success";
+            $scope.resultMessage = $scope.resourceBundle.eventSubmitSuccess;
             return $hustle.publish({
                 "data": data,
                 "type": type
@@ -112,6 +119,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 $scope.resultMessageType = "success";
                 $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;
                 getAllEvents();
+                scrollToTop();
                 if (isDraft)
                     return payload;
                 return saveToDhis(payload, "uploadProgramEvents");

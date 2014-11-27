@@ -78,5 +78,9 @@
     "modeOfOperation": "Mode of operation",
     "modelOfManagement": "Model of management",
     "modelOfManagementValidation": "Model of management is required",
-    "reasonForInterventionValidation": "Reason for intervention is required"
+    "reasonForInterventionValidation": "Reason for intervention is required",
+    "deleteEventConfirmation": "Are you sure you want to delete this event?",
+    "eventDeleteSuccess": "Event deleted successfully",
+    "eventSubmitSuccess": "Event submitted successfully",
+    "eventSaveSuccess": "Event saved successfully"
 }
