@@ -137,6 +137,9 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                         $scope.deleteSuccess = false;
                     }, properties.messageTimeout);
 
+                    if (event.localStatus === "NEW") {
+                        return;
+                    }
                     return saveToDhis(eventId, "deleteEvent");
                 });
             }, $scope.resourceBundle.deleteEventConfirmation);
