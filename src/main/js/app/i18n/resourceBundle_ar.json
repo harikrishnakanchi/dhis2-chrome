@@ -17,6 +17,7 @@
     "dataApprovalConfirmationMessage": "هل أنت متأكد أنك تريد الموافقة؟",
     "dataApproveFailure": "خطأ الموافقة على البيانات. يرجى المحاولة مرة أخرى في وقت لاحق",
     "lineListEventDate": "Event date",
+    "eventListTitle": "List of Events",
     "chooseWeek": "الرجاء اختيار في الأسبوع لإدخال البيانات.",
     "syncRunning": "بدأت مزامنة البيانات. يرجى الانتظار.",
     "syncComplete": "الانتهاء مزامنة البيانات بنجاح.",

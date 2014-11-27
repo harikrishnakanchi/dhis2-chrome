@@ -193,7 +193,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment"], function(P
 
             var expectedEvents = [{
                 event: 'event1',
-                eventDate: '2014-11-26',
+                eventDate: '2014-11-26T00:00:00',
                 dataValues: [{
                     shortName: 'Age',
                     showInEventSummary: true,
@@ -206,7 +206,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment"], function(P
                 }]
             }, {
                 event: 'event2',
-                eventDate: '2014-11-24',
+                eventDate: '2014-11-24T00:00:00',
                 dataValues: [{
                     shortName: 'Age',
                     showInEventSummary: true,

@@ -18,6 +18,7 @@
     "dataApproveFailure": "Error approving data. Please try again later",
     "chooseWeek": "Please choose a week to enter data.",
     "lineListEventDate": "Event date",
+    "eventListTitle": "List of Events",
     "syncRunning": "Data sync initiated. Please wait.",
     "syncComplete": "Data sync completed successfully.",
     "openingDateValidation": "Opening Date is required.",

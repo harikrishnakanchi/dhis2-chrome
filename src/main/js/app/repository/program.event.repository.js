@@ -54,27 +54,29 @@ define(["moment", "lodash"], function(moment, _) {
                 }));
             };
 
-            var getDataElements = function(programStages) {
-                var dataElementIds = _.pluck(_.flatten(_.flatten(_.flatten(programStages, 'programStageSections'), 'programStageDataElements'), 'dataElement'), 'id');
+            var getDataElements = function() {
+                return getProgram().then(getProgramStages).then(function(programStages) {
+                    var store = db.objectStore("dataElements");
+                    var dataElementIds = _.pluck(_.flatten(_.flatten(_.flatten(programStages, 'programStageSections'), 'programStageDataElements'), 'dataElement'), 'id');
+                    
+                    return $q.all(_.map(dataElementIds, function(dataElementId) {
+                        return store.find(dataElementId).then(function(dataElement) {
+                            var attr = _.find(dataElement.attributeValues, {
+                                "attribute": {
+                                    "code": 'showInEventSummary'
+                                }
+                            });
 
-                var store = db.objectStore("dataElements");
-                return $q.all(_.map(dataElementIds, function(dataElementId) {
-                    return store.find(dataElementId).then(function(dataElement) {
-                        var attr = _.find(dataElement.attributeValues, {
-                            "attribute": {
-                                "code": 'showInEventSummary'
+                            if ((!_.isEmpty(attr)) && attr.value === "true") {
+                                dataElement.showInEventSummary = true;
+                            } else {
+                                dataElement.showInEventSummary = false;
                             }
+                            dataElement.dataElement = dataElement.id;
+                            return _.omit(dataElement, ["id", "attributeValues"]);
                         });
-
-                        if ((!_.isEmpty(attr)) && attr.value === "true") {
-                            dataElement.showInEventSummary = true;
-                        } else {
-                            dataElement.showInEventSummary = false;
-                        }
-                        dataElement.dataElement = dataElement.id;
-                        return _.omit(dataElement, ["id", "attributeValues"]);
-                    });
-                }));
+                    }));
+                });
             };
 
             var getEvents = function() {
@@ -83,21 +85,21 @@ define(["moment", "lodash"], function(moment, _) {
                 return store.each(query);
             };
 
-            return $q.all([getProgram().then(getProgramStages).then(getDataElements), getEvents()]).then(function(data) {
+            return $q.all([getDataElements(), getEvents()]).then(function(data) {
                 var dataElements = data[0];
                 var events = data[1];
-                var dataElementIds = _.pluck(dataElements, "id");
-                return _.map(events, function(programEvent) {
-                    var returnEvent = _.omit(programEvent, "dataValues");
-                    returnEvent.eventDate = moment(returnEvent.eventDate).format("YYYY-MM-DD");
-                    returnEvent.dataValues = _.cloneDeep(dataElements);
-                    _.each(programEvent.dataValues, function(dv) {
-                        _.find(returnEvent.dataValues, {
-                            'dataElement': dv.dataElement
-                        }).value = dv.value;
-                    });
 
-                    return returnEvent;
+                return _.map(events, function(programEvent) {                    
+                    var mappedEvent = _.omit(programEvent, "dataValues");
+                    mappedEvent.dataValues = _.cloneDeep(dataElements);
+                    _.each(programEvent.dataValues, function(programEventDataValue) {
+                        var mappedEventDataValue = _.find(mappedEvent.dataValues, {
+                            'dataElement': programEventDataValue.dataElement
+                        });
+                        mappedEventDataValue.value = programEventDataValue.value;
+                    });
+                    console.log(mappedEvent);
+                    return mappedEvent;
                 });
             });
         };

@@ -45,17 +45,18 @@
 					<ul>
 						<li>
 							<div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
-								<input type="button" class="btn btn-main" value="Save" ng-click="submit(true)" />
+						 		<input type="button" class="btn btn-main" value="Save" ng-click="submit(true)" />
 								<input type="button" class="btn btn-main" value="Submit" ng-click="submit(false)" />
 							</div>
 						</li>
 					</ul>
 				</div>
-				<div class="panel-default" ng-if="allEvents.length &gt; 0">
+
+				<div ng-if="allEvents.length &gt; 0">
 					<div class="panel-heading">
-						<h4 class="panel-title"><a href="">List of Events</a></h4>
+						<h3 class="panel-title">{{resourceBundle.eventListTitle}}</h3>
 					</div>
-					<div class="panel-body">
+					<accordion close-others="false">
 						<table class="table table-bordered">
 							<thead>
 								<tr>
@@ -68,12 +69,12 @@
 									<th></th>
 								</tr>
 							</thead>
-
 							<tbody>
 								<tr  ng-repeat="event in allEvents">
-									<td>{{event.eventDate}}</td>
+									<td>{{event.eventDate | date:'yyyy-MM-dd'}}</td>
 									<td ng-repeat= "dataValue in event.dataValues" ng-if="dataValue.showInEventSummary">
-										{{dataValue.value}}
+										<span ng-if="dataValue.type === 'date'">{{dataValue.value | date:'yyyy-MM-dd'}}</span>
+										<span ng-if="dataValue.type !== 'date'">{{dataValue.value}}</span>
 									</td>
 									<td>
 					                    <a href="" id="" title="View" class="view">
@@ -93,7 +94,7 @@
 								</tr>
 							</tbody>
 						</table>
-					</div>
+					</accordion>
 				</div>
 			</accordion-group>
 		</accordion>
