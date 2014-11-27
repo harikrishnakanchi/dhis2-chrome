@@ -23,7 +23,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     'id': 'ae2a77b82a5'
                 };
 
-                allEvents = [{
+                var event1 = {
                     event: 'event1',
                     dataValues: [{
                         dataElement: 'de1',
@@ -31,7 +31,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                         showInEventSummary: true,
                         name: 'dataElement1',
                     }]
-                }, {
+                };
+
+                var event2 = {
                     event: 'event2',
                     dataValues: [{
                         dataElement: 'de2',
@@ -39,13 +41,26 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                         showInEventSummary: false,
                         name: 'dataElement2',
                     }]
-                }];
+                };
+
+                allEvents = [event1, event2];
 
                 programRepository = new ProgramRepository();
                 programEventRepository = new ProgramEventRepository();
                 dataElementRepository = new DataElementRepository();
 
-                spyOn(programEventRepository, "getEventsFor").and.returnValue(utils.getPromise(q, allEvents));
+                programEventRepository = {
+                    "getEventsFor": jasmine.createSpy("getEventsFor").and.returnValue(utils.getPromise(q, [])),
+                    "upsert": {}
+                };
+
+                programEventRepository.getEventsFor.and.callFake(function(programId) {
+                if (programId === "p1")
+                    return utils.getPromise(q, event1);
+                if (programId === "p2")
+                    return utils.getPromise(q, event2);
+                return utils.getPromise(q, undefined);
+            });
             }));
 
             it("should load programs into scope on init", function() {
@@ -241,7 +256,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     'eventSaveSuccess': 'Event saved successfully',
                     'eventSubmitSuccess': 'Event submitted succesfully'
                 };
-
+                scope.programsInCurrentModule = ["p1", "p2"];
+                spyOn(programRepository,"getProgramAndStages").and.returnValue(utils.getPromise(q, []));
+                
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
@@ -279,6 +296,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
             });
 
             it("should load all events for org unit and period on init", function() {
+                scope.programsInCurrentModule = ["p1", "p2"];
+                spyOn(programRepository,"getProgramAndStages").and.returnValue(utils.getPromise(q, []));
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 

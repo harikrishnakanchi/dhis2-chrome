@@ -57,9 +57,12 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
 
         var getAllEvents = function() {
             var period = $scope.year + "W" + $scope.week.weekNumber;
-            return programEventRepository.getEventsFor(period, $scope.currentModule.id).then(function(events) {
-                $scope.allEvents = events;
-                return events;
+            var programIdsInCurrentModule = $scope.programsInCurrentModule;
+            $scope.allEvents = [];
+            return _.forEach(programIdsInCurrentModule, function(programId) {
+                programEventRepository.getEventsFor(programId, period, $scope.currentModule.id).then(function(events) {
+                    $scope.allEvents = $scope.allEvents.concat(events);
+                });
             });
         };
 
