@@ -1,7 +1,5 @@
-define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
-    return function($scope, $q, $hustle, db, programRepository, programEventRepository, dataElementRepository) {
-
-
+define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
+    return function($scope, $q, $hustle, $modal, $timeout, db, programRepository, programEventRepository, dataElementRepository) {
         var resetForm = function() {
             $scope.dataValues = {};
             $scope.eventDates = {};
@@ -66,6 +64,16 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
             });
         };
 
+        var showModal = function(okCallback, message) {
+            $scope.modalMessage = message;
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/confirm.dialog.html',
+                controller: 'confirmDialogController',
+                scope: $scope
+            });
+            modalInstance.result.then(okCallback);
+        };
+
         $scope.getEventDateNgModel = function(eventDates, programId, programStageId) {
             eventDates[programId] = eventDates[programId] || {};
             eventDates[programId][programStageId] = eventDates[programId][programStageId] || new Date();
@@ -91,12 +99,10 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
             return options;
         };
 
-        var saveToDhis = function(data) {
-            $scope.resultMessageType = "success";
-            $scope.resultMessage = $scope.resourceBundle.eventSubmitSuccess;
+        var saveToDhis = function(data, type) {
             return $hustle.publish({
                 "data": data,
-                "type": "uploadProgramEvents"
+                "type": type
             }, "dataValues");
         };
 
@@ -108,8 +114,24 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
                 getAllEvents();
                 if (isDraft)
                     return payload;
-                return saveToDhis(payload);
+                return saveToDhis(payload, "uploadProgramEvents");
             });
+        };
+
+        $scope.deleteEvent = function(event) {
+            var eventId = event.event;
+            showModal(function() {
+                return programEventRepository.delete(eventId).then(function() {
+                    $scope.allEvents.splice(_.indexOf($scope.allEvents, event), 1);
+                    $scope.deleteSuccess = true;
+
+                    $timeout(function() {
+                        $scope.deleteSuccess = false;
+                    }, properties.messageTimeout);
+
+                    return saveToDhis(eventId, "deleteEvent");
+                });
+            }, $scope.resourceBundle.deleteEventConfirmation);
         };
 
         var init = function() {

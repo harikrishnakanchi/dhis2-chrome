@@ -2,13 +2,24 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
     function(LineListDataEntryController, mocks, utils, moment, ProgramRepository, ProgramEventRepository, DataElementRepository) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, q, hustle, programRepository, mockDB, mockStore, dataElementRepository, allEvents;
+            var scope, q, hustle, programRepository, mockDB, mockStore, dataElementRepository, allEvents, timeout, fakeModal;
 
             beforeEach(module('hustle'));
-            beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
+            beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout) {
                 scope = $rootScope.$new();
                 q = $q;
                 hustle = $hustle;
+                timeout = $timeout;
+
+                fakeModal = {
+                    close: function() {
+                        this.result.confirmCallBack();
+                    },
+                    dismiss: function(type) {
+                        this.result.cancelCallback(type);
+                    },
+                    open: function(object) {}
+                };
 
                 mockDB = utils.getMockDB($q);
                 mockStore = mockDB.objectStore;
@@ -51,16 +62,17 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
                 programEventRepository = {
                     "getEventsFor": jasmine.createSpy("getEventsFor").and.returnValue(utils.getPromise(q, [])),
-                    "upsert": {}
+                    "upsert": {},
+                    "delete": jasmine.createSpy("getEventsFor").and.returnValue(utils.getPromise(q, {}))
                 };
 
                 programEventRepository.getEventsFor.and.callFake(function(programId) {
-                if (programId === "p1")
-                    return utils.getPromise(q, event1);
-                if (programId === "p2")
-                    return utils.getPromise(q, event2);
-                return utils.getPromise(q, undefined);
-            });
+                    if (programId === "p1")
+                        return utils.getPromise(q, event1);
+                    if (programId === "p2")
+                        return utils.getPromise(q, event2);
+                    return utils.getPromise(q, undefined);
+                });
             }));
 
             it("should load programs into scope on init", function() {
@@ -70,7 +82,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, programAndStageData));
 
                 scope.programsInCurrentModule = ['p1'];
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 expect(programRepository.getProgramAndStages).toHaveBeenCalledWith('p1');
@@ -83,7 +95,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 }];
                 mockStore.getAll.and.returnValue(utils.getPromise(q, optionSets));
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 expect(scope.optionSets).toBe(optionSets);
@@ -105,7 +117,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
                 mockStore.getAll.and.returnValue(utils.getPromise(q, optionSets));
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 expect(scope.getOptionsFor('os2')).toEqual([{
@@ -128,7 +140,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     }]
                 }]));
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 expect(scope.getOptionsFor('os1')).toEqual([{
@@ -136,13 +148,12 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     'name': 'os1o1 name',
                     'displayName': 'os1o1 translated name'
                 }]);
-
             });
 
             it("should update dataValues with new program and stage if not present", function() {
                 var dataValues = {};
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 scope.getDataValueNgModel(dataValues, 'p1', 'ps1');
@@ -161,7 +172,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     }
                 };
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 scope.getDataValueNgModel(dataValues, 'p1', 'ps2');
@@ -177,7 +188,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
             it("should get eventDates with default set to today", function() {
                 var eventDates = {};
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 scope.getEventDateNgModel(eventDates, 'p1', 'ps1');
@@ -193,7 +204,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     "endOfWeek": "2014-11-16"
                 };
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 expect(moment(scope.minDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-10");
@@ -209,7 +220,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     'eventSaveSuccess': 'Event saved successfully'
                 };
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 scope.programs = [{
@@ -257,9 +268,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     'eventSubmitSuccess': 'Event submitted succesfully'
                 };
                 scope.programsInCurrentModule = ["p1", "p2"];
-                spyOn(programRepository,"getProgramAndStages").and.returnValue(utils.getPromise(q, []));
-                
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, []));
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 scope.programs = [{
@@ -281,7 +292,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     }
                 };
 
-
                 scope.submit(false);
                 scope.$apply();
 
@@ -290,18 +300,39 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
 
                 expect(scope.resultMessageType).toEqual("success");
-                expect(scope.resultMessage).toEqual("Event submitted succesfully");
+                expect(scope.resultMessage).toEqual("Event saved successfully");
                 expect(hustle.publish).toHaveBeenCalled();
                 expect(scope.allEvents).toEqual(allEvents);
             });
 
             it("should load all events for org unit and period on init", function() {
                 scope.programsInCurrentModule = ["p1", "p2"];
-                spyOn(programRepository,"getProgramAndStages").and.returnValue(utils.getPromise(q, []));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, []));
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
                 expect(scope.allEvents).toEqual(allEvents);
+            });
+
+            it("should delete event", function() {
+                scope.programsInCurrentModule = ["p1", "p2"];
+                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, []));
+                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
+                spyOn(fakeModal, "open").and.returnValue({
+                    result: utils.getPromise(q, {})
+                });
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+
+                scope.deleteEvent(allEvents[0]);
+                scope.$apply();
+
+                expect(fakeModal.open).toHaveBeenCalled();
+                expect(scope.allEvents).toEqual([allEvents[1]]);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    data: 'event1',
+                    type: 'deleteEvent'
+                }, 'dataValues');
             });
         });
     });
