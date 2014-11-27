@@ -60,7 +60,6 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
             httpBackend.expectPOST(properties.dhis.url + "/api/events", expectedPayload).respond(200, "ok");
 
             httpBackend.flush();
-
         });
 
         it("should return rejected promise if save events fails", function() {
@@ -89,8 +88,16 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
 
             httpBackend.flush();
              expect(status).toEqual(500);
-
         });
 
+        it("should delete event", function() {
+            var eventId = "event1234";
+
+            eventService.deleteEvent(eventId);
+
+            httpBackend.expectDELETE(properties.dhis.url + "/api/events/" + eventId).respond(200, "OK");
+
+            httpBackend.flush();
+        });
     });
 });

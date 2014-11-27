@@ -1,9 +1,10 @@
 define(["uploadApprovalDataConsumer", "orgUnitConsumer", "datasetConsumer", "systemSettingConsumer", "createUserConsumer", "updateUserConsumer",
         "dispatcher", "consumerRegistry", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "orgUnitRepository", "programConsumer",
-        "downloadEventDataConsumer", "eventService", "programEventRepository", "uploadEventDataConsumer"
+        "downloadEventDataConsumer","deleteEventConsumer", "eventService", "programEventRepository", "uploadEventDataConsumer"
     ],
     function(uploadApprovalDataConsumer, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
-        dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, orgUnitRepository, programConsumer, downloadEventDataConsumer, eventService, programEventRepository, uploadEventDataConsumer) {
+        dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, orgUnitRepository, programConsumer, 
+        downloadEventDataConsumer, deleteEventConsumer, eventService, programEventRepository, uploadEventDataConsumer) {
 
         var init = function(app) {
             app.service("downloadDataConsumer", ["dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "$q", "approvalService", "approvalDataRepository", "orgUnitRepository", downloadDataConsumer]);
@@ -15,11 +16,12 @@ define(["uploadApprovalDataConsumer", "orgUnitConsumer", "datasetConsumer", "sys
             app.service("systemSettingConsumer", ["systemSettingService", systemSettingConsumer]);
             app.service("createUserConsumer", ["userService", createUserConsumer]);
             app.service("updateUserConsumer", ["userService", updateUserConsumer]);
-            app.service("dispatcher", ["$q", "orgUnitConsumer", "datasetConsumer", "systemSettingConsumer", "createUserConsumer", "updateUserConsumer", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "uploadApprovalDataConsumer", "programConsumer", "downloadEventDataConsumer", "uploadEventDataConsumer", dispatcher]);
+            app.service("dispatcher", ["$q", "orgUnitConsumer", "datasetConsumer", "systemSettingConsumer", "createUserConsumer", "updateUserConsumer", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "uploadApprovalDataConsumer", "programConsumer", "downloadEventDataConsumer", "uploadEventDataConsumer", "deleteEventConsumer", dispatcher]);
             app.service("consumerRegistry", ["$hustle", "$q", "dispatcher", consumerRegistry]);
             app.service("programConsumer", ["programService", programConsumer]);
             app.service("downloadEventDataConsumer", ["eventService", "programEventRepository", "$q", downloadEventDataConsumer]);
             app.service("uploadEventDataConsumer", ["eventService", "programEventRepository", "$q", uploadEventDataConsumer]);
+            app.service("deleteEventConsumer", ["eventService", "$q", deleteEventConsumer]);
         };
         return {
             init: init

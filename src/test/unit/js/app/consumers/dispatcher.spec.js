@@ -1,7 +1,8 @@
 define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, utils) {
     describe("dispatcher", function() {
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, scope,
-            systemSettingConsumer, createUserConsumer, updateUserConsumer, programConsumer;
+            systemSettingConsumer, createUserConsumer, updateUserConsumer, programConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
+            deleteEventConsumer;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -34,12 +35,26 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             programConsumer = {
                 'run': jasmine.createSpy("programConsumer")
             };
+            downloadEventDataConsumer = {
+                'run': jasmine.createSpy("downloadEventDataConsumer")
+            };
+            uploadEventDataConsumer = {
+                'run': jasmine.createSpy("uploadEventDataConsumer")
+            };
+            deleteEventConsumer = {
+                'run': jasmine.createSpy("deleteEventConsumer")
+            };
+
             message = {};
             q = $q;
             scope = $rootScope.$new();
+
             downloadDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadEventDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
+
             dispatcher = new Dispatcher(q, orgUnitConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
-                downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer);
+                downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
+                downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -133,7 +148,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
         });
 
-
         it("should call create user consumer", function() {
             message.data = {
                 "data": {},
@@ -159,6 +173,31 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             dispatcher.run(message);
             expect(programConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call event download and upload consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "uploadProgramEvents"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(downloadEventDataConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadEventDataConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call delete event consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "deleteEvent"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(deleteEventConsumer.run).toHaveBeenCalledWith(message);
         });
     });
 });

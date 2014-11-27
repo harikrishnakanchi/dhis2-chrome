@@ -53,6 +53,7 @@ require.config({
         "programConsumer": "app/consumer/program.consumer",
         "downloadEventDataConsumer": "app/consumer/download.event.data.consumer",
         "uploadEventDataConsumer": "app/consumer/upload.event.data.consumer",
+        "deleteEventConsumer": "app/consumer/delete.event.consumer",
         "dispatcher": "app/consumer/dispatcher",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",

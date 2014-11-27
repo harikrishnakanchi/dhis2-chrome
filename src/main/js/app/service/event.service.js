@@ -34,5 +34,9 @@ define(["moment", "properties"], function(moment, properties) {
 
             return $http.post(properties.dhis.url + "/api/events", updatedPayload).then(onSuccess, onFailure);
         };
+
+        this.deleteEvent = function(eventId) {
+            return $http.delete(properties.dhis.url + "/api/events/" + eventId);
+        };
     };
 });
