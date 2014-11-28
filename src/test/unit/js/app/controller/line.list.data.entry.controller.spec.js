@@ -56,7 +56,29 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     }]
                 };
 
-                allEvents = [event1, event2];
+                var event3 = {
+                    event: 'event3',
+                    localStatus: 'NEW',
+                    dataValues: [{
+                        dataElement: 'de3',
+                        value: 'c33',
+                        showInEventSummary: true,
+                        name: 'dataElement3',
+                    }]
+                };
+
+                var event4 = {
+                    event: 'event4',
+                    localStatus: 'DELETED',
+                    dataValues: [{
+                        dataElement: 'de4',
+                        value: 'd44',
+                        showInEventSummary: true,
+                        name: 'dataElement4',
+                    }]
+                };
+
+                allEvents = [event1, event2, event3, event4];
 
                 programRepository = new ProgramRepository();
                 programEventRepository = new ProgramEventRepository();
@@ -64,15 +86,15 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
                 programEventRepository = {
                     "getEventsFor": jasmine.createSpy("getEventsFor").and.returnValue(utils.getPromise(q, [])),
-                    "upsert": {},
-                    "delete": jasmine.createSpy("getEventsFor").and.returnValue(utils.getPromise(q, {}))
+                    "upsert": jasmine.createSpy("upsert").and.returnValue(utils.getPromise(q, [])),
+                    "delete": jasmine.createSpy("delete").and.returnValue(utils.getPromise(q, {}))
                 };
 
                 programEventRepository.getEventsFor.and.callFake(function(programId) {
                     if (programId === "p1")
-                        return utils.getPromise(q, event1);
+                        return utils.getPromise(q, [event1, event4]);
                     if (programId === "p2")
-                        return utils.getPromise(q, event2);
+                        return utils.getPromise(q, [event2, event3]);
                     return utils.getPromise(q, undefined);
                 });
             }));
@@ -215,7 +237,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
             it("should save event details as draft", function() {
 
-                spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish");
                 spyOn(location, "hash");
 
@@ -264,7 +285,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
             });
 
             it("should submit event details", function() {
-                spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
                 spyOn(location, "hash");
 
@@ -307,38 +327,64 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 expect(scope.resultMessageType).toEqual("success");
                 expect(scope.resultMessage).toEqual("Event submitted succesfully");
                 expect(hustle.publish).toHaveBeenCalled();
-                expect(scope.allEvents).toEqual(allEvents);
+                expect(scope.allEvents).toEqual(allEvents.splice(0, 3));
                 expect(location.hash).toHaveBeenCalled();
             });
 
-            it("should load all events for org unit and period on init", function() {
+            it("should load all events except the ones that are soft deleted for org unit and period on init", function() {
                 scope.programsInCurrentModule = ["p1", "p2"];
                 spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, []));
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository);
                 scope.$apply();
 
-                expect(scope.allEvents).toEqual(allEvents);
+                expect(scope.allEvents).toEqual(allEvents.splice(0, 3));
             });
 
-            it("should delete event", function() {
+            it("should soft-delete event which is POSTed to DHIS", function() {
                 scope.programsInCurrentModule = ["p1", "p2"];
                 spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, []));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
-                
+
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository);
 
-                scope.deleteEvent(allEvents[0]);
+                var eventToDelete = allEvents[0];
+                scope.deleteEvent(eventToDelete);
                 scope.$apply();
 
+                eventToDelete.localStatus = "DELETED";
+                var softDeletedEventPayload = {
+                    "events": [eventToDelete]
+                };
+
                 expect(fakeModal.open).toHaveBeenCalled();
-                expect(scope.allEvents).toEqual([allEvents[1]]);
+                expect(scope.allEvents).toEqual([allEvents[1], allEvents[2]]);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: 'event1',
                     type: 'deleteEvent'
                 }, 'dataValues');
+                expect(programEventRepository.upsert).toHaveBeenCalledWith(softDeletedEventPayload);
+            });
+
+            it("should hard delete a local event", function() {
+                scope.programsInCurrentModule = ["p1", "p2"];
+                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, []));
+                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
+                spyOn(fakeModal, "open").and.returnValue({
+                    result: utils.getPromise(q, {})
+                });
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+
+                var eventToDelete = allEvents[2];
+                scope.deleteEvent(eventToDelete);
+                scope.$apply();
+
+                expect(fakeModal.open).toHaveBeenCalled();
+                expect(scope.allEvents).toEqual([allEvents[0], allEvents[1]]);
+                expect(programEventRepository.delete).toHaveBeenCalledWith('event3');
             });
         });
     });

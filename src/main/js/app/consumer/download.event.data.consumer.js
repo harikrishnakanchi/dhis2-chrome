@@ -13,7 +13,7 @@ define(["moment"], function(moment) {
             var updatePromises = [];
 
             _.each(dbEventList, function(dbEvent) {
-                if (dbEvent.localStatus === "NEW")
+                if (dbEvent.localStatus === "NEW" || dbEvent.localStatus === "DELETED")
                     return;
 
                 var dhisEvent = _.find(dhisEventList, {
@@ -42,8 +42,6 @@ define(["moment"], function(moment) {
             updatePromises.push(approvalPromise);
 
             return $q.all[updatePromises];
-
-
         };
 
         var downloadEventsData = function() {

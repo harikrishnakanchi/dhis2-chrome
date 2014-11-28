@@ -59,6 +59,9 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             $scope.allEvents = [];
             return _.forEach(programIdsInCurrentModule, function(programId) {
                 programEventRepository.getEventsFor(programId, period, $scope.currentModule.id).then(function(events) {
+                    events = _.reject(events, function(e) {
+                        return e.localStatus === "DELETED";
+                    });
                     $scope.allEvents = $scope.allEvents.concat(events);
                 });
             });
@@ -127,20 +130,31 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
         };
 
         $scope.deleteEvent = function(event) {
-            var eventId = event.event;
             showModal(function() {
-                return programEventRepository.delete(eventId).then(function() {
+                var eventId = event.event;
+
+                var hardDelete = function() {
+                    return programEventRepository.delete(eventId);
+                };
+
+                var softDelete = function() {
+                    event.localStatus = "DELETED";
+                    var eventsPayload = {
+                        'events': [event]
+                    };
+                    return programEventRepository.upsert(eventsPayload).then(function() {
+                        return saveToDhis(eventId, "deleteEvent");
+                    });
+                };
+
+                var deleteFunction = event.localStatus === "NEW" ? hardDelete : softDelete;
+
+                return deleteFunction.apply().then(function() {
                     $scope.allEvents.splice(_.indexOf($scope.allEvents, event), 1);
                     $scope.deleteSuccess = true;
-
                     $timeout(function() {
                         $scope.deleteSuccess = false;
                     }, properties.messageTimeout);
-
-                    if (event.localStatus === "NEW") {
-                        return;
-                    }
-                    return saveToDhis(eventId, "deleteEvent");
                 });
             }, $scope.resourceBundle.deleteEventConfirmation);
         };
