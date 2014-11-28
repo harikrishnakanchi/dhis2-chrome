@@ -111,19 +111,16 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 },
                 attributeValues: [{
                     attribute: {
-                        id: '52ec8ccaf8f',
                         code: 'opUnitType'
                     },
                     value: 'Hospital'
                 }, {
                     attribute: {
-                        id: 'a1fa2777924',
                         code: 'Type'
                     },
                     value: 'Operation Unit'
                 }, {
                     attribute: {
-                        id: 'c6d3c8a7286',
                         code: 'hospitalUnitCode'
                     },
                     value: 'Unit Code - A'
@@ -140,19 +137,16 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 },
                 attributeValues: [{
                     attribute: {
-                        id: '52ec8ccaf8f',
                         code: 'opUnitType'
                     },
                     value: 'Community'
                 }, {
                     attribute: {
-                        id: 'a1fa2777924',
                         code: 'Type'
                     },
                     value: 'Operation Unit'
                 }, {
                     attribute: {
-                        id: 'c6d3c8a7286',
                         code: 'hospitalUnitCode'
                     },
                     value: 'Unit Code - A'

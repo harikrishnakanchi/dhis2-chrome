@@ -32,21 +32,17 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     'parent': _.pick(parent, "name", "id"),
                     "attributeValues": [{
                         "attribute": {
-                            "id": "52ec8ccaf8f",
                             "code": "opUnitType"
                         },
                         "value": opUnitType
                     }, {
                         "attribute": {
-                            "id": "a1fa2777924",
                             "code": "Type"
                         },
                         "value": "Operation Unit"
                     }, {
                         "attribute": {
-                            "id": "c6d3c8a7286",
                             "code": "hospitalUnitCode"
-
                         },
                         "value": hospitalUnitCode
                     }]
