@@ -35,6 +35,18 @@
                                         <input type="text" class="form-control" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory"/>
                                         <input type="number" class="form-control" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory"/>
                                         <input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory"/>
+                                        <div ng-if="de.dataElement.type === 'bool' &amp;&amp; !de.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
+				                            <div class="radio-inline">
+				                                <label for="Yes"> 
+				                                	<input type="radio" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" value="true" ng-required= "de.compulsory"> Yes 
+				                                </label>
+				                            </div>
+				                            <div class="radio-inline">
+				                                <label for="No"> 
+				                                	<input type="radio" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" value="false" ng-required= "de.compulsory"> No 
+				                                </label>
+				                            </div>
+				                        </div>
                                         <select ng-options="o.name as o.displayName for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory">
                                             <option value=""></option>
                                         </select>
@@ -78,7 +90,9 @@
 									<td>{{event.eventDate | date:'yyyy-MM-dd'}}</td>
 									<td ng-repeat= "dataValue in event.dataValues" ng-if="dataValue.showInEventSummary">
 										<span ng-if="dataValue.type === 'date'">{{dataValue.value | date:'yyyy-MM-dd'}}</span>
-										<span ng-if="dataValue.type !== 'date'">{{dataValue.value}}</span>
+										<span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'true'">Yes</span>
+										<span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'false'">No</span>
+										<span ng-if="dataValue.type !== 'date' &amp;&amp; dataValue.type !== 'bool'">{{dataValue.value}}</span>
 									</td>
 									<td>
 					                    <a href="" id="" title="View" class="view">
