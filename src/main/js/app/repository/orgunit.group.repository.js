@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define([], function() {
     return function(db) {
         this.getAll = function() {
             var store = db.objectStore("orgUnitGroups");

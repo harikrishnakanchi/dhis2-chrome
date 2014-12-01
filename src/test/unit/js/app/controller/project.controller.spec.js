@@ -1,6 +1,6 @@
-define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "approvalHelper", "timecop"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, ApprovalHelper, timecop) {
+define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "approvalHelper", "timecop", "orgUnitGroupHelper"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, ApprovalHelper, timecop, OrgUnitGroupHelper) {
     describe("project controller tests", function() {
-        var scope, timeout, q, location, anchorScroll, userRepository, parent,
+        var scope, timeout, q, location, anchorScroll, userRepository, parent, orgUnitRepository,
             fakeModal, orgUnitRepo, hustle, rootScope, approvalHelper;
 
         beforeEach(module('hustle'));
@@ -12,6 +12,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             timeout = $timeout;
             location = $location;
             approvalHelper = new ApprovalHelper();
+            orgUnitGroupHelper = new OrgUnitGroupHelper();
 
             orgUnitRepo = utils.getMockRepo(q);
 
@@ -50,7 +51,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, approvalHelper);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, approvalHelper,orgUnitGroupHelper);
         }));
 
         afterEach(function() {
@@ -98,6 +99,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(expectedNewOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
+            spyOn(orgUnitGroupHelper,"createOrgUnitGroups").and.returnValue(utils.getPromise(q,{}));
 
             scope.update({}, {});
             scope.$apply();
@@ -122,6 +124,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(approvalHelper, "autoApproveExistingData").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
+            spyOn(orgUnitGroupHelper,"createOrgUnitGroups").and.returnValue(utils.getPromise(q,{}));
 
             scope.update(newOrgUnit, orgUnit);
             scope.$apply();
@@ -136,6 +139,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
         it("should display error if updating organization unit fails", function() {
             spyOn(hustle, "publish").and.returnValue(utils.getRejectedPromise(q, {}));
+            spyOn(orgUnitGroupHelper,"createOrgUnitGroups").and.returnValue(utils.getPromise(q,{}));
 
             scope.update({}, parent);
             scope.$apply();

@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, orgUnitMapper, toTree, properties) {
 
-    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal, approvalHelper) {
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal, approvalHelper, orgUnitGroupHelper) {
 
         $scope.allContexts = ['Internal instability', 'Stable', 'Post-conflict', 'Cross-border instability'].sort();
         $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
@@ -62,11 +62,14 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         $scope.update = function(newOrgUnit, orgUnit) {
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
             saveToDbAndPublishMessage(dhisProject).then(function(data) {
-                if (newOrgUnit.autoApprove) {
-                    return approvalHelper.autoApproveExistingData(data);
-                } else {
-                    return data;
-                }
+                orgUnitRepository.getAllModulesInProjects([dhisProject.id], true).then(function(modules) {
+                    orgUnitGroupHelper.createOrgUnitGroups(modules,true);
+                    if (newOrgUnit.autoApprove) {
+                        return approvalHelper.autoApproveExistingData(data);
+                    } else {
+                        return data;
+                    }
+                });
             });
         };
 

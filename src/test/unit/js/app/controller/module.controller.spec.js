@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer"], function(ModuleController, mocks, utils, testData, datasetTransformer) {
+define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper) {
     describe("module controller", function() {
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
             dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
@@ -23,6 +23,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             systemSettingRepo = utils.getMockRepo(q);
             systemSettingRepo.getAllWithProjectId = function() {};
             programsRepo = utils.getMockRepo(q);
+            orgUnitGroupHelper = new OrgUnitGroupHelper(hustle,q,scope,orgUnitRepo,orgunitGroupRepo);
 
             mockOrgStore = {
                 upsert: function() {},
@@ -98,7 +99,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     return programs;
                 return getMockStore(testData.get(storeName));
             });
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
         }));
 
         afterEach(function() {
