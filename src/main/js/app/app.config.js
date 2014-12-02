@@ -49,9 +49,6 @@ require.config({
         "projectUserController": "app/controller/project.user.controller",
         "selectProjectController": "app/controller/select.project.controller",
 
-        //Directives
-        "directives": "app/directive/directives",
-
         //Services
         "services": "app/service/services",
         "metadataService": "app/service/metadata.service",
