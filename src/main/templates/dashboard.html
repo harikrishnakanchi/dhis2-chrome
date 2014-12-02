@@ -4,6 +4,24 @@
     <a id="linkToDataApproval" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])" href="#/data-entry" class="btn btn-default">{{ resourceBundle.approveDataLabel }}</a>
     <a id="linkToProjects" ng-if="hasRoles(['Superuser'])" href="#/projects" class="btn btn-default">{{ resourceBundle.projectsLabel }}</a>
     <a id="linkToDownloadData" ng-if="hasRoles(['Superuser', 'Data entry user', 'Project Level Approver', 'Coordination Level Approver'])" href="" ng-click="syncNow()" class="btn btn-default">{{ resourceBundle.downloadDataLabel }}</a>
+
+    <div class="btn-group" dropdown is-open="status.isopen">
+        <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+            {{resourceBundle.importExportMenuLabel}} <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="">{{resourceBundle.fullImportLabel}}</a>
+            </li>
+            <li><a href="">{{resourceBundle.fullExportLabel}}</a>
+            </li>
+            <li class="divider"></li>
+            <li><a href="">{{resourceBundle.importLabel}}</a>
+            </li>
+            <li><a href="">{{resourceBundle.exportLabel}}</a>
+            </li>
+        </ul>
+    </div>
+
     <span ng-show="isSyncRunning">{{resourceBundle.syncRunning}}</span>
     <span ng-show="isSyncDone">{{resourceBundle.syncComplete}}</span>
     <div>

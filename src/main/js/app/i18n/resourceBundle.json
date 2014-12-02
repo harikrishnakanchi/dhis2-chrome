@@ -101,5 +101,10 @@
     "eventSaveSuccess": "Event saved successfully",
     "required": " is required",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "importExportMenuLabel": "Import / Export to USB ",
+    "fullImportLabel": "Full Import",
+    "fullExportLabel": "Full Export",
+    "importLabel": "Import",
+    "exportLabel": "Export"
 }

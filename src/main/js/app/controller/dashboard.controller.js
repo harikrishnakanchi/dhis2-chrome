@@ -8,6 +8,16 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
             "approveAllItems": false
         };
 
+        $scope.status = {
+            isopen: false
+        };
+
+        $scope.toggleDropdown = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.status.isopen = !$scope.status.isopen;
+        };
+
         $scope.syncNow = function() {
             $scope.isSyncRunning = true;
 
