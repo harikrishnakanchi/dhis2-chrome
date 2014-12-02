@@ -38,12 +38,12 @@
                                         <div ng-if="de.dataElement.type === 'bool' &amp;&amp; !de.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
 				                            <div class="radio-inline">
 				                                <label for="Yes"> 
-				                                	<input type="radio" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" value="true" ng-required= "de.compulsory"> Yes 
+				                                	<input type="radio" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" value="true" ng-required= "de.compulsory"> {{resourceBundle.yes}} 
 				                                </label>
 				                            </div>
 				                            <div class="radio-inline">
 				                                <label for="No"> 
-				                                	<input type="radio" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" value="false" ng-required= "de.compulsory"> No 
+				                                	<input type="radio" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" value="false" ng-required= "de.compulsory"> {{resourceBundle.no}} 
 				                                </label>
 				                            </div>
 				                        </div>
@@ -90,8 +90,8 @@
 									<td>{{event.eventDate | date:'yyyy-MM-dd'}}</td>
 									<td ng-repeat= "dataValue in event.dataValues" ng-if="dataValue.showInEventSummary">
 										<span ng-if="dataValue.type === 'date'">{{dataValue.value | date:'yyyy-MM-dd'}}</span>
-										<span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'true'">Yes</span>
-										<span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'false'">No</span>
+										<span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'true'">{{resourceBundle.yes}}</span>
+										<span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'false'">{{resourceBundle.no}}</span>
 										<span ng-if="dataValue.type !== 'date' &amp;&amp; dataValue.type !== 'bool'">{{dataValue.value}}</span>
 									</td>
 									<td>

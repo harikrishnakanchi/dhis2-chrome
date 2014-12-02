@@ -99,5 +99,7 @@
     "eventDeleteSuccess": "Event deleted successfully",
     "eventSubmitSuccess": "Event submitted successfully",
     "eventSaveSuccess": "Event saved successfully",
-    "required": " is required"
+    "required": " is required",
+    "yes": "Yes",
+    "no": "No"
 }
