@@ -24,6 +24,7 @@ require.config({
         "angular-ui-collapse": "lib/custom/angular-ui-collapse/collapse",
         "angular-ui-transition": "lib/custom/angular-ui-transition/transition",
         "angular-ui-modal": "lib/custom/angular-ui-modal/modal",
+        "angular-ui-dropdown": "lib/custom/angular-ui-dropdown/dropdown",
         "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
         "angular-ui-notin": "lib/angularjs-directives/src/notIn/notIn",
         "angular-ui-equals": "lib/angularjs-directives/src/equals/equals",
@@ -141,6 +142,9 @@ require.config({
         },
         'angular-ui-modal': {
             deps: ["angular", "angular-ui-transition"]
+        },
+        'angular-ui-dropdown': {
+            deps: ["angular"]
         },
         'angular-ui-accordion': {
             deps: ["angular", "angular-ui-collapse"]
