@@ -26,7 +26,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             });
         };
 
-        var buildPayloadFromView = function() {
+        var buildPayloadFromView = function(localStatus) {
             var newEvents = [];
             _.each($scope.programs, function(p) {
                 _.each(p.programStages, function(ps) {
@@ -37,7 +37,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                         'orgUnit': $scope.currentModule.id,
                         'eventDate': moment($scope.eventDates[p.id][ps.id]).format("YYYY-MM-DD"),
                         'dataValues': [],
-                        'localStatus': "NEW"
+                        'localStatus': localStatus
                     };
                     _.each(ps.programStageDataElements, function(psde) {
                         event.dataValues.push({
@@ -117,7 +117,11 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
         };
 
         $scope.submit = function(isDraft) {
-            var newEventsPayload = buildPayloadFromView();
+            var newEventsPayload;
+            if(isDraft)
+                newEventsPayload = buildPayloadFromView("DRAFT");
+            else
+                newEventsPayload = buildPayloadFromView("NEW");
             return programEventRepository.upsert(newEventsPayload).then(function(payload) {
                 $scope.resultMessageType = "success";
                 $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;

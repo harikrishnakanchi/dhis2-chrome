@@ -275,7 +275,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
                 expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("ae2a77b82a5");
                 expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2014-11-18");
-                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW");
+                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("DRAFT");
                 expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([]);
 
                 expect(scope.resultMessageType).toEqual("success");
@@ -323,7 +323,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 var actualPayloadInUpsertCall = programEventRepository.upsert.calls.first().args[0];
 
                 expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
-
+                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW");
                 expect(scope.resultMessageType).toEqual("success");
                 expect(scope.resultMessage).toEqual("Event submitted succesfully");
                 expect(hustle.publish).toHaveBeenCalled();
