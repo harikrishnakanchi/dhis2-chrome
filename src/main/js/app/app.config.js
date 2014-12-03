@@ -88,6 +88,10 @@ require.config({
         "approvalDataTransformer": "app/transformers/approval.data.transformer",
         "programTransformer": "app/transformers/program.transformer",
 
+        //Database Utilities
+        "dbutils": "app/dbutils/dbutils",
+        "indexeddbUtils": "app/dbutils/indexeddb.utils",
+
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",
         "monitors": "app/monitors/monitors",
