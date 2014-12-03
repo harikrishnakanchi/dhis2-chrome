@@ -34,7 +34,7 @@ define(["moment", "approvalDataTransformer", "properties", "fileSystemUtils", "l
                 "type": "downloadEventData"
             }, "dataValues");
 
-            return downloadData.then(downloadEvents).then(onSuccess);
+            return $q.all([downloadData, downloadEvents]).then(onSuccess);
         };
 
         $scope.formatPeriods = function(period) {

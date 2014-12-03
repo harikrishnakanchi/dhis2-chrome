@@ -45,6 +45,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         $hustle.publish({
                             "type": "downloadData"
                         }, "dataValues");
+                        
+                        $hustle.publish({
+                            "type": "downloadEventData"
+                        }, "dataValues");
                     };
 
                     chrome.alarms.create('metadataSyncAlarm', {

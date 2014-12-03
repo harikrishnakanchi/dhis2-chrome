@@ -49,7 +49,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
 
         it("should fetch and display all organisation units", function() {
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-
+            
             scope.syncNow();
 
             expect(scope.isSyncRunning).toEqual(true);
