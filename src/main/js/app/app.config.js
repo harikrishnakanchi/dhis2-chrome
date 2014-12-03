@@ -105,6 +105,7 @@ require.config({
         //Utils
         "chromeRuntime": "app/utils/chrome.runtime",
         "dhisId": "app/utils/dhis.id",
+        "fileSystemUtils": "app/utils/filesystem.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",
