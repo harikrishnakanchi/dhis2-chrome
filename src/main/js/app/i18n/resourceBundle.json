@@ -107,5 +107,7 @@
     "createCloneLabel": "Create Clone",
     "loadCloneLabel": "Load Clone",
     "importLabel": "Import",
-    "exportLabel": "Export"
+    "exportLabel": "Export",
+    "cloneSuccessMessage": "Clone created successfully at ",
+    "cloneErrorMessage": "Error creating clone: "
 }

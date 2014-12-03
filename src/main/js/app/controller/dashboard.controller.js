@@ -19,11 +19,11 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
         };
 
         $scope.syncNow = function() {
-            $scope.isSyncRunning = true;
+            $scope.showMessage = true;
+            $scope.message = $scope.resourceBundle.syncRunning;
 
             var onSuccess = function(response) {
-                $scope.isSyncRunning = false;
-                $scope.isSyncDone = true;
+                displayMessage($scope.resourceBundle.syncComplete, false);
             };
 
             var downloadData = $hustle.publish({
@@ -183,11 +183,35 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
         };
 
         $scope.createClone = function() {
+            var errorCallback = function(error) {
+                displayMessage($scope.resourceBundle.cloneErrorMessage + error.name, true);
+                $scope.$apply();
+            };
+
+            var successCallback = function(directory) {
+                displayMessage($scope.resourceBundle.cloneSuccessMessage + directory.name, false);
+                $scope.$apply();
+            };
+
             indexeddbUtils.backupEntireDB().then(function(data) {
                 var cloneFileName = "dhis_idb_" + moment().format("YYYYMMDD-HHmmss") + ".clone";
-                filesystemService.writeFile(cloneFileName, JSON.stringify(data), "application/json");
+                filesystemService.writeFile(cloneFileName, JSON.stringify(data), "application/json", successCallback, errorCallback);
             });
         };
+
+        var displayMessage = function(messageText, isErrorMessage) {
+            var hideMessage = function() {
+                $scope.showMessage = false;
+                $scope.message = "";
+                $scope.messageClass = "";
+            };
+
+            $scope.showMessage = true;
+            $scope.message = messageText;
+            $scope.messageClass = isErrorMessage ? "alert alert-danger" : "alert alert-success";
+            $timeout(hideMessage, properties.messageTimeout);
+        };
+
 
         var filterItems = function(items, withSelectedItems) {
             items = _.map(items, function(item) {

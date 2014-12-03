@@ -39,6 +39,10 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
                 }]
             };
 
+            scope.resourceBundle = {
+                "syncRunning": "syncRunning"
+            };
+
             approvalHelper = new ApprovalHelper();
             filesystemService = new FilesystemService();
             dataSetRepository = new DataSetRepository();
@@ -68,16 +72,11 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
 
         it("should fetch and display all organisation units", function() {
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-            
-            scope.syncNow();
 
-            expect(scope.isSyncRunning).toEqual(true);
-            expect(scope.isSyncDone).toEqual(undefined);
+            scope.syncNow();
 
             scope.$apply();
 
-            expect(scope.isSyncRunning).toEqual(false);
-            expect(scope.isSyncDone).toEqual(true);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "type": "downloadData"
             }, "dataValues");
@@ -371,7 +370,8 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             scope.$apply();
 
             expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
-            expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', JSON.stringify(idbDump), 'application/json');
+            expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', JSON.stringify(idbDump),
+                'application/json', jasmine.any(Function), jasmine.any(Function));
         });
     });
 });

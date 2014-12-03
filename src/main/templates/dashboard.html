@@ -22,8 +22,8 @@
         </ul>
     </div>
 
-    <span ng-show="isSyncRunning">{{resourceBundle.syncRunning}}</span>
-    <span ng-show="isSyncDone">{{resourceBundle.syncComplete}}</span>
+    <span ng-show="showMessage" class="{{messageClass}}">{{message}}</span>
+
     <div>
         <div class="loading" ng-show="loading">
             <img src="img/ajax-loader.gif" class="spinner" />
