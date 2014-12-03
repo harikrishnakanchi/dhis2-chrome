@@ -1,11 +1,14 @@
 define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
     return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository) {
         var resetForm = function() {
+            $scope.showForm = false;
+            $scope.showView = false;
             $scope.dataValues = {};
             $scope.eventDates = {};
             $scope.minDateInCurrentPeriod = $scope.week.startOfWeek;
             $scope.maxDateInCurrentPeriod = $scope.week.endOfWeek;
-            getAllEvents();
+            if ($scope.eventDataEntryForm !== undefined)
+                $scope.eventDataEntryForm.$setPristine();
         };
 
         var loadPrograms = function() {
@@ -26,42 +29,12 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             });
         };
 
-        var buildPayloadFromView = function(localStatus) {
-            var newEvents = [];
-            _.each($scope.programs, function(p) {
-                _.each(p.programStages, function(ps) {
-                    var event = {
-                        'event': dhisId.get(p.id + ps.id + $scope.currentModule.id + moment().format()),
-                        'program': p.id,
-                        'programStage': ps.id,
-                        'orgUnit': $scope.currentModule.id,
-                        'eventDate': moment($scope.eventDates[p.id][ps.id]).format("YYYY-MM-DD"),
-                        'dataValues': [],
-                        'localStatus': localStatus
-                    };
-                    _.each(ps.programStageDataElements, function(psde) {
-                        event.dataValues.push({
-                            "dataElement": psde.dataElement.id,
-                            "value": $scope.dataValues[p.id][ps.id][psde.dataElement.id]
-                        });
-                    });
-                    newEvents.push(event);
-                });
-            });
-            return {
-                'events': newEvents
-            };
-        };
-
-        var getAllEvents = function() {
+        var reloadEventsView = function() {
             var period = $scope.year + "W" + $scope.week.weekNumber;
             var programIdsInCurrentModule = $scope.programsInCurrentModule;
             $scope.allEvents = [];
             return _.forEach(programIdsInCurrentModule, function(programId) {
                 programEventRepository.getEventsFor(programId, period, $scope.currentModule.id).then(function(events) {
-                    events = _.reject(events, function(e) {
-                        return e.localStatus === "DELETED";
-                    });
                     $scope.allEvents = $scope.allEvents.concat(events);
                 });
             });
@@ -107,34 +80,90 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             $anchorScroll();
         };
 
-        var saveToDhis = function(data, type) {
-            $scope.resultMessageType = "success";
-            $scope.resultMessage = $scope.resourceBundle.eventSubmitSuccess;
-            return $hustle.publish({
-                "data": data,
-                "type": type
-            }, "dataValues");
+        $scope.openNewForm = function() {
+            resetForm();
+            $scope.showForm = true;
         };
 
-        $scope.submit = function(isDraft) {
-            var newEventsPayload;
-            if(isDraft)
-                newEventsPayload = buildPayloadFromView("DRAFT");
-            else
-                newEventsPayload = buildPayloadFromView("NEW");
-            return programEventRepository.upsert(newEventsPayload).then(function(payload) {
+        $scope.closeNewForm = function() {
+            resetForm();
+            $scope.showView = true;
+        };
+
+        $scope.save = function(program, programStage, addAnother) {
+
+            var showResultMessage = function() {
                 $scope.resultMessageType = "success";
                 $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;
-                getAllEvents();
                 scrollToTop();
-                if (isDraft)
-                    return payload;
-                return saveToDhis(payload, "uploadProgramEvents");
-            });
+            };
+
+            var buildPayloadFromView = function() {
+                var newEvent = {
+                    'event': dhisId.get(program.id + programStage.id + $scope.currentModule.id + moment().format()),
+                    'program': program.id,
+                    'programStage': programStage.id,
+                    'orgUnit': $scope.currentModule.id,
+                    'eventDate': moment($scope.eventDates[program.id][programStage.id]).format("YYYY-MM-DD"),
+                    'dataValues': [],
+                    'localStatus': "DRAFT"
+                };
+                _.each(programStage.programStageDataElements, function(psde) {
+                    newEvent.dataValues.push({
+                        "dataElement": psde.dataElement.id,
+                        "value": $scope.dataValues[program.id][programStage.id][psde.dataElement.id]
+                    });
+                });
+
+                return {
+                    'events': [newEvent]
+                };
+            };
+
+            var newEventsPayload = buildPayloadFromView();
+
+            return programEventRepository.upsert(newEventsPayload)
+                .then(function() {
+                    showResultMessage();
+                    reloadEventsView();
+                    if (addAnother)
+                        $scope.openNewForm();
+                    else
+                        $scope.closeNewForm();
+                });
+        };
+
+        $scope.submit = function(programId) {
+            var saveToDhis = function() {
+                return $hustle.publish({
+                    "type": "uploadProgramEvents"
+                }, "dataValues");
+            };
+
+            var showResultMessage = function() {
+                $scope.resultMessageType = "success";
+                $scope.resultMessage = $scope.resourceBundle.eventSubmitSuccess;
+                scrollToTop();
+            };
+
+            var period = $scope.year + "W" + $scope.week.weekNumber;
+            var currentModule = $scope.currentModule.id;
+
+            return programEventRepository.markEventsAsSubmitted(programId, period, currentModule)
+                .then(saveToDhis)
+                .then(showResultMessage);
         };
 
         $scope.deleteEvent = function(event) {
-            showModal(function() {
+
+            var saveToDhis = function(data) {
+                return $hustle.publish({
+                    "data": data,
+                    "type": "deleteEvent"
+                }, "dataValues");
+            };
+
+            var deleteOnConfirm = function() {
                 var eventId = event.event;
 
                 var hardDelete = function() {
@@ -147,11 +176,11 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                         'events': [event]
                     };
                     return programEventRepository.upsert(eventsPayload).then(function() {
-                        return saveToDhis(eventId, "deleteEvent");
+                        return saveToDhis(eventId);
                     });
                 };
 
-                var deleteFunction = event.localStatus === "NEW" ? hardDelete : softDelete;
+                var deleteFunction = event.localStatus === "DRAFT" ? hardDelete : softDelete;
 
                 return deleteFunction.apply().then(function() {
                     $scope.allEvents.splice(_.indexOf($scope.allEvents, event), 1);
@@ -160,12 +189,16 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                         $scope.deleteSuccess = false;
                     }, properties.messageTimeout);
                 });
-            }, $scope.resourceBundle.deleteEventConfirmation);
+            };
+
+            showModal(deleteOnConfirm, $scope.resourceBundle.deleteEventConfirmation);
         };
 
         var init = function() {
             $scope.loading = true;
             resetForm();
+            $scope.showView = true;
+            reloadEventsView();
             loadPrograms().then(loadOptionSets);
             $scope.loading = false;
         };

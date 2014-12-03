@@ -12,7 +12,7 @@
 					<span ng-if="resourceBundle[program.id]">{{ resourceBundle[program.id] }}</span> 
 					<span ng-if="!resourceBundle[program.id]">{{ program.name }}</span> 
 				</accordion-heading>
-                <div class="exp-coll-group" ng-repeat="programStage in program.programStages">
+                <div class="exp-coll-group" ng-show="showForm" ng-repeat="programStage in program.programStages">
                     <accordion close-others="false">
                         <ul>
                             <li class="form-group">
@@ -61,14 +61,25 @@
                     <ul>
                     	<li>
                     		<div class="text-center">
-		                        <input type="button" class="btn btn-main" value="Save" ng-click="submit(true)" ng-disabled="eventDataEntryForm.$invalid"/>
-		                        <input type="button" class="btn btn-main" value="Submit" ng-click="submit(false)"  ng-disabled="eventDataEntryForm.$invalid"/>
+                    			<input type="button" class="btn btn-main" value="Save Case" ng-click="save(program, programStage)" ng-disabled="eventDataEntryForm.$invalid"/>
+                    			<input type="button" class="btn btn-main" value="Save and Add Another" ng-click="save(program, programStage, true)" ng-disabled="eventDataEntryForm.$invalid"/>
+                    			<input type="button" class="btn btn-main" value="Cancel" ng-click="closeNewForm()" />
 	                        </div>
                     	</li>
                     </ul>
                 </div>
-				<div ng-if="allEvents.length &gt; 0">
+                <div ng-if="allEvents.length === 0" ng-show="showView">
+                	<div class="alert alert-success">There are no cases. <a ng-click="openNewForm()">Add new case</a></div>
+                </div>
+				<div ng-if="allEvents.length &gt; 0" ng-show="showView">
 					<div ng-show="deleteSuccess" class="alert alert-success">{{resourceBundle.eventDeleteSuccess}}</div>
+					<ul>
+						<li>
+							<div class="text-right">
+								<input type="button" class="btn btn-main" value="New Case" ng-click="openNewForm()" />
+							</div>
+						</li>
+					</ul>
 					<div class="panel-heading">
 						<h3 class="panel-title"><a>{{resourceBundle.eventListTitle}}</a></h3>
 					</div>
@@ -112,6 +123,13 @@
 								</tr>
 							</tbody>
 						</table>
+						<ul>
+							<li>
+								<div class="text-center">
+									<input type="button" class="btn btn-main" value="Submit" ng-click="submit(program.id)" />
+								</div>
+							</li>
+						</ul>
 					</accordion>
 				</div>
 			</accordion-group>

@@ -1,4 +1,4 @@
-define(["moment"], function(moment) {
+define(["moment", "lodash"], function(moment, _) {
     return function(eventService, programEventRepository, $q) {
 
         var saveAllEvents = function(response) {
@@ -13,7 +13,7 @@ define(["moment"], function(moment) {
             var updatePromises = [];
 
             _.each(dbEventList, function(dbEvent) {
-                if (dbEvent.localStatus === "DRAFT" || dbEvent.localStatus === "NEW" || dbEvent.localStatus === "DELETED")
+                if (!_.isEmpty(dbEvent.localStatus))
                     return;
 
                 var dhisEvent = _.find(dhisEventList, {

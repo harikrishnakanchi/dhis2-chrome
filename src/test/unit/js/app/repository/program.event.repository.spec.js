@@ -1,4 +1,4 @@
-define(["programEventRepository", "angularMocks", "utils", "moment"], function(ProgramEventRepository, mocks, utils, moment) {
+define(["programEventRepository", "angularMocks", "utils", "moment", "properties"], function(ProgramEventRepository, mocks, utils, moment, properties) {
     describe("programEventRepository", function() {
 
         var scope, q, programEventRepository, mockDB;
@@ -47,12 +47,12 @@ define(["programEventRepository", "angularMocks", "utils", "moment"], function(P
         });
 
         it("should get last updated period if data is present in indexedDB", function() {
+            var periodSevenWeeksAgo = moment().year() + "W" + (moment().week() - 7);
+            var periodEightWeeksAgo = moment().year() + "W" + (moment().week() - properties.projectDataSync.numWeeksToSync);
+
             var allEvents = [{
                 'event': 'event_1',
-                'period': '2014W44'
-            }, {
-                'event': 'event_2',
-                'period': '2014W47'
+                'period': periodSevenWeeksAgo
             }];
 
             mockDB = utils.getMockDB(q, [], allEvents);
@@ -66,7 +66,30 @@ define(["programEventRepository", "angularMocks", "utils", "moment"], function(P
             scope.$apply();
 
             expect(mockStore.getAll).toHaveBeenCalled();
-            expect(lastUpdatedPeriod).toEqual('2014W47');
+            expect(lastUpdatedPeriod).toEqual(periodEightWeeksAgo);
+        });
+
+        it("should get last updated period from indexedDB if data was synched 8 weeks ago", function() {
+            var periodNineWeeksAgo = moment().year() + "W" + (moment().week() - 9);
+            var periodEightWeeksAgo = moment().year() + "W" + (moment().week() - properties.projectDataSync.numWeeksToSync);
+
+            var allEvents = [{
+                'event': 'event_1',
+                'period': periodNineWeeksAgo
+            }];
+
+            mockDB = utils.getMockDB(q, [], allEvents);
+            mockStore = mockDB.objectStore;
+            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+
+            var lastUpdatedPeriod;
+            programEventRepository.getLastUpdatedPeriod().then(function(data) {
+                lastUpdatedPeriod = data;
+            });
+            scope.$apply();
+
+            expect(mockStore.getAll).toHaveBeenCalled();
+            expect(lastUpdatedPeriod).toEqual(periodNineWeeksAgo);
         });
 
         it("should get last updated period if no data is present in indexedDB", function() {
@@ -164,6 +187,14 @@ define(["programEventRepository", "angularMocks", "utils", "moment"], function(P
                     'dataElement': 'de2',
                     'value': 'ABC1'
                 }]
+            }, {
+                'event': 'event3',
+                'eventDate': '2014-11-23T00:00:00',
+                'localStatus': 'DELETED',
+                'dataValues': [{
+                    'dataElement': 'de1',
+                    'value': '20'
+                }]
             }];
 
             mockDB = utils.getMockDB(q, "", dataElements);
@@ -220,6 +251,54 @@ define(["programEventRepository", "angularMocks", "utils", "moment"], function(P
             }];
 
             expect(enrichedEvents).toEqual(expectedEvents);
+        });
+
+        it("should mark event as submitted", function() {
+            mockDB = utils.getMockDB(q, [], [], []);
+            mockStore = mockDB.objectStore;
+
+            var events = [{
+                'event': 'event1',
+                'eventDate': '2014-11-26T00:00:00',
+                'localStatus': 'DRAFT',
+                'dataValues': [{
+                    'dataElement': 'de1',
+                    'value': '20'
+                }]
+            }, {
+                'event': 'event2',
+                'eventDate': '2014-11-24T00:00:00',
+                'dataValues': [{
+                    'dataElement': 'de2',
+                    'value': 'ABC1'
+                }]
+            }, {
+                'event': 'event3',
+                'eventDate': '2014-11-23T00:00:00',
+                'localStatus': 'DELETED',
+                'dataValues': [{
+                    'dataElement': 'de1',
+                    'value': '20'
+                }]
+            }];
+            mockStore.each.and.returnValue(utils.getPromise(q, events));
+
+            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+
+            programEventRepository.markEventsAsSubmitted("programId", "2014W07", "orgId");
+            scope.$apply();
+
+            var expectedPayload = [{
+                    event: 'event1',
+                    eventDate: '2014-11-26T00:00:00',
+                    localStatus: 'NEW',
+                    dataValues: [{
+                        dataElement: 'de1',
+                        value: '20'
+                    }]
+                }];
+
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedPayload);
         });
     });
 });

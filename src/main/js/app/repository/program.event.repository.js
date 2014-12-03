@@ -1,15 +1,16 @@
-define(["moment", "lodash"], function(moment, _) {
+define(["moment", "lodash", "properties"], function(moment, _, properties) {
     return function(db, $q) {
 
-        var updatePeriod = function(eventsPayload) {
-            _.each(eventsPayload.events, function(event) {
-                event.period = event.period || moment(event.eventDate).year() + "W" + moment(event.eventDate).isoWeek();
-            });
-            return eventsPayload;
-        };
-
         this.upsert = function(eventsPayload) {
+            var updatePeriod = function(eventsPayload) {
+                _.each(eventsPayload.events, function(event) {
+                    event.period = event.period || moment(event.eventDate).year() + "W" + moment(event.eventDate).isoWeek();
+                });
+                return eventsPayload;
+            };
+
             eventsPayload = updatePeriod(eventsPayload);
+
             var store = db.objectStore("programEvents");
             return store.upsert(eventsPayload.events).then(function() {
                 return eventsPayload;
@@ -29,13 +30,39 @@ define(["moment", "lodash"], function(moment, _) {
                 if (_.isEmpty(allEvents)) {
                     return "1900W01";
                 }
-                return _.first(_.sortBy(allEvents, 'period').reverse()).period;
+                var period8WeeksAgo = moment().year() + "W" + (moment().week() - properties.projectDataSync.numWeeksToSync);
+                var lastUpdatedPeriod = _.first(_.sortBy(allEvents, 'period').reverse()).period;
+                return _.first(_.sortBy([period8WeeksAgo, lastUpdatedPeriod].reverse()));
             });
         };
 
         this.delete = function(eventId) {
             var store = db.objectStore("programEvents");
             return store.delete(eventId);
+        };
+
+        this.markEventsAsSubmitted = function(programId, period, orgUnit) {
+            var getEvents = function() {
+                var store = db.objectStore('programEvents');
+                var query = db.queryBuilder().$eq([programId, period, orgUnit]).$index("by_program_period_orgunit").compile();
+                return store.each(query);
+            };
+
+            var updateEvents = function(events) {
+                var eventsToBeSubmitted = _.filter(events, function(e){
+                    return e.localStatus === "DRAFT";
+                });
+
+                return _.map(eventsToBeSubmitted, function(e) {
+                    e.localStatus = "NEW";
+                    return e;
+                });
+            };
+
+            return getEvents().then(updateEvents).then(function(newEvents) {
+                var store = db.objectStore('programEvents');
+                return store.upsert(newEvents);
+            });
         };
 
         this.getEventsFor = function(programId, period, orgUnit) {
@@ -80,9 +107,16 @@ define(["moment", "lodash"], function(moment, _) {
             };
 
             var getEvents = function() {
+
+                var excludeSoftDeletedEvents = function(events) {
+                    return _.reject(events, function(e) {
+                        return e.localStatus === "DELETED";
+                    });
+                };
+
                 var store = db.objectStore('programEvents');
                 var query = db.queryBuilder().$eq([programId, period, orgUnit]).$index("by_program_period_orgunit").compile();
-                return store.each(query);
+                return store.each(query).then(excludeSoftDeletedEvents);
             };
 
             return $q.all([getDataElements(), getEvents()]).then(function(data) {

@@ -13,60 +13,44 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                 uploadEventDataConsumer = new UploadEventDataConsumer(eventService, programEventRepository, q);
             }));
 
-            it("should save event data to DHIS", function() {
-                var eventPayload = {
-                    'events': [{
-                        'event': 'e1',
-                        'eventDate': '2014-09-28'
-                    }]
-                };
+            it("should save event data to DHIS and change local status in indexedDb", function() {
+                var events = [{
+                    'event': 'e1',
+                    'eventDate': '2014-09-28',
+                    'localStatus': "NEW"
+                }, {
+                    'event': 'e2',
+                    'eventDate': '2014-09-29'
+                }];
 
-                var message = {
-                    "data": {
-                        "type": "uploadEventData",
-                        "data": eventPayload
-                    }
-                };
+                spyOn(programEventRepository, "getLastUpdatedPeriod").and.returnValue(utils.getPromise(q, "2014W44"));
+                spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, events));
 
-                spyOn(programEventRepository, "upsert");
-                spyOn(eventService, "upsertEvents").and.returnValue(utils.getPromise(q, []));
-                uploadEventDataConsumer.run(message);
-                scope.$apply();
-
-                expect(eventService.upsertEvents).toHaveBeenCalledWith(eventPayload);
-            });
-
-            it("should change event localStatus in indexedDb", function() {
-                var eventPayload = {
+                var dhisEventPayload = {
                     'events': [{
                         'event': 'e1',
                         'eventDate': '2014-09-28',
                         'localStatus': "NEW"
                     }]
                 };
+                spyOn(eventService, "upsertEvents").and.returnValue(utils.getPromise(q, dhisEventPayload));
+                spyOn(programEventRepository, "upsert");
 
-                var message = {
-                    "data": {
-                        "type": "uploadEventData",
-                        "data": eventPayload
-                    }
-                };
+                uploadEventDataConsumer.run();
+                scope.$apply();
 
-                var expectedPayload = {
+
+                expect(eventService.upsertEvents).toHaveBeenCalledWith(dhisEventPayload);
+
+                var dbEventPayload = {
                     'events': [{
                         'event': 'e1',
                         'eventDate': '2014-09-28'
                     }]
                 };
+                expect(programEventRepository.upsert).toHaveBeenCalledWith(dbEventPayload);
 
-                spyOn(programEventRepository, "upsert");
-                spyOn(eventService, "upsertEvents").and.returnValue(utils.getPromise(q, eventPayload));
-                uploadEventDataConsumer.run(message);
-                scope.$apply();
-
-                expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedPayload);
             });
-
 
         });
     });
