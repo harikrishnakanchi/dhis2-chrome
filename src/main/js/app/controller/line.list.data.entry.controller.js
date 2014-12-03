@@ -1,6 +1,7 @@
 define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
     return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository) {
         var resetForm = function() {
+            $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.showForm = false;
             $scope.showView = false;
             $scope.dataValues = {};
@@ -52,7 +53,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
         $scope.getEventDateNgModel = function(eventDates, programId, programStageId) {
             eventDates[programId] = eventDates[programId] || {};
-            eventDates[programId][programStageId] = eventDates[programId][programStageId] || new Date();
+            eventDates[programId][programStageId] = eventDates[programId][programStageId] || moment($scope.minDateInCurrentPeriod).toDate();
             return eventDates[programId];
         };
 

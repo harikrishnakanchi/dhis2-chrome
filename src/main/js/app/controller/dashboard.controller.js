@@ -32,7 +32,7 @@ define(["moment", "approvalDataTransformer", "properties", "fileSystemUtils", "l
 
             var downloadEvents = $hustle.publish({
                 "type": "downloadEventData"
-            }, "dataValues")
+            }, "dataValues");
 
             return downloadData.then(downloadEvents).then(onSuccess);
         };

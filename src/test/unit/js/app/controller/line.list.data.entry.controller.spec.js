@@ -195,7 +195,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
                 scope.getEventDateNgModel(eventDates, 'p1', 'ps1');
 
-                expect(moment(eventDates.p1.ps1).isSame(moment(), 'days')).toBe(true);
+                expect(moment(eventDates.p1.ps1).isSame(scope.minDateInCurrentPeriod, 'days')).toBe(true);
             });
 
             it("should set min and max date for selected period", function() {
@@ -368,5 +368,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 expect(programEventRepository.delete).toHaveBeenCalledWith('event1');
                 expect(hustle.publish).not.toHaveBeenCalled();
             });
+
         });
     });
