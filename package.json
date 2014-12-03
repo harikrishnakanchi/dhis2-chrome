@@ -5,7 +5,7 @@
     "description": "DHIS2-Chrome-App",
     "devDependencies": {
         "gulp": "*",
-        "gulp-karma": "0.0.4",
+        "gulp-karma": "*",
         "gulp-protractor": "*",
         "gulp-jshint": "*",
         "jshint-stylish": "*",
@@ -15,7 +15,7 @@
         "path": "~0.4.9",
         "watch": "~0.9.0",
 
-        "karma-jasmine": "~0.2.0",
+        "karma-jasmine": "*",
         "karma-requirejs": "*",
         "karma-chrome-launcher": "*",
         "karma-coverage": "*",
