@@ -1,5 +1,5 @@
-define(["moment", "approvalDataTransformer", "properties", "fileSystemUtils", "lodash"], function(moment, approvalDataTransformer, properties, fileSystemUtils, _) {
-    return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout, indexeddbUtils) {
+define(["moment", "approvalDataTransformer", "properties", "lodash"], function(moment, approvalDataTransformer, properties, _) {
+    return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout, indexeddbUtils, filesystemService) {
         var dataValues = [];
         $scope.approveSuccessForLevelOne = false;
         $scope.approveSuccessForLevelTwo = false;
@@ -184,8 +184,8 @@ define(["moment", "approvalDataTransformer", "properties", "fileSystemUtils", "l
 
         $scope.createClone = function() {
             indexeddbUtils.backupEntireDB().then(function(data) {
-                var cloneFileName = "dhis_idb_" + moment().format("YYYY-MM-DD:HH:mm:ss") + ".clone";
-                fileSystemUtils.writeFile(cloneFileName, JSON.stringify(data), "application/json");
+                var cloneFileName = "dhis_idb_" + moment().format("YYYYMMDD-HHmmss") + ".clone";
+                filesystemService.writeFile(cloneFileName, JSON.stringify(data), "application/json");
             });
         };
 

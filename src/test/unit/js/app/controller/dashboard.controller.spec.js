@@ -1,6 +1,6 @@
-define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataSetRepository"], function(DashboardController, mocks, utils, ApprovalHelper, DataSetRepository) {
+define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataSetRepository", "filesystemService", "indexeddbUtils", "timecop"], function(DashboardController, mocks, utils, ApprovalHelper, DataSetRepository, FilesystemService, IndexeddbUtils, timecop) {
     describe("dashboard controller", function() {
-        var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, dataSetRepository;
+        var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, dataSetRepository, filesystemService, indexeddbUtils, idbDump;
 
         beforeEach(module("hustle"));
 
@@ -33,9 +33,20 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
                 open: function(object) {}
             };
 
+            idbDump = {
+                "storeName": [{
+                    "id": "identity"
+                }]
+            };
+
             approvalHelper = new ApprovalHelper();
+            filesystemService = new FilesystemService();
             dataSetRepository = new DataSetRepository();
+            indexeddbUtils = new IndexeddbUtils();
+
+            spyOn(filesystemService, "writeFile");
             spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
+            spyOn(indexeddbUtils, "backupEntireDB").and.returnValue(utils.getPromise(q, idbDump));
             spyOn(fakeModal, 'open').and.returnValue({
                 result: utils.getPromise(q, {})
             });
@@ -44,8 +55,16 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
                 return true;
             };
 
-            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
+            Timecop.install();
+            Timecop.freeze(new Date("2014-05-30 12:43:54"));
+
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout, indexeddbUtils, filesystemService);
         }));
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
 
         it("should fetch and display all organisation units", function() {
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
@@ -344,8 +363,15 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             scope.toggleSelectAllOption(true);
             scope.$apply();
             expect(scope.weeks.approveAllItems).toBe(true);
-
         });
 
+        it("should clone the entire indexed db and save it to a file", function() {
+            scope.createClone();
+
+            scope.$apply();
+
+            expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
+            expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', JSON.stringify(idbDump), 'application/json');
+        });
     });
 });

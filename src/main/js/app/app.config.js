@@ -61,6 +61,7 @@ require.config({
         "programService": "app/service/program.service",
         "eventService": "app/service/event.service",
         "orgUnitGroupService": "app/service/orgUnitgroup.service",
+        "filesystemService": "app/service/filesystem.service",
 
         //Repositories
         "repositories": "app/repository/repositories",
@@ -105,7 +106,6 @@ require.config({
         //Utils
         "chromeRuntime": "app/utils/chrome.runtime",
         "dhisId": "app/utils/dhis.id",
-        "fileSystemUtils": "app/utils/filesystem.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",
