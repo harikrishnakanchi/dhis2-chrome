@@ -13,7 +13,7 @@ define([], function() {
         return deferred.promise;
     };
 
-    var getMockDB = function(q, findResult, allResult, eachResult) {
+    var getMockDB = function(q, findResult, allResult, eachResult, dbInfo) {
         var mockStore = {
             "upsert": jasmine.createSpy("upsert").and.callFake(function(data) {
                 return getPromise(q, data);
@@ -48,7 +48,8 @@ define([], function() {
             "objectStore": jasmine.createSpy("objectStore").and.callFake(function() {
                 return mockStore;
             }),
-            "queryBuilder": queryBuilder
+            "queryBuilder": queryBuilder,
+            "dbInfo": jasmine.createSpy("dbInfo").and.returnValue(getPromise(q, dbInfo))
         };
 
         return {
