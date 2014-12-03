@@ -37,6 +37,8 @@ define([], function() {
                     return downloadEventDataConsumer.run(message).then(function() {
                         return uploadEventDataConsumer.run(message);
                     });
+                case "downloadEventData":
+                    return downloadEventDataConsumer.run(message);
                 case "deleteEvent":
                     return deleteEventConsumer.run(message);
                 default:

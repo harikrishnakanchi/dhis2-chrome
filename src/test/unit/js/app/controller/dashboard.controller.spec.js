@@ -62,6 +62,9 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             expect(hustle.publish).toHaveBeenCalledWith({
                 "type": "downloadData"
             }, "dataValues");
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "type": "downloadEventData"
+            }, "dataValues");
         });
 
         it("should format periods to be shown on dashboard", function() {

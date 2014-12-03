@@ -30,7 +30,11 @@ define(["moment", "approvalDataTransformer", "properties", "fileSystemUtils", "l
                 "type": "downloadData"
             }, "dataValues");
 
-            return downloadData.then(onSuccess);
+            var downloadEvents = $hustle.publish({
+                "type": "downloadEventData"
+            }, "dataValues")
+
+            return downloadData.then(downloadEvents).then(onSuccess);
         };
 
         $scope.formatPeriods = function(period) {
