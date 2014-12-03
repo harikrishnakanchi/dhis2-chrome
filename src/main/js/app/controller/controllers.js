@@ -4,14 +4,14 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
     function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, moduleController, projectController, countryController, confirmDialogController,
         projectUserController, selectProjectController, aggregateDataEntryController, lineListDataEntryController, programRepository, programEventRepository, dataElementRepository) {
         var init = function(app) {
-            app.controller('dashboardController', ['$scope', '$hustle', '$q', '$rootScope', 'approvalHelper', 'dataSetRepository', '$modal', '$timeout', dashboardController]);
+            app.controller('dashboardController', ['$scope', '$hustle', '$q', '$rootScope', 'approvalHelper', 'dataSetRepository', '$modal', '$timeout', 'indexeddbUtils', dashboardController]);
             app.controller('dataEntryController', ['$scope', '$routeParams', '$q', '$location', '$rootScope', 'orgUnitRepository', 'programRepository', dataEntryController]);
             app.controller('aggregateDataEntryController', ['$scope', '$routeParams', '$q', '$hustle', '$indexedDB', 'dataRepository', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', 'approvalDataRepository', '$timeout', 'orgUnitRepository', 'approvalHelper', aggregateDataEntryController]);
             app.controller('lineListDataEntryController', ['$scope', '$q', '$hustle', '$modal', '$timeout', '$location', '$anchorScroll', '$indexedDB', 'programRepository', 'programEventRepository', 'dataElementRepository', lineListDataEntryController]);
             app.controller('orgUnitContoller', ['$scope', '$indexedDB', '$q', '$location', '$timeout', '$anchorScroll', orgUnitContoller]);
             app.controller('opUnitController', ['$scope', '$q', '$hustle', 'orgUnitRepository', '$indexedDB', '$location', '$modal', opUnitController]);
-            app.controller('moduleController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', 'dataSetRepository', 'systemSettingRepository', '$indexedDB', '$location', '$q', '$modal', 'programRepository', 'orgUnitGroupRepository','orgUnitGroupHelper', moduleController]);
-            app.controller('projectController', ['$scope', '$rootScope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', 'userRepository', '$modal', 'approvalHelper','orgUnitGroupHelper', projectController]);
+            app.controller('moduleController', ['$scope', '$hustle', 'orgUnitService', 'orgUnitRepository', 'dataSetRepository', 'systemSettingRepository', '$indexedDB', '$location', '$q', '$modal', 'programRepository', 'orgUnitGroupRepository', 'orgUnitGroupHelper', moduleController]);
+            app.controller('projectController', ['$scope', '$rootScope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', 'userRepository', '$modal', 'approvalHelper', 'orgUnitGroupHelper', projectController]);
             app.controller('mainController', ['$scope', '$location', '$rootScope', 'ngI18nResourceBundle', '$indexedDB', 'userPreferenceRepository', 'orgUnitRepository', 'userRepository', "metadataService", mainController]);
             app.controller('loginController', ['$scope', '$rootScope', '$location', '$indexedDB', '$q', '$hustle', 'userPreferenceRepository', loginController]);
             app.controller('countryController', ['$scope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', countryController]);

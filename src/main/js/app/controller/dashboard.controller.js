@@ -1,5 +1,5 @@
-define(["moment", "approvalDataTransformer", "properties", "lodash"], function(moment, approvalDataTransformer, properties, _) {
-    return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout) {
+define(["moment", "approvalDataTransformer", "properties", "fileSystemUtils", "lodash"], function(moment, approvalDataTransformer, properties, fileSystemUtils, _) {
+    return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout, indexeddbUtils) {
         var dataValues = [];
         $scope.approveSuccessForLevelOne = false;
         $scope.approveSuccessForLevelTwo = false;
@@ -176,6 +176,13 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
             if (level === 1) return "Project Level";
             if (level === 2) return "Coordination Level";
             if (level === 3) return "Desk Level";
+        };
+
+        $scope.createClone = function() {
+            indexeddbUtils.backupEntireDB().then(function(data) {
+                var cloneFileName = "dhis_idb_" + moment().format("YYYY-MM-DD:HH:mm:ss") + ".clone";
+                fileSystemUtils.writeFile(cloneFileName, JSON.stringify(data), "application/json");
+            });
         };
 
         var filterItems = function(items, withSelectedItems) {

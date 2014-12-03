@@ -103,8 +103,8 @@
     "yes": "Yes",
     "no": "No",
     "importExportMenuLabel": "Import / Export to USB ",
-    "fullImportLabel": "Full Import",
-    "fullExportLabel": "Full Export",
+    "createCloneLabel": "Create Clone",
+    "loadCloneLabel": "Load Clone",
     "importLabel": "Import",
     "exportLabel": "Export"
 }
