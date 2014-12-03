@@ -64,13 +64,14 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 };
 
                 var l2ApprovalData = {
-                    "dataSets": ['Vacc'],
-                    "period": '2014W14',
-                    "orgUnit": 'mod2',
-                    "createdByUsername": 'dataentryuser',
-                    "createdDate": moment().toISOString(),
-                    "isApproved": true,
-                    "status": "NEW"
+                    dataSets: ['Vacc'],
+                    period: '2014W14',
+                    orgUnit: 'mod2',
+                    createdByUsername: 'dataentryuser',
+                    createdDate: '2014-05-30T12:43:54.972Z',
+                    isAccepted: false,
+                    isApproved: true,
+                    status: 'NEW'
                 };
 
                 var hustlePublishData = {
@@ -90,11 +91,15 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 var modules = [{
                     "id": "123",
                     "name": "mod1",
-                    "parent":{"name": "parent"}
+                    "parent": {
+                        "name": "parent"
+                    }
                 }, {
                     "id": "234",
                     "name": "mod2",
-                    "parent":{"name": "parent"}
+                    "parent": {
+                        "name": "parent"
+                    }
                 }];
 
                 var dataValues = [{
@@ -343,13 +348,14 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 };
 
                 var l2ApprovalData = {
-                    "dataSets": ['ds1'],
-                    "period": '2014W17',
-                    "orgUnit": '123',
-                    "createdByUsername": 'service.account',
-                    "createdDate": '2014-05-30T12:43:54.972Z',
-                    "isApproved": true,
-                    "status": 'NEW'
+                    dataSets: ['ds1'],
+                    period: '2014W17',
+                    orgUnit: '123',
+                    createdByUsername: 'service.account',
+                    createdDate: '2014-05-30T12:43:54.972Z',
+                    isAccepted: false,
+                    isApproved: true,
+                    status: 'NEW'
                 };
 
                 spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, modules));

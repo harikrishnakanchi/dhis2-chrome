@@ -39,6 +39,19 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
             });
         };
 
+        this.markAsAccepted = function(dataSets, period, orgUnit) {
+             var payload = _.transform(dataSets, function(result, ds) {
+                result.push({
+                    "ds": ds,
+                    "pe": period,
+                    "ou": orgUnit,
+                    "ab": approvedBy,
+                    "ad": approvalDate
+                });
+            });
+            return $http.post(properties.dhis.url + "/api/dataAcceptances/multiple", payload);   
+        };
+
         this.getAllLevelOneApprovalData = function(orgUnits, dataSets) {
             var transform = function(completeDataSetRegistrationList) {
                 var registrationsGroupedByPeriodAndOu = _.groupBy(completeDataSetRegistrationList, function(registration) {

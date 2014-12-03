@@ -33,7 +33,23 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"]
                 "orgUnit": data.orgUnit,
                 "createdByUsername": data.storedBy,
                 "createdDate": moment().toISOString(),
+                "isAccepted": false,
                 "isApproved": true,
+                "status": "NEW"
+            };
+
+            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData");
+        };
+
+        var markDataAsAccepted = function(data) {
+            var dataForApproval = {
+                "dataSets": data.dataSets,
+                "period": data.period,
+                "orgUnit": data.orgUnit,
+                "createdByUsername": data.storedBy,
+                "createdDate": moment().toISOString(),
+                "isApproved": true,
+                "isAccepted": true,
                 "status": "NEW"
             };
 

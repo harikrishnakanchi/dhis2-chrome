@@ -120,7 +120,11 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     save(false).then(approvalHelper.markDataAsComplete).then(approvalHelper.markDataAsApproved).then(successPromise, errorPromise);
                 }, $scope.resourceBundle.reapprovalConfirmationMessage);
             } else {
-                save(false).then(approvalHelper.markDataAsComplete).then(approvalHelper.markDataAsApproved).then(successPromise, errorPromise);
+                save(false)
+                .then(approvalHelper.markDataAsComplete)
+                .then(approvalHelper.markDataAsApproved)
+                .then(approvalHelper.markDataAsAccepted)
+                .then(successPromise, errorPromise);
             }
         };
 

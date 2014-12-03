@@ -96,6 +96,11 @@ define([], function() {
         create_index(approvalDataSetsStore, "by_period", "period", false);
     };
 
+    // var add_accepted_datasets_store = function(db, tx) {
+    //     var acceptedDataSetsStore = create_store_with_key("acceptedDataSets", ["period", "orgUnit"], db);
+    //     create_index(acceptedDataSetsStore, "by_period", "period", false);
+    // };
+
     var add_programs_store = function(db, tx) {
         var programStore = create_store_with_key("programs", "id", db);
         create_index(programStore, "by_organisationUnit", "orgUnitIds", false, true);

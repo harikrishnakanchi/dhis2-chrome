@@ -19,6 +19,8 @@ define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approv
                             "orgUnit": "ou1",
                             "period": "2014W12",
                             "dataSets": ["d1", "d2"],
+                            "isApproved": true,
+                            "isAccepted": false,
                             "status": "NEW",
                             "createdByUsername": "foobar",
                             "createdDate": "2014-01-01"
@@ -35,6 +37,8 @@ define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approv
                     period: '2014W12',
                     orgUnit: 'ou1',
                     status: "NEW",
+                    isApproved: true,
+                    isAccepted: false,
                     createdByUsername: "foobar",
                     createdDate: "2014-01-01"
                 };

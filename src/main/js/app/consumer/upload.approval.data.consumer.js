@@ -12,7 +12,10 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                 var clearStatusFlag = function() {
                     return approvalDataRepository.saveLevelTwoApproval(_.omit(payload, "status"));
                 };
-                return approvalService.markAsApproved(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate).then(clearStatusFlag);
+                if (payload.isApproved === true && payload.isAccepted === true)
+                    return approvalService.markAsAccepted(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate).then(clearStatusFlag);
+                else if (payload.isApproved === true)
+                    return approvalService.markAsApproved(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate).then(clearStatusFlag);
             };
 
             var deleteApproval = function() {
