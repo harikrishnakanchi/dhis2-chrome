@@ -24,11 +24,8 @@ define([], function() {
                     };
                     return _.map(orgUnitGroups, function(orgUnitGroup) {
                         var res = _.find(attributes, {
-                            'value': orgUnitGroup.name
+                            'value': orgUnitGroup.name.trim()
                         });
-
-
-
                         if (isUpdateProject) {
                             orgUnitGroup.organisationUnits = _.reject(orgUnitGroup.organisationUnits, moduleToAdd);
                         }
