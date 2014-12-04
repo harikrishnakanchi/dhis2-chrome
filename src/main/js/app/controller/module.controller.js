@@ -122,7 +122,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var enrichedModules = orgUnitMapper.mapToModules(modules, parent);
 
             parent.children = parent.children.concat(enrichedModules);
-            orgUnitGroupHelper.createOrgUnitGroups(enrichedModules,false);
 
             return $q.all(orgUnitRepository.upsert(parent), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit"))
                 .then(function() {
@@ -199,7 +198,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             };
 
             var saveAggregateModules = function() {
-                var aggregateModules = getModulesOfServiceType("Aggregate");
                 if (aggregateModules.length === 0) return $q.when([]);
                 return $scope.createModules(aggregateModules)
                     .then($scope.associateDatasets)
@@ -208,7 +206,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             };
 
             var saveLinelistModules = function() {
-                var linelistModules = getModulesOfServiceType("Linelist");
                 if (linelistModules.length === 0) return $q.when([]);
 
                 var programWiseModules = _.groupBy(linelistModules, function(m) {
@@ -220,7 +217,24 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                     .then($scope.onSuccess, $scope.onError);
             };
 
-            saveAggregateModules().then(saveLinelistModules);
+            var createOrgUnitGroups = function() {
+                var modulesToAdd = [];
+                var parent = $scope.orgUnit;
+                if (aggregateModules.length !== 0) {
+                    var enrichedAggregateModules = orgUnitMapper.mapToModules(aggregateModules, parent);
+                    modulesToAdd = modulesToAdd.concat(enrichedAggregateModules);
+                }
+                if (linelistModules.length !== 0) {
+                    var enrichedLineListModules = orgUnitMapper.mapToModules(linelistModules, parent);
+                    modulesToAdd = modulesToAdd.concat(enrichedLineListModules);
+                }
+                return orgUnitGroupHelper.createOrgUnitGroups(modulesToAdd, false);
+            };
+
+            var aggregateModules = getModulesOfServiceType("Aggregate");
+            var linelistModules = getModulesOfServiceType("Linelist");
+
+            saveAggregateModules().then(saveLinelistModules).then(createOrgUnitGroups);
         };
 
         $scope.update = function(modules) {
