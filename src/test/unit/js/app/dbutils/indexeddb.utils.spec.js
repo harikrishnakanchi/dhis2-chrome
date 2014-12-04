@@ -1,6 +1,6 @@
 define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(IndexeddbUtils, mocks, utils, _) {
     describe("indexeddbUtils", function() {
-        var q, db, storeNames, indexeddbUtils, rootScope, allResult;
+        var q, db, storeNames, indexeddbUtils, scope, allResult;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             storeNames = ["store1", "store2"];
@@ -20,13 +20,13 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             }];
 
             q = $q;
-            rootScope = $rootScope;
+            scope = $rootScope.$new();
             db = utils.getMockDB(q, findResult, allResult, eachResult, dbInfo).db;
 
             indexeddbUtils = new IndexeddbUtils(db, q);
         }));
 
-        it("should create a back up for the given stores", function(done) {
+        it("should create a back up for the given stores", function() {
             var stores = [storeNames[0]];
             var objectStore1 = db.objectStore(storeNames[0]);
             var expectedBackup = getExpectedBackupResult(stores);
@@ -37,11 +37,10 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
 
             expect(objectStore1.getAll).toHaveBeenCalled();
 
-            rootScope.$digest();
-            done();
+            scope.$digest();
         });
 
-        it("should create a back up of the entire db", function(done) {
+        it("should create a back up of the entire db", function() {
             var expectedBackup = getExpectedBackupResult(storeNames);
 
             indexeddbUtils.backupEntireDB().then(function(actualBackup) {
@@ -50,8 +49,34 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
 
             expect(db.dbInfo).toHaveBeenCalled();
 
-            rootScope.$digest();
-            done();
+            scope.$digest();
+        });
+
+        it("should restore database from backup", function() {
+            var store1 = storeNames[0];
+            var store2 = storeNames[1];
+
+            var objectStore1 = db.objectStore(store1);
+            var objectStore2 = db.objectStore(store2);
+
+            var backupData = {
+                store1: [{
+                    "id": "identity"
+                }],
+                store2: [{
+                    "id": "identity"
+                }]
+            };
+
+            indexeddbUtils.restore(backupData).then(function() {
+                expect(objectStore1.insert).toHaveBeenCalledWith(backupData[store1]);
+                expect(objectStore2.insert).toHaveBeenCalledWith(backupData[store2]);
+            });
+
+            expect(objectStore1.clear).toHaveBeenCalled();
+            expect(objectStore2.clear).toHaveBeenCalled();
+
+            scope.$digest();
         });
 
         var getExpectedBackupResult = function(storeNames) {

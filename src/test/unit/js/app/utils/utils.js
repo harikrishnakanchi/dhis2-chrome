@@ -18,10 +18,14 @@ define([], function() {
             "upsert": jasmine.createSpy("upsert").and.callFake(function(data) {
                 return getPromise(q, data);
             }),
+            "insert": jasmine.createSpy("insert").and.callFake(function(data) {
+                return getPromise(q, data);
+            }),
             "delete": jasmine.createSpy("delete").and.returnValue(getPromise(q, {})),
             "find": jasmine.createSpy("find").and.returnValue(getPromise(q, findResult)),
             "getAll": jasmine.createSpy("getAll").and.returnValue(getPromise(q, allResult)),
             "each": jasmine.createSpy("each").and.returnValue(getPromise(q, eachResult)),
+            "clear": jasmine.createSpy("clear").and.returnValue(getPromise(q, {}))
         };
         var queryBuilder = function() {
 
@@ -65,7 +69,7 @@ define([], function() {
             }),
             getAll: jasmine.createSpy("getAll").and.returnValue(getPromise(q, allResults)),
             getProjectAndOpUnitAttributes: jasmine.createSpy("getProjectAndOpUnitAttributes").and.returnValue(getPromise(q, allResults)),
-            getAllModulesInProjects: jasmine.createSpy("getAllModulesInProjects").and.returnValue(getPromise(q, allResults)),
+            getAllModulesInProjects: jasmine.createSpy("getAllModulesInProjects").and.returnValue(getPromise(q, allResults))
         };
     };
 
