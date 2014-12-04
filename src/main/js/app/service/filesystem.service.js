@@ -28,9 +28,12 @@ define([], function() {
             });
         };
 
-        var readFile = function(successHandler, errorHandler) {
+        var readFile = function(successHandler, errorHandler, extensions) {
             var entryType = {
-                "type": 'openFile'
+                "type": 'openFile',
+                "accepts": [{
+                    "extensions": extensions
+                }]
             };
 
             chrome.fileSystem.chooseEntry(entryType, function(readOnlyEntry) {

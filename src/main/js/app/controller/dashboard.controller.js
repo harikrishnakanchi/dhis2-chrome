@@ -205,9 +205,8 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
             };
 
             showModal(function() {
-                filesystemService.readFile(successCallback, errorCallback);
+                filesystemService.readFile(successCallback, errorCallback, ["clone"]);
             }, $scope.resourceBundle.loadCloneConfirmationMessage);
-
         };
 
         var displayMessage = function(messageText, isErrorMessage) {
