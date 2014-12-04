@@ -1,8 +1,8 @@
-define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "userRepository", "metadataService"],
-    function(MainController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, UserRepository, MetadataService) {
+define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "userRepository", "metadataService", "sessionHelper"],
+    function(MainController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, UserRepository, MetadataService, SessionHelper) {
         describe("main controller", function() {
             var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, getAllProjectsSpy, db,
-                translationStore, userPreferenceRepository, location, orgUnitRepository, userRepository, metadataService;
+                translationStore, userPreferenceRepository, location, orgUnitRepository, userRepository, metadataService, sessionHelper;
 
             beforeEach(mocks.inject(function($rootScope, $q, $location) {
                 scope = $rootScope.$new();
@@ -12,6 +12,7 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 orgUnitRepository = new OrgUnitRepository();
                 userRepository = new UserRepository();
                 metadataService = new MetadataService();
+                sessionHelper = new SessionHelper();
 
                 i18nResourceBundle = {
                     get: function() {}
@@ -54,6 +55,7 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
 
                 translationStore = getMockStore("translations");
 
+                spyOn(sessionHelper, "logout");
                 spyOn(translationStore, "each").and.returnValue(utils.getPromise(q, {}));
                 spyOn(db, 'objectStore').and.callFake(function(storeName) {
                     return translationStore;
@@ -64,7 +66,7 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 getAllProjectsSpy.and.returnValue(utils.getPromise(q, []));
 
                 mainController = new MainController(scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
-                    userRepository, metadataService);
+                    userRepository, metadataService, sessionHelper);
             }));
 
             it("should load projects", function() {
@@ -74,7 +76,7 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
 
                 getAllProjectsSpy.and.returnValue(utils.getPromise(q, projectList));
                 mainController = new MainController(scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
-                    userRepository, metadataService);
+                    userRepository, metadataService, sessionHelper);
                 scope.$apply();
 
                 expect(metadataService.loadMetadataFromFile).toHaveBeenCalled();
@@ -82,11 +84,9 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
             });
 
             it("should logout user", function() {
-                rootScope.isLoggedIn = true;
-
                 scope.logout();
 
-                expect(rootScope.isLoggedIn).toEqual(false);
+                expect(sessionHelper.logout).toHaveBeenCalled();
             });
 
             it("should default locale to en", function() {
@@ -146,11 +146,11 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 var old = {
                     "id": "123"
                 };
-                
+
                 scope.currentUserProject = current;
                 scope.oldUserProject = old;
-                
-                var projectList = [current , old];
+
+                var projectList = [current, old];
                 getAllProjectsSpy.and.returnValue(utils.getPromise(q, projectList));
 
                 spyOn(userRepository, "upsert").and.returnValue(utils.getPromise(q, {}));

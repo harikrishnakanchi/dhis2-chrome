@@ -110,7 +110,8 @@ require.config({
         //Helpers
         "helpers": "app/helpers/helpers",
         "approvalHelper": "app/helpers/approval.helper",
-        "orgUnitGroupHelper": "app/helpers/orgUnitGroup.helper"
+        "orgUnitGroupHelper": "app/helpers/orgUnitGroup.helper",
+        "sessionHelper": "app/helpers/session.helper"
 
     },
     shim: {

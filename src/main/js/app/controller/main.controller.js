@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $location, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository, metadataService) {
+    return function($scope, $location, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository, metadataService, sessionHelper) {
         var oldUserProject;
         $scope.projects = [];
 
@@ -89,11 +89,7 @@ define(["lodash"], function(_) {
         }, true);
 
         $scope.logout = function() {
-            $scope.oldUserProject = undefined;
-            $rootScope.isLoggedIn = false;
-            $rootScope.currentUser = undefined;
-            $scope.currentUserProject = undefined;
-            $scope.oldUserProject = undefined;
+            sessionHelper.logout();
         };
 
         $rootScope.$on('resetProjects', resetProjects);
