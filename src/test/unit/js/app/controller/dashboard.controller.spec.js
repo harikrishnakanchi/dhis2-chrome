@@ -1,15 +1,16 @@
-define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataSetRepository", "filesystemService", "indexeddbUtils", "timecop"], function(DashboardController, mocks, utils, ApprovalHelper, DataSetRepository, FilesystemService, IndexeddbUtils, timecop) {
+define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataSetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper"], function(DashboardController, mocks, utils, ApprovalHelper, DataSetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper) {
     describe("dashboard controller", function() {
-        var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, dataSetRepository, filesystemService, indexeddbUtils, idbDump;
+        var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, dataSetRepository, filesystemService, indexeddbUtils, idbDump, sessionHelper, location;
 
         beforeEach(module("hustle"));
 
-        beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout) {
+        beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
             q = $q;
             scope = $rootScope.$new();
             hustle = $hustle;
             rootScope = $rootScope;
             timeout = $timeout;
+            location = $location;
 
             var allDatasets = [{
                 "id": "DS1",
@@ -47,10 +48,23 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             filesystemService = new FilesystemService();
             dataSetRepository = new DataSetRepository();
             indexeddbUtils = new IndexeddbUtils();
+            sessionHelper = new SessionHelper();
 
             spyOn(filesystemService, "writeFile");
+            spyOn(filesystemService, "readFile").and.callFake(function() {
+                var result = "{}";
+                var fileData = {
+                    "target": {
+                        "result": result
+                    }
+                };
+                filesystemService.readFile.calls.allArgs()[0][0](fileData);
+            });
             spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
             spyOn(indexeddbUtils, "backupEntireDB").and.returnValue(utils.getPromise(q, idbDump));
+            spyOn(indexeddbUtils, "restore").and.returnValue(utils.getPromise(q, {}));
+            spyOn(sessionHelper, "logout");
+            spyOn(location, "path");
             spyOn(fakeModal, 'open').and.returnValue({
                 result: utils.getPromise(q, {})
             });
@@ -62,12 +76,13 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30 12:43:54"));
 
-            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout, indexeddbUtils, filesystemService);
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout, indexeddbUtils, filesystemService, sessionHelper, location);
         }));
 
         afterEach(function() {
             Timecop.returnToPresent();
             Timecop.uninstall();
+            timeout.verifyNoPendingTasks();
         });
 
         it("should fetch and display all organisation units", function() {
@@ -76,6 +91,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             scope.syncNow();
 
             scope.$apply();
+            timeout.flush();
 
             expect(hustle.publish).toHaveBeenCalledWith({
                 "type": "downloadData"
@@ -110,6 +126,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
 
             scope.$apply();
+            timeout.flush();
 
             expect(scope.userApprovalLevel).toBe(1);
         });
@@ -195,6 +212,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
 
             scope.$apply();
+            timeout.flush();
 
             expect(scope.itemsAwaitingSubmission).toEqual(itemsAwaitingSubmission);
             expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(itemsAwaitingApprovalAtUserLevel);
@@ -284,6 +302,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             scope.bulkApprove();
 
             scope.$apply();
+            timeout.flush();
 
             expect(approvalHelper.markDataAsComplete).toHaveBeenCalled();
             expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
@@ -368,10 +387,23 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             scope.createClone();
 
             scope.$apply();
+            timeout.flush();
 
             expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
             expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', JSON.stringify(idbDump),
                 'application/json', jasmine.any(Function), jasmine.any(Function));
+        });
+
+        it("should load clone to indexed db from selected file", function() {
+            scope.loadClone();
+
+            scope.$apply();
+            timeout.flush();
+
+            expect(filesystemService.readFile).toHaveBeenCalled();
+            expect(indexeddbUtils.restore).toHaveBeenCalled();
+            expect(sessionHelper.logout).toHaveBeenCalled();
+            expect(location.path).toHaveBeenCalledWith('#/login');
         });
     });
 });

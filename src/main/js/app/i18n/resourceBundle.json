@@ -108,6 +108,8 @@
     "loadCloneLabel": "Load Clone",
     "importLabel": "Import",
     "exportLabel": "Export",
-    "cloneSuccessMessage": "Clone created successfully at ",
-    "cloneErrorMessage": "Error creating clone: "
+    "createCloneSuccessMessage": "Clone created successfully at ",
+    "createCloneErrorMessage": "Error creating clone: ",
+    "loadCloneErrorMessage": "Error loading clone: ",
+    "loadCloneConfirmationMessage": "Loading clone will delete all the existing data and make an exact replica of the clone data. It will even log you out. This operation is irreversible. Are you sure you want to continue?"
 }

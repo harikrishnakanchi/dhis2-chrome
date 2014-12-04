@@ -16,7 +16,9 @@ define(["lodash"], function(_) {
                 var store = db.objectStore(name);
                 return store.clear();
             });
-            return $q.all(truncatePromises);
+            return $q.all(truncatePromises).then(function(data) {
+                return data;
+            });
         };
 
         var backupEntireDB = function() {

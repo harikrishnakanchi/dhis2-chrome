@@ -1,5 +1,5 @@
 define(["moment", "approvalDataTransformer", "properties", "lodash"], function(moment, approvalDataTransformer, properties, _) {
-    return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout, indexeddbUtils, filesystemService) {
+    return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location) {
         var dataValues = [];
         $scope.approveSuccessForLevelOne = false;
         $scope.approveSuccessForLevelTwo = false;
@@ -151,17 +151,6 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
                 return data;
             };
 
-            var showModal = function(okCallback, message) {
-                $scope.modalMessage = message;
-                var modalInstance = $modal.open({
-                    templateUrl: 'templates/confirm.dialog.html',
-                    controller: 'confirmDialogController',
-                    scope: $scope
-                });
-
-                modalInstance.result.then(approve);
-            };
-
             var approve = function() {
                 return dataSetRepository.getAll().then(function(dataSets) {
                     var bulkApprovalData = approvalDataTransformer.generateBulkApprovalData(getPeriodsToBeApproved(), dataSets, $rootScope.currentUser.userCredentials.username);
@@ -184,12 +173,12 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
 
         $scope.createClone = function() {
             var errorCallback = function(error) {
-                displayMessage($scope.resourceBundle.cloneErrorMessage + error.name, true);
+                displayMessage($scope.resourceBundle.createCloneErrorMessage + error.name, true);
                 $scope.$apply();
             };
 
             var successCallback = function(directory) {
-                displayMessage($scope.resourceBundle.cloneSuccessMessage + directory.name, false);
+                displayMessage($scope.resourceBundle.createCloneSuccessMessage + directory.name, false);
                 $scope.$apply();
             };
 
@@ -197,6 +186,28 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
                 var cloneFileName = "dhis_idb_" + moment().format("YYYYMMDD-HHmmss") + ".clone";
                 filesystemService.writeFile(cloneFileName, JSON.stringify(data), "application/json", successCallback, errorCallback);
             });
+        };
+
+        $scope.loadClone = function() {
+            var errorCallback = function(error) {
+                displayMessage($scope.resourceBundle.loadCloneErrorMessage + error, true);
+                $scope.$apply();
+            };
+
+            var successCallback = function(fileData) {
+                $timeout(function() {
+                    indexeddbUtils.restore(JSON.parse(fileData.target.result)).then(function() {
+                        sessionHelper.logout();
+                        $location.path("#/login");
+                    }, errorCallback);
+
+                }, 0);
+            };
+
+            showModal(function() {
+                filesystemService.readFile(successCallback, errorCallback);
+            }, $scope.resourceBundle.loadCloneConfirmationMessage);
+
         };
 
         var displayMessage = function(messageText, isErrorMessage) {
@@ -212,6 +223,16 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
             $timeout(hideMessage, properties.messageTimeout);
         };
 
+        var showModal = function(okCallback, message) {
+            $scope.modalMessage = message;
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/confirm.dialog.html',
+                controller: 'confirmDialogController',
+                scope: $scope
+            });
+
+            modalInstance.result.then(okCallback);
+        };
 
         var filterItems = function(items, withSelectedItems) {
             items = _.map(items, function(item) {
