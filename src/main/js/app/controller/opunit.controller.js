@@ -109,7 +109,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                             "code": "opUnitType"
                         }
                     }).value,
-                    'hospitalUnitCode': _.find($scope.orgUnit.attributeValues, {
+                    'hospitalUnitCode': "Unit Code - " + _.find($scope.orgUnit.attributeValues, {
                         "attribute": {
                             "code": "hospitalUnitCode"
                         }
