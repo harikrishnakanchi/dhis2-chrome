@@ -1,4 +1,4 @@
-define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataSetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper"], function(DashboardController, mocks, utils, ApprovalHelper, DataSetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper) {
+define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataSetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5"], function(DashboardController, mocks, utils, ApprovalHelper, DataSetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5) {
     describe("dashboard controller", function() {
         var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, dataSetRepository, filesystemService, indexeddbUtils, idbDump, sessionHelper, location;
 
@@ -52,7 +52,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
 
             spyOn(filesystemService, "writeFile");
             spyOn(filesystemService, "readFile").and.callFake(function() {
-                var result = "{}";
+                var result = "{}\nchecksum: " + md5("{}");
                 var fileData = {
                     "target": {
                         "result": result
@@ -384,13 +384,16 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
         });
 
         it("should clone the entire indexed db and save it to a file", function() {
+            idbDump = JSON.stringify(idbDump);
+            var expectedFileContents = idbDump + "\nchecksum: " + md5(idbDump);
+
             scope.createClone();
 
             scope.$apply();
             timeout.flush();
 
             expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
-            expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', JSON.stringify(idbDump),
+            expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', expectedFileContents,
                 'application/json', jasmine.any(Function), jasmine.any(Function));
         });
 

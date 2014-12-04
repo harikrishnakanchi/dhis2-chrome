@@ -111,5 +111,6 @@
     "createCloneSuccessMessage": "Clone created successfully at ",
     "createCloneErrorMessage": "Error creating clone: ",
     "loadCloneErrorMessage": "Error loading clone: ",
+    "corruptFileMessage": "The selected file is corrupted.",
     "loadCloneConfirmationMessage": "Loading clone will delete all the existing data and make an exact replica of the clone data. It will even log you out. This operation is irreversible. Are you sure you want to continue?"
 }

@@ -1,4 +1,4 @@
-define(["moment", "approvalDataTransformer", "properties", "lodash"], function(moment, approvalDataTransformer, properties, _) {
+define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], function(moment, approvalDataTransformer, properties, _, md5) {
     return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location) {
         var dataValues = [];
         $scope.approveSuccessForLevelOne = false;
@@ -182,9 +182,14 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
                 $scope.$apply();
             };
 
+            var addChecksum = function(data) {
+                return data + "\nchecksum: " + md5(data);
+            };
+
             indexeddbUtils.backupEntireDB().then(function(data) {
                 var cloneFileName = "dhis_idb_" + moment().format("YYYYMMDD-HHmmss") + ".clone";
-                filesystemService.writeFile(cloneFileName, JSON.stringify(data), "application/json", successCallback, errorCallback);
+                var cloneFileContents = addChecksum(JSON.stringify(data));
+                filesystemService.writeFile(cloneFileName, cloneFileContents, "application/json", successCallback, errorCallback);
             });
         };
 
@@ -194,12 +199,23 @@ define(["moment", "approvalDataTransformer", "properties", "lodash"], function(m
                 $scope.$apply();
             };
 
+            var isValidChecksum = function(data, checksum) {
+                return checksum === md5(data);
+            };
+
             var successCallback = function(fileData) {
                 $timeout(function() {
-                    indexeddbUtils.restore(JSON.parse(fileData.target.result)).then(function() {
-                        sessionHelper.logout();
-                        $location.path("#/login");
-                    }, errorCallback);
+                    var fileContents = fileData.target.result;
+                    fileContents = fileContents.split("\nchecksum: ");
+
+                    if (fileContents.length === 2 && isValidChecksum(fileContents[0], fileContents[1])) {
+                        indexeddbUtils.restore(JSON.parse(fileContents[0])).then(function() {
+                            sessionHelper.logout();
+                            $location.path("#/login");
+                        }, errorCallback);
+                    } else {
+                        displayMessage($scope.resourceBundle.corruptFileMessage, true);
+                    }
 
                 }, 0);
             };
