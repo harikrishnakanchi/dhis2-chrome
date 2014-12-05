@@ -310,7 +310,10 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 }, {
                     name: 'Unit Code - C2',
                     id: 'a9ab62b5ef3',
-                    organisationUnits: []
+                    organisationUnits: [{
+                        id: 'a72ec34b863',
+                        name: 'OBGYN'
+                    }]
                 }, {
                     name: 'Unit Code - C3',
                     id: 'a0a3d72134f',

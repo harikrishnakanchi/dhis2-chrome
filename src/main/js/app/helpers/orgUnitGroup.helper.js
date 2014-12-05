@@ -23,9 +23,18 @@ define([], function() {
                         'name': module_t.name
                     };
                     return _.map(orgUnitGroups, function(orgUnitGroup) {
-                        var res = _.find(attributes, {
-                            'value': orgUnitGroup.name.trim()
-                        });
+                        var res;
+                        if (orgUnitGroup.name.indexOf("Unit Code - ") !== -1) {
+                            var orgUnitGroupName = orgUnitGroup.name.replace("Unit Code - ", "");
+                            res = _.find(attributes, {
+                                'value': orgUnitGroupName.trim()
+                            });
+                        } else {
+                            res = _.find(attributes, {
+                                'value': orgUnitGroup.name.trim()
+                            });
+                        }
+
                         if (isUpdateProject) {
                             orgUnitGroup.organisationUnits = _.reject(orgUnitGroup.organisationUnits, moduleToAdd);
                         }
