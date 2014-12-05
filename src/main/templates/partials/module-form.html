@@ -29,6 +29,14 @@
                             <option value="Linelist">{{resourceBundle.lineListLabel}}</option>
                         </select>
                     </li>
+                    <li ng-if="module.serviceType==='Aggregate'">
+                        <label for="dataModelType" class="col-sm-4 col-md-4 control-label">{{resourceBundle.dataModelLabel}}
+                        </label>
+                        <select type="text" name="dataModelType" id="dataModelType" ng-model="module.dataModelType" ng-disabled="!isNewMode" ng-change="changeDataModel(module, module.dataModelType)" required>
+                            <option value="New">{{resourceBundle.newLabel}}</option>
+                            <option value="Current">{{resourceBundle.currentLabel}}</option>
+                        </select>
+                    </li>
                     <li class="form-group" ng-if="module.serviceType==='Aggregate'">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-show="isNewMode">Add service</label>
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-hide="isNewMode">Services</label>
@@ -42,7 +50,7 @@
                                     </div>
                                     <multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isNewMode" on-right-item-select="selectDataSet(module, item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
                                 </div>
-                                <div class="details" ng-show="module.selectedDataset.sections.length > 0">
+                                <div class="details" ng-show="module.selectedDataset.sections.length > 0" ng-if="module.dataModelType==='New'">
                                     <span ng-show="areNoSectionsSelectedForDataset(module.selectedDataset)">{{resourceBundle.selectDatasetSection}}</span>
                                     <h4 ng-class="{cur: true}">{{module.selectedDataset.name}}</h4>
                                     <div ng-repeat="section in module.selectedDataset.sections">
@@ -65,9 +73,9 @@
                         </div>
                     </li>
                     <li class="form-group" ng-if="module.serviceType==='Linelist'">
-                        <label for="program" class="col-sm-4 col-md-4 control-label">{{resourceBundle.selectProgramLabel}}</label> 
+                        <label for="program" class="col-sm-4 col-md-4 control-label">{{resourceBundle.selectProgramLabel}}</label>
                         <select type="text" name="programsDropDown" id="programsDropDown" ng-model="module.program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
-                           <option value=""></option>
+                            <option value=""></option>
                         </select>
                     </li>
                 </ul>

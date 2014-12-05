@@ -23,7 +23,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             systemSettingRepo = utils.getMockRepo(q);
             systemSettingRepo.getAllWithProjectId = function() {};
             programsRepo = utils.getMockRepo(q);
-            orgUnitGroupHelper = new OrgUnitGroupHelper(hustle,q,scope,orgUnitRepo,orgunitGroupRepo);
+            orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
 
             mockOrgStore = {
                 upsert: function() {},
@@ -749,6 +749,88 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(module, "disabledModule");
             expect(scope.isDisabled).toEqual(true);
+        });
+
+        it("should load current datasets for a module if dataModelType is current", function() {
+            var module = {
+                'id': "Mod1",
+                'name': "Module1"
+            };
+
+            scope.allDatasets = [{
+                'id': 'ds1',
+                'name': 'Neonat',
+                'attributeValues': [{
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": "true"
+                }]
+            }, {
+                'id': 'ds2',
+                'name': 'NeoNat = V1',
+                'attributeValues': [{
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": "false"
+                }]
+            }];
+
+            scope.changeDataModel(module, "Current");
+            scope.$apply();
+
+            expect(module.allDatasets).toEqual([{
+                'id': 'ds2',
+                'name': 'NeoNat = V1',
+                'attributeValues': [{
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": "false"
+                }]
+            }]);
+        });
+
+        it("should load current datasets for a module if dataModelType is new", function() {
+            var module = {
+                'id': "Mod1",
+                'name': "Module1"
+            };
+
+            scope.allDatasets = [{
+                'id': 'ds1',
+                'name': 'Neonat',
+                'attributeValues': [{
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": "true"
+                }]
+            }, {
+                'id': 'ds2',
+                'name': 'NeoNat = V1',
+                'attributeValues': [{
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": "false"
+                }]
+            }];
+
+            scope.changeDataModel(module, "New");
+            scope.$apply();
+
+            expect(module.allDatasets).toEqual([{
+                'id': 'ds1',
+                'name': 'Neonat',
+                'attributeValues': [{
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": "true"
+                }]
+            }]);
         });
     });
 });

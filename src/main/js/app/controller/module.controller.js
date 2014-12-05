@@ -52,7 +52,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 var setUpEditMode = function() {
                     var associatedDatasets = datasetTransformer.getAssociatedDatasets($scope.orgUnit.id, $scope.allDatasets);
                     var nonAssociatedDatasets = _.reject($scope.allDatasets, function(d) {
-                        return !isNewDataModel(d) || _.any(associatedDatasets, {
+                        return _.any(associatedDatasets, {
                             "id": d.id
                         });
                     });
@@ -64,7 +64,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         'datasets': associatedDatasets,
                         'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
                         'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
-                        'program': findAssociatedModule()
+                        'program': findAssociatedModule(),
+                        "dataModelType": isNewDataModel(associatedDatasets[0]) ? "New" : "Current"
                     });
 
                     var isDisabled = _.find($scope.orgUnit.attributeValues, {
@@ -247,6 +248,19 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             return $scope.isExpanded[module.timestamp];
         };
 
+        $scope.changeDataModel = function(module, dataModel) {
+            if (dataModel === "New") {
+                module.allDatasets = _.filter(_.cloneDeep($scope.allDatasets), isNewDataModel);
+            } else {
+                module.allDatasets = _.filter(_.cloneDeep($scope.allDatasets), function(ds) {
+                    return !isNewDataModel(ds);
+                });
+            }
+            module.dataModelType = dataModel;
+            module.datasets = [];
+            module.selectedDataset = {};
+        };
+
         $scope.addModules = function() {
             $scope.modules.push({
                 'openingDate': moment().format("YYYY-MM-DD"),
@@ -257,7 +271,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 "serviceType": "",
                 "program": {
                     "name": ""
-                }
+                },
+                "dataModelType": "New"
             });
         };
 
