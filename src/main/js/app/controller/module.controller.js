@@ -65,7 +65,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
                         'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
                         'program': findAssociatedModule(),
-                        "dataModelType": isNewDataModel(associatedDatasets[0]) ? "New" : "Current"
+                        "dataModelType": associatedDatasets[0] && isNewDataModel(associatedDatasets[0]) ? "New" : "Current"
                     });
 
                     var isDisabled = _.find($scope.orgUnit.attributeValues, {
