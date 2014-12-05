@@ -554,7 +554,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var projectToBeSaved = orgUnitMapper.mapToExistingProject(newProject, project);
 
             expect(projectToBeSaved).toEqual({
-                name: 'Project1',
+                name: 'Org1',
                 id: 'id1',
                 children: [{
                     id: '123'
