@@ -39,6 +39,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                     });
 
                     return linelistAttribute ? linelistAttribute.value : false;
+
                 };
 
                 var setUpNewMode = function() {
@@ -239,14 +240,19 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.update = function(modules) {
-            $scope.excludeDataElements($scope.orgUnit.parent.id, modules).then($scope.onSuccess, $scope.onError);
+            var enrichedModules = orgUnitMapper.mapToModules(modules, $scope.orgUnit.parent, $scope.orgUnit.id, 6);
+
+            return $q.all($scope.excludeDataElements($scope.orgUnit.parent.id, modules), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit"))
+                .then($scope.onSuccess, $scope.onError);
         };
 
-        $scope.getIsExpanded = function(module) {
-            module.timestamp = module.timestamp || new Date().getTime();
-            $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
-            return $scope.isExpanded[module.timestamp];
-        };
+
+        $scope.getIsExpanded =
+            function(module) {
+                module.timestamp = module.timestamp || new Date().getTime();
+                $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
+                return $scope.isExpanded[module.timestamp];
+            };
 
         $scope.changeDataModel = function(module, dataModel) {
             if (dataModel === "New") {

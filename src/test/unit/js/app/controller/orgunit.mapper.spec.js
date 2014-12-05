@@ -228,7 +228,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             expect(result).toEqual(expectedResult);
         });
 
-        it("should map modules for dhis", function() {
+        it("should map modules for dhis if id and level are not given", function() {
             var projectOrgUnit = {
                 'id': 'Project1Id',
                 'name': 'Project1',
@@ -305,6 +305,64 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 shortName: 'Module2',
                 id: 'acccf1dda36',
                 level: 4,
+                openingDate: "2010-01-01",
+                selectedDataset: undefined,
+                attributeValues: [{
+                    attribute: {
+                        code: "Type",
+                        name: "Type"
+                    },
+                    value: 'Module'
+                }, {
+                    attribute: {
+                        code: "isLineListService",
+                        name: "Is Linelist Service"
+                    },
+                    value: false
+                }],
+                parent: {
+                    name: 'Project1',
+                    id: 'Project1Id'
+                }
+            }]);
+        });
+
+        it("should map modules for dhis if id and level are given", function() {
+            var projectOrgUnit = {
+                'id': 'Project1Id',
+                'name': 'Project1',
+                'level': '3',
+            };
+
+            var modules = [{
+                'name': "Module1",
+                'service': "Aggregate",
+                'datasets': [{
+                    'id': 'ds_11',
+                    'name': 'dataset11',
+                }, {
+                    'id': 'ds_12',
+                    'name': 'dataset12'
+                }]
+            }];
+
+            var today = new Date("2010-01-01T00:00:00");
+            spyOn(window, 'Date').and.returnValue(today);
+
+            var actualModules = orgUnitMapper.mapToModules(modules, projectOrgUnit, "someId", "someLevel");
+
+            expect(actualModules).toEqual([{
+                name: 'Module1',
+                datasets: [{
+                    'id': 'ds_11',
+                    'name': 'dataset11',
+                }, {
+                    'id': 'ds_12',
+                    'name': 'dataset12'
+                }],
+                shortName: 'Module1',
+                id: 'someId',
+                level: 'someLevel',
                 openingDate: "2010-01-01",
                 selectedDataset: undefined,
                 attributeValues: [{

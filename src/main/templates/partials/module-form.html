@@ -14,7 +14,7 @@
                     <li class="form-group">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label">Module name</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="Module Name" ng-model="module.name" not-in="allModules" ng-disabled="!isNewMode" required>
+                            <input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="Module Name" ng-model="module.name" not-in="allModules" required>
                             <div ng-show="form.moduleName.$dirty &amp;&amp; form.moduleName.$invalid">
                                 <span class="errortxt" ng-show="form.moduleName.$error.required">{{resourceBundle.nameValidation}}</span>
                                 <span class="errortxt" ng-show="form.moduleName.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
@@ -23,7 +23,7 @@
                     </li>
                     <li class="form-group">
                         <label for="service" class="col-sm-4 col-md-4 control-label">{{resourceBundle.serviceLabel}}</label>
-                        <div class="col-sm-6 col-md-6" >
+                        <div class="col-sm-6 col-md-6">
                             <select type="text" name="serviceDropDown" id="serviceDropDown" ng-model="module.serviceType" ng-disabled="!isNewMode" required>
                                 <option value=""></option>
                                 <option value="Aggregate">{{resourceBundle.aggregateLabel}}</option>
@@ -33,11 +33,11 @@
                     </li>
                     <li class="form-group" ng-if="module.serviceType==='Aggregate'">
                         <label for="dataModelType" class="col-sm-4 col-md-4 control-label">{{resourceBundle.dataModelLabel}}</label>
-                        <div class="col-sm-6 col-md-6" >
-                        <select type="text" name="dataModelType" id="dataModelType" ng-model="module.dataModelType" ng-disabled="!isNewMode" ng-change="changeDataModel(module, module.dataModelType)" required>
-                            <option value="New">{{resourceBundle.newLabel}}</option>
-                            <option value="Current">{{resourceBundle.currentLabel}}</option>
-                        </select>
+                        <div class="col-sm-6 col-md-6">
+                            <select type="text" name="dataModelType" id="dataModelType" ng-model="module.dataModelType" ng-disabled="!isNewMode" ng-change="changeDataModel(module, module.dataModelType)" required>
+                                <option value="New">{{resourceBundle.newLabel}}</option>
+                                <option value="Current">{{resourceBundle.currentLabel}}</option>
+                            </select>
                         </div>
                     </li>
                     <li class="form-group" ng-if="module.serviceType==='Aggregate'">
@@ -76,8 +76,8 @@
                         </div>
                     </li>
                     <li class="form-group" ng-if="module.serviceType==='Linelist'">
-                        <label for="program" class="col-sm-4 col-md-4 control-label">{{resourceBundle.selectProgramLabel}}</label> 
-                        <div class="col-sm-6 col-md-6" >
+                        <label for="program" class="col-sm-4 col-md-4 control-label">{{resourceBundle.selectProgramLabel}}</label>
+                        <div class="col-sm-6 col-md-6">
                             <select type="text" name="programsDropDown" id="programsDropDown" ng-model="module.program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
                                 <option value=""></option>
                             </select>

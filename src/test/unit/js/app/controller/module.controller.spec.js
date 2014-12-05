@@ -414,7 +414,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(scope.isDisabled).toBeTruthy();
         });
 
-        it("should update module", function() {
+        it("should update module datasets", function() {
             scope.orgUnit = {
                 "id": "mod2",
                 "parent": {
@@ -439,6 +439,57 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.$apply();
 
             expect(scope.excludeDataElements).toHaveBeenCalledWith('par1', scope.modules);
+        });
+
+        it("should update module name", function() {
+            scope.orgUnit = {
+                "id": "mod2",
+                "name": "module OLD name",
+                "parent": {
+                    "id": "par1",
+                    "name": "Par1"
+                }
+            };
+
+            var modules = [{
+                "name": "module NEW name",
+                "parent": {
+                    "id": "par1"
+                }
+            }];
+            scope.isNewMode = false;
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+
+            scope.update(modules);
+            scope.$apply();
+
+            var expectedModules = [{
+                name: 'module NEW name',
+                shortName: 'module NEW name',
+                id: 'mod2',
+                level: 6,
+                openingDate: moment().format("YYYY-MM-DD"),
+                selectedDataset: undefined,
+                datasets: undefined,
+                attributeValues: [{
+                    attribute: {
+                        code: 'Type',
+                        name: 'Type'
+                    },
+                    value: 'Module'
+                }, {
+                    attribute: {
+                        code: 'isLineListService',
+                        name: 'Is Linelist Service'
+                    },
+                    value: false
+                }],
+                parent: {
+                    name: "Par1",
+                    id: 'par1'
+                }
+            }];
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModules);
         });
 
         it("should exclude modules", function() {

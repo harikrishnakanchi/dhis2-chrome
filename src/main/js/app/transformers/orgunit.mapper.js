@@ -149,13 +149,13 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         };
     };
 
-    this.mapToModules = function(modules, moduleParent) {
+    this.mapToModules = function(modules, moduleParent, moduleId, moduleLevel) {
         var result = _.map(modules, function(module) {
             return {
                 name: module.name,
                 shortName: module.name,
-                id: dhisId.get(module.name + moduleParent.id),
-                level: parseInt(moduleParent.level) + 1,
+                id: moduleId || dhisId.get(module.name + moduleParent.id),
+                level: moduleLevel || parseInt(moduleParent.level) + 1,
                 openingDate: moment().format("YYYY-MM-DD"),
                 selectedDataset: module.selectedDataset,
                 datasets: module.datasets,
