@@ -45,21 +45,11 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             };
 
             approvalHelper = new ApprovalHelper();
-            filesystemService = new FilesystemService();
+            filesystemService = new FilesystemService(q);
             dataSetRepository = new DataSetRepository();
             indexeddbUtils = new IndexeddbUtils();
             sessionHelper = new SessionHelper();
 
-            spyOn(filesystemService, "writeFile");
-            spyOn(filesystemService, "readFile").and.callFake(function() {
-                var result = "{}\nchecksum: " + md5("{}");
-                var fileData = {
-                    "target": {
-                        "result": result
-                    }
-                };
-                filesystemService.readFile.calls.allArgs()[0][0](fileData);
-            });
             spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
             spyOn(indexeddbUtils, "backupEntireDB").and.returnValue(utils.getPromise(q, idbDump));
             spyOn(indexeddbUtils, "restore").and.returnValue(utils.getPromise(q, {}));
@@ -82,7 +72,6 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
         afterEach(function() {
             Timecop.returnToPresent();
             Timecop.uninstall();
-            timeout.verifyNoPendingTasks();
         });
 
         it("should fetch and display all organisation units", function() {
@@ -383,25 +372,59 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
             expect(scope.weeks.approveAllItems).toBe(true);
         });
 
-        it("should clone the entire indexed db and save it to a file", function() {
+        it("should clone the entire indexed db successfully and save it to a file", function() {
             idbDump = JSON.stringify(idbDump);
             var expectedFileContents = idbDump + "\nchecksum: " + md5(idbDump);
+            spyOn(filesystemService, "writeFile").and.returnValue(utils.getPromise(q, {
+                "name": "Desktop"
+            }));
+            scope.resourceBundle = {
+                "createCloneSuccessMessage": "Clone created successfully at "
+            };
 
             scope.createClone();
 
             scope.$apply();
-            timeout.flush();
 
             expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
             expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', expectedFileContents,
-                'application/json', jasmine.any(Function), jasmine.any(Function));
+                'application/json');
+
+            expect(scope.showMessage).toBeTruthy();
+            expect(scope.message).toEqual("Clone created successfully at Desktop");
+        });
+
+        it("should fail if cloning entire indexedDb fails", function() {
+            idbDump = JSON.stringify(idbDump);
+            var expectedFileContents = idbDump + "\nchecksum: " + md5(idbDump);
+            spyOn(filesystemService, "writeFile").and.returnValue(utils.getRejectedPromise(q, {
+                "name": "InvalidFile"
+            }));
+            scope.resourceBundle = {
+                "createCloneErrorMessage": "Error creating clone: "
+            };
+
+            scope.createClone();
+
+            scope.$apply();
+
+            expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
+            expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', expectedFileContents,
+                'application/json');
+
+            expect(scope.showMessage).toBeTruthy();
+            expect(scope.message).toEqual("Error creating clone: InvalidFile");
         });
 
         it("should load clone to indexed db from selected file", function() {
-            scope.loadClone();
+            spyOn(filesystemService, "readFile").and.returnValue(utils.getPromise(q, {
+                "target": {
+                    "result": "{}\nchecksum: " + md5('{}')
+                }
+            }));
 
+            scope.loadClone();
             scope.$apply();
-            timeout.flush();
 
             expect(filesystemService.readFile).toHaveBeenCalled();
             expect(indexeddbUtils.restore).toHaveBeenCalled();

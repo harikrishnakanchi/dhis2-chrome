@@ -1,6 +1,11 @@
 define([], function() {
-    return function() {
-        var writeFile = function(fileName, contents, blobType, successHandler, errorHandler) {
+    return function($q) {
+        var writeFile = function(fileName, contents, blobType) {
+            var deferred = $q.defer();
+            var errorHandler = function(err) {
+                deferred.reject(err);
+            };
+
             var entryType = {
                 "type": 'openDirectory'
             };
@@ -17,7 +22,7 @@ define([], function() {
 
                             writer.onerror = errorHandler;
                             writer.onwriteend = function() {
-                                successHandler(entry);
+                                deferred.resolve(entry);
                             };
                             writer.write(new Blob([contents], {
                                 type: blobType
@@ -26,9 +31,16 @@ define([], function() {
                     }, errorHandler);
                 });
             });
+
+            return deferred.promise;
         };
 
-        var readFile = function(successHandler, errorHandler, extensions) {
+        var readFile = function(extensions) {
+            var deferred = $q.defer();
+            var errorHandler = function(err) {
+                deferred.reject(err);
+            };
+
             var entryType = {
                 "type": 'openFile',
                 "accepts": [{
@@ -40,10 +52,14 @@ define([], function() {
                 readOnlyEntry.file(function(file) {
                     var reader = new FileReader();
                     reader.onerror = errorHandler;
-                    reader.onloadend = successHandler;
+                    reader.onloadend = function(data) {
+                        deferred.resolve(data);
+                    };
                     reader.readAsText(file);
                 });
             });
+
+            return deferred.promise;
         };
 
         return {

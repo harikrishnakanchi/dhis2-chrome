@@ -174,12 +174,10 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
         $scope.createClone = function() {
             var errorCallback = function(error) {
                 displayMessage($scope.resourceBundle.createCloneErrorMessage + error.name, true);
-                $scope.$apply();
             };
 
             var successCallback = function(directory) {
                 displayMessage($scope.resourceBundle.createCloneSuccessMessage + directory.name, false);
-                $scope.$apply();
             };
 
             var addChecksum = function(data) {
@@ -189,14 +187,13 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
             indexeddbUtils.backupEntireDB().then(function(data) {
                 var cloneFileName = "dhis_idb_" + moment().format("YYYYMMDD-HHmmss") + ".clone";
                 var cloneFileContents = addChecksum(JSON.stringify(data));
-                filesystemService.writeFile(cloneFileName, cloneFileContents, "application/json", successCallback, errorCallback);
+                filesystemService.writeFile(cloneFileName, cloneFileContents, "application/json").then(successCallback, errorCallback);
             });
         };
 
         $scope.loadClone = function() {
             var errorCallback = function(error) {
                 displayMessage($scope.resourceBundle.loadCloneErrorMessage + error, true);
-                $scope.$apply();
             };
 
             var isValidChecksum = function(data, checksum) {
@@ -204,24 +201,21 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
             };
 
             var successCallback = function(fileData) {
-                $timeout(function() {
-                    var fileContents = fileData.target.result;
-                    fileContents = fileContents.split("\nchecksum: ");
+                var fileContents = fileData.target.result;
+                fileContents = fileContents.split("\nchecksum: ");
 
-                    if (fileContents.length === 2 && isValidChecksum(fileContents[0], fileContents[1])) {
-                        indexeddbUtils.restore(JSON.parse(fileContents[0])).then(function() {
-                            sessionHelper.logout();
-                            $location.path("#/login");
-                        }, errorCallback);
-                    } else {
-                        displayMessage($scope.resourceBundle.corruptFileMessage, true);
-                    }
-
-                }, 0);
+                if (fileContents.length === 2 && isValidChecksum(fileContents[0], fileContents[1])) {
+                    indexeddbUtils.restore(JSON.parse(fileContents[0])).then(function() {
+                        sessionHelper.logout();
+                        $location.path("#/login");
+                    }, errorCallback);
+                } else {
+                    displayMessage($scope.resourceBundle.corruptFileMessage, true);
+                }
             };
 
             showModal(function() {
-                filesystemService.readFile(successCallback, errorCallback, ["clone"]);
+                filesystemService.readFile(["clone"]).then(successCallback, errorCallback);
             }, $scope.resourceBundle.loadCloneConfirmationMessage);
         };
 
