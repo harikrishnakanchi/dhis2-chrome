@@ -106,8 +106,6 @@
     "importExportMenuLabel": "Import / Export to USB ",
     "createCloneLabel": "Create Clone",
     "loadCloneLabel": "Load Clone",
-    "importLabel": "Import",
-    "exportLabel": "Export",
     "createCloneSuccessMessage": "Clone created successfully at ",
     "createCloneErrorMessage": "Error creating clone: ",
     "loadCloneErrorMessage": "Error loading clone: ",
