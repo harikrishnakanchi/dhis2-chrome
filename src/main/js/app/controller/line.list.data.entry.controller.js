@@ -63,6 +63,16 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             return dataValues[programId][programStageId];
         };
 
+        $scope.getDisplayValue = function(dataValue) {
+            if (dataValue.optionSet && dataValue.optionSet.options.length > 0) {
+                return _.find(dataValue.optionSet.options, function(o) {
+                    return o.code === dataValue.value;
+                }).name;
+            } else {
+                return dataValue.value;
+            }
+        };
+
         $scope.getOptionsFor = function(optionSetId) {
             var optionSet = _.find($scope.optionSets, function(os) {
                 return optionSetId === os.id;

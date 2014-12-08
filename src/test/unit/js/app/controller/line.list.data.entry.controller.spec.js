@@ -2,8 +2,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
     function(LineListDataEntryController, mocks, utils, moment, ProgramRepository, ProgramEventRepository, DataElementRepository) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, q, hustle, programRepository, mockDB, mockStore, dataElementRepository, allEvents, timeout, 
-            fakeModal, anchorScroll, location, event1, event2, event3, event4;
+            var scope, q, hustle, programRepository, mockDB, mockStore, dataElementRepository, allEvents, timeout,
+                fakeModal, anchorScroll, location, event1, event2, event3, event4;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
@@ -268,7 +268,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
                 expect(scope.showView).toEqual(true);
                 expect(scope.showForm).toEqual(false);
-                
+
             });
 
             it("should save event details as draft and show form again", function() {
@@ -294,7 +294,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
                 expect(scope.showView).toEqual(false);
                 expect(scope.showForm).toEqual(true);
-                
+
             });
 
             it("should submit event details", function() {
@@ -369,5 +369,41 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 expect(hustle.publish).not.toHaveBeenCalled();
             });
 
+            it("should get data value", function() {
+                var dataValue = {
+                    "id": "dv1",
+                    "value": "Case123"
+                };
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var actualValue = scope.getDisplayValue(dataValue);
+                scope.$apply();
+
+                expect(actualValue).toEqual("Case123");
+            });
+
+            it("should get option names as data value if options are present", function() {
+                var dataValue = {
+                    "id": "dv1",
+                    "optionSet": {
+                        "options": [{
+                            "id": "Code1",
+                            "code": "Code1",
+                            "name": "Male"
+                        }, {
+                            "id": "Code2",
+                            "code": "Code2",
+                            "name": "Female"
+                        }]
+                    },
+                    "value": "Code1"
+                };
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                var actualValue = scope.getDisplayValue(dataValue);
+                scope.$apply();
+
+                expect(actualValue).toEqual("Male");
+            });
         });
     });
