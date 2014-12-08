@@ -19,6 +19,15 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }, "dataValues");
         };
 
+        var onSuccess = function(data) {
+            if ($scope.$parent.closeNewForm)
+                $scope.$parent.closeNewForm($scope.orgUnit, "savedOpUnit");
+        };
+
+        var onError = function(data) {
+            $scope.saveFailure = true;
+        };
+
         $scope.save = function(opUnits) {
             var parent = $scope.orgUnit;
             var newOpUnits = _.map(opUnits, function(opUnit) {
@@ -51,20 +60,45 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
 
             parent.children = parent.children.concat(newOpUnits);
 
-            var onSuccess = function(data) {
-                if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm($scope.orgUnit, "savedOpUnit");
-            };
-
-            var onError = function(data) {
-                $scope.saveFailure = true;
-            };
-
             return orgUnitRepository.upsert(parent).then(function() {
                 return orgUnitRepository.upsert(newOpUnits)
                     .then(saveToDhis)
                     .then(onSuccess, onError);
             });
+        };
+
+        $scope.update = function(opUnits) {
+            var newOpUnits = _.map(opUnits, function(opUnit) {
+                var opUnitType = opUnit.type;
+                var hospitalUnitCode = opUnit.hospitalUnitCode;
+                opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode']);
+                return _.merge(opUnit, {
+                    'id': $scope.orgUnit.id,
+                    'shortName': opUnit.name,
+                    'level': $scope.orgUnit.level,
+                    'parent': _.pick($scope.orgUnit.parent, "name", "id"),
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "opUnitType"
+                        },
+                        "value": opUnitType
+                    }, {
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Operation Unit"
+                    }, {
+                        "attribute": {
+                            "code": "hospitalUnitCode"
+                        },
+                        "value": hospitalUnitCode
+                    }]
+                });
+            });
+
+            return orgUnitRepository.upsert(newOpUnits)
+                .then(saveToDhis)
+                .then(onSuccess, onError);
         };
 
         $scope.delete = function(index) {

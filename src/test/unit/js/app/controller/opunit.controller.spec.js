@@ -289,5 +289,68 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(opunit, 'disabledOpUnit');
             expect(scope.isDisabled).toEqual(true);
         });
+
+        it('should update operation units', function() {
+            var opUnit1 = {
+                'name': 'OpUnit1',
+                'type': 'Hospital',
+                'openingDate': today,
+                'hospitalUnitCode': 'Unit Code - A'
+            };
+            var opUnits = [opUnit1];
+
+            scope.orgUnit = {
+                'id': "opUnit1Id",
+                'name': 'OpUnit1',
+                'type': 'Health Center',
+                'level': 5,
+                'hospitalUnitCode': 'Unit Code - B1',
+                'parent': {
+                    'name': 'Parent',
+                    'id': 'ParentId'
+                }
+            };
+
+            var expectedOpUnits = [{
+                name: 'OpUnit1',
+                id: 'opUnit1Id',
+                openingDate: today,
+                shortName: 'OpUnit1',
+                level: 5,
+                parent: {
+                    name: 'Parent',
+                    id: 'ParentId'
+                },
+                attributeValues: [{
+                    attribute: {
+                        code: 'opUnitType'
+                    },
+                    value: 'Hospital'
+                }, {
+                    attribute: {
+                        code: 'Type'
+                    },
+                    value: 'Operation Unit'
+                }, {
+                    attribute: {
+                        code: 'hospitalUnitCode'
+                    },
+                    value: 'Unit Code - A'
+                }]
+            }];
+
+            spyOn(location, 'hash');
+
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+
+            scope.update(opUnits);
+            scope.$apply();
+
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnits);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: expectedOpUnits,
+                type: "upsertOrgUnit"
+            }, "dataValues");
+        });
     });
 });
