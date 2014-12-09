@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper) {
+define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment) {
     describe("module controller", function() {
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
             dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
