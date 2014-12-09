@@ -110,6 +110,10 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             };
 
             var buildPayloadFromView = function() {
+                var formatValue = function(value) {
+                    return _.isDate(value) ? moment(value).format("YYYY-MM-DD") : value;
+                };
+
                 var newEvent = {
                     'event': dhisId.get(program.id + programStage.id + $scope.currentModule.id + moment().format()),
                     'program': program.id,
@@ -122,7 +126,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 _.each(programStage.programStageDataElements, function(psde) {
                     newEvent.dataValues.push({
                         "dataElement": psde.dataElement.id,
-                        "value": $scope.dataValues[program.id][programStage.id][psde.dataElement.id]
+                        "value": formatValue($scope.dataValues[program.id][programStage.id][psde.dataElement.id])
                     });
                 });
 
