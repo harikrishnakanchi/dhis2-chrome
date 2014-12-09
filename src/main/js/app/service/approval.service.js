@@ -160,6 +160,7 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
                     "startDate": startDate,
                     "endDate": endDate,
                     "ou": orgUnits,
+                    "pe": "Weekly",
                     "children": true
                 }
             }).then(onSuccess);
