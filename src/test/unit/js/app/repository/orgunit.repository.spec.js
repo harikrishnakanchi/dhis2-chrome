@@ -500,5 +500,60 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
 
             expect(modules).toEqual([module2]);
         });
+
+        it("should get all modules under opUnits", function() {
+            var prj = {
+                'id': 'Prj1'
+            };
+
+            var opUnit1 = {
+                "name": "opunit1",
+                "id": "opunit1",
+                 "parent": {
+                    "id": "prj1"
+                }
+            };
+
+            var opUnit2 = {
+                "name": "opunit2",
+                "id": "opunit2",
+                 "parent": {
+                    "id": "prj2"
+                }
+            };
+
+            var module1 = {
+                "name": "module1",
+                "id": "module1",
+                 "parent": {
+                    "id": "opunit1"
+                }
+            };
+
+            var module2 = {
+                "name": "module2",
+                "displayName": "module2",
+                "id": "module2",
+                 "parent": {
+                    "id": "opunit2"
+                }
+            };
+            
+            var allOrgUnits = [prj, opUnit1, opUnit2, module2, module1];
+
+            mockDb = utils.getMockDB(q, {}, allOrgUnits);
+
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
+            scope.$apply();
+
+            var modules;
+            orgUnitRepository.getAllModulesInOpUnit("opunit1").then(function(data) {
+                modules = data;
+            });
+
+            scope.$apply();
+
+            expect(modules).toEqual([module1]);
+        });
     });
 });

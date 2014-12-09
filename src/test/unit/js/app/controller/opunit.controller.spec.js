@@ -1,8 +1,8 @@
 /*global Date:true*/
-define(["opUnitController", "angularMocks", "utils"], function(OpUnitController, mocks, utils) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper) {
     describe("op unit controller", function() {
 
-        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal;
+        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -13,6 +13,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             location = $location;
 
             orgUnitRepo = utils.getMockRepo(q);
+            orgUnitGroupHelper = new OrgUnitGroupHelper();
             scope.orgUnit = {
                 id: "blah"
             };
@@ -32,7 +33,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 },
                 open: function(object) {}
             };
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, db, location, fakeModal);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, orgUnitGroupHelper, db, location, fakeModal);
         }));
 
         afterEach(function() {
@@ -342,6 +343,7 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
             spyOn(location, 'hash');
 
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
 
             scope.update(opUnits);
             scope.$apply();
@@ -351,6 +353,8 @@ define(["opUnitController", "angularMocks", "utils"], function(OpUnitController,
                 data: expectedOpUnits,
                 type: "upsertOrgUnit"
             }, "dataValues");
+            expect(orgUnitRepo.getAllModulesInOpUnit).toHaveBeenCalledWith("opUnit1Id");
+            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
         });
     });
 });

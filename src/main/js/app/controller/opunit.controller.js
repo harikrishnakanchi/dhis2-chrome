@@ -1,5 +1,5 @@
 define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
-    return function($scope, $q, $hustle, orgUnitRepository, db, $location, $modal) {
+    return function($scope, $q, $hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, $modal) {
         $scope.isDisabled = false;
         $scope.hospitalUnitCodes = ['A', 'B1', 'C1', 'C2', 'C3', 'X'];
         $scope.opUnits = [{
@@ -96,8 +96,14 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 });
             });
 
+            var updateOrgUnitGroupsForModules = function(){
+                return orgUnitRepository.getAllModulesInOpUnit($scope.orgUnit.id).then(function(modules) {
+                    return orgUnitGroupHelper.createOrgUnitGroups(modules,true);
+                });
+            };
+
             return orgUnitRepository.upsert(newOpUnits)
-                .then(saveToDhis)
+                .then(saveToDhis).then(updateOrgUnitGroupsForModules)
                 .then(onSuccess, onError);
         };
 

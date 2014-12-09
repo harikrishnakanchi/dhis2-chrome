@@ -74,18 +74,33 @@ define([], function() {
             });
         };
 
+        this.getAllModulesInOpUnit = function(opUnitId) {
+            return this.getAll().then(function(allOrgUnits) {
+
+                return _.filter(allOrgUnits, function(orgUnit){
+                    if(orgUnit.parent && orgUnit.parent.id === opUnitId){
+                        return orgUnit;
+                    }
+                });
+            });
+        };
+
         this.getProjectAndOpUnitAttributes = function(module_t) {
             var attributes_arr = [];
 
             var pushAttributeValues = function(attributes) {
-                _.forEach(attributes,function( attribute) {
+                _.forEach(attributes, function(attribute) {
                     attributes_arr.push(attribute);
                 });
             };
 
             var getAttributes = function(orgUnits) {
-                var opUnit = _.find(orgUnits,{'id': module_t.parent.id});
-                var project = _.find(orgUnits,{'id': opUnit.parent.id});
+                var opUnit = _.find(orgUnits, {
+                    'id': module_t.parent.id
+                });
+                var project = _.find(orgUnits, {
+                    'id': opUnit.parent.id
+                });
 
                 pushAttributeValues(opUnit.attributeValues);
                 pushAttributeValues(project.attributeValues);
