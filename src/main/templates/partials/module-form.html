@@ -48,7 +48,7 @@
                         <div class="col-sm-12">
                             <section class="module-details">
                                 <div class="add-item-ctrl">
-                                    <div ng-show="areDatasetsNotSelected([module])">
+                                    <div ng-show="areDatasetsNotSelected([module]) &amp;&amp; isNewModule([module])">
                                         <span>{{resourceBundle.selectDatasets}}</span>
                                     </div>
                                     <multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isNewMode" on-right-item-select="selectDataSet(module, item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
@@ -86,7 +86,7 @@
                 </ul>
             </div>
             <input type="button" class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules)" value="Save" ng-if="isNewMode" />
-            <input type="button" class="btn btn-main pull-right" ng-click="update(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules) || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode &amp;&amp; !updateDisabled" />
+            <input type="button" class="btn btn-main pull-right" ng-click="update(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules) || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode"/>
             <input type="button" class="btn btn-main pull-right" ng-click="disable(orgUnit)" value="Disable" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !isDisabled" />
         </form>
     </div>

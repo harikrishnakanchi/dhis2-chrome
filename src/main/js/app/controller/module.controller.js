@@ -306,8 +306,14 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
         };
 
+        $scope.isNewModule = function(modules){
+            return _.any(modules, function(module){
+                return module.dataModelType === "New";
+            });
+        };
+
         $scope.shouldDisableSaveOrUpdateButton = function(modules) {
-            return $scope.areDatasetsNotSelected(modules) || $scope.areNoSectionsSelected(modules) || $scope.areNoProgramsSelected(modules);
+            return $scope.isNewModule(modules) && ($scope.areDatasetsNotSelected(modules) || $scope.areNoSectionsSelected(modules) || $scope.areNoProgramsSelected(modules));
         };
 
         $scope.areNoSectionsSelectedForDataset = function(dataset) {
