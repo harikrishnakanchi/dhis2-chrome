@@ -38,7 +38,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         }
                     });
 
-                    return linelistAttribute ? linelistAttribute.value==="true" : false;
+                    return linelistAttribute ? linelistAttribute.value === "true" : false;
 
                 };
 
@@ -175,12 +175,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
         };
 
-        $scope.onSuccess = function(data) {
-            $scope.saveFailure = false;
-            if ($scope.$parent.closeNewForm)
-                $scope.$parent.closeNewForm($scope.orgUnit, "savedModule");
-        };
-
         $scope.onError = function(data) {
             $scope.saveFailure = true;
         };
@@ -193,6 +187,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.save = function(modules) {
+            var onSuccess = function(data) {
+                $scope.saveFailure = false;
+                if ($scope.$parent.closeNewForm)
+                    $scope.$parent.closeNewForm($scope.orgUnit, "savedModule");
+            };
+
             var getModulesOfServiceType = function(serviceType) {
                 return _.filter(modules, function(m) {
                     return m.serviceType === serviceType;
@@ -204,7 +204,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 return $scope.createModules(aggregateModules)
                     .then($scope.associateDatasets)
                     .then(_.curry($scope.excludeDataElements)($scope.orgUnit.id))
-                    .then($scope.onSuccess, $scope.onError);
+                    .then(onSuccess, $scope.onError);
             };
 
             var saveLinelistModules = function() {
@@ -216,7 +216,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
                 return $scope.createModules(linelistModules)
                     .then(_.curry(associatePrograms)(programWiseModules))
-                    .then($scope.onSuccess, $scope.onError);
+                    .then(onSuccess, $scope.onError);
             };
 
             var createOrgUnitGroups = function() {
@@ -240,10 +240,16 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.update = function(modules) {
+            var onSuccess = function(data) {
+                $scope.saveFailure = false;
+                if ($scope.$parent.closeNewForm)
+                    $scope.$parent.closeNewForm(enrichedModules[0], "savedModule");
+            };
+
             var enrichedModules = orgUnitMapper.mapToModules(modules, $scope.orgUnit.parent, $scope.orgUnit.id, 6);
 
             return $q.all($scope.excludeDataElements($scope.orgUnit.parent.id, modules), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit"))
-                .then($scope.onSuccess, $scope.onError);
+                .then(onSuccess, $scope.onError);
         };
 
 
@@ -252,7 +258,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 module.timestamp = module.timestamp || new Date().getTime();
                 $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
                 return $scope.isExpanded[module.timestamp];
-            };
+        };
 
         $scope.changeDataModel = function(module, dataModel) {
             if (dataModel === "New") {
@@ -306,8 +312,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
         };
 
-        $scope.isNewModule = function(modules){
-            return _.any(modules, function(module){
+        $scope.isNewModule = function(modules) {
+            return _.any(modules, function(module) {
                 return module.dataModelType === "New";
             });
         };
