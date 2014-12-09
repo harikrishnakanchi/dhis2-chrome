@@ -287,7 +287,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         code: "isLineListService",
                         name: "Is Linelist Service"
                     },
-                    value: false
+                    value: 'false'
                 }],
                 parent: {
                     name: 'Project1',
@@ -318,7 +318,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         code: "isLineListService",
                         name: "Is Linelist Service"
                     },
-                    value: false
+                    value: 'false'
                 }],
                 parent: {
                     name: 'Project1',
@@ -376,7 +376,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                         code: "isLineListService",
                         name: "Is Linelist Service"
                     },
-                    value: false
+                    value: 'false'
                 }],
                 parent: {
                     name: 'Project1',

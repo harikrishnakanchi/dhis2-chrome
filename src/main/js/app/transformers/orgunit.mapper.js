@@ -170,7 +170,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                         "code": "isLineListService",
                         "name": "Is Linelist Service"
                     },
-                    value: module.serviceType === "Linelist"
+                    value: module.serviceType === "Linelist" ? "true" : "false"
                 }],
                 parent: {
                     name: moduleParent.name,

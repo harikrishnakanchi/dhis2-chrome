@@ -254,7 +254,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                         code: "isLineListService",
                         name: "Is Linelist Service"
                     },
-                    value: false
+                    value: 'false'
                 }],
                 parent: {
                     name: 'Project1',
@@ -482,7 +482,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                         code: 'isLineListService',
                         name: 'Is Linelist Service'
                     },
-                    value: false
+                    value: 'false'
                 }],
                 parent: {
                     name: "Par1",

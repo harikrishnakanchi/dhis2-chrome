@@ -38,7 +38,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         }
                     });
 
-                    return linelistAttribute ? linelistAttribute.value : false;
+                    return linelistAttribute ? linelistAttribute.value==="true" : false;
 
                 };
 
