@@ -21,7 +21,7 @@ define([], function() {
     };
 
     var add_object_stores = function(db, tx) {
-        const syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "programStages", "optionSets"];
+        syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "programStages", "optionSets"];
         create_data_store(syncable_types, db);
     };
 
@@ -39,7 +39,7 @@ define([], function() {
     };
 
     var add_organisation_units_and_level_store = function(db, tx) {
-        const syncable_types = ["organisationUnits", "organisationUnitLevels"];
+        syncable_types = ["organisationUnits", "organisationUnitLevels"];
         create_data_store(syncable_types, db);
     };
 
@@ -82,7 +82,7 @@ define([], function() {
     };
 
     var add_translation_store = function(db, tx) {
-        var translationsStore = create_store_with_key("translations", ["objectUid", "locale"], db)
+        var translationsStore = create_store_with_key("translations", ["objectUid", "locale"], db);
         create_index(translationsStore, "by_locale", "locale", false);
     };
 

@@ -7,7 +7,7 @@ require.config({
         "ng-i18n": "lib/ng-i18n/src/js/ng-i18n",
         "angular-route": "lib/angular-route/angular-route",
         "angular-resource": "lib/angular-resource/angular-resource",
-        "migrations": "../data/migrations",
+        "migrations": "app/migrator/migrations",
         "migrator": "app/migrator/migrator",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",

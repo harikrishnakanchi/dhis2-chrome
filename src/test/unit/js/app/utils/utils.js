@@ -53,7 +53,10 @@ define([], function() {
                 return mockStore;
             }),
             "queryBuilder": queryBuilder,
-            "dbInfo": jasmine.createSpy("dbInfo").and.returnValue(getPromise(q, dbInfo))
+            "dbInfo": jasmine.createSpy("dbInfo").and.returnValue(getPromise(q, dbInfo)),
+            "switchDB": jasmine.createSpy("switchDB").and.callFake(function() {
+                return;
+            })
         };
 
         return {

@@ -41,7 +41,10 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
         });
 
         it("should create a back up of the entire db", function() {
-            var expectedBackup = getExpectedBackupResult(storeNames);
+            var expectedBackup = {
+                "msf": getExpectedBackupResult(storeNames),
+                "hustle": getExpectedBackupResult(storeNames)
+            };
 
             indexeddbUtils.backupEntireDB().then(function(actualBackup) {
                 expect(actualBackup).toEqual(expectedBackup);
@@ -58,23 +61,33 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
 
             var objectStore1 = db.objectStore(store1);
             var objectStore2 = db.objectStore(store2);
+            var hustleStore1 = db.objectStore("hustleStore1");
 
             var backupData = {
-                store1: [{
-                    "id": "identity"
-                }],
-                store2: [{
-                    "id": "identity"
-                }]
+                "msf": {
+                    store1: [{
+                        "id": "identity"
+                    }],
+                    store2: [{
+                        "id": "identity"
+                    }]
+                },
+                "hustle": {
+                    "hustleStore1": [{
+                        "id": "identity"
+                    }]
+                }
             };
 
             indexeddbUtils.restore(backupData).then(function() {
-                expect(objectStore1.insert).toHaveBeenCalledWith(backupData[store1]);
-                expect(objectStore2.insert).toHaveBeenCalledWith(backupData[store2]);
+                expect(objectStore1.insert).toHaveBeenCalledWith(backupData.msf[store1]);
+                expect(objectStore2.insert).toHaveBeenCalledWith(backupData.msf[store2]);
+                expect(hustleStore1.insert).toHaveBeenCalledWith(backupData.hustle.hustleStore1);
             });
 
             expect(objectStore1.clear).toHaveBeenCalled();
             expect(objectStore2.clear).toHaveBeenCalled();
+            expect(hustleStore1.clear).toHaveBeenCalled();
 
             scope.$digest();
         });
