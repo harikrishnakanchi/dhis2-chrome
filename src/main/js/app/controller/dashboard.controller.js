@@ -172,6 +172,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
         };
 
         $scope.createClone = function() {
+            $scope.cloning = true;
             var errorCallback = function(error) {
                 displayMessage($scope.resourceBundle.createCloneErrorMessage + error.name, true);
             };
@@ -187,6 +188,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
             indexeddbUtils.backupEntireDB().then(function(data) {
                 var cloneFileName = "dhis_idb_" + moment().format("YYYYMMDD-HHmmss") + ".clone";
                 var cloneFileContents = addChecksum(JSON.stringify(data));
+                $scope.cloning = false;
                 filesystemService.writeFile(cloneFileName, cloneFileContents, "application/json").then(successCallback, errorCallback);
             });
         };
@@ -194,6 +196,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
         $scope.loadClone = function() {
             var errorCallback = function(error) {
                 displayMessage($scope.resourceBundle.loadCloneErrorMessage + error, true);
+                $scope.cloning = false;
             };
 
             var isValidChecksum = function(data, checksum) {
@@ -201,16 +204,19 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
             };
 
             var successCallback = function(fileData) {
+                $scope.cloning = true;
                 var fileContents = fileData.target.result;
                 fileContents = fileContents.split("\nchecksum: ");
 
                 if (fileContents.length === 2 && isValidChecksum(fileContents[0], fileContents[1])) {
                     indexeddbUtils.restore(JSON.parse(fileContents[0])).then(function() {
+                        $scope.cloning = false;
                         sessionHelper.logout();
                         $location.path("#/login");
                     }, errorCallback);
                 } else {
                     displayMessage($scope.resourceBundle.corruptFileMessage, true);
+                    $scope.cloning = false;
                 }
             };
 

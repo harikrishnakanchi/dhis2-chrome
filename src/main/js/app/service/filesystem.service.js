@@ -19,7 +19,6 @@ define([], function() {
                 chrome.fileSystem.getWritableEntry(entry, function(writableEntry) {
                     writableEntry.getFile(fileName, createStrategy, function(fileEntry) {
                         fileEntry.createWriter(function(writer) {
-
                             writer.onerror = errorHandler;
                             writer.onwriteend = function() {
                                 deferred.resolve(entry);
