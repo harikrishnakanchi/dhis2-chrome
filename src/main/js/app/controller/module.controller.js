@@ -125,7 +125,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
             parent.children = parent.children.concat(enrichedModules);
 
-            return $q.all(orgUnitRepository.upsert(parent), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit"))
+            return $q.all([orgUnitRepository.upsert(parent), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
                 .then(function() {
                     return enrichedModules;
                 });
@@ -189,7 +189,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.save = function(modules) {
             var onSuccess = function(data) {
                 $scope.saveFailure = false;
-                if ($scope.$parent.closeNewForm)
+                if ($scope.$parent.closeNewForm) 
                     $scope.$parent.closeNewForm($scope.orgUnit, "savedModule");
             };
 
@@ -215,8 +215,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
 
                 return $scope.createModules(linelistModules)
-                    .then(_.curry(associatePrograms)(programWiseModules))
-                    .then(onSuccess, $scope.onError);
+                    .then(_.curry(associatePrograms)(programWiseModules));
             };
 
             var createOrgUnitGroups = function() {
@@ -236,7 +235,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var aggregateModules = getModulesOfServiceType("Aggregate");
             var linelistModules = getModulesOfServiceType("Linelist");
 
-            saveAggregateModules().then(saveLinelistModules).then(createOrgUnitGroups);
+            $q.all([saveAggregateModules(), saveLinelistModules()])
+                .then(createOrgUnitGroups)
+                .then(onSuccess, $scope.onError);
         };
 
         $scope.update = function(modules) {
@@ -248,7 +249,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
             var enrichedModules = orgUnitMapper.mapToModules(modules, $scope.orgUnit.parent, $scope.orgUnit.id, 6);
 
-            return $q.all($scope.excludeDataElements($scope.orgUnit.parent.id, modules), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit"))
+            return $q.all([$scope.excludeDataElements($scope.orgUnit.parent.id, modules), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
                 .then(onSuccess, $scope.onError);
         };
 
