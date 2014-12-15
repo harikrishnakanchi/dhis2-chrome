@@ -1,7 +1,10 @@
 define(["properties", "lodash"], function(properties, _) {
     return function($http, db) {
         var create = function(user) {
-            return $http.post(properties.dhis.url + '/api/users', user).then(function(data) {
+            var payload = {
+                "users": [user]
+            };
+            return $http.post(properties.dhis.url + '/api/metadata', payload).then(function(data) {
                 return data;
             });
         };
