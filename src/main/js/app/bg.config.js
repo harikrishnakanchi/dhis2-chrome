@@ -10,8 +10,10 @@ require.config({
         "hustle": "lib/hustle/hustle",
         "moment": "lib/moment/moment",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
-
         "angular": "lib/angular/angular",
+
+        //md5
+        "md5": "lib/js-md5/js/md5",
 
         //services
         "dataService": "app/service/data.service",
@@ -35,7 +37,6 @@ require.config({
         "orgUnitRepository": "app/repository/orgunit.repository",
         "programEventRepository": "app/repository/program.event.repository",
         "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
-
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",

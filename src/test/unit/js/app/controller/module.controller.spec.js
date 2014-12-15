@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment) {
+define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5) {
     describe("module controller", function() {
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
             dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
@@ -22,6 +22,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             dataSetRepo = utils.getMockRepo(q);
             systemSettingRepo = utils.getMockRepo(q);
             systemSettingRepo.getAllWithProjectId = function() {};
+            systemSettingRepo.upsert = function() {};
             programsRepo = utils.getMockRepo(q);
             orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
 
@@ -195,11 +196,15 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             spyOn(scope, "createModules").and.returnValue(utils.getPromise(q, modules));
             spyOn(scope, "associateDatasets").and.returnValue(utils.getPromise(q, modules));
 
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+
             scope.save(modules);
             scope.$apply();
 
             expect(scope.saveFailure).toBe(false);
             expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedPayload);
+            expectedHustleMessage.data.checksum = md5(expectedSystemSettings);
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
         });
 
@@ -271,6 +276,9 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }],
                 "orgUnitIds": ['a1ab18b5fdd']
             }];
+
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
 
             scope.save(modules);
             scope.$apply();
@@ -458,6 +466,9 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }
             }];
             scope.isNewMode = false;
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
 
             scope.update(modules);
@@ -497,7 +508,11 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "id": "mod1"
             }];
 
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+
             scope.excludeDataElements("proj1", modules);
+            scope.$apply();
 
             var expectedSystemSettings = {
                 projectId: 'proj1',
@@ -507,17 +522,20 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     }
                 }
             };
+            var settings = {
+                "excludedDataElements": {
+                    "mod1": []
+                }
+            };
             var expectedMessage = {
                 data: {
                     projectId: 'proj1',
-                    settings: {
-                        excludedDataElements: {
-                            mod1: []
-                        }
-                    }
+                    settings: settings,
+                    checksum: md5(settings)
                 },
                 type: 'excludeDataElements'
             };
+
             expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettings);
             expect(hustle.publish).toHaveBeenCalledWith(expectedMessage, 'dataValues');
         });

@@ -1,4 +1,4 @@
-define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer", "programTransformer"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer, programTransformer) {
+define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer", "programTransformer", "md5"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer, programTransformer, md5) {
     return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, systemSettingRepository, db, $location, $q, $modal, programRepository, orgUnitGroupRepository, orgUnitGroupHelper) {
 
         $scope.isopen = {};
@@ -158,12 +158,20 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.excludeDataElements = function(projectId, enrichedModules) {
             var systemSettings = systemSettingsTransformer.constructSystemSettings(enrichedModules);
-            var payload = {
-                "projectId": projectId,
-                "settings": systemSettings
-            };
-            return $q.all([systemSettingRepository.upsert(payload), publishMessage(payload, "excludeDataElements")]).then(function() {
-                return enrichedModules;
+            systemSettingRepository.getAllWithProjectId(projectId).then(function(data) {
+                var checksum = md5(data);
+                var payload = {
+                    "projectId": projectId,
+                    "settings": systemSettings
+                };
+
+                return systemSettingRepository.upsert(payload).then(function() {
+                    var hustlePayload = _.cloneDeep(payload);
+                    hustlePayload.checksum = checksum;
+                    return publishMessage(hustlePayload, "excludeDataElements").then(function() {
+                        return enrichedModules;
+                    });
+                });
             });
         };
 
@@ -252,7 +260,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             return $q.all([$scope.excludeDataElements($scope.orgUnit.parent.id, modules), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
                 .then(onSuccess, $scope.onError);
         };
-
 
         $scope.getIsExpanded =
             function(module) {
