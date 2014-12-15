@@ -162,7 +162,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 "projectId": projectId,
                 "settings": systemSettings
             };
-            return $q.all(systemSettingRepository.upsert(payload), publishMessage(payload, "excludeDataElements")).then(function() {
+            return $q.all([systemSettingRepository.upsert(payload), publishMessage(payload, "excludeDataElements")]).then(function() {
                 return enrichedModules;
             });
         };
@@ -170,7 +170,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.associateDatasets = function(enrichedModules) {
             var parent = $scope.orgUnit;
             var datasets = orgUnitMapper.mapToDataSets(enrichedModules, parent, $scope.originalDatasets);
-            return $q.all(dataSetRepository.upsert(datasets), publishMessage(datasets, "associateDataset")).then(function() {
+            return $q.all([dataSetRepository.upsert(datasets), publishMessage(datasets, "associateDataset")]).then(function() {
                 return enrichedModules;
             });
         };
@@ -189,7 +189,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.save = function(modules) {
             var onSuccess = function(data) {
                 $scope.saveFailure = false;
-                if ($scope.$parent.closeNewForm) 
+                if ($scope.$parent.closeNewForm)
                     $scope.$parent.closeNewForm($scope.orgUnit, "savedModule");
             };
 
@@ -259,7 +259,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 module.timestamp = module.timestamp || new Date().getTime();
                 $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
                 return $scope.isExpanded[module.timestamp];
-        };
+            };
 
         $scope.changeDataModel = function(module, dataModel) {
             if (dataModel === "New") {

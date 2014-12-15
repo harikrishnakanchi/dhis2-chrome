@@ -41,7 +41,7 @@ define(["moment", "lodash"], function(moment, _) {
             var approvalPromise = programEventRepository.upsert(newEventPayload);
             updatePromises.push(approvalPromise);
 
-            return $q.all[updatePromises];
+            return $q.all(updatePromises);
         };
 
         var downloadEventsData = function() {

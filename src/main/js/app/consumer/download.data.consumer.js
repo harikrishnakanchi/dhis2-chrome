@@ -76,7 +76,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                     var approvalPromise = approvalDataRepository.saveLevelTwoApproval(newApprovals);
                     l1UpdatePromises.push(approvalPromise);
 
-                    return $q.all[l1UpdatePromises];
+                    return $q.all(l1UpdatePromises);
                 };
 
                 var m = moment();
@@ -129,7 +129,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                     var approvalPromise = approvalDataRepository.saveLevelOneApproval(newApprovals);
                     l1UpdatePromises.push(approvalPromise);
 
-                    return $q.all[l1UpdatePromises];
+                    return $q.all(l1UpdatePromises);
                 };
 
                 var m = moment();
