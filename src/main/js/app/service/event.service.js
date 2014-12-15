@@ -16,19 +16,21 @@ define(["moment", "properties"], function(moment, properties) {
         };
 
         this.upsertEvents = function(eventsPayload) {
-            var updatedEventsPayload = function(){
-                return _.map(eventsPayload.events, function(eventPayload){
+            var updatedEventsPayload = function() {
+                return _.map(eventsPayload.events, function(eventPayload) {
                     return _.omit(eventPayload, ['period', 'localStatus']);
                 });
             };
 
-            var updatedPayload = {"events": updatedEventsPayload()};
+            var updatedPayload = {
+                "events": updatedEventsPayload()
+            };
 
-            var onSuccess = function(data){
+            var onSuccess = function(data) {
                 return eventsPayload;
             };
 
-            var onFailure = function(data){
+            var onFailure = function(data) {
                 return $q.reject(data);
             };
 
@@ -36,7 +38,17 @@ define(["moment", "properties"], function(moment, properties) {
         };
 
         this.deleteEvent = function(eventId) {
-            return $http.delete(properties.dhis.url + "/api/events/" + eventId);
+            var onSuccess = function(data) {
+                return data;
+            };
+            var onError = function(data) {
+                if (data.status !== 404) {
+                    return $q.reject(data);
+                } else {
+                    return $q.when(data);
+                }
+            };
+            return $http.delete(properties.dhis.url + "/api/events/" + eventId).then(onSuccess, onError);
         };
     };
 });

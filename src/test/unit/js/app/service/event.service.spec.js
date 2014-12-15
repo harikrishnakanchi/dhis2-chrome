@@ -82,12 +82,12 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
 
             httpBackend.expectPOST(properties.dhis.url + "/api/events", expectedPayload).respond(500, "error");
 
-            eventService.upsertEvents(eventsPayload).then(undefined, function(data){
+            eventService.upsertEvents(eventsPayload).then(undefined, function(data) {
                 status = data.status;
             });
 
             httpBackend.flush();
-             expect(status).toEqual(500);
+            expect(status).toEqual(500);
         });
 
         it("should delete event", function() {
