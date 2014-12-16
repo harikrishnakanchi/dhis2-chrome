@@ -15,6 +15,13 @@ var rename = require('gulp-rename');
 var path = require('path');
 var ChromeExtension = require("crx");
 
+var base_url = argv.url || "http://localhost:8080"
+var auth = {
+    user: argv.user || 'admin',
+    pass: argv.pass || 'district'
+};
+
+
 gulp.task('test', function() {
     return gulp.src('_')
         .pipe(karma({
@@ -84,28 +91,28 @@ gulp.task('watch', function() {
     return gulp.watch('./src/main/less/main.less', ['less']);
 });
 
-gulp.task('download-metadata', function() {
-    var base_url = argv.url || "http://localhost:8080"
-    var auth = {
-        user: argv.user || 'admin',
-        pass: argv.pass || 'district'
-    };
 
-    download(base_url + "/api/metadata.json", auth)
-        .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
-
-    download(base_url + "/api/organisationUnits.json?fields=:all&paging=false", auth)
+gulp.task('download-org', function() {
+    return download(base_url + "/api/organisationUnits.json?fields=:all&paging=false", auth)
         .pipe(rename("organisationUnits.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/organisationUnits.json")));
+});
 
-    download(base_url + "/api/systemSettings.json", auth)
+gulp.task('download-systemSettings', function() {
+    return download(base_url + "/api/systemSettings.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
-
-    download(base_url + "/api/translations.json", auth)
+});
+gulp.task('download-translations', function() {
+    return download(base_url + "/api/translations.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/translations.json")));
 });
 
-gulp.task('pack', ['less','config', 'download-metadata'], function() {
+gulp.task('download-metadata', ['download-org', 'download-systemSettings', 'download-translations'], function() {
+    return download(base_url + "/api/metadata.json", auth)
+        .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
+});
+
+gulp.task('pack', ['less', 'config', 'download-metadata'], function() {
     var crx = new ChromeExtension({
         rootDirectory: "src/main",
         privateKey: fs.readFileSync("key.pem")
