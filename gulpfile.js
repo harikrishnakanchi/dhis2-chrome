@@ -6,10 +6,14 @@ var shell = require('gulp-shell');
 var http = require('http');
 var ecstatic = require('ecstatic');
 var protractor = require('gulp-protractor').protractor;
-
+var download = require('gulp-download');
 var argv = require('yargs').argv;
 var karmaConf = 'src/test/unit/conf/karma.conf.js';
 var webserver;
+var fs = require('fs');
+var rename = require('gulp-rename');
+var path = require('path');
+var ChromeExtension = require("crx");
 
 gulp.task('test', function() {
     return gulp.src('_')
@@ -78,4 +82,36 @@ gulp.task('less', function() {
 
 gulp.task('watch', function() {
     return gulp.watch('./src/main/less/main.less', ['less']);
+});
+
+gulp.task('download-metadata', function() {
+    var base_url = argv.url || "http://localhost:8080"
+    var auth = {
+        user: argv.user || 'admin',
+        pass: argv.pass || 'district'
+    };
+
+    download(base_url + "/api/metadata.json", auth)
+        .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
+
+    download(base_url + "/api/organisationUnits.json?fields=:all&paging=false", auth)
+        .pipe(rename("organisationUnits.json"))
+        .pipe(gulp.dest(path.dirname("src/main/data/organisationUnits.json")));
+
+    download(base_url + "/api/systemSettings.json", auth)
+        .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
+
+    download(base_url + "/api/translations.json", auth)
+        .pipe(gulp.dest(path.dirname("src/main/data/translations.json")));
+});
+
+gulp.task('pack', ['less','config', 'download-metadata'], function() {
+    var crx = new ChromeExtension({
+        rootDirectory: "src/main",
+        privateKey: fs.readFileSync("key.pem")
+    });
+    return crx.pack().then(function(buf) {
+        fs.writeFile("dhis2_" + (argv.env || "dev") + ".crx", buf);
+        crx.destroy();
+    });
 });
