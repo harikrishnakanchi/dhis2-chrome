@@ -24,7 +24,7 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5"], f
             var systemSetting = {
                 projectId: projectId,
                 settings: expectedSystemSettings,
-                checksum: md5("1234")
+                checksum: md5(JSON.stringify("1234"))
             };
             service.excludeDataElements(systemSetting);
 

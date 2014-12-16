@@ -15,7 +15,7 @@ define(["properties", "md5"], function(properties, md5) {
             };
 
             getExcludedDataElements(data.projectId).then(function(dataFromServer) {
-                var dhisChecksum = md5(dataFromServer.data);
+                var dhisChecksum = md5(JSON.stringify(dataFromServer.data));
                 if (dhisChecksum === data.checksum) {
                     return postExcludedDataElements();
                 } else {

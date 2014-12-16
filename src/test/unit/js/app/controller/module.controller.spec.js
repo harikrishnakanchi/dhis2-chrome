@@ -189,14 +189,21 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             var expectedHustleMessage = {
-                data: expectedPayload,
-                type: "excludeDataElements"
+                data: {
+                    projectId: projectId,
+                    settings: expectedSystemSettings,
+                    checksum: md5(JSON.stringify(expectedSystemSettings))
+                },
+                type: "excludeDataElements",
             };
 
             spyOn(scope, "createModules").and.returnValue(utils.getPromise(q, modules));
             spyOn(scope, "associateDatasets").and.returnValue(utils.getPromise(q, modules));
 
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {
+                "key": projectId,
+                "value": expectedSystemSettings
+            }));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
 
             scope.save(modules);
@@ -204,7 +211,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             expect(scope.saveFailure).toBe(false);
             expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedPayload);
-            expectedHustleMessage.data.checksum = md5(expectedSystemSettings);
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
         });
 
@@ -508,7 +514,16 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "id": "mod1"
             }];
 
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            var settings = {
+                "excludedDataElements": {
+                    "mod1": []
+                }
+            };
+
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {
+                "key": "proj1",
+                "value": settings
+            }));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
 
             scope.excludeDataElements("proj1", modules);
@@ -516,22 +531,14 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var expectedSystemSettings = {
                 projectId: 'proj1',
-                settings: {
-                    excludedDataElements: {
-                        mod1: []
-                    }
-                }
+                settings: settings
             };
-            var settings = {
-                "excludedDataElements": {
-                    "mod1": []
-                }
-            };
+
             var expectedMessage = {
                 data: {
                     projectId: 'proj1',
                     settings: settings,
-                    checksum: md5(settings)
+                    checksum: md5(JSON.stringify(settings))
                 },
                 type: 'excludeDataElements'
             };
