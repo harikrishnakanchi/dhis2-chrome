@@ -127,7 +127,7 @@
 						<ul>
 							<li>
 								<div class="text-center">
-									<input type="button" class="btn btn-main" value="Submit" ng-click="submit(program.id)" />
+									<input type="button" ng-disabled="isCurrentWeekSelected(week)" class="btn btn-main" value="Submit" ng-click="submit(program.id)" />
 								</div>
 							</li>
 						</ul>

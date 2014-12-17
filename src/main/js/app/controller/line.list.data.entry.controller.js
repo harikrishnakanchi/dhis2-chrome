@@ -101,6 +101,13 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             $scope.showView = true;
         };
 
+        $scope.isCurrentWeekSelected = function(week) {
+            var today = moment().format("YYYY-MM-DD");
+            if (week && today >= week.startOfWeek && today <= week.endOfWeek)
+                return true;
+            return false;
+        };
+
         $scope.save = function(program, programStage, addAnother) {
 
             var showResultMessage = function() {
