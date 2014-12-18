@@ -159,7 +159,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.excludeDataElements = function(projectId, enrichedModules) {
             var systemSettings = systemSettingsTransformer.constructSystemSettings(enrichedModules);
             systemSettingRepository.getAllWithProjectId(projectId).then(function(data) {
-                var checksum = md5(JSON.stringify(data.value));
+                var checksum = md5(JSON.stringify(data ? data.value : undefined));
                 var payload = {
                     "projectId": projectId,
                     "settings": systemSettings
