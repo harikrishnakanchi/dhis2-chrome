@@ -14,13 +14,11 @@ var fs = require('fs');
 var rename = require('gulp-rename');
 var path = require('path');
 var ChromeExtension = require("crx");
+var preprocess = require("gulp-preprocess");
+var cat = require("gulp-cat");
 
-var base_url = argv.url || "http://localhost:8080"
-var auth = {
-    user: argv.user || 'admin',
-    pass: argv.pass || 'district'
-};
-
+var base_url = argv.url || "http://localhost:8080";
+var auth = argv.auth || "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA==";
 
 gulp.task('test', function() {
     return gulp.src('_')
@@ -73,9 +71,14 @@ gulp.task('lint', function() {
 });
 
 gulp.task('config', function() {
-    if (argv.env)
-        return gulp.src('conf/' + argv.env + '/overrides.js')
-            .pipe(gulp.dest('./src/main/js/app/conf'));
+    return gulp.src('./conf/overrides.js')
+        .pipe(preprocess({
+            context: {
+                DHIS_URL: base_url,
+                DHIS_AUTH: auth
+            }
+        }))
+        .pipe(gulp.dest('./src/main/js/app/conf'));
 });
 
 gulp.task('less', function() {
