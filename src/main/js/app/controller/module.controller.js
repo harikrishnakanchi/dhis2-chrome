@@ -16,6 +16,16 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             return attr.value === 'true';
         };
 
+        var filterAllDataSetsBasedOnDataModelType = function(allDatasets, dataModelType) {
+            if (dataModelType === "New") {
+                return _.filter(_.cloneDeep(allDatasets), isNewDataModel);
+            } else {
+                return _.filter(_.cloneDeep(allDatasets), function(ds) {
+                    return !isNewDataModel(ds);
+                });
+            }
+        };
+
         var init = function() {
             var setUpData = function(data) {
                 $scope.originalDatasets = data[0];
@@ -52,21 +62,26 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
                 var setUpEditMode = function() {
                     var associatedDatasets = datasetTransformer.getAssociatedDatasets($scope.orgUnit.id, $scope.allDatasets);
-                    var nonAssociatedDatasets = _.reject($scope.allDatasets, function(d) {
-                        return _.any(associatedDatasets, {
-                            "id": d.id
+                    var dataModelType = associatedDatasets[0] && isNewDataModel(associatedDatasets[0]) ? "New" : "Current";
+
+                    var getNonAssociatedDatasets = function() {
+                        var allDatasetsExceptAssociatedDataSets = _.reject($scope.allDatasets, function(d) {
+                            return _.any(associatedDatasets, {
+                                "id": d.id
+                            });
                         });
-                    });
+                        return filterAllDataSetsBasedOnDataModelType(allDatasetsExceptAssociatedDataSets, dataModelType);
+                    };
 
                     $scope.modules.push({
                         'id': $scope.orgUnit.id,
                         'name': $scope.orgUnit.name,
-                        'allDatasets': nonAssociatedDatasets,
+                        'allDatasets': getNonAssociatedDatasets(),
                         'datasets': associatedDatasets,
                         'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
                         'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
                         'program': findAssociatedModule(),
-                        "dataModelType": associatedDatasets[0] && isNewDataModel(associatedDatasets[0]) ? "New" : "Current"
+                        "dataModelType": dataModelType
                     });
 
                     var isDisabled = _.find($scope.orgUnit.attributeValues, {
@@ -266,16 +281,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 module.timestamp = module.timestamp || new Date().getTime();
                 $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
                 return $scope.isExpanded[module.timestamp];
-            };
+        };
 
         $scope.changeDataModel = function(module, dataModel) {
-            if (dataModel === "New") {
-                module.allDatasets = _.filter(_.cloneDeep($scope.allDatasets), isNewDataModel);
-            } else {
-                module.allDatasets = _.filter(_.cloneDeep($scope.allDatasets), function(ds) {
-                    return !isNewDataModel(ds);
-                });
-            }
+            module.allDatasets = filterAllDataSetsBasedOnDataModelType($scope.allDatasets, dataModel);
             module.dataModelType = dataModel;
             module.datasets = [];
             module.selectedDataset = {};

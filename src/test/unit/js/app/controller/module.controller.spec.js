@@ -375,26 +375,54 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "id": "mod2",
                 "parent": {
                     "id": "par1"
-                },
-                "dataSets": [{
-                    "id": "ds1",
-                    "name": "dataset1",
+                }
+            };
+
+            var newDataSet1 = {
+                    "id": "dataSet1",
+                    "name": "NeoNat",
                     "attributeValues": [{
                         "attribute": {
                             "code": "isNewDataModel"
                         },
-                        "value": true
+                        "value": 'true'
                     }]
-                }]
-            };
-            scope.isNewMode = false;
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+                };
 
+            var newDataSet2 = {
+                    "id": "dataSet2",
+                    "name": "IPD",
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": 'true'
+                    }]
+                };
+
+            var currentDataSet = {
+                    "id": "dataSet2",
+                    "name": "Neonat - V1",
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": 'false'
+                    }]
+                };
+
+            
+            scope.isNewMode = false;
+
+            spyOn(datasetTransformer, "getAssociatedDatasets").and.returnValue([newDataSet1]);
+            spyOn(datasetTransformer, 'enrichDatasets').and.returnValue([newDataSet1, newDataSet2, currentDataSet]);
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             scope.$apply();
 
             expect(scope.isDisabled).toBeFalsy();
             expect(scope.modules[0].datasets.length).toEqual(1);
             expect(scope.modules[0].selectedDataset).toEqual(scope.modules[0].datasets[0]);
+            expect(scope.modules[0].allDatasets).toEqual([newDataSet2]);
         });
 
         it("should disable update and diable if orgunit is disabled", function() {
