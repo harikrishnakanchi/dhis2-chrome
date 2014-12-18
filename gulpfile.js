@@ -18,7 +18,7 @@ var preprocess = require("gulp-preprocess");
 var cat = require("gulp-cat");
 
 var base_url = argv.url || "http://localhost:8080";
-var auth = argv.auth || "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA==";
+var auth = argv.auth ? "Basic " + argv.auth : "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA==";
 
 gulp.task('test', function() {
     return gulp.src('_')
