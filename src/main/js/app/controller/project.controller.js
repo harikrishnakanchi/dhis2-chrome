@@ -63,7 +63,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
             saveToDbAndPublishMessage(dhisProject).then(function(data) {
                 orgUnitRepository.getAllModulesInProjects([dhisProject.id], true).then(function(modules) {
-                    orgUnitGroupHelper.createOrgUnitGroups(modules,true);
+                    orgUnitGroupHelper.createOrgUnitGroups(modules, true);
                     if (newOrgUnit.autoApprove) {
                         return approvalHelper.autoApproveExistingData(data);
                     } else {
@@ -143,6 +143,16 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             $scope.reset();
             orgUnitRepository.getAll().then(function(allOrgUnits) {
                 $scope.peerProjects = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
+                $scope.existingProjectCodes = _.transform(allOrgUnits, function(acc, orgUnit) {
+                    var projCodeAttribute = _.find(orgUnit.attributeValues, {
+                        'attribute': {
+                            'code': "projCode"
+                        }
+                    });
+                    if(!_.isEmpty(projCodeAttribute) && !_.isEmpty(projCodeAttribute.value)){
+                        acc.push(projCodeAttribute.value);
+                    }
+                }, []);
             });
         };
 

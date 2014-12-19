@@ -86,5 +86,6 @@
     "required": " is required",
     "yes": "Yes",
     "no": "No",
-    "invalidPattern": "is invalid"
+    "invalidPattern": "is invalid",
+    "projectCodeExists": "Project code already exists"
 }

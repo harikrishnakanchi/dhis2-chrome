@@ -25,9 +25,10 @@
 					<li class="form-group">
 						<label for="newOrgUnitProjCode" class="col-sm-4 col-md-4  control-label">Project Code</label>
 						<div class="col-sm-6 col-md-6" >
-							<input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitProjCode" id="newOrgUnitProjCode" ng-model="newOrgUnit.projectCode" required/>
+							<input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitProjCode" id="newOrgUnitProjCode" ng-model="newOrgUnit.projectCode" not-in="existingProjectCodes" required/>
 							<div ng-show="createForm.newOrgUnitProjCode.$dirty &amp;&amp; createForm.newOrgUnitProjCode.$invalid">
 								<span ng-show="createForm.newOrgUnitProjCode.$error.required"class="errortxt">{{resourceBundle.projectCodeValidation}}</span>
+								<span ng-show="createForm.newOrgUnitProjCode.$error.isWithin" class="errortxt">{{resourceBundle.projectCodeExists}}</span>
 							</div>
 						</div>
 					</li>
