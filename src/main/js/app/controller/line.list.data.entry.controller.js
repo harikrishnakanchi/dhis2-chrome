@@ -166,6 +166,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 $scope.resultMessageType = "success";
                 $scope.resultMessage = $scope.resourceBundle.eventSubmitSuccess;
                 scrollToTop();
+                reloadEventsView();
             };
 
             var period = $scope.year + "W" + $scope.week.weekNumber;

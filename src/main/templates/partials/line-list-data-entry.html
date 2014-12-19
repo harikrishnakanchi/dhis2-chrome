@@ -107,8 +107,8 @@
 										<span ng-if="dataValue.type !== 'date' &amp;&amp; dataValue.type !== 'bool'">{{getDisplayValue(dataValue)}}</span>
 									</td>
 									<td>
-					                    <a href="" id="" title="View" class="view">
-					                        <span class="glyphicon glyphicon-info-sign"></span>
+					                    <a href="" id="" title="Submitted" class="submitted">
+					                        <span class="glyphicon glyphicon-ok" ng-if="!event.localStatus || event.localStatus === 'NEW'"></span>
 					                    </a>
 					                </td>
 									<td>
