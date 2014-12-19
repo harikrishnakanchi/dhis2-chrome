@@ -83,7 +83,8 @@ define(["lodash"], function(_) {
         $rootScope.$watch("currentUser.organisationUnits", function() {
             if ($rootScope.currentUser && !$scope.oldUserProject) {
                 var orgUnits = $rootScope.currentUser.organisationUnits;
-                $scope.oldUserProject = orgUnits[0];
+                if(!_.isEmpty($rootScope.currentUser.organisationUnits))
+                    $scope.oldUserProject = $rootScope.currentUser.organisationUnits[0];
                 resetProjects();
             }
         }, true);
