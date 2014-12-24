@@ -6,7 +6,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
         $scope.thisDate = moment().toDate();
         $scope.reasonForIntervention = ['Armed Conflict', 'Access to health care', 'Natural Disaster', 'Epidemic'].sort();
-        $scope.modeOfOperation = ['Direct operation', 'Remote management', 'Remote operation'].sort();
+        $scope.modeOfOperation = ['Direct operation','Remote operation'].sort();
         $scope.modelOfManagement = ['Collaboration', 'MSF management'].sort();
 
         $scope.openOpeningDate = function($event) {
