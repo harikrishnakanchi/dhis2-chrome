@@ -1,8 +1,11 @@
-define(["orgUnitConsumer"], function(OrgunitConsumer) {
+define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(OrgunitConsumer, OrgUnitService, utils, mocks) {
     describe("orgunitConsumer", function() {
-        var orgunitConsumer, message, payload, orgunitService;
+        var orgunitConsumer, payload, orgUnitService, orgUnitRepository, q, scope;
 
-        beforeEach(function() {
+        beforeEach(mocks.inject(function($q, $rootScope) {
+            q = $q;
+            scope = $rootScope.$new();
+
             payload = [{
                 'id': 'a4acf9115a7',
                 'name': 'Org1',
@@ -22,21 +25,104 @@ define(["orgUnitConsumer"], function(OrgunitConsumer) {
                     "value": "val1"
                 }]
             }];
-            orgunitService = jasmine.createSpyObj({}, ['upsert']);
+            orgUnitService = new OrgUnitService();
+            orgUnitRepository = jasmine.createSpyObj({}, ['upsert']);
 
-            orgunitConsumer = new OrgunitConsumer(orgunitService);
-            message = {
-                data: {
-                    data: payload,
-                    type: "upsertOrgUnit"
-                }
+        }));
+
+        it("should over write local org unit data with dhis data if it is stale", function() {
+            var message = {
+                "data": {
+                    "data": payload,
+                    "type": "upsertOrgUnit"
+                },
+                "created": "2014-10-24T09:01:12.020+0000"
             };
 
+            var orgUnitFromDHIS = {
+                "id": "orgUnit1",
+                "name": "Afghanistan",
+                "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                "attributeValues": [{
+                    "value": "population",
+                    "lastUpdated": "2014-12-24T09:01:12.020+0000",
+                    "attribute": {
+                        "id": "abcd1234",
+                        "name": "Type of population",
+                        "code": "prjPopType"
+                    }
+                }]
+            };
+
+            spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
+            spyOn(orgUnitService, 'upsert');
+
+            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository);
+
+            orgunitConsumer.run(message);
+            scope.$apply();
+
+            expect(orgUnitService.upsert).not.toHaveBeenCalled();
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith([orgUnitFromDHIS]);
         });
 
-        it("should create org unit", function() {
+        it("should sync local org unit data to dhis if it is not stale", function() {
+            var message = {
+                "data": {
+                    "data": payload,
+                    "type": "upsertOrgUnit"
+                },
+                "created": "2014-14-24T09:01:12.020+0000"
+            };
+
+            var orgUnitFromDHIS = {
+                "id": "orgUnit1",
+                "name": "Afghanistan",
+                "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                "attributeValues": [{
+                    "value": "population",
+                    "lastUpdated": "2014-12-24T09:01:12.020+0000",
+                    "attribute": {
+                        "id": "abcd1234",
+                        "name": "Type of population",
+                        "code": "prjPopType"
+                    }
+                }]
+            };
+
+            spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
+            spyOn(orgUnitService, 'upsert');
+
+            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository);
+
             orgunitConsumer.run(message);
-            expect(orgunitService.upsert).toHaveBeenCalledWith(payload);
+            scope.$apply();
+
+            expect(orgUnitService.upsert).toHaveBeenCalledWith(message.data.data);
+            expect(orgUnitRepository.upsert).not.toHaveBeenCalled();
+        });
+
+        it("should sync locally created org units", function() {
+            var message = {
+                "data": {
+                    "data": payload,
+                    "type": "upsertOrgUnit"
+                },
+                "created": "2014-14-24T09:01:12.020+0000"
+            };
+
+            spyOn(orgUnitService, 'get').and.returnValue(utils.getRejectedPromise(q, {
+                "status": 404
+            }));
+            spyOn(orgUnitService, 'upsert');
+
+            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository);
+
+            orgunitConsumer.run(message);
+            scope.$apply();
+
+            expect(orgUnitService.upsert).toHaveBeenCalledWith(message.data.data);
+            expect(orgUnitRepository.upsert).not.toHaveBeenCalled();
         });
 
     });

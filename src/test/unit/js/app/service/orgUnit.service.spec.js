@@ -137,5 +137,14 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
+
+        it("should get org unit id", function() {
+            var orgUnitId = "org1234";
+
+            orgUnitService.get(orgUnitId);
+
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + ".json?fields=:all").respond(200, "ok");
+            httpBackend.flush();
+        });
     });
 });

@@ -11,7 +11,7 @@ define(["uploadApprovalDataConsumer", "orgUnitConsumer", "orgUnitGroupConsumer",
             app.service("uploadDataConsumer", ["dataService", "dataRepository", uploadDataConsumer]);
             app.service("uploadCompletionDataConsumer", ["approvalService", "approvalDataRepository", uploadCompletionDataConsumer]);
             app.service("uploadApprovalDataConsumer", ["approvalService", "approvalDataRepository", uploadApprovalDataConsumer]);
-            app.service("orgUnitConsumer", ["orgUnitService", orgUnitConsumer]);
+            app.service("orgUnitConsumer", ["orgUnitService", "orgUnitRepository", orgUnitConsumer]);
             app.service("orgUnitGroupConsumer", ["orgUnitGroupService", orgUnitGroupConsumer]);
             app.service("datasetConsumer", ["datasetService", datasetConsumer]);
             app.service("systemSettingConsumer", ["systemSettingService", systemSettingConsumer]);
