@@ -83,7 +83,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"]
                     }
                 });
 
-                return linelistAttribute ? linelistAttribute.value : false;
+                return linelistAttribute ? linelistAttribute.value === "true" : false;
             };
             var getStatus = function(modules, submittedPeriods, dataSetCompletePeriods, approvalData) {
 
