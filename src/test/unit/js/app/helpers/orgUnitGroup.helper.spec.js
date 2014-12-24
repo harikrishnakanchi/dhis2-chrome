@@ -205,24 +205,12 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                         name: 'OBGYN'
                     }]
                 }, {
-                    name: 'Armed Conflict',
-                    id: 'ab4b1006371',
-                    organisationUnits: []
-                }, {
                     name: 'Collaboration',
                     id: 'a11a7a5d55a',
                     organisationUnits: [{
                         id: 'a72ec34b863',
                         name: 'OBGYN'
                     }]
-                }, {
-                    name: 'Community',
-                    id: 'a82df41632d',
-                    organisationUnits: []
-                }, {
-                    name: 'Cross-border instability',
-                    id: 'abfef86a4b6',
-                    organisationUnits: []
                 }, {
                     name: 'Direct operation',
                     id: 'a560238bc90',
@@ -231,20 +219,12 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                         name: 'OBGYN'
                     }]
                 }, {
-                    name: 'Epidemic',
-                    id: 'a9e29c075cc',
-                    organisationUnits: []
-                }, {
                     name: 'General Population',
                     id: 'afbdf5ffe08',
                     organisationUnits: [{
                         id: 'a72ec34b863',
                         name: 'OBGYN'
                     }]
-                }, {
-                    name: 'Health Center',
-                    id: 'a376a7aaec9',
-                    organisationUnits: []
                 }, {
                     name: 'Hospital',
                     id: 'a8b42a1c9b8',
@@ -253,26 +233,6 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                         name: 'OBGYN'
                     }]
                 }, {
-                    name: 'Internal instability',
-                    id: 'ac606ebc28f',
-                    organisationUnits: []
-                }, {
-                    name: 'Internally Displaced People',
-                    id: 'a969403a997',
-                    organisationUnits: []
-                }, {
-                    name: 'MSF management',
-                    id: 'aa9a24c9126',
-                    organisationUnits: []
-                }, {
-                    name: 'Most-at-risk Population',
-                    id: 'a35778ed565',
-                    organisationUnits: []
-                }, {
-                    name: 'Natural Disaster',
-                    id: 'a8014cfca5c',
-                    organisationUnits: []
-                }, {
                     name: 'Post-conflict',
                     id: 'a16b4a97ce4',
                     organisationUnits: [{
@@ -280,48 +240,12 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                         name: 'OBGYN'
                     }]
                 }, {
-                    name: 'Refugee',
-                    id: 'a48f665185e',
-                    organisationUnits: []
-                }, {
-                    name: 'Remote management',
-                    id: 'a91227821b3',
-                    organisationUnits: []
-                }, {
-                    name: 'Remote operation',
-                    id: 'a92cee050b0',
-                    organisationUnits: []
-                }, {
-                    name: 'Stable',
-                    id: 'af40faf6384',
-                    organisationUnits: []
-                }, {
-                    name: 'Unit Code - A',
-                    id: 'a0cc175b9c0',
-                    organisationUnits: []
-                }, {
-                    name: 'Unit Code - B1',
-                    id: 'aedbab45572',
-                    organisationUnits: []
-                }, {
-                    name: 'Unit Code - C1',
-                    id: 'aa9f7e97965',
-                    organisationUnits: []
-                }, {
                     name: 'Unit Code - C2',
                     id: 'a9ab62b5ef3',
                     organisationUnits: [{
                         id: 'a72ec34b863',
                         name: 'OBGYN'
                     }]
-                }, {
-                    name: 'Unit Code - C3',
-                    id: 'a0a3d72134f',
-                    organisationUnits: []
-                }, {
-                    name: 'Unit Code - X',
-                    id: 'a9dd4e46126',
-                    organisationUnits: []
                 }];
 
                 spyOn(orgUnitGroupRepository, "getAll").and.returnValue(utils.getPromise(q, orgunitgroups));

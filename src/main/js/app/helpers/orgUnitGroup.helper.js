@@ -22,7 +22,8 @@ define([], function() {
                         'id': module_t.id,
                         'name': module_t.name
                     };
-                    return _.map(orgUnitGroups, function(orgUnitGroup) {
+                    var modifiedOrgUnitGroups = [];
+                    _.forEach(orgUnitGroups, function(orgUnitGroup) {
                         var res;
                         if (orgUnitGroup.name.indexOf("Unit Code - ") !== -1) {
                             var orgUnitGroupName = orgUnitGroup.name.replace("Unit Code - ", "");
@@ -42,11 +43,10 @@ define([], function() {
 
                         if (res !== undefined && isOrgUnitAbsent) {
                             orgUnitGroup.organisationUnits.push(moduleToAdd);
-                            return orgUnitGroup;
-                        } else {
-                            return orgUnitGroup;
-                        }
+                            modifiedOrgUnitGroups.push(orgUnitGroup);
+                        } 
                     });
+                    return modifiedOrgUnitGroups;
                 };
 
                 var upsertOrgUnitGroup = function(orgUnitGroups) {
