@@ -99,5 +99,20 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
 
             httpBackend.flush();
         });
+
+        it("should get event by id", function() {
+            var expectedEvent = {
+                "event": "Event1",
+                "eventDate": "2001-01-01",
+                "period": "2001W01",
+                "localStatus": "NEW"
+            };
+
+            eventService.getEventById('Event1');
+
+            httpBackend.expectGET(properties.dhis.url + "/api/events/Event1.json?paging=false").respond(200, expectedEvent);
+
+            httpBackend.flush();
+        });
     });
 });
