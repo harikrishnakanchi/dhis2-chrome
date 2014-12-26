@@ -40,7 +40,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/select.project.html',
                         controller: 'selectProjectController'
                     }).
-                    when('/edit.event/:eventId?', {
+                    when('/event/:operation/:eventId?', {
                         templateUrl: 'templates/edit.event.html',
                         controller: 'lineListDataEntryController'
                     }).

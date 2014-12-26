@@ -218,22 +218,37 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
         };
 
         var init = function() {
+            var setUpViewOrEditForm = function() {
 
-            var setUpEvent = function(eventData) {
-                $scope.eventToBeEdited = _.find(eventData, {
-                    'event': $routeParams.eventId
-                });
+                var setUpEvent = function(eventData) {
+                    $scope.eventToBeEdited = _.find(eventData, {
+                        'event': $routeParams.eventId
+                    });
+                };
+
+               if($routeParams.operation === "view"){
+                    $scope.isEditable = false;
+                }else{
+                    $scope.isEditable = true;
+                }
+
+                return programEventRepository.getAll().then(setUpEvent);
             };
 
-            if ($routeParams.eventId) {
-                programEventRepository.getAll().then(setUpEvent);
-            } else {
+            var setUpNewForm = function() {
+                $scope.isEditable = true;
                 $scope.loading = true;
                 resetForm();
                 $scope.showView = true;
                 reloadEventsView();
                 loadPrograms().then(loadOptionSets);
                 $scope.loading = false;
+            };
+
+            if ($routeParams.eventId) {
+                setUpViewOrEditForm();
+            } else {
+                setUpNewForm();
             }
 
         };
