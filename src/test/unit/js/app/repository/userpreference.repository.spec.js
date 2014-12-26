@@ -1,13 +1,18 @@
 define(["userPreferenceRepository", "angularMocks", "utils"], function(UserPreferenceRepository, mocks, utils) {
     describe("User Preference repository", function() {
-        var db, mockStore, q, scope;
+        var db, mockStore, q, scope, orgUnitRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
             scope = $rootScope.$new();
             q = $q;
-            userPreferenceRepository = new UserPreferenceRepository(mockDB.db);
+
+            orgUnitRepository = {
+                "getAllModulesInProjects": jasmine.createSpy("getAllModulesInProjects").and.returnValue(utils.getPromise(q, ["mod1"])),
+            };
+
+            userPreferenceRepository = new UserPreferenceRepository(mockDB.db, orgUnitRepository);
         }));
 
         it("should get user preferences", function() {
@@ -46,6 +51,46 @@ define(["userPreferenceRepository", "angularMocks", "utils"], function(UserPrefe
             });
             scope.$apply();
             expect(mockStore.getAll).toHaveBeenCalled();
+        });
+
+        it("should get all modules id for logged in user", function() {
+            var userPrefs = [{
+                "orgUnits": [{
+                    "id": "pro1Id",
+                    "name": "Pro1"
+                }, {
+                    "id": "pro2Id",
+                    "name": "Pro2"
+                }]
+            }, {
+                "orgUnits": [{
+                    "id": "pro3Id",
+                    "name": "Pro3"
+                }]
+            }, {
+                "orgUnits": [{
+                    "id": "pro1Id",
+                    "name": "Pro1"
+                }]
+            }];
+
+            orgUnitRepository.getAllModulesInProjects.and.returnValue(utils.getPromise(q, [{
+                "id": "mod1"
+            }, {
+                "id": "mod2"
+            }, {
+                "id": "mod3"
+            }]));
+
+            mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
+
+            var actualUserModules;
+            userPreferenceRepository.getUserModuleIds().then(function(data) {
+                actualUserModules = data;
+            });
+
+            scope.$apply();
+            expect(actualUserModules).toEqual(["mod1", "mod2", "mod3"]);
         });
     });
 });

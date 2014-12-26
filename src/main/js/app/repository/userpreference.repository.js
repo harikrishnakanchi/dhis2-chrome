@@ -1,18 +1,39 @@
 define(["lodash"], function(_) {
-    return function(db) {
-        this.get = function(username) {
+    return function(db, orgUnitRepository) {
+        var get = function(username) {
             var store = db.objectStore('userPreferences');
             return store.find(username);
         };
 
-        this.getAll = function() {
+        var getAll = function() {
             var store = db.objectStore('userPreferences');
             return store.getAll();
         };
 
-        this.save = function(userPreferences) {
+        var save = function(userPreferences) {
             var store = db.objectStore('userPreferences');
             return store.upsert(userPreferences);
+        };
+
+        var getUserModuleIds = function() {
+            return getAll().then(function(userPreferences) {
+                userPreferences = userPreferences || [];
+                var userProjectIds = _.uniq(_.pluck(_.flatten(userPreferences, "orgUnits"), 'id'));
+
+                if (_.isEmpty(userProjectIds))
+                    return [];
+
+                return orgUnitRepository.getAllModulesInProjects(userProjectIds).then(function(userModules) {
+                    return _.pluck(userModules, "id");
+                });
+            });
+        };
+
+        return {
+            "get": get,
+            "getAll": getAll,
+            "save": save,
+            "getUserModuleIds": getUserModuleIds
         };
     };
 });

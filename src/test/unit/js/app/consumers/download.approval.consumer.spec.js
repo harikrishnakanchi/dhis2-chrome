@@ -2,18 +2,14 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
     function(DownloadApprovalConsumer, mocks, properties, utils, DataSetRepository, UserPreferenceRepository, ApprovalService, moment) {
         describe("download data consumer", function() {
 
-            var approvalDataRepository, dataSetRepository, userPreferenceRepository, q, scope, downloadApprovalConsumer, message, approvalService, orgUnitRepository;
+            var approvalDataRepository, dataSetRepository, userPreferenceRepository, q, scope, downloadApprovalConsumer, message, approvalService;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
                 scope = $rootScope.$new();
 
                 userPreferenceRepository = {
-                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [{
-                        "orgUnits": [{
-                            "id": "org_0"
-                        }]
-                    }]))
+                    "getUserModuleIds": jasmine.createSpy("getUserModuleIds").and.returnValue(utils.getPromise(q, ["org_0"]))
                 };
 
                 dataSetRepository = {
@@ -31,10 +27,6 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "deleteLevelTwoApproval": jasmine.createSpy("deleteLevelTwoApproval")
                 };
 
-                orgUnitRepository = {
-                    "getAllModulesInProjects": jasmine.createSpy("getAllModulesInProjects").and.returnValue(utils.getPromise(q, ["mod1"])),
-                };
-
                 approvalService = {
                     "getAllLevelOneApprovalData": jasmine.createSpy("getAllLevelOneApprovalData").and.returnValue(utils.getPromise(q, [])),
                     "getAllLevelTwoApprovalData": jasmine.createSpy("getAllLevelTwoApprovalData").and.returnValue(utils.getPromise(q, [])),
@@ -45,38 +37,11 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "markAsIncomplete": jasmine.createSpy("markAsIncomplete")
                 };
 
-                downloadApprovalConsumer = new DownloadApprovalConsumer(dataSetRepository, userPreferenceRepository, q, approvalService, approvalDataRepository, orgUnitRepository);
+                downloadApprovalConsumer = new DownloadApprovalConsumer(dataSetRepository, userPreferenceRepository, q, approvalService, approvalDataRepository);
             }));
 
             it("should download approval data from dhis based on user preferences and dataset", function() {
-                userPreferenceRepository.getAll.and.returnValue(utils.getPromise(q, [{
-                    "orgUnits": [{
-                        "id": "pro1Id",
-                        "name": "Pro1"
-                    }, {
-                        "id": "pro2Id",
-                        "name": "Pro2"
-                    }]
-                }, {
-                    "orgUnits": [{
-                        "id": "pro3Id",
-                        "name": "Pro3"
-                    }]
-                }, {
-                    "orgUnits": [{
-                        "id": "pro1Id",
-                        "name": "Pro1"
-                    }]
-                }]));
-
-                orgUnitRepository.getAllModulesInProjects.and.returnValue(utils.getPromise(q, [{
-                    "id": "mod1"
-                }, {
-                    "id": "mod2"
-                }, {
-                    "id": "mod3"
-                }]));
-
+                userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
 
                 dataSetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, ["ds1"]));
 
@@ -89,9 +54,8 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 downloadApprovalConsumer.run(message);
                 scope.$apply();
 
-                expect(userPreferenceRepository.getAll).toHaveBeenCalled();
+                expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
                 expect(dataSetRepository.getAllDatasetIds).toHaveBeenCalled();
-                expect(orgUnitRepository.getAllModulesInProjects).toHaveBeenCalledWith(['pro1Id', 'pro2Id', 'pro3Id']);
 
                 expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
                 expect(approvalService.getAllLevelTwoApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);

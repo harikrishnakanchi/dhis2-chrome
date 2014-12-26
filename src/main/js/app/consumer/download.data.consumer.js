@@ -1,19 +1,5 @@
 define(["moment", "properties", "lodash", "dateUtils"], function(moment, properties, _, dateUtils) {
-    return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q, approvalDataRepository, orgUnitRepository) {
-        var getUserModuleIds = function() {
-            return userPreferenceRepository.getAll().then(function(userPreferences) {
-                userPreferences = userPreferences || [];
-                var userProjectIds = _.uniq(_.pluck(_.flatten(userPreferences, "orgUnits"), 'id'));
-
-                if (_.isEmpty(userProjectIds))
-                    return [];
-
-                return orgUnitRepository.getAllModulesInProjects(userProjectIds).then(function(userModules) {
-                    return _.pluck(userModules, "id");
-                });
-            });
-        };
-
+    return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q, approvalDataRepository) {
         var merge = function(list1, list2, equalsPred, lastUpdateDateProperty) {
             lastUpdateDateProperty = lastUpdateDateProperty || "lastUpdated";
             equalsPred = _.curry(equalsPred);
@@ -90,7 +76,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
         };
 
         this.run = function() {
-            return $q.all([getUserModuleIds(), dataSetRepository.getAllDatasetIds()]).then(downloadDataValues);
+            return $q.all([userPreferenceRepository.getUserModuleIds(), dataSetRepository.getAllDatasetIds()]).then(downloadDataValues);
         };
     };
 });

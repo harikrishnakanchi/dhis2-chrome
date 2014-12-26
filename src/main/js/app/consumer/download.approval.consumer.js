@@ -1,19 +1,5 @@
 define(["moment", "properties", "lodash", "dateUtils"], function(moment, properties, _, dateUtils) {
-    return function(dataSetRepository, userPreferenceRepository, $q, approvalService, approvalDataRepository, orgUnitRepository) {
-        var getUserModuleIds = function() {
-            return userPreferenceRepository.getAll().then(function(userPreferences) {
-                userPreferences = userPreferences || [];
-                var userProjectIds = _.uniq(_.pluck(_.flatten(userPreferences, "orgUnits"), 'id'));
-
-                if (_.isEmpty(userProjectIds))
-                    return [];
-
-                return orgUnitRepository.getAllModulesInProjects(userProjectIds).then(function(userModules) {
-                    return _.pluck(userModules, "id");
-                });
-            });
-        };
-
+    return function(dataSetRepository, userPreferenceRepository, $q, approvalService, approvalDataRepository) {
         var downloadApprovalData = function(metadata) {
             var userModuleIds = metadata[0];
             var allDataSetIds = metadata[1];
@@ -118,7 +104,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
         };
 
         this.run = function() {
-            return $q.all([getUserModuleIds(), dataSetRepository.getAllDatasetIds()]).then(function(metadata) {
+            return $q.all([userPreferenceRepository.getUserModuleIds(), dataSetRepository.getAllDatasetIds()]).then(function(metadata) {
                 return $q.all([downloadCompletionData(metadata), downloadApprovalData(metadata)]);
             });
         };
