@@ -18,12 +18,6 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             });
         };
 
-        var getAllDatasetIds = function() {
-            return dataSetRepository.getAll().then(function(data) {
-                return _.pluck(data, "id");
-            });
-        };
-
         var merge = function(list1, list2, equalsPred, lastUpdateDateProperty) {
             lastUpdateDateProperty = lastUpdateDateProperty || "lastUpdated";
             equalsPred = _.curry(equalsPred);
@@ -204,7 +198,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
         };
 
         this.run = function() {
-            return $q.all([getUserModuleIds(), getAllDatasetIds()]).then(function(metadata) {
+            return $q.all([getUserModuleIds(), dataSetRepository.getAllDatasetIds()]).then(function(metadata) {
                 return $q.all([downloadDataValues(metadata), downloadCompletionData(metadata), downloadApprovalData(metadata)]);
             });
         };

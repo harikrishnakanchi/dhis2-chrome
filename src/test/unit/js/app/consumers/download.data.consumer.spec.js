@@ -17,9 +17,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 };
 
                 dataSetRepository = {
-                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [{
-                        "id": "DS_OPD"
-                    }]))
+                    "getAllDatasetIds": jasmine.createSpy("getAllDatasetIds").and.returnValue(utils.getPromise(q, ["DS_OPD"]))
                 };
 
                 dataRepository = {
@@ -91,9 +89,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 }]));
 
 
-                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, [{
-                    "id": "ds1"
-                }]));
+                dataSetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, ["ds1"]));
 
                 message = {
                     "data": {
@@ -105,7 +101,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 scope.$apply();
 
                 expect(userPreferenceRepository.getAll).toHaveBeenCalled();
-                expect(dataSetRepository.getAll).toHaveBeenCalled();
+                expect(dataSetRepository.getAllDatasetIds).toHaveBeenCalled();
                 expect(orgUnitRepository.getAllModulesInProjects).toHaveBeenCalledWith(['pro1Id', 'pro2Id', 'pro3Id']);
 
                 expect(dataService.downloadAllData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ['ds1']);
@@ -128,7 +124,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
             });
 
             it("should not download data values if dataSets is not present", function() {
-                dataSetRepository.getAll.and.returnValue(utils.getPromise(q, {}));
+                dataSetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, []));
 
                 message = {
                     "data": {
