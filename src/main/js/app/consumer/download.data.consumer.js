@@ -1,9 +1,5 @@
-define(["moment", "properties", "lodash"], function(moment, properties, _) {
-    return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q, approvalService, approvalDataRepository, orgUnitRepository) {
-        var getPeriod = function(m) {
-            return m.year() + "W" + m.isoWeek();
-        };
-
+define(["moment", "properties", "lodash", "dateUtils"], function(moment, properties, _, dateUtils) {
+    return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q, approvalDataRepository, orgUnitRepository) {
         var getUserModuleIds = function() {
             return userPreferenceRepository.getAll().then(function(userPreferences) {
                 userPreferences = userPreferences || [];
@@ -32,110 +28,6 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                     acc.push(ele);
                 }
             }, mergedList);
-        };
-
-        var downloadApprovalData = function(metadata) {
-            var userModuleIds = metadata[0];
-            var allDataSetIds = metadata[1];
-
-            if (userModuleIds.length === 0 || allDataSetIds.length === 0) return;
-
-            var saveAllLevelTwoApprovalData = function(dhisApprovalDataList) {
-
-                var mergeAndSaveCompletion = function(dbApprovalDataList) {
-
-                    if (_.isEmpty(dhisApprovalDataList) && _.isEmpty(dbApprovalDataList))
-                        return;
-
-                    var l1UpdatePromises = [];
-                    _.each(dbApprovalDataList, function(dbApprovalData) {
-                        if (dbApprovalData.status === "NEW" || dbApprovalData.status === "DELETED")
-                            return;
-
-                        var dhisApprovalData = _.find(dhisApprovalDataList, {
-                            "orgUnit": dbApprovalData.orgUnit,
-                            "period": dbApprovalData.period
-                        });
-
-                        var l1UpdatePromise = dhisApprovalData ? approvalDataRepository.saveLevelTwoApproval(dhisApprovalData) : approvalDataRepository.deleteLevelTwoApproval(dbApprovalData.period, dbApprovalData.orgUnit);
-                        l1UpdatePromises.push(l1UpdatePromise);
-                    });
-
-                    var newApprovals = _.reject(dhisApprovalDataList, function(dhisApprovalData) {
-                        return _.any(dbApprovalDataList, {
-                            "orgUnit": dhisApprovalData.orgUnit,
-                            "period": dhisApprovalData.period
-                        });
-                    });
-                    var approvalPromise = approvalDataRepository.saveLevelTwoApproval(newApprovals);
-                    l1UpdatePromises.push(approvalPromise);
-
-                    return $q.all(l1UpdatePromises);
-                };
-
-                var m = moment();
-                var startPeriod = getPeriod(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
-                var endPeriod = getPeriod(moment());
-
-                var moduleIds = _.unique(_.pluck(dhisApprovalDataList, "orgUnit"));
-
-                approvalDataRepository.getLevelTwoApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(mergeAndSaveCompletion);
-            };
-
-            return approvalService.getAllLevelTwoApprovalData(userModuleIds, allDataSetIds).then(saveAllLevelTwoApprovalData);
-        };
-
-
-        var downloadCompletionData = function(metadata) {
-            var userModuleIds = metadata[0];
-            var allDataSetIds = metadata[1];
-
-            if (userModuleIds.length === 0 || allDataSetIds.length === 0) return;
-
-            var saveAllLevelOneApprovalData = function(dhisApprovalDataList) {
-
-                var mergeAndSaveCompletion = function(dbApprovalDataList) {
-
-                    if (_.isEmpty(dhisApprovalDataList) && _.isEmpty(dbApprovalDataList))
-                        return;
-
-                    var l1UpdatePromises = [];
-                    _.each(dbApprovalDataList, function(dbApprovalData) {
-                        if (dbApprovalData.status === "NEW" || dbApprovalData.status === "DELETED")
-                            return;
-
-                        var dhisApprovalData = _.find(dhisApprovalDataList, {
-                            "orgUnit": dbApprovalData.orgUnit,
-                            "period": dbApprovalData.period
-                        });
-
-                        var l1UpdatePromise = dhisApprovalData ? approvalDataRepository.saveLevelOneApproval(dhisApprovalData) : approvalDataRepository.deleteLevelOneApproval(dbApprovalData.period, dbApprovalData.orgUnit);
-                        l1UpdatePromises.push(l1UpdatePromise);
-                    });
-
-                    var newApprovals = _.reject(dhisApprovalDataList, function(dhisApprovalData) {
-                        return _.any(dbApprovalDataList, {
-                            "orgUnit": dhisApprovalData.orgUnit,
-                            "period": dhisApprovalData.period
-                        });
-                    });
-
-                    var approvalPromise = approvalDataRepository.saveLevelOneApproval(newApprovals);
-                    l1UpdatePromises.push(approvalPromise);
-
-                    return $q.all(l1UpdatePromises);
-                };
-
-                var m = moment();
-                var startPeriod = getPeriod(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
-                var endPeriod = getPeriod(moment());
-
-                var moduleIds = _.unique(_.pluck(dhisApprovalDataList, "orgUnit"));
-
-                approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(mergeAndSaveCompletion);
-            };
-
-            return approvalService.getAllLevelOneApprovalData(userModuleIds, allDataSetIds).then(saveAllLevelOneApprovalData);
         };
 
         var downloadDataValues = function(metadata) {
@@ -178,8 +70,8 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                 var dataValuesFromDhis = data.dataValues;
 
                 var m = moment();
-                var startPeriod = getPeriod(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
-                var endPeriod = getPeriod(moment());
+                var startPeriod = dateUtils.toDhisFormat(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
+                var endPeriod = dateUtils.toDhisFormat(moment());
 
                 var moduleIds = _.unique(_.pluck(dataValuesFromDhis, "orgUnit"));
 
@@ -198,9 +90,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
         };
 
         this.run = function() {
-            return $q.all([getUserModuleIds(), dataSetRepository.getAllDatasetIds()]).then(function(metadata) {
-                return $q.all([downloadDataValues(metadata), downloadCompletionData(metadata), downloadApprovalData(metadata)]);
-            });
+            return $q.all([getUserModuleIds(), dataSetRepository.getAllDatasetIds()]).then(downloadDataValues);
         };
     };
 });

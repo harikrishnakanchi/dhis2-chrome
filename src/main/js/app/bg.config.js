@@ -46,6 +46,7 @@ require.config({
         "consumers": "app/consumer/consumers",
         "consumerRegistry": "app/consumer/consumer.registry",
         "downloadDataConsumer": "app/consumer/download.data.consumer",
+        "downloadApprovalConsumer": "app/consumer/download.approval.consumer",
         "uploadDataConsumer": "app/consumer/upload.data.consumer",
         "uploadCompletionDataConsumer": "app/consumer/upload.completion.data.consumer",
         "uploadApprovalDataConsumer": "app/consumer/upload.approval.data.consumer",
@@ -71,7 +72,8 @@ require.config({
 
         //Utils
         "chromeRuntime": "app/utils/chrome.runtime",
-        "dhisId": "app/utils/dhis.id"
+        "dhisId": "app/utils/dhis.id",
+        "dateUtils": "app/utils/date.utils"
     },
     shim: {
         'angular': {

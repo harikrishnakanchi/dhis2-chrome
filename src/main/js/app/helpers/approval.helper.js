@@ -1,4 +1,4 @@
-define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"], function(properties, datasetTransformer, moment, approvalDataTransformer) {
+define(["properties", "datasetTransformer", "moment", "approvalDataTransformer", "dateUtils"], function(properties, datasetTransformer, moment, approvalDataTransformer, dateUtils) {
     return function($hustle, $q, $rootScope, orgUnitRepository, dataSetRepository, approvalDataRepository, dataRepository) {
         var approveData = function(approvalData, approvalFn, approvalType) {
             var saveToDhis = function() {
@@ -124,7 +124,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"]
 
                 return _.map(modules, function(mod) {
                     var status = _.map(_.range(properties.weeksToDisplayStatusInDashboard, 0, -1), function(i) {
-                        var period = getPeriod(moment().isoWeek(moment().isoWeek() - i));
+                        var period = dateUtils.toDhisFormat(moment().isoWeek(moment().isoWeek() - i));
                         var submitted = isSubmitted(submittedPeriods, mod.id, period);
                         var approvalLevel = isComplete(dataSetCompletePeriods, mod.id, period) ? 1 : undefined;
                         approvalLevel = getApprovalLevel(approvalData, mod.id, period) || approvalLevel;
@@ -163,13 +163,9 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"]
             });
         };
 
-        var getPeriod = function(m) {
-            return m.year() + "W" + m.isoWeek();
-        };
-
         var getSubmittedPeriodsForModules = function(modules, numOfWeeks) {
-            var endPeriod = getPeriod(moment());
-            var startPeriod = getPeriod(moment().subtract(numOfWeeks, 'week'));
+            var endPeriod = dateUtils.toDhisFormat(moment());
+            var startPeriod = dateUtils.toDhisFormat(moment().subtract(numOfWeeks, 'week'));
 
             var filterDraftData = function(data) {
                 return _.filter(data, function(datum) {
@@ -196,8 +192,8 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"]
         };
 
         var getLevelOneApprovedPeriodsForModules = function(modules, numOfWeeks) {
-            var endPeriod = getPeriod(moment());
-            var startPeriod = getPeriod(moment().subtract(numOfWeeks, 'week'));
+            var endPeriod = dateUtils.toDhisFormat(moment());
+            var startPeriod = dateUtils.toDhisFormat(moment().subtract(numOfWeeks, 'week'));
 
             return approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, _.pluck(modules, "id")).then(function(data) {
                 data = filterDeletedData(data);
@@ -212,8 +208,8 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer"]
         };
 
         var getLevelTwoAndThreeApprovedPeriodsForModules = function(modules, numOfWeeks) {
-            var endPeriod = getPeriod(moment());
-            var startPeriod = getPeriod(moment().subtract(numOfWeeks, 'week'));
+            var endPeriod = dateUtils.toDhisFormat(moment());
+            var startPeriod = dateUtils.toDhisFormat(moment().subtract(numOfWeeks, 'week'));
 
             return approvalDataRepository.getLevelTwoApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, _.pluck(modules, "id")).then(function(data) {
                 data = filterDeletedData(data);
