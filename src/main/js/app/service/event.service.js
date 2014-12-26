@@ -15,13 +15,13 @@ define(["moment", "properties"], function(moment, properties) {
 
         };
 
-        this.getEventById = function(eventId) {
-            var onSuccess = function(response) {
-                return response.data;
-            };
+        // this.getEventById = function(eventId) {
+        //     var onSuccess = function(response) {
+        //         return response.data;
+        //     };
 
-            return $http.get(properties.dhis.url + '/api/events/' + eventId + '.json?paging=false' ).then(onSuccess);
-        };
+        //     return $http.get(properties.dhis.url + '/api/events/' + eventId + '.json?paging=false' ).then(onSuccess);
+        // };
 
         this.upsertEvents = function(eventsPayload) {
             var updatedEventsPayload = function() {

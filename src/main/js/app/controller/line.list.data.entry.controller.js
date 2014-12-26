@@ -217,22 +217,54 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             showModal(deleteOnConfirm, $scope.resourceBundle.deleteEventConfirmation);
         };
 
+        var getDataElementValues = function(eventToBeEdited) {
+            var dataValueHash = {};
+
+            _.forEach(eventToBeEdited.program.programStages, function(programStage) {
+                _.forEach(programStage.programStageSections, function(programStageSection) {
+                    _.forEach(programStageSection.programStageDataElements, function(de) {
+                        var dataElementId = de.dataElement.id;
+                        var dataElementAttribute = _.find(eventToBeEdited.dataValues, {
+                            "dataElement": dataElementId
+                        });
+                        if (!_.isEmpty(dataElementAttribute)) {
+                            if (de.dataElement.type === "date") {
+                                dataValueHash[dataElementId] = new Date(dataElementAttribute.value);
+                            } else {
+                                dataValueHash[dataElementId] = dataElementAttribute.value;
+                            }
+                        }
+                    });
+                });
+            });
+            return dataValueHash;
+        };
+
         var init = function() {
+
             var setUpViewOrEditForm = function() {
+                var getAllEvents = function() {
+                    return programEventRepository.getAll();
+                };
 
                 var setUpEvent = function(eventData) {
-                    $scope.eventToBeEdited = _.find(eventData, {
+                    var getProgramInfoNgModel = function(programId) {
+                        return programRepository.getProgramAndStages(programId);
+                    };
+
+                    var eventToBeEdited = _.find(eventData, {
                         'event': $routeParams.eventId
+                    });
+
+                    return getProgramInfoNgModel(eventToBeEdited.program).then(function(program) {
+                        eventToBeEdited.eventDate = new Date(eventToBeEdited.eventDate);
+                        eventToBeEdited.program = program;
+                        eventToBeEdited.dataElementValues = getDataElementValues(eventToBeEdited);
+                        $scope.eventToBeEdited = _.cloneDeep(eventToBeEdited);
                     });
                 };
 
-               if($routeParams.operation === "view"){
-                    $scope.isEditable = false;
-                }else{
-                    $scope.isEditable = true;
-                }
-
-                return programEventRepository.getAll().then(setUpEvent);
+                return loadOptionSets().then(getAllEvents).then(setUpEvent);
             };
 
             var setUpNewForm = function() {

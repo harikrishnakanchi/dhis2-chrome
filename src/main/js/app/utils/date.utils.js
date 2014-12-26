@@ -1,6 +1,6 @@
 define(["moment"], function(moment) {
     var toDhisFormat = function(m) {
-        return m.isoWeekYear() + "W" + m.isoWeek();
+        return m.year() + "W" + m.isoWeek();
     };
 
     return {

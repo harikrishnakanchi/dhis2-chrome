@@ -39,6 +39,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
                 event1 = {
                     event: 'event1',
+                    eventDate: '2014-12-29T05:06:30.950+0000',
                     dataValues: [{
                         dataElement: 'de1',
                         value: 'a11',
@@ -49,6 +50,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
                 event2 = {
                     event: 'event2',
+                    eventDate: '2014-12-29T05:06:30.950+0000',
                     dataValues: [{
                         dataElement: 'de2',
                         value: 'b22',
@@ -62,7 +64,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 dataElementRepository = new DataElementRepository();
 
                 programEventRepository = {
-                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [event1,event2])),
+                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [event1, event2])),
                     "getEventsFor": jasmine.createSpy("getEventsFor").and.returnValue(utils.getPromise(q, [])),
                     "upsert": jasmine.createSpy("upsert").and.returnValue(utils.getPromise(q, [])),
                     "delete": jasmine.createSpy("delete").and.returnValue(utils.getPromise(q, {})),
@@ -407,13 +409,85 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 expect(actualValue).toEqual("Male");
             });
 
-            it("should get all event and set correct event to be edited if route params has id", function(){
+            it("should get all event and set correct event to be edited if route params has id", function() {
+                var optionSets = [{
+                    'id': 'os1'
+                }];
+                var program = {
+                    "id": "ab1cbd4f11a",
+                    "name": "Surgery - V1",
+                    "programStages": [{
+                        "id": "a40aa8ce8d5",
+                        "name": "Surgery - V1 Stage",
+                        "programStageSections": [{
+                            "id": "W2SSCuf7fv8",
+                            "name": "Surgery",
+                            "programStageDataElements": [{
+                                "dataElement": {
+                                    "id": "de1",
+                                    "name": "Patient ID - V1 - Surgery",
+                                    "type": "string"
+                                }
+                            }, {
+                                "dataElement": {
+                                    "id": "de2",
+                                    "name": "Type of patient - V1 - Surgery",
+                                    "type": "string"
+                                }
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, {'eventId': "event1"}, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                            }]
+                        }]
+                    }]
+                };
 
+                var expectedEvent = {
+                    "event": 'event1',
+                    "program": {
+                        "id": "ab1cbd4f11a",
+                        "name": "Surgery - V1",
+                        "programStages": [{
+                            "id": "a40aa8ce8d5",
+                            "name": "Surgery - V1 Stage",
+                            "programStageSections": [{
+                                "id": "W2SSCuf7fv8",
+                                "name": "Surgery",
+                                "programStageDataElements": [{
+                                    "dataElement": {
+                                        "id": "de1",
+                                        "name": "Patient ID - V1 - Surgery",
+                                        "type": "string"
+                                    }
+                                }, {
+                                    "dataElement": {
+                                        "id": "de2",
+                                        "name": "Type of patient - V1 - Surgery",
+                                        "type": "string"
+                                    }
+
+                                }]
+                            }]
+                        }]
+                    },
+                    "dataValues": [{
+                        "dataElement": 'de1',
+                        "value": 'a11',
+                        "showInEventSummary": true,
+                        "name": 'dataElement1',
+                    }],
+                    "dataElementValues": {
+                        "de1": 'a11'
+                    }
+                };
+
+                mockStore.getAll.and.returnValue(utils.getPromise(q, optionSets));
+                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, program));
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, {
+                    'eventId': "event1"
+                }, mockDB.db, programRepository, programEventRepository, dataElementRepository);
+                scope.$apply();
 
                 expect(programEventRepository.getAll).toHaveBeenCalled();
-                scope.$apply();
+
                 expect(scope.eventToBeEdited).toEqual(event1);
             });
         });
