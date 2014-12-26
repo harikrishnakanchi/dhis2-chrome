@@ -38,8 +38,8 @@ define(["moment", "lodash"], function(moment, _) {
                 'events': newEvents
             };
 
-            var approvalPromise = programEventRepository.upsert(newEventPayload);
-            updatePromises.push(approvalPromise);
+            var eventPromise = programEventRepository.upsert(newEventPayload);
+            updatePromises.push(eventPromise);
 
             return $q.all(updatePromises);
         };
