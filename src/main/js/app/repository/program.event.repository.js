@@ -17,6 +17,13 @@ define(["moment", "lodash", "properties"], function(moment, _, properties) {
             });
         };
 
+        this.getAll = function() {
+            var store = db.objectStore("programEvents");
+            return store.getAll().then(function(allEvents) {
+                return allEvents;
+            });
+        };
+
         this.getEventsFromPeriod = function(startPeriod) {
             var endPeriod = moment().year() + "W" + moment().week();
             var store = db.objectStore('programEvents');

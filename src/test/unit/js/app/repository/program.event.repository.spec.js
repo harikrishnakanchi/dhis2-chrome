@@ -35,6 +35,17 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedEventData);
         });
 
+        it("should get all events", function() {
+            mockDB = utils.getMockDB(q);
+            mockStore = mockDB.objectStore;
+            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+
+            programEventRepository.getAll();
+            scope.$apply();
+
+            expect(mockStore.getAll).toHaveBeenCalled();
+        });
+
         it("should delete an event given an id", function() {
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
@@ -289,14 +300,14 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             scope.$apply();
 
             var expectedPayload = [{
-                    event: 'event1',
-                    eventDate: '2014-11-26T00:00:00',
-                    localStatus: 'NEW',
-                    dataValues: [{
-                        dataElement: 'de1',
-                        value: '20'
-                    }]
-                }];
+                event: 'event1',
+                eventDate: '2014-11-26T00:00:00',
+                localStatus: 'NEW',
+                dataValues: [{
+                    dataElement: 'de1',
+                    value: '20'
+                }]
+            }];
 
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedPayload);
         });

@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
-    return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, $routeParams, db, programRepository, programEventRepository, dataElementRepository, eventService) {
+    return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, $routeParams, db, programRepository, programEventRepository, dataElementRepository) {
         var resetForm = function() {
             $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.showForm = false;
@@ -219,16 +219,14 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
         var init = function() {
 
-            var setUpEditEventForm = function(eventData) {
-                $scope.dataValues = eventData.dataValues;
-            };
-
-            var setUpEvent = function() {
-                eventService.getEventById($routeParams.eventId).then(setUpEditEventForm);
+            var setUpEvent = function(eventData) {
+                $scope.eventToBeEdited = _.find(eventData, {
+                    'event': $routeParams.eventId
+                });
             };
 
             if ($routeParams.eventId) {
-                setUpEvent();
+                programEventRepository.getAll().then(setUpEvent);
             } else {
                 $scope.loading = true;
                 resetForm();
