@@ -1,4 +1,4 @@
-define(["moment", "lodash", "properties"], function(moment, _, properties) {
+define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, properties, dateUtils) {
     return function(db, $q) {
 
         this.upsert = function(eventsPayload) {
@@ -37,9 +37,9 @@ define(["moment", "lodash", "properties"], function(moment, _, properties) {
                 if (_.isEmpty(allEvents)) {
                     return "1900W01";
                 }
-                var period8WeeksAgo = moment().year() + "W" + (moment().week() - properties.projectDataSync.numWeeksToSync);
+                var periodXWeeksAgo = dateUtils.toDhisFormat(moment().isoWeek(moment().isoWeek() - (properties.projectDataSync.numWeeksToSync)));
                 var lastUpdatedPeriod = _.first(_.sortBy(allEvents, 'period').reverse()).period;
-                return _.first(_.sortBy([period8WeeksAgo, lastUpdatedPeriod].reverse()));
+                return _.first(_.sortBy([periodXWeeksAgo, lastUpdatedPeriod].reverse()));
             });
         };
 
