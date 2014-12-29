@@ -84,7 +84,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
             it("should set initial values for modules and week from route params", function() {
                 routeParams = {
                     "module": allModules[0].name,
-                    "week": "W31 - 2014-07-28 - 2014-08-03"
+                    "week": "2014W31"
                 };
 
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
@@ -92,6 +92,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
                 expect(scope.week).toEqual({
                     "weekNumber": 31,
+                    "weekYear": 2014,
                     "startOfWeek": '2014-07-28',
                     "endOfWeek": '2014-08-03'
                 });

@@ -4,7 +4,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
         this.upsert = function(eventsPayload) {
             var updatePeriod = function(eventsPayload) {
                 _.each(eventsPayload.events, function(event) {
-                    event.period = event.period || moment(event.eventDate).year() + "W" + moment(event.eventDate).isoWeek();
+                    event.period = event.period || moment(event.eventDate).format("GGGG[W]WW");
                 });
                 return eventsPayload;
             };
@@ -25,7 +25,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
         };
 
         this.getEventsFromPeriod = function(startPeriod) {
-            var endPeriod = moment().year() + "W" + moment().week();
+            var endPeriod = moment().format("GGGG[W]WW");
             var store = db.objectStore('programEvents');
             var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
             return store.each(query);

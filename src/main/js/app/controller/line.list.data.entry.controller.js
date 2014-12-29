@@ -31,7 +31,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
         };
 
         var reloadEventsView = function() {
-            var period = $scope.year + "W" + $scope.week.weekNumber;
+            var period = $scope.week.weekYear + "W" + $scope.week.weekNumber;
             var programIdsInCurrentModule = $scope.programsInCurrentModule;
             $scope.allEvents = [];
             return _.forEach(programIdsInCurrentModule, function(programId) {
@@ -216,7 +216,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 reloadEventsView();
             };
 
-            var period = $scope.year + "W" + $scope.week.weekNumber;
+            var period = $scope.week.weekYear + "W" + $scope.week.weekNumber;
             var currentModule = $scope.currentModule.id;
 
             return programEventRepository.markEventsAsSubmitted(programId, period, currentModule)

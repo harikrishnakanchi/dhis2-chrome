@@ -46,9 +46,8 @@ define(["moment", "lodash"], function(moment, _) {
 
         var downloadEventsData = function() {
             return programEventRepository.getLastUpdatedPeriod().then(function(lastUpdatedPeriod) {
-                var year = lastUpdatedPeriod.split("W")[0];
-                var isoWeek = lastUpdatedPeriod.split("W")[1];
-                var startDate = moment().year(year).isoWeek(isoWeek).startOf('week').format("YYYY-MM-DD");
+                var m = moment(lastUpdatedPeriod, "GGGG[W]WW");
+                var startDate = m.format("YYYY-MM-DD");
                 return $q.all([eventService.getRecentEvents(startDate), programEventRepository.getEventsFromPeriod(lastUpdatedPeriod)]);
             });
         };

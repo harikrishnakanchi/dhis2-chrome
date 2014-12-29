@@ -58,7 +58,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
         });
 
         it("should get last updated period if data is present in indexedDB", function() {
-            var periodSevenWeeksAgo = moment().year() + "W" + (moment().subtract(7, 'weeks').week());
+            var periodSevenWeeksAgo = moment().subtract(7, 'weeks').format("GGGG[W]WW");
             
             var allEvents = [{
                 'event': 'event_1',
@@ -77,12 +77,12 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             expect(mockStore.getAll).toHaveBeenCalled();
 
-            var periodEightWeeksAgo = moment().year() + "W" + (moment().subtract(properties.projectDataSync.numWeeksToSync, 'weeks').week());
+            var periodEightWeeksAgo = moment().subtract(properties.projectDataSync.numWeeksToSync, 'weeks').format("GGGG[W]WW");
             expect(lastUpdatedPeriod).toEqual(periodEightWeeksAgo);
         });
 
         it("should get last updated period from indexedDB if data was synched 8 weeks ago", function() {
-            var periodNineWeeksAgo = moment().year() + "W" + (moment().subtract(9, 'weeks').week());
+            var periodNineWeeksAgo = moment().subtract(9, 'weeks').format("GGGG[W]WW");
 
             var allEvents = [{
                 'event': 'event_1',
@@ -137,7 +137,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             scope.$apply();
 
             expect(mockStore.each.calls.argsFor(0)[0].betweenX).toEqual("2014W40");
-            expect(mockStore.each.calls.argsFor(0)[0].betweenY).toEqual(moment().year() + "W" + moment().week());
+            expect(mockStore.each.calls.argsFor(0)[0].betweenY).toEqual(moment().format("GGGG[W]WW"));
 
             expect(actualEvents).toEqual(listOfEvents);
         });

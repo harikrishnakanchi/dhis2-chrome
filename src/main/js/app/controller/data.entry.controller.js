@@ -41,15 +41,15 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 };
 
                 var setSelectedWeek = function(period) {
-                    period = period.split(" - ");
-                    var m = moment(period[1]);
+                    var m = moment(period, "GGGG[W]WW");
 
                     $scope.year = m.year();
                     $scope.month = m.month();
                     $scope.week = {
-                        "weekNumber": parseInt(period[0].substring(1)),
-                        "startOfWeek": period[1],
-                        "endOfWeek": period[2]
+                        "weekNumber": m.isoWeek(),
+                        "weekYear": m.isoWeekYear(),
+                        "startOfWeek": m.startOf("isoWeek").format("YYYY-MM-DD"),
+                        "endOfWeek": m.endOf("isoWeek").format("YYYY-MM-DD")
                     };
                 };
 

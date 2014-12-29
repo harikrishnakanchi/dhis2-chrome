@@ -50,7 +50,7 @@
                                 <ul>
                                     <li ng-repeat="status in item.status">
                                         <input type="checkbox" ng-model="status.shouldBeApproved" ng-change="toggleSelectAllOption(status.shouldBeApproved)">
-                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}">{{formatPeriods(status.period)}}</a>
+                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{status.period}}">{{formatPeriods(status.period)}}</a>
                                     </li>
                                 </ul>
                             </td>
@@ -79,7 +79,7 @@
                             <td>
                                 <ul>
                                     <li ng-repeat="status in item.status">
-                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}" ng-if="!userApprovalLevel">{{formatPeriods(status.period)}}</a>
+                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{status.period}}" ng-if="!userApprovalLevel">{{formatPeriods(status.period)}}</a>
                                         <span ng-if="userApprovalLevel">{{formatPeriods(status.period)}}</span>
                                     </li>
                                 </ul>
@@ -104,7 +104,7 @@
                             <td>
                                 <ul>
                                     <li ng-repeat="status in item.status | orderBy:'period'">
-                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{formatPeriods(status.period)}}" ng-if="!userApprovalLevel">{{formatPeriods(status.period)}}</a>
+                                        <a ng-href="#/data-entry/{{item.moduleId}}/{{status.period}}" ng-if="!userApprovalLevel">{{formatPeriods(status.period)}}</a>
                                         <span ng-if="userApprovalLevel">{{formatPeriods(status.period)}}</span>
                                     </li>
                                 </ul>

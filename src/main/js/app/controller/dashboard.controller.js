@@ -38,10 +38,8 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
         };
 
         $scope.formatPeriods = function(period) {
-            var year = period.substring(0, 4);
-            var week = period.substring(4);
-            m = moment(year + "-" + week);
-            return "W" + m.isoWeek() + " - " + m.startOf("isoWeek").format("YYYY-MM-DD") + " - " + m.endOf("isoWeek").format("YYYY-MM-DD");
+            m = moment(period, "GGGG[W]WW");
+            return m.format("[W]WW") + " - " + m.startOf("isoWeek").format("YYYY-MM-DD") + " - " + m.endOf("isoWeek").format("YYYY-MM-DD");
         };
 
         $scope.toggleSelectAllOption = function(status) {

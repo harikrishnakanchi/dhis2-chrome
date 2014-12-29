@@ -301,7 +301,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var getPeriod = function() {
-            return $scope.year + "W" + $scope.week.weekNumber;
+            return $scope.week.weekYear + "W" + $scope.week.weekNumber;
         };
 
 

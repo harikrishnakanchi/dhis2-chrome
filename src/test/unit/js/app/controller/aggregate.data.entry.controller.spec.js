@@ -30,7 +30,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 };
                 scope.year = 2014;
                 scope.week = {
-                    "weekNumber": 14
+                    "weekNumber": 14,
+                    "weekYear": 2014
                 };
 
                 orgUnitRepository = new OrgUnitRepository();
@@ -419,7 +420,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should fetch empty data if no data exists for the given period", function() {
                 scope.year = 2014;
                 scope.week = {
-                    "weekNumber": 14
+                    "weekNumber": 14,
+                    "weekYear": 2014
                 };
                 scope.currentModule = {
                     'id': 'Mod1',
@@ -436,7 +438,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should display data for the given period", function() {
                 scope.year = 2014;
                 scope.week = {
-                    "weekNumber": 14
+                    "weekNumber": 14,
+                    "weekYear": 2014
                 };
                 scope.currentModule = {
                     id: 'mod2',
@@ -480,7 +483,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(scope.dataentryForm, '$setPristine');
 
                 scope.week = {
-                    "weekNumber": 14
+                    "weekNumber": 14,
+                    "weekYear": 2014
                 };
                 scope.currentModule = {
                     'id': 'mod1',
@@ -515,7 +519,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 }));
 
                 scope.week = {
-                    "weekNumber": 14
+                    "weekNumber": 14,
+                    "weekYear": 2014
                 };
                 scope.currentModule = {
                     'id': 'mod1',
@@ -548,6 +553,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should return true if current week is selected", function() {
                 var selectedWeek = {
                     'weekNumber': 2,
+                    "weekYear": 2014,
                     'startOfWeek': moment().startOf("isoWeek").format("YYYY-MM-DD"),
                     'endOfWeek': moment().endOf("isoWeek").format("YYYY-MM-DD")
                 };
@@ -559,6 +565,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should return false if current week is not selected", function() {
                 var selectedWeek = {
                     'weekNumber': 21,
+                    "weekYear": 2014,
                     'startOfWeek': moment("2001-01-01", "YYYY-MM-DD").startOf("isoWeek").format("YYYY-MM-DD"),
                     'endOfWeek': moment("2001-01-01", "YYYY-MM-DD").endOf("isoWeek").format("YYYY-MM-DD")
                 };

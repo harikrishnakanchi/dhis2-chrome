@@ -30,6 +30,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                 scope.resourceBundle = {};
                 scope.week = {
                     "weekNumber": 44,
+                    "weekYear": 2014,
                     "startOfWeek": "2014-10-27",
                     "endOfWeek": "2014-11-02"
                 };
@@ -205,6 +206,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
                 scope.week = {
                     "weekNumber": 46,
+                    "weekYear": 2014,
                     "startOfWeek": "2014-11-10",
                     "endOfWeek": "2014-11-16"
                 };
