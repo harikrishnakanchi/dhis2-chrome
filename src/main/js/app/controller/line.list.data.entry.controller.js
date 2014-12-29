@@ -155,6 +155,53 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 });
         };
 
+         $scope.update = function(programStage) {
+
+            var showResultMessage = function() {
+                $scope.resultMessageType = "success";
+                $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;
+                scrollToTop();
+            };
+
+            var buildPayloadFromView = function() {
+                var formatValue = function(value) {
+                    return _.isDate(value) ? moment(value).format("YYYY-MM-DD") : value;
+                };
+
+                var newEvent = {
+                    'event': $scope.eventToBeEdited.event,
+                    'program': $scope.eventToBeEdited.program.id,
+                    'programStage': $scope.eventToBeEdited.programStage,
+                    'orgUnit': $scope.eventToBeEdited.orgUnit,
+                    'eventDate': moment($scope.eventToBeEdited.eventDate).format("YYYY-MM-DD"),
+                    'dataValues': [],
+                    'localStatus': "DRAFT"
+                };
+                _.each(programStage.programStageDataElements, function(psde) {
+                    newEvent.dataValues.push({
+                        "dataElement": psde.dataElement.id,
+                        "value": formatValue($scope.eventToBeEdited.dataElementValues[psde.dataElement.id])
+                    });
+                });
+
+                return {
+                    'events': [newEvent]
+                };
+            };
+
+            var newEventsPayload = buildPayloadFromView();
+
+            return programEventRepository.upsert(newEventsPayload)
+                .then(function() {
+                    showResultMessage();
+                    // reloadEventsView();
+                    // if (addAnother)
+                    //     $scope.openNewForm();
+                    // else
+                    //     $scope.closeNewForm();
+                });
+        };
+
         $scope.submit = function(programId) {
             var saveToDhis = function() {
                 return $hustle.publish({
