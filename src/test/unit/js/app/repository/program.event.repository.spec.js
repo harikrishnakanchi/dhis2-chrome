@@ -78,7 +78,6 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             expect(mockStore.getAll).toHaveBeenCalled();
 
             var periodEightWeeksAgo = moment().year() + "W" + (moment().subtract(properties.projectDataSync.numWeeksToSync, 'weeks').week());
-            console.error(lastUpdatedPeriod);
             expect(lastUpdatedPeriod).toEqual(periodEightWeeksAgo);
         });
 
