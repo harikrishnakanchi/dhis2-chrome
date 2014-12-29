@@ -13,12 +13,16 @@ define([], function() {
                         return uploadDataConsumer.run(message);
                     });
                 case "uploadCompletionData":
-                    return downloadApprovalConsumer.run(message).then(function() {
-                        return uploadCompletionDataConsumer.run(message);
+                    return downloadDataConsumer.run(message).then(function() {
+                        return downloadApprovalConsumer.run(message).then(function() {
+                            return uploadCompletionDataConsumer.run(message);
+                        });                    
                     });
                 case "uploadApprovalData":
-                    return downloadApprovalConsumer.run(message).then(function() {
-                        return uploadApprovalDataConsumer.run(message);
+                    return downloadDataConsumer.run(message).then(function() {
+                        return downloadApprovalConsumer.run(message).then(function() {
+                            return uploadApprovalDataConsumer.run(message);
+                        });
                     });
                 case "upsertOrgUnit":
                     return orgUnitConsumer.run(message);

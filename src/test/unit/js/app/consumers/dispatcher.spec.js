@@ -112,6 +112,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
 
+            expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
             expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message);
             expect(uploadApprovalDataConsumer.run).toHaveBeenCalledWith(message);
         });
