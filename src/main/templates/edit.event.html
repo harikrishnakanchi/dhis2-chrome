@@ -18,7 +18,7 @@
                             <li class="form-group">
                                 <label for="eventDate" class="col-sm-4 col-md-4 control-label">{{ resourceBundle["lineListEventDate"] }}</label>
                                 <div class="col-sm-6 col-md-6">
-                                    <input name="eventDate" type="date" class="form-control" ng-model="eventToBeEdited.eventDate" required />
+                                    <input name="eventDate" type="date" class="form-control" ng-model="eventToBeEdited.eventDate" required min="{{minDateInCurrentPeriod}}" max="{{maxDateInCurrentPeriod}}"/>
                                 </div>
                             </li>
                         </ul>

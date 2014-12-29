@@ -155,7 +155,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 });
         };
 
-         $scope.update = function(programStage) {
+        $scope.update = function(programStage) {
 
             var showResultMessage = function() {
                 $scope.resultMessageType = "success";
@@ -302,6 +302,9 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                     var eventToBeEdited = _.find(eventData, {
                         'event': $routeParams.eventId
                     });
+
+                    $scope.minDateInCurrentPeriod = moment(eventToBeEdited.eventDate).startOf('week').format('YYYY-MM-DD');
+                    $scope.maxDateInCurrentPeriod = moment(eventToBeEdited.eventDate).endOf('week').format('YYYY-MM-DD');
 
                     return getProgramInfoNgModel(eventToBeEdited.program).then(function(program) {
                         eventToBeEdited.eventDate = new Date(eventToBeEdited.eventDate);
