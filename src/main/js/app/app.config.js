@@ -76,6 +76,7 @@ require.config({
         "programEventRepository": "app/repository/program.event.repository",
         "dataElementRepository": "app/repository/data.element.repository",
         "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
+        "changeLogRepository": "app/repository/changelog.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",

@@ -37,6 +37,7 @@ require.config({
         "orgUnitRepository": "app/repository/orgunit.repository",
         "programEventRepository": "app/repository/program.event.repository",
         "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
+        "changeLogRepository": "app/repository/changelog.repository",
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",
