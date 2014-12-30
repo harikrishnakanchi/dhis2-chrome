@@ -6,7 +6,8 @@ define(['moment'], function(moment) {
         };
 
         var downloadAndMerge = function(message) {
-            var merge = function(orgUnit) {
+            var merge = function(data) {
+                var orgUnit = data.data;
                 var lastUpdatedOnDhis = _.pluck(orgUnit.attributeValues, "lastUpdated");
                 lastUpdatedOnDhis.push(orgUnit.lastUpdated);
 

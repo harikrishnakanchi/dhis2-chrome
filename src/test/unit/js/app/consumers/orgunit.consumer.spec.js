@@ -40,18 +40,20 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             };
 
             var orgUnitFromDHIS = {
-                "id": "orgUnit1",
-                "name": "Afghanistan",
-                "lastUpdated": "2014-09-24T09:01:12.020+0000",
-                "attributeValues": [{
-                    "value": "population",
-                    "lastUpdated": "2014-12-24T09:01:12.020+0000",
-                    "attribute": {
-                        "id": "abcd1234",
-                        "name": "Type of population",
-                        "code": "prjPopType"
-                    }
-                }]
+                "data": {
+                    "id": "orgUnit1",
+                    "name": "Afghanistan",
+                    "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                    "attributeValues": [{
+                        "value": "population",
+                        "lastUpdated": "2014-12-24T09:01:12.020+0000",
+                        "attribute": {
+                            "id": "abcd1234",
+                            "name": "Type of population",
+                            "code": "prjPopType"
+                        }
+                    }]
+                }
             };
 
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
@@ -63,7 +65,7 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             scope.$apply();
 
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitRepository.upsert).toHaveBeenCalledWith([orgUnitFromDHIS]);
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith([orgUnitFromDHIS.data]);
         });
 
         it("should sync local org unit data to dhis if it is not stale", function() {
@@ -76,18 +78,20 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             };
 
             var orgUnitFromDHIS = {
-                "id": "orgUnit1",
-                "name": "Afghanistan",
-                "lastUpdated": "2014-09-24T09:01:12.020+0000",
-                "attributeValues": [{
-                    "value": "population",
-                    "lastUpdated": "2014-12-24T09:01:12.020+0000",
-                    "attribute": {
-                        "id": "abcd1234",
-                        "name": "Type of population",
-                        "code": "prjPopType"
-                    }
-                }]
+                "data": {
+                    "id": "orgUnit1",
+                    "name": "Afghanistan",
+                    "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                    "attributeValues": [{
+                        "value": "population",
+                        "lastUpdated": "2014-12-24T09:01:12.020+0000",
+                        "attribute": {
+                            "id": "abcd1234",
+                            "name": "Type of population",
+                            "code": "prjPopType"
+                        }
+                    }]
+                }
             };
 
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
