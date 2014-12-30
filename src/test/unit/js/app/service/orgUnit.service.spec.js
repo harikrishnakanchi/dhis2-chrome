@@ -146,5 +146,21 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + ".json?fields=:all").respond(200, "ok");
             httpBackend.flush();
         });
+
+        it("should get all org units updated after a particular time", function() {
+            var lastUpdatedTime = "2014-12-30T09:13:41.092Z";
+
+            orgUnitService.getAll(lastUpdatedTime);
+
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=:all&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, "ok");
+            httpBackend.flush();
+        });
+
+        it("should get all org units", function() {
+            orgUnitService.getAll();
+
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?fields=:all').respond(200, "ok");
+            httpBackend.flush();
+        });
     });
 });

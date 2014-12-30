@@ -9,5 +9,11 @@ define(["properties", "lodash"], function(properties, _) {
                 'organisationUnits': angular.isArray(orgUnitRequest) ? orgUnitRequest : [orgUnitRequest]
             });
         };
+
+        this.getAll = function(lastUpdatedTime) {
+            var url = properties.dhis.url + '/api/organisationUnits.json?fields=:all';
+            url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
+            return $http.get(url);
+        };
     };
 });
