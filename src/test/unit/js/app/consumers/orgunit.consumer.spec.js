@@ -27,7 +27,6 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             }];
             orgUnitService = new OrgUnitService();
             orgUnitRepository = jasmine.createSpyObj({}, ['upsert']);
-
         }));
 
         it("should over write local org unit data with dhis data if it is stale", function() {
@@ -59,11 +58,12 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'upsert');
 
-            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository);
+            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository, q);
 
             orgunitConsumer.run(message);
             scope.$apply();
 
+            expect(orgUnitService.get).toHaveBeenCalledWith("a4acf9115a7");
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
             expect(orgUnitRepository.upsert).toHaveBeenCalledWith([orgUnitFromDHIS.data]);
         });
@@ -97,12 +97,13 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'upsert');
 
-            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository);
+            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository, q);
 
             orgunitConsumer.run(message);
             scope.$apply();
 
-            expect(orgUnitService.upsert).toHaveBeenCalledWith(message.data.data);
+            expect(orgUnitService.get).toHaveBeenCalledWith("a4acf9115a7");
+            expect(orgUnitService.upsert).toHaveBeenCalledWith(message.data.data[0]);
             expect(orgUnitRepository.upsert).not.toHaveBeenCalled();
         });
 
@@ -120,14 +121,69 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             }));
             spyOn(orgUnitService, 'upsert');
 
-            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository);
+            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository, q);
 
             orgunitConsumer.run(message);
             scope.$apply();
 
-            expect(orgUnitService.upsert).toHaveBeenCalledWith(message.data.data);
+            expect(orgUnitService.get).toHaveBeenCalledWith("a4acf9115a7");
+            expect(orgUnitService.upsert).toHaveBeenCalledWith(message.data.data[0]);
             expect(orgUnitRepository.upsert).not.toHaveBeenCalled();
         });
 
+        it("should create multiple orgunits", function() {
+            payload = [{
+                "id": "213046e2707",
+                "name": "OpUnit1",
+                "lastUpdated": "2014-12-30T05:47:16.732+0000",
+                "attributeValues": [{
+                    "created": "2014-12-30T05:47:20.631+0000",
+                    "value": "X",
+                    "lastUpdated": "2014-12-30T05:47:20.631+0000",
+                    "attribute": {
+                        "id": "huc",
+                        "name": "Hospital Code"
+                    }
+                }]
+            }, {
+                "id": "213046e2708",
+                "name": "OpUnit2",
+                "lastUpdated": "2014-12-30T05:47:16.732+0000",
+                "attributeValues": [{
+                    "created": "2014-12-30T05:47:20.631+0000",
+                    "value": "Y",
+                    "lastUpdated": "2014-12-30T05:47:20.631+0000",
+                    "attribute": {
+                        "id": "huc",
+                        "name": "Hospital Code"
+                    }
+                }]
+            }];
+            var message = {
+                "data": {
+                    "data": payload,
+                    "type": "upsertOrgUnit"
+                },
+                "created": "2014-14-24T09:01:12.020+0000"
+            };
+
+            spyOn(orgUnitService, 'get').and.returnValue(utils.getRejectedPromise(q, {
+                "status": 404
+            }));
+            spyOn(orgUnitService, 'upsert');
+
+            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository, q);
+
+            orgunitConsumer.run(message);
+            scope.$apply();
+
+            expect(orgUnitService.get.calls.argsFor(0)).toEqual(["213046e2707"]);
+            expect(orgUnitService.upsert.calls.argsFor(0)).toEqual([message.data.data[0]]);
+
+            expect(orgUnitService.get.calls.argsFor(1)).toEqual(["213046e2708"]);
+            expect(orgUnitService.upsert.calls.argsFor(1)).toEqual([message.data.data[1]]);
+
+            expect(orgUnitRepository.upsert).not.toHaveBeenCalled();
+        });
     });
 });
