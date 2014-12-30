@@ -1,4 +1,4 @@
-define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepository, utils, mocks) {
+define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUnitRepository, utils, mocks, timecop) {
     describe("Org Unit Repository specs", function() {
         var mockOrgStore, mockDb, orgUnitRepository, q, orgUnits, scope;
         var getAttr = function(key, value) {
@@ -59,10 +59,18 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             }];
             scope = $rootScope.$new();
 
+            Timecop.install();
+            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
+
             mockDb = utils.getMockDB(q, {}, _.clone(orgUnits, true));
             mockOrgStore = mockDb.objectStore;
             orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
         }));
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
 
         it("should get orgUnit", function() {
             var projectId = "proj1";
@@ -78,10 +86,35 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 "level": 1
             }];
 
+            var expectedUpsertPayload = [{
+                "id": "org_0",
+                "level": 1,
+                "lastUpdated": "2014-05-30T12:43:54.972Z"
+            }];
+
             orgUnitRepository.upsert(orgUnit).then(function(data) {
-                expect(data).toEqual(orgUnit);
+                expect(data).toEqual(expectedUpsertPayload);
             });
-            expect(mockOrgStore.upsert).toHaveBeenCalledWith(orgUnit);
+
+            scope.$apply();
+
+            expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedUpsertPayload);
+        });
+
+        it("should update lastupdated time", function() {
+            var orgUnit = {
+                "id": "org_0",
+                "level": 1
+            };
+
+            var expectedUpsertPayload = [{
+                "id": "org_0",
+                "level": 1,
+                "lastUpdated": "2014-05-30T12:43:54.972Z"
+            }];
+
+            orgUnitRepository.upsert(orgUnit);
+            expect(mockOrgStore.upsert).toHaveBeenCalledWith(expectedUpsertPayload);
         });
 
         it("should get all org units", function() {
@@ -509,7 +542,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             var opUnit1 = {
                 "name": "opunit1",
                 "id": "opunit1",
-                 "parent": {
+                "parent": {
                     "id": "prj1"
                 }
             };
@@ -517,7 +550,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             var opUnit2 = {
                 "name": "opunit2",
                 "id": "opunit2",
-                 "parent": {
+                "parent": {
                     "id": "prj2"
                 }
             };
@@ -525,7 +558,7 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
             var module1 = {
                 "name": "module1",
                 "id": "module1",
-                 "parent": {
+                "parent": {
                     "id": "opunit1"
                 }
             };
@@ -534,11 +567,11 @@ define(["orgUnitRepository", "utils", "angularMocks"], function(OrgUnitRepositor
                 "name": "module2",
                 "displayName": "module2",
                 "id": "module2",
-                 "parent": {
+                "parent": {
                     "id": "opunit2"
                 }
             };
-            
+
             var allOrgUnits = [prj, opUnit1, opUnit2, module2, module1];
 
             mockDb = utils.getMockDB(q, {}, allOrgUnits);

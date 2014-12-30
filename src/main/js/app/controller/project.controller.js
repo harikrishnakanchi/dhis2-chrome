@@ -6,7 +6,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
         $scope.thisDate = moment().toDate();
         $scope.reasonForIntervention = ['Armed Conflict', 'Access to health care', 'Natural Disaster', 'Epidemic'].sort();
-        $scope.modeOfOperation = ['Direct operation','Remote operation'].sort();
+        $scope.modeOfOperation = ['Direct operation', 'Remote operation'].sort();
         $scope.modelOfManagement = ['Collaboration', 'MSF management'].sort();
 
         $scope.openOpeningDate = function($event) {
@@ -44,7 +44,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
             var onSuccess = function(data) {
                 $rootScope.$broadcast('resetProjects');
                 if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm(data, "savedProject");
+                    $scope.$parent.closeNewForm(data[0], "savedProject");
                 return dhisProject;
             };
 
@@ -149,7 +149,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
                             'code': "projCode"
                         }
                     });
-                    if(!_.isEmpty(projCodeAttribute) && !_.isEmpty(projCodeAttribute.value)){
+                    if (!_.isEmpty(projCodeAttribute) && !_.isEmpty(projCodeAttribute.value)) {
                         acc.push(projCodeAttribute.value);
                     }
                 }, []);

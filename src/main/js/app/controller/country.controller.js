@@ -30,7 +30,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
 
             var onSuccess = function(data) {
                 if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm(data, "savedCountry");
+                    $scope.$parent.closeNewForm(data[0], "savedCountry");
             };
 
             var onError = function() {

@@ -1,4 +1,4 @@
-define([], function() {
+define(["moment", "lodash"], function(moment, _) {
     return function(db) {
         var isOfType = function(orgUnit, type) {
             return _.any(orgUnit.attributeValues, {
@@ -10,14 +10,23 @@ define([], function() {
         };
 
         this.upsert = function(payload) {
+            payload = _.isArray(payload) ? payload : [payload];
+            var addLastUpdatedField = function(payload) {
+                return _.map(payload, function(p) {
+                    p.lastUpdated = moment().toISOString();
+                    return p;
+                });
+            };
+
             var store = db.objectStore("organisationUnits");
+            payload = addLastUpdatedField(payload);
+
             return store.upsert(payload).then(function() {
                 return payload;
             });
         };
 
         this.getAll = function() {
-
             var populateDisplayName = function(allOrgUnits, orgUnit) {
                 var parent = _.find(allOrgUnits, {
                     'id': orgUnit.parent ? orgUnit.parent.id : undefined
@@ -77,8 +86,8 @@ define([], function() {
         this.getAllModulesInOpUnit = function(opUnitId) {
             return this.getAll().then(function(allOrgUnits) {
 
-                return _.filter(allOrgUnits, function(orgUnit){
-                    if(orgUnit.parent && orgUnit.parent.id === opUnitId){
+                return _.filter(allOrgUnits, function(orgUnit) {
+                    if (orgUnit.parent && orgUnit.parent.id === opUnitId) {
                         return orgUnit;
                     }
                 });
