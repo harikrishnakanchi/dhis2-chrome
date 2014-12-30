@@ -194,11 +194,9 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             return programEventRepository.upsert(newEventsPayload)
                 .then(function() {
                     showResultMessage();
-                    // reloadEventsView();
-                    // if (addAnother)
-                    //     $scope.openNewForm();
-                    // else
-                    //     $scope.closeNewForm();
+                    reloadEventsView();
+                    $scope.showView = true;
+                    $scope.includeEditForm = false;
                 });
         };
 
@@ -278,9 +276,6 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                     'event': eventId
                 });
 
-                $scope.minDateInCurrentPeriod = moment(eventToBeEdited.eventDate).startOf('week').format('YYYY-MM-DD');
-                $scope.maxDateInCurrentPeriod = moment(eventToBeEdited.eventDate).endOf('week').format('YYYY-MM-DD');
-
                 return getProgramInfoNgModel(eventToBeEdited.program).then(function(program) {
                     eventToBeEdited.eventDate = new Date(eventToBeEdited.eventDate);
                     eventToBeEdited.program = program;
@@ -290,8 +285,13 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             };
             $scope.showView = false;
             $scope.includeEditForm = true;
-            $scope.formTemplateUrl = "templates/edit.event.html" + '?' + moment().format("X");
+            $scope.formTemplateUrl = "templates/partials/edit-event.html" + '?' + moment().format("X");
             return loadOptionSets().then(getAllEvents).then(setUpEvent);
+        };
+
+        $scope.closeEditForm = function() {
+            $scope.showView = true;
+            $scope.includeEditForm = false;
         };
 
         var getDataElementValues = function(eventToBeEdited) {
@@ -307,7 +307,9 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                         if (!_.isEmpty(dataElementAttribute)) {
                             if (de.dataElement.type === "date") {
                                 dataValueHash[dataElementId] = new Date(dataElementAttribute.value);
-                            } else {
+                            } else  if (de.dataElement.type === "int") {
+                                dataValueHash[dataElementId] = parseInt(dataElementAttribute.value);
+                            }else {
                                 dataValueHash[dataElementId] = dataElementAttribute.value;
                             }
                         }

@@ -1,7 +1,3 @@
-<!-- <div ng-controller="lineListDataEntryController"> -->
-<!-- <div class="loading" ng-show="loading">
-     <img src="img/ajax-loader.gif" class="spinner" />
-</div> -->
 <section class="panel tab-panel">
 	<div ng-show="resultMessageType === 'success'" class="alert alert-success">{{resultMessage}}</div>
 	<div ng-show="resultMessageType === 'failure'" class="alert alert-danger">{{resultMessage}}</div>
@@ -63,7 +59,7 @@
                     	<li>
                     		<div class="text-center">
                     			<input type="button" class="btn btn-main" value="Update Case" ng-click="update(programStage)" ng-disabled="editEventDataEntryForm.$invalid"/>
-                    			<!-- <input type="button" class="btn btn-main" value="Cancel" ng-click="closeNewForm()" /> -->
+                    			<input type="button" class="btn btn-main" value="Cancel" ng-click="closeEditForm()" />
 	                        </div>
                     	</li>
                     </ul>
