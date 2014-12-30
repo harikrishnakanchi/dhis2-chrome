@@ -108,12 +108,19 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             return false;
         };
 
+        var hideMessage = function() {
+            $scope.resultMessageType = "";
+            $scope.resultMessage = "";
+        };
+
         $scope.save = function(program, programStage, addAnother) {
 
             var showResultMessage = function() {
                 $scope.resultMessageType = "success";
                 $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;
                 scrollToTop();
+
+                $timeout(hideMessage, properties.messageTimeout);
             };
 
             var buildPayloadFromView = function() {
@@ -161,6 +168,8 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 $scope.resultMessageType = "success";
                 $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;
                 scrollToTop();
+
+                $timeout(hideMessage, properties.messageTimeout);
             };
 
             var buildPayloadFromView = function() {
@@ -212,6 +221,8 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 $scope.resultMessage = $scope.resourceBundle.eventSubmitSuccess;
                 scrollToTop();
                 reloadEventsView();
+
+                $timeout(hideMessage, properties.messageTimeout);
             };
 
             var period = $scope.week.weekYear + "W" + $scope.week.weekNumber;
@@ -307,9 +318,9 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                         if (!_.isEmpty(dataElementAttribute)) {
                             if (de.dataElement.type === "date") {
                                 dataValueHash[dataElementId] = new Date(dataElementAttribute.value);
-                            } else  if (de.dataElement.type === "int") {
+                            } else if (de.dataElement.type === "int") {
                                 dataValueHash[dataElementId] = parseInt(dataElementAttribute.value);
-                            }else {
+                            } else {
                                 dataValueHash[dataElementId] = dataElementAttribute.value;
                             }
                         }
