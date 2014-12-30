@@ -8,8 +8,8 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             $scope.eventDates = {};
             $scope.minDateInCurrentPeriod = $scope.week.startOfWeek;
             $scope.maxDateInCurrentPeriod = $scope.week.endOfWeek;
-            if ($scope.eventDataEntryForm !== undefined)
-                $scope.eventDataEntryForm.$setPristine();
+            if ($scope.form.eventDataEntryForm !== undefined)
+                $scope.form.eventDataEntryForm.$setPristine();
         };
 
         var loadPrograms = function() {
@@ -330,8 +330,15 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             return dataValueHash;
         };
 
+        $scope.$watch('eventDataEntryForm', function(eventDataEntryForm) {
+            if (eventDataEntryForm) {
+                $scope.eventDataEntryForm.$setPristine();
+            }
+        });
+
         var init = function() {
             var setUpNewForm = function() {
+                $scope.form = {};
                 $scope.loading = true;
                 resetForm();
                 $scope.showView = true;
