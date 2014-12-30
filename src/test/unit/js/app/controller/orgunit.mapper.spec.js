@@ -1,5 +1,15 @@
-define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mocks, moment) {
+define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitMapper, mocks, moment, timecop) {
     describe("orgUnitMapper", function() {
+
+        beforeEach(function() {
+            Timecop.install();
+            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
+        });
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
 
         it("should convert project from DHIS to project for view", function() {
             var dhisProject = {
@@ -158,6 +168,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 level: 3,
                 shortName: 'Org1',
                 openingDate: '2010-01-01',
+                lastUpdated: "2014-05-30T12:43:54.972Z",
                 parent: {
                     name: 'Name1',
                     id: 'Id1'
@@ -614,6 +625,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             expect(projectToBeSaved).toEqual({
                 name: 'Org1',
                 id: 'id1',
+                lastUpdated: "2014-05-30T12:43:54.972Z",
                 children: [{
                     id: '123'
                 }],

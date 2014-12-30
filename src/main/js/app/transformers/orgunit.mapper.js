@@ -94,12 +94,12 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
     this.mapToExistingProject = function(newProject, existingProject) {
         existingProject.name = newProject.name;
         existingProject.openingDate = moment(newProject.openingDate).format("YYYY-MM-DD");
+        existingProject.lastUpdated = moment().toISOString();
         existingProject.attributeValues = buildProjectAttributeValues(newProject);
         return existingProject;
     };
 
     this.mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
-
         var projectOrgUnit = {
             'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
             'name': orgUnit.name,
@@ -107,6 +107,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             'shortName': orgUnit.name,
             'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
             'parent': _.pick(parentOrgUnit, "name", "id"),
+            "lastUpdated": moment().toISOString(),
             'attributeValues': buildProjectAttributeValues(orgUnit)
         };
 
