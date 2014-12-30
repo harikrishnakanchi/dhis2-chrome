@@ -3,138 +3,143 @@
      <img src="img/ajax-loader.gif" class="spinner" />
 </div>
 <section class="panel tab-panel">
-	<div ng-show="resultMessageType === 'success'" class="alert alert-success">{{resultMessage}}</div>
-	<div ng-show="resultMessageType === 'failure'" class="alert alert-danger">{{resultMessage}}</div>
-	<form name="eventDataEntryForm" id="eventDataEntryForm" class="form-horizontal">
-		<accordion close-others="false">
-			<accordion-group ng-repeat="program in programs" is-open="true">
-				<accordion-heading>
-					<span ng-if="resourceBundle[program.id]">{{ resourceBundle[program.id] }}</span> 
-					<span ng-if="!resourceBundle[program.id]">{{ program.name }}</span> 
-				</accordion-heading>
-                <div class="exp-coll-group" ng-show="showForm" ng-repeat="programStage in program.programStages">
-                    <accordion close-others="false">
-                        <ul>
-                            <li class="form-group">
-                                <label for="eventDate" class="col-sm-4 col-md-4 control-label">{{ resourceBundle["lineListEventDate"] }}</label>
-                                <div class="col-sm-6 col-md-6">
-                                    <input name="eventDate" type="date" class="form-control" ng-model="getEventDateNgModel(eventDates, program.id, programStage.id)[programStage.id]" required min="{{minDateInCurrentPeriod}}" max="{{maxDateInCurrentPeriod}}" />
-                                </div>
-                            </li>
-                        </ul>
-                        <accordion-group ng-repeat="section in programStage.programStageSections" is-open="true">
-                            <accordion-heading>
-                                <span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span>
-                                <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
-                            </accordion-heading>
-                            <ul>
-                                <li class="form-group" ng-repeat="de in section.programStageDataElements">
-                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="resourceBundle[de.dataElement.id]">{{ resourceBundle[de.dataElement.id] }}</label>
-                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</label>
-                                    <div class="col-sm-6 col-md-6">
-                                        <input type="text" class="form-control" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory"/>
-                                        <input type="number" class="form-control" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory" ng-pattern = "numberPattern"/>
-                                        <input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory"/>
-                                        <div ng-if="de.dataElement.type === 'bool' &amp;&amp; !de.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
-				                            <div class="radio-inline">
-				                                <label for="Yes"> 
-				                                	<input type="radio" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" value="true" ng-required= "de.compulsory"> {{resourceBundle.yes}} 
-				                                </label>
+	<div ng-if="!includeEditForm">
+		<div ng-show="resultMessageType === 'success'" class="alert alert-success">{{resultMessage}}</div>
+		<div ng-show="resultMessageType === 'failure'" class="alert alert-danger">{{resultMessage}}</div>
+		<form name="eventDataEntryForm" id="eventDataEntryForm" class="form-horizontal">
+			<accordion close-others="false">
+				<accordion-group ng-repeat="program in programs" is-open="true">
+					<accordion-heading>
+						<span ng-if="resourceBundle[program.id]">{{ resourceBundle[program.id] }}</span> 
+						<span ng-if="!resourceBundle[program.id]">{{ program.name }}</span> 
+					</accordion-heading>
+	                <div class="exp-coll-group" ng-show="showForm" ng-repeat="programStage in program.programStages">
+	                    <accordion close-others="false">
+	                        <ul>
+	                            <li class="form-group">
+	                                <label for="eventDate" class="col-sm-4 col-md-4 control-label">{{ resourceBundle["lineListEventDate"] }}</label>
+	                                <div class="col-sm-6 col-md-6">
+	                                    <input name="eventDate" type="date" class="form-control" ng-model="getEventDateNgModel(eventDates, program.id, programStage.id)[programStage.id]" required min="{{minDateInCurrentPeriod}}" max="{{maxDateInCurrentPeriod}}" />
+	                                </div>
+	                            </li>
+	                        </ul>
+	                        <accordion-group ng-repeat="section in programStage.programStageSections" is-open="true">
+	                            <accordion-heading>
+	                                <span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span>
+	                                <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
+	                            </accordion-heading>
+	                            <ul>
+	                                <li class="form-group" ng-repeat="de in section.programStageDataElements">
+	                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="resourceBundle[de.dataElement.id]">{{ resourceBundle[de.dataElement.id] }}</label>
+	                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</label>
+	                                    <div class="col-sm-6 col-md-6">
+	                                        <input type="text" class="form-control" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory"/>
+	                                        <input type="number" class="form-control" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory" ng-pattern = "numberPattern"/>
+	                                        <input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory"/>
+	                                        <div ng-if="de.dataElement.type === 'bool' &amp;&amp; !de.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
+					                            <div class="radio-inline">
+					                                <label for="Yes"> 
+					                                	<input type="radio" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" value="true" ng-required= "de.compulsory"> {{resourceBundle.yes}} 
+					                                </label>
+					                            </div>
+					                            <div class="radio-inline">
+					                                <label for="No"> 
+					                                	<input type="radio" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" value="false" ng-required= "de.compulsory"> {{resourceBundle.no}} 
+					                                </label>
+					                            </div>
+					                        </div>
+	                                        <select ng-options="o.code as o.displayName for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory">
+	                                            <option value=""></option>
+	                                        </select>
+	                                        <div ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$dirty &amp;&amp; eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$invalid">
+				                                <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.required"> {{de.dataElement.formName}} {{resourceBundle.required}}</span>
+				                                <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.pattern"> {{de.dataElement.formName}} {{resourceBundle.invalidPattern}}</span>
 				                            </div>
-				                            <div class="radio-inline">
-				                                <label for="No"> 
-				                                	<input type="radio" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" value="false" ng-required= "de.compulsory"> {{resourceBundle.no}} 
-				                                </label>
-				                            </div>
-				                        </div>
-                                        <select ng-options="o.code as o.displayName for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory">
-                                            <option value=""></option>
-                                        </select>
-                                        <div ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$dirty &amp;&amp; eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$invalid">
-			                                <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.required"> {{de.dataElement.formName}} {{resourceBundle.required}}</span>
-			                                <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.pattern"> {{de.dataElement.formName}} {{resourceBundle.invalidPattern}}</span>
-			                            </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </accordion-group>
-                    </accordion>
-                    <ul>
-                    	<li>
-                    		<div class="text-center">
-                    			<input type="button" class="btn btn-main" value="Save Case" ng-click="save(program, programStage)" ng-disabled="eventDataEntryForm.$invalid"/>
-                    			<input type="button" class="btn btn-main" value="Save and Add Another" ng-click="save(program, programStage, true)" ng-disabled="eventDataEntryForm.$invalid"/>
-                    			<input type="button" class="btn btn-main" value="Cancel" ng-click="closeNewForm()" />
-	                        </div>
-                    	</li>
-                    </ul>
-                </div>
-                <div ng-if="allEvents.length === 0" ng-show="showView">
-                	<div class="alert alert-success">There are no cases. <a ng-click="openNewForm()">Add new case</a></div>
-                </div>
-				<div ng-if="allEvents.length &gt; 0" ng-show="showView">
-					<div ng-show="deleteSuccess" class="alert alert-success">{{resourceBundle.eventDeleteSuccess}}</div>
-					<ul>
-						<li>
-							<div class="text-right">
-								<input type="button" class="btn btn-main" value="New Case" ng-click="openNewForm()" />
-							</div>
-						</li>
-					</ul>
-					<div class="panel-heading">
-						<h3 class="panel-title"><a>{{resourceBundle.eventListTitle}}</a></h3>
-					</div>
-					<accordion close-others="false">
-						<table class="table table-bordered">
-							<thead>
-								<tr>
-									<th>Event Date</th>
-									<th ng-repeat= "dataValue in allEvents[0].dataValues" ng-if = "dataValue.showInEventSummary">
-										{{dataValue.formName}}
-									</th>
-									<th></th>
-									<th></th>
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr  ng-repeat="event in allEvents">
-									<td>{{event.eventDate | date:'yyyy-MM-dd'}}</td>
-									<td ng-repeat= "dataValue in event.dataValues" ng-if="dataValue.showInEventSummary">
-										<span ng-if="dataValue.type === 'date'">{{dataValue.value | date:'yyyy-MM-dd'}}</span>
-										<span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'true'">{{resourceBundle.yes}}</span>
-										<span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'false'">{{resourceBundle.no}}</span>
-										<span ng-if="dataValue.type !== 'date' &amp;&amp; dataValue.type !== 'bool'">{{getDisplayValue(dataValue)}}</span>
-									</td>
-									<td>
-					                    <a href="" id="" title="Submitted" class="submitted">
-					                        <span class="glyphicon glyphicon-ok" ng-if="!event.localStatus || event.localStatus === 'NEW'"></span>
-					                    </a>
-					                </td>
-					                <td>
-					                    <a title="Edit" href="#/editevent/{{event.event}}" class="edit">
-					                        <span class="glyphicon glyphicon-edit"></span>
-					                    </a>
-					                </td>
-					                <td>
-					                    <a href="" id="" ng-click="deleteEvent(event)" title="Delete" class="delete">
-                                            <span class="glyphicon glyphicon-remove"></span>
-                                        </a>
-					                </td>
-								</tr>
-							</tbody>
-						</table>
+	                                    </div>
+	                                </li>
+	                            </ul>
+	                        </accordion-group>
+	                    </accordion>
+	                    <ul>
+	                    	<li>
+	                    		<div class="text-center">
+	                    			<input type="button" class="btn btn-main" value="Save Case" ng-click="save(program, programStage)" ng-disabled="eventDataEntryForm.$invalid"/>
+	                    			<input type="button" class="btn btn-main" value="Save and Add Another" ng-click="save(program, programStage, true)" ng-disabled="eventDataEntryForm.$invalid"/>
+	                    			<input type="button" class="btn btn-main" value="Cancel" ng-click="closeNewForm()" />
+		                        </div>
+	                    	</li>
+	                    </ul>
+	                </div>
+	                <div ng-if="allEvents.length === 0" ng-show="showView">
+	                	<div class="alert alert-success">There are no cases. <a ng-click="openNewForm()">Add new case</a></div>
+	                </div>
+					<div ng-if="allEvents.length &gt; 0" ng-show="showView">
+						<div ng-show="deleteSuccess" class="alert alert-success">{{resourceBundle.eventDeleteSuccess}}</div>
 						<ul>
 							<li>
-								<div class="text-center">
-									<input type="button" ng-disabled="isCurrentWeekSelected(week)" class="btn btn-main" value="Submit" ng-click="submit(program.id)" />
+								<div class="text-right">
+									<input type="button" class="btn btn-main" value="New Case" ng-click="openNewForm()" />
 								</div>
 							</li>
 						</ul>
-					</accordion>
-				</div>
-			</accordion-group>
-		</accordion>
-	</form>		
+						<div class="panel-heading">
+							<h3 class="panel-title"><a>{{resourceBundle.eventListTitle}}</a></h3>
+						</div>
+						<accordion close-others="false">
+							<table class="table table-bordered">
+								<thead>
+									<tr>
+										<th>Event Date</th>
+										<th ng-repeat= "dataValue in allEvents[0].dataValues" ng-if = "dataValue.showInEventSummary">
+											{{dataValue.formName}}
+										</th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr  ng-repeat="event in allEvents">
+										<td>{{event.eventDate | date:'yyyy-MM-dd'}}</td>
+										<td ng-repeat= "dataValue in event.dataValues" ng-if="dataValue.showInEventSummary">
+											<span ng-if="dataValue.type === 'date'">{{dataValue.value | date:'yyyy-MM-dd'}}</span>
+											<span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'true'">{{resourceBundle.yes}}</span>
+											<span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'false'">{{resourceBundle.no}}</span>
+											<span ng-if="dataValue.type !== 'date' &amp;&amp; dataValue.type !== 'bool'">{{getDisplayValue(dataValue)}}</span>
+										</td>
+										<td>
+						                    <a href="" id="" title="Submitted" class="submitted">
+						                        <span class="glyphicon glyphicon-ok" ng-if="!event.localStatus || event.localStatus === 'NEW'"></span>
+						                    </a>
+						                </td>
+						                <td>
+						                    <a title="Edit" href="" ng-click="setUpViewOrEditForm(event.event)" class="edit">
+						                        <span class="glyphicon glyphicon-edit"></span>
+						                    </a>
+						                </td>
+						                <td>
+						                    <a href="" id="" ng-click="deleteEvent(event)" title="Delete" class="delete">
+	                                            <span class="glyphicon glyphicon-remove"></span>
+	                                        </a>
+						                </td>
+									</tr>
+								</tbody>
+							</table>
+							<ul>
+								<li>
+									<div class="text-center">
+										<input type="button" ng-disabled="isCurrentWeekSelected(week)" class="btn btn-main" value="Submit" ng-click="submit(program.id)" />
+									</div>
+								</li>
+							</ul>
+						</accordion>
+					</div>				
+				</accordion-group>
+			</accordion>
+		</form>		
+	</div>
+	<div ng-if="includeEditForm">
+		<div ng-include="formTemplateUrl"></div>
+	</div>
 </section>
 </div>

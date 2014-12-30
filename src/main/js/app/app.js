@@ -40,10 +40,6 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/select.project.html',
                         controller: 'selectProjectController'
                     }).
-                    when('/editevent/:eventId?', {
-                        templateUrl: 'templates/edit.event.html',
-                        controller: 'lineListDataEntryController'
-                    }).
                     otherwise({
                         redirectTo: '/dashboard'
                     });

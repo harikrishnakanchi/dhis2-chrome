@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
-    return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, $routeParams, db, programRepository, programEventRepository, dataElementRepository) {
+    return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository) {
         var resetForm = function() {
             $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.showForm = false;
@@ -264,6 +264,36 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             showModal(deleteOnConfirm, $scope.resourceBundle.deleteEventConfirmation);
         };
 
+        $scope.setUpViewOrEditForm = function(eventId) {
+            var getAllEvents = function() {
+                return programEventRepository.getAll();
+            };
+
+            var setUpEvent = function(eventData) {
+                var getProgramInfoNgModel = function(programId) {
+                    return programRepository.getProgramAndStages(programId);
+                };
+
+                var eventToBeEdited = _.find(eventData, {
+                    'event': eventId
+                });
+
+                $scope.minDateInCurrentPeriod = moment(eventToBeEdited.eventDate).startOf('week').format('YYYY-MM-DD');
+                $scope.maxDateInCurrentPeriod = moment(eventToBeEdited.eventDate).endOf('week').format('YYYY-MM-DD');
+
+                return getProgramInfoNgModel(eventToBeEdited.program).then(function(program) {
+                    eventToBeEdited.eventDate = new Date(eventToBeEdited.eventDate);
+                    eventToBeEdited.program = program;
+                    eventToBeEdited.dataElementValues = getDataElementValues(eventToBeEdited);
+                    $scope.eventToBeEdited = _.cloneDeep(eventToBeEdited);
+                });
+            };
+            $scope.showView = false;
+            $scope.includeEditForm = true;
+            $scope.formTemplateUrl = "templates/edit.event.html" + '?' + moment().format("X");
+            return loadOptionSets().then(getAllEvents).then(setUpEvent);
+        };
+
         var getDataElementValues = function(eventToBeEdited) {
             var dataValueHash = {};
 
@@ -288,50 +318,17 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
         };
 
         var init = function() {
-
-            var setUpViewOrEditForm = function() {
-                var getAllEvents = function() {
-                    return programEventRepository.getAll();
-                };
-
-                var setUpEvent = function(eventData) {
-                    var getProgramInfoNgModel = function(programId) {
-                        return programRepository.getProgramAndStages(programId);
-                    };
-
-                    var eventToBeEdited = _.find(eventData, {
-                        'event': $routeParams.eventId
-                    });
-
-                    $scope.minDateInCurrentPeriod = moment(eventToBeEdited.eventDate).startOf('week').format('YYYY-MM-DD');
-                    $scope.maxDateInCurrentPeriod = moment(eventToBeEdited.eventDate).endOf('week').format('YYYY-MM-DD');
-
-                    return getProgramInfoNgModel(eventToBeEdited.program).then(function(program) {
-                        eventToBeEdited.eventDate = new Date(eventToBeEdited.eventDate);
-                        eventToBeEdited.program = program;
-                        eventToBeEdited.dataElementValues = getDataElementValues(eventToBeEdited);
-                        $scope.eventToBeEdited = _.cloneDeep(eventToBeEdited);
-                    });
-                };
-
-                return loadOptionSets().then(getAllEvents).then(setUpEvent);
-            };
-
             var setUpNewForm = function() {
-                $scope.isEditable = true;
                 $scope.loading = true;
                 resetForm();
                 $scope.showView = true;
                 reloadEventsView();
                 loadPrograms().then(loadOptionSets);
                 $scope.loading = false;
+                $scope.includeEditForm = false;
             };
 
-            if ($routeParams.eventId) {
-                setUpViewOrEditForm();
-            } else {
-                setUpNewForm();
-            }
+            setUpNewForm();
 
         };
 
