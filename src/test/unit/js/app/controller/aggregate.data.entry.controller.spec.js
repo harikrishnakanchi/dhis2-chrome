@@ -1,6 +1,6 @@
 /*global Date:true*/
-define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "approvalDataRepository", "orgUnitRepository", "approvalHelper"],
-    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, ApprovalDataRepository, OrgUnitRepository, ApprovalHelper) {
+define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "approvalHelper"],
+    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ApprovalHelper) {
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, db, q, location, anchorScroll, aggregateDataEntryController, rootScope, approvalStore,
                 saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getLevelOneApprovalDataSpy, getLevelTwoApprovalDataSpy, getDataValuesSpy,
@@ -16,6 +16,9 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 anchorScroll = $anchorScroll;
                 rootScope = $rootScope;
                 routeParams = {};
+
+                Timecop.install();
+                Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
 
                 scope = $rootScope.$new();
                 dataRepository = new DataRepository();
@@ -159,6 +162,11 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
             }));
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
 
             it("should return the sum of the list ", function() {
                 var list = {
@@ -686,9 +694,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     return utils.getPromise(q, {});
                 });
 
-                var _Date = Date;
-                spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
-
                 var data = {
                     "dataSets": ['Vacc'],
                     "period": '2014W14',
@@ -750,9 +755,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     });
                 });
 
-                var _Date = Date;
-                spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
-
                 getOrgUnitSpy.and.returnValue(utils.getPromise(q, {
                     "id": "proj1",
                     "attributeValues": [{
@@ -799,15 +801,12 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
             it("should not submit data for approval", function() {
 
-
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
                 getDataValuesSpy.and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalHelper, "markDataAsComplete").and.returnValue(utils.getRejectedPromise(q, {}));
 
-                var _Date = Date;
-                spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
                 scope.firstLevelApproval();
                 scope.$apply();
 
@@ -819,9 +818,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should mark data as complete if proccessed", function() {
 
                 getDataValuesSpy.and.returnValue(utils.getPromise(q, {}));
-
-                var _Date = Date;
-                spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
 
                 scope.$apply();
 
@@ -864,9 +860,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 });
 
                 getDataValuesSpy.and.returnValue(utils.getPromise(q, {}));
-
-                var _Date = Date;
-                spyOn(window, 'Date').and.returnValue(new _Date("2014-05-30T12:43:54.972Z"));
 
                 scope.$apply();
 

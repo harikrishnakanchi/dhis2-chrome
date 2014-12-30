@@ -301,9 +301,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var getPeriod = function() {
-            return $scope.week.weekYear + "W" + $scope.week.weekNumber;
+            return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
         };
-
 
         var getAll = function(storeName) {
             var store = db.objectStore(storeName);

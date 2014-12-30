@@ -1,5 +1,5 @@
-define(["lineListDataEntryController", "angularMocks", "utils", "moment", "programRepository", "programEventRepository", "dataElementRepository"],
-    function(LineListDataEntryController, mocks, utils, moment, ProgramRepository, ProgramEventRepository, DataElementRepository) {
+define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programRepository", "programEventRepository", "dataElementRepository"],
+    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramRepository, ProgramEventRepository, DataElementRepository) {
         describe("lineListDataEntryController ", function() {
 
             var scope, q, hustle, programRepository, mockDB, mockStore, dataElementRepository, allEvents, timeout,
@@ -26,6 +26,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
 
                 mockDB = utils.getMockDB($q);
                 mockStore = mockDB.objectStore;
+
+                Timecop.install();
+                Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
 
                 scope.resourceBundle = {};
                 scope.week = {
@@ -80,6 +83,11 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "progr
                     return utils.getPromise(q, undefined);
                 });
             }));
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
 
             it("should load programs into scope on init", function() {
                 var programAndStageData = {
