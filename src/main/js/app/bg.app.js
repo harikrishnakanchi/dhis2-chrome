@@ -33,7 +33,14 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                         console.log("Starting metadata sync");
 
-                        metadataService.sync();
+                        $hustle.publish({
+                            "type": "downloadMetadata"
+                        }, "dataValues");
+
+                        $hustle.publish({
+                            "type": "downloadOrgUnit",
+                            "data": []
+                        }, "dataValues");
                     };
 
                     var projectDataSync = function() {
@@ -45,7 +52,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         $hustle.publish({
                             "type": "downloadData"
                         }, "dataValues");
-                        
+
                         $hustle.publish({
                             "type": "downloadEventData"
                         }, "dataValues");

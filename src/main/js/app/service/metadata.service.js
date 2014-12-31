@@ -166,8 +166,6 @@ define(["properties", "lodash"], function(properties, _) {
             return getLastUpdatedTime()
                 .then(getMetadata)
                 .then(upsertMetadata)
-                .then(getOrgUnits)
-                .then(upsertOrgUnits)
                 .then(getOrgUnitGroups)
                 .then(upsertOrgunitGroups)
                 .then(getSystemSettings)

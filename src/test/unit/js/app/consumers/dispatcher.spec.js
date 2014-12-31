@@ -2,7 +2,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
     describe("dispatcher", function() {
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, scope,
             systemSettingConsumer, createUserConsumer, updateUserConsumer, programConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
-            deleteEventConsumer, downloadApprovalConsumer;
+            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -53,6 +53,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadApprovalConsumer = {
                 'run': jasmine.createSpy("downloadApprovalConsumer")
             };
+            downloadMetadataConsumer = {
+                'run': jasmine.createSpy("downloadMetadataConsumer")
+            };
 
             message = {};
             q = $q;
@@ -65,7 +68,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
             dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
-                downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer);
+                downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -225,6 +228,18 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(deleteEventConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call download metadata consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "downloadMetadata"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(downloadMetadataConsumer.run).toHaveBeenCalledWith(message);
         });
     });
 });
