@@ -115,6 +115,19 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             getAllData.then(setUpData).then(setUpForm);
         };
 
+        $scope.getDetailedProgram = function(program) {
+            return programRepository.getProgramAndStages(program.id).then(function(enrichedProgram) {
+                _.forEach(enrichedProgram.programStages, function(programStage){
+                    _.forEach(programStage.programStageSections, function(programStageSection){
+                        _.forEach(programStageSection.programStageDataElements, function(de){
+                            de.dataElement.isIncluded = true;
+                        });
+                    });
+                });
+                $scope.program = enrichedProgram;
+            });
+        };
+
         $scope.getSection = function(selectedDataSet, sectionId) {
             return _.find(selectedDataSet.sections, {
                 "id": sectionId

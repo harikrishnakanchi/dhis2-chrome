@@ -73,7 +73,7 @@ define([], function() {
             getAll: jasmine.createSpy("getAll").and.returnValue(getPromise(q, allResults)),
             getProjectAndOpUnitAttributes: jasmine.createSpy("getProjectAndOpUnitAttributes").and.returnValue(getPromise(q, allResults)),
             getAllModulesInProjects: jasmine.createSpy("getAllModulesInProjects").and.returnValue(getPromise(q, allResults)),
-            getAllModulesInOpUnit: jasmine.createSpy("getAllModulesInOpUnit").and.returnValue(getPromise(q, allResults))
+            getAllModulesInOpUnit: jasmine.createSpy("getAllModulesInOpUnit").and.returnValue(getPromise(q, allResults)),
         };
     };
 

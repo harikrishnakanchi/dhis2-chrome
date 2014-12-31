@@ -24,6 +24,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             systemSettingRepo.getAllWithProjectId = function() {};
             systemSettingRepo.upsert = function() {};
             programsRepo = utils.getMockRepo(q);
+            programsRepo.getProgramAndStages = function() {};
             orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
 
             mockOrgStore = {
@@ -379,39 +380,39 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             var newDataSet1 = {
-                    "id": "dataSet1",
-                    "name": "NeoNat",
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "isNewDataModel"
-                        },
-                        "value": 'true'
-                    }]
-                };
+                "id": "dataSet1",
+                "name": "NeoNat",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": 'true'
+                }]
+            };
 
             var newDataSet2 = {
-                    "id": "dataSet2",
-                    "name": "IPD",
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "isNewDataModel"
-                        },
-                        "value": 'true'
-                    }]
-                };
+                "id": "dataSet2",
+                "name": "IPD",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": 'true'
+                }]
+            };
 
             var currentDataSet = {
-                    "id": "dataSet2",
-                    "name": "Neonat - V1",
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "isNewDataModel"
-                        },
-                        "value": 'false'
-                    }]
-                };
+                "id": "dataSet2",
+                "name": "Neonat - V1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": 'false'
+                }]
+            };
 
-            
+
             scope.isNewMode = false;
 
             spyOn(datasetTransformer, "getAssociatedDatasets").and.returnValue([newDataSet1]);
@@ -935,6 +936,44 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     "value": "true"
                 }]
             }]);
+        });
+
+        it("should set program on scope", function() {
+            var program = {
+                "id": "surgery1",
+                "name": "Surgery",
+                "programStages": [{
+                    "programStageSections": [{
+                        "programStageDataElements": [{
+                            "dataElement": {
+                                "id": "de1" 
+                            }
+                        }]
+                    }]
+                }]
+            };
+
+            spyOn(programsRepo, "getProgramAndStages").and.returnValue(utils.getPromise(q, program));
+
+            scope.getDetailedProgram("surgery1");
+            scope.$apply();
+
+            var expectedProgram = {
+                "id": "surgery1",
+                "name": "Surgery",
+                "programStages": [{
+                    "programStageSections": [{
+                        "programStageDataElements": [{
+                            "dataElement": {
+                                "id": "de1" ,
+                                "isIncluded": true
+                            }
+                        }]
+                    }]
+                }]
+            };
+            expect(scope.program).toEqual(expectedProgram);
+
         });
     });
 });

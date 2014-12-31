@@ -78,11 +78,30 @@
                     <li class="form-group" ng-if="module.serviceType==='Linelist'">
                         <label for="program" class="col-sm-4 col-md-4 control-label">{{resourceBundle.selectProgramLabel}}</label>
                         <div class="col-sm-6 col-md-6">
-                            <select type="text" name="programsDropDown" id="programsDropDown" ng-model="module.program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
+                            <select type="text" ng-change="getDetailedProgram(module.program)" name="programsDropDown" id="programsDropDown" ng-model="module.program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
                                 <option value=""></option>
                             </select>
                         </div>
+                        <div>
+
+                        </div>
                     </li>
+
+                     <div class="exp-coll-group" ng-repeat="programStage in program.programStages" ng-if="program !== undefined">
+                        <accordion close-others="false">
+                            <accordion-group ng-repeat="section in programStage.programStageSections" is-open="true">
+                                <accordion-heading>
+                                    <span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span>
+                                    <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
+                                </accordion-heading>
+                                <ul>
+                                    <li class="form-group" ng-repeat="de in section.programStageDataElements">
+                                         <input type="checkbox" ng-disabled="de.compulsory" ng-model="de.dataElement.isIncluded">{{de.dataElement.formName}}
+                                    </li>
+                                </ul>
+                            </accordion-group>
+                        </accordion>
+                    </div>
                 </ul>
             </div>
             <input type="button" class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules)" value="Save" ng-if="isNewMode" />
