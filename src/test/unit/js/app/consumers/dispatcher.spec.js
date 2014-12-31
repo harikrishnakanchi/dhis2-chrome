@@ -17,8 +17,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadDataConsumer = {
                 'run': jasmine.createSpy("downloadDataConsumer")
             };
-            orgUnitConsumer = {
-                'run': jasmine.createSpy("orgUnitConsumer")
+            downloadOrgUnitConsumer = {
+                'run': jasmine.createSpy("downloadOrgUnitConsumer")
             };
             orgUnitGroupConsumer = {
                 'run': jasmine.createSpy("orgUnitGroupConsumer")
@@ -59,7 +59,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadEventDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadApprovalConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
-            dispatcher = new Dispatcher(q, orgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
+            dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer);
         }));
@@ -123,7 +123,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 "type": "upsertOrgUnit"
             };
             dispatcher.run(message);
-            expect(orgUnitConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadOrgUnitConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should call dataset consumer", function() {

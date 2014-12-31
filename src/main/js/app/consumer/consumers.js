@@ -1,8 +1,8 @@
-define(["uploadApprovalDataConsumer", "orgUnitConsumer", "orgUnitGroupConsumer", "datasetConsumer", "systemSettingConsumer", "createUserConsumer", "updateUserConsumer",
+define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "orgUnitGroupConsumer", "datasetConsumer", "systemSettingConsumer", "createUserConsumer", "updateUserConsumer",
         "dispatcher", "consumerRegistry", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "orgUnitRepository", "programConsumer",
         "downloadEventDataConsumer", "deleteEventConsumer", "eventService", "programEventRepository", "uploadEventDataConsumer", "downloadApprovalConsumer"
     ],
-    function(uploadApprovalDataConsumer, orgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
+    function(uploadApprovalDataConsumer, downloadOrgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
         dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, orgUnitRepository, programConsumer,
         downloadEventDataConsumer, deleteEventConsumer, eventService, programEventRepository, uploadEventDataConsumer, downloadApprovalConsumer) {
 
@@ -12,13 +12,13 @@ define(["uploadApprovalDataConsumer", "orgUnitConsumer", "orgUnitGroupConsumer",
             app.service("uploadDataConsumer", ["dataService", "dataRepository", uploadDataConsumer]);
             app.service("uploadCompletionDataConsumer", ["approvalService", "approvalDataRepository", uploadCompletionDataConsumer]);
             app.service("uploadApprovalDataConsumer", ["approvalService", "approvalDataRepository", uploadApprovalDataConsumer]);
-            app.service("orgUnitConsumer", ["orgUnitService", "orgUnitRepository", "$q", orgUnitConsumer]);
+            app.service("downloadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "$q", downloadOrgUnitConsumer]);
             app.service("orgUnitGroupConsumer", ["orgUnitGroupService", orgUnitGroupConsumer]);
             app.service("datasetConsumer", ["datasetService", datasetConsumer]);
             app.service("systemSettingConsumer", ["systemSettingService", systemSettingConsumer]);
             app.service("createUserConsumer", ["userService", createUserConsumer]);
             app.service("updateUserConsumer", ["userService", updateUserConsumer]);
-            app.service("dispatcher", ["$q", "orgUnitConsumer", "orgUnitGroupConsumer", "datasetConsumer", "systemSettingConsumer", "createUserConsumer", "updateUserConsumer",
+            app.service("dispatcher", ["$q", "downloadOrgUnitConsumer", "orgUnitGroupConsumer", "datasetConsumer", "systemSettingConsumer", "createUserConsumer", "updateUserConsumer",
                 "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "uploadApprovalDataConsumer", "programConsumer", "downloadEventDataConsumer",
                 "uploadEventDataConsumer", "deleteEventConsumer", "downloadApprovalConsumer", dispatcher
             ]);

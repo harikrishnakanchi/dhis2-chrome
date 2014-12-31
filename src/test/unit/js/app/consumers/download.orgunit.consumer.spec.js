@@ -1,6 +1,6 @@
-define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(OrgunitConsumer, OrgUnitService, utils, mocks) {
-    describe("orgunitConsumer", function() {
-        var orgunitConsumer, payload, orgUnitService, orgUnitRepository, q, scope;
+define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(DownloadOrgunitConsumer, OrgUnitService, utils, mocks) {
+    describe("downloadOrgunitConsumer", function() {
+        var downloadOrgunitConsumer, payload, orgUnitService, orgUnitRepository, q, scope;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -58,9 +58,9 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'upsert');
 
-            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, q);
 
-            orgunitConsumer.run(message);
+            downloadOrgunitConsumer.run(message);
             scope.$apply();
 
             expect(orgUnitService.get).toHaveBeenCalledWith("a4acf9115a7");
@@ -97,9 +97,9 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'upsert');
 
-            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, q);
 
-            orgunitConsumer.run(message);
+            downloadOrgunitConsumer.run(message);
             scope.$apply();
 
             expect(orgUnitService.get).toHaveBeenCalledWith("a4acf9115a7");
@@ -121,9 +121,9 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             }));
             spyOn(orgUnitService, 'upsert');
 
-            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, q);
 
-            orgunitConsumer.run(message);
+            downloadOrgunitConsumer.run(message);
             scope.$apply();
 
             expect(orgUnitService.get).toHaveBeenCalledWith("a4acf9115a7");
@@ -172,9 +172,9 @@ define(["orgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(
             }));
             spyOn(orgUnitService, 'upsert');
 
-            orgunitConsumer = new OrgunitConsumer(orgUnitService, orgUnitRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, q);
 
-            orgunitConsumer.run(message);
+            downloadOrgunitConsumer.run(message);
             scope.$apply();
 
             expect(orgUnitService.get.calls.argsFor(0)).toEqual(["213046e2707"]);
