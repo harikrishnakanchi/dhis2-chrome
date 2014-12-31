@@ -1,10 +1,12 @@
-define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "orgUnitGroupConsumer", "datasetConsumer", "systemSettingConsumer", "createUserConsumer", "updateUserConsumer",
-        "dispatcher", "consumerRegistry", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "orgUnitRepository", "programConsumer",
-        "downloadEventDataConsumer", "deleteEventConsumer", "eventService", "programEventRepository", "uploadEventDataConsumer", "downloadApprovalConsumer"
+define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "orgUnitGroupConsumer", "datasetConsumer", "systemSettingConsumer",
+        "createUserConsumer", "updateUserConsumer", "dispatcher", "consumerRegistry", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer",
+        "orgUnitRepository", "programConsumer", "downloadEventDataConsumer", "deleteEventConsumer", "eventService", "programEventRepository", "uploadEventDataConsumer",
+        "downloadApprovalConsumer"
     ],
-    function(uploadApprovalDataConsumer, downloadOrgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
-        dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, orgUnitRepository, programConsumer,
-        downloadEventDataConsumer, deleteEventConsumer, eventService, programEventRepository, uploadEventDataConsumer, downloadApprovalConsumer) {
+    function(uploadApprovalDataConsumer, downloadOrgUnitConsumer, uploadOrgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer,
+        createUserConsumer, updateUserConsumer, dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer,
+        orgUnitRepository, programConsumer, downloadEventDataConsumer, deleteEventConsumer, eventService, programEventRepository, uploadEventDataConsumer,
+        downloadApprovalConsumer) {
 
         var init = function(app) {
             app.service("downloadDataConsumer", ["dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "$q", "approvalDataRepository", downloadDataConsumer]);
@@ -12,13 +14,14 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "orgUnitGroupCo
             app.service("uploadDataConsumer", ["dataService", "dataRepository", uploadDataConsumer]);
             app.service("uploadCompletionDataConsumer", ["approvalService", "approvalDataRepository", uploadCompletionDataConsumer]);
             app.service("uploadApprovalDataConsumer", ["approvalService", "approvalDataRepository", uploadApprovalDataConsumer]);
-            app.service("downloadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "$q", downloadOrgUnitConsumer]);
+            app.service("downloadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "changeLogRepository", "$q", downloadOrgUnitConsumer]);
+            app.service("uploadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "$q", uploadOrgUnitConsumer]);
             app.service("orgUnitGroupConsumer", ["orgUnitGroupService", orgUnitGroupConsumer]);
             app.service("datasetConsumer", ["datasetService", datasetConsumer]);
             app.service("systemSettingConsumer", ["systemSettingService", systemSettingConsumer]);
             app.service("createUserConsumer", ["userService", createUserConsumer]);
             app.service("updateUserConsumer", ["userService", updateUserConsumer]);
-            app.service("dispatcher", ["$q", "downloadOrgUnitConsumer", "orgUnitGroupConsumer", "datasetConsumer", "systemSettingConsumer", "createUserConsumer", "updateUserConsumer",
+            app.service("dispatcher", ["$q", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "orgUnitGroupConsumer", "datasetConsumer", "systemSettingConsumer", "createUserConsumer", "updateUserConsumer",
                 "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "uploadApprovalDataConsumer", "programConsumer", "downloadEventDataConsumer",
                 "uploadEventDataConsumer", "deleteEventConsumer", "downloadApprovalConsumer", dispatcher
             ]);

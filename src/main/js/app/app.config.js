@@ -108,6 +108,7 @@ require.config({
         "chromeRuntime": "app/utils/chrome.runtime",
         "dhisId": "app/utils/dhis.id",
         "dateUtils": "app/utils/date.utils",
+        "lodashUtils": "app/utils/lodash.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",

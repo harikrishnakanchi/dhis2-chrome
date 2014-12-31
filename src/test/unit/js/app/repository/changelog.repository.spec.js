@@ -14,9 +14,9 @@ define(["changeLogRepository", "angularMocks", "utils"], function(ChangeLogRepos
         }));
 
         it("should upsert change log", function() {
-            repo.upsert("metadata", lastUpdatedTime);
+            repo.upsert("orgUnit", lastUpdatedTime);
             expect(mockStore.upsert).toHaveBeenCalledWith({
-                "type": 'metaData',
+                "type": 'orgUnit',
                 "lastUpdatedTime": lastUpdatedTime
             });
         });

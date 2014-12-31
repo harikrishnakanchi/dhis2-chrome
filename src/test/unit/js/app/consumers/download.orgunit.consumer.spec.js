@@ -1,17 +1,18 @@
-define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks"], function(DownloadOrgunitConsumer, OrgUnitService, utils, mocks) {
+define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "orgUnitRepository", "timecop"], function(DownloadOrgunitConsumer, OrgUnitService, utils, mocks, OrgUnitRepository, timecop) {
     describe("downloadOrgunitConsumer", function() {
-        var downloadOrgunitConsumer, payload, orgUnitService, orgUnitRepository, q, scope;
+        var downloadOrgunitConsumer, payload, orgUnitService, orgUnitRepository, q, scope, changeLogRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
             scope = $rootScope.$new();
 
-            payload = [{
+            payload = {
                 'id': 'a4acf9115a7',
                 'name': 'Org1',
                 'shortName': 'Org1',
                 'level': 4,
                 'openingDate': "YYYY-MM-DD",
+                "lastUpdated": "2014-10-20T09:01:12.020+0000",
                 "parent": {
                     name: 'Name1',
                     id: 'Id1'
@@ -22,14 +23,30 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks"], f
                         "name": "No of Consultation days per week",
                         "id": "VKc7bvogtcP"
                     },
+                    "lastUpdated": "2014-10-20T09:01:12.020+0000",
                     "value": "val1"
                 }]
-            }];
+            };
             orgUnitService = new OrgUnitService();
-            orgUnitRepository = jasmine.createSpyObj({}, ['upsert']);
+            orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, "upsert");
+
+            changeLogRepository = {
+                "get": jasmine.createSpy("get").and.returnValue(utils.getPromise(q, "2014-10-24T09:01:12.020+0000")),
+                "upsert": jasmine.createSpy("upsert")
+            };
+
+            Timecop.install();
+            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
         }));
 
-        it("should over write local org unit data with dhis data if it is stale", function() {
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
+
+        it("should over write local org unit data with dhis data for upsertOrgUnit message", function() {
+            var localCopy = payload;
             var message = {
                 "data": {
                     "data": payload,
@@ -40,154 +57,221 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks"], f
 
             var orgUnitFromDHIS = {
                 "data": {
-                    "organisationUnits": {
-                        "id": "orgUnit1",
-                        "name": "Afghanistan",
-                        "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                    "organisationUnits": [{
+                        'id': 'a4acf9115a7',
+                        'name': 'Org1',
+                        'shortName': 'Org1',
+                        'level': 4,
+                        'openingDate': "YYYY-MM-DD",
+                        "lastUpdated": "2014-10-24T09:01:12.020+0000",
+                        "parent": {
+                            "name": 'Name1',
+                            "id": 'Id1'
+                        },
                         "attributeValues": [{
-                            "value": "population",
-                            "lastUpdated": "2014-12-24T09:01:12.020+0000",
                             "attribute": {
-                                "id": "abcd1234",
-                                "name": "Type of population",
-                                "code": "prjPopType"
-                            }
+                                "code": "prjConDays",
+                                "name": "No of Consultation days per week",
+                                "id": "VKc7bvogtcP"
+                            },
+                            "lastUpdated": "2014-10-20T09:01:12.020+0000",
+                            "value": "val1"
                         }]
-                    }
+                    }]
                 }
             };
 
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
+            spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'upsert');
+            spyOn(orgUnitRepository, 'getOrgUnit').and.returnValue(utils.getPromise(q, localCopy));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
 
             downloadOrgunitConsumer.run(message);
             scope.$apply();
 
-            expect(orgUnitService.get).toHaveBeenCalledWith("a4acf9115a7");
+            expect(orgUnitService.get).toHaveBeenCalledWith(["a4acf9115a7"]);
+            expect(orgUnitService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
+            expect(orgUnitRepository.getOrgUnit).toHaveBeenCalledWith("a4acf9115a7");
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitRepository.upsert).toHaveBeenCalledWith([orgUnitFromDHIS.data.organisationUnits]);
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnits[0]);
         });
 
-        it("should sync local org unit data to dhis if it is not stale", function() {
+        it("should ignore dhis data for upsertOrgUnit message", function() {
+            var localCopy = payload;
             var message = {
                 "data": {
                     "data": payload,
                     "type": "upsertOrgUnit"
                 },
-                "created": "2014-14-24T09:01:12.020+0000"
+                "created": "2014-10-24T09:01:12.020+0000"
             };
 
             var orgUnitFromDHIS = {
                 "data": {
-                    "organisationUnits": {
-                        "id": "orgUnit1",
-                        "name": "Afghanistan",
+                    "organisationUnits": [{
+                        'id': 'a4acf9115a7',
+                        'name': 'Org1',
+                        'shortName': 'Org1',
+                        'level': 4,
+                        'openingDate': "YYYY-MM-DD",
                         "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                        "parent": {
+                            "name": 'Name1',
+                            "id": 'Id1'
+                        },
                         "attributeValues": [{
-                            "value": "population",
-                            "lastUpdated": "2014-12-24T09:01:12.020+0000",
                             "attribute": {
-                                "id": "abcd1234",
-                                "name": "Type of population",
-                                "code": "prjPopType"
-                            }
+                                "code": "prjConDays",
+                                "name": "No of Consultation days per week",
+                                "id": "VKc7bvogtcP"
+                            },
+                            "lastUpdated": "2014-09-20T09:01:12.020+0000",
+                            "value": "val1"
                         }]
-                    }
+                    }]
                 }
             };
 
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
+            spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'upsert');
+            spyOn(orgUnitRepository, 'getOrgUnit').and.returnValue(utils.getPromise(q, localCopy));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
 
             downloadOrgunitConsumer.run(message);
             scope.$apply();
 
-            expect(orgUnitService.get).toHaveBeenCalledWith("a4acf9115a7");
-            expect(orgUnitService.upsert).toHaveBeenCalledWith(message.data.data[0]);
+            expect(orgUnitService.get).toHaveBeenCalledWith(["a4acf9115a7"]);
+            expect(orgUnitService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
+            expect(orgUnitRepository.getOrgUnit).toHaveBeenCalledWith("a4acf9115a7");
+            expect(orgUnitService.upsert).not.toHaveBeenCalled();
             expect(orgUnitRepository.upsert).not.toHaveBeenCalled();
         });
 
-        it("should sync locally created org units", function() {
+        it("should overwrite local data with dhis data for downloadOrgUnit message", function() {
+            var localCopy = payload;
             var message = {
                 "data": {
-                    "data": payload,
-                    "type": "upsertOrgUnit"
+                    "data": [],
+                    "type": "downloadOrgUnit"
                 },
-                "created": "2014-14-24T09:01:12.020+0000"
+                "created": "2014-10-24T09:01:12.020+0000"
             };
 
-            spyOn(orgUnitService, 'get').and.returnValue(utils.getRejectedPromise(q, {
-                "status": 404
-            }));
+            var orgUnitFromDHISSinceLastUpdatedTime = {
+                "data": {
+                    "organisationUnits": [{
+                        'id': 'a4acf9115a7',
+                        'name': 'Org1',
+                        'shortName': 'Org1',
+                        'level': 4,
+                        'openingDate': "YYYY-MM-DD",
+                        "lastUpdated": "2014-10-24T09:01:12.020+0000",
+                        "parent": {
+                            "name": 'Name1',
+                            "id": 'Id1'
+                        },
+                        "attributeValues": [{
+                            "attribute": {
+                                "code": "prjConDays",
+                                "name": "No of Consultation days per week",
+                                "id": "VKc7bvogtcP"
+                            },
+                            "lastUpdated": "2014-10-20T09:01:12.020+0000",
+                            "value": "val1"
+                        }]
+                    }]
+                }
+            };
+
+            spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitService, 'upsert');
+            spyOn(orgUnitRepository, 'getOrgUnit').and.returnValue(utils.getPromise(q, localCopy));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, q);
-
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
             downloadOrgunitConsumer.run(message);
+
             scope.$apply();
 
-            expect(orgUnitService.get).toHaveBeenCalledWith("a4acf9115a7");
-            expect(orgUnitService.upsert).toHaveBeenCalledWith(message.data.data[0]);
+            expect(orgUnitService.upsert).not.toHaveBeenCalled();
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(orgUnitFromDHISSinceLastUpdatedTime.data.organisationUnits[0]);
+        });
+
+        it("should ignore dhis data for downloadOrgUnit message", function() {
+            var localCopy = payload;
+            var message = {
+                "data": {
+                    "data": [],
+                    "type": "downloadOrgUnit"
+                },
+                "created": "2014-10-24T09:01:12.020+0000"
+            };
+
+            var orgUnitFromDHISSinceLastUpdatedTime = {
+                "data": {
+                    "organisationUnits": [{
+                        'id': 'a4acf9115a8',
+                        'name': 'Org2',
+                        'shortName': 'Org2',
+                        'level': 4,
+                        'openingDate': "YYYY-MM-DD",
+                        "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                        "parent": {
+                            "name": 'Name1',
+                            "id": 'Id1'
+                        },
+                        "attributeValues": [{
+                            "attribute": {
+                                "code": "prjConDays",
+                                "name": "No of Consultation days per week",
+                                "id": "VKc7bvogtcP"
+                            },
+                            "lastUpdated": "2014-09-20T09:01:12.020+0000",
+                            "value": "val1"
+                        }]
+                    }]
+                }
+            };
+
+            spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
+            spyOn(orgUnitService, 'upsert');
+            spyOn(orgUnitRepository, 'getOrgUnit').and.returnValue(utils.getPromise(q, localCopy));
+
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
+            downloadOrgunitConsumer.run(message);
+
+            scope.$apply();
+
+            expect(orgUnitService.upsert).not.toHaveBeenCalled();
             expect(orgUnitRepository.upsert).not.toHaveBeenCalled();
         });
 
-        it("should create multiple orgunits", function() {
-            payload = [{
-                "id": "213046e2707",
-                "name": "OpUnit1",
-                "lastUpdated": "2014-12-30T05:47:16.732+0000",
-                "attributeValues": [{
-                    "created": "2014-12-30T05:47:20.631+0000",
-                    "value": "X",
-                    "lastUpdated": "2014-12-30T05:47:20.631+0000",
-                    "attribute": {
-                        "id": "huc",
-                        "name": "Hospital Code"
-                    }
-                }]
-            }, {
-                "id": "213046e2708",
-                "name": "OpUnit2",
-                "lastUpdated": "2014-12-30T05:47:16.732+0000",
-                "attributeValues": [{
-                    "created": "2014-12-30T05:47:20.631+0000",
-                    "value": "Y",
-                    "lastUpdated": "2014-12-30T05:47:20.631+0000",
-                    "attribute": {
-                        "id": "huc",
-                        "name": "Hospital Code"
-                    }
-                }]
-            }];
+        it("should upsert lastUpdated time in change log", function() {
             var message = {
                 "data": {
-                    "data": payload,
-                    "type": "upsertOrgUnit"
-                },
-                "created": "2014-14-24T09:01:12.020+0000"
+                    "data": [],
+                    "type": "downloadOrgUnit"
+                }
             };
 
-            spyOn(orgUnitService, 'get').and.returnValue(utils.getRejectedPromise(q, {
-                "status": 404
-            }));
+            var orgUnitFromDHISSinceLastUpdatedTime = {
+                "data": {
+                    "organisationUnits": []
+                }
+            };
+
+            spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitService, 'upsert');
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, q);
-
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
             downloadOrgunitConsumer.run(message);
+
             scope.$apply();
 
-            expect(orgUnitService.get.calls.argsFor(0)).toEqual(["213046e2707"]);
-            expect(orgUnitService.upsert.calls.argsFor(0)).toEqual([message.data.data[0]]);
-
-            expect(orgUnitService.get.calls.argsFor(1)).toEqual(["213046e2708"]);
-            expect(orgUnitService.upsert.calls.argsFor(1)).toEqual([message.data.data[1]]);
-
-            expect(orgUnitRepository.upsert).not.toHaveBeenCalled();
+            expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnits", "2014-05-30T12:43:54.972Z");
         });
     });
 });

@@ -1,5 +1,5 @@
 define([], function() {
-    return function($q, downloadOrgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
+    return function($q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
         downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
         downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer) {
         this.run = function(message) {
@@ -25,6 +25,10 @@ define([], function() {
                         });
                     });
                 case "upsertOrgUnit":
+                    return downloadOrgUnitConsumer.run(message).then(function() {
+                        return uploadOrgUnitConsumer.run(message);
+                    });
+                case "downloadOrgUnit":
                     return downloadOrgUnitConsumer.run(message);
                 case "upsertOrgUnitGroups":
                     return orgUnitGroupConsumer.run(message);

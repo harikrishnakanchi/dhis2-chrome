@@ -4,7 +4,7 @@ define(["lodash", "moment"], function(_, moment) {
             lastUpdatedTime = lastUpdatedTime || moment().toISOString();
             var store = db.objectStore("changeLog");
             return store.upsert({
-                'type': 'metaData',
+                'type': type,
                 'lastUpdatedTime': lastUpdatedTime
             });
         };

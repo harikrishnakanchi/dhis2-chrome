@@ -20,6 +20,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadOrgUnitConsumer = {
                 'run': jasmine.createSpy("downloadOrgUnitConsumer")
             };
+            uploadOrgUnitConsumer = {
+                'run': jasmine.createSpy("uploadOrgUnitConsumer")
+            };
             orgUnitGroupConsumer = {
                 'run': jasmine.createSpy("orgUnitGroupConsumer")
             };
@@ -58,8 +61,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadEventDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadApprovalConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadOrgUnitConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
-            dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
+            dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer);
         }));
@@ -117,13 +121,27 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(uploadApprovalDataConsumer.run).toHaveBeenCalledWith(message);
         });
 
-        it("should call org units consumer", function() {
+        it("should call upload org units consumer", function() {
             message.data = {
                 "data": {},
                 "type": "upsertOrgUnit"
             };
             dispatcher.run(message);
+            scope.$apply();
+
             expect(downloadOrgUnitConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadOrgUnitConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call download org units consumer", function() {
+            message.data = {
+                "data": [],
+                "type": "downloadOrgUnit"
+            };
+            dispatcher.run(message);
+            scope.$apply();
+            expect(downloadOrgUnitConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadOrgUnitConsumer.run).not.toHaveBeenCalled();
         });
 
         it("should call dataset consumer", function() {

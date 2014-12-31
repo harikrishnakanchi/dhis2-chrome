@@ -52,8 +52,9 @@ require.config({
         "uploadCompletionDataConsumer": "app/consumer/upload.completion.data.consumer",
         "uploadApprovalDataConsumer": "app/consumer/upload.approval.data.consumer",
         "downloadOrgUnitConsumer": "app/consumer/download.orgunit.consumer",
-        "datasetConsumer": "app/consumer/dataset.consumer",
+        "uploadOrgUnitConsumer": "app/consumer/upload.orgunit.consumer",
         "systemSettingConsumer": "app/consumer/system.setting.consumer",
+        "datasetConsumer": "app/consumer/dataset.consumer",
         "createUserConsumer": "app/consumer/create.user.consumer",
         "updateUserConsumer": "app/consumer/update.user.consumer",
         "programConsumer": "app/consumer/program.consumer",
@@ -74,7 +75,8 @@ require.config({
         //Utils
         "chromeRuntime": "app/utils/chrome.runtime",
         "dhisId": "app/utils/dhis.id",
-        "dateUtils": "app/utils/date.utils"
+        "dateUtils": "app/utils/date.utils",
+        "lodashUtils": "app/utils/lodash.utils"
     },
     shim: {
         'angular': {
