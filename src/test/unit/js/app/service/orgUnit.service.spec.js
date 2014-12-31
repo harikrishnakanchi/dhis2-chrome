@@ -138,12 +138,22 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.flush();
         });
 
-        it("should get org unit id", function() {
+        it("should get org unit with a particular id", function() {
             var orgUnitId = "org1234";
 
             orgUnitService.get(orgUnitId);
 
-            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + ".json?fields=:all").respond(200, "ok");
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?filter=id:eq:org1234&fields=:all&paging=false').respond(200, "ok");
+            httpBackend.flush();
+        });
+
+        it("should get multiple org units with given ids", function() {
+            var orgUnitId = ["id1", "id2", "id3"];
+
+            orgUnitService.get(orgUnitId);
+
+            httpBackend.expectGET(properties.dhis.url +
+                '/api/organisationUnits.json?filter=id:eq:id1&filter=id:eq:id2&filter=id:eq:id3&fields=:all&paging=false').respond(200, "ok");
             httpBackend.flush();
         });
 

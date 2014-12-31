@@ -11,7 +11,7 @@ define(['moment', "lodash"], function(moment, _) {
 
         var downloadAndMerge = function(messageCreatedAt, orgUnitFromHustle) {
             var merge = function(data) {
-                var orgUnitFromDHIS = data.data;
+                var orgUnitFromDHIS = data.data.organisationUnits;
                 var lastUpdatedOnDhis = _.pluck(orgUnitFromDHIS.attributeValues, "lastUpdated");
                 lastUpdatedOnDhis.push(orgUnitFromDHIS.lastUpdated);
 

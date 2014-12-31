@@ -1,7 +1,18 @@
 define(["properties", "lodash"], function(properties, _) {
     return function($http, db) {
-        this.get = function(orgUnitId) {
-            return $http.get(properties.dhis.url + '/api/organisationUnits/' + orgUnitId + ".json?fields=:all");
+        this.get = function(orgUnitIds) {
+            var generateParamsString = function(orgUnitIds) {
+                var paramString = _.reduce(orgUnitIds, function(acc, id) {
+                    acc = acc + "filter=id:eq:" + id + "&";
+                    return acc;
+                }, "?");
+
+                paramString = paramString + "fields=:all&paging=false";
+                return paramString;
+            };
+
+            orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
+            return $http.get(properties.dhis.url + '/api/organisationUnits.json' + generateParamsString(orgUnitIds));
         };
 
         this.upsert = function(orgUnitRequest) {

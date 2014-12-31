@@ -40,18 +40,20 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks"], f
 
             var orgUnitFromDHIS = {
                 "data": {
-                    "id": "orgUnit1",
-                    "name": "Afghanistan",
-                    "lastUpdated": "2014-09-24T09:01:12.020+0000",
-                    "attributeValues": [{
-                        "value": "population",
-                        "lastUpdated": "2014-12-24T09:01:12.020+0000",
-                        "attribute": {
-                            "id": "abcd1234",
-                            "name": "Type of population",
-                            "code": "prjPopType"
-                        }
-                    }]
+                    "organisationUnits": {
+                        "id": "orgUnit1",
+                        "name": "Afghanistan",
+                        "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                        "attributeValues": [{
+                            "value": "population",
+                            "lastUpdated": "2014-12-24T09:01:12.020+0000",
+                            "attribute": {
+                                "id": "abcd1234",
+                                "name": "Type of population",
+                                "code": "prjPopType"
+                            }
+                        }]
+                    }
                 }
             };
 
@@ -65,7 +67,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks"], f
 
             expect(orgUnitService.get).toHaveBeenCalledWith("a4acf9115a7");
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitRepository.upsert).toHaveBeenCalledWith([orgUnitFromDHIS.data]);
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith([orgUnitFromDHIS.data.organisationUnits]);
         });
 
         it("should sync local org unit data to dhis if it is not stale", function() {
@@ -79,18 +81,20 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks"], f
 
             var orgUnitFromDHIS = {
                 "data": {
-                    "id": "orgUnit1",
-                    "name": "Afghanistan",
-                    "lastUpdated": "2014-09-24T09:01:12.020+0000",
-                    "attributeValues": [{
-                        "value": "population",
-                        "lastUpdated": "2014-12-24T09:01:12.020+0000",
-                        "attribute": {
-                            "id": "abcd1234",
-                            "name": "Type of population",
-                            "code": "prjPopType"
-                        }
-                    }]
+                    "organisationUnits": {
+                        "id": "orgUnit1",
+                        "name": "Afghanistan",
+                        "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                        "attributeValues": [{
+                            "value": "population",
+                            "lastUpdated": "2014-12-24T09:01:12.020+0000",
+                            "attribute": {
+                                "id": "abcd1234",
+                                "name": "Type of population",
+                                "code": "prjPopType"
+                            }
+                        }]
+                    }
                 }
             };
 
