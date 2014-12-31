@@ -946,33 +946,50 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     "programStageSections": [{
                         "programStageDataElements": [{
                             "dataElement": {
-                                "id": "de1" 
+                                "id": "de1"
                             }
                         }]
                     }]
                 }]
+            };
+
+            var module1 = {
+                "id": "mod1",
+                "program": {
+                    "id": "surgery1",
+                    "name": "Surgery"
+                }
+            };
+
+            var expectedModule = {
+                 "id": "mod1",
+                "program": {
+                    "id": "surgery1",
+                    "name": "Surgery"
+                },
+                "enrichedProgram": {
+                    "id": "surgery1",
+                    "name": "Surgery",
+                    "programStages": [{
+                        "programStageSections": [{
+                            "programStageDataElements": [{
+                                "dataElement": {
+                                    "id": "de1",
+                                    "isIncluded": true
+                                }
+                            }]
+                        }]
+                    }]
+                }
             };
 
             spyOn(programsRepo, "getProgramAndStages").and.returnValue(utils.getPromise(q, program));
 
-            scope.getDetailedProgram("surgery1");
+            scope.getDetailedProgram(module1).then(function(data){
+                expect(data).toEqual(expectedModule);
+            });
+            
             scope.$apply();
-
-            var expectedProgram = {
-                "id": "surgery1",
-                "name": "Surgery",
-                "programStages": [{
-                    "programStageSections": [{
-                        "programStageDataElements": [{
-                            "dataElement": {
-                                "id": "de1" ,
-                                "isIncluded": true
-                            }
-                        }]
-                    }]
-                }]
-            };
-            expect(scope.program).toEqual(expectedProgram);
 
         });
     });

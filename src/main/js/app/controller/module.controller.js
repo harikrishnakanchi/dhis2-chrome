@@ -115,8 +115,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             getAllData.then(setUpData).then(setUpForm);
         };
 
-        $scope.getDetailedProgram = function(program) {
-            return programRepository.getProgramAndStages(program.id).then(function(enrichedProgram) {
+        $scope.getDetailedProgram = function(module) {
+            return programRepository.getProgramAndStages(module.program.id).then(function(enrichedProgram) {
                 _.forEach(enrichedProgram.programStages, function(programStage){
                     _.forEach(programStage.programStageSections, function(programStageSection){
                         _.forEach(programStageSection.programStageDataElements, function(de){
@@ -124,7 +124,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         });
                     });
                 });
-                $scope.program = enrichedProgram;
+                module.enrichedProgram = enrichedProgram;
+                return module;
             });
         };
 

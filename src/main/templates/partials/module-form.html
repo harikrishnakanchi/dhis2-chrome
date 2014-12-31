@@ -78,7 +78,7 @@
                     <li class="form-group" ng-if="module.serviceType==='Linelist'">
                         <label for="program" class="col-sm-4 col-md-4 control-label">{{resourceBundle.selectProgramLabel}}</label>
                         <div class="col-sm-6 col-md-6">
-                            <select type="text" ng-change="getDetailedProgram(module.program)" name="programsDropDown" id="programsDropDown" ng-model="module.program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
+                            <select type="text" ng-change="getDetailedProgram(module)" name="programsDropDown" id="programsDropDown" ng-model="module.program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
                                 <option value=""></option>
                             </select>
                         </div>
@@ -87,7 +87,7 @@
                         </div>
                     </li>
 
-                     <div class="exp-coll-group" ng-repeat="programStage in program.programStages" ng-if="program !== undefined">
+                     <div class="exp-coll-group" ng-repeat="programStage in module.enrichedProgram.programStages" ng-if="module.enrichedProgram !== undefined">
                         <accordion close-others="false">
                             <accordion-group ng-repeat="section in programStage.programStageSections" is-open="true">
                                 <accordion-heading>
