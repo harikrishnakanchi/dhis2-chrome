@@ -87,5 +87,6 @@
     "yes": "Yes",
     "no": "No",
     "invalidPattern": "is invalid",
-    "projectCodeExists": "Project code already exists"
+    "projectCodeExists": "Project code already exists",
+    "dateInvalid": "Not a valid date"
 }

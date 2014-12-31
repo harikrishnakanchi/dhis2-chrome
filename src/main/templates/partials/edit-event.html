@@ -48,6 +48,7 @@
                                         </select>
                                         <div ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$dirty &amp;&amp; editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$invalid">
 			                                <span class="errortxt" ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.required"> {{de.dataElement.formName}} {{resourceBundle.required}}</span>
+                                            <span class="errortxt" ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.date"> {{resourceBundle.dateInvalid}}</span>
 			                                <span class="errortxt" ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.pattern"> {{de.dataElement.formName}} {{resourceBundle.invalidPattern}}</span>
 			                            </div>
                                     </div>
