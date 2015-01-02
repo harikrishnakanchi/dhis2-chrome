@@ -35,7 +35,7 @@ define(["orgUnitGroupRepository", "angularMocks", "utils"], function(OrgUnitGrou
 
             orgUnitGroupRepository.get(id);
 
-            expect(mockStore.find).toHaveBeenCalledWith(id);
+            expect(mockStore.find).toHaveBeenCalledWith([id]);
         });
     });
 });

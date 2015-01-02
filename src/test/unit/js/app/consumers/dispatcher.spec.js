@@ -23,8 +23,11 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             uploadOrgUnitConsumer = {
                 'run': jasmine.createSpy("uploadOrgUnitConsumer")
             };
-            orgUnitGroupConsumer = {
-                'run': jasmine.createSpy("orgUnitGroupConsumer")
+            uploadOrgUnitGroupConsumer = {
+                'run': jasmine.createSpy("uploadOrgUnitGroupConsumer")
+            };
+            downloadOrgUnitGroupConsumer = {
+                'run': jasmine.createSpy("downloadOrgUnitGroupConsumer")
             };
             datasetConsumer = {
                 'run': jasmine.createSpy("datasetConsumer")
@@ -65,10 +68,11 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadEventDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadApprovalConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadOrgUnitConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadOrgUnitGroupConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
-            dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, orgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
+            dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
-                downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer);
+                downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -240,6 +244,31 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(downloadMetadataConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call uploadOrgUnitGroupConsumer", function() {
+            message.data = {
+                "data": {},
+                "type": "upsertOrgUnitGroups"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(downloadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call downloadOrgUnitGroupConsumer", function() {
+            message.data = {
+                "data": {},
+                "type": "downloadOrgUnitGroups"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(downloadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
         });
     });
 });

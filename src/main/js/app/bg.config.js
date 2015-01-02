@@ -53,6 +53,8 @@ require.config({
         "uploadApprovalDataConsumer": "app/consumer/upload.approval.data.consumer",
         "downloadOrgUnitConsumer": "app/consumer/download.orgunit.consumer",
         "uploadOrgUnitConsumer": "app/consumer/upload.orgunit.consumer",
+        "downloadOrgUnitGroupConsumer": "app/consumer/download.orgunit.group.consumer",
+        "uploadOrgUnitGroupConsumer": "app/consumer/upload.orgunit.group.consumer",
         "systemSettingConsumer": "app/consumer/system.setting.consumer",
         "datasetConsumer": "app/consumer/dataset.consumer",
         "createUserConsumer": "app/consumer/create.user.consumer",
@@ -62,7 +64,6 @@ require.config({
         "uploadEventDataConsumer": "app/consumer/upload.event.data.consumer",
         "deleteEventConsumer": "app/consumer/delete.event.consumer",
         "dispatcher": "app/consumer/dispatcher",
-        "orgUnitGroupConsumer": "app/consumer/orgunit.group.consumer",
         "downloadMetadataConsumer": "app/consumer/download.metadata.consumer",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",

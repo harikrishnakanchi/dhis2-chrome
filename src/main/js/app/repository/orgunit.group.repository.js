@@ -14,7 +14,7 @@ define([], function() {
 
         this.get = function(orgUnitGroupId) {
             var store = db.objectStore("orgUnitGroups");
-            return store.find(orgUnitGroupId);
+            return store.find([orgUnitGroupId]);
         };
     };
 });
