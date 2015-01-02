@@ -49,9 +49,9 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
                     var lastUpdatedInIDB = dateUtils.max(lastUpdatedTimeIncludingAttributes(ouFromIDB));
 
                     if (lastUpdatedInDhis.isAfter(lastUpdatedInIDB)) {
+                        console.error("ignoring local changes for orgnization : id " + ouFromIDB.id + " name : " + ouFromIDB.name);
                         return orgUnitRepository.upsert(ouFromDHIS);
                     } else {
-                        console.error("ignoring local changes for orgnization : id " + ouFromIDB.id + " name : " + ouFromIDB.name);
                         $q.when({});
                     }
                 });
