@@ -77,7 +77,8 @@ require.config({
         "chromeRuntime": "app/utils/chrome.runtime",
         "dhisId": "app/utils/dhis.id",
         "dateUtils": "app/utils/date.utils",
-        "lodashUtils": "app/utils/lodash.utils"
+        "lodashUtils": "app/utils/lodash.utils",
+        "httpUtils": "app/utils/http.utils"
     },
     shim: {
         'angular': {
