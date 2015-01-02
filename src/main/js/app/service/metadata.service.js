@@ -28,8 +28,13 @@ define(["properties", "lodash"], function(properties, _) {
             }
         };
 
-        var getDataFromResponse = function(response) {
-            return response.data;
+        var getDataFromResponse = function(response, filterFields) {
+            filterFields = filterFields || [];
+            var data = response.data;
+            _.forEach(filterFields, function(f) {
+                delete data[f];
+            });
+            return data;
         };
 
         var getMetadata = function(metadataChangeLog) {
@@ -37,7 +42,9 @@ define(["properties", "lodash"], function(properties, _) {
             var url = properties.dhis.url + "/api/metaData" + lastUpdatedTimeQueryString;
 
             console.debug("Fetching " + url);
-            return $http.get(url).then(getDataFromResponse);
+            return $http.get(url).then(function(data) {
+                return getDataFromResponse(data, ["organisationUnits"]);
+            });
         };
 
         var updateChangeLog = function(data) {

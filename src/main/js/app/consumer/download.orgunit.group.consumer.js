@@ -36,13 +36,16 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var merge = function(orgUnitGroupsFromDHIS) {
+            var isLocalDataStale = function(ougFromDHIS, ougFromIDB) {
+                if (!ougFromIDB) return true;
+                var lastUpdatedInDhis = moment(ougFromDHIS.lastUpdated);
+                var lastUpdatedInIDB = moment(ougFromIDB.lastUpdated);
+                return lastUpdatedInDhis.isAfter(lastUpdatedInIDB)
+            };
             var syncPromises = _.map(orgUnitGroupsFromDHIS, function(ougFromDHIS) {
                 return orgUnitGroupRepository.get(ougFromDHIS.id).then(function(ougFromIDB) {
-                    var lastUpdatedInDhis = moment(ougFromDHIS.lastUpdated);
-                    var lastUpdatedInIDB = moment(ougFromIDB.lastUpdated);
-
-                    if (lastUpdatedInDhis.isAfter(lastUpdatedInIDB)) {
-                        console.error("ignoring local changes for orgunitgroup : id " + ougFromIDB.id + " name : " + ougFromIDB.name);
+                    if (isLocalDataStale(ougFromDHIS, ougFromIDB)) {
+                        console.error("upserting orgunitgroup : id " + ougFromDHIS.id + " name : " + ougFromDHIS.name);
                         return orgUnitGroupRepository.upsert(ougFromDHIS);
                     } else {
                         $q.when({});

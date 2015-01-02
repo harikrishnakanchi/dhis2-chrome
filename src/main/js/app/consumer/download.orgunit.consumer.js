@@ -39,20 +39,23 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
             var lastUpdatedTimeIncludingAttributes = function(orgUnit) {
                 var lastUpdated = _.pluck(orgUnit.attributeValues, "lastUpdated");
                 lastUpdated.push(orgUnit.lastUpdated);
-
                 return lastUpdated;
+            };
+
+            var isLocalDataStale = function(ouFromDHIS, ouFromIDB) {
+                if (!ouFromIDB) return true;
+                var lastUpdatedInDhis = dateUtils.max(lastUpdatedTimeIncludingAttributes(ouFromDHIS));
+                var lastUpdatedInIDB = dateUtils.max(lastUpdatedTimeIncludingAttributes(ouFromIDB));
+                return lastUpdatedInDhis.isAfter(lastUpdatedInIDB);
             };
 
             var syncPromises = _.map(orgUnitsFromDHIS, function(ouFromDHIS) {
                 return orgUnitRepository.getOrgUnit(ouFromDHIS.id).then(function(ouFromIDB) {
-                    var lastUpdatedInDhis = dateUtils.max(lastUpdatedTimeIncludingAttributes(ouFromDHIS));
-                    var lastUpdatedInIDB = dateUtils.max(lastUpdatedTimeIncludingAttributes(ouFromIDB));
-
-                    if (lastUpdatedInDhis.isAfter(lastUpdatedInIDB)) {
-                        console.error("ignoring local changes for orgnization : id " + ouFromIDB.id + " name : " + ouFromIDB.name);
+                    if (isLocalDataStale(ouFromDHIS, ouFromIDB)) {
+                        console.log("upserting orgnization : id " + ouFromDHIS.id + " name : " + ouFromDHIS.name);
                         return orgUnitRepository.upsert(ouFromDHIS);
                     } else {
-                        $q.when({});
+                        return $q.when({});
                     }
                 });
             });

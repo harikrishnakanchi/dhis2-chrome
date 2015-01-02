@@ -11,7 +11,9 @@ define(["lodash", "moment"], function(_, moment) {
 
         this.get = function(type) {
             var store = db.objectStore("changeLog");
-            return store.find(type);
+            return store.find(type).then(function(data) {
+                return data === undefined ? data : data.lastUpdatedTime;
+            });
         };
     };
 });

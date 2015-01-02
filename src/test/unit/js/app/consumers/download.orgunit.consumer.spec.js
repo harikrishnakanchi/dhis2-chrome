@@ -273,5 +273,52 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
 
             expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnits", "2014-05-30T12:43:54.972Z");
         });
+
+        it("should upsert new org units from dhis to local db", function() {
+            var message = {
+                "data": {
+                    "data": [],
+                    "type": "downloadOrgUnit"
+                }
+            };
+
+            var orgUnitFromDHISSinceLastUpdatedTime = {
+                "data": {
+                    "organisationUnits": [{
+                        'id': 'a4acf9115a8',
+                        'name': 'Org2',
+                        'shortName': 'Org2',
+                        'level': 4,
+                        'openingDate': "YYYY-MM-DD",
+                        "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                        "parent": {
+                            "name": 'Name1',
+                            "id": 'Id1'
+                        },
+                        "attributeValues": [{
+                            "attribute": {
+                                "code": "prjConDays",
+                                "name": "No of Consultation days per week",
+                                "id": "VKc7bvogtcP"
+                            },
+                            "lastUpdated": "2014-09-20T09:01:12.020+0000",
+                            "value": "val1"
+                        }]
+                    }]
+                }
+            };
+
+            spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
+            spyOn(orgUnitService, 'upsert');
+            spyOn(orgUnitRepository, 'getOrgUnit').and.returnValue(utils.getPromise(q, undefined));
+
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
+            downloadOrgunitConsumer.run(message);
+
+            scope.$apply();
+
+            expect(orgUnitService.upsert).not.toHaveBeenCalled();
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(orgUnitFromDHISSinceLastUpdatedTime.data.organisationUnits[0]);
+        });
     });
 });

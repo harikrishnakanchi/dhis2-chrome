@@ -12,7 +12,7 @@ define(["properties", "httpUtils", "lodash"], function(properties, httpUtils, _)
         };
 
         this.getAll = function(lastUpdatedTime) {
-            var url = properties.dhis.url + '/api/organisationUnits.json?fields=:all';
+            var url = properties.dhis.url + '/api/organisationUnits.json?fields=:all&paging=false';
             url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
             return $http.get(url);
         };

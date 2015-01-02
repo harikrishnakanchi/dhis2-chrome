@@ -8,7 +8,10 @@ define(["changeLogRepository", "angularMocks", "utils"], function(ChangeLogRepos
 
             lastUpdatedTime = "2014-12-30T09:13:41.092Z";
 
-            mockDB = utils.getMockDB($q, lastUpdatedTime);
+            mockDB = utils.getMockDB($q, {
+                "type": 'orgUnit',
+                "lastUpdatedTime": lastUpdatedTime
+            });
             mockStore = mockDB.objectStore;
             repo = new ChangeLogRepository(mockDB.db);
         }));
