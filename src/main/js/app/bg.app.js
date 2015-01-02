@@ -41,6 +41,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             "type": "downloadOrgUnit",
                             "data": []
                         }, "dataValues");
+
+                        $hustle.publish({
+                            "type": "downloadOrgUnitGroups",
+                            "data": []
+                        }, "dataValues");
                     };
 
                     var projectDataSync = function() {

@@ -43,7 +43,7 @@ define(["properties", "lodash"], function(properties, _) {
 
             console.debug("Fetching " + url);
             return $http.get(url).then(function(data) {
-                return getDataFromResponse(data, ["organisationUnits"]);
+                return getDataFromResponse(data, ["organisationUnits", "organisationUnitGroups"]);
             });
         };
 
@@ -84,18 +84,6 @@ define(["properties", "lodash"], function(properties, _) {
 
         var getSystemSettings = function() {
             var url = properties.dhis.url + "/api/systemSettings";
-            console.debug("Fetching " + url);
-            return $http.get(url).then(getDataFromResponse);
-        };
-
-        var getOrgUnits = function() {
-            var url = properties.dhis.url + "/api/organisationUnits?fields=:all&paging=false";
-            console.debug("Fetching " + url);
-            return $http.get(url).then(getDataFromResponse);
-        };
-
-        var getOrgUnitGroups = function() {
-            var url = properties.dhis.url + "/api/organisationUnitGroups.json?fields=:all&paging=false";
             console.debug("Fetching " + url);
             return $http.get(url).then(getDataFromResponse);
         };
@@ -157,13 +145,6 @@ define(["properties", "lodash"], function(properties, _) {
             return store.upsert(data.organisationUnits);
         };
 
-        var upsertOrgunitGroups = function(data) {
-            console.debug("Processing organisationUnitGroups ", data);
-            var store = db.objectStore("orgUnitGroups");
-            return store.upsert(data.organisationUnitGroups);
-        };
-
-
         this.loadMetadataFromFile = function() {
             return getLastUpdatedTime()
                 .then(loadMetadata);
@@ -173,8 +154,6 @@ define(["properties", "lodash"], function(properties, _) {
             return getLastUpdatedTime()
                 .then(getMetadata)
                 .then(upsertMetadata)
-                .then(getOrgUnitGroups)
-                .then(upsertOrgunitGroups)
                 .then(getSystemSettings)
                 .then(upsertSystemSettings)
                 .then(getTranslations)

@@ -40,12 +40,12 @@ define(["moment", "lodash"], function(moment, _) {
                 if (!ougFromIDB) return true;
                 var lastUpdatedInDhis = moment(ougFromDHIS.lastUpdated);
                 var lastUpdatedInIDB = moment(ougFromIDB.lastUpdated);
-                return lastUpdatedInDhis.isAfter(lastUpdatedInIDB)
+                return lastUpdatedInDhis.isAfter(lastUpdatedInIDB);
             };
             var syncPromises = _.map(orgUnitGroupsFromDHIS, function(ougFromDHIS) {
                 return orgUnitGroupRepository.get(ougFromDHIS.id).then(function(ougFromIDB) {
                     if (isLocalDataStale(ougFromDHIS, ougFromIDB)) {
-                        console.error("upserting orgunitgroup : id " + ougFromDHIS.id + " name : " + ougFromDHIS.name);
+                        console.log("upserting orgunitgroup : id " + ougFromDHIS.id + " name : " + ougFromDHIS.name);
                         return orgUnitGroupRepository.upsert(ougFromDHIS);
                     } else {
                         $q.when({});
