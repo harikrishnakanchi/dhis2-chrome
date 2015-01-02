@@ -157,7 +157,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.flush();
         });
 
-        it("should get all org units updated after a particular time", function() {
+        it("should get all org units since lastUpdated", function() {
             var lastUpdatedTime = "2014-12-30T09:13:41.092Z";
 
             orgUnitService.getAll(lastUpdatedTime);

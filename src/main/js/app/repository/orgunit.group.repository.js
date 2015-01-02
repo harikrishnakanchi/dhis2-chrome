@@ -11,5 +11,10 @@ define([], function() {
                 return orgUnitGroups;
             });
         };
+
+        this.get = function(orgUnitGroupId) {
+            var store = db.objectStore("orgUnitGroups");
+            return store.find(orgUnitGroupId);
+        };
     };
 });
