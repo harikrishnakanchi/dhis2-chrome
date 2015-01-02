@@ -19,14 +19,14 @@ require.config({
         "dataService": "app/service/data.service",
         "approvalService": "app/service/approval.service",
         "metadataService": "app/service/metadata.service",
-        "orgUnitService": "app/service/orgUnit.service",
+        "orgUnitService": "app/service/orgunit.service",
         "datasetService": "app/service/dataset.service",
         "systemSettingService": "app/service/system.setting.service",
         "userService": "app/service/user.service",
         "programService": "app/service/program.service",
         "eventService": "app/service/event.service",
         "services": "app/service/bg.services",
-        "orgUnitGroupService": "app/service/orgUnitgroup.service",
+        "orgUnitGroupService": "app/service/orgunit.group.service",
 
         //Repositories
         "repositories": "app/repository/bg.repositories",
@@ -62,7 +62,7 @@ require.config({
         "uploadEventDataConsumer": "app/consumer/upload.event.data.consumer",
         "deleteEventConsumer": "app/consumer/delete.event.consumer",
         "dispatcher": "app/consumer/dispatcher",
-        "orgUnitGroupConsumer": "app/consumer/orgunitGroup.consumer",
+        "orgUnitGroupConsumer": "app/consumer/orgunit.group.consumer",
         "downloadMetadataConsumer": "app/consumer/download.metadata.consumer",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",

@@ -53,14 +53,14 @@ require.config({
         "services": "app/service/services",
         "metadataService": "app/service/metadata.service",
         "dataService": "app/service/data.service",
-        "orgUnitService": "app/service/orgUnit.service",
+        "orgUnitService": "app/service/orgunit.service",
         "datasetService": "app/service/dataset.service",
         "systemSettingService": "app/service/system.setting.service",
         "userService": "app/service/user.service",
         "approvalService": "app/service/approval.service",
         "programService": "app/service/program.service",
         "eventService": "app/service/event.service",
-        "orgUnitGroupService": "app/service/orgUnitgroup.service",
+        "orgUnitGroupService": "app/service/orgunit.group.service",
         "filesystemService": "app/service/filesystem.service",
 
         //Repositories
