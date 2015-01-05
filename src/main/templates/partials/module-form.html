@@ -86,22 +86,32 @@
 
                         </div>
                     </li>
-
-                     <div class="exp-coll-group" ng-repeat="programStage in module.enrichedProgram.programStages" ng-if="module.serviceType==='Linelist' &amp;&amp; module.enrichedProgram !== undefined">
-                        <accordion close-others="false">
-                            <accordion-group ng-repeat="section in programStage.programStageSections" is-open="true">
-                                <accordion-heading>
-                                    <span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span>
-                                    <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
-                                </accordion-heading>
-                                <ul>
-                                    <li class="form-group" ng-repeat="de in section.programStageDataElements">
-                                         <input type="checkbox" ng-disabled="de.compulsory" ng-model="de.dataElement.isIncluded">{{de.dataElement.formName}}
-                                    </li>
-                                </ul>
-                            </accordion-group>
-                        </accordion>
-                    </div>
+                    <li class="form-group"  ng-if="module.serviceType==='Linelist' &amp;&amp; module.program.name !== ''">
+                        <div class="col-sm-12">
+                            <section class="module-details">
+                                <div class="details">
+                                    <div ng-repeat="programStage in module.enrichedProgram.programStages" ng-if="module.serviceType==='Linelist' &amp;&amp; module.enrichedProgram !== undefined">
+                                        <div ng-repeat="section in programStage.programStageSections">
+                                            <div class="collapse-head">
+                                                <h5 ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</h5>
+                                                <h5 ng-if="!resourceBundle[section.id]">{{section.name}}</h5>
+                                            </div>
+                                            <div collapse="false" class="collapse-body">
+                                                <ul>
+                                                    <li ng-repeat="de in section.programStageDataElements">
+                                                        <label>
+                                                            <input type="checkbox" ng-disabled="de.compulsory" ng-model="de.dataElement.isIncluded">{{de.dataElement.formName}}
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </li>
+                    
                 </ul>
             </div>
             <input type="button" class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules)" value="Save" ng-if="isNewMode" />

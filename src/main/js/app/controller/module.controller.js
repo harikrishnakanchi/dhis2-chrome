@@ -129,6 +129,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.getDetailedProgram = function(module) {
+            if(_.isEmpty(module.program)){
+                 module.program = {
+                    'name': ''
+                };
+                return module;
+            }
+               
             return programRepository.getProgramAndStages(module.program.id).then(function(enrichedProgram) {
                 _.forEach(enrichedProgram.programStages, function(programStage) {
                     _.forEach(programStage.programStageSections, function(programStageSection) {
