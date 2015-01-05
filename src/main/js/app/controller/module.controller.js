@@ -73,24 +73,36 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         return filterAllDataSetsBasedOnDataModelType(allDatasetsExceptAssociatedDataSets, dataModelType);
                     };
 
-                    $scope.modules.push({
-                        'id': $scope.orgUnit.id,
-                        'name': $scope.orgUnit.name,
-                        'allDatasets': getNonAssociatedDatasets(),
-                        'datasets': associatedDatasets,
-                        'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
-                        'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
-                        'program': findAssociatedModule(),
-                        "dataModelType": dataModelType
-                    });
+                    var setUpModuleInformation = function() {
+                        $scope.modules.push({
+                            'id': $scope.orgUnit.id,
+                            'name': $scope.orgUnit.name,
+                            'allDatasets': getNonAssociatedDatasets(),
+                            'datasets': associatedDatasets,
+                            'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
+                            'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
+                            'program': findAssociatedModule(),
+                            "dataModelType": dataModelType
+                        });
 
-                    var isDisabled = _.find($scope.orgUnit.attributeValues, {
-                        "attribute": {
-                            "code": "isDisabled"
-                        }
-                    });
-                    $scope.isDisabled = isDisabled && isDisabled.value;
-                    $scope.updateDisabled = !_.all(associatedDatasets, isNewDataModel) || $scope.isDisabled;
+                        var isDisabled = _.find($scope.orgUnit.attributeValues, {
+                            "attribute": {
+                                "code": "isDisabled"
+                            }
+                        });
+                        $scope.isDisabled = isDisabled && isDisabled.value;
+                        $scope.updateDisabled = !_.all(associatedDatasets, isNewDataModel) || $scope.isDisabled;
+                    };
+
+                    var getAllModules = function() {
+                        return orgUnitRepository.getAll().then(function(allOrgUnits) {
+                            $scope.allModules = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.parent.id);
+                            return allOrgUnits;
+                        });
+                    };
+
+                    getAllModules().then(setUpModuleInformation);
+
                 };
 
                 if ($scope.isNewMode) {

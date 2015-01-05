@@ -49,7 +49,7 @@
     "usernameExists": "Username already exists.",
     "confirmPassword": "Confirm your password.",
     "pwdMatch": "Passwords do not match.",
-    "alreadyExists": "Name already exists under this project.",
+    "alreadyExists": "Name already exists under this Op Unit.",
     "projectCodeValidation": "Project Code is required.",
     "disabledCredentials": "User is disabled. Please contact admin for more details.",
     "userDisableSuccess": "User disabled successfully.",
