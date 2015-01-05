@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
-    return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository) {
+    return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepository) {
         var resetForm = function() {
             $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.showForm = false;
@@ -20,6 +20,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
             return $q.all(getProgramAndStagesPromises).then(function(allPrograms) {
                 $scope.programs = allPrograms;
+                return $scope.programs;
             });
         };
 
@@ -27,7 +28,33 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             var store = db.objectStore("optionSets");
             return store.getAll().then(function(opSets) {
                 $scope.optionSets = opSets;
+                return;
             });
+        };
+
+
+
+        var setExcludedPropertyForDataElements = function(programs) {
+            var loadSystemSettings = function() {
+                return systemSettingRepository.getAllWithProjectId($scope.currentModule.parent.id).then(function(data) {
+                    var excludedDataElementIds = data.value.excludedDataElements[$scope.currentModule.id];
+                    return excludedDataElementIds;
+                });
+            };
+
+            var setDataElements = function(excludedDataElementIds) {
+                _.forEach(programs, function(program) {
+                    _.forEach(program.programStages, function(programStage) {
+                        _.forEach(programStage.programStageSections, function(section) {
+                            _.forEach(section.programStageDataElements, function(psde) {
+                                psde.dataElement.isExcluded = (_.indexOf(excludedDataElementIds, psde.dataElement.id) !== -1) ? true : false;
+                            });
+                        });
+                    });
+                });
+                return programs;
+            };
+            return loadSystemSettings().then(setDataElements);
         };
 
         var reloadEventsView = function() {
@@ -289,9 +316,13 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
                 return getProgramInfoNgModel(eventToBeEdited.program).then(function(program) {
                     eventToBeEdited.eventDate = new Date(eventToBeEdited.eventDate);
-                    eventToBeEdited.program = program;
-                    eventToBeEdited.dataElementValues = getDataElementValues(eventToBeEdited);
-                    $scope.eventToBeEdited = _.cloneDeep(eventToBeEdited);
+                    setExcludedPropertyForDataElements([program]).then(function(modifiedPrograms) {
+                        eventToBeEdited.program = modifiedPrograms[0];
+                        eventToBeEdited.dataElementValues = getDataElementValues(eventToBeEdited);
+                        $scope.eventToBeEdited = _.cloneDeep(eventToBeEdited);
+                        return;
+                    });
+
                 });
             };
             $scope.showView = false;
@@ -343,7 +374,9 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 resetForm();
                 $scope.showView = true;
                 reloadEventsView();
-                loadPrograms().then(loadOptionSets);
+                loadPrograms()
+                    .then(setExcludedPropertyForDataElements)
+                    .then(loadOptionSets);
                 $scope.loading = false;
                 $scope.includeEditForm = false;
             };

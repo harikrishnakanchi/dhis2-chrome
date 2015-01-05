@@ -30,9 +30,11 @@
 	                            </accordion-heading>
 	                            <ul>
 	                                <li class="form-group" ng-repeat="de in section.programStageDataElements">
-	                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="resourceBundle[de.dataElement.id]">{{ resourceBundle[de.dataElement.id] }}</label>
-	                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</label>
-	                                    <div class="col-sm-6 col-md-6">
+	                                	<div ng-if="!de.dataElement.isExcluded">
+		                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="resourceBundle[de.dataElement.id]">{{ resourceBundle[de.dataElement.id] }}</label>
+		                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</label>
+	                                    </div>
+	                                    <div class="col-sm-6 col-md-6" ng-if="!de.dataElement.isExcluded">
 	                                        <input type="text" class="form-control" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory"/>
 	                                        <input type="number" class="form-control" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory" ng-pattern = "numberPattern"/>
 	                                        <input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="getDataValueNgModel(dataValues, program.id, programStage.id)[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required= "de.compulsory"/>
