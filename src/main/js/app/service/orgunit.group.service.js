@@ -1,19 +1,19 @@
-define(["properties", "httpUtils", "lodash"], function(properties, httpUtils, _) {
+define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
     return function($http, db) {
         this.upsert = function(orgUnitGroupRequest) {
             console.debug("Posting Orgunit Groups");
-            return $http.post(properties.dhis.url + '/api/metadata', {
+            return $http.post(dhisUrl.metadata, {
                 'organisationUnitGroups': angular.isArray(orgUnitGroupRequest) ? orgUnitGroupRequest : [orgUnitGroupRequest]
             });
         };
 
         this.get = function(orgUnitGroupIds) {
             orgUnitGroupIds = _.isArray(orgUnitGroupIds) ? orgUnitGroupIds : [orgUnitGroupIds];
-            return $http.get(properties.dhis.url + '/api/organisationUnitGroups.json?' + httpUtils.getParamString('id', orgUnitGroupIds));
+            return $http.get(dhisUrl.orgUnitGroups + '?' + httpUtils.getParamString('id', orgUnitGroupIds));
         };
 
         this.getAll = function(lastUpdatedTime) {
-            var url = properties.dhis.url + '/api/organisationUnitGroups.json?fields=:all&paging=false';
+            var url = dhisUrl.orgUnitGroups + '?fields=:all&paging=false';
             url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
             return $http.get(url);
         };

@@ -1,4 +1,4 @@
-define(["lodash", "properties", "moment"], function(_, properties, moment) {
+define(["lodash", "moment", "dhisUrl"], function(_, moment, dhisUrl) {
     return function($http, $q) {
         this.downloadAllData = function(orgUnitIds, dataSetIds) {
             var today = moment().format("YYYY-MM-DD");
@@ -7,7 +7,7 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
             };
 
 
-            return $http.get(properties.dhis.url + '/api/dataValueSets', {
+            return $http.get(dhisUrl.dataValueSets, {
                 "params": {
                     "orgUnit": orgUnitIds,
                     "children": true,
@@ -30,7 +30,7 @@ define(["lodash", "properties", "moment"], function(_, properties, moment) {
                 return $q.reject(response);
             };
 
-            return $http.post(properties.dhis.url + '/api/dataValueSets', payload).then(sucessResponse, errorResponse);
+            return $http.post(dhisUrl.dataValueSets, payload).then(sucessResponse, errorResponse);
         };
     };
 });

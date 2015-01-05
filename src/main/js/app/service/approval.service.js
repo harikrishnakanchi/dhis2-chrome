@@ -1,4 +1,4 @@
-define(["properties", "moment", "lodash"], function(properties, moment, _) {
+define(["properties", "moment", "dhisUrl", "lodash"], function(properties, moment, dhisUrl, _) {
     return function($http, db, $q) {
         this.markAsComplete = function(dataSets, period, orgUnit, storedBy, completionDate) {
             var payload = _.transform(dataSets, function(result, ds) {
@@ -12,7 +12,7 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
                 });
             });
 
-            return $http.post(properties.dhis.url + "/api/completeDataSetRegistrations/multiple", payload);
+            return $http.post(dhisUrl.approvalMultipleL1, payload);
         };
 
         this.markAsApproved = function(dataSets, period, orgUnit, approvedBy, approvalDate) {
@@ -26,11 +26,11 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
                 });
             });
 
-            return $http.post(properties.dhis.url + "/api/dataApprovals/multiple", payload);
+            return $http.post(dhisUrl.approvalMultipleL2, payload);
         };
 
         this.markAsUnapproved = function(dataSets, period, orgUnit) {
-            return $http.delete(properties.dhis.url + "/api/dataApprovals", {
+            return $http.delete(dhisUrl.approvalL2, {
                 params: {
                     "ds": dataSets,
                     "pe": period,
@@ -40,7 +40,7 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
         };
 
         this.markAsAccepted = function(dataSets, period, orgUnit) {
-             var payload = _.transform(dataSets, function(result, ds) {
+            var payload = _.transform(dataSets, function(result, ds) {
                 result.push({
                     "ds": ds,
                     "pe": period,
@@ -49,7 +49,7 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
                     "ad": approvalDate
                 });
             });
-            return $http.post(properties.dhis.url + "/api/dataAcceptances/multiple", payload);   
+            return $http.post(dhisUrl.approvalMultipleL3, payload);
         };
 
         this.getAllLevelOneApprovalData = function(orgUnits, dataSets) {
@@ -81,7 +81,7 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
             var endDate = moment().format("YYYY-MM-DD");
             var startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
 
-            return $http.get(properties.dhis.url + '/api/completeDataSetRegistrations', {
+            return $http.get(dhisUrl.approvalL1, {
                 "params": {
                     "dataSet": dataSets,
                     "startDate": startDate,
@@ -154,7 +154,7 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
             var startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
 
 
-            return $http.get(properties.dhis.url + '/api/dataApprovals/status', {
+            return $http.get(dhisUrl.approvalStatus, {
                 "params": {
                     "ds": dataSets,
                     "startDate": startDate,
@@ -167,7 +167,7 @@ define(["properties", "moment", "lodash"], function(properties, moment, _) {
         };
 
         this.markAsIncomplete = function(dataSets, period, orgUnit) {
-            return $http.delete(properties.dhis.url + "/api/completeDataSetRegistrations", {
+            return $http.delete(dhisUrl.approvalL1, {
                 params: {
                     "ds": dataSets,
                     "pe": period,

@@ -110,13 +110,13 @@ require.config({
         "dateUtils": "app/utils/date.utils",
         "lodashUtils": "app/utils/lodash.utils",
         "httpUtils": "app/utils/http.utils",
+        "dhisUrl": "app/utils/dhis.url",
 
         //Helpers
         "helpers": "app/helpers/helpers",
         "approvalHelper": "app/helpers/approval.helper",
         "orgUnitGroupHelper": "app/helpers/orgunit.group.helper",
         "sessionHelper": "app/helpers/session.helper"
-
     },
     shim: {
         "ng-i18n": {

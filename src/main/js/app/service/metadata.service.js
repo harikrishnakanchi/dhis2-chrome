@@ -1,4 +1,4 @@
-define(["properties", "lodash"], function(properties, _) {
+define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
     return function($http, db, $q) {
         var upsertMetadata = function(data) {
             var upsertPromises = [];
@@ -39,7 +39,7 @@ define(["properties", "lodash"], function(properties, _) {
 
         var getMetadata = function(metadataChangeLog) {
             var lastUpdatedTimeQueryString = metadataChangeLog ? "?lastUpdated=" + metadataChangeLog.lastUpdatedTime : "";
-            var url = properties.dhis.url + "/api/metaData" + lastUpdatedTimeQueryString;
+            var url = dhisUrl.metadata + lastUpdatedTimeQueryString;
 
             console.debug("Fetching " + url);
             return $http.get(url).then(function(data) {
@@ -83,7 +83,7 @@ define(["properties", "lodash"], function(properties, _) {
         };
 
         var getSystemSettings = function() {
-            var url = properties.dhis.url + "/api/systemSettings";
+            var url = dhisUrl.systemSettings;
             console.debug("Fetching " + url);
             return $http.get(url).then(getDataFromResponse);
         };
@@ -128,7 +128,7 @@ define(["properties", "lodash"], function(properties, _) {
         };
 
         var getTranslations = function() {
-            var url = properties.dhis.url + "/api/translations";
+            var url = dhisUrl.translations;
             console.debug("Fetching " + url);
             return $http.get(url).then(getDataFromResponse);
         };

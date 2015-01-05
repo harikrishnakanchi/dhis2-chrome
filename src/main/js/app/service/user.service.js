@@ -1,10 +1,10 @@
-define(["properties", "lodash"], function(properties, _) {
+define(["dhisUrl", "lodash"], function(dhisUrl, _) {
     return function($http, db) {
         var create = function(user) {
             var payload = {
                 "users": [user]
             };
-            return $http.post(properties.dhis.url + '/api/metadata', payload).then(function(data) {
+            return $http.post(dhisUrl.metadata, payload).then(function(data) {
                 return data;
             });
         };
@@ -21,7 +21,7 @@ define(["properties", "lodash"], function(properties, _) {
             };
 
             var saveToDhis = function(data) {
-                return $http.put(properties.dhis.url + '/api/users/' + user.id, deleteUserPayload()).then(function() {
+                return $http.put(dhisUrl.users + '/' + user.id, deleteUserPayload()).then(function() {
                     return data;
                 });
             };

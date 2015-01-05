@@ -1,4 +1,4 @@
-define(["moment", "properties"], function(moment, properties) {
+define(["moment", "dhisUrl"], function(moment, dhisUrl) {
     return function($http, $q) {
 
         this.getRecentEvents = function(startDate) {
@@ -6,7 +6,7 @@ define(["moment", "properties"], function(moment, properties) {
                 return response.data;
             };
 
-            return $http.get(properties.dhis.url + '/api/events', {
+            return $http.get(dhisUrl.events, {
                 "params": {
                     "startDate": startDate,
                     "endDate": moment().format("YYYY-MM-DD")
@@ -34,7 +34,7 @@ define(["moment", "properties"], function(moment, properties) {
                 return $q.reject(data);
             };
 
-            return $http.post(properties.dhis.url + "/api/events", updatedPayload).then(onSuccess, onFailure);
+            return $http.post(dhisUrl.events, updatedPayload).then(onSuccess, onFailure);
         };
 
         this.deleteEvent = function(eventId) {
@@ -48,7 +48,7 @@ define(["moment", "properties"], function(moment, properties) {
                     return $q.when(data);
                 }
             };
-            return $http.delete(properties.dhis.url + "/api/events/" + eventId).then(onSuccess, onError);
+            return $http.delete(dhisUrl.events + "/" + eventId).then(onSuccess, onError);
         };
     };
 });

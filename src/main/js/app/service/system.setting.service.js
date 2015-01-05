@@ -1,10 +1,10 @@
-define(["properties", "md5"], function(properties, md5) {
+define(["dhisUrl", "md5"], function(dhisUrl, md5) {
     return function($http) {
         this.excludeDataElements = function(data) {
             var postExcludedDataElements = function() {
                 return $http({
                     method: 'POST',
-                    url: properties.dhis.url + '/api/systemSettings/' + data.projectId,
+                    url: dhisUrl.systemSettings + '/' + data.projectId,
                     data: JSON.stringify(data.settings),
                     headers: {
                         'Content-Type': 'text/plain'
@@ -25,7 +25,7 @@ define(["properties", "md5"], function(properties, md5) {
         };
 
         var getExcludedDataElements = function(projectId) {
-            return $http.get(properties.dhis.url + '/api/systemSettings/' + projectId);
+            return $http.get(dhisUrl.systemSettings + '/' + projectId);
         };
     };
 });
