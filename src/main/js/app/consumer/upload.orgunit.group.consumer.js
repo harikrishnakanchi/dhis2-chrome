@@ -1,10 +1,14 @@
 define(["lodash"], function(_) {
-    return function(orgUnitGroupService, orgUnitGroupRepository) {
+    return function(orgUnitGroupService, orgUnitGroupRepository, $q) {
+        var retrieveFromIDB = function(orgUnitGroups) {
+            return $q.all(_.map(orgUnitGroups, function(o) {
+                return orgUnitGroupRepository.get(o.id);
+            }));
+        };
+
         this.run = function(message) {
-            console.debug("Syncing org unit groups: ", message.data.data);
-            return orgUnitGroupRepository.get(_.pluck(message.data.data, "id")).then(function(data) {
-                return orgUnitGroupService.upsert(data);
-            });
+            var orgUnitGroups = _.isArray(message.data.data) ? message.data.data : [message.data.data];
+            return retrieveFromIDB(orgUnitGroups).then(orgUnitGroupService.upsert);
         };
     };
 });
