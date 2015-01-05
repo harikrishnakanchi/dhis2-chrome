@@ -3,7 +3,7 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
 
         var modules, parent, expectedSystemSettings;
 
-        it("should construct system settings", function() {
+        it("should construct system settings for aggregate modules", function() {
             modules = [{
                 name: "mod1 name",
                 id: "mod1",
@@ -23,12 +23,42 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
                 }]
             }];
 
-            expectedSystemSettings = {
-                "excludedDataElements": {
-                    "mod1": ["2"]
+            expect(systemSettingsTransformer.constructSystemSettings(modules)).toEqual({
+                "mod1": ["2"]
+            });
+        });
+
+        it("should construct system settings for line list modules", function() {
+            modules = [{
+                name: "mod1 name",
+                id: "mod1",
+                enrichedProgram: {
+                    programStages: [{
+                        programStageSections: [{
+                            programStageDataElements: [{
+                                "dataElement": {
+                                    "id": "1",
+                                    "isIncluded": true
+                                }
+                            }, {
+                                "dataElement": {
+                                    "id": "2",
+                                    "isIncluded": false
+                                }
+                            }, {
+                                "dataElement": {
+                                    "id": "3",
+                                    "isIncluded": true
+                                }
+                            }]
+                        }]
+                    }]
                 }
-            };
-            expect(systemSettingsTransformer.constructSystemSettings(modules)).toEqual(expectedSystemSettings);
+            }];
+
+            expect(systemSettingsTransformer.constructSystemSettings(modules, true)).toEqual({
+                    "mod1": ["2"]
+                });
         });
     });
 });

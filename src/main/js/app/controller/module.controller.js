@@ -77,6 +77,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         $scope.modules.push({
                             'id': $scope.orgUnit.id,
                             'name': $scope.orgUnit.name,
+                            'enrichedProgram': $scope.orgUnit.enrichedProgram,
                             'allDatasets': getNonAssociatedDatasets(),
                             'datasets': associatedDatasets,
                             'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
@@ -96,7 +97,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
                     var getAllModules = function() {
                         return orgUnitRepository.getAll().then(function(allOrgUnits) {
-                            $scope.allModules = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.parent.id);
+                            $scope.allModules = _.difference(orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.parent.id), [$scope.orgUnit.name]);
                             return allOrgUnits;
                         });
                     };
@@ -129,9 +130,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.getDetailedProgram = function(module) {
             return programRepository.getProgramAndStages(module.program.id).then(function(enrichedProgram) {
-                _.forEach(enrichedProgram.programStages, function(programStage){
-                    _.forEach(programStage.programStageSections, function(programStageSection){
-                        _.forEach(programStageSection.programStageDataElements, function(de){
+                _.forEach(enrichedProgram.programStages, function(programStage) {
+                    _.forEach(programStage.programStageSections, function(programStageSection) {
+                        _.forEach(programStageSection.programStageDataElements, function(de) {
                             de.dataElement.isIncluded = true;
                         });
                     });
@@ -165,7 +166,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var enrichedModules = orgUnitMapper.mapToModules(modules, parent);
 
             parent.children = parent.children.concat(enrichedModules);
-
             return $q.all([orgUnitRepository.upsert(parent), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
                 .then(function() {
                     return enrichedModules;
@@ -197,25 +197,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             }, $scope.resourceBundle.disableOrgUnitConfirmationMessage);
         };
 
-        $scope.excludeDataElements = function(projectId, enrichedModules) {
-            var systemSettings = systemSettingsTransformer.constructSystemSettings(enrichedModules);
-            systemSettingRepository.getAllWithProjectId(projectId).then(function(data) {
-                var checksum = md5(JSON.stringify(data ? data.value : undefined));
-                var payload = {
-                    "projectId": projectId,
-                    "settings": systemSettings
-                };
-
-                return systemSettingRepository.upsert(payload).then(function() {
-                    var hustlePayload = _.cloneDeep(payload);
-                    hustlePayload.checksum = checksum;
-                    return publishMessage(hustlePayload, "excludeDataElements").then(function() {
-                        return enrichedModules;
-                    });
-                });
-            });
-        };
-
         $scope.associateDatasets = function(enrichedModules) {
             var parent = $scope.orgUnit;
             var datasets = orgUnitMapper.mapToDataSets(enrichedModules, parent, $scope.originalDatasets);
@@ -231,28 +212,58 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         var associatePrograms = function(programWiseModules, enrichedModules) {
             var programs = programTransformer.addModules($scope.allPrograms, programWiseModules, enrichedModules);
             return programRepository.upsert(programs).then(function() {
-                return publishMessage(programs, "uploadProgram");
+                publishMessage(programs, "uploadProgram");
+                return enrichedModules;
             });
+
         };
 
-        $scope.save = function(modules) {
-            var onSuccess = function(data) {
-                $scope.saveFailure = false;
-                if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm($scope.orgUnit, "savedModule");
+        var saveSystemSettingsForExcludedDataElements = function(parentId, aggModules, linelistModules) {
+            var saveSystemSettings = function(systemSettings, projectId) {
+                return systemSettingRepository.getAllWithProjectId(projectId).then(function(data) {
+                    var checksum = md5(JSON.stringify(data ? data.value : undefined));
+                    var payload = {
+                        "projectId": projectId,
+                        "settings": systemSettings
+                    };
+
+                    return systemSettingRepository.upsert(payload).then(function() {
+                        var hustlePayload = _.cloneDeep(payload);
+                        hustlePayload.checksum = checksum;
+                        return publishMessage(hustlePayload, "excludeDataElements").then(function() {
+                            return;
+                        });
+                    });
+                });
             };
 
-            var getModulesOfServiceType = function(serviceType) {
+            var systemSettingsForAggregateModules = systemSettingsTransformer.constructSystemSettings(aggModules);
+            var systemSettingsForLineListModules = systemSettingsTransformer.constructSystemSettings(linelistModules, true);
+            var systemSettings = {
+                'excludedDataElements': _.merge(systemSettingsForAggregateModules, systemSettingsForLineListModules)
+            };
+
+            return saveSystemSettings(systemSettings, parentId);
+        };
+
+        var getModulesOfServiceType = function(serviceType, modules) {
                 return _.filter(modules, function(m) {
                     return m.serviceType === serviceType;
                 });
+            };
+
+        $scope.save = function(modules) {
+            var onSuccess = function(enrichedModules) {
+                $scope.saveFailure = false;
+                if ($scope.$parent.closeNewForm)
+                    $scope.$parent.closeNewForm($scope.orgUnit, "savedModule");
+                return enrichedModules;
             };
 
             var saveAggregateModules = function() {
                 if (aggregateModules.length === 0) return $q.when([]);
                 return $scope.createModules(aggregateModules)
                     .then($scope.associateDatasets)
-                    .then(_.curry($scope.excludeDataElements)($scope.orgUnit.id))
                     .then(onSuccess, $scope.onError);
             };
 
@@ -265,6 +276,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
                 return $scope.createModules(linelistModules)
                     .then(_.curry(associatePrograms)(programWiseModules));
+
+            };
+
+            var saveExcludedDataElementsSystemSettings = function(data) {
+                return saveSystemSettingsForExcludedDataElements($scope.orgUnit.id, data[0], data[1]);
             };
 
             var createOrgUnitGroups = function() {
@@ -281,10 +297,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 return orgUnitGroupHelper.createOrgUnitGroups(modulesToAdd, false);
             };
 
-            var aggregateModules = getModulesOfServiceType("Aggregate");
-            var linelistModules = getModulesOfServiceType("Linelist");
+            var aggregateModules = getModulesOfServiceType("Aggregate", modules);
+            var linelistModules = getModulesOfServiceType("Linelist", modules);
 
             $q.all([saveAggregateModules(), saveLinelistModules()])
+                .then(saveExcludedDataElementsSystemSettings)
                 .then(createOrgUnitGroups)
                 .then(onSuccess, $scope.onError);
         };
@@ -296,9 +313,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                     $scope.$parent.closeNewForm(enrichedModules[0], "savedModule");
             };
 
+            var aggregateModules = getModulesOfServiceType("Aggregate", modules);
+            var linelistModules = getModulesOfServiceType("Linelist", modules);
             var enrichedModules = orgUnitMapper.mapToModules(modules, $scope.orgUnit.parent, $scope.orgUnit.id, 6);
 
-            return $q.all([$scope.excludeDataElements($scope.orgUnit.parent.id, modules), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
+            return $q.all([saveSystemSettingsForExcludedDataElements($scope.orgUnit.parent.id, aggregateModules, linelistModules), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
                 .then(onSuccess, $scope.onError);
         };
 

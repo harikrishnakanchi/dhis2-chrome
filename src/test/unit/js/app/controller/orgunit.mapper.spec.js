@@ -276,6 +276,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 level: 4,
                 openingDate: "2010-01-01",
                 selectedDataset: undefined,
+                enrichedProgram: undefined,
                 attributeValues: [{
                     attribute: {
                         code: "Type",
@@ -307,6 +308,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 level: 4,
                 openingDate: "2010-01-01",
                 selectedDataset: undefined,
+                enrichedProgram: undefined,
                 attributeValues: [{
                     attribute: {
                         code: "Type",
@@ -365,6 +367,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 level: 'someLevel',
                 openingDate: "2010-01-01",
                 selectedDataset: undefined,
+                enrichedProgram: undefined,
                 attributeValues: [{
                     attribute: {
                         code: "Type",

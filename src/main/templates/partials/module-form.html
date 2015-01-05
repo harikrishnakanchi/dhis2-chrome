@@ -87,7 +87,7 @@
                         </div>
                     </li>
 
-                     <div class="exp-coll-group" ng-repeat="programStage in module.enrichedProgram.programStages" ng-if="module.enrichedProgram !== undefined">
+                     <div class="exp-coll-group" ng-repeat="programStage in module.enrichedProgram.programStages" ng-if="module.serviceType==='Linelist' &amp;&amp; module.enrichedProgram !== undefined">
                         <accordion close-others="false">
                             <accordion-group ng-repeat="section in programStage.programStageSections" is-open="true">
                                 <accordion-heading>

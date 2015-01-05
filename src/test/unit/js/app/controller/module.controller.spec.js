@@ -215,7 +215,211 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
         });
 
-        it("should create aggregate and linelist modules", function() {
+        it("should save aggregate and linelist module excludeDataElement system-setting", function() {
+            scope.orgUnit = {
+                "name": "Project1",
+                "id": "someid",
+                "children": []
+            };
+
+            var aggregateModule = {
+                'name': "Module1",
+                'serviceType': "Aggregate",
+                'datasets': [{
+                    'id': 'DS_OPD',
+                    'name': 'dataset11',
+                    'sections': [{
+                        'dataElements': [{
+                            'isIncluded': false,
+                            'id': 'de1'
+                        }, {
+                            'isIncluded': true,
+                            'id': 'de2'
+                        }]
+                    }]
+                }]
+            };
+
+            var LinelistModule = {
+                'name': "Module2",
+                'serviceType': "Linelist",
+                'enrichedProgram': {
+                    'programStages': [{
+                        'programStageSections': [{
+                            'programStageDataElements': [{
+                                'dataElement': {
+                                    'isIncluded': false,
+                                    'id': 'de3'
+                                }
+                            }, {
+                                'dataElement': {
+                                    'isIncluded': true,
+                                    'id': 'de4'
+                                }
+                            }]
+                        }]
+                    }]
+                },
+                'program': {
+                    'id': 'prog1',
+                    'name': 'ER Linelist',
+                    'organisationUnits': []
+                }
+            };
+
+            var modules = [aggregateModule, LinelistModule];
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+            scope.save(modules);
+            scope.$apply();
+
+            expect(scope.saveFailure).toBe(false);
+            expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith("someid");
+
+            var expectedSystemSettingsPayload = {
+                "projectId": "someid",
+                "settings": {
+                    "excludedDataElements": {
+                        "adba40b7157": ["de1"],
+                        "a1ab18b5fdd": ["de3"]
+                    }
+                }
+            };
+            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettingsPayload);
+
+            var hustlePayload = {
+                "projectId": "someid",
+                "settings": {
+                    "excludedDataElements": {
+                        "adba40b7157": ["de1"],
+                        "a1ab18b5fdd": ["de3"]
+                    }
+                },
+                "checksum": "5e543256c480ac577d30f76f9120eb74"
+            };
+
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: hustlePayload,
+                type: "excludeDataElements"
+            }, "dataValues");
+        });
+
+        it("should save linelist modules", function() {
+            scope.orgUnit = {
+                "name": "Project1",
+                "id": "someid",
+                "children": []
+            };
+
+            var modules = [{
+                'name': "Module2",
+                'serviceType': "Linelist",
+                'enrichedProgram': {
+                    'programStages': [{
+                        'programStageSections': [{
+                            'programStageDataElements': [{
+                                'dataElement': {
+                                    'isIncluded': false,
+                                    'id': 'de3'
+                                }
+                            }, {
+                                'dataElement': {
+                                    'isIncluded': true,
+                                    'id': 'de4'
+                                }
+                            }]
+                        }]
+                    }]
+                },
+                'program': {
+                    'id': 'prog1',
+                    'name': 'ER Linelist',
+                    'organisationUnits': []
+                }
+            }];
+
+            var enrichedLineListModules = [{
+                "name": "Module2",
+                "shortName": "Module2",
+                "id": "a1ab18b5fdd",
+                "level": NaN,
+                "openingDate": "2014-04-01",
+                "selectedDataset": undefined,
+                "datasets": undefined,
+                "enrichedProgram": {
+                    "programStages": [{
+                        "programStageSections": [{
+                            "programStageDataElements": [{
+                                "dataElement": {
+                                    "isIncluded": false,
+                                    "id": "de3"
+                                }
+                            }, {
+                                "dataElement": {
+                                    "isIncluded": true,
+                                    "id": "de4"
+                                }
+                            }]
+                        }]
+                    }]
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
+                    },
+                    "value": "Module"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService",
+                        "name": "Is Linelist Service"
+                    },
+                    "value": "true"
+                }],
+                "parent": {
+                    "name": "Project1",
+                    "id": "someid"
+                }
+            }];
+
+            var modifiedParent = {
+                "name": "Project1",
+                "id": "someid",
+                "children": enrichedLineListModules
+            };
+
+            var programs = [{
+                'id': 'prog1',
+                'name': 'ER Linelist',
+                'organisationUnits': [{
+                    id: 'a1ab18b5fdd',
+                    name: 'Module2'
+                }],
+                "orgUnitIds": ['a1ab18b5fdd']
+            }];
+
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+            scope.save(modules);
+            scope.$apply();
+
+            expect(scope.saveFailure).toBe(false);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(modifiedParent);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedLineListModules);
+
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: enrichedLineListModules,
+                type: "upsertOrgUnit"
+            }, "dataValues");
+
+            expect(programsRepo.upsert).toHaveBeenCalledWith(programs);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: programs,
+                type: "uploadProgram"
+            }, "dataValues");
+        });
+
+        it("should save aggregate modules", function() {
             scope.orgUnit = {
                 "name": "Project1",
                 "id": "someid",
@@ -228,28 +432,34 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 'datasets': [{
                     'id': 'DS_OPD',
                     'name': 'dataset11',
+                    'sections': [{
+                        'dataElements': [{
+                            'isIncluded': false,
+                            'id': 'de1'
+                        }, {
+                            'isIncluded': true,
+                            'id': 'de2'
+                        }]
+                    }]
                 }]
-            }, {
-                'name': "Module2",
-                'serviceType': "Linelist",
-                'program': {
-                    'id': 'prog1',
-                    'name': 'ER Linelist',
-                    'organisationUnits': []
-                }
             }];
 
-            var moduleList = [{
-                name: 'Module1',
-                shortName: 'Module1',
-            }];
-
-            var enrichedModules = [{
+            var enrichedAggregateModules = [{
                 name: 'Module1',
                 datasets: [{
                     'id': 'DS_OPD',
                     'name': 'dataset11',
+                    'sections': [{
+                        "dataElements": [{
+                            "isIncluded": false,
+                            "id": "de1"
+                        }, {
+                            "isIncluded": true,
+                            "id": "de2"
+                        }]
+                    }]
                 }],
+                enrichedProgram: undefined,
                 shortName: 'Module1',
                 id: 'adba40b7157',
                 level: NaN,
@@ -274,101 +484,50 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }
             }];
 
-            var programs = [{
-                'id': 'prog1',
-                'name': 'ER Linelist',
-                'organisationUnits': [{
-                    id: 'a1ab18b5fdd',
-                    name: 'Module2'
-                }],
-                "orgUnitIds": ['a1ab18b5fdd']
-            }];
+            var enrichedParent = {
+                "name": "Project1",
+                "id": "someid",
+                "children": enrichedAggregateModules
+            };
 
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
-
             scope.save(modules);
             scope.$apply();
 
             expect(scope.saveFailure).toBe(false);
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedModules);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedParent);
+
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedAggregateModules);
+
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: enrichedModules,
+                data: enrichedAggregateModules,
                 type: "upsertOrgUnit"
             }, "dataValues");
 
-            expect(programsRepo.upsert).toHaveBeenCalledWith(programs);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                data: programs,
-                type: "uploadProgram"
-            }, "dataValues");
-        });
-
-        it("should associate data sets to module", function() {
-
-            scope.originalDatasets = [{
-                'id': 'ds_11',
-                'name': 'dataset11',
-            }, {
-                'id': 'ds_12',
-                'name': 'dataset12'
-            }];
-
-            scope.orgUnit = {
-                'id': 'Project1Id',
-                'name': 'Project1'
-            };
-
-            var modules = [{
-                'name': "Module1",
-                'serviceType': 'Aggregate',
-                'datasets': [{
-                    'id': 'ds_11',
-                    'name': 'dataset11',
-                }, {
-                    'id': 'ds_12',
-                    'name': 'dataset12'
-                }]
-            }, {
-                'name': "Module2",
-                'serviceType': 'Aggregate',
-                'datasets': [{
-                    'id': 'ds_11',
-                    'name': 'dataset21',
-                }]
-            }];
-
             var expectedDatasets = [{
-                id: 'ds_11',
-                name: 'dataset11',
+                name: 'OPD',
+                id: 'DS_OPD',
                 organisationUnits: [{
-                    name: 'Module1',
-                    id: 'aac1bbd0985'
+                    id: 'mod1'
                 }, {
-                    name: 'Module2',
-                    id: 'acccf1dda36'
-                }]
-            }, {
-                id: 'ds_12',
-                name: 'dataset12',
-                organisationUnits: [{
                     name: 'Module1',
-                    id: 'aac1bbd0985'
+                    id: 'adba40b7157'
+                }],
+                attributeValues: [{
+                    attribute: {
+                        id: 'wFC6joy3I8Q',
+                        code: 'isNewDataModel'
+                    },
+                    value: 'false'
                 }]
             }];
 
-            spyOn(scope, "createModules").and.returnValue(utils.getPromise(q, modules));
-            spyOn(scope, "excludeDataElements").and.returnValue(utils.getPromise(q, modules));
-
-            scope.save(modules);
-            scope.$apply();
-            expect(scope.saveFailure).toBe(false);
+            expect(dataSetRepo.upsert).toHaveBeenCalledWith(expectedDatasets);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: expectedDatasets,
                 type: "associateDataset"
             }, "dataValues");
-
-            expect(dataSetRepo.upsert).toHaveBeenCalledWith(expectedDatasets);
         });
 
         it("should set datasets associated with module for edit", function() {
@@ -457,31 +616,70 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(scope.isDisabled).toBeTruthy();
         });
 
-        it("should update module datasets", function() {
+        it("should update system setting while updating module", function(){
             scope.orgUnit = {
                 "id": "mod2",
+                "name": "module OLD name",
                 "parent": {
-                    "id": "par1"
-                },
-                "dataSets": [{
-                    "id": "ds1",
-                    "name": "dataset1",
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "isNewDataModel"
-                        },
-                        "value": true
+                    "id": "par1",
+                    "name": "Par1"
+                }
+            };
+
+            var modules = [{
+                name: "module NEW name",
+                id: "newId",
+                serviceType: "Aggregate",
+                datasets: [{
+                    sections: [{
+                        dataElements: [{
+                            "id": "1",
+                            "isIncluded": false
+                        }, {
+                            "id": "2",
+                            "isIncluded": true
+                        }, {
+                            "id": "3",
+                            "isIncluded": false
+                        }]
                     }]
                 }]
-            };
+            }];
+
             scope.isNewMode = false;
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
-            spyOn(scope, "excludeDataElements").and.returnValue(utils.getPromise(q, []));
-
-            scope.update(scope.modules);
+            scope.update(modules);
             scope.$apply();
+            
+            expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith("par1");
 
-            expect(scope.excludeDataElements).toHaveBeenCalledWith('par1', scope.modules);
+            var expectedSystemSettingsPayload = {
+                projectId: 'par1',
+                settings: {
+                    excludedDataElements: {
+                        "newId": ['1', '3']
+                    }
+                }
+            };
+            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettingsPayload);
+
+            var hustlePayload = {
+                "projectId": "par1",
+                "settings": {
+                    "excludedDataElements": {
+                        "newId": ["1", "3"]
+                    }
+                },
+                "checksum": "5e543256c480ac577d30f76f9120eb74"
+            };
+
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: hustlePayload,
+                type: "excludeDataElements"
+            }, "dataValues");
         });
 
         it("should update module name", function() {
@@ -495,17 +693,30 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             var modules = [{
-                "name": "module NEW name",
-                "parent": {
-                    "id": "par1"
-                }
+                name: "module NEW name",
+                id: "newId",
+                serviceType: "Aggregate",
+                datasets: [{
+                    sections: [{
+                        dataElements: [{
+                            "id": "1",
+                            "isIncluded": false
+                        }, {
+                            "id": "2",
+                            "isIncluded": true
+                        }, {
+                            "id": "3",
+                            "isIncluded": false
+                        }]
+                    }]
+                }]
             }];
+
             scope.isNewMode = false;
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
 
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
-
             scope.update(modules);
             scope.$apply();
 
@@ -516,7 +727,21 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 level: 6,
                 openingDate: moment().format("YYYY-MM-DD"),
                 selectedDataset: undefined,
-                datasets: undefined,
+                enrichedProgram: undefined,
+                datasets: [{
+                    sections: [{
+                        dataElements: [{
+                            id: '1',
+                            isIncluded: false
+                        }, {
+                            id: '2',
+                            isIncluded: true
+                        }, {
+                            id: '3',
+                            isIncluded: false
+                        }]
+                    }]
+                }],
                 attributeValues: [{
                     attribute: {
                         code: 'Type',
@@ -535,45 +760,55 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     id: 'par1'
                 }
             }];
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModules);
-        });
 
-        it("should exclude modules", function() {
-            var modules = [{
-                "id": "mod1"
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModules);
+
+            var expectedPayload = [{
+                name: 'module NEW name',
+                shortName: 'module NEW name',
+                id: 'mod2',
+                level: 6,
+                openingDate: '2014-04-01',
+                selectedDataset: undefined,
+                datasets: [{
+                    sections: [{
+                        dataElements: [{
+                            id: '1',
+                            isIncluded: false
+                        }, {
+                            id: '2',
+                            isIncluded: true
+                        }, {
+                            id: '3',
+                            isIncluded: false
+                        }]
+                    }]
+                }],
+                enrichedProgram: undefined,
+                attributeValues: [{
+                    attribute: {
+                        code: 'Type',
+                        name: 'Type'
+                    },
+                    value: 'Module'
+                }, {
+                    attribute: {
+                        code: 'isLineListService',
+                        name: 'Is Linelist Service'
+                    },
+                    value: 'false'
+                }],
+                parent: {
+                    name: 'Par1',
+                    id: 'par1'
+                }
             }];
 
-            var settings = {
-                "excludedDataElements": {
-                    "mod1": []
-                }
-            };
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: expectedPayload,
+                type: "upsertOrgUnit"
+            }, "dataValues");
 
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {
-                "key": "proj1",
-                "value": settings
-            }));
-            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
-
-            scope.excludeDataElements("proj1", modules);
-            scope.$apply();
-
-            var expectedSystemSettings = {
-                projectId: 'proj1',
-                settings: settings
-            };
-
-            var expectedMessage = {
-                data: {
-                    projectId: 'proj1',
-                    settings: settings,
-                    checksum: md5(JSON.stringify(settings))
-                },
-                type: 'excludeDataElements'
-            };
-
-            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettings);
-            expect(hustle.publish).toHaveBeenCalledWith(expectedMessage, 'dataValues');
         });
 
         it("should return false if datasets for modules are selected", function() {
@@ -962,7 +1197,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             var expectedModule = {
-                 "id": "mod1",
+                "id": "mod1",
                 "program": {
                     "id": "surgery1",
                     "name": "Surgery"
@@ -985,10 +1220,10 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             spyOn(programsRepo, "getProgramAndStages").and.returnValue(utils.getPromise(q, program));
 
-            scope.getDetailedProgram(module1).then(function(data){
+            scope.getDetailedProgram(module1).then(function(data) {
                 expect(data).toEqual(expectedModule);
             });
-            
+
             scope.$apply();
 
         });
