@@ -93,10 +93,10 @@
                                     <div ng-repeat="programStage in module.enrichedProgram.programStages" ng-if="module.serviceType==='Linelist' &amp;&amp; module.enrichedProgram !== undefined">
                                         <div ng-repeat="section in programStage.programStageSections">
                                             <div class="collapse-head">
-                                                <h5 ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</h5>
-                                                <h5 ng-if="!resourceBundle[section.id]">{{section.name}}</h5>
+                                                <h5 ng-click="changeCollapsed(section.id)" ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</h5>
+                                                <h5 ng-click="changeCollapsed(section.id)" ng-if="!resourceBundle[section.id]">{{section.name}}</h5>
                                             </div>
-                                            <div collapse="false" class="collapse-body">
+                                            <div collapse="getCollapsed(section.id)" class="collapse-body">
                                                 <ul>
                                                     <li ng-repeat="de in section.programStageDataElements">
                                                         <label>

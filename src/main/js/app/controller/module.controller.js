@@ -129,6 +129,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.getDetailedProgram = function(module) {
+            $scope.collapseSection = {};
             if(_.isEmpty(module.program)){
                  module.program = {
                     'name': ''
@@ -139,6 +140,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             return programRepository.getProgramAndStages(module.program.id).then(function(enrichedProgram) {
                 _.forEach(enrichedProgram.programStages, function(programStage) {
                     _.forEach(programStage.programStageSections, function(programStageSection) {
+                        $scope.collapseSection[programStageSection.id] = true;
                         _.forEach(programStageSection.programStageDataElements, function(de) {
                             de.dataElement.isIncluded = true;
                         });
@@ -147,6 +149,14 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 module.enrichedProgram = enrichedProgram;
                 return module;
             });
+        };
+
+        $scope.changeCollapsed = function(sectionId){
+            $scope.collapseSection[sectionId] = !$scope.collapseSection[sectionId];
+        };
+
+        $scope.getCollapsed = function(sectionId){
+            return $scope.collapseSection[sectionId];
         };
 
         $scope.getSection = function(selectedDataSet, sectionId) {
