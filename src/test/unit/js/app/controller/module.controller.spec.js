@@ -616,7 +616,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(scope.isDisabled).toBeTruthy();
         });
 
-        it("should update system setting while updating module", function(){
+        it("should update system setting while updating module", function() {
             scope.orgUnit = {
                 "id": "mod2",
                 "name": "module OLD name",
@@ -653,7 +653,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             scope.update(modules);
             scope.$apply();
-            
+
             expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith("par1");
 
             var expectedSystemSettingsPayload = {
@@ -1179,6 +1179,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "name": "Surgery",
                 "programStages": [{
                     "programStageSections": [{
+                        "id": "sectionId",
                         "programStageDataElements": [{
                             "dataElement": {
                                 "id": "de1"
@@ -1207,6 +1208,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     "name": "Surgery",
                     "programStages": [{
                         "programStageSections": [{
+                            "id": "sectionId",
                             "programStageDataElements": [{
                                 "dataElement": {
                                     "id": "de1",
@@ -1222,10 +1224,31 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             scope.getDetailedProgram(module1).then(function(data) {
                 expect(data).toEqual(expectedModule);
+                expect(scope.collapseSection).toEqual({
+                    sectionId: true
+                });
             });
 
             scope.$apply();
+        });
 
+        it("should change collapsed", function() {
+            scope.collapseSection = {
+                "sectionId": true
+            };
+
+            scope.changeCollapsed("sectionId");
+            scope.$apply();
+
+            expect(scope.collapseSection.sectionId).toEqual(false);
+        });
+
+        it("should get collapsed for a section", function() {
+            scope.collapseSection = {
+                "sectionId": true
+            };
+
+            expect(scope.getCollapsed("sectionId")).toEqual(true);
         });
     });
 });
