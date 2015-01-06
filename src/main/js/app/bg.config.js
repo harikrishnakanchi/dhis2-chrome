@@ -65,6 +65,7 @@ require.config({
         "deleteEventConsumer": "app/consumer/delete.event.consumer",
         "dispatcher": "app/consumer/dispatcher",
         "downloadMetadataConsumer": "app/consumer/download.metadata.consumer",
+        "deleteApprovalConsumer": "app/consumer/delete.approval.consumer",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
 

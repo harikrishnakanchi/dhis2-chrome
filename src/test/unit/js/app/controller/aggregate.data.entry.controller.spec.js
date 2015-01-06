@@ -898,62 +898,19 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.isApproved).toBeTruthy();
             });
 
-            it("should mark as incomplete if data edited after completion", function() {
-                getLevelOneApprovalDataSpy.and.returnValue(utils.getPromise(q, {
-                    "foo": "bar"
-                }));
-                getLevelTwoApprovalDataSpy.and.returnValue(utils.getPromise(q, undefined));
-                spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, {
-                    "foo": "bar"
-                }));
-                spyOn(approvalDataRepository, "unapproveLevelTwoData").and.returnValue(utils.getPromise(q, undefined));
+            it("should delete approvals if data is edited", function() {
+                spyOn(approvalDataRepository, "unapproveLevelOneData");
+                spyOn(approvalDataRepository, "unapproveLevelTwoData");
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
                 spyOn(hustle, "publish");
 
-                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
+                scope.currentGroupedSections = {
+                    "ds1": [],
+                    "ds2": []
+                };
 
-
-                scope.submit();
-                scope.$apply();
-
-                expect(dataRepository.save).toHaveBeenCalled();
-                expect(approvalDataRepository.unapproveLevelOneData).toHaveBeenCalledWith('2014W14', 'mod2');
-                expect(hustle.publish.calls.argsFor(0)).toEqual([{
-                    data: {
-                        "foo": "bar"
-                    },
-                    type: 'uploadCompletionData'
-                }, 'dataValues']);
-                expect(hustle.publish.calls.argsFor(1)).toEqual([{
-                    data: {
-                        ok: 'ok'
-                    },
-                    type: 'uploadDataValues'
-                }, 'dataValues']);
-            });
-
-            it("should mark as unapproved and incomplete if data edited after approval", function() {
-                getLevelOneApprovalDataSpy.and.returnValue(utils.getPromise(q, {
-                    "foo": "bar"
-                }));
-
-                getLevelTwoApprovalDataSpy.and.returnValue(utils.getPromise(q, {
-                    "blah": "moreBlah"
-                }));
-
-                spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, {
-                    "foo": "bar"
-                }));
-
-                spyOn(approvalDataRepository, "unapproveLevelTwoData").and.returnValue(utils.getPromise(q, {
-                    "blah": "moreBlah"
-                }));
-
-                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                spyOn(hustle, "publish");
-
-                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
-
+                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db,
+                    dataRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
 
                 scope.submit();
                 scope.$apply();
@@ -964,23 +921,11 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 expect(hustle.publish.calls.argsFor(0)).toEqual([{
                     data: {
-                        "blah": "moreBlah"
+                        "ds": ["ds1", "ds2"],
+                        "pe": "2014W14",
+                        "ou": "mod2"
                     },
-                    type: 'uploadApprovalData'
-                }, 'dataValues']);
-
-                expect(hustle.publish.calls.argsFor(1)).toEqual([{
-                    data: {
-                        "foo": "bar"
-                    },
-                    type: 'uploadCompletionData'
-                }, 'dataValues']);
-
-                expect(hustle.publish.calls.argsFor(2)).toEqual([{
-                    data: {
-                        ok: 'ok'
-                    },
-                    type: 'uploadDataValues'
+                    type: 'deleteApproval'
                 }, 'dataValues']);
             });
         });

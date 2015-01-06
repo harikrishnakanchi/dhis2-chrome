@@ -1,7 +1,7 @@
 define([], function() {
     return function($q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
         downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
-        downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer) {
+        downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer) {
         this.run = function(message) {
             switch (message.data.type) {
                 case "downloadMetadata":
@@ -20,6 +20,8 @@ define([], function() {
                             return uploadCompletionDataConsumer.run(message);
                         });
                     });
+                case "deleteApproval":
+                    return deleteApprovalConsumer.run(message);
                 case "uploadApprovalData":
                     return downloadDataConsumer.run(message).then(function() {
                         return downloadApprovalConsumer.run(message).then(function() {

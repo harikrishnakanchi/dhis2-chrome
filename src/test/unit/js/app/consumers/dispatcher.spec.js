@@ -2,7 +2,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
     describe("dispatcher", function() {
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, scope,
             systemSettingConsumer, createUserConsumer, updateUserConsumer, programConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
-            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer;
+            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -56,6 +56,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadApprovalConsumer = {
                 'run': jasmine.createSpy("downloadApprovalConsumer")
             };
+            deleteApprovalConsumer = {
+                'run': jasmine.createSpy("deleteApprovalConsumer")
+            };
             downloadMetadataConsumer = {
                 'run': jasmine.createSpy("downloadMetadataConsumer")
             };
@@ -72,7 +75,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
             dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
-                downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer);
+                downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -269,6 +272,17 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(downloadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call delete approval consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "deleteApproval"
+            };
+
+            dispatcher.run(message);
+
+            expect(deleteApprovalConsumer.run).toHaveBeenCalledWith(message);
         });
     });
 });

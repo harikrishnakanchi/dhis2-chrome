@@ -121,10 +121,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 }, $scope.resourceBundle.reapprovalConfirmationMessage);
             } else {
                 save(false)
-                .then(approvalHelper.markDataAsComplete)
-                .then(approvalHelper.markDataAsApproved)
-                .then(approvalHelper.markDataAsAccepted)
-                .then(successPromise, errorPromise);
+                    .then(approvalHelper.markDataAsComplete)
+                    .then(approvalHelper.markDataAsApproved)
+                    .then(approvalHelper.markDataAsAccepted)
+                    .then(successPromise, errorPromise);
             }
         };
 
@@ -213,31 +213,24 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             var unapproveData = function(payload) {
-                var saveCompletionToDhis = function(approvalData) {
-                    if (!approvalData) return;
+                var unapproveOnDHIS = function() {
                     return $hustle.publish({
-                        "data": approvalData,
-                        "type": "uploadCompletionData"
+                        "data": {
+                            "ds": _.keys($scope.currentGroupedSections),
+                            "pe": getPeriod(),
+                            "ou": $scope.currentModule.id
+                        },
+                        "type": "deleteApproval"
                     }, "dataValues");
                 };
 
-                var saveApprovalToDhis = function(approvalData) {
-                    if (!approvalData) return;
-                    return $hustle.publish({
-                        "data": approvalData,
-                        "type": "uploadApprovalData"
-                    }, "dataValues");
+                var unapproveLocally = function() {
+                    return $q.all([approvalDataRepository.unapproveLevelTwoData(period, $scope.currentModule.id),
+                        approvalDataRepository.unapproveLevelOneData(period, $scope.currentModule.id)
+                    ]);
                 };
 
-                var unapproveLevelOne = function() {
-                    return approvalDataRepository.unapproveLevelOneData(period, $scope.currentModule.id).then(saveCompletionToDhis);
-                };
-
-                var unapproveLevelTwo = function() {
-                    return approvalDataRepository.unapproveLevelTwoData(period, $scope.currentModule.id).then(saveApprovalToDhis);
-                };
-
-                return unapproveLevelTwo().then(unapproveLevelOne).then(function() {
+                return unapproveLocally().then(unapproveOnDHIS).then(function() {
                     return payload;
                 });
             };
