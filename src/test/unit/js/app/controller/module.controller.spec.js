@@ -1225,7 +1225,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.getDetailedProgram(module1).then(function(data) {
                 expect(data).toEqual(expectedModule);
                 expect(scope.collapseSection).toEqual({
-                    sectionId: true
+                    sectionId: false
                 });
             });
 

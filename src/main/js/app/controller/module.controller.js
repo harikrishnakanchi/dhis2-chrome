@@ -74,6 +74,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                     };
 
                     var setUpModuleInformation = function() {
+                        var setCollapsedPropertyForSection = function() {
+                            $scope.collapseSection = {};
+                            _.forEach($scope.orgUnit.enrichedProgram.programStages, function(programStage) {
+                                _.forEach(programStage.programStageSections, function(programStageSection) {
+                                    $scope.collapseSection[programStageSection.id] = true;
+                                });
+                                $scope.collapseSection[programStage.programStageSections[0].id] = false;
+                            });
+                        };
+
+                        if (!_.isEmpty($scope.orgUnit.enrichedProgram))
+                            setCollapsedPropertyForSection();
                         $scope.modules.push({
                             'id': $scope.orgUnit.id,
                             'name': $scope.orgUnit.name,
@@ -130,13 +142,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.getDetailedProgram = function(module) {
             $scope.collapseSection = {};
-            if(_.isEmpty(module.program)){
-                 module.program = {
+            if (_.isEmpty(module.program)) {
+                module.program = {
                     'name': ''
                 };
                 return module;
             }
-               
+
             return programRepository.getProgramAndStages(module.program.id).then(function(enrichedProgram) {
                 _.forEach(enrichedProgram.programStages, function(programStage) {
                     _.forEach(programStage.programStageSections, function(programStageSection) {
@@ -145,17 +157,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                             de.dataElement.isIncluded = true;
                         });
                     });
+                    $scope.collapseSection[programStage.programStageSections[0].id] = false;
                 });
                 module.enrichedProgram = enrichedProgram;
                 return module;
             });
         };
 
-        $scope.changeCollapsed = function(sectionId){
+        $scope.changeCollapsed = function(sectionId) {
             $scope.collapseSection[sectionId] = !$scope.collapseSection[sectionId];
         };
 
-        $scope.getCollapsed = function(sectionId){
+        $scope.getCollapsed = function(sectionId) {
             return $scope.collapseSection[sectionId];
         };
 
@@ -264,10 +277,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         var getModulesOfServiceType = function(serviceType, modules) {
-                return _.filter(modules, function(m) {
-                    return m.serviceType === serviceType;
-                });
-            };
+            return _.filter(modules, function(m) {
+                return m.serviceType === serviceType;
+            });
+        };
 
         $scope.save = function(modules) {
             var onSuccess = function(enrichedModules) {
