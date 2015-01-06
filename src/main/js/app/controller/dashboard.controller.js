@@ -49,7 +49,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
                 var selectWeekFlag = true;
                 _.forEach($scope.itemsAwaitingApprovalAtUserLevel, function(item) {
                     _.forEach(item.status, function(status) {
-                        if (status.shouldBeApproved === false)
+                        if (status.shouldBeApproved === false || status.shouldBeApproved === undefined)
                             selectWeekFlag = false;
                     });
                     $scope.weeks.approveAllItems = selectWeekFlag;
