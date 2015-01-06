@@ -193,7 +193,11 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 data: {
                     projectId: projectId,
                     settings: expectedSystemSettings,
-                    checksum: md5(JSON.stringify(expectedSystemSettings))
+                    indexedDbOldSystemSettings: {
+                        excludedDataElements: {
+                            1: ['1', '3']
+                        }
+                    }
                 },
                 type: "excludeDataElements",
             };
@@ -302,7 +306,12 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var hustlePayload = {
                 "projectId": "someid",
                 "settings": expectedSystemSettingsPayload.settings,
-                "checksum": "ba6cc7d4ebf83a95b3c7beb5c5cb7c15"
+                "indexedDbOldSystemSettings": {
+                    "excludedDataElements": {
+                        "module3": ["de3", "de4"],
+                        "adba40b7157": ["de4"]
+                    }
+                }
             };
 
             expect(hustle.publish).toHaveBeenCalledWith({
@@ -680,7 +689,9 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                         "newId": ["1", "3"]
                     }
                 },
-                "checksum": "5e543256c480ac577d30f76f9120eb74"
+                "indexedDbOldSystemSettings": {
+                    "excludedDataElements": {}
+                }
             };
 
             expect(hustle.publish).toHaveBeenCalledWith({

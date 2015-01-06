@@ -251,19 +251,19 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         var saveSystemSettingsForExcludedDataElements = function(parentId, aggModules, linelistModules) {
             var saveSystemSettings = function(newSystemSettings, projectId) {
                 return systemSettingRepository.getAllWithProjectId(projectId).then(function(data) {
-                    var checksum = md5(JSON.stringify(data ? data.value : undefined));
-                    var existingSystemSettings = (_.isEmpty(data)) ? {} :   data.value.excludedDataElements;
+                    var existingSystemSettings = (_.isEmpty(data)) ? {} : data.value.excludedDataElements;
                     var systemSettings = {
-                        'excludedDataElements': _.merge(existingSystemSettings, newSystemSettings)
+                        'excludedDataElements': _.merge(_.cloneDeep(existingSystemSettings), newSystemSettings)
                     };
                     var payload = {
                         "projectId": projectId,
                         "settings": systemSettings
                     };
 
+                    var oldIndexedDbSystemSettings = (_.isEmpty(data)) ? {'excludedDataElements': {}} : data.value;
                     return systemSettingRepository.upsert(payload).then(function() {
                         var hustlePayload = _.cloneDeep(payload);
-                        hustlePayload.checksum = checksum;
+                        hustlePayload.indexedDbOldSystemSettings = oldIndexedDbSystemSettings;
                         return publishMessage(hustlePayload, "excludeDataElements").then(function() {
                             return;
                         });
@@ -274,7 +274,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var systemSettingsForAggregateModules = systemSettingsTransformer.constructSystemSettings(aggModules);
             var systemSettingsForLineListModules = systemSettingsTransformer.constructSystemSettings(linelistModules, true);
             var newSystemSettings = _.merge(systemSettingsForAggregateModules, systemSettingsForLineListModules);
-            
+
             return saveSystemSettings(newSystemSettings, parentId);
         };
 

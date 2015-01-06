@@ -14,40 +14,58 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5"], f
             httpBackend.verifyNoOutstandingRequest();
         });
 
-        it("should post excluded data elements for a project if checksum is same", function() {
-            var projectId = "12445";
-            var expectedSystemSettings = {
+        it("should post correct systemsettings for excludedDataElements ", function() {
+            var systemSettingsAlreadyStoredInIndexedDb = {
                 "excludedDataElements": {
-                    "1": ["123452", "123457"]
+                    "mod1": [
+                        "de1"
+                    ],
+                    "mod2": [
+                        "de2"
+                    ]
                 }
             };
-            var systemSetting = {
-                projectId: projectId,
-                settings: expectedSystemSettings,
-                checksum: md5(JSON.stringify("1234"))
-            };
-            service.excludeDataElements(systemSetting);
 
-            httpBackend.expectGET(properties.dhis.url + "/api/systemSettings/" + projectId).respond(200, "1234");
+            var projectId = "prj1";
+            var newSystemSettingForModules = {
+                projectId: projectId,
+                settings: {
+                    "excludedDataElements": {
+                        "mod1": ["de1", "de2"],
+                        "mod3": ["de4"]
+                    }
+                },
+                indexedDbOldSystemSettings: systemSettingsAlreadyStoredInIndexedDb
+            };
+
+            service.excludeDataElements(newSystemSettingForModules);
+
+            var systemSettingsAlreadyStoredInDhis = {
+                "excludedDataElements": {
+                    "mod1": [
+                        "de1"
+                    ],
+                    "mod2": [
+                        "de2", "de3"
+                    ]
+                }
+            };
+
+            httpBackend.expectGET(properties.dhis.url + "/api/systemSettings/" + projectId).respond(200, systemSettingsAlreadyStoredInDhis);
+
+            var expectedSystemSettings = {
+                "excludedDataElements": {
+                    "mod1": [
+                        "de1", "de2"
+                    ],
+                    "mod2": [
+                        "de2", "de3"
+                    ],
+                    "mod3": ["de4"]
+                }
+            };
+
             httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/" + projectId, expectedSystemSettings).respond(200, "ok");
-            httpBackend.flush();
-        });
-
-        it("should not post the excluded data elements if the checksum is not the same", function() {
-            var projectId = "12445";
-            var expectedSystemSettings = {
-                "excludedDataElements": {
-                    "1": ["123452", "123457"]
-                }
-            };
-            var systemSetting = {
-                projectId: projectId,
-                settings: expectedSystemSettings,
-                checksum: md5("123")
-            };
-            service.excludeDataElements(systemSetting);
-
-            httpBackend.expectGET(properties.dhis.url + "/api/systemSettings/" + projectId).respond(200, "1234");
             httpBackend.flush();
         });
     });
