@@ -58,7 +58,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
         };
 
         var reloadEventsView = function() {
-            var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
+            var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
             var programIdsInCurrentModule = $scope.programsInCurrentModule;
             $scope.allEvents = [];
             return _.forEach(programIdsInCurrentModule, function(programId) {
@@ -252,7 +252,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 $timeout(hideMessage, properties.messageTimeout);
             };
 
-            var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
+            var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
             var currentModule = $scope.currentModule.id;
 
             return programEventRepository.markEventsAsSubmitted(programId, period, currentModule)

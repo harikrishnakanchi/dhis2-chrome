@@ -46,7 +46,7 @@ define(["moment", "lodash"], function(moment, _) {
 
         var downloadEventsData = function() {
             return programEventRepository.getLastUpdatedPeriod().then(function(lastUpdatedPeriod) {
-                var m = moment(lastUpdatedPeriod, "GGGG[W]WW");
+                var m = moment(lastUpdatedPeriod, "GGGG[W]W");
                 var startDate = m.format("YYYY-MM-DD");
                 return $q.all([eventService.getRecentEvents(startDate), programEventRepository.getEventsFromPeriod(lastUpdatedPeriod)]);
             });

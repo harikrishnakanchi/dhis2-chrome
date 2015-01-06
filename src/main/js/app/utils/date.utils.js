@@ -1,6 +1,6 @@
 define(["moment", "lodash"], function(moment, _) {
     var toDhisFormat = function(m) {
-        return m.format("GGGG[W]WW");
+        return m.format("GGGG[W]W");
     };
 
     var max = function(dateStrings) {

@@ -41,7 +41,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 };
 
                 var setSelectedWeek = function(period) {
-                    var m = moment(period, "GGGG[W]WW");
+                    var m = moment(period, "GGGG[W]W");
 
                     $scope.year = m.year();
                     $scope.month = m.month();
