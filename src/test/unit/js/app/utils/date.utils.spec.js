@@ -24,9 +24,9 @@ define(["dateUtils", "moment", "timecop"], function(dateUtils, moment, timecop) 
         });
 
         it("should adjust for timezones and return max time", function() {
-            var timeStrings = ["Wed Dec 31 2014 11:54:32 GMT+0530", "Wed Dec 31 2014 11:50:32 GMT"];
+            var timeStrings = ["2014-05-30T12:00:00.000Z", "2014-05-30T18:00:00.000+0530"];
             var actualResult = dateUtils.max(timeStrings);
-            expect(actualResult).toEqual(moment("Wed Dec 31 2014 11:50:32 GMT"));
+            expect(actualResult).toEqual(moment("2014-05-30T18:00:00.000+0530"));
         });
     });
 });
