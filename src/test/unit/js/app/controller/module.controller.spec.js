@@ -268,7 +268,18 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             var modules = [aggregateModule, LinelistModule];
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+
+            var data = {
+                "key": "someid",
+                "value": {
+                    "excludedDataElements": {
+                        "module3": ["de3", "de4"],
+                        "adba40b7157": ["de4"]
+                    }
+                }
+            };
+
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, data));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             scope.save(modules);
             scope.$apply();
@@ -280,6 +291,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "projectId": "someid",
                 "settings": {
                     "excludedDataElements": {
+                        "module3": ["de3", "de4"],
                         "adba40b7157": ["de1"],
                         "a1ab18b5fdd": ["de3"]
                     }
@@ -289,13 +301,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var hustlePayload = {
                 "projectId": "someid",
-                "settings": {
-                    "excludedDataElements": {
-                        "adba40b7157": ["de1"],
-                        "a1ab18b5fdd": ["de3"]
-                    }
-                },
-                "checksum": "5e543256c480ac577d30f76f9120eb74"
+                "settings": expectedSystemSettingsPayload.settings,
+                "checksum": "ba6cc7d4ebf83a95b3c7beb5c5cb7c15"
             };
 
             expect(hustle.publish).toHaveBeenCalledWith({

@@ -249,9 +249,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         var saveSystemSettingsForExcludedDataElements = function(parentId, aggModules, linelistModules) {
-            var saveSystemSettings = function(systemSettings, projectId) {
+            var saveSystemSettings = function(newSystemSettings, projectId) {
                 return systemSettingRepository.getAllWithProjectId(projectId).then(function(data) {
                     var checksum = md5(JSON.stringify(data ? data.value : undefined));
+                    var existingSystemSettings = (_.isEmpty(data)) ? {} :   data.value.excludedDataElements;
+                    var systemSettings = {
+                        'excludedDataElements': _.merge(existingSystemSettings, newSystemSettings)
+                    };
                     var payload = {
                         "projectId": projectId,
                         "settings": systemSettings
@@ -269,11 +273,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
             var systemSettingsForAggregateModules = systemSettingsTransformer.constructSystemSettings(aggModules);
             var systemSettingsForLineListModules = systemSettingsTransformer.constructSystemSettings(linelistModules, true);
-            var systemSettings = {
-                'excludedDataElements': _.merge(systemSettingsForAggregateModules, systemSettingsForLineListModules)
-            };
-
-            return saveSystemSettings(systemSettings, parentId);
+            var newSystemSettings = _.merge(systemSettingsForAggregateModules, systemSettingsForLineListModules);
+            
+            return saveSystemSettings(newSystemSettings, parentId);
         };
 
         var getModulesOfServiceType = function(serviceType, modules) {
