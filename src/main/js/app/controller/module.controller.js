@@ -84,27 +84,62 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                             });
                         };
 
-                        if (!_.isEmpty($scope.orgUnit.enrichedProgram))
-                            setCollapsedPropertyForSection();
-                        $scope.modules.push({
-                            'id': $scope.orgUnit.id,
-                            'name': $scope.orgUnit.name,
-                            'enrichedProgram': $scope.orgUnit.enrichedProgram,
-                            'allDatasets': getNonAssociatedDatasets(),
-                            'datasets': associatedDatasets,
-                            'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
-                            'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
-                            'program': findAssociatedModule(),
-                            "dataModelType": dataModelType
-                        });
+                        var getEnrichedProgram = function(systemSettings) {
+                            return programRepository.getProgramAndStages(findAssociatedModule().id).then(function(program) {
+                                _.forEach(program.programStages, function(programStage) {
+                                    _.forEach(programStage.programStageSections, function(programStageSection) {
+                                        _.forEach(programStageSection.programStageDataElements, function(de) {
+                                            if (_.contains(systemSettings.value.excludedDataElements[$scope.orgUnit.id], de.dataElement.id)) {
+                                                de.dataElement.isIncluded = false;
+                                            } else {
+                                                de.dataElement.isIncluded = true;
+                                            }
+                                        });
+                                    });
+                                });
+                                return program;
+                            });
+                        };
 
-                        var isDisabled = _.find($scope.orgUnit.attributeValues, {
-                            "attribute": {
-                                "code": "isDisabled"
-                            }
-                        });
-                        $scope.isDisabled = isDisabled && isDisabled.value;
-                        $scope.updateDisabled = !_.all(associatedDatasets, isNewDataModel) || $scope.isDisabled;
+                        var getSystemSettings = function() {
+                            return systemSettingRepository.getAllWithProjectId($scope.orgUnit.parent.id).then(function(data) {
+                                return data;
+                            });
+                        };
+
+                        var setUpModule = function(data) {
+                            if(data)
+                                $scope.orgUnit.enrichedProgram = data;
+
+                            if (!_.isEmpty($scope.orgUnit.enrichedProgram))
+                                setCollapsedPropertyForSection();
+                            $scope.modules.push({
+                                'id': $scope.orgUnit.id,
+                                'name': $scope.orgUnit.name,
+                                'enrichedProgram': $scope.orgUnit.enrichedProgram,
+                                'allDatasets': getNonAssociatedDatasets(),
+                                'datasets': associatedDatasets,
+                                'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
+                                'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
+                                'program': findAssociatedModule(),
+                                "dataModelType": dataModelType
+                            });
+
+                            var isDisabled = _.find($scope.orgUnit.attributeValues, {
+                                "attribute": {
+                                    "code": "isDisabled"
+                                }
+                            });
+                            $scope.isDisabled = isDisabled && isDisabled.value;
+                            $scope.updateDisabled = !_.all(associatedDatasets, isNewDataModel) || $scope.isDisabled;
+                        };
+
+                        if (isLinelistService()) {
+                            getSystemSettings().then(getEnrichedProgram).then(setUpModule);
+                        } else {
+                            setUpModule();
+                        }
+
                     };
 
                     var getAllModules = function() {
