@@ -101,6 +101,12 @@ gulp.task('download-org', function() {
         .pipe(gulp.dest(path.dirname("src/main/data/organisationUnits.json")));
 });
 
+gulp.task('download-org-unit-groups', function() {
+    return download(base_url + "/api/organisationUnitGroups.json?paging=false&fields=[:all]", auth)
+        .pipe(rename("organisationUnitGroups.json"))
+        .pipe(gulp.dest(path.dirname("src/main/data/organisationUnitGroups.json")));
+});
+
 gulp.task('download-systemSettings', function() {
     return download(base_url + "/api/systemSettings.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
@@ -110,7 +116,7 @@ gulp.task('download-translations', function() {
         .pipe(gulp.dest(path.dirname("src/main/data/translations.json")));
 });
 
-gulp.task('download-metadata', ['download-org', 'download-systemSettings', 'download-translations'], function() {
+gulp.task('download-metadata', ['download-org', 'download-org-unit-groups', 'download-systemSettings', 'download-translations'], function() {
     return download(base_url + "/api/metadata.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });

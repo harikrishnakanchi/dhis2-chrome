@@ -63,6 +63,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             var findCall = 0;
             setupLocalFileHttpRequest(today);
             httpBackend.expectGET("/data/organisationUnits.json").respond(200, {});
+            httpBackend.expectGET("/data/organisationUnitGroups.json").respond(200, {});
             httpBackend.expectGET("/data/systemSettings.json").respond(200, {});
             httpBackend.expectGET("/data/translations.json").respond(200, {});
 
@@ -76,7 +77,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 type: 'metaData',
                 lastUpdatedTime: today
             });
-            expect(mockStore.upsert.calls.count()).toEqual(5);
+            expect(mockStore.upsert.calls.count()).toEqual(6);
         });
 
         it("should trasform and sync program data", function() {

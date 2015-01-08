@@ -74,6 +74,8 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
                     return upsertMetadata(data)
                         .then(getLocalOrgUnits)
                         .then(upsertOrgUnits)
+                        .then(getLocalOrgUnitGroups)
+                        .then(upsertOrgUnitGroups)
                         .then(getLocalSystemSettings)
                         .then(upsertSystemSettings)
                         .then(getLocalTranslations)
@@ -101,6 +103,11 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
         var getLocalOrgUnits = function() {
             console.debug("Fetching /data/organisationUnits.json");
             return $http.get("/data/organisationUnits.json").then(getDataFromResponse);
+        };
+
+        var getLocalOrgUnitGroups = function(){
+            console.debug("Fetching /data/organisationUnitGroups.json");
+            return $http.get("/data/organisationUnitGroups.json").then(getDataFromResponse);
         };
 
         var tryParseJson = function(val) {
@@ -143,6 +150,12 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
             console.debug("Processing organisationUnits ", data);
             var store = db.objectStore("organisationUnits");
             return store.upsert(data.organisationUnits);
+        };
+
+        var upsertOrgUnitGroups = function(data){
+            console.debug("Processing organisationUnitGroups ", data);
+            var store = db.objectStore("orgUnitGroups");
+            return store.upsert(data.organisationUnitGroups);
         };
 
         this.loadMetadataFromFile = function() {
