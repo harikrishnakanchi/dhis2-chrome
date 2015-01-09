@@ -8,7 +8,12 @@ define([], function() {
         });
     };
 
+    var post = function(apiUrl, payload) {
+        return httpService.post(baseUrl + apiUrl, payload);
+    };
+
     return {
-        "GET": get
+        "GET": get,
+        "POST": post
     };
 });

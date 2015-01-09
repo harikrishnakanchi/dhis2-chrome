@@ -16,9 +16,15 @@ define([], function() {
         return store.delete(key);
     };
 
+    var get = function(storeName, key) {
+        var store = db.objectStore(storeName);
+        return store.find(key);
+    };
+
     return {
         "upsert": upsert,
         "clear": clear,
-        "deleteRecord": deleteRecord
+        "deleteRecord": deleteRecord,
+        "get": get
     };
 });
