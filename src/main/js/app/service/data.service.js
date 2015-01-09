@@ -6,7 +6,6 @@ define(["lodash", "moment", "dhisUrl"], function(_, moment, dhisUrl) {
                 return response.data;
             };
 
-
             return $http.get(dhisUrl.dataValueSets, {
                 "params": {
                     "orgUnit": orgUnitIds,

@@ -11,10 +11,11 @@ require.config({
     baseUrl: '/base/main/js',
     paths: {
         angular: 'lib/angular/angular',
-        angularMocks: 'lib/angular-mocks/angular-mocks',
-        testData: '../../test/unit/js/data/test.data',
-        utils: '../../test/unit/js/app/utils/utils',
-        mockChrome: '../../test/unit/js/app/utils/mockChrome'
+        lodash: 'lib/lodash/dist/lodash',
+        utils: '../../test/integration/js/utils/utils',
+        idbUtils: '../../test/integration/js/utils/idb.utils',
+        httpTestUtils: '../../test/integration/js/utils/http.utils',
+        testData: '../../test/integration/js/data/test.data'
     },
     shim: {
         'angular': {
@@ -24,9 +25,12 @@ require.config({
             deps: ['angular'],
             'exports': 'angular.mock'
         },
+        'testApp': {
+            deps: ['angular']
+        }
     }
 });
 
 console.log("load complete");
-console.log = function() {}
-console.debug = function() {}
+console.log = function() {};
+console.debug = function() {};

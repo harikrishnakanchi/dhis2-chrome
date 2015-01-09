@@ -9,6 +9,7 @@ var protractor = require('gulp-protractor').protractor;
 var download = require('gulp-download');
 var argv = require('yargs').argv;
 var karmaConf = 'src/test/unit/conf/karma.conf.js';
+var karmaIntConf = 'src/test/integration/conf/karma.conf.js';
 var webserver;
 var fs = require('fs');
 var rename = require('gulp-rename');
@@ -38,6 +39,15 @@ gulp.task('devtest', function() {
     return gulp.src('_')
         .pipe(karma({
             configFile: karmaConf,
+            action: 'watch',
+            preprocessors: {}
+        }));
+});
+
+gulp.task('itest', function() {
+    return gulp.src('_')
+        .pipe(karma({
+            configFile: karmaIntConf,
             action: 'watch',
             preprocessors: {}
         }));
