@@ -15,7 +15,7 @@ require.config({
         utils: '../../test/integration/js/utils/utils',
         idbUtils: '../../test/integration/js/utils/idb.utils',
         httpTestUtils: '../../test/integration/js/utils/http.utils',
-        testData: '../../test/integration/js/data/test.data'
+        dataValueBuilder: '../../test/integration/js/builders/data.value.builder'
     },
     shim: {
         'angular': {

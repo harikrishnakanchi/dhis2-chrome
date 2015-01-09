@@ -1,4 +1,4 @@
-define(["idbUtils", "httpTestUtils", "testData", "lodash"], function(idbUtils, http, testData, _) {
+define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idbUtils, http, dataValueBuilder, _) {
     describe("sync data values", function() {
         var hustle, q, userPrefs;
 
@@ -33,26 +33,26 @@ define(["idbUtils", "httpTestUtils", "testData", "lodash"], function(idbUtils, h
             }, "dataValues");
         };
 
-        var verify = function(actual, expected) {
-            var expectedDataValues = expected.dataValues;
-            var actualDataValues = actual.dataValues;
+        var setUpVerify = function(getActualDataCallback, expectedData, done) {
+            var verify = function(actual, expected) {
+                var expectedDataValues = expected.dataValues;
+                var actualDataValues = actual.dataValues;
 
-            var findCorrespondingActualDV = function(expectedDV) {
-                return _.find(actualDataValues, {
-                    'dataElement': expectedDV.dataElement,
-                    'categoryOptionCombo': expectedDV.categoryOptionCombo,
-                    'attributeOptionCombo': expectedDV.attributeOptionCombo
+                var findCorrespondingActualDV = function(expectedDV) {
+                    return _.find(actualDataValues, {
+                        'dataElement': expectedDV.dataElement,
+                        'categoryOptionCombo': expectedDV.categoryOptionCombo,
+                        'attributeOptionCombo': expectedDV.attributeOptionCombo
+                    });
+                };
+
+                _.forEach(expectedDataValues, function(expectedDV) {
+                    var actualDV = findCorrespondingActualDV(expectedDV);
+                    expect(actualDV).not.toBeUndefined();
+                    expect(actualDV.value).toEqual(expectedDV.value);
                 });
             };
 
-            _.forEach(expectedDataValues, function(expectedDV) {
-                var actualDV = findCorrespondingActualDV(expectedDV);
-                expect(actualDV).not.toBeUndefined();
-                expect(actualDV.value).toEqual(expectedDV.value);
-            });
-        };
-
-        var setUpVerify = function(getActualDataCallback, expectedData, done) {
             var onSuccess = function(actualData) {
                 verify(actualData, expectedData);
                 done();
@@ -80,7 +80,11 @@ define(["idbUtils", "httpTestUtils", "testData", "lodash"], function(idbUtils, h
             var orgUnitId = "e3e286c6ca8";
             var period = "2014W50";
             var datasetId = "a170b8cd5e5";
-            var idbData = testData.uploadDataValues1_IDBPayload;
+            var idbData = dataValueBuilder.build({
+                "period": period,
+                "lastUpdated": "2015-01-08T00:00:00",
+                "values": ["9", "9"]
+            });
 
             var setupData = function() {
                 return q.all([idbUtils.upsert("userPreferences", userPrefs), idbUtils.upsert('dataValues', idbData)]);
@@ -101,12 +105,22 @@ define(["idbUtils", "httpTestUtils", "testData", "lodash"], function(idbUtils, h
             setupData().then(_.curry(setUpVerify)(remoteCopy, idbData, done)).then(_.curry(publishUploadMessage)(period, orgUnitId));
         });
 
-        it("should reject local data values on uploadDataValues", function(done) {
+        it("should overwrite local changes from dhis data", function(done) {
             var orgUnitId = "e3e286c6ca8";
             var period = "2014W51";
             var datasetId = "a170b8cd5e5";
-            var idbData = testData.uploadDataValues2_IDBPayload;
-            var dhisData = testData.uploadDataValues2_DHISPayload;
+
+            var idbData = dataValueBuilder.build({
+                "period": period,
+                "lastUpdated": "2015-01-01T04:00:00",
+                "values": ["9", "9"]
+            });
+
+            var dhisData = dataValueBuilder.build({
+                "period": period,
+                "lastUpdated": "2015-01-02T06:00:00",
+                "values": ["19", "19"]
+            });
 
             var setupData = function() {
                 return q.all([idbUtils.upsert("userPreferences", userPrefs), http.POST('/api/dataValueSets', dhisData), idbUtils.upsert('dataValues', idbData)]);
