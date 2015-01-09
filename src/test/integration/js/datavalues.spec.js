@@ -67,12 +67,6 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
                 getActualDataCallback.apply().then(onSuccess, onError);
             });
 
-            chrome.runtime.onMessage.addListener('uploadDataValuesFailed', function() {
-                console.error("hustle publish failed");
-                expect(undefined).toBeDefined();
-                done();
-            });
-
             return q.when([]);
         };
 
