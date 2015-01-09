@@ -32,6 +32,7 @@ module.exports = function(config) {
             }
         },
         logLevel: config.LOG_ERROR,
+        browserNoActivityTimeout: 30000,
         junitReporter: {
             outputFile: 'test/integration/coverage/test-results.xml'
         }
