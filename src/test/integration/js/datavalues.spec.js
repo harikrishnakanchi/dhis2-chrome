@@ -1,15 +1,16 @@
 define(["idbUtils", "httpTestUtils", "testData", "lodash"], function(idbUtils, http, testData, _) {
     describe("sync data values", function() {
-        var hustle;
+        var hustle, q;
 
         beforeEach(function() {
             jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
             hustle = dhis.injector.get("$hustle");
+            q = dhis.injector.get("$q");
         });
 
         it("should upload datavalues when there is no conflicts", function(done) {
             var orgUnitId = "e3e286c6ca8";
-            var period = "2014W28";
+            var period = "2014W50";
             var datasetId = "a170b8cd5e5";
             var idbData = testData.uploadDataValuesIDBPayload;
 
@@ -64,22 +65,27 @@ define(["idbUtils", "httpTestUtils", "testData", "lodash"], function(idbUtils, h
                 });
             };
 
-            var testThisScenario = function() {
+            var setUpVerify = function() {
                 var onSuccess = function(data) {
                     verify(data.data);
                     clearIDB();
                     done();
                 };
+
                 var onError = function() {
                     clearIDB();
                     expect(undefined).toBeDefined();
                     done();
                 };
-                setupData().then(publishHustle).then(function() {
-                    setTimeout(function() {
-                        getValuesFromDHIS().then(onSuccess, onError);
-                    }, 8000);
+
+                chrome.runtime.onMessage.addListener('uploadDataValuesDone', function() {
+                    getValuesFromDHIS().then(onSuccess, onError);
                 });
+                return q.when([]);
+            };
+
+            var testThisScenario = function() {
+                setupData().then(setUpVerify).then(publishHustle);
             };
 
             testThisScenario();

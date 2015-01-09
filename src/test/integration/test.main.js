@@ -17,11 +17,16 @@ require(["base/test/integration/test.config"], function() {
 
 var extendChromeFunctionality = function() {
     chrome.runtime.onMessage = {
-        "addListener": function(callback) {
-            callback.apply();
+        "addListener": function(messageName, callback) {
+            document.addEventListener(messageName, callback);
         }
     };
-    chrome.runtime.sendMessage = function() {};
+
+    chrome.runtime.sendMessage = function(messageName) {
+        var event = new Event(messageName);
+        document.dispatchEvent(event);
+    };
+
     chrome.alarms = {
         "create": function() {},
         "onAlarm": {
