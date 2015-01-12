@@ -19,18 +19,27 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
             return idbUtils.clear("dataValues");
         });
 
-        var publishUploadMessage = function(period, orgUnitId) {
-            var hustleData = {
+        var publishUploadMessage = function(period, orgUnitId, dataSetId) {
+            var hustleDataValuesData = {
                 "dataValues": [{
                     "period": period,
                     "orgUnit": orgUnitId
                 }]
             };
 
-            return hustle.publish({
-                "data": hustleData,
+            var hustleDeleteApprovalData = {
+                "ds": [dataSetId],
+                "pe": period,
+                "ou": orgUnitId
+            };
+
+            return q.all([hustle.publish({
+                "data": hustleDataValuesData,
                 "type": "uploadDataValues"
-            }, "dataValues");
+            }, "dataValues"), hustle.publish({
+                "data": hustleDeleteApprovalData,
+                "type": "deleteApproval"
+            }, "dataValues")]);
         };
 
         var setUpVerify = function(getActualDataCallback, expectedData, done) {
@@ -48,7 +57,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 done();
             };
 
-            chrome.runtime.onMessage.addListener('uploadDataValuesDone', function() {
+            chrome.runtime.onMessage.addListener('deleteApprovalDone', function() {
                 getActualDataCallback.apply().then(onSuccess, onError);
             });
 
@@ -110,7 +119,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getRemoteCopy, undefined, done)).then(_.curry(publishUploadMessage)(period, orgUnitId));
+            setupData().then(_.curry(setUpVerify)(getRemoteCopy, {}, done)).then(_.curry(publishUploadMessage)(period, orgUnitId, datasetId));
         });
     });
 });
