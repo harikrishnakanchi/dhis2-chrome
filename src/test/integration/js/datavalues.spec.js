@@ -41,8 +41,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
                 var findCorrespondingActualDV = function(expectedDV) {
                     return _.find(actualDataValues, {
                         'dataElement': expectedDV.dataElement,
-                        'categoryOptionCombo': expectedDV.categoryOptionCombo,
-                        'attributeOptionCombo': expectedDV.attributeOptionCombo
+                        'categoryOptionCombo': expectedDV.categoryOptionCombo
                     });
                 };
 
