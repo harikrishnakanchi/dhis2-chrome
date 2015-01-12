@@ -121,5 +121,79 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
 
             setupData().then(_.curry(setUpVerify)(getRemoteCopy, {}, done)).then(_.curry(publishUploadMessage)(period, orgUnitId, datasetId));
         });
+
+        it("should not upload approval data to DHIS, if data is locally approved (not synced to dhis) till level 2 and then re-submitted", function(done) {
+            var orgUnitId = "e3e286c6ca8";
+            var period = "2015W02";
+            var datasetId = "a170b8cd5e5";
+
+            var idbDataValues = dataValueBuilder.build({
+                "period": period,
+                "lastUpdated": moment().add(2, 'days').toISOString(),
+                "values": ["19", "19"]
+            });
+
+            var newIdbDataValues = dataValueBuilder.build({
+                "period": period,
+                "lastUpdated": "2015-01-10T00:00:00",
+                "values": ["9", "19"]
+            });
+
+            var idbCompletionData = {
+                "dataSets": [datasetId],
+                "date": "2015-01-08T11:42:41.108Z",
+                "orgUnit": orgUnitId,
+                "period": period,
+                "storedBy": "prj_approver_l1"
+            };
+
+            var idbApprovedData = {
+                "dataSets": [datasetId],
+                "createdDate": "2015-01-08T11:42:41.108Z",
+                "orgUnit": orgUnitId,
+                "period": period,
+                "isAccepted": false,
+                "isApproved": true,
+                "createdByUsername": "prj_approver_l2"
+            };
+
+            var setupData = function() {
+                return q.all([idbUtils.upsert("userPreferences", userPrefs),
+                    idbUtils.upsert('dataValues', idbDataValues),
+                    idbUtils.upsert('completedDataSets', idbCompletionData),
+                    idbUtils.upsert('approvedDataSets', idbApprovedData),
+                    idbUtils.upsert('dataValues', newIdbDataValues)
+                ]);
+            };
+
+            var getActualData = function() {
+                var level1Params = {
+                    "dataSet": "a170b8cd5e5",
+                    "startDate": "2014-12-29",
+                    "endDate": "2015-01-04",
+                    "orgUnit": orgUnitId,
+                    "children": true
+                };
+
+                var level2Params = {
+                    "ds": "a170b8cd5e5",
+                    "startDate": "2014-12-29",
+                    "endDate": "2015-01-04",
+                    "ou": orgUnitId,
+                    "pe": "Weekly",
+                    "children": true
+                };
+
+                return q.all([http.GET("/api/completeDataSetRegistrations.json", level1Params),
+                    http.GET("/api/dataApprovals/status.json", level2Params)
+                ]).then(function(data) {
+                    return [data[0].data,
+                        data[1].data.dataApprovalStateResponses[0].state
+                    ];
+                });
+            };
+
+            setupData().then(_.curry(setUpVerify)(getActualData, [{}, 'UNAPPROVED_READY'], done)).then(_.curry(publishUploadMessage)(period, orgUnitId, datasetId));
+        });
     });
 });
