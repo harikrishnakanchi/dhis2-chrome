@@ -287,8 +287,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var saveSystemSettings = function(newSystemSettings, projectId) {
                 return systemSettingRepository.getAllWithProjectId(projectId).then(function(data) {
                     var existingSystemSettings = (_.isEmpty(data)) ? {} : data.value.excludedDataElements;
+                    var systemSettingsPayload = _.cloneDeep(existingSystemSettings);
+                    _.forEach(_.keys(newSystemSettings), function(key){
+                        systemSettingsPayload[key] = newSystemSettings[key];
+                    });
                     var systemSettings = {
-                        'excludedDataElements': _.merge(_.cloneDeep(existingSystemSettings), newSystemSettings)
+                        'excludedDataElements': systemSettingsPayload
                     };
                     var payload = {
                         "projectId": projectId,
