@@ -42,7 +42,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
             }, "dataValues")]);
         };
 
-        var setUpVerify = function(getActualDataCallback, expectedData, done) {
+        var setUpVerify = function(getActualDataCallback, expectedData, done, message) {
             var verify = function(actual, expected) {
                 expect(actual).toEqual(expected);
             };
@@ -57,7 +57,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 done();
             };
 
-            chrome.runtime.onMessage.addListener('deleteApprovalDone', function() {
+            chrome.runtime.onMessage.addListener(message, function() {
                 getActualDataCallback.apply().then(onSuccess, onError);
             });
 
@@ -119,7 +119,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getRemoteCopy, {}, done)).then(_.curry(publishUploadMessage)(period, orgUnitId, datasetId));
+            setupData().then(_.curry(setUpVerify)(getRemoteCopy, {}, done, "deleteApprovalDone")).then(_.curry(publishUploadMessage)(period, orgUnitId, datasetId));
         });
 
         it("should not upload approval data to DHIS, if data is locally approved (not synced to dhis) till level 2 and then re-submitted", function(done) {
@@ -193,7 +193,110 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getActualData, [{}, 'UNAPPROVED_READY'], done)).then(_.curry(publishUploadMessage)(period, orgUnitId, datasetId));
+            setupData().then(_.curry(setUpVerify)(getActualData, [{}, 'UNAPPROVED_READY'], done, "deleteApprovalDone")).then(_.curry(publishUploadMessage)(period, orgUnitId, datasetId));
+        });
+
+        it("should upload approval data when field app comes online", function(done) {
+            var orgUnitId = "e3e286c6ca8";
+            var period = "2014W48";
+            var datasetId = "a170b8cd5e5";
+
+            var idbDataValues = dataValueBuilder.build({
+                "period": period,
+                "lastUpdated": moment().add(2, 'days').toISOString(),
+                "values": ["19", "19"]
+            });
+
+            var idbCompletionData = {
+                "dataSets": [datasetId],
+                "date": "2015-01-08T11:42:41.108Z",
+                "orgUnit": orgUnitId,
+                "period": period,
+                "status": "NEW",
+                "storedBy": "prj_approver_l1"
+            };
+
+            var idbApprovedData = {
+                "dataSets": [datasetId],
+                "createdDate": "2015-01-08T11:42:41.108Z",
+                "orgUnit": orgUnitId,
+                "period": period,
+                "status": "NEW",
+                "isAccepted": false,
+                "isApproved": true,
+                "createdByUsername": "prj_approver_l2"
+            };
+
+            var setupData = function() {
+                return q.all([idbUtils.upsert("userPreferences", userPrefs),
+                    idbUtils.upsert('dataValues', idbDataValues),
+                    idbUtils.upsert('completedDataSets', idbCompletionData),
+                    idbUtils.upsert('approvedDataSets', idbApprovedData)
+                ]);
+            };
+
+            var getRemoteCopy = function() {
+                var level1Params = {
+                    "dataSet": "a170b8cd5e5",
+                    "startDate": "2014-11-24",
+                    "endDate": "2014-11-30",
+                    "orgUnit": orgUnitId,
+                    "children": true
+                };
+
+                var level2Params = {
+                    "ds": "a170b8cd5e5",
+                    "startDate": "2014-11-24",
+                    "endDate": "2014-11-30",
+                    "ou": orgUnitId,
+                    "pe": "Weekly",
+                    "children": true
+                };
+
+                return q.all([http.GET("/api/completeDataSetRegistrations.json", level1Params),
+                    http.GET("/api/dataApprovals/status.json", level2Params)
+                ]).then(function(data) {
+                    return [data[0].data.completeDataSetRegistrations.length,
+                        data[1].data.dataApprovalStateResponses[0].state
+                    ];
+                });
+            };
+
+            setupData().then(_.curry(setUpVerify)(getRemoteCopy, [1, 'APPROVED_HERE'], done, "uploadApprovalDataDone")).then(function() {
+                var hustleDataValuesData = {
+                    "dataValues": [{
+                        "period": period,
+                        "orgUnit": orgUnitId
+                    }]
+                };
+
+                var hustleDeleteApprovalData = {
+                    "ds": [datasetId],
+                    "pe": period,
+                    "ou": orgUnitId
+                };
+
+                var approvalAndCompletionData = {
+                    "period": period,
+                    "orgUnit": orgUnitId
+                };
+
+                return q.all([hustle.publish({
+                    "data": hustleDataValuesData,
+                    "type": "uploadDataValues"
+                }, "dataValues"), hustle.publish({
+                    "data": hustleDeleteApprovalData,
+                    "type": "deleteApproval"
+                }, "dataValues")]).then(function() {
+                    return q.all([hustle.publish({
+                        "data": approvalAndCompletionData,
+                        "type": "uploadCompletionData"
+                    }, "dataValues"), hustle.publish({
+                        "data": approvalAndCompletionData,
+                        "type": "uploadApprovalData"
+                    }, "dataValues")]);
+                });
+            });
         });
     });
 });

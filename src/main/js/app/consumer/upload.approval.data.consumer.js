@@ -31,8 +31,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             };
 
             var command = commands[payload.status] || function() {};
-            command.apply(this);
-
+            return command.apply(this);
         };
 
         this.run = function(message) {
