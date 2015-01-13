@@ -19,6 +19,13 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
             return idbUtils.clear("dataValues");
         });
 
+        var publishToHustle = function(data, type) {
+            return hustle.publish({
+                "data": data,
+                "type": type
+            }, "dataValues");
+        };
+
         var publishUploadMessage = function(period, orgUnitId, dataSetId) {
             var hustleDataValuesData = {
                 "dataValues": [{
@@ -33,13 +40,9 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 "ou": orgUnitId
             };
 
-            return q.all([hustle.publish({
-                "data": hustleDataValuesData,
-                "type": "uploadDataValues"
-            }, "dataValues"), hustle.publish({
-                "data": hustleDeleteApprovalData,
-                "type": "deleteApproval"
-            }, "dataValues")]);
+            return q.all([publishToHustle(hustleDataValuesData, "uploadDataValues"),
+                publishToHustle(hustleDeleteApprovalData, "deleteApproval")
+            ]);
         };
 
         var setUpVerify = function(getActualDataCallback, expectedData, done, message) {
@@ -262,7 +265,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getRemoteCopy, [1, 'APPROVED_HERE'], done, "uploadApprovalDataDone")).then(function() {
+            var publishMessage = function() {
                 var hustleDataValuesData = {
                     "dataValues": [{
                         "period": period,
@@ -281,22 +284,12 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                     "orgUnit": orgUnitId
                 };
 
-                return q.all([hustle.publish({
-                    "data": hustleDataValuesData,
-                    "type": "uploadDataValues"
-                }, "dataValues"), hustle.publish({
-                    "data": hustleDeleteApprovalData,
-                    "type": "deleteApproval"
-                }, "dataValues")]).then(function() {
-                    return q.all([hustle.publish({
-                        "data": approvalAndCompletionData,
-                        "type": "uploadCompletionData"
-                    }, "dataValues"), hustle.publish({
-                        "data": approvalAndCompletionData,
-                        "type": "uploadApprovalData"
-                    }, "dataValues")]);
+                return q.all([publishToHustle(hustleDataValuesData, "uploadDataValues"), publishToHustle(hustleDeleteApprovalData, "deleteApproval")]).then(function() {
+                    return q.all([publishToHustle(approvalAndCompletionData, "uploadCompletionData"), publishToHustle(approvalAndCompletionData, "uploadApprovalData")]);
                 });
-            });
+            };
+
+            setupData().then(_.curry(setUpVerify)(getRemoteCopy, [1, 'APPROVED_HERE'], done, "uploadApprovalDataDone")).then(publishMessage);
         });
     });
 });
