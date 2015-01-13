@@ -291,5 +291,143 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
 
             setupData().then(_.curry(setUpVerify)(getRemoteCopy, [1, 'APPROVED_HERE'], done, "uploadApprovalDataDone")).then(publishMessage);
         });
+
+        it("should show local data as approved after next sync cycle if it is approved (L2) on dhis", function(done) {
+            var orgUnitId = "e3e286c6ca8";
+            var period = "2014W49";
+            var datasetId = "a170b8cd5e5";
+
+            var idbDataValues = dataValueBuilder.build({
+                "period": period,
+                "lastUpdated": moment().add(2, 'days').toISOString(),
+                "values": ["19", "19"]
+            });
+
+            var dhisDataValues = dataValueBuilder.build({
+                "period": period,
+                "lastUpdated": "2015-01-08T00:00:00",
+                "values": ["9", "9"]
+            });
+
+            var idbCompletionData = {
+                "dataSets": [datasetId],
+                "date": "2015-01-09T11:42:41.108Z",
+                "orgUnit": orgUnitId,
+                "period": period,
+                "storedBy": "prj_approver_l1"
+            };
+
+            var dhisCompletionData = [{
+                "ds": datasetId,
+                "pe": period,
+                "ou": orgUnitId,
+                "sb": "prj_approver_l1",
+                "cd": "2015-01-09T12:11:55.567Z",
+                "multiOu": true
+            }];
+
+            var dhisApprovalData = [{
+                "ds": datasetId,
+                "pe": period,
+                "ou": orgUnitId,
+                "ab": "prj_approver_l1",
+                "ad": "2015-01-09T12:11:55.567Z"
+            }];
+
+            var setupData = function() {
+                return q.all([idbUtils.upsert("userPreferences", userPrefs),
+                    idbUtils.upsert('dataValues', idbDataValues),
+                    idbUtils.upsert('completedDataSets', idbCompletionData),
+                    http.POST('/api/dataValueSets', dhisDataValues),
+                    http.POST('/api/completeDataSetRegistrations/multiple', dhisCompletionData),
+                    http.POST('/api/dataApprovals/multiple', dhisApprovalData)
+                ]);
+            };
+
+            var getIndexedDBCopy = function() {
+                return idbUtils.get('approvedDataSets', [period, orgUnitId]).then(function(data) {
+                    return data.isApproved;
+                });
+            };
+
+            setupData().then(_.curry(setUpVerify)(getIndexedDBCopy, true, done, "downloadDataDone")).then(publishToHustle({}, "downloadData"));
+        });
+
+        it("should show local data as unapproved after next sync cycle if it is unapproved (L2) on dhis", function(done) {
+            var orgUnitId = "e3e286c6ca8";
+            var period = "2014W46";
+            var datasetId = "a170b8cd5e5";
+
+            var idbDataValues = dataValueBuilder.build({
+                "period": period,
+                "lastUpdated": moment().add(2, 'days').toISOString(),
+                "values": ["19", "19"]
+            });
+
+            var dhisDataValues = dataValueBuilder.build({
+                "period": period,
+                "lastUpdated": "2015-01-08T00:00:00",
+                "values": ["9", "9"]
+            });
+
+            var idbCompletionData = {
+                "dataSets": [datasetId],
+                "date": "2015-01-09T11:42:41.108Z",
+                "orgUnit": orgUnitId,
+                "period": period,
+                "storedBy": "prj_approver_l1"
+            };
+
+            var dhisCompletionData = [{
+                "ds": datasetId,
+                "pe": period,
+                "ou": orgUnitId,
+                "sb": "prj_approver_l1",
+                "cd": "2015-01-09T12:11:55.567Z",
+                "multiOu": true
+            }];
+
+            var dhisApprovalData = [{
+                "ds": datasetId,
+                "pe": period,
+                "ou": orgUnitId,
+                "ab": "prj_approver_l1",
+                "ad": "2015-01-09T12:11:55.567Z"
+            }];
+
+            var idbApprovedData = {
+                "dataSets": [datasetId],
+                "createdDate": "2015-01-08T11:42:41.108Z",
+                "orgUnit": orgUnitId,
+                "period": period,
+                "isAccepted": false,
+                "isApproved": true,
+                "createdByUsername": "prj_approver_l2"
+            };
+
+            var dhisUnapprovalData = {
+                "ds": datasetId,
+                "pe": period,
+                "ou": orgUnitId
+            };
+
+            var setupData = function() {
+                return q.all([idbUtils.upsert("userPreferences", userPrefs),
+                    idbUtils.upsert('dataValues', idbDataValues),
+                    idbUtils.upsert('completedDataSets', idbCompletionData),
+                    idbUtils.upsert('approvedDataSets', idbApprovedData),
+                    http.POST('/api/dataValueSets', dhisDataValues),
+                    http.POST('/api/completeDataSetRegistrations/multiple', dhisCompletionData),
+                    http.POST('/api/dataApprovals/multiple', dhisApprovalData),
+                    http.DELETE('/api/dataApprovals', dhisUnapprovalData)
+                ]);
+            };
+
+            var getIndexedDBCopy = function() {
+                return idbUtils.get('approvedDataSets', [period, orgUnitId]);
+            };
+
+            setupData().then(_.curry(setUpVerify)(getIndexedDBCopy, undefined, done, "downloadDataDone")).then(_.curry(publishToHustle)({}, "downloadData"));
+        });
     });
 });

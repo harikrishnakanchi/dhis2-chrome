@@ -45,7 +45,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
 
                 var moduleIds = _.unique(_.pluck(dhisApprovalDataList, "orgUnit"));
 
-                approvalDataRepository.getLevelTwoApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(mergeAndSaveCompletion);
+                return approvalDataRepository.getLevelTwoApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(mergeAndSaveCompletion);
             };
 
             return approvalService.getAllLevelTwoApprovalData(userModuleIds, allDataSetIds).then(saveAllLevelTwoApprovalData);
@@ -97,7 +97,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
 
                 var moduleIds = _.unique(_.pluck(dhisApprovalDataList, "orgUnit"));
 
-                approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(mergeAndSaveCompletion);
+                return approvalDataRepository.getLevelOneApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(mergeAndSaveCompletion);
             };
 
             return approvalService.getAllLevelOneApprovalData(userModuleIds, allDataSetIds).then(saveAllLevelOneApprovalData);
