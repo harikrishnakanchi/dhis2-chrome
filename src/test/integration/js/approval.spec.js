@@ -336,12 +336,12 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
 
             var setupData = function() {
                 return q.all([idbUtils.upsert("userPreferences", userPrefs),
-                    idbUtils.upsert('dataValues', idbDataValues),
-                    idbUtils.upsert('completedDataSets', idbCompletionData),
-                    http.POST('/api/dataValueSets', dhisDataValues),
-                    http.POST('/api/completeDataSetRegistrations/multiple', dhisCompletionData),
-                    http.POST('/api/dataApprovals/multiple', dhisApprovalData)
-                ]);
+                        idbUtils.upsert('dataValues', idbDataValues),
+                        idbUtils.upsert('completedDataSets', idbCompletionData),
+                        http.POST('/api/dataValueSets', dhisDataValues)
+                    ])
+                    .then(_.curry(http.POST)('/api/completeDataSetRegistrations/multiple', dhisCompletionData))
+                    .then(_.curry(http.POST)('/api/dataApprovals/multiple', dhisApprovalData));
             };
 
             var getIndexedDBCopy = function() {
@@ -355,7 +355,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
 
         it("should show local data as unapproved after next sync cycle if it is unapproved (L2) on dhis", function(done) {
             var orgUnitId = "e3e286c6ca8";
-            var period = "2014W46";
+            var period = "2014W48";
             var datasetId = "a170b8cd5e5";
 
             var idbDataValues = dataValueBuilder.build({
@@ -413,21 +413,22 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
 
             var setupData = function() {
                 return q.all([idbUtils.upsert("userPreferences", userPrefs),
-                    idbUtils.upsert('dataValues', idbDataValues),
-                    idbUtils.upsert('completedDataSets', idbCompletionData),
-                    idbUtils.upsert('approvedDataSets', idbApprovedData),
-                    http.POST('/api/dataValueSets', dhisDataValues),
-                    http.POST('/api/completeDataSetRegistrations/multiple', dhisCompletionData),
-                    http.POST('/api/dataApprovals/multiple', dhisApprovalData),
-                    http.DELETE('/api/dataApprovals', dhisUnapprovalData)
-                ]);
+                        idbUtils.upsert('dataValues', idbDataValues),
+                        idbUtils.upsert('completedDataSets', idbCompletionData),
+                        idbUtils.upsert('approvedDataSets', idbApprovedData),
+                        http.POST('/api/dataValueSets', dhisDataValues)
+                    ])
+                    .then(_.curry(http.POST)('/api/completeDataSetRegistrations/multiple', dhisCompletionData))
+                    .then(_.curry(http.POST)('/api/dataApprovals/multiple', dhisApprovalData))
+                    .then(_.curry(http.DELETE)('/api/dataApprovals', dhisUnapprovalData));
             };
 
             var getIndexedDBCopy = function() {
                 return idbUtils.get('approvedDataSets', [period, orgUnitId]);
             };
 
-            setupData().then(_.curry(setUpVerify)(getIndexedDBCopy, undefined, done, "downloadDataDone")).then(_.curry(publishToHustle)({}, "downloadData"));
+            setupData().then(_.curry(setUpVerify)(getIndexedDBCopy, undefined, done, "downloadDataDone"))
+                .then(_.curry(publishToHustle)({}, "downloadData"));
         });
     });
 });
