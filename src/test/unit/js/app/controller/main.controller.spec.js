@@ -111,6 +111,11 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                     }
                 };
                 spyOn(userPreferenceRepository, "save");
+                spyOn(userPreferenceRepository, "get").and.returnValue(utils.getPromise(q, {
+                    'orgUnits': [{
+                        'id': 111
+                    }]
+                }));
                 spyOn(orgUnitRepository, "getAll").and.returnValue(utils.getPromise(q, []));
                 getResourceBundleSpy.and.returnValue(utils.getPromise(q, frenchResourceBundle));
 
@@ -155,6 +160,11 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
 
                 spyOn(userRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(userPreferenceRepository, "save");
+                spyOn(userPreferenceRepository, "get").and.returnValue(utils.getPromise(q, {
+                    'orgUnits': [{
+                        'id': "123"
+                    }]
+                }));
 
                 scope.saveUser();
                 scope.$apply();
@@ -165,6 +175,9 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                     "username": '1',
                     "locale": "en",
                     "orgUnits": [current]
+                });
+                expect(scope.currentUserProject).toEqual({
+                    id: '123'
                 });
             });
 

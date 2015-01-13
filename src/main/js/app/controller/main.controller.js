@@ -67,11 +67,13 @@ define(["lodash"], function(_) {
 
         var resetProjects = function() {
             var assignCurrentProject = function() {
-                if ($scope.oldUserProject) {
-                    $scope.oldUserProject = _.find($scope.projects, {
-                        "id": $scope.oldUserProject.id
+                if (!_.isEmpty($rootScope.currentUser) && $scope.oldUserProject) {
+                    userPreferenceRepository.get($rootScope.currentUser.userCredentials.username).then(function(data) {
+                        $scope.currentUserProject = _.find($scope.projects, {
+                            "id": data.orgUnits[0].id
+                        });
+                        $scope.oldUserProject = $scope.currentUserProject;
                     });
-                    $scope.currentUserProject = $scope.oldUserProject;
                 }
             };
 
@@ -83,7 +85,7 @@ define(["lodash"], function(_) {
         $rootScope.$watch("currentUser.organisationUnits", function() {
             if ($rootScope.currentUser && !$scope.oldUserProject) {
                 var orgUnits = $rootScope.currentUser.organisationUnits;
-                if(!_.isEmpty($rootScope.currentUser.organisationUnits))
+                if (!_.isEmpty($rootScope.currentUser.organisationUnits))
                     $scope.oldUserProject = $rootScope.currentUser.organisationUnits[0];
                 resetProjects();
             }

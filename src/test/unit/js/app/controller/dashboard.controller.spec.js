@@ -59,8 +59,11 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
                 result: utils.getPromise(q, {})
             });
 
-            rootScope.hasRoles = function() {
-                return true;
+            rootScope.hasRoles = function(args) {
+                if (args[0] === "Superuser")
+                    return false;
+                else
+                    return true;
             };
 
             Timecop.install();
@@ -92,6 +95,43 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataS
 
         it("should format periods to be shown on dashboard", function() {
             expect(scope.formatPeriods("2014W42")).toEqual("W42 - 2014-10-13 - 2014-10-19");
+        });
+
+        it("should set current users project", function() {
+            scope.$parent.projects = [{
+                "id": 321,
+                "name": "Prj1"
+            }, {
+                "id": "123"
+            }];
+
+            rootScope.currentUser = {
+                "firstName": "test1",
+                "lastName": "test1last",
+                "userCredentials": {
+                    "username": "dataentryuser",
+                    "userRoles": [{
+                        "name": 'Superuser'
+                    }]
+                },
+                "organisationUnits": [{
+                    "id": "123",
+                    "name": "MISSIONS EXPLOS"
+                }]
+            };
+
+            rootScope.hasRoles = function(args) {
+                if (args[0] === "Superuser")
+                    return true;
+                else
+                    return false;
+            };
+
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
+
+            scope.$apply();
+
+            expect(scope.$parent.currentUserProject.id).toBe("123");
         });
 
         it("should set user approval level", function() {

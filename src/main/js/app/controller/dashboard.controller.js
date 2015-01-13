@@ -321,6 +321,11 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
                 return approvalRole[0] ? getApproverLevelFromRole(approvalRole[0].name) : undefined;
             };
 
+            if ($rootScope.hasRoles(['Superuser']) && $rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
+                $scope.$parent.currentUserProject = _.find($scope.$parent.projects, {
+                    "id": $rootScope.currentUser.organisationUnits[0].id
+                });
+            }
             if ($rootScope.hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver']) && $rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
                 $scope.loading = true;
                 approvalHelper.getApprovalStatus($rootScope.currentUser.organisationUnits[0].id).then(function(approvalStatusData) {
