@@ -7,7 +7,7 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
             modules = [{
                 name: "mod1 name",
                 id: "mod1",
-                datasets: [{
+                dataSets: [{
                     sections: [{
                         dataElements: [{
                             "id": "1",

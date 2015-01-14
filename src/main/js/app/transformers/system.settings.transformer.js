@@ -5,7 +5,7 @@ define(["lodash"], function(_) {
 
         _.each(modules, function(module) {
             var excludedDataElements = [];
-            _.each(module.datasets, function(ds) {
+            _.each(module.dataSets, function(ds) {
                 _.each(ds.sections, function(section) {
                     excludedDataElements = excludedDataElements.concat(
                         _.pluck(_.filter(section.dataElements, {

@@ -1,5 +1,5 @@
 define(["moment", "lodash"], function(moment, _) {
-    return function(db) {
+    return function(db, dataSetRepository, q) {
         var isOfType = function(orgUnit, type) {
             return _.any(orgUnit.attributeValues, {
                 attribute: {
@@ -7,6 +7,40 @@ define(["moment", "lodash"], function(moment, _) {
                 },
                 value: type
             });
+        };
+
+        var isLinelistService = function(orgUnit) {
+            var linelistAttribute = _.find(orgUnit.attributeValues, {
+                "attribute": {
+                    "code": "isLineListService"
+                }
+            });
+
+            return linelistAttribute ? linelistAttribute.value === "true" : false;
+        };
+
+        var getNewDataSetIds = function() {
+            var isNewDataModel = function(ds) {
+                var attr = _.find(ds.attributeValues, {
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    }
+                });
+                return attr.value === 'true';
+            };
+            return dataSetRepository.getAll().then(function(datasets) {
+                return _.pluck(_.filter(datasets, isNewDataModel), "id");
+            });
+        };
+
+        var notACurrentModule = function(module, newDataSetIds) {
+            if (isLinelistService(module)) {
+                return true;
+            } else if (!_.isEmpty(module.dataSets) && _.contains(newDataSetIds, (module.dataSets[0]).id)) {
+                return true;
+            } else {
+                return false;
+            }
         };
 
         this.upsert = function(payload) {
@@ -48,11 +82,14 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         this.getAllModulesInProjects = function(projectIds, rejectDisabled) {
-            return this.getAll().then(function(allOrgUnits) {
+            return q.all([this.getAll(), getNewDataSetIds()]).then(function(data){
+                var allOrgUnits = data[0];
+                var newDataSetIds = data[1];
+
                 var getChildModules = function(orgUnitId) {
                     return _.flatten(_.transform(allOrgUnits[orgUnitId][0].children, function(acc, child) {
                         child = allOrgUnits[child.id][0];
-                        if (isOfType(child, "Module")) {
+                        if (isOfType(child, "Module") && (notACurrentModule(child, newDataSetIds))) {
                             acc.push(child);
                         } else {
                             acc.push(getChildModules(child.id));
@@ -143,6 +180,27 @@ define(["moment", "lodash"], function(moment, _) {
             };
 
             return this.getAll().then(filterProjects).then(mapProjectCode);
+        };
+
+        this.getAllOrgUnitsExceptCurrentOrgUnits = function() {
+            var getAllOrgUnits = function() {
+                var store = db.objectStore("organisationUnits");
+                return store.getAll();
+            };
+
+            var rejectCurrentModules = function(data) {
+                var orgUnits = data[0];
+                var newDataSetIds = data[1];
+                return _.transform(orgUnits, function(acc, orgUnit) {
+                    if (!isOfType(orgUnit, "Module")) {
+                        return acc.push(orgUnit);
+                    } else if (notACurrentModule(orgUnit, newDataSetIds)) {
+                        return acc.push(orgUnit);
+                    }
+                }, []);
+            };
+
+            return q.all([getAllOrgUnits(), getNewDataSetIds()]).then(rejectCurrentModules);
         };
     };
 });

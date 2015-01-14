@@ -157,7 +157,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 name: "test1",
                 id: projectId,
                 serviceType: "Aggregate",
-                datasets: [{
+                dataSets: [{
                     sections: [{
                         dataElements: [{
                             "id": "1",
@@ -229,7 +229,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var aggregateModule = {
                 'name': "Module1",
                 'serviceType': "Aggregate",
-                'datasets': [{
+                'dataSets': [{
                     'id': 'DS_OPD',
                     'name': 'dataset11',
                     'sections': [{
@@ -361,7 +361,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "level": NaN,
                 "openingDate": "2014-04-01",
                 "selectedDataset": undefined,
-                "datasets": undefined,
+                "dataSets": undefined,
                 "enrichedProgram": {
                     "programStages": [{
                         "programStageSections": [{
@@ -445,7 +445,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var modules = [{
                 'name': "Module1",
                 'serviceType': "Aggregate",
-                'datasets': [{
+                'dataSets': [{
                     'id': 'DS_OPD',
                     'name': 'dataset11',
                     'sections': [{
@@ -462,7 +462,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var enrichedAggregateModules = [{
                 name: 'Module1',
-                datasets: [{
+                dataSets: [{
                     'id': 'DS_OPD',
                     'name': 'dataset11',
                     'sections': [{
@@ -596,8 +596,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.$apply();
 
             expect(scope.isDisabled).toBeFalsy();
-            expect(scope.modules[0].datasets.length).toEqual(1);
-            expect(scope.modules[0].selectedDataset).toEqual(scope.modules[0].datasets[0]);
+            expect(scope.modules[0].dataSets.length).toEqual(1);
+            expect(scope.modules[0].selectedDataset).toEqual(scope.modules[0].dataSets[0]);
             expect(scope.modules[0].allDatasets).toEqual([newDataSet2]);
         });
 
@@ -646,7 +646,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 name: "module NEW name",
                 id: "newId",
                 serviceType: "Aggregate",
-                datasets: [{
+                dataSets: [{
                     sections: [{
                         dataElements: [{
                             "id": "1",
@@ -714,7 +714,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 name: "module NEW name",
                 id: "newId",
                 serviceType: "Aggregate",
-                datasets: [{
+                dataSets: [{
                     sections: [{
                         dataElements: [{
                             "id": "1",
@@ -746,7 +746,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 openingDate: moment().format("YYYY-MM-DD"),
                 selectedDataset: undefined,
                 enrichedProgram: undefined,
-                datasets: [{
+                dataSets: [{
                     sections: [{
                         dataElements: [{
                             id: '1',
@@ -788,7 +788,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 level: 6,
                 openingDate: '2014-04-01',
                 selectedDataset: undefined,
-                datasets: [{
+                dataSets: [{
                     sections: [{
                         dataElements: [{
                             id: '1',
@@ -833,7 +833,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var modules = [{
                 'name': "Module1",
                 'serviceType': "Aggregate",
-                'datasets': [{
+                'dataSets': [{
                     'id': 'ds_11',
                     'name': 'dataset11',
                 }, {
@@ -848,7 +848,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         it("should return true if dataset is not selected", function() {
             var modules = [{
                 'name': "Module1",
-                'datasets': [],
+                'dataSets': [],
                 'serviceType': "Aggregate"
             }];
 
@@ -964,7 +964,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         it("should return true if no section is selected from each dataset", function() {
             var module = {
                 'serviceType': "Aggregate",
-                'datasets': [{
+                'dataSets': [{
                     "sections": [{
                         "name": "section1",
                         "id": "section_1",
@@ -993,7 +993,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var module = {
                 'serviceType': "Aggregate",
-                'datasets': [{
+                'dataSets': [{
                     "sections": [{
                         "name": "section1",
                         "id": "section_1",
@@ -1076,14 +1076,14 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var module = {
                 name: "test1",
                 id: "projectId",
-                datasets: [],
+                dataSets: [],
                 attributeValues: []
             };
 
             var expectedModule = {
                 name: "test1",
                 id: "projectId",
-                datasets: [],
+                dataSets: [],
                 attributeValues: [{
                     attribute: {
                         code: 'isDisabled',

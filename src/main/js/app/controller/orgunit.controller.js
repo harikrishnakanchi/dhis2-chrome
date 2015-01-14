@@ -1,5 +1,5 @@
 define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment, properties) {
-    return function($scope, db, $q, $location, $timeout, $anchorScroll) {
+    return function($scope, db, $q, $location, $timeout, $anchorScroll, orgUnitRepository) {
         var templateUrlMap = {
             'Company': 'templates/partials/company-form.html',
             'Operational Center': 'templates/partials/oc-form.html',
@@ -15,6 +15,10 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         var getAll = function(storeName) {
             var store = db.objectStore(storeName);
             return store.getAll();
+        };
+
+        var getAllOrgUnitsExceptCurrentModules = function() {
+            return orgUnitRepository.getAllOrgUnitsExceptCurrentOrgUnits();
         };
 
         var selectCurrentNode = function(transformedOrgUnits) {
@@ -42,7 +46,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         var init = function() {
             var selectedNodeId = $location.hash()[0];
             var message = $location.hash()[1];
-            $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
+            $q.all([getAllOrgUnitsExceptCurrentModules(), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
         };
 
         $scope.closeNewForm = function(selectedNode, message) {
@@ -53,7 +57,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
                     $scope.showMessage = false;
                 }, properties.messageTimeout);
             }
-            $q.all([getAll("organisationUnits"), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNode.id));
+            $q.all([getAllOrgUnitsExceptCurrentModules(), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNode.id));
         };
 
         var scrollToTop = function() {

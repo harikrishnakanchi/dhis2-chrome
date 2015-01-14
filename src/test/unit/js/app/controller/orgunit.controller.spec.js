@@ -1,8 +1,8 @@
 /*global Date:true*/
-define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnitController, mocks, utils, _) {
+define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository) {
     describe("org unit controller", function() {
         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits,
-            orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll, expectedOrgUnitTree, child;
+            orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll, expectedOrgUnitTree, child, orgUnitRepository;
         var getOrgUnit = function(id, name, level, parent) {
             return {
                 'id': id,
@@ -87,6 +87,8 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             mockOrgUnitLevelStore = {
                 getAll: function() {}
             };
+            orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, "getAllOrgUnitsExceptCurrentOrgUnits").and.returnValue(utils.getPromise(q, allOrgUnits));
             var stores = {
                 "organisationUnits": mockOrgStore,
                 "organisationUnitLevels": mockOrgUnitLevelStore
@@ -97,7 +99,6 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 }
             };
 
-            spyOn(mockOrgStore, 'getAll').and.returnValue(utils.getPromise(q, allOrgUnits));
             spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnitLevels));
             _Date = Date;
             todayStr = "2014-04-01";
@@ -112,7 +113,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
                 'id': 'Id1'
             };
             anchorScroll = jasmine.createSpy();
-            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll);
+            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll, orgUnitRepository);
         }));
 
         afterEach(function() {
@@ -121,10 +122,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
 
         it("should fetch and display all organisation units", function() {
             spyOn(scope, 'onOrgUnitSelect');
-
             scope.$apply();
 
-            expect(mockOrgStore.getAll).toHaveBeenCalled();
+            expect(orgUnitRepository.getAllOrgUnitsExceptCurrentOrgUnits).toHaveBeenCalled();
             expect(scope.organisationUnits).toEqual(expectedOrgUnitTree);
             expect(scope.onOrgUnitSelect).not.toHaveBeenCalled();
             expect(scope.state).toEqual(undefined);
@@ -132,7 +132,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
 
         it("should fetch and select the newly created organization unit", function() {
             spyOn(location, 'hash').and.returnValue([2, 1]);
-            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll);
+            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll, orgUnitRepository);
             spyOn(scope, 'onOrgUnitSelect');
             var child = {
                 id: 2,
@@ -163,7 +163,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
 
         it("should display a timed message after creating a organization unit", function() {
             spyOn(location, 'hash').and.returnValue([1, 2]);
-            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll);
+            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll, orgUnitRepository);
             spyOn(scope, 'onOrgUnitSelect');
 
             scope.$apply();
@@ -252,6 +252,5 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash"], function(OrgUnit
             expect(scope.templateUrl.split('?')[0]).toEqual('templates/partials/module-form.html');
             expect(scope.isNewMode).toEqual(false);
         });
-
     });
 });

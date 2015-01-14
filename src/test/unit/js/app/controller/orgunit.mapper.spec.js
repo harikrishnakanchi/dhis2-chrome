@@ -238,7 +238,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var modules = [{
                 'name': "Module1",
                 'service': "Aggregate",
-                'datasets': [{
+                'dataSets': [{
                     'id': 'ds_11',
                     'name': 'dataset11',
                 }, {
@@ -248,7 +248,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             }, {
                 'name': "Module2",
                 'service': "Aggregate",
-                'datasets': [{
+                'dataSets': [{
                     'id': 'ds_21',
                     'name': 'dataset21',
                 }, {
@@ -264,7 +264,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
             expect(actualModules).toEqual([{
                 name: 'Module1',
-                datasets: [{
+                dataSets: [{
                     'id': 'ds_11',
                     'name': 'dataset11',
                 }, {
@@ -296,7 +296,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }
             }, {
                 name: 'Module2',
-                datasets: [{
+                dataSets: [{
                     'id': 'ds_21',
                     'name': 'dataset21',
                 }, {
@@ -339,7 +339,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var modules = [{
                 'name': "Module1",
                 'service': "Aggregate",
-                'datasets': [{
+                'dataSets': [{
                     'id': 'ds_11',
                     'name': 'dataset11',
                 }, {
@@ -355,7 +355,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
             expect(actualModules).toEqual([{
                 name: 'Module1',
-                datasets: [{
+                dataSets: [{
                     'id': 'ds_11',
                     'name': 'dataset11',
                 }, {
@@ -424,7 +424,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
             var modules = [{
                 'name': "Module1",
-                'datasets': [{
+                'dataSets': [{
                     'id': 'ds_11',
                     'name': 'dataset11',
                 }, {
@@ -433,7 +433,7 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                 }]
             }, {
                 'name': "Module2",
-                'datasets': [{
+                'dataSets': [{
                     'id': 'ds_11',
                     'name': 'dataset21',
                 }]

@@ -1,6 +1,6 @@
 define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUnitRepository, utils, mocks, timecop) {
     describe("Org Unit Repository specs", function() {
-        var mockOrgStore, mockDb, orgUnitRepository, q, orgUnits, scope;
+        var mockOrgStore, mockDb, orgUnitRepository, q, orgUnits, scope, dataSetRepository;
         var getAttr = function(key, value) {
             return {
                 "attribute": {
@@ -58,13 +58,48 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 }
             }];
             scope = $rootScope.$new();
+            dataSetRepository = {
+                "getAll": function() {
+                    return utils.getPromise(q, []);
+                }
+            };
 
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
+            var currentDataSet = {
+                "id": "currentDs",
+                "name": "OBGY_OPD - V1",
+                "attributeValues": [{
+                    "value": "false",
+                    "attribute": {
+                        "id": "wFC6joy3I8Q",
+                        "name": "Is New Data Model",
+                        "code": "isNewDataModel",
+                    }
+                }]
+            };
+            var newDataSet = {
+                "id": "newDs",
+                "name": "NeoNat",
+                "attributeValues": [{
+                    "value": "true",
+                    "attribute": {
+                        "id": "wFC6joy3I8Q",
+                        "name": "Is New Data Model",
+                        "code": "isNewDataModel",
+                    }
+                }]
+            };
+
+            dataSetRepository = {
+                "getAll": function() {
+                    return utils.getPromise(q, [newDataSet, currentDataSet]);
+                }
+            };
 
             mockDb = utils.getMockDB(q, {}, _.clone(orgUnits, true));
             mockOrgStore = mockDb.objectStore;
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
         }));
 
         afterEach(function() {
@@ -160,7 +195,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             orgUnits = [project, country];
             mockDb = utils.getMockDB(q, {}, orgUnits);
             mockOrgStore = mockDb.objectStore;
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
 
             orgUnitRepository.getAllProjects().then(function(data) {
                 expect(data.length).toEqual(1);
@@ -171,7 +206,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             scope.$apply();
         });
 
-        it("should get all modules for given org units if disabled flag is not given", function() {
+        it("should get all modules except current modules for given org units if disabled flag is not given", function() {
             var modules = [];
             var project1 = {
                 "name": "prj1",
@@ -240,6 +275,10 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "parent": {
                     id: "prj1"
                 },
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
@@ -275,6 +314,30 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "parent": {
                     id: "opunit1"
                 },
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    value: "Module"
+                }],
+                "children": []
+            };
+
+            var module5 = {
+                "name": "mod5",
+                "displayName": "mod5",
+                "id": "mod5",
+                "parent": {
+                    id: "opunit1"
+                },
+                "dataSets": [{
+                    "id": "currentDs",
+                    "name": "OBGY_OPD - V1"
+                }],
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
@@ -291,6 +354,10 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "parent": {
                     id: "prj3"
                 },
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
@@ -327,6 +394,10 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "parent": {
                     id: "opunit2"
                 },
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
@@ -336,10 +407,10 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "children": []
             };
 
-            var allOrgUnits = [project1, project2, project3, module1, module2, module3, module4, opunit1, opunit2];
+            var allOrgUnits = [project1, project2, project3, module1, module2, module3, module4, module5, opunit1, opunit2];
             mockDb = utils.getMockDB(q, {}, allOrgUnits);
 
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
             scope.$apply();
             orgUnitRepository.getAllModulesInProjects(["prj1", "prj2"]).then(function(userModules) {
                 modules = userModules;
@@ -419,6 +490,10 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "parent": {
                     id: "prj1"
                 },
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
@@ -459,6 +534,10 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "parent": {
                     id: "opunit1"
                 },
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
@@ -475,6 +554,10 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "parent": {
                     id: "prj3"
                 },
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
@@ -511,6 +594,10 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "parent": {
                     id: "opunit2"
                 },
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
@@ -523,7 +610,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             var allOrgUnits = [project1, project2, project3, module1, module2, module3, module4, opunit1, opunit2];
             mockDb = utils.getMockDB(q, {}, allOrgUnits);
 
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
             scope.$apply();
             orgUnitRepository.getAllModulesInProjects(["prj1", "prj2"], true).then(function(userModules) {
                 modules = userModules;
@@ -576,7 +663,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
 
             mockDb = utils.getMockDB(q, {}, allOrgUnits);
 
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
             scope.$apply();
 
             var modules;
@@ -587,6 +674,159 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             scope.$apply();
 
             expect(modules).toEqual([module1]);
+        });
+
+        it("should get all org units except current modules", function() {
+            var testCountry = {
+                "id": "testCountry",
+                "level": 3,
+                "name": "A Test Country",
+                "dataSets": [],
+                "attributeValues": [{
+                    "value": "Country",
+                    "attribute": {
+                        "id": "a1fa2777924",
+                        "name": "Type",
+                        "code": "Type",
+                    }
+                }]
+            };
+
+            var testProject = {
+                "id": "testProject",
+                "level": 4,
+                "name": "A Test Proj",
+                "dataSets": [],
+                "attributeValues": [{
+                    "value": "Project",
+                    "attribute": {
+                        "id": "a1fa2777924",
+                        "name": "Type",
+                        "code": "Type",
+                    }
+                }]
+            };
+
+            var opUnit1 = {
+                "id": "opUnit1",
+                "level": 5,
+                "name": "OpUnit1",
+                "dataSets": [],
+                "attributeValues": [{
+                    "value": "Operation Unit",
+                    "attribute": {
+                        "id": "a1fa2777924",
+                        "name": "Type",
+                        "code": "Type",
+                    }
+                }]
+            };
+
+            var currentModule = {
+                "id": "currentMod",
+                "level": 6,
+                "name": "c2",
+                "children": [],
+                "dataSets": [{
+                    "id": "currentDs",
+                    "name": "OBGY_OPD - V1"
+                }],
+                "attributeValues": [{
+                    "value": "false",
+                    "attribute": {
+                        "id": "ca6958d702e",
+                        "name": "Is Linelist Service",
+                        "code": "isLineListService",
+                    }
+                }, {
+                    "value": "Module",
+                    "attribute": {
+                        "id": "a1fa2777924",
+                        "name": "Type",
+                        "code": "Type",
+                    }
+                }]
+            };
+
+            var aggModuleWithoutDataset = {
+                "id": "aggModuleWithoutDataset",
+                "level": 6,
+                "name": "Operating Theatre",
+                "children": [],
+                "dataSets": [],
+                "attributeValues": [{
+                    "value": "Module",
+                    "attribute": {
+                        "id": "a1fa2777924",
+                        "name": "Type",
+                        "code": "Type",
+                    }
+                }]
+            };
+
+            var newModule = {
+                "id": "newMod",
+                "level": 6,
+                "name": "m2",
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
+                "attributeValues": [{
+                    "value": "Module",
+                    "attribute": {
+                        "id": "a1fa2777924",
+                        "name": "Type",
+                        "code": "Type",
+                    }
+                }, {
+                    "value": "false",
+                    "attribute": {
+                        "id": "ca6958d702e",
+                        "name": "Is Linelist Service",
+                        "code": "isLineListService",
+                    }
+                }]
+            };
+
+            var lineListModule = {
+                "id": "lineListMod",
+                "level": 6,
+                "name": "l1",
+                "dataSets": [],
+                "attributeValues": [{
+                    "value": "Module",
+                    "attribute": {
+                        "id": "a1fa2777924",
+                        "name": "Type",
+                        "code": "Type",
+                    }
+                }, {
+                    "value": "true",
+                    "attribute": {
+                        "id": "ca6958d702e",
+                        "name": "Is Linelist Service",
+                        "code": "isLineListService",
+                    }
+                }]
+            };
+
+            var allOrgUnits = [testCountry, testProject, opUnit1, currentModule, aggModuleWithoutDataset, newModule, lineListModule];
+
+            mockDb = utils.getMockDB(q, {}, _.clone(allOrgUnits, true));
+            mockOrgStore = mockDb.objectStore;
+
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
+
+            var actualOrgUnits = [];
+            orgUnitRepository.getAllOrgUnitsExceptCurrentOrgUnits().then(function(data) {
+                actualOrgUnits = data;
+            });
+
+            scope.$apply();
+
+            var expectedOrgUnits = [testCountry, testProject, opUnit1, newModule, lineListModule];
+            expect(actualOrgUnits).toEqual(expectedOrgUnits);
         });
     });
 });

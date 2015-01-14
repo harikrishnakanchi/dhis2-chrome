@@ -108,7 +108,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         };
 
                         var setUpModule = function(data) {
-                            if(data)
+                            if (data)
                                 $scope.orgUnit.enrichedProgram = data;
 
                             if (!_.isEmpty($scope.orgUnit.enrichedProgram))
@@ -118,7 +118,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                                 'name': $scope.orgUnit.name,
                                 'enrichedProgram': $scope.orgUnit.enrichedProgram,
                                 'allDatasets': getNonAssociatedDatasets(),
-                                'datasets': associatedDatasets,
+                                'dataSets': associatedDatasets,
                                 'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
                                 'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
                                 'program': findAssociatedModule(),
@@ -288,7 +288,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 return systemSettingRepository.getAllWithProjectId(projectId).then(function(data) {
                     var existingSystemSettings = (_.isEmpty(data)) ? {} : data.value.excludedDataElements;
                     var systemSettingsPayload = _.cloneDeep(existingSystemSettings);
-                    _.forEach(_.keys(newSystemSettings), function(key){
+                    _.forEach(_.keys(newSystemSettings), function(key) {
                         systemSettingsPayload[key] = newSystemSettings[key];
                     });
                     var systemSettings = {
@@ -299,7 +299,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         "settings": systemSettings
                     };
 
-                    var oldIndexedDbSystemSettings = (_.isEmpty(data)) ? {'excludedDataElements': {}} : data.value;
+                    var oldIndexedDbSystemSettings = (_.isEmpty(data)) ? {
+                        'excludedDataElements': {}
+                    } : data.value;
                     return systemSettingRepository.upsert(payload).then(function() {
                         var hustlePayload = _.cloneDeep(payload);
                         hustlePayload.indexedDbOldSystemSettings = oldIndexedDbSystemSettings;
@@ -409,7 +411,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.addModules = function() {
             $scope.modules.push({
                 'openingDate': moment().format("YYYY-MM-DD"),
-                'datasets': [],
+                'dataSets': [],
                 'allDatasets': _.filter(_.cloneDeep($scope.allDatasets), isNewDataModel),
                 'selectedDataset': {},
                 'timestamp': new Date().getTime(),
@@ -427,13 +429,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.areDatasetsNotSelected = function(modules) {
             return _.any(modules, function(module) {
-                return module.serviceType === "Aggregate" && _.isEmpty(module.datasets);
+                return module.serviceType === "Aggregate" && _.isEmpty(module.dataSets);
             });
         };
 
         $scope.areNoSectionsSelected = function(modules) {
             return _.any(modules, function(module) {
-                return _.any(module.datasets, function(dataSet) {
+                return _.any(module.dataSets, function(dataSet) {
                     return module.serviceType === "Aggregate" && $scope.areNoSectionsSelectedForDataset(dataSet);
                 });
             });

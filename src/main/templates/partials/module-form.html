@@ -31,7 +31,7 @@
                             </select>
                         </div>
                     </li>
-                    <li class="form-group" ng-if="module.serviceType==='Aggregate'">
+                    <li class="form-group" ng-if="module.serviceType==='Aggregate'" ng-hide="true">
                         <label for="dataModelType" class="col-sm-4 col-md-4 control-label">{{resourceBundle.dataModelLabel}}</label>
                         <div class="col-sm-6 col-md-6">
                             <select type="text" name="dataModelType" id="dataModelType" ng-model="module.dataModelType" ng-disabled="!isNewMode" ng-change="changeDataModel(module, module.dataModelType)" required>
@@ -51,7 +51,7 @@
                                     <div ng-show="areDatasetsNotSelected([module]) &amp;&amp; isNewModule([module])">
                                         <span>{{resourceBundle.selectDatasets}}</span>
                                     </div>
-                                    <multiselect left-list="module.allDatasets" name="name" ng-model="module.datasets" disabled="!isNewMode" on-right-item-select="selectDataSet(module, item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
+                                    <multiselect left-list="module.allDatasets" name="name" ng-model="module.dataSets" disabled="!isNewMode" on-right-item-select="selectDataSet(module, item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
                                 </div>
                                 <div class="details" ng-show="module.selectedDataset.sections.length > 0" ng-if="module.dataModelType==='New'">
                                     <span ng-show="areNoSectionsSelectedForDataset(module.selectedDataset)">{{resourceBundle.selectDatasetSection}}</span>
