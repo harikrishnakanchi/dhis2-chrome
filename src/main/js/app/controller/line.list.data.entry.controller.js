@@ -37,6 +37,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
         var setExcludedPropertyForDataElements = function(programs) {
             var loadSystemSettings = function() {
                 return systemSettingRepository.getAllWithProjectId($scope.currentModule.parent.id).then(function(data) {
+                    if (data === undefined) return [];
                     var excludedDataElementIds = data.value.excludedDataElements[$scope.currentModule.id];
                     return excludedDataElementIds;
                 });

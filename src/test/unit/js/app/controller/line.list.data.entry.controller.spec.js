@@ -194,7 +194,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.$apply();
 
                 expect(scope.programs).toEqual([expectedProgram]);
-
             });
 
             it("should find optionSets for id", function() {
@@ -363,7 +362,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 expect(scope.showView).toEqual(true);
                 expect(scope.showForm).toEqual(false);
-
             });
 
             it("should save event details as draft and show form again", function() {
@@ -389,7 +387,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 expect(scope.showView).toEqual(false);
                 expect(scope.showForm).toEqual(true);
-
             });
 
             it("should submit event details", function() {
@@ -577,12 +574,11 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, program));
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo);
 
-                scope.setUpViewOrEditForm('event1').then(function(data){
+                scope.setUpViewOrEditForm('event1').then(function(data) {
                     expect(programEventRepository.getAll).toHaveBeenCalled();
                     // expect(scope.eventToBeEdited).toEqual(event1);
                 });
                 scope.$apply();
-                
             });
         });
     });
