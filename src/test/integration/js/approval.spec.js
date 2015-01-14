@@ -353,15 +353,16 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
             setupData().then(_.curry(setUpVerify)(getIndexedDBCopy, true, done, "downloadDataDone")).then(publishToHustle({}, "downloadData"));
         });
 
-        it("should show local data as unapproved after next sync cycle if it is unapproved (L2) on dhis", function(done) {
+        it("should show local data as unapproved after next sync cycle if another app has resubmitted the data", function(done) {
             var orgUnitId = "e3e286c6ca8";
             var period = "2014W48";
-            var datasetId = "a170b8cd5e5";
+            var atfcDatasetId = "a170b8cd5e5";
+            var esDatasetId = "ad7fe0ff2af";
 
             var idbDataValues = dataValueBuilder.build({
                 "period": period,
-                "lastUpdated": moment().add(2, 'days').toISOString(),
-                "values": ["19", "19"]
+                "lastUpdated": "2015-01-08T00:00:00",
+                "values": ["9", "9"]
             });
 
             var dhisDataValues = dataValueBuilder.build({
@@ -371,7 +372,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
             });
 
             var idbCompletionData = {
-                "dataSets": [datasetId],
+                "dataSets": [atfcDatasetId, esDatasetId],
                 "date": "2015-01-09T11:42:41.108Z",
                 "orgUnit": orgUnitId,
                 "period": period,
@@ -379,7 +380,14 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
             };
 
             var dhisCompletionData = [{
-                "ds": datasetId,
+                "ds": atfcDatasetId,
+                "pe": period,
+                "ou": orgUnitId,
+                "sb": "prj_approver_l1",
+                "cd": "2015-01-09T12:11:55.567Z",
+                "multiOu": true
+            }, {
+                "ds": esDatasetId,
                 "pe": period,
                 "ou": orgUnitId,
                 "sb": "prj_approver_l1",
@@ -388,7 +396,13 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
             }];
 
             var dhisApprovalData = [{
-                "ds": datasetId,
+                "ds": atfcDatasetId,
+                "pe": period,
+                "ou": orgUnitId,
+                "ab": "prj_approver_l1",
+                "ad": "2015-01-09T12:11:55.567Z"
+            }, {
+                "ds": esDatasetId,
                 "pe": period,
                 "ou": orgUnitId,
                 "ab": "prj_approver_l1",
@@ -396,7 +410,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
             }];
 
             var idbApprovedData = {
-                "dataSets": [datasetId],
+                "dataSets": [atfcDatasetId, esDatasetId],
                 "createdDate": "2015-01-08T11:42:41.108Z",
                 "orgUnit": orgUnitId,
                 "period": period,
