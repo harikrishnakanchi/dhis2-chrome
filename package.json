@@ -5,6 +5,7 @@
     "description": "DHIS2-Chrome-App",
     "devDependencies": {
         "gulp": "*",
+        "q": "*",
         "gulp-karma": "*",
         "gulp-protractor": "*",
         "gulp-rename": "*",
@@ -21,7 +22,7 @@
         "gulp-download": "DWB-eHealth/gulp-download",
         "path": "~0.4.9",
         "watch": "~0.9.0",
-
+        "restler": "*",
         "karma-jasmine": "*",
         "karma-requirejs": "*",
         "karma-chrome-launcher": "*",
