@@ -102,7 +102,11 @@
             }));
     });
 
-    gulp.task('stop', ["it"], shell.task['java -jar ' + process.env.JETTY_HOME + '/start.jar --stop -DSTOP.PORT=8889 -DSTOP.KEy=booyakasha']);
+    var stopDhis = function() {
+        var stream = shell(['java -jar ' + process.env.JETTY_HOME + '/start.jar --stop -DSTOP.PORT=8889 -DSTOP.KEY=booyakasha']);
+        stream.write(process.stdout);
+        return stream;
+    };
 
     gulp.task('it', ["check-jetty-home", "check-war-path", 'start-dhis'], function() {
         return gulp.src('_')
@@ -110,7 +114,13 @@
                 configFile: karmaIntConf,
                 action: 'run',
                 preprocessors: {}
-            }));
+            })).on('error', function(err) {
+                stopDhis();
+                throw err;
+            })
+            .on('end', function(err) {
+                stopDhis();
+            });
     });
 
     gulp.task('itest', function() {
