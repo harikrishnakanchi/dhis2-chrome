@@ -16,7 +16,8 @@ require.config({
         utils: '../../test/integration/js/utils/utils',
         idbUtils: '../../test/integration/js/utils/idb.utils',
         httpTestUtils: '../../test/integration/js/utils/http.utils',
-        dataValueBuilder: '../../test/integration/js/builders/data.value.builder'
+        dataValueBuilder: '../../test/integration/js/builders/data.value.builder',
+        overrides: "/Users/kprakash/Projects/msf/dhis2-chrome/src/test/integration/conf/overrides"
     },
     shim: {
         'angular': {

@@ -1,5 +1,8 @@
-require(["base/test/integration/test.config"], function() {
-    require(["app/app.config", "app/bg.config", "app/test.app"], function(_, __, testApp) {
+require(["base/main/js/app/app.config", "base/main/js/app/bg.config"], function() {
+    require(["base/test/integration/test.config", "base/main/js/app/conf/properties", "base/main/js/app/test.app"], function(___, properties, testApp) {
+        // properties.dhis.url = "http://localhost:8888/dhis"
+        console.error(properties);
+
         extendChromeFunctionality();
         return testApp.bootstrap(testApp.init()).then(function(data) {
             var injector = data[0];

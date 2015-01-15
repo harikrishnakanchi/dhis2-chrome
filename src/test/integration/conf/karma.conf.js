@@ -15,6 +15,9 @@ module.exports = function(config) {
             }, {
                 pattern: 'test/integration/js/**/*.js',
                 included: false
+            }, {
+                pattern: 'test/integration/conf/overrides.js',
+                included: false
             }
         ],
         exclude: [
@@ -31,7 +34,7 @@ module.exports = function(config) {
                 flags: ['--disable-web-security']
             }
         },
-        logLevel: config.LOG_ERROR,
+        logLevel: config.LOG_INFO,
         browserNoActivityTimeout: 30000,
         junitReporter: {
             outputFile: 'test/integration/coverage/test-results.xml'

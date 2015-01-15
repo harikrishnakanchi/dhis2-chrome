@@ -1,6 +1,6 @@
 define([], function() {
     var httpService = dhis.injector.get("$http");
-    var baseUrl = "http://localhost:8080";
+    var baseUrl = "http://localhost:8888/dhis";
 
     var httpGet = function(apiUrl, params) {
         return httpService.get(baseUrl + apiUrl, {
