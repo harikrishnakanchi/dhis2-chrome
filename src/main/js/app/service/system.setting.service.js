@@ -14,25 +14,25 @@ define(["dhisUrl", "md5"], function(dhisUrl, md5) {
                 });
             };
 
-            getExcludedDataElements(data.projectId).then(function(dataFromServer) {
-                var computeNewSystemSettingsPayload = function(){
+            return getExcludedDataElements(data.projectId).then(function(dataFromServer) {
+                var computeNewSystemSettingsPayload = function() {
                     var moduleIds = _.keys(data.settings.excludedDataElements);
-                    _.forEach(moduleIds, function(modId){
-                        var indexedDbChecksum =md5(JSON.stringify((data.indexedDbOldSystemSettings.excludedDataElements)[modId]));
+                    _.forEach(moduleIds, function(modId) {
+                        var indexedDbChecksum = md5(JSON.stringify((data.indexedDbOldSystemSettings.excludedDataElements)[modId]));
                         var dhisChecksum = md5(JSON.stringify((dataFromServer.data.excludedDataElements[modId])));
-                        if(dhisChecksum === indexedDbChecksum){
+                        if (dhisChecksum === indexedDbChecksum) {
                             (dataFromServer.data.excludedDataElements)[modId] = (data.settings.excludedDataElements)[modId];
-                        }else{
+                        } else {
                             console.error("Excluded data elements for " + modId + "under" + data.projectId + " have changed on server before this request could sync.");
                         }
                     });
                     return postExcludedDataElements(dataFromServer.data);
                 };
 
-                if(_.isEmpty(dataFromServer.data)){
+                if (_.isEmpty(dataFromServer.data)) {
                     return postExcludedDataElements(data.settings);
-                }else{
-                    return computeNewSystemSettingsPayload(); 
+                } else {
+                    return computeNewSystemSettingsPayload();
                 }
             });
         };

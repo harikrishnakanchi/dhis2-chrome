@@ -8,8 +8,16 @@ define([], function() {
         });
     };
 
-    var httpPost = function(apiUrl, payload) {
-        return httpService.post(baseUrl + apiUrl, payload);
+    var httpPost = function(apiUrl, payload, headers) {
+        var httpPostParams = {
+            method: 'POST',
+            url: baseUrl + apiUrl,
+            data: payload
+        };
+        if (headers) {
+            httpPostParams.headers = headers;
+        }
+        return httpService(httpPostParams);
     };
 
     var httpDelete = function(apiUrl, params) {
