@@ -14,7 +14,7 @@
                     <li class="form-group">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label">Module name</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="Module Name" ng-model="module.name" not-in="allModules" required>
+                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="Module Name" ng-model="module.name" not-in="allModuleNames" ng-change=getAllModulesNames() required>
                             <div ng-show="form.moduleName{{$index}}.$dirty &amp;&amp; form.moduleName{{$index}}.$invalid">
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>

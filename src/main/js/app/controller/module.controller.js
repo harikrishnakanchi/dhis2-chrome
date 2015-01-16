@@ -7,6 +7,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.isExpanded = {};
         $scope.isDisabled = false;
 
+        var allModules = [];
+
         var isNewDataModel = function(ds) {
             var attr = _.find(ds.attributeValues, {
                 "attribute": {
@@ -54,7 +56,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
                 var setUpNewMode = function() {
                     orgUnitRepository.getAll().then(function(allOrgUnits) {
-                        $scope.allModules = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
+                        allModules = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
                     });
 
                     $scope.addModules();
@@ -144,7 +146,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
                     var getAllModules = function() {
                         return orgUnitRepository.getAll().then(function(allOrgUnits) {
-                            $scope.allModules = _.difference(orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.parent.id), [$scope.orgUnit.name]);
+                            allModules = _.difference(orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.parent.id), [$scope.orgUnit.name]);
                             return allOrgUnits;
                         });
                     };
@@ -280,7 +282,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 publishMessage(programs, "uploadProgram");
                 return enrichedModules;
             });
-
         };
 
         var saveSystemSettingsForExcludedDataElements = function(parentId, aggModules, linelistModules) {
@@ -399,7 +400,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 module.timestamp = module.timestamp || new Date().getTime();
                 $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
                 return $scope.isExpanded[module.timestamp];
-        };
+            };
 
         $scope.changeDataModel = function(module, dataModel) {
             module.allDatasets = filterAllDataSetsBasedOnDataModelType($scope.allDatasets, dataModel);
@@ -495,6 +496,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
             });
             module.selectedDataset = undefined;
+        };
+
+        $scope.getAllModulesNames = function() {
+            $scope.allModuleNames = _.reject(allModules.concat(_.pluck($scope.modules, "name")), function(m) {
+                return m === undefined;
+            });
         };
 
         init();
