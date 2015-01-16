@@ -15,7 +15,10 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
             orgUnitRepo = utils.getMockRepo(q);
             orgUnitGroupHelper = new OrgUnitGroupHelper();
             scope.orgUnit = {
-                id: "blah"
+                id: "blah",
+                parent: {
+                    id: "parent"
+                }
             };
 
             _Date = Date;
@@ -171,6 +174,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
         it("should set operation unit for view", function() {
             scope.orgUnit = {
                 'name': 'opUnit1',
+                'parent': {
+                    "id": "parent"
+                },
                 "attributeValues": [{
                     "attribute": {
                         "code": "opUnitType"
@@ -190,7 +196,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
             };
             scope.isNewMode = false;
 
-            opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location, fakeModal);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, db, location, fakeModal);
 
             scope.$apply();
             expect(scope.opUnits[0].name).toEqual('opUnit1');
@@ -201,6 +207,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
         it("should disable disable button for opunit", function() {
             scope.orgUnit = {
                 'name': 'opUnit1',
+                'parent': {
+                    "id": "parent"
+                },
                 "attributeValues": [{
                     "attribute": {
                         "code": "opUnitType"
@@ -220,7 +229,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
             };
             scope.isNewMode = false;
 
-            opUnitController = new OpUnitController(scope, hustle, orgUnitRepo, db, location, fakeModal);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, db, location, fakeModal);
 
             scope.$apply();
             expect(scope.isDisabled).toBeTruthy();

@@ -5,6 +5,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         $scope.opUnits = [{
             'openingDate': moment().format("YYYY-MM-DD")
         }];
+        var allOpUnits = [];
 
         $scope.addOpUnits = function() {
             $scope.opUnits.push({
@@ -96,9 +97,9 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 });
             });
 
-            var updateOrgUnitGroupsForModules = function(){
+            var updateOrgUnitGroupsForModules = function() {
                 return orgUnitRepository.getAllModulesInOpUnit($scope.orgUnit.id).then(function(modules) {
-                    return orgUnitGroupHelper.createOrgUnitGroups(modules,true);
+                    return orgUnitGroupHelper.createOrgUnitGroups(modules, true);
                 });
             };
 
@@ -140,6 +141,12 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }, $scope.resourceBundle.disableOrgUnitConfirmationMessage);
         };
 
+        $scope.getAllOpunits = function() {
+            $scope.allOpunitNames = _.reject(allOpUnits.concat(_.pluck($scope.opUnits, "name")), function(m) {
+                return m === undefined;
+            });
+        };
+
         var init = function() {
             if (!$scope.isNewMode) {
                 $scope.opUnits = [{
@@ -161,11 +168,11 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     }
                 });
                 $scope.isDisabled = isDisabled && isDisabled.value;
-            } else {
-                orgUnitRepository.getAll().then(function(allOrgUnits) {
-                    $scope.allOpUnits = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
-                });
             }
+            orgUnitRepository.getAll().then(function(allOrgUnits) {
+                var parentId = $scope.isNewMode ? $scope.orgUnit.id : $scope.orgUnit.parent.id;
+                allOpUnits = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, parentId);
+            });
         };
 
         init();
