@@ -14,10 +14,10 @@
                     <li class="form-group">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label">Module name</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="moduleName" id="moduleName" placeholder="Module Name" ng-model="module.name" not-in="allModules" required>
-                            <div ng-show="form.moduleName.$dirty &amp;&amp; form.moduleName.$invalid">
-                                <span class="errortxt" ng-show="form.moduleName.$error.required">{{resourceBundle.nameValidation}}</span>
-                                <span class="errortxt" ng-show="form.moduleName.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
+                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="Module Name" ng-model="module.name" not-in="allModules" required>
+                            <div ng-show="form.moduleName{{$index}}.$dirty &amp;&amp; form.moduleName{{$index}}.$invalid">
+                                <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
+                                <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
                             </div>
                         </div>
                     </li>
@@ -86,7 +86,7 @@
 
                         </div>
                     </li>
-                    <li class="form-group"  ng-if="module.serviceType==='Linelist' &amp;&amp; module.program.name !== ''">
+                    <li class="form-group" ng-if="module.serviceType==='Linelist' &amp;&amp; module.program.name !== ''">
                         <div class="col-sm-12">
                             <section class="module-details">
                                 <div class="details">
@@ -104,18 +104,18 @@
                                                         </label>
                                                     </li>
                                                 </ul>
-                                        </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </section>
                         </div>
                     </li>
-                    
+
                 </ul>
             </div>
             <input type="button" class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules)" value="Save" ng-if="isNewMode" />
-            <input type="button" class="btn btn-main pull-right" ng-click="update(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules) || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode"/>
+            <input type="button" class="btn btn-main pull-right" ng-click="update(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules) || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode" />
             <input type="button" class="btn btn-main pull-right" ng-click="disable(orgUnit)" value="Disable" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !isDisabled" />
         </form>
     </div>
