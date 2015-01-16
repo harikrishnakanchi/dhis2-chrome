@@ -117,7 +117,7 @@
         return gulp.src('_')
             .pipe(karma({
                 configFile: karmaIntConf,
-                action: 'run',
+                action: 'watch',
                 preprocessors: {}
             }));
     });

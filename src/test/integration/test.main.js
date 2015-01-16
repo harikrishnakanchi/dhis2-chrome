@@ -26,18 +26,4 @@ var extendChromeFunctionality = function() {
         var event = new Event(messageName);
         document.dispatchEvent(event);
     };
-
-    chrome.alarms = {
-        "create": function() {},
-        "onAlarm": {
-            "addListener": function(callback) {
-                callback.apply(null, [{
-                    "name": "metadataSyncAlarm"
-                }]);
-                callback.apply(null, [{
-                    "name": "projectDataSyncAlarm"
-                }]);
-            }
-        }
-    };
 };

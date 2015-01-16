@@ -33,5 +33,4 @@ require.config({
 });
 
 console.log("load complete");
-console.log = function() {};
 console.debug = function() {};

@@ -31,50 +31,24 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 }
             ]);
 
-            app.run(['metadataService', 'consumerRegistry', 'dhisMonitor', '$hustle',
-                function(metadataService, consumerRegistry, dhisMonitor, $hustle) {
-
-                    var registerCallback = function(alarmName, callback) {
-                        return function(alarm) {
-                            if (alarm.name === alarmName)
-                                callback();
+            app.run(['metadataService', 'consumerRegistry', '$hustle',
+                function(metadataService, consumerRegistry, $hustle) {
+                    var syncWithDhis = function() {
+                        var doPublish = function(messageType) {
+                            $hustle.publish({
+                                "type": messageType,
+                                "data": []
+                            }, "dataValues");
                         };
-                    };
-
-                    var metadataSync = function() {
-                        if (!dhisMonitor.isOnline())
-                            return;
 
                         console.log("Starting metadata sync");
-
-                        $hustle.publish({
-                            "type": "downloadMetadata"
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadOrgUnit",
-                            "data": []
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadOrgUnitGroups",
-                            "data": []
-                        }, "dataValues");
-                    };
-
-                    var projectDataSync = function() {
-                        if (!dhisMonitor.isOnline())
-                            return;
+                        doPublish("downloadMetadata");
+                        doPublish("downloadOrgUnit");
+                        doPublish("downloadOrgUnitGroups");
 
                         console.log("Starting project data sync");
-
-                        $hustle.publish({
-                            "type": "downloadData"
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadEventData"
-                        }, "dataValues");
+                        doPublish("downloadData");
+                        doPublish("downloadEventData");
                     };
 
                     console.log("Registering hustle consumers");
@@ -82,9 +56,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         consumerRegistry.startAllConsumers();
                     });
 
-                    dhisMonitor.start()
-                        .then(metadataSync)
-                        .then(projectDataSync);
+                    syncWithDhis();
                 }
             ]);
 
