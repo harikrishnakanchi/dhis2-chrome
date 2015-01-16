@@ -207,6 +207,5 @@
         });
         return crx.pack().then(function(buf) {
             fs.writeFile("dhis2_" + (argv.env || "dev") + ".crx", buf);
-            crx.destroy();
         });
     });
