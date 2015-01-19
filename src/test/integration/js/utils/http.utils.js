@@ -1,4 +1,4 @@
-define([], function() {
+define(["lodash"], function(_) {
     var httpService = dhis.injector.get("$http");
     var baseUrl = "http://localhost:8888/dhis";
 
@@ -9,15 +9,16 @@ define([], function() {
     };
 
     var httpPost = function(apiUrl, payload, headers) {
-        var httpPostParams = {
-            method: 'POST',
-            url: baseUrl + apiUrl,
-            data: payload
+        var defultHeaders = {
+            "Content-Type": 'application/json'
         };
-        if (headers) {
-            httpPostParams.headers = headers;
-        }
-        return httpService(httpPostParams);
+        return httpService.post(baseUrl + apiUrl, payload).then(function(data) {
+            console.error("post sucess " + JSON.stringify(data) + "url :" + apiUrl);
+            return data;
+        }, function(data, status, headers, config) {
+            console.error("error posting to " + apiUrl + "status :" + status + "data :" + data);
+            return data;
+        });
     };
 
     var httpDelete = function(apiUrl, params) {

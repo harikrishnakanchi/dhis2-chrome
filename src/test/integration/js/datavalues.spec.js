@@ -81,7 +81,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
             var idbData = dataValueBuilder.build({
                 "period": period,
                 "lastUpdated": "2015-01-08T00:00:00",
-                "values": ["9", "9"]
+                "values": ["10", "10"]
             });
 
             var setupData = function() {
@@ -139,7 +139,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
             var idbData = dataValueBuilder.build({
                 "period": period,
                 "lastUpdated": "2015-01-02T04:00:00",
-                "values": ["9", "9"]
+                "values": ["88", "88"]
             });
 
             var dhisData = dataValueBuilder.build({
@@ -166,6 +166,8 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
 
             setupData().then(_.curry(setUpVerify)(getRemoteCopy, idbData, 2, done)).then(_.curry(publishUploadMessage)(period, orgUnitId, 2));
         });
+
+
 
     });
 });
