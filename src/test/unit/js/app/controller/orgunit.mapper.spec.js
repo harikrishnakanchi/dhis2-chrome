@@ -1,12 +1,21 @@
-define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mocks, moment) {
+define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitMapper, mocks, moment, timecop) {
     describe("orgUnitMapper", function() {
+        beforeEach(function() {
+            Timecop.install();
+            Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
+        });
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
 
         it("should convert project from DHIS to project for view", function() {
             var dhisProject = {
                 "id": "aa4acf9115a",
-                "name": 'Org1',
+                "name": "Org1",
                 "level": 3,
-                "shortName": 'Org1',
+                "shortName": "Org1",
                 "openingDate": "2010-01-01",
                 "parent": {
                     "name": "name1",
@@ -43,46 +52,46 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     },
                     "value": "RU118"
                 }, {
-                    attribute: {
-                        code: 'reasonForIntervention',
-                        name: 'Reason For Intervention'
+                    "attribute": {
+                        "code": "reasonForIntervention",
+                        "name": "Reason For Intervention"
                     },
-                    value: 'Armed Conflict'
+                    "value": "Armed Conflict"
                 }, {
-                    attribute: {
-                        code: 'modeOfOperation',
-                        name: 'Mode Of Operation'
+                    "attribute": {
+                        "code": "modeOfOperation",
+                        "name": "Mode Of Operation"
                     },
-                    value: 'Direct Operation'
+                    "value": "Direct Operation"
                 }, {
-                    attribute: {
-                        code: 'modelOfManagement',
-                        name: 'Model Of Management'
+                    "attribute": {
+                        "code": "modelOfManagement",
+                        "name": "Model Of Management"
                     },
-                    value: 'Collaboration'
+                    "value": "Collaboration"
                 }, {
-                    'attribute': {
-                        'code': 'autoApprove',
-                        'name': 'Auto Approve'
+                    "attribute": {
+                        "code": "autoApprove",
+                        "name": "Auto Approve"
                     },
-                    'value': 'true'
+                    "value": "true"
                 }]
             };
 
             var result = orgUnitMapper.mapToProject(dhisProject);
 
             var expectedResult = {
-                'name': dhisProject.name,
-                'openingDate': moment(dhisProject.openingDate).toDate(),
-                'context': "val2",
-                'location': "val3",
-                'populationType': "val5",
-                'endDate': moment("2011-01-01").toDate(),
-                'projectCode': 'RU118',
-                'reasonForIntervention': 'Armed Conflict',
-                'modeOfOperation': 'Direct Operation',
-                'modelOfManagement': 'Collaboration',
-                'autoApprove': 'true'
+                "name": dhisProject.name,
+                "openingDate": moment(dhisProject.openingDate).toDate(),
+                "context": "val2",
+                "location": "val3",
+                "populationType": "val5",
+                "endDate": moment("2011-01-01").toDate(),
+                "projectCode": "RU118",
+                "reasonForIntervention": "Armed Conflict",
+                "modeOfOperation": "Direct Operation",
+                "modelOfManagement": "Collaboration",
+                "autoApprove": "true"
             };
 
             expect(result).toEqual(expectedResult);
@@ -91,9 +100,9 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
         it("should set autoApprove to false if the attribute does not exist in dhis", function() {
             var dhisProject = {
                 "id": "aa4acf9115a",
-                "name": 'Org1',
+                "name": "Org1",
                 "level": 3,
-                "shortName": 'Org1',
+                "shortName": "Org1",
                 "openingDate": "2010-01-01",
                 "parent": {
                     "name": "name1",
@@ -111,17 +120,17 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             var result = orgUnitMapper.mapToProject(dhisProject);
 
             var expectedResult = {
-                'name': dhisProject.name,
-                'openingDate': moment(dhisProject.openingDate).toDate(),
-                'context': undefined,
-                'location': undefined,
-                'populationType': undefined,
-                'endDate': undefined,
-                'projectCode': 'RU118',
-                'reasonForIntervention': undefined,
-                'modeOfOperation': undefined,
-                'modelOfManagement': undefined,
-                'autoApprove': 'false'
+                "name": dhisProject.name,
+                "openingDate": moment(dhisProject.openingDate).toDate(),
+                "context": undefined,
+                "location": undefined,
+                "populationType": undefined,
+                "endDate": undefined,
+                "projectCode": "RU118",
+                "reasonForIntervention": undefined,
+                "modeOfOperation": undefined,
+                "modelOfManagement": undefined,
+                "autoApprove": "false"
             };
 
             expect(result).toEqual(expectedResult);
@@ -130,98 +139,117 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
         it("should transform orgUnit to contain attributes as per DHIS", function() {
 
             var orgUnit = {
-                'name': 'Org1',
-                'openingDate': moment("2010-01-01").toDate(),
-                'context': "val2",
-                'location': "val3",
-                'endDate': moment("2011-01-01").toDate(),
-                'populationType': "val6",
-                'projectCode': 'AB001',
-                'reasonForIntervention': 'Armed Conflict',
-                'modeOfOperation': 'Direct Operation',
-                'modelOfManagement': 'Collaboration',
-                'autoApprove': 'true'
+                "name": "Org1",
+                "openingDate": moment("2010-01-01").toDate(),
+                "context": "val2",
+                "location": "val3",
+                "endDate": moment("2011-01-01").toDate(),
+                "populationType": "val6",
+                "projectCode": "AB001",
+                "reasonForIntervention": "Armed Conflict",
+                "modeOfOperation": "Direct Operation",
+                "modelOfManagement": "Collaboration",
+                "autoApprove": "true"
             };
 
             var parentOrgUnit = {
-                name: 'Name1',
-                id: 'Id1',
-                level: "2",
+                "name": "Name1",
+                "id": "Id1",
+                "level": "2",
             };
-
 
             var result = orgUnitMapper.mapToProjectForDhis(orgUnit, parentOrgUnit);
 
             var expectedResult = {
-                id: 'a131658d54b',
-                name: 'Org1',
-                level: 3,
-                shortName: 'Org1',
-                openingDate: '2010-01-01',
-                parent: {
-                    name: 'Name1',
-                    id: 'Id1'
+                "id": "a131658d54b",
+                "name": "Org1",
+                "level": 3,
+                "shortName": "Org1",
+                "openingDate": "2010-01-01",
+                "parent": {
+                    "name": "Name1",
+                    "id": "Id1"
                 },
-                attributeValues: [{
-                    attribute: {
-                        code: 'Type',
-                        name: 'Type'
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
                     },
-                    value: 'Project'
+                    "value": "Project"
                 }, {
-                    attribute: {
-                        code: 'prjCon',
-                        name: 'Context'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "prjCon",
+                        "name": "Context"
                     },
-                    value: 'val2'
+                    "value": "val2"
                 }, {
-                    attribute: {
-                        code: 'prjLoc',
-                        name: 'Location'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "prjLoc",
+                        "name": "Location"
                     },
-                    value: 'val3'
+                    "value": "val3"
                 }, {
-                    attribute: {
-                        code: 'prjPopType',
-                        name: 'Type of population'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "prjPopType",
+                        "name": "Type of population"
                     },
-                    value: 'val6'
+                    "value": "val6"
                 }, {
-                    attribute: {
-                        code: 'projCode',
-                        name: 'Project Code'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "projCode",
+                        "name": "Project Code"
                     },
-                    value: 'AB001'
+                    "value": "AB001"
                 }, {
-                    attribute: {
-                        code: 'reasonForIntervention',
-                        name: 'Reason For Intervention'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "reasonForIntervention",
+                        "name": "Reason For Intervention"
                     },
-                    value: 'Armed Conflict'
+                    "value": "Armed Conflict"
                 }, {
-                    attribute: {
-                        code: 'modeOfOperation',
-                        name: 'Mode Of Operation'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "modeOfOperation",
+                        "name": "Mode Of Operation"
                     },
-                    value: 'Direct Operation'
+                    "value": "Direct Operation"
                 }, {
-                    attribute: {
-                        code: 'modelOfManagement',
-                        name: 'Model Of Management'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "modelOfManagement",
+                        "name": "Model Of Management"
                     },
-                    value: 'Collaboration'
+                    "value": "Collaboration"
                 }, {
-                    'attribute': {
-                        'code': 'autoApprove',
-                        'name': 'Auto Approve'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "autoApprove",
+                        "name": "Auto Approve"
                     },
-                    'value': 'true'
+                    "value": "true"
                 }, {
-                    attribute: {
-                        code: 'prjEndDate',
-                        name: 'End date'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "prjEndDate",
+                        "name": "End date"
                     },
-                    value: '2011-01-01'
+                    "value": "2011-01-01"
                 }]
             };
 
@@ -230,174 +258,186 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
         it("should map modules for dhis if id and level are not given", function() {
             var projectOrgUnit = {
-                'id': 'Project1Id',
-                'name': 'Project1',
-                'level': '3',
+                "id": "Project1Id",
+                "name": "Project1",
+                "level": "3",
             };
 
             var modules = [{
-                'name': "Module1",
-                'service': "Aggregate",
-                'dataSets': [{
-                    'id': 'ds_11',
-                    'name': 'dataset11',
+                "name": "Module1",
+                "service": "Aggregate",
+                "dataSets": [{
+                    "id": "ds_11",
+                    "name": "dataset11",
                 }, {
-                    'id': 'ds_12',
-                    'name': 'dataset12'
+                    "id": "ds_12",
+                    "name": "dataset12"
                 }]
             }, {
-                'name': "Module2",
-                'service': "Aggregate",
-                'dataSets': [{
-                    'id': 'ds_21',
-                    'name': 'dataset21',
+                "name": "Module2",
+                "service": "Aggregate",
+                "dataSets": [{
+                    "id": "ds_21",
+                    "name": "dataset21",
                 }, {
-                    'id': 'ds_22',
-                    'name': 'dataset22'
+                    "id": "ds_22",
+                    "name": "dataset22"
                 }]
             }];
 
             var today = new Date("2010-01-01T00:00:00");
-            spyOn(window, 'Date').and.returnValue(today);
+            spyOn(window, "Date").and.returnValue(today);
 
             var actualModules = orgUnitMapper.mapToModules(modules, projectOrgUnit);
 
             expect(actualModules).toEqual([{
-                name: 'Module1',
-                dataSets: [{
-                    'id': 'ds_11',
-                    'name': 'dataset11',
+                "name": "Module1",
+                "dataSets": [{
+                    "id": "ds_11",
+                    "name": "dataset11",
                 }, {
-                    'id': 'ds_12',
-                    'name': 'dataset12'
+                    "id": "ds_12",
+                    "name": "dataset12"
                 }],
-                shortName: 'Module1',
-                id: 'aac1bbd0985',
-                level: 4,
-                openingDate: "2010-01-01",
-                selectedDataset: undefined,
-                enrichedProgram: undefined,
-                attributeValues: [{
-                    attribute: {
-                        code: "Type",
-                        name: "Type"
+                "shortName": "Module1",
+                "id": "aac1bbd0985",
+                "level": 4,
+                "openingDate": "2010-01-01",
+                "selectedDataset": undefined,
+                "enrichedProgram": undefined,
+                "attributeValues": [{
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
                     },
-                    value: 'Module'
+                    "value": "Module"
                 }, {
-                    attribute: {
-                        code: "isLineListService",
-                        name: "Is Linelist Service"
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": "isLineListService",
+                        "name": "Is Linelist Service"
                     },
-                    value: 'false'
+                    "value": "false"
                 }],
-                parent: {
-                    name: 'Project1',
-                    id: 'Project1Id'
+                "parent": {
+                    "name": "Project1",
+                    "id": "Project1Id"
                 }
             }, {
-                name: 'Module2',
-                dataSets: [{
-                    'id': 'ds_21',
-                    'name': 'dataset21',
+                "name": "Module2",
+                "dataSets": [{
+                    "id": "ds_21",
+                    "name": "dataset21",
                 }, {
-                    'id': 'ds_22',
-                    'name': 'dataset22'
+                    "id": "ds_22",
+                    "name": "dataset22"
                 }],
-                shortName: 'Module2',
-                id: 'acccf1dda36',
-                level: 4,
-                openingDate: "2010-01-01",
-                selectedDataset: undefined,
-                enrichedProgram: undefined,
-                attributeValues: [{
-                    attribute: {
-                        code: "Type",
-                        name: "Type"
+                "shortName": "Module2",
+                "id": "acccf1dda36",
+                "level": 4,
+                "openingDate": "2010-01-01",
+                "selectedDataset": undefined,
+                "enrichedProgram": undefined,
+                "attributeValues": [{
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
                     },
-                    value: 'Module'
+                    "value": "Module"
                 }, {
-                    attribute: {
-                        code: "isLineListService",
-                        name: "Is Linelist Service"
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": "isLineListService",
+                        "name": "Is Linelist Service"
                     },
-                    value: 'false'
+                    "value": "false"
                 }],
-                parent: {
-                    name: 'Project1',
-                    id: 'Project1Id'
+                "parent": {
+                    "name": "Project1",
+                    "id": "Project1Id"
                 }
             }]);
         });
 
         it("should map modules for dhis if id and level are given", function() {
             var projectOrgUnit = {
-                'id': 'Project1Id',
-                'name': 'Project1',
-                'level': '3',
+                "id": "Project1Id",
+                "name": "Project1",
+                "level": "3",
             };
 
             var modules = [{
-                'name': "Module1",
-                'service': "Aggregate",
-                'dataSets': [{
-                    'id': 'ds_11',
-                    'name': 'dataset11',
+                "name": "Module1",
+                "service": "Aggregate",
+                "dataSets": [{
+                    "id": "ds_11",
+                    "name": "dataset11",
                 }, {
-                    'id': 'ds_12',
-                    'name': 'dataset12'
+                    "id": "ds_12",
+                    "name": "dataset12"
                 }]
             }];
 
             var today = new Date("2010-01-01T00:00:00");
-            spyOn(window, 'Date').and.returnValue(today);
+            spyOn(window, "Date").and.returnValue(today);
 
             var actualModules = orgUnitMapper.mapToModules(modules, projectOrgUnit, "someId", "someLevel");
 
             expect(actualModules).toEqual([{
-                name: 'Module1',
-                dataSets: [{
-                    'id': 'ds_11',
-                    'name': 'dataset11',
+                "name": "Module1",
+                "dataSets": [{
+                    "id": "ds_11",
+                    "name": "dataset11",
                 }, {
-                    'id': 'ds_12',
-                    'name': 'dataset12'
+                    "id": "ds_12",
+                    "name": "dataset12"
                 }],
-                shortName: 'Module1',
-                id: 'someId',
-                level: 'someLevel',
-                openingDate: "2010-01-01",
-                selectedDataset: undefined,
-                enrichedProgram: undefined,
-                attributeValues: [{
-                    attribute: {
-                        code: "Type",
-                        name: "Type"
+                "shortName": "Module1",
+                "id": "someId",
+                "level": "someLevel",
+                "openingDate": "2010-01-01",
+                "selectedDataset": undefined,
+                "enrichedProgram": undefined,
+                "attributeValues": [{
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
                     },
-                    value: 'Module'
+                    "value": "Module"
                 }, {
-                    attribute: {
-                        code: "isLineListService",
-                        name: "Is Linelist Service"
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": "isLineListService",
+                        "name": "Is Linelist Service"
                     },
-                    value: 'false'
+                    "value": "false"
                 }],
-                parent: {
-                    name: 'Project1',
-                    id: 'Project1Id'
+                "parent": {
+                    "name": "Project1",
+                    "id": "Project1Id"
                 }
             }]);
         });
 
         it("should return all the projects under a orgUnit", function() {
             var allOrgUnit = [{
-                name: "blah1",
-                parent: {
-                    id: 1
+                "name": "blah1",
+                "parent": {
+                    "id": 1
                 }
             }, {
-                name: "blah2",
-                parent: {
-                    id: 1
+                "name": "blah2",
+                "parent": {
+                    "id": 1
                 }
             }];
             var id = 1;
@@ -410,52 +450,52 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
         it("should map datasets for dhis", function() {
             var originalDataSets = [{
-                'id': 'ds_11',
-                'name': 'dataset11',
+                "id": "ds_11",
+                "name": "dataset11",
             }, {
-                'id': 'ds_12',
-                'name': 'dataset12'
+                "id": "ds_12",
+                "name": "dataset12"
             }];
 
             var projectOrgUnit = {
-                'id': 'Project1Id',
-                'name': 'Project1'
+                "id": "Project1Id",
+                "name": "Project1"
             };
 
             var modules = [{
-                'name': "Module1",
-                'dataSets': [{
-                    'id': 'ds_11',
-                    'name': 'dataset11',
+                "name": "Module1",
+                "dataSets": [{
+                    "id": "ds_11",
+                    "name": "dataset11",
                 }, {
-                    'id': 'ds_12',
-                    'name': 'dataset12'
+                    "id": "ds_12",
+                    "name": "dataset12"
                 }]
             }, {
-                'name': "Module2",
-                'dataSets': [{
-                    'id': 'ds_11',
-                    'name': 'dataset21',
+                "name": "Module2",
+                "dataSets": [{
+                    "id": "ds_11",
+                    "name": "dataset21",
                 }]
             }];
 
             var datasets = orgUnitMapper.mapToDataSets(modules, projectOrgUnit, originalDataSets);
             var expectedDatasets = [{
-                id: 'ds_11',
-                name: 'dataset11',
-                organisationUnits: [{
-                    name: 'Module1',
-                    id: 'aac1bbd0985'
+                "id": "ds_11",
+                "name": "dataset11",
+                "organisationUnits": [{
+                    "name": "Module1",
+                    "id": "aac1bbd0985"
                 }, {
-                    name: 'Module2',
-                    id: 'acccf1dda36'
+                    "name": "Module2",
+                    "id": "acccf1dda36"
                 }]
             }, {
-                id: 'ds_12',
-                name: 'dataset12',
-                organisationUnits: [{
-                    name: 'Module1',
-                    id: 'aac1bbd0985'
+                "id": "ds_12",
+                "name": "dataset12",
+                "organisationUnits": [{
+                    "name": "Module1",
+                    "id": "aac1bbd0985"
                 }]
             }];
 
@@ -464,21 +504,21 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
         it("should filter modules from org units", function() {
             var project = {
-                'name': 'Project1',
-                'id': 'id1',
-                'attributeValues': [{
+                "name": "Project1",
+                "id": "id1",
+                "attributeValues": [{
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "type"
                     },
                     "value": "Project"
                 }]
             };
 
             var module = {
-                'name': 'Module1',
-                'attributeValues': [{
+                "name": "Module1",
+                "attributeValues": [{
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "type"
                     },
                     "value": "Module"
                 }],
@@ -489,11 +529,11 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             };
 
             var opUnit = {
-                'name': 'opunit1',
-                'id': 'opunit1',
-                'attributeValues': [{
+                "name": "opunit1",
+                "id": "opunit1",
+                "attributeValues": [{
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "type"
                     },
                     "value": "Operation Unit"
                 }],
@@ -504,10 +544,10 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             };
 
             var moduleUnderOpunit = {
-                'name': 'Module2',
-                'attributeValues': [{
+                "name": "Module2",
+                "attributeValues": [{
                     "attribute": {
-                        "id": "a1fa2777924"
+                        "code": "type"
                     },
                     "value": "Module"
                 }],
@@ -518,10 +558,10 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             };
             var organisationUnits = [project, module, opUnit, moduleUnderOpunit];
             var expectedModule1 = _.merge(_.cloneDeep(module), {
-                'displayName': 'Module1'
+                "displayName": "Module1"
             });
             var expectedModule2 = _.merge(_.cloneDeep(moduleUnderOpunit), {
-                'displayName': 'opunit1 - Module2'
+                "displayName": "opunit1 - Module2"
             });
 
             var actualModules = orgUnitMapper.filterModules(organisationUnits);
@@ -531,8 +571,10 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
         it("should disable orgUnit", function() {
             var module = {
-                'name': 'Module1',
-                'attributeValues': [{
+                "name": "Module1",
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
                         "code": "isDisabled",
                         "name": "Is Disabled"
@@ -542,8 +584,10 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
             };
 
             var expectedModule = {
-                'name': 'Module1',
-                'attributeValues': [{
+                "name": "Module1",
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
                         "code": "isDisabled",
                         "name": "Is Disabled"
@@ -558,16 +602,18 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
         it("should disable multiple orgUnits", function() {
             var modules = [{
-                'name': 'Module1',
-                'attributeValues': [],
+                "name": "Module1",
+                "attributeValues": [],
             }, {
-                'name': 'Module2',
-                'attributeValues': [],
+                "name": "Module2",
+                "attributeValues": [],
             }];
 
             var expectedModules = [{
-                'name': 'Module1',
-                'attributeValues': [{
+                "name": "Module1",
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
                         "code": "isDisabled",
                         "name": "Is Disabled"
@@ -575,8 +621,10 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
                     "value": true
                 }],
             }, {
-                'name': 'Module2',
-                'attributeValues': [{
+                "name": "Module2",
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
                         "code": "isDisabled",
                         "name": "Is Disabled"
@@ -591,98 +639,120 @@ define(["orgUnitMapper", "angularMocks", "moment"], function(orgUnitMapper, mock
 
         it("should map to existing project", function() {
             var project = {
-                'name': 'Project1',
-                'id': 'id1',
-                'children': [{
-                    'id': "123"
+                "name": "Project1",
+                "id": "id1",
+                "children": [{
+                    "id": "123"
                 }]
             };
 
             var newProject = {
-                'name': 'Org1',
-                'openingDate': moment("2010-01-01").toDate(),
-                'context': "val2",
-                'location': "val3",
-                'endDate': moment("2011-01-01").toDate(),
-                'populationType': "val6",
-                'projectCode': 'AB001',
-                'reasonForIntervention': 'Armed Conflict',
-                'modeOfOperation': 'Direct Operation',
-                'modelOfManagement': 'Collaboration',
-                'autoApprove': 'true'
+                "name": "Org1",
+                "openingDate": moment("2010-01-01").toDate(),
+                "context": "val2",
+                "location": "val3",
+                "endDate": moment("2011-01-01").toDate(),
+                "populationType": "val6",
+                "projectCode": "AB001",
+                "reasonForIntervention": "Armed Conflict",
+                "modeOfOperation": "Direct Operation",
+                "modelOfManagement": "Collaboration",
+                "autoApprove": "true"
+            };
+
+            var expectedSavedProject = {
+                "name": "Org1",
+                "id": "id1",
+                "children": [{
+                    "id": "123"
+                }],
+                "openingDate": "2010-01-01",
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
+                    },
+                    "value": "Project"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "prjCon",
+                        "name": "Context"
+                    },
+                    "value": "val2"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "prjLoc",
+                        "name": "Location"
+                    },
+                    "value": "val3"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "prjPopType",
+                        "name": "Type of population"
+                    },
+                    "value": "val6"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "projCode",
+                        "name": "Project Code"
+                    },
+                    "value": "AB001"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "reasonForIntervention",
+                        "name": "Reason For Intervention"
+                    },
+                    "value": "Armed Conflict"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "modeOfOperation",
+                        "name": "Mode Of Operation"
+                    },
+                    "value": "Direct Operation"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "modelOfManagement",
+                        "name": "Model Of Management"
+                    },
+                    "value": "Collaboration"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "autoApprove",
+                        "name": "Auto Approve"
+                    },
+                    "value": "true"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "prjEndDate",
+                        "name": "End date"
+                    },
+                    "value": "2011-01-01"
+                }]
             };
 
             var projectToBeSaved = orgUnitMapper.mapToExistingProject(newProject, project);
 
-            expect(projectToBeSaved).toEqual({
-                name: 'Org1',
-                id: 'id1',
-                children: [{
-                    id: '123'
-                }],
-                openingDate: '2010-01-01',
-                attributeValues: [{
-                    attribute: {
-                        code: 'Type',
-                        name: 'Type'
-                    },
-                    value: 'Project'
-                }, {
-                    attribute: {
-                        code: 'prjCon',
-                        name: 'Context'
-                    },
-                    value: 'val2'
-                }, {
-                    attribute: {
-                        code: 'prjLoc',
-                        name: 'Location'
-                    },
-                    value: 'val3'
-                }, {
-                    attribute: {
-                        code: 'prjPopType',
-                        name: 'Type of population'
-                    },
-                    value: 'val6'
-                }, {
-                    attribute: {
-                        code: 'projCode',
-                        name: 'Project Code'
-                    },
-                    value: 'AB001'
-                }, {
-                    attribute: {
-                        code: 'reasonForIntervention',
-                        name: 'Reason For Intervention'
-                    },
-                    value: 'Armed Conflict'
-                }, {
-                    attribute: {
-                        code: 'modeOfOperation',
-                        name: 'Mode Of Operation'
-                    },
-                    value: 'Direct Operation'
-                }, {
-                    attribute: {
-                        code: 'modelOfManagement',
-                        name: 'Model Of Management'
-                    },
-                    value: 'Collaboration'
-                }, {
-                    attribute: {
-                        code: 'autoApprove',
-                        name: 'Auto Approve'
-                    },
-                    value: 'true'
-                }, {
-                    attribute: {
-                        code: 'prjEndDate',
-                        name: 'End date'
-                    },
-                    value: '2011-01-01'
-                }]
-            });
+            expect(projectToBeSaved).toEqual(expectedSavedProject);
         });
     });
 });

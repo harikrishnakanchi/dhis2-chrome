@@ -1,10 +1,10 @@
 /*global Date:true*/
-define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop) {
     describe("op unit controller", function() {
 
         var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper;
 
-        beforeEach(module('hustle'));
+        beforeEach(module("hustle"));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
             scope = $rootScope.$new();
             scope.isNewMode = true;
@@ -15,18 +15,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
             orgUnitRepo = utils.getMockRepo(q);
             orgUnitGroupHelper = new OrgUnitGroupHelper();
             scope.orgUnit = {
-                id: "blah",
-                parent: {
-                    id: "parent"
+                "id": "blah",
+                "parent": {
+                    "id": "parent"
                 }
             };
 
-            _Date = Date;
-            todayStr = "2014-04-01";
-            today = new Date(todayStr);
-            Date = function() {
-                return today;
-            };
+            Timecop.install();
+            Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
+
             fakeModal = {
                 close: function() {
                     this.result.confirmCallBack();
@@ -40,10 +37,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
         }));
 
         afterEach(function() {
-            Date = _Date;
+            Timecop.returnToPresent();
+            Timecop.uninstall();
         });
 
-        it('should add new op units', function() {
+        it("should add new op units", function() {
             scope.isNewMode = false;
 
             scope.$apply();
@@ -54,15 +52,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
             expect(scope.isDisabled).toBeFalsy();
         });
 
-        it('should delete operation unit', function() {
+        it("should delete operation unit", function() {
             scope.opUnits = [{
-                'name': 'opUnit1'
+                "name": "opUnit1"
             }, {
-                'name': 'opUnit2'
+                "name": "opUnit2"
             }, {
-                'name': 'opUnit1'
+                "name": "opUnit1"
             }, {
-                'name': 'opUnit4'
+                "name": "opUnit4"
             }];
 
             scope.isNewMode = false;
@@ -70,94 +68,105 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
 
             scope.delete(2);
             expect(scope.opUnits).toEqual([{
-                'name': 'opUnit1'
+                "name": "opUnit1"
             }, {
-                'name': 'opUnit2'
+                "name": "opUnit2"
             }, {
-                'name': 'opUnit4'
+                "name": "opUnit4"
             }]);
-
         });
 
-        it('should save operation units', function() {
-            var opUnit1Id = 'a823e522c15';
-            var opUnit2Id = 'a764a0f84af';
+        it("should save operation units", function() {
+            var opUnit1Id = "a823e522c15";
+            var opUnit2Id = "a764a0f84af";
             var opUnit1 = {
-                'name': 'OpUnit1',
-                'type': 'Hospital',
-                'openingDate': today,
-                'hospitalUnitCode': 'Unit Code - A'
+                "name": "OpUnit1",
+                "type": "Hospital",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "hospitalUnitCode": "Unit Code - A"
             };
             var opUnit2 = {
-                'name': 'OpUnit2',
-                'type': 'Community',
-                'openingDate': today,
-                'hospitalUnitCode': 'Unit Code - A'
+                "name": "OpUnit2",
+                "type": "Community",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "hospitalUnitCode": "Unit Code - A"
             };
             var opUnits = [opUnit1, opUnit2];
 
             scope.orgUnit = {
-                'level': '4',
-                'name': 'Parent',
-                'id': 'ParentId',
-                'children': []
+                "level": "4",
+                "name": "Parent",
+                "id": "ParentId",
+                "children": []
             };
 
             var expectedOpUnits = [{
-                name: 'OpUnit1',
-                openingDate: today,
-                id: 'a823e522c15',
-                shortName: 'OpUnit1',
-                level: 5,
-                parent: {
-                    name: 'Parent',
-                    id: 'ParentId'
+                "name": "OpUnit1",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "id": "a823e522c15",
+                "shortName": "OpUnit1",
+                "level": 5,
+                "parent": {
+                    "name": "Parent",
+                    "id": "ParentId"
                 },
-                attributeValues: [{
-                    attribute: {
-                        code: 'opUnitType'
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "opUnitType"
                     },
-                    value: 'Hospital'
+                    "value": "Hospital"
                 }, {
-                    attribute: {
-                        code: 'Type'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "Type"
                     },
-                    value: 'Operation Unit'
+                    "value": "Operation Unit"
                 }, {
-                    attribute: {
-                        code: 'hospitalUnitCode'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "hospitalUnitCode"
                     },
-                    value: 'Unit Code - A'
+                    "value": "Unit Code - A"
                 }]
             }, {
-                name: 'OpUnit2',
-                openingDate: today,
-                id: 'a764a0f84af',
-                shortName: 'OpUnit2',
-                level: 5,
-                parent: {
-                    name: 'Parent',
-                    id: 'ParentId'
+                "name": "OpUnit2",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "id": "a764a0f84af",
+                "shortName": "OpUnit2",
+                "level": 5,
+                "parent": {
+                    "name": "Parent",
+                    "id": "ParentId"
                 },
-                attributeValues: [{
-                    attribute: {
-                        code: 'opUnitType'
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "opUnitType"
                     },
-                    value: 'Community'
+                    "value": "Community"
                 }, {
-                    attribute: {
-                        code: 'Type'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "Type"
                     },
-                    value: 'Operation Unit'
+                    "value": "Operation Unit"
                 }, {
-                    attribute: {
-                        code: 'hospitalUnitCode'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "hospitalUnitCode"
                     },
-                    value: 'Unit Code - A'
+                    "value": "Unit Code - A"
                 }]
             }];
 
-            spyOn(location, 'hash');
+            spyOn(location, "hash");
 
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
@@ -166,15 +175,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnits);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: expectedOpUnits,
-                type: "upsertOrgUnit"
+                "data": expectedOpUnits,
+                "type": "upsertOrgUnit"
             }, "dataValues");
         });
 
         it("should set operation unit for view", function() {
             scope.orgUnit = {
-                'name': 'opUnit1',
-                'parent': {
+                "name": "opUnit1",
+                "parent": {
                     "id": "parent"
                 },
                 "attributeValues": [{
@@ -199,15 +208,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
             opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, db, location, fakeModal);
 
             scope.$apply();
-            expect(scope.opUnits[0].name).toEqual('opUnit1');
-            expect(scope.opUnits[0].type).toEqual('Health Center');
+            expect(scope.opUnits[0].name).toEqual("opUnit1");
+            expect(scope.opUnits[0].type).toEqual("Health Center");
             expect(scope.isDisabled).toBeFalsy();
         });
 
         it("should disable disable button for opunit", function() {
             scope.orgUnit = {
-                'name': 'opUnit1',
-                'parent': {
+                "name": "opUnit1",
+                "parent": {
                     "id": "parent"
                 },
                 "attributeValues": [{
@@ -239,51 +248,55 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
             scope.$parent.closeNewForm = jasmine.createSpy();
             scope.resourceBundle = {};
             var opunit = {
-                name: "opunit1",
-                id: "opunit1",
-                datasets: [],
-                attributeValues: []
+                "name": "opunit1",
+                "id": "opunit1",
+                "datasets": [],
+                "attributeValues": []
             };
 
             var module = {
-                name: "mod1",
-                id: "mod1",
-                attributeValues: [],
-                parent: {
-                    id: "opunit1",
+                "name": "mod1",
+                "id": "mod1",
+                "attributeValues": [],
+                "parent": {
+                    "id": "opunit1",
                 }
             };
 
             var modulesUnderOpunit = [module];
 
             var expectedOrgUnits = [{
-                name: "mod1",
-                id: "mod1",
-                attributeValues: [{
-                    attribute: {
-                        code: 'isDisabled',
-                        name: 'Is Disabled'
+                "name": "mod1",
+                "id": "mod1",
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "isDisabled",
+                        "name": "Is Disabled"
                     },
-                    value: true
+                    "value": true
                 }],
-                parent: {
-                    id: "opunit1",
+                "parent": {
+                    "id": "opunit1",
                 }
             }, {
-                name: "opunit1",
-                id: "opunit1",
-                datasets: [],
-                attributeValues: [{
-                    attribute: {
-                        code: 'isDisabled',
-                        name: 'Is Disabled'
+                "name": "opunit1",
+                "id": "opunit1",
+                "datasets": [],
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "isDisabled",
+                        "name": "Is Disabled"
                     },
-                    value: true
+                    "value": true
                 }]
             }];
             var expectedHustleMessage = {
-                data: expectedOrgUnits,
-                type: "upsertOrgUnit"
+                "data": expectedOrgUnits,
+                "type": "upsertOrgUnit"
             };
             orgUnitRepo.getAllModulesInProjects = jasmine.createSpy("getAllModulesInProjects").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             spyOn(hustle, "publish");
@@ -295,61 +308,67 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
             scope.$apply();
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnits);
-            expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
-            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(opunit, 'disabledOpUnit');
+            expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, "dataValues");
+            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(opunit, "disabledOpUnit");
             expect(scope.isDisabled).toEqual(true);
         });
 
-        it('should update operation units', function() {
+        it("should update operation units", function() {
             var opUnit1 = {
-                'name': 'OpUnit1',
-                'type': 'Hospital',
-                'openingDate': today,
-                'hospitalUnitCode': 'Unit Code - A'
+                "name": "OpUnit1",
+                "type": "Hospital",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "hospitalUnitCode": "Unit Code - A"
             };
             var opUnits = [opUnit1];
 
             scope.orgUnit = {
-                'id': "opUnit1Id",
-                'name': 'OpUnit1',
-                'type': 'Health Center',
-                'level': 5,
-                'hospitalUnitCode': 'Unit Code - B1',
-                'parent': {
-                    'name': 'Parent',
-                    'id': 'ParentId'
+                "id": "opUnit1Id",
+                "name": "OpUnit1",
+                "type": "Health Center",
+                "level": 5,
+                "hospitalUnitCode": "Unit Code - B1",
+                "parent": {
+                    "name": "Parent",
+                    "id": "ParentId"
                 }
             };
 
             var expectedOpUnits = [{
-                name: 'OpUnit1',
-                id: 'opUnit1Id',
-                openingDate: today,
-                shortName: 'OpUnit1',
-                level: 5,
-                parent: {
-                    name: 'Parent',
-                    id: 'ParentId'
+                "name": "OpUnit1",
+                "id": "opUnit1Id",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "shortName": "OpUnit1",
+                "level": 5,
+                "parent": {
+                    "name": "Parent",
+                    "id": "ParentId"
                 },
-                attributeValues: [{
-                    attribute: {
-                        code: 'opUnitType'
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "opUnitType"
                     },
-                    value: 'Hospital'
+                    "value": "Hospital"
                 }, {
-                    attribute: {
-                        code: 'Type'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "Type"
                     },
-                    value: 'Operation Unit'
+                    "value": "Operation Unit"
                 }, {
-                    attribute: {
-                        code: 'hospitalUnitCode'
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "hospitalUnitCode"
                     },
-                    value: 'Unit Code - A'
+                    "value": "Unit Code - A"
                 }]
             }];
 
-            spyOn(location, 'hash');
+            spyOn(location, "hash");
 
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
@@ -359,8 +378,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper"], func
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnits);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: expectedOpUnits,
-                type: "upsertOrgUnit"
+                "data": expectedOpUnits,
+                "type": "upsertOrgUnit"
             }, "dataValues");
             expect(orgUnitRepo.getAllModulesInOpUnit).toHaveBeenCalledWith("opUnit1Id");
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();

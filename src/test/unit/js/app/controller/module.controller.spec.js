@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5) {
+define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop) {
     describe("module controller", function() {
         var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
             dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
@@ -36,12 +36,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 objectStore: function() {}
             };
 
-            _Date = Date;
-            todayStr = "2014-04-01";
-            today = new Date(todayStr);
-            Date = function() {
-                return today;
-            };
+            Timecop.install();
+            Timecop.freeze(new Date("2014-04-01T00:00:00.000Z"));
 
             var getMockStore = function(data) {
                 var getAll = function() {
@@ -105,7 +101,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         }));
 
         afterEach(function() {
-            Date = _Date;
+            Timecop.returnToPresent();
+            Timecop.uninstall();
         });
 
         it("should fetch is expanded for a particular module based on timestamp", function() {
@@ -380,12 +377,16 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     }]
                 },
                 "attributeValues": [{
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
                     "attribute": {
                         "code": "Type",
                         "name": "Type"
                     },
                     "value": "Module"
                 }, {
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
                     "attribute": {
                         "code": "isLineListService",
                         "name": "Is Linelist Service"
@@ -482,12 +483,16 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 openingDate: '2014-04-01',
                 selectedDataset: undefined,
                 attributeValues: [{
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
                     attribute: {
                         code: "Type",
                         name: "Type",
                     },
                     value: 'Module'
                 }, {
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
                     attribute: {
                         code: "isLineListService",
                         name: "Is Linelist Service"
@@ -761,12 +766,16 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     }]
                 }],
                 attributeValues: [{
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
                     attribute: {
                         code: 'Type',
                         name: 'Type'
                     },
                     value: 'Module'
                 }, {
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
                     attribute: {
                         code: 'isLineListService',
                         name: 'Is Linelist Service'
@@ -804,12 +813,16 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }],
                 enrichedProgram: undefined,
                 attributeValues: [{
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
                     attribute: {
                         code: 'Type',
                         name: 'Type'
                     },
                     value: 'Module'
                 }, {
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
                     attribute: {
                         code: 'isLineListService',
                         name: 'Is Linelist Service'
@@ -826,7 +839,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 data: expectedPayload,
                 type: "upsertOrgUnit"
             }, "dataValues");
-
         });
 
         it("should return false if datasets for modules are selected", function() {
@@ -1081,10 +1093,12 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             var expectedModule = {
-                name: "test1",
-                id: "projectId",
+                name: 'test1',
+                id: 'projectId',
                 dataSets: [],
                 attributeValues: [{
+                    created: '2014-04-01T00:00:00.000Z',
+                    lastUpdated: '2014-04-01T00:00:00.000Z',
                     attribute: {
                         code: 'isDisabled',
                         name: 'Is Disabled'

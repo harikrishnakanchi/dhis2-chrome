@@ -1,4 +1,4 @@
-define(["countryController", "angularMocks", "utils", "moment"], function(CountryController, mocks, utils, moment) {
+define(["countryController", "angularMocks", "utils", "moment", "timecop"], function(CountryController, mocks, utils, moment, timecop) {
 
     describe("contry controller", function() {
 
@@ -23,9 +23,18 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                 id: "blah"
             };
 
+            Timecop.install();
+            Timecop.freeze(new Date('2014-10-29T12:43:54.972Z'));
+
             anchorScroll = jasmine.createSpy();
             countryController = new CountryController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll);
         }));
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
+
 
         it("should open the opening date datepicker", function() {
 
@@ -69,6 +78,8 @@ define(["countryController", "angularMocks", "utils", "moment"], function(Countr
                     'name': parent.name,
                 },
                 'attributeValues': [{
+                    'created': '2014-10-29T12:43:54.972Z',
+                    'lastUpdated': '2014-10-29T12:43:54.972Z',
                     'attribute': {
                         'code': 'Type',
                         'name': 'Type'

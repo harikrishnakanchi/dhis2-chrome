@@ -18,11 +18,13 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 'openingDate': moment(orgUnit.openingDate).format("YYYY-MM-DD"),
                 'parent': _.pick(parentOrgUnit, "name", "id"),
                 'attributeValues': [{
+                    'created': moment().toISOString(),
+                    'lastUpdated': moment().toISOString(),
                     'attribute': {
                         "code": "Type",
                         "name": "Type"
                     },
-                    value: "Country"
+                    'value': "Country"
                 }]
             };
 

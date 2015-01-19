@@ -41,16 +41,22 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     'level': parseInt(parent.level) + 1,
                     'parent': _.pick(parent, "name", "id"),
                     "attributeValues": [{
+                        "created": moment().toISOString(),
+                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "opUnitType"
                         },
                         "value": opUnitType
                     }, {
+                        "created": moment().toISOString(),
+                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "Type"
                         },
                         "value": "Operation Unit"
                     }, {
+                        "created": moment().toISOString(),
+                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "hospitalUnitCode"
                         },
@@ -79,16 +85,22 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     'level': $scope.orgUnit.level,
                     'parent': _.pick($scope.orgUnit.parent, "name", "id"),
                     "attributeValues": [{
+                        "created": moment().toISOString(),
+                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "opUnitType"
                         },
                         "value": opUnitType
                     }, {
+                        "created": moment().toISOString(),
+                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "Type"
                         },
                         "value": "Operation Unit"
                     }, {
+                        "created": moment().toISOString(),
+                        "lastUpdated": moment().toISOString(),
                         "attribute": {
                             "code": "hospitalUnitCode"
                         },

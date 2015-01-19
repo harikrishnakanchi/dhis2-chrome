@@ -1,55 +1,73 @@
 define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
     var buildProjectAttributeValues = function(orgUnit) {
         var attributeValues = [{
-            'attribute': {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
+            "attribute": {
                 "code": "Type",
                 "name": "Type"
             },
             value: "Project"
         }];
         attributeValues.push({
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
             "attribute": {
                 "code": "prjCon",
                 "name": "Context"
             },
             "value": orgUnit.context
         }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
             "attribute": {
                 "code": "prjLoc",
                 "name": "Location"
             },
             "value": orgUnit.location
         }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
             "attribute": {
                 "code": "prjPopType",
                 "name": "Type of population"
             },
             "value": orgUnit.populationType
         }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
             "attribute": {
                 "code": "projCode",
                 "name": "Project Code"
             },
             "value": orgUnit.projectCode
         }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
             "attribute": {
                 "code": "reasonForIntervention",
                 "name": "Reason For Intervention"
             },
             "value": orgUnit.reasonForIntervention
         }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
             "attribute": {
                 "code": "modeOfOperation",
                 "name": "Mode Of Operation"
             },
             "value": orgUnit.modeOfOperation
         }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
             "attribute": {
                 "code": "modelOfManagement",
                 "name": "Model Of Management"
             },
             "value": orgUnit.modelOfManagement
         }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
             "attribute": {
                 "code": "autoApprove",
                 "name": "Auto Approve"
@@ -59,6 +77,8 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
 
         if (orgUnit.endDate)
             attributeValues.push({
+                "created": moment().toISOString(),
+                "lastUpdated": moment().toISOString(),
                 "attribute": {
                     "code": "prjEndDate",
                     "name": "End date"
@@ -71,6 +91,8 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
 
     this.disable = function(orgUnits) {
         var attributeValue = {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
             'attribute': {
                 "code": "isDisabled",
                 "name": "Is Disabled"
@@ -99,7 +121,6 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
     };
 
     this.mapToProjectForDhis = function(orgUnit, parentOrgUnit) {
-
         var projectOrgUnit = {
             'id': dhisId.get(orgUnit.name + parentOrgUnit.id),
             'name': orgUnit.name,
@@ -161,12 +182,16 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 dataSets: module.dataSets,
                 enrichedProgram: module.enrichedProgram,
                 attributeValues: [{
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
                     attribute: {
                         "code": "Type",
                         "name": "Type"
                     },
                     value: "Module"
                 }, {
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
                     attribute: {
                         "code": "isLineListService",
                         "name": "Is Linelist Service"
@@ -213,7 +238,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
     var isOfType = function(orgUnit, type) {
         return _.any(orgUnit.attributeValues, {
             attribute: {
-                id: "a1fa2777924"
+                code: "type"
             },
             value: type
         });
