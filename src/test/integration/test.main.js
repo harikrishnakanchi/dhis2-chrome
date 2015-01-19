@@ -25,8 +25,24 @@ var extendChromeFunctionality = function() {
         }
     };
 
-    chrome.runtime.sendMessage = function(messageName) {
-        var event = new Event(messageName);
+    chrome.runtime.sendMessage = function(messageName, requestId) {
+        var event = new CustomEvent(messageName, {
+            'detail': requestId
+        });
         document.dispatchEvent(event);
+    };
+
+    chrome.alarms = {
+        "create": function() {},
+        "onAlarm": {
+            "addListener": function(callback) {
+                callback.apply(null, [{
+                    "name": "metadataSyncAlarm"
+                }]);
+                callback.apply(null, [{
+                    "name": "projectDataSyncAlarm"
+                }]);
+            }
+        }
     };
 };

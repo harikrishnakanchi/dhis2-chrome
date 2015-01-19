@@ -19,7 +19,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
             return idbUtils.clear("dataValues");
         });
 
-        var publishUploadMessage = function(period, orgUnitId) {
+        var publishUploadMessage = function(period, orgUnitId, requestid) {
             var hustleData = {
                 "dataValues": [{
                     "period": period,
@@ -29,11 +29,12 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
 
             return hustle.publish({
                 "data": hustleData,
-                "type": "uploadDataValues"
+                "type": "uploadDataValues",
+                "requestid": requestid
             }, "dataValues");
         };
 
-        var setUpVerify = function(getActualDataCallback, expectedData, done) {
+        var setUpVerify = function(getActualDataCallback, expectedData, requestid, done) {
             var verify = function(actual, expected) {
                 var expectedDataValues = expected.dataValues;
                 var actualDataValues = actual.dataValues;
@@ -62,8 +63,12 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
                 done();
             };
 
-            chrome.runtime.onMessage.addListener('uploadDataValuesDone', function() {
-                getActualDataCallback.apply().then(onSuccess, onError);
+            chrome.runtime.onMessage.addListener('uploadDataValuesDone', function(e) {
+                console.error("event " + e.detail);
+                if (e.detail === requestid) {
+                    console.error("asserting " + e.detail);
+                    getActualDataCallback.apply().then(onSuccess, onError);
+                }
             });
 
             return q.when([]);
@@ -95,7 +100,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getRemoteCopy, idbData, done)).then(_.curry(publishUploadMessage)(period, orgUnitId));
+            setupData().then(_.curry(setUpVerify)(getRemoteCopy, idbData, 3, done)).then(_.curry(publishUploadMessage)(period, orgUnitId, 3));
         });
 
         it("should overwrite local changes from dhis data", function(done) {
@@ -123,7 +128,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
                 return idbUtils.get("dataValues", [period, orgUnitId]);
             };
 
-            setupData().then(_.curry(setUpVerify)(getLocalCopy, dhisData, done)).then(_.curry(publishUploadMessage)(period, orgUnitId));
+            setupData().then(_.curry(setUpVerify)(getLocalCopy, dhisData, 1, done)).then(_.curry(publishUploadMessage)(period, orgUnitId, 1));
         });
 
         it("should ignore remote changes", function(done) {
@@ -159,7 +164,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getRemoteCopy, idbData, done)).then(_.curry(publishUploadMessage)(period, orgUnitId));
+            setupData().then(_.curry(setUpVerify)(getRemoteCopy, idbData, 2, done)).then(_.curry(publishUploadMessage)(period, orgUnitId, 2));
         });
 
     });
