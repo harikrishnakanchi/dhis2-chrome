@@ -122,8 +122,15 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
                     return currentApprovalLevel < 3 ? currentApprovalLevel + 1 : undefined;
                 };
 
+                var getWeeksToDisplayStatus = function(openingDate) {
+                    var orgUnitDuration = moment().diff(moment(openingDate), 'weeks');
+                    orgUnitDuration = orgUnitDuration === 0 ? 1 : orgUnitDuration;
+                    return orgUnitDuration > properties.weeksToDisplayStatusInDashboard ? properties.weeksToDisplayStatusInDashboard : orgUnitDuration;
+                };
+
                 return _.map(modules, function(mod) {
-                    var status = _.map(_.range(properties.weeksToDisplayStatusInDashboard, 0, -1), function(i) {
+                    var weeksToDisplayStatus = getWeeksToDisplayStatus(mod.openingDate);
+                    var status = _.map(_.range(weeksToDisplayStatus, 0, -1), function(i) {
                         var period = dateUtils.toDhisFormat(moment().isoWeek(moment().isoWeek() - i));
                         var submitted = isSubmitted(submittedPeriods, mod.id, period);
                         var approvalLevel = isComplete(dataSetCompletePeriods, mod.id, period) ? 1 : undefined;

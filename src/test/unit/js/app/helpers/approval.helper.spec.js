@@ -87,16 +87,78 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 expect(hustle.publish).toHaveBeenCalledWith(hustlePublishData, "dataValues");
             });
 
-            it('should get approval status', function() {
+            it("should get approval status from the starting date", function() {
                 var modules = [{
                     "id": "123",
                     "name": "mod1",
+                    "openingDate": "2014-05-20",
+                    "parent": {
+                        "name": "parent"
+                    }
+                }];
+
+                var dataValues = [{
+                    "period": "2014W21",
+                    "orgUnit": "123",
+                    "dataValues": [{
+                        "categoryOptionCombo": "co123",
+                        "dataElement": "de123",
+                        "orgUnit": "123",
+                        "period": "2014W21",
+                        "value": 9
+                    }]
+                }];
+
+                var completedDatasets = [{
+                    "orgUnit": "123",
+                    "period": "2014W21",
+                    "dataSets": ["ds213", "ds345"]
+                }];
+
+                var approvalData = [{
+                    "orgUnit": "123",
+                    "period": "2014W21",
+                    "isAccepted": false,
+                    "isApproved": true,
+                    "dataSets": ["ds123", "ds345"]
+                }];
+
+                var expectedStatus = [{
+                    "moduleId": "123",
+                    "moduleName": "parent - mod1",
+                    "status": [{
+                        "period": "2014W21",
+                        "submitted": true,
+                        "nextApprovalLevel": 3
+                    }]
+                }];
+
+                var orgUnitId = "123";
+
+                spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, modules));
+                spyOn(dataRepository, "getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, dataValues));
+                spyOn(approvalDataRepository, "getLevelOneApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, completedDatasets));
+                spyOn(approvalDataRepository, "getLevelTwoApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, approvalData));
+
+                approvalHelper.getApprovalStatus(orgUnitId).then(function(actualStatus) {
+                    expect(actualStatus).toEqual(expectedStatus);
+                });
+
+                scope.$apply();
+            });
+
+            it('should get approval status for last 12 weeks', function() {
+                var modules = [{
+                    "id": "123",
+                    "name": "mod1",
+                    "openingDate": "2013-01-01",
                     "parent": {
                         "name": "parent"
                     }
                 }, {
                     "id": "234",
                     "name": "mod2",
+                    "openingDate": "2013-01-01",
                     "parent": {
                         "name": "parent"
                     }
