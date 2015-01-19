@@ -1,31 +1,31 @@
 {
-  "name": "DHIS2-Chrome-App",
-  "version": "0.0.1",
-  "private": true,
-  "keywords": [
-    "dhis2"
-  ],
-  "dependencies": {
-    "requirejs": null,
-    "q": "1.0.1",
-    "angular": null,
-    "angular-resource": null,
-    "angular-indexedDB": "https://github.com/DWB-eHealth/angular-indexedDB.git",
-    "angular-route": null,
-    "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
-    "lodash": null,
-    "angularjs-directives": "https://github.com/DWB-eHealth/angularjs-directives.git",
-    "moment": null,
-    "js-md5": null,
-    "hustle": "https://github.com/orthecreedence/hustle.git",
-    "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git",
-    "ramda": null,
-    "timecop": null
-  },
-  "devDependencies": {
-    "angular-mocks": null
-  },
-  "resolutions": {
-    "angular": "1.3.0"
-  }
+    "name": "DHIS2-Chrome-App",
+    "version": "0.0.1",
+    "private": true,
+    "keywords": [
+        "dhis2"
+    ],
+    "dependencies": {
+        "requirejs": null,
+        "q": "1.0.1",
+        "angular": null,
+        "angular-resource": null,
+        "angular-indexedDB": "https://github.com/DWB-eHealth/angular-indexedDB.git",
+        "angular-route": null,
+        "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
+        "lodash": null,
+        "angularjs-directives": "https://github.com/DWB-eHealth/angularjs-directives.git",
+        "moment": null,
+        "js-md5": null,
+        "hustle": "https://github.com/orthecreedence/hustle.git",
+        "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git",
+        "ramda": null,
+        "timecop": null
+    },
+    "devDependencies": {
+        "angular-mocks": null
+    },
+    "resolutions": {
+        "angular": "1.3.0"
+    }
 }
