@@ -3,7 +3,6 @@ require.config({
         "angular": "lib/angular/angular",
         "Q": "lib/q/q",
         "lodash": "lib/lodash/dist/lodash",
-        "ramda": "lib/ramda/ramda",
         "ng-i18n": "lib/ng-i18n/src/js/ng-i18n",
         "angular-route": "lib/angular-route/angular-route",
         "angular-resource": "lib/angular-resource/angular-resource",
