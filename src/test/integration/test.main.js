@@ -25,9 +25,9 @@ var extendChromeFunctionality = function() {
         }
     };
 
-    chrome.runtime.sendMessage = function(messageName, requestId) {
-        var event = new CustomEvent(messageName, {
-            'detail': requestId
+    chrome.runtime.sendMessage = function(msg) {
+        var event = new CustomEvent(msg.message, {
+            'detail': msg.requestId
         });
         document.dispatchEvent(event);
     };

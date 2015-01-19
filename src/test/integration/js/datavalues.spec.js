@@ -19,7 +19,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
             return idbUtils.clear("dataValues");
         });
 
-        var publishUploadMessage = function(period, orgUnitId, requestid) {
+        var publishUploadMessage = function(period, orgUnitId, requestId) {
             var hustleData = {
                 "dataValues": [{
                     "period": period,
@@ -30,11 +30,11 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
             return hustle.publish({
                 "data": hustleData,
                 "type": "uploadDataValues",
-                "requestid": requestid
+                "requestId": requestId
             }, "dataValues");
         };
 
-        var setUpVerify = function(getActualDataCallback, expectedData, requestid, done) {
+        var setUpVerify = function(getActualDataCallback, expectedData, requestId, done) {
             var verify = function(actual, expected) {
                 var expectedDataValues = expected.dataValues;
                 var actualDataValues = actual.dataValues;
@@ -65,7 +65,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
 
             chrome.runtime.onMessage.addListener('uploadDataValuesDone', function(e) {
                 console.error("event " + e.detail);
-                if (e.detail === requestid) {
+                if (e.detail === requestId) {
                     console.error("asserting " + e.detail);
                     getActualDataCallback.apply().then(onSuccess, onError);
                 }
