@@ -124,8 +124,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
 
                 var getWeeksToDisplayStatus = function(openingDate) {
                     var orgUnitDuration = moment().diff(moment(openingDate), 'weeks');
-                    orgUnitDuration = orgUnitDuration === 0 ? 1 : orgUnitDuration;
-                    return orgUnitDuration > properties.weeksToDisplayStatusInDashboard ? properties.weeksToDisplayStatusInDashboard : orgUnitDuration;
+                    return orgUnitDuration > properties.weeksToDisplayStatusInDashboard ? properties.weeksToDisplayStatusInDashboard : orgUnitDuration + 1;
                 };
 
                 return _.map(modules, function(mod) {

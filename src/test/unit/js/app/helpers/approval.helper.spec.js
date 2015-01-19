@@ -91,7 +91,7 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 var modules = [{
                     "id": "123",
                     "name": "mod1",
-                    "openingDate": "2014-05-20",
+                    "openingDate": "2014-05-30",
                     "parent": {
                         "name": "parent"
                     }
