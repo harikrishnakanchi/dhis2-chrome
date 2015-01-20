@@ -1,5 +1,5 @@
 define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], function(idbUtils, http, dataValueBuilder, moment, _) {
-    describe("system setting scenarios", function() {
+    xdescribe("system setting scenarios", function() {
         var hustle, q, userPrefs;
 
         beforeEach(function() {
