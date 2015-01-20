@@ -73,7 +73,7 @@ gulp.task('reset-db', shell.task(['dropdb dhis_test  --if-exists && createdb dhi
 gulp.task('start-dhis', ['check-jetty-home', 'check-war-path', 'deploy-war', 'reset-db'], function() {
     process.env.DHIS2_HOME = path.join(__dirname, 'src/test/integration/conf');
     var deferred = Q.defer();
-    var stream = shell(['java -Xms1024m -Xmx4g -XX:NewSize=256m -XX:MaxNewSize=356m -XX:PermSize=512m -XX:MaxPermSize=1024m -jar ' + process.env.JETTY_HOME + '/start.jar -Djetty.port=8888 -DSTOP.PORT=8889 -DSTOP.KEY=booyakasha'], {
+    var stream = shell(['java -Xms1024m -Xmx4g -XX:NewSize=256m -XX:MaxNewSize=356m -XX:PermSize=512m -XX:MaxPermSize=1024m -jar ' + process.env.JETTY_HOME + '/start.jar etc/jetty-logging.xml -Djetty.port=8888 -DSTOP.PORT=8889 -DSTOP.KEY=booyakasha'], {
         cwd: process.env.JETTY_HOME
     });
 
