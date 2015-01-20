@@ -64,9 +64,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
             };
 
             chrome.runtime.onMessage.addListener('uploadDataValuesDone', function(e) {
-                console.error("event " + e.detail);
                 if (e.detail === requestId) {
-                    console.error("asserting " + e.detail);
                     getActualDataCallback.apply().then(onSuccess, onError);
                 }
             });

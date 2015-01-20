@@ -12,13 +12,7 @@ define(["lodash"], function(_) {
         var defultHeaders = {
             "Content-Type": 'application/json'
         };
-        return httpService.post(baseUrl + apiUrl, payload).then(function(data) {
-            console.error("post sucess " + JSON.stringify(data) + "url :" + apiUrl);
-            return data;
-        }, function(data, status, headers, config) {
-            console.error("error posting to " + apiUrl + "status :" + status + "data :" + data);
-            return data;
-        });
+        return httpService.post(baseUrl + apiUrl, payload);
     };
 
     var httpDelete = function(apiUrl, params) {
