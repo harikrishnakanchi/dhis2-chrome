@@ -17,6 +17,7 @@ define(["properties"], function(properties) {
         "translations": with_host("/api/translations"),
         "orgUnitGroups": with_host("/api/organisationUnitGroups.json"),
         "orgUnits": with_host("/api/organisationUnits.json"),
-        "users": with_host("/api/users")
+        "users": with_host("/api/users"),
+        "programs": with_host("/api/programs.json")
     };
 });

@@ -59,6 +59,7 @@ require.config({
         "createUserConsumer": "app/consumer/create.user.consumer",
         "updateUserConsumer": "app/consumer/update.user.consumer",
         "programConsumer": "app/consumer/program.consumer",
+        "downloadProgramConsumer": "app/consumer/download.program.consumer",
         "downloadEventDataConsumer": "app/consumer/download.event.data.consumer",
         "uploadEventDataConsumer": "app/consumer/upload.event.data.consumer",
         "deleteEventConsumer": "app/consumer/delete.event.consumer",

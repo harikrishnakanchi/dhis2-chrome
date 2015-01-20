@@ -25,10 +25,18 @@ define(["programService", "angularMocks", "properties", "utils"], function(Progr
             }];
 
             programService.upload(programs);
-
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", {
                 "programs": programs
             }).respond(200, "ok");
+            httpBackend.flush();
+        });
+
+        it("should download programs last updated since lastUpdated", function() {
+            var lastUpdatedTime = "2014-12-30T09:13:41.092Z";
+
+            programService.getAll(lastUpdatedTime);
+
+            httpBackend.expectGET(properties.dhis.url + '/api/programs.json?fields=:all&paging=false&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, "ok");
             httpBackend.flush();
         });
     });
