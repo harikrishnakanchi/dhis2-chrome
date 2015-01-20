@@ -37,7 +37,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         var doPublish = function(messageType) {
                             $hustle.publish({
                                 "type": messageType,
-                                "data": []
+                                "data": [],
+                                "requestId": 0
                             }, "dataValues");
                         };
 

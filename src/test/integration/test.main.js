@@ -6,9 +6,14 @@ require(["base/main/js/app/app.config", "base/main/js/app/bg.config"], function(
             window.dhis = {
                 "injector": injector
             };
-            require.config({
-                deps: tests,
-                callback: window.__karma__.start,
+
+            chrome.runtime.onMessage.addListener('downloadEventDataDone', function(e) {
+                if (e.detail === 0) {
+                    require.config({
+                        deps: tests,
+                        callback: window.__karma__.start,
+                    });
+                }
             });
         });
     });
