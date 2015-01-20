@@ -97,8 +97,8 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
             };
 
             setupData()
-                .then(_.curry(setUpVerify)(getRemoteValue, settingsUpdated, done, "excludeDataElementsDone"))
-                .then(_.curry(publishToHustle)(updatedSystemSettings, "excludeDataElements"));
+                .then(_.bind(setUpVerify, undefined, getRemoteValue, settingsUpdated, done, "excludeDataElementsDone"))
+                .then(_.bind(publishToHustle, undefined, updatedSystemSettings, "excludeDataElements"));
         });
 
     });

@@ -122,7 +122,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getRemoteCopy, {}, done, "deleteApprovalDone")).then(_.curry(publishUploadMessage)(period, orgUnitId, datasetId));
+            setupData().then(_.bind(setUpVerify, undefined, getRemoteCopy, {}, done, "deleteApprovalDone")).then(_.bind(publishUploadMessage, undefined, period, orgUnitId, datasetId));
         });
 
         it("should not upload approval data to DHIS, if data is locally approved (not synced to dhis) till level 2 and then re-submitted", function(done) {
@@ -196,7 +196,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getActualData, [{}, 'UNAPPROVED_READY'], done, "deleteApprovalDone")).then(_.curry(publishUploadMessage)(period, orgUnitId, datasetId));
+            setupData().then(_.bind(setUpVerify, undefined, getActualData, [{}, 'UNAPPROVED_READY'], done, "deleteApprovalDone")).then(_.bind(publishUploadMessage, undefined, period, orgUnitId, datasetId));
         });
 
         it("should upload approval data when field app comes online", function(done) {
@@ -289,7 +289,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getRemoteCopy, [1, 'APPROVED_HERE'], done, "uploadApprovalDataDone")).then(publishMessage);
+            setupData().then(_.bind(setUpVerify, undefined, getRemoteCopy, [1, 'APPROVED_HERE'], done, "uploadApprovalDataDone")).then(publishMessage);
         });
 
         it("should show local data as approved after next sync cycle if it is approved (L2) on dhis", function(done) {
@@ -340,8 +340,8 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                         idbUtils.upsert('completedDataSets', idbCompletionData),
                         http.POST('/api/dataValueSets', dhisDataValues)
                     ])
-                    .then(_.curry(http.POST)('/api/completeDataSetRegistrations/multiple', dhisCompletionData))
-                    .then(_.curry(http.POST)('/api/dataApprovals/multiple', dhisApprovalData));
+                    .then(_.bind(http.POST, undefined, '/api/completeDataSetRegistrations/multiple', dhisCompletionData))
+                    .then(_.bind(http.POST, undefined, '/api/dataApprovals/multiple', dhisApprovalData));
             };
 
             var getIndexedDBCopy = function() {
@@ -350,7 +350,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getIndexedDBCopy, true, done, "downloadDataDone")).then(publishToHustle({}, "downloadData"));
+            setupData().then(_.bind(setUpVerify, undefined, getIndexedDBCopy, true, done, "downloadDataDone")).then(_.bind(publishToHustle, undefined, {}, "downloadData"));
         });
 
         it("should show local data as unapproved after next sync cycle if another app has resubmitted the data", function(done) {
@@ -432,16 +432,16 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                         idbUtils.upsert('approvedDataSets', idbApprovedData),
                         http.POST('/api/dataValueSets', dhisDataValues)
                     ])
-                    .then(_.curry(http.POST)('/api/completeDataSetRegistrations/multiple', dhisCompletionData))
-                    .then(_.curry(http.POST)('/api/dataApprovals/multiple', dhisApprovalData))
-                    .then(_.curry(http.DELETE)('/api/dataApprovals', dhisUnapprovalData));
+                    .then(_.bind(http.POST, undefined, '/api/completeDataSetRegistrations/multiple', dhisCompletionData))
+                    .then(_.bind(http.POST, undefined, '/api/dataApprovals/multiple', dhisApprovalData))
+                    .then(_.bind(http.DELETE, undefined, '/api/dataApprovals', dhisUnapprovalData));
             };
 
             var getIndexedDBCopy = function() {
                 return idbUtils.get('approvedDataSets', [period, orgUnitId]);
             };
 
-            setupData().then(_.curry(setUpVerify)(getIndexedDBCopy, undefined, done, "downloadDataDone"))
+            setupData().then(_.bind(setUpVerify, undefined, getIndexedDBCopy, undefined, done, "downloadDataDone"))
                 .then(_.curry(publishToHustle)({}, "downloadData"));
         });
     });

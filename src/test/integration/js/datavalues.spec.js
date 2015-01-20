@@ -100,7 +100,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getRemoteCopy, idbData, 3, done)).then(_.curry(publishUploadMessage)(period, orgUnitId, 3));
+            setupData().then(_.bind(setUpVerify, undefined, getRemoteCopy, idbData, 3, done)).then(_.bind(publishUploadMessage, undefined, period, orgUnitId, 3));
         });
 
         it("should overwrite local changes from dhis data", function(done) {
@@ -128,7 +128,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
                 return idbUtils.get("dataValues", [period, orgUnitId]);
             };
 
-            setupData().then(_.curry(setUpVerify)(getLocalCopy, dhisData, 1, done)).then(_.curry(publishUploadMessage)(period, orgUnitId, 1));
+            setupData().then(_.bind(setUpVerify, undefined, getLocalCopy, dhisData, 1, done)).then(_.bind(publishUploadMessage, undefined, period, orgUnitId, 1));
         });
 
         it("should ignore remote changes", function(done) {
@@ -164,10 +164,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
                 });
             };
 
-            setupData().then(_.curry(setUpVerify)(getRemoteCopy, idbData, 2, done)).then(_.curry(publishUploadMessage)(period, orgUnitId, 2));
+            setupData().then(_.bind(setUpVerify, undefined, getRemoteCopy, idbData, 2, done)).then(_.bind(publishUploadMessage, undefined, period, orgUnitId, 2));
         });
-
-
-
     });
 });
