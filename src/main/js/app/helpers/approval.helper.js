@@ -129,7 +129,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
 
                 return _.map(modules, function(mod) {
                     var weeksToDisplayStatus = getWeeksToDisplayStatus(mod.openingDate);
-                    var status = _.map(_.range(weeksToDisplayStatus, 0, -1), function(i) {
+                    var status = _.map(_.range(weeksToDisplayStatus - 1, -1, -1), function(i) {
                         var period = dateUtils.toDhisFormat(moment().isoWeek(moment().isoWeek() - i));
                         var submitted = isSubmitted(submittedPeriods, mod.id, period);
                         var approvalLevel = isComplete(dataSetCompletePeriods, mod.id, period) ? 1 : undefined;

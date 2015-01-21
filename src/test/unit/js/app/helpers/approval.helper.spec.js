@@ -97,39 +97,19 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     }
                 }];
 
-                var dataValues = [{
-                    "period": "2014W21",
-                    "orgUnit": "123",
-                    "dataValues": [{
-                        "categoryOptionCombo": "co123",
-                        "dataElement": "de123",
-                        "orgUnit": "123",
-                        "period": "2014W21",
-                        "value": 9
-                    }]
-                }];
+                var dataValues = [];
 
-                var completedDatasets = [{
-                    "orgUnit": "123",
-                    "period": "2014W21",
-                    "dataSets": ["ds213", "ds345"]
-                }];
+                var completedDatasets = [];
 
-                var approvalData = [{
-                    "orgUnit": "123",
-                    "period": "2014W21",
-                    "isAccepted": false,
-                    "isApproved": true,
-                    "dataSets": ["ds123", "ds345"]
-                }];
+                var approvalData = [];
 
                 var expectedStatus = [{
                     "moduleId": "123",
                     "moduleName": "parent - mod1",
                     "status": [{
-                        "period": "2014W21",
-                        "submitted": true,
-                        "nextApprovalLevel": 3
+                        "period": "2014W22",
+                        "submitted": false,
+                        "nextApprovalLevel": undefined
                     }]
                 }];
 
@@ -250,10 +230,6 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     "moduleId": "123",
                     "moduleName": "parent - mod1",
                     "status": [{
-                        "period": "2014W10",
-                        "submitted": false,
-                        "nextApprovalLevel": undefined
-                    }, {
                         "period": "2014W11",
                         "submitted": false,
                         "nextApprovalLevel": undefined
@@ -297,15 +273,15 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                         "period": "2014W21",
                         "submitted": false,
                         "nextApprovalLevel": undefined
+                    }, {
+                        "period": "2014W22",
+                        "submitted": false,
+                        "nextApprovalLevel": undefined
                     }]
                 }, {
                     "moduleId": "234",
                     "moduleName": "parent - mod2",
                     "status": [{
-                        "period": "2014W10",
-                        "submitted": false,
-                        "nextApprovalLevel": undefined
-                    }, {
                         "period": "2014W11",
                         "submitted": false,
                         "nextApprovalLevel": undefined
@@ -347,6 +323,10 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                         "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W21",
+                        "submitted": false,
+                        "nextApprovalLevel": undefined
+                    }, {
+                        "period": "2014W22",
                         "submitted": false,
                         "nextApprovalLevel": undefined
                     }]
