@@ -298,10 +298,10 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 'userCredentials': {
                     'username': 'foobar',
                     'userRoles': [{
-                        "name": 'Role1',
+                        "name": 'Data Entry User',
                         "id": 'Role1Id'
                     }, {
-                        "name": 'Role2',
+                        "name": 'Project Level Approver',
                         "id": 'Role2Id'
                     }]
                 }
@@ -309,36 +309,36 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 'userCredentials': {
                     'username': 'blah',
                     'userRoles': [{
-                        "name": 'Role1',
+                        "name": 'Data Entry User',
                         "id": 'Role1Id'
                     }, {
-                        "name": 'Role3',
+                        "name": 'Coordination Level Approver',
                         "id": 'Role3Id'
                     }]
                 }
             }];
 
             var expectedUsers = [{
-                'roles': 'Role1, Role2',
+                'roles': 'Data Entry User, Project Level Approver',
                 'userCredentials': {
                     'username': 'foobar',
                     'userRoles': [{
-                        "name": 'Role1',
+                        "name": 'Data Entry User',
                         "id": 'Role1Id'
                     }, {
-                        "name": 'Role2',
+                        "name": 'Project Level Approver',
                         "id": 'Role2Id',
                     }]
                 }
             }, {
-                'roles': 'Role1, Role3',
+                'roles': 'Data Entry User, Coordination Level Approver',
                 'userCredentials': {
                     'username': 'blah',
                     'userRoles': [{
-                        "name": 'Role1',
+                        "name": 'Data Entry User',
                         "id": 'Role1Id'
                     }, {
-                        "name": 'Role3',
+                        "name": 'Coordination Level Approver',
                         "id": 'Role3Id'
                     }]
                 }

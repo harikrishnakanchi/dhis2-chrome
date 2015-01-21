@@ -6,7 +6,7 @@ define(["dhisId"], function(dhisId) {
         }, {
             "name": "Project Level Approver"
         }, {
-            "name": "Coordination Level Approver",
+            "name": "Coordination Level Approver"
         }];
 
         var init = function() {

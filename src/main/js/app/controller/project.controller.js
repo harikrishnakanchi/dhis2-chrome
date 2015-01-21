@@ -129,13 +129,21 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         };
 
         var setProjectUsersForEdit = function(projectUsers) {
+            var roleNamesToDisplay = ["Data entry user", "Project Level Approver", "Coordination Level Approver"];
+
+            var shouldDisplayUser = function(userRoleNames) {
+                return _.intersection(_.pluck(userRoleNames, "name"), roleNamesToDisplay).length === 1;
+            };
+
             $scope.projectUsers = [];
             _.each(projectUsers, function(user) {
-                var roles = user.userCredentials.userRoles.map(function(role) {
-                    return role.name;
-                });
-                user.roles = roles.join(", ");
-                $scope.projectUsers.push(user);
+                if (shouldDisplayUser(user.userCredentials.userRoles)) {
+                    var roles = user.userCredentials.userRoles.map(function(role) {
+                        return role.name;
+                    });
+                    user.roles = roles.join(", ");
+                    $scope.projectUsers.push(user);
+                }
             });
         };
 
