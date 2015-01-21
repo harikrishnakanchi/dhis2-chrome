@@ -24,9 +24,9 @@ define(['moment', "lodashUtils"], function(moment, _) {
                 return isLocalDataStale(remoteProgram, localProgram) ? programRepository.upsert(remoteProgram) : $q.when({});
             };
 
-            return _.map(remotePrograms, function(remoteProgram) {
+            return $q.all(_.map(remotePrograms, function(remoteProgram) {
                 return programRepository.get(remoteProgram.id).then(_.curry(merge)(remoteProgram));
-            });
+            }));
         };
 
     };
