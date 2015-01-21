@@ -18,6 +18,7 @@ var ChromeExtension = require("crx");
 var preprocess = require("gulp-preprocess");
 var cat = require("gulp-cat");
 var base_url = argv.url || "http://localhost:8080";
+var metadata_sync_interval = argv.metadataSyncInterval || "1";
 var Q = require('q');
 var auth = argv.auth ? "Basic " + argv.auth : "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA==";
 var rest = require('restler');
@@ -164,7 +165,8 @@ gulp.task('config', function() {
         .pipe(preprocess({
             context: {
                 DHIS_URL: base_url,
-                DHIS_AUTH: auth
+                DHIS_AUTH: auth,
+                METADATA_SYNC_INTERVAL: metadata_sync_interval
             }
         }))
         .pipe(gulp.dest('./src/main/js/app/conf'));
