@@ -9,14 +9,12 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
                     upsertPromises.push(store.upsert(entities));
             });
 
-            upsertPromises.push(upsertProgramData(data));
-
             return $q.all(upsertPromises).then(function() {
                 return updateChangeLog(data);
             });
         };
 
-        var upsertProgramData = function(data) {
+        var upsertPrograms = function(data) {
             if (!_.isEmpty(data.programs)) {
                 var programs = _.transform(data.programs, function(acc, ele) {
                     if (!_.isEmpty(ele.organisationUnits))
@@ -43,7 +41,7 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
 
             console.debug("Fetching " + url);
             return $http.get(url).then(function(data) {
-                return getDataFromResponse(data, ["organisationUnits", "organisationUnitGroups"]);
+                return getDataFromResponse(data, ["organisationUnits", "organisationUnitGroups", "programs"]);
             });
         };
 
@@ -79,7 +77,9 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
                         .then(getLocalSystemSettings)
                         .then(upsertSystemSettings)
                         .then(getLocalTranslations)
-                        .then(upsertTranslations);
+                        .then(upsertTranslations)
+                        .then(getLocalPrograms)
+                        .then(upsertPrograms);
                 return metadataChangeLog;
             });
         };
@@ -105,9 +105,14 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
             return $http.get("/data/organisationUnits.json").then(getDataFromResponse);
         };
 
-        var getLocalOrgUnitGroups = function(){
+        var getLocalOrgUnitGroups = function() {
             console.debug("Fetching /data/organisationUnitGroups.json");
             return $http.get("/data/organisationUnitGroups.json").then(getDataFromResponse);
+        };
+
+        var getLocalPrograms = function() {
+            console.debug("Fetching /data/programs.json");
+            return $http.get("/data/programs.json").then(getDataFromResponse);
         };
 
         var tryParseJson = function(val) {
@@ -152,7 +157,7 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
             return store.upsert(data.organisationUnits);
         };
 
-        var upsertOrgUnitGroups = function(data){
+        var upsertOrgUnitGroups = function(data) {
             console.debug("Processing organisationUnitGroups ", data);
             var store = db.objectStore("orgUnitGroups");
             return store.upsert(data.organisationUnitGroups);

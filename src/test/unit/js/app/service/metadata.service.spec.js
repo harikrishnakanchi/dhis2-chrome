@@ -66,6 +66,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             httpBackend.expectGET("/data/organisationUnitGroups.json").respond(200, {});
             httpBackend.expectGET("/data/systemSettings.json").respond(200, {});
             httpBackend.expectGET("/data/translations.json").respond(200, {});
+            httpBackend.expectGET("/data/programs.json").respond(200, {});
 
             var metadataService = new MetadataService(http, db, q);
             metadataService.loadMetadataFromFile();
@@ -84,6 +85,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             var headers = {
                 "Accept": "application/json, text/plain, */*"
             };
+            setupLocalFileHttpRequest(today);
 
             var data = {
                 "programs": [{
@@ -101,12 +103,15 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 "created": tomorrow
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/metadata").respond(200, data);
-            httpBackend.expectGET(properties.dhis.url + "/api/systemSettings", headers).respond(200, {});
-            httpBackend.expectGET(properties.dhis.url + "/api/translations", headers).respond(200, {});
+            httpBackend.expectGET("/data/organisationUnits.json").respond(200, {});
+            httpBackend.expectGET("/data/organisationUnitGroups.json").respond(200, {});
+            httpBackend.expectGET("/data/systemSettings.json", headers).respond(200, {});
+            httpBackend.expectGET("/data/translations.json", headers).respond(200, {});
+            httpBackend.expectGET("/data/programs.json").respond(200, data);
+
 
             var metadataService = new MetadataService(http, db, q);
-            metadataService.sync();
+            metadataService.loadMetadataFromFile();
 
             httpBackend.flush();
 

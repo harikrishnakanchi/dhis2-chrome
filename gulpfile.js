@@ -202,12 +202,19 @@ gulp.task('download-systemSettings', function() {
     return download(base_url + "/api/systemSettings.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
 });
+
 gulp.task('download-translations', function() {
     return download(base_url + "/api/translations.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/translations.json")));
 });
 
-gulp.task('download-metadata', ['download-org', 'download-org-unit-groups', 'download-systemSettings', 'download-translations'], function() {
+gulp.task('download-programs', function() {
+    return download(base_url + "/api/programs.json?fields=:all&paging=false", auth)
+        .pipe(rename("programs.json"))
+        .pipe(gulp.dest(path.dirname("src/main/data/programs.json")));
+});
+
+gulp.task('download-metadata', ['download-org', 'download-org-unit-groups', 'download-systemSettings', 'download-translations', 'download-programs'], function() {
     return download(base_url + "/api/metadata.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });
