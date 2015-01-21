@@ -1,11 +1,14 @@
 define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
     return function(orgUnitService, orgUnitRepository, changeLogRepository, $q) {
+
         this.run = function(message) {
             console.debug("Syncing org unit: ", message.data.data);
             var orgUnits = _.isArray(message.data.data) ? message.data.data : [message.data.data];
-            return download(orgUnits).then(merge).then(function() {
-                return changeLogRepository.upsert("orgUnits", moment().toISOString());
-            });
+            return download(orgUnits).then(merge).then(updateChangeLog);
+        };
+
+        var updateChangeLog = function() {
+            return changeLogRepository.upsert("orgUnits", moment().toISOString());
         };
 
         var download = function(orgUnits) {

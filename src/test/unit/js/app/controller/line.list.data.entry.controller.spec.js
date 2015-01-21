@@ -109,13 +109,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 var programAndStageData = {
                     'id': 'p1'
                 };
-                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, programAndStageData));
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, programAndStageData));
 
                 scope.programsInCurrentModule = ['p1'];
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo);
                 scope.$apply();
 
-                expect(programRepository.getProgramAndStages).toHaveBeenCalledWith('p1');
+                expect(programRepository.get).toHaveBeenCalledWith('p1');
                 expect(scope.programs).toEqual([programAndStageData]);
             });
 
@@ -189,7 +189,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         }]
                     }]
                 };
-                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, program));
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, program));
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo);
                 scope.$apply();
 
@@ -324,7 +324,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
                 scope.programsInCurrentModule = ["p1", "p2"];
 
-                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, []));
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, []));
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo);
                 scope.$apply();
 
@@ -414,7 +414,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
             it("should soft-delete event which is POSTed to DHIS", function() {
                 scope.programsInCurrentModule = ["p1", "p2"];
-                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, []));
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, []));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
@@ -443,7 +443,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             it("should hard delete a local event", function() {
                 event1.localStatus = "DRAFT";
                 scope.programsInCurrentModule = ["p1", "p2"];
-                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, []));
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, []));
                 spyOn(hustle, "publish");
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
@@ -571,7 +571,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 mockStore.getAll.and.returnValue(utils.getPromise(q, optionSets));
-                spyOn(programRepository, "getProgramAndStages").and.returnValue(utils.getPromise(q, program));
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, program));
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo);
 
                 scope.setUpViewOrEditForm('event1').then(function(data) {

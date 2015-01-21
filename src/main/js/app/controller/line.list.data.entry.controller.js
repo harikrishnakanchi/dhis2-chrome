@@ -15,7 +15,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
         var loadPrograms = function() {
             var getProgramAndStagesPromises = [];
             _.each($scope.programsInCurrentModule, function(programId) {
-                getProgramAndStagesPromises.push(programRepository.getProgramAndStages(programId));
+                getProgramAndStagesPromises.push(programRepository.get(programId));
             });
 
             return $q.all(getProgramAndStagesPromises).then(function(allPrograms) {
@@ -306,7 +306,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
             var setUpEvent = function(eventData) {
                 var getProgramInfoNgModel = function(programId) {
-                    return programRepository.getProgramAndStages(programId);
+                    return programRepository.get(programId);
                 };
 
                 var eventToBeEdited = _.find(eventData, {

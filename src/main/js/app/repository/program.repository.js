@@ -13,7 +13,7 @@ define(["lodash"], function(_) {
             });
         };
 
-        this.getProgramAndStages = function(programId) {
+        this.get = function(programId) {
             var getProgram = function(programId) {
                 var programsStore = db.objectStore("programs");
                 return programsStore.find(programId);

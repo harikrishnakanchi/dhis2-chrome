@@ -37,6 +37,7 @@ require.config({
         "programEventRepository": "app/repository/program.event.repository",
         "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
         "changeLogRepository": "app/repository/changelog.repository",
+        "programRepository": "app/repository/program.repository",
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",
@@ -58,7 +59,7 @@ require.config({
         "datasetConsumer": "app/consumer/dataset.consumer",
         "createUserConsumer": "app/consumer/create.user.consumer",
         "updateUserConsumer": "app/consumer/update.user.consumer",
-        "programConsumer": "app/consumer/program.consumer",
+        "uploadProgramConsumer": "app/consumer/upload.program.consumer",
         "downloadProgramConsumer": "app/consumer/download.program.consumer",
         "downloadEventDataConsumer": "app/consumer/download.event.data.consumer",
         "uploadEventDataConsumer": "app/consumer/upload.event.data.consumer",

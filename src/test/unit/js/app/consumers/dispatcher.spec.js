@@ -1,7 +1,7 @@
 define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, utils) {
     describe("dispatcher", function() {
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, scope,
-            systemSettingConsumer, createUserConsumer, updateUserConsumer, programConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
+            systemSettingConsumer, createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
@@ -41,8 +41,11 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             updateUserConsumer = {
                 'run': jasmine.createSpy("updateUserConsumer")
             };
-            programConsumer = {
-                'run': jasmine.createSpy("programConsumer")
+            downloadProgramConsumer = {
+                'run': jasmine.createSpy("downloadProgramConsumer")
+            };
+            uploadProgramConsumer = {
+                'run': jasmine.createSpy("uploadProgramConsumer")
             };
             downloadEventDataConsumer = {
                 'run': jasmine.createSpy("downloadEventDataConsumer")
@@ -72,9 +75,10 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadApprovalConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadOrgUnitConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadOrgUnitGroupConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadProgramConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
-                downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
+                downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer);
         }));
 
@@ -203,13 +207,25 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(updateUserConsumer.run).toHaveBeenCalledWith(message);
         });
 
-        it("should call program consumer", function() {
+        it("should call upload program consumer", function() {
             message.data = {
                 "data": {},
                 "type": "uploadProgram"
             };
             dispatcher.run(message);
-            expect(programConsumer.run).toHaveBeenCalledWith(message);
+            scope.$apply();
+            expect(downloadProgramConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadProgramConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call download program consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "downloadProgram"
+            };
+            dispatcher.run(message);
+            scope.$apply();
+            expect(downloadProgramConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should call event download and upload consumer", function() {

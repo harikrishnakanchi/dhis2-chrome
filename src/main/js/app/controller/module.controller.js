@@ -87,7 +87,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         };
 
                         var getEnrichedProgram = function(systemSettings) {
-                            return programRepository.getProgramAndStages(findAssociatedModule().id).then(function(program) {
+                            return programRepository.get(findAssociatedModule().id).then(function(program) {
                                 _.forEach(program.programStages, function(programStage) {
                                     _.forEach(programStage.programStageSections, function(programStageSection) {
                                         _.forEach(programStageSection.programStageDataElements, function(de) {
@@ -186,7 +186,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 return module;
             }
 
-            return programRepository.getProgramAndStages(module.program.id).then(function(enrichedProgram) {
+            return programRepository.get(module.program.id).then(function(enrichedProgram) {
                 _.forEach(enrichedProgram.programStages, function(programStage) {
                     _.forEach(programStage.programStageSections, function(programStageSection) {
                         $scope.collapseSection[programStageSection.id] = true;

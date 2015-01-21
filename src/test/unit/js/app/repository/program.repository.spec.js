@@ -144,7 +144,7 @@ define(["programRepository", "angularMocks", "utils"], function(ProgramRepositor
             });
 
             var actualValues;
-            programRepository.getProgramAndStages("p1").then(function(programData) {
+            programRepository.get("p1").then(function(programData) {
                 actualValues = programData;
             });
 

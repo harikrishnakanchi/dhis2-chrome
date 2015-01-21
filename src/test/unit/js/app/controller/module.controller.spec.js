@@ -24,7 +24,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             systemSettingRepo.getAllWithProjectId = function() {};
             systemSettingRepo.upsert = function() {};
             programsRepo = utils.getMockRepo(q);
-            programsRepo.getProgramAndStages = function() {};
+            programsRepo.get = function() {};
             orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
 
             mockOrgStore = {
@@ -1252,7 +1252,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }
             };
 
-            spyOn(programsRepo, "getProgramAndStages").and.returnValue(utils.getPromise(q, program));
+            spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
 
             scope.getDetailedProgram(module1).then(function(data) {
                 expect(data).toEqual(expectedModule);

@@ -1,6 +1,6 @@
 define([], function() {
     return function($q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
-        downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, programConsumer,
+        downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
         downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer) {
         this.run = function(message) {
             switch (message.data.type) {
@@ -48,8 +48,12 @@ define([], function() {
                     return createUserConsumer.run(message);
                 case "updateUser":
                     return updateUserConsumer.run(message);
+                case "downloadProgram":
+                    return downloadProgramConsumer.run(message);
                 case "uploadProgram":
-                    return programConsumer.run(message);
+                    return downloadProgramConsumer.run(message).then(function() {
+                        return uploadProgramConsumer.run(message);
+                    });
                 case "uploadProgramEvents":
                     return downloadEventDataConsumer.run(message).then(function() {
                         return uploadEventDataConsumer.run(message);

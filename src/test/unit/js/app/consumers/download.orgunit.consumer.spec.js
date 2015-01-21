@@ -6,6 +6,9 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             q = $q;
             scope = $rootScope.$new();
 
+            Timecop.install();
+            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
+
             payload = {
                 'id': 'a4acf9115a7',
                 'name': 'Org1',
@@ -36,8 +39,6 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
                 "upsert": jasmine.createSpy("upsert")
             };
 
-            Timecop.install();
-            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
         }));
 
         afterEach(function() {
