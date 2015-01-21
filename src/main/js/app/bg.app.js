@@ -79,22 +79,22 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
 
                     console.log("Registering hustle consumers");
-                    consumerRegistry.register();
+                    consumerRegistry.register().then(function() {
 
+                        dhisMonitor.online(function() {
+                            console.log("Starting all hustle consumers");
+                            consumerRegistry.startAllConsumers();
+                        });
 
-                    dhisMonitor.online(function() {
-                        console.log("Starting all hustle consumers");
-                        consumerRegistry.startAllConsumers();
+                        dhisMonitor.offline(function() {
+                            console.log("Stopping all hustle consumers");
+                            consumerRegistry.stopAllConsumers();
+                        });
+
+                        dhisMonitor.start()
+                            .then(metadataSync)
+                            .then(projectDataSync);
                     });
-
-                    dhisMonitor.offline(function() {
-                        console.log("Stopping all hustle consumers");
-                        consumerRegistry.stopAllConsumers();
-                    });
-
-                    dhisMonitor.start()
-                        .then(metadataSync)
-                        .then(projectDataSync);
                 }
             ]);
 
