@@ -20,6 +20,7 @@ define(["lodash"], function(_) {
             };
 
             var enrichProgramStages = function(program) {
+                if (!program) return undefined;
                 var programStagesStore = db.objectStore("programStages");
                 var programStageGetPromises = [];
                 _.each(program.programStages, function(s) {
@@ -32,6 +33,8 @@ define(["lodash"], function(_) {
             };
 
             var enrichDataElements = function(program) {
+                if (!program) return undefined;
+
                 var dataElementsStore = db.objectStore("dataElements");
                 var promises = [];
                 _.each(program.programStages, function(stage) {

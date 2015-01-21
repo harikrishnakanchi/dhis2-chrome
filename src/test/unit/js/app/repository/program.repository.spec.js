@@ -43,6 +43,14 @@ define(["programRepository", "angularMocks", "utils"], function(ProgramRepositor
             expect(mockStore.upsert).toHaveBeenCalledWith(program);
         });
 
+        it("should return undefined", function() {
+            mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+            programRepository.get("nonexistant").then(function(actual) {
+                expect(actual).toBe(undefined);
+            });
+            scope.$apply();
+        });
+
         it("should get program", function() {
 
             var programData = {
