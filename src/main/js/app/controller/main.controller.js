@@ -69,10 +69,12 @@ define(["lodash"], function(_) {
             var assignCurrentProject = function() {
                 if (!_.isEmpty($rootScope.currentUser) && $scope.oldUserProject) {
                     userPreferenceRepository.get($rootScope.currentUser.userCredentials.username).then(function(data) {
-                        $scope.currentUserProject = _.find($scope.projects, {
-                            "id": data.orgUnits[0].id
-                        });
-                        $scope.oldUserProject = $scope.currentUserProject;
+                        if (data.orgUnits.length > 0) {
+                            $scope.currentUserProject = _.find($scope.projects, {
+                                "id": data.orgUnits[0].id
+                            });
+                            $scope.oldUserProject = $scope.currentUserProject;
+                        }
                     });
                 }
             };
