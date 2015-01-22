@@ -1056,6 +1056,10 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(scope.areNoSectionsSelectedForDataset(dataset)).toEqual(true);
         });
 
+        it("should return false if no dataset is selected", function() {
+            expect(scope.areNoSectionsSelectedForDataset(undefined)).toEqual(false);
+        });
+
         it("should return false if any one section is selected for dataset", function() {
 
             var dataset = {

@@ -459,10 +459,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.areNoSectionsSelectedForDataset = function(dataset) {
+            if(_.isEmpty(dataset))
+                return false;
             return _.all(dataset.sections, function(section) {
                 return _.all(section.dataElements, {
                     "isIncluded": false
-                });
+                }); 
             });
         };
 
