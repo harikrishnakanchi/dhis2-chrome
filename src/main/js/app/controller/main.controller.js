@@ -51,11 +51,11 @@ define(["lodash"], function(_) {
         });
 
         $scope.saveUser = function() {
-            var oldProject = $scope.oldUserProject || {};
-
-            $rootScope.currentUser.organisationUnits = _.reject($rootScope.currentUser.organisationUnits, {
-                "id": oldProject.id
-            });
+            if (!_.isEmpty($scope.oldUserProject)) {
+                $rootScope.currentUser.organisationUnits = _.reject($rootScope.currentUser.organisationUnits, {
+                    "id": $scope.oldUserProject.id
+                });
+            }
 
             $rootScope.currentUser.organisationUnits.push({
                 "id": $scope.currentUserProject.id,
@@ -67,9 +67,9 @@ define(["lodash"], function(_) {
 
         var resetProjects = function() {
             var assignCurrentProject = function() {
-                if (!_.isEmpty($rootScope.currentUser) && $scope.oldUserProject) {
+                if (!_.isEmpty($rootScope.currentUser)) {
                     userPreferenceRepository.get($rootScope.currentUser.userCredentials.username).then(function(data) {
-                        if (data.orgUnits.length > 0) {
+                        if ( !_.isEmpty(data) && !_.isEmpty(data.orgUnits)) {
                             $scope.currentUserProject = _.find($scope.projects, {
                                 "id": data.orgUnits[0].id
                             });
@@ -85,12 +85,11 @@ define(["lodash"], function(_) {
         };
 
         $rootScope.$watch("currentUser.organisationUnits", function() {
-            if ($rootScope.currentUser && !$scope.oldUserProject) {
-                var orgUnits = $rootScope.currentUser.organisationUnits;
-                if (!_.isEmpty($rootScope.currentUser.organisationUnits))
-                    $scope.oldUserProject = $rootScope.currentUser.organisationUnits[0];
-                resetProjects();
-            }
+            resetProjects();
+        }, true);
+
+        $rootScope.$watch("currentUser", function() {
+            resetProjects();
         }, true);
 
         $scope.logout = function() {
