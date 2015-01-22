@@ -13,7 +13,7 @@
         "angular-indexedDB": "https://github.com/DWB-eHealth/angular-indexedDB.git",
         "angular-route": null,
         "ng-i18n": "https://github.com/gertn/ng-i18n.git#v0.2.1",
-        "lodash": null,
+        "lodash": "2.4.1",
         "angularjs-directives": "https://github.com/DWB-eHealth/angularjs-directives.git",
         "moment": null,
         "js-md5": null,
