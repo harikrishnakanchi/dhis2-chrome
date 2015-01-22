@@ -16,9 +16,8 @@
         <a class="navbar-brand" href="#/dashboard"><img src="img/logo.png" alt="" title="DHIS" id="logoImg"></a>
         <ul class="nav navbar-nav navbar-right">
           <li><a  href="#/dashboard">Home</a></li>
-          <li  ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a></li>
+          
           <li><p class="navbar-text" ng-show="isDhisOnline"  id="loggedInUser"> <span class="online">{{currentUser.userCredentials.username}}</span> </p></li>
-          <li><p class="navbar-text" ng-show="!isDhisOnline" id="loggedInUser"> <span class="offline"> {{currentUser.userCredentials.username}} </span></p></li>
           <li>
             <select id="languageSelectButton" ng-model="currentUser.locale" ng-if="currentUser" class="input-sm"> 
               <option value="en">English</option>
@@ -26,6 +25,12 @@
               <option dir="rtl" lang="ar" value="ar">العربية</option>
             </select>
           </li>
+
+          <li  ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a></li>
+        </ul>
+      </div>
+      <div class="container">
+        <ul class="nav navbar-nav navbar-right">
           <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Superuser']))">
             <select name="project" class="select_project input-sm" ng-model="currentUserProject" ng-options="getFormattedOption(p) for p in projects | orderBy:getFormattedOption" ng-change="saveUser()">
             </select>

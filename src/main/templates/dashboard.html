@@ -33,13 +33,13 @@
             <div ng-show="approveSuccessForLevelThree" class="alert alert-success">{{resourceBundle.thirdLevelApproveSuccess}}</div>
             <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
             <form name="approvalForm">
-                <table class="table table-bordered" ng-if="itemsAwaitingApprovalAtUserLevel.length > 0">
-                    <caption>{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</caption>
+                <table class="table table-bordered msf-table" ng-if="itemsAwaitingApprovalAtUserLevel.length > 0">
+                    <caption class="msf-table-caption">{{resourceBundle.itemsAwaitingApprovalAtUserLevelLabel}}</caption>
                     <thead>
                         <tr>
                             <th>{{resourceBundle.moduleLabel}}</th>
                             <th ng-model="weeks">
-                                <input type="checkbox" ng-model="weeks.approveAllItems" ng-change="toggleAllItemsAwaitingApproval()">{{resourceBundle.weekLabel}}
+                                <input type="checkbox" class="dashboard-form-checkbox" ng-model="weeks.approveAllItems" ng-change="toggleAllItemsAwaitingApproval()">{{resourceBundle.weekLabel}}
                             </th>
                         </tr>
                     </thead>
@@ -49,7 +49,7 @@
                             <td>
                                 <ul>
                                     <li ng-repeat="status in item.status">
-                                        <input type="checkbox" ng-model="status.shouldBeApproved" ng-change="toggleSelectAllOption(status.shouldBeApproved)">
+                                        <input type="checkbox" class="dashboard-form-checkbox" ng-model="status.shouldBeApproved" ng-change="toggleSelectAllOption(status.shouldBeApproved)">
                                         <a ng-href="#/data-entry/{{item.moduleId}}/{{status.period}}">{{formatPeriods(status.period)}}</a>
                                     </li>
                                 </ul>
@@ -65,8 +65,8 @@
                 </table>
             </form>
             <form>
-                <table class="table table-bordered" ng-if="itemsAwaitingSubmission.length > 0">
-                    <caption>{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</caption>
+                <table class="table table-bordered msf-table" ng-if="itemsAwaitingSubmission.length > 0">
+                    <caption class="msf-table-caption">{{resourceBundle.itemsAwaitingDataSubmissionLabel}}</caption>
                     <thead>
                         <tr>
                             <th>{{resourceBundle.moduleLabel}}</th>
@@ -88,9 +88,9 @@
                     </tbody>
                 </table>
 
-                <table class="table table-bordered" ng-if="itemsAwaitingApprovalAtOtherLevels.length > 0">
-                    <caption ng-if="userApprovalLevel">{{resourceBundle.itemsAwaitingApprovalAtOtherLevelLabel}}</caption>
-                    <caption ng-if="!userApprovalLevel">{{resourceBundle.itemsAwaitingApproval}}</caption>
+                <table class="table table-bordered msf-table" ng-if="itemsAwaitingApprovalAtOtherLevels.length > 0">
+                    <caption class="msf-table-caption" ng-if="userApprovalLevel">{{resourceBundle.itemsAwaitingApprovalAtOtherLevelLabel}}</caption>
+                    <caption class="msf-table-caption" ng-if="!userApprovalLevel">{{resourceBundle.itemsAwaitingApproval}}</caption>
                     <thead>
                         <tr>
                             <th>{{resourceBundle.moduleLabel}}</th>
