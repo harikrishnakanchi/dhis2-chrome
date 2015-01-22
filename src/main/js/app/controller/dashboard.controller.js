@@ -34,7 +34,26 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
                 "type": "downloadEventData"
             }, "dataValues");
 
-            return $q.all([downloadData, downloadEvents]).then(onSuccess);
+            var downloadMetadata = $hustle.publish({
+                "type": "downloadMetadata"
+            }, "dataValues");
+
+            var downloadOrgUnit = $hustle.publish({
+                "type": "downloadOrgUnit",
+                "data": []
+            }, "dataValues");
+
+            var downloadOrgUnitGroups = $hustle.publish({
+                "type": "downloadOrgUnitGroups",
+                "data": []
+            }, "dataValues");
+
+            var downloadProgram = $hustle.publish({
+                "type": "downloadProgram",
+                "data": []
+            }, "dataValues");
+
+            return $q.all([downloadData, downloadEvents, downloadMetadata, downloadOrgUnit, downloadOrgUnitGroups, downloadProgram]).then(onSuccess);
         };
 
         $scope.formatPeriods = function(period) {
