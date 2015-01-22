@@ -26,14 +26,6 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
                 displayMessage($scope.resourceBundle.syncComplete, false);
             };
 
-            var downloadData = $hustle.publish({
-                "type": "downloadData"
-            }, "dataValues");
-
-            var downloadEvents = $hustle.publish({
-                "type": "downloadEventData"
-            }, "dataValues");
-
             var downloadMetadata = $hustle.publish({
                 "type": "downloadMetadata"
             }, "dataValues");
@@ -51,6 +43,14 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
             var downloadProgram = $hustle.publish({
                 "type": "downloadProgram",
                 "data": []
+            }, "dataValues");
+
+            var downloadData = $hustle.publish({
+                "type": "downloadData"
+            }, "dataValues");
+
+            var downloadEvents = $hustle.publish({
+                "type": "downloadEventData"
             }, "dataValues");
 
             return $q.all([downloadData, downloadEvents, downloadMetadata, downloadOrgUnit, downloadOrgUnitGroups, downloadProgram]).then(onSuccess);
