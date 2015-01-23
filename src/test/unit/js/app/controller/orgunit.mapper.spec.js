@@ -266,6 +266,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
             var modules = [{
                 "name": "Module1",
                 "service": "Aggregate",
+                "openingDate": new Date(),
                 "dataSets": [{
                     "id": "ds_11",
                     "name": "dataset11",
@@ -276,6 +277,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
             }, {
                 "name": "Module2",
                 "service": "Aggregate",
+                "openingDate": new Date(),
                 "dataSets": [{
                     "id": "ds_21",
                     "name": "dataset21",
@@ -302,7 +304,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 "shortName": "Module1",
                 "id": "aac1bbd0985",
                 "level": 4,
-                "openingDate": "2010-01-01",
+                "openingDate": moment(new Date()).toDate(),
                 "selectedDataset": undefined,
                 "enrichedProgram": undefined,
                 "attributeValues": [{
@@ -338,7 +340,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 "shortName": "Module2",
                 "id": "acccf1dda36",
                 "level": 4,
-                "openingDate": "2010-01-01",
+                "openingDate": moment(new Date()).toDate(),
                 "selectedDataset": undefined,
                 "enrichedProgram": undefined,
                 "attributeValues": [{
@@ -374,6 +376,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
 
             var modules = [{
                 "name": "Module1",
+                "openingDate": new Date(),
                 "service": "Aggregate",
                 "dataSets": [{
                     "id": "ds_11",
@@ -401,7 +404,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 "shortName": "Module1",
                 "id": "someId",
                 "level": "someLevel",
-                "openingDate": "2010-01-01",
+                "openingDate": moment(new Date()).toDate(),
                 "selectedDataset": undefined,
                 "enrichedProgram": undefined,
                 "attributeValues": [{

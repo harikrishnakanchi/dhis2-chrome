@@ -6,6 +6,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.originalDatasets = [];
         $scope.isExpanded = {};
         $scope.isDisabled = false;
+        $scope.thisDate = (moment().add(1, 'day')).toDate();
 
         var allModules = [];
 
@@ -118,6 +119,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                             $scope.modules.push({
                                 'id': $scope.orgUnit.id,
                                 'name': $scope.orgUnit.name,
+                                'openingDate':moment($scope.orgUnit.openingDate).toDate(), 
                                 'enrichedProgram': $scope.orgUnit.enrichedProgram,
                                 'allDatasets': getNonAssociatedDatasets(),
                                 'dataSets': associatedDatasets,
@@ -400,7 +402,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 module.timestamp = module.timestamp || new Date().getTime();
                 $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
                 return $scope.isExpanded[module.timestamp];
-            };
+        };
 
         $scope.changeDataModel = function(module, dataModel) {
             module.allDatasets = filterAllDataSetsBasedOnDataModelType($scope.allDatasets, dataModel);
@@ -411,7 +413,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.addModules = function() {
             $scope.modules.push({
-                'openingDate': moment().format("YYYY-MM-DD"),
+                'openingDate': moment().toDate(),
                 'dataSets': [],
                 'allDatasets': _.filter(_.cloneDeep($scope.allDatasets), isNewDataModel),
                 'selectedDataset': {},
@@ -459,12 +461,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.areNoSectionsSelectedForDataset = function(dataset) {
-            if(_.isEmpty(dataset))
+            if (_.isEmpty(dataset))
                 return false;
             return _.all(dataset.sections, function(section) {
                 return _.all(section.dataElements, {
                     "isIncluded": false
-                }); 
+                });
             });
         };
 
@@ -504,6 +506,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             $scope.allModuleNames = _.reject(allModules.concat(_.pluck($scope.modules, "name")), function(m) {
                 return m === undefined;
             });
+        };
+
+        $scope.isAfterMaxDate = function(module) {
+            if(module.openingDate === undefined)
+                return true;
+            return false;
         };
 
         init();

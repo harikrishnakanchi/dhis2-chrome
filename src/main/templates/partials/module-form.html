@@ -22,6 +22,16 @@
                         </div>
                     </li>
                     <li class="form-group">
+                        <label for="moduleOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
+                        <div class="col-sm-6 col-md-6" >
+                            <input type="date" max={{thisDate}} name="moduleOpeningDate" ng-model="module.openingDate" required>
+                            <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; (form.moduleOpeningDate.$invalid || isAfterMaxDate(module))">
+                                <span ng-show="form.moduleOpeningDate.$error.required"class="errortxt">{{resourceBundle.openingDateValidation}}</span>
+                                <span ng-show="isAfterMaxDate(module)" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="form-group">
                         <label for="service" class="col-sm-4 col-md-4 control-label">{{resourceBundle.serviceLabel}}</label>
                         <div class="col-sm-6 col-md-6">
                             <select type="text" name="serviceDropDown" id="serviceDropDown" ng-model="module.serviceType" ng-disabled="!isNewMode" required>

@@ -177,7 +177,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 shortName: module.name,
                 id: moduleId || dhisId.get(module.name + moduleParent.id),
                 level: moduleLevel || parseInt(moduleParent.level) + 1,
-                openingDate: moment().format("YYYY-MM-DD"),
+                openingDate: moment(module.openingDate).toDate(),
                 selectedDataset: module.selectedDataset,
                 dataSets: module.dataSets,
                 enrichedProgram: module.enrichedProgram,

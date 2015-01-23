@@ -326,6 +326,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var modules = [{
                 'name': "Module2",
+                'openingDate': new Date(),
                 'serviceType': "Linelist",
                 'enrichedProgram': {
                     'programStages': [{
@@ -356,7 +357,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "shortName": "Module2",
                 "id": "a1ab18b5fdd",
                 "level": NaN,
-                "openingDate": "2014-04-01",
+                "openingDate": moment(new Date()).toDate(),
                 "selectedDataset": undefined,
                 "dataSets": undefined,
                 "enrichedProgram": {
@@ -446,6 +447,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var modules = [{
                 'name': "Module1",
                 'serviceType': "Aggregate",
+                'openingDate': new Date(),
                 'dataSets': [{
                     'id': 'DS_OPD',
                     'name': 'dataset11',
@@ -480,7 +482,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 shortName: 'Module1',
                 id: 'adba40b7157',
                 level: NaN,
-                openingDate: '2014-04-01',
+                openingDate: moment(new Date()).toDate(),
                 selectedDataset: undefined,
                 attributeValues: [{
                     created: moment().toISOString(),
@@ -718,6 +720,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var modules = [{
                 name: "module NEW name",
                 id: "newId",
+                openingDate: new Date(),
                 serviceType: "Aggregate",
                 dataSets: [{
                     sections: [{
@@ -748,7 +751,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 shortName: 'module NEW name',
                 id: 'mod2',
                 level: 6,
-                openingDate: moment().format("YYYY-MM-DD"),
+                openingDate: new Date(),
                 selectedDataset: undefined,
                 enrichedProgram: undefined,
                 dataSets: [{
@@ -795,7 +798,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 shortName: 'module NEW name',
                 id: 'mod2',
                 level: 6,
-                openingDate: '2014-04-01',
+                openingDate: moment(new Date()).toDate(),
                 selectedDataset: undefined,
                 dataSets: [{
                     sections: [{
