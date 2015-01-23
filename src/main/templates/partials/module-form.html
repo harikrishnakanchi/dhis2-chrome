@@ -14,7 +14,7 @@
                     <li class="form-group">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label">Module name</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="Module Name" ng-model="module.name" not-in="allModuleNames" ng-change=getAllModulesNames() required>
+                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="Module Name" ng-model="module.name" not-in="allModuleNames" ng-change=getAllModulesNames() ng-disabled="isDisabled" required>
                             <div ng-show="form.moduleName{{$index}}.$dirty &amp;&amp; form.moduleName{{$index}}.$invalid">
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
@@ -101,7 +101,7 @@
                                                 <ul>
                                                     <li ng-repeat="de in section.programStageDataElements">
                                                         <label>
-                                                            <input type="checkbox" ng-disabled="de.compulsory" ng-model="de.dataElement.isIncluded">{{de.dataElement.formName}}
+                                                            <input type="checkbox" ng-disabled="de.compulsory || isDisabled" ng-model="de.dataElement.isIncluded">{{de.dataElement.formName}}
                                                         </label>
                                                     </li>
                                                 </ul>
@@ -116,7 +116,7 @@
                 </ul>
             </div>
             <input type="button" class="btn btn-main pull-right" ng-click="save(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules)" value="Save" ng-if="isNewMode" />
-            <input type="button" class="btn btn-main pull-right" ng-click="update(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules) || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode" />
+            <input type="button" class="btn btn-main pull-right" ng-click="update(modules)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton(modules) || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode &amp;&amp; !isDisabled" />
             <input type="button" class="btn btn-main pull-right" ng-click="disable(orgUnit)" value="Disable" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !isDisabled" />
         </form>
     </div>
