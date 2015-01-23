@@ -17,7 +17,7 @@
         <div class="alert alert-danger" ng-if="isDataFormInitialized &amp;&amp; !isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
         <form name="dataentryForm" id="dataentry" ng-if="(isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) || (isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || !hasRoles(['Project Level Approver', 'Coordination Level Approver'])">
             <div class="text-right">
-                <input type="button" ng-click="printWindow()" value="{{resourceBundle.printTallySheetBtnValue}}" ng-show="currentModule"></input>
+                <input type="button"  class="printTallySheetBtn" ng-click="printWindow()" value="{{resourceBundle.printTallySheetBtnValue}}" ng-show="currentModule"></input>
             </div>
             <accordion close-others="false">
                 <accordion-group ng-repeat="(dataSetId, sections) in currentGroupedSections" is-open="getDatasetState(dataSetId, $first)[dataSetId]">

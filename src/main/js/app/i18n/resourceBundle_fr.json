@@ -18,7 +18,7 @@
     "eventListTitle": "List of Events",
     "chooseWeek": "S'il vous plaît choisir une semaine pour entrer des données.",
     "syncRunning": "Synchronisation de données initié. S'il vous plaît attendre.",
-    "syncComplete": "Synchronisation des données terminée avec succès.",
+    "syncComplete": "Data sync scheduled successfully.",
     "openingDateValidation": "Date d'ouverture est nécessaire.",
     "endDateValidation": "Date de fin est nécessaire",
     "beyondMaxDate": "La date ne peut pas dépasser la date d'aujourd'hui.",

@@ -20,7 +20,7 @@
     "lineListEventDate": "Event date",
     "eventListTitle": "List of Events",
     "syncRunning": "Data sync initiated. Please wait.",
-    "syncComplete": "Data sync completed successfully.",
+    "syncComplete": "Data sync scheduled successfully.",
     "openingDateValidation": "Opening Date is required.",
     "endDateValidation": "End Date is required.",
     "beyondMaxDate": "Date cannot exceed today's date.",

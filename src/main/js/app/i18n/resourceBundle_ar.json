@@ -20,7 +20,7 @@
     "eventListTitle": "List of Events",
     "chooseWeek": "الرجاء اختيار في الأسبوع لإدخال البيانات.",
     "syncRunning": "بدأت مزامنة البيانات. يرجى الانتظار.",
-    "syncComplete": "الانتهاء مزامنة البيانات بنجاح.",
+    "syncComplete": "Data sync scheduled successfully.d",
     "openingDateValidation": "مطلوب افتتاح التسجيل.",
     "endDateValidation": "مطلوب تاريخ نهاية",
     "beyondMaxDate": "تاريخ لا يمكن أن يتجاوز تاريخ اليوم.",

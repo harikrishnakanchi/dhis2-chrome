@@ -378,6 +378,9 @@ text-align: center;
         float: left;
         width:100%;
     }
+    span + span{
+    	cursor: pointer;
+    }
 }
 
 //loginform
@@ -621,4 +624,41 @@ table td:first-child span{
 input[type="checkbox"].dashboard-form-checkbox{
 	vertical-align: top;
 	margin-right: 5px;
+}
+.panel{
+	form.form-horizontal{
+		&>.btn-main+.btn-main{
+			margin-right: 10px;
+		}
+	}
+}
+.form-horizontal{
+	.add-service-label{
+		margin-bottom: 0;
+		label.control-label{
+			text-align: left;
+			font-weight: bold;
+		}
+	}
+}
+.mb5{
+	margin-bottom: 5px;
+}
+.download-msg-alert{
+	padding: 7px 15px 8px 15px;
+}
+
+.treeview-col + .main-content{
+	padding-top: 20px;
+}
+#dataentry{
+	.accordion-toggle{
+		cursor: pointer;
+	}
+}
+.printTallySheetBtn{
+	margin-bottom: 20px;
+}
+.dataentrypage .module-select{
+	margin-bottom: 0;
 }
