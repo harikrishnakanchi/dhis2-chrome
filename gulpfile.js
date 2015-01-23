@@ -20,7 +20,7 @@ var cat = require("gulp-cat");
 var base_url = argv.url || "http://localhost:8080";
 var metadata_sync_interval = argv.metadataSyncInterval || "1";
 var Q = require('q');
-var auth = argv.auth ? "Basic " + argv.auth : "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA==";
+var auth = argv.auth || "c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA==";
 var rest = require('restler');
 
 gulp.task('test', function() {
