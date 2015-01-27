@@ -26,6 +26,13 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
             }
         };
 
+        var upsertDataSets = function(data) {
+            if (!_.isEmpty(data.dataSets)) {
+                var store = db.objectStore("dataSets");
+                return store.upsert(data.dataSets);
+            }
+        };
+
         var getDataFromResponse = function(response, filterFields) {
             filterFields = filterFields || [];
             var data = response.data;
@@ -41,7 +48,15 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
 
             console.debug("Fetching " + url);
             return $http.get(url).then(function(data) {
-                return getDataFromResponse(data, ["organisationUnits", "organisationUnitGroups", "programs"]);
+                return getDataFromResponse(data, ["organisationUnits", "organisationUnitGroups", "programs", "dataSets"]);
+            });
+        };
+
+        var getDataSet = function() {
+            var url = dhisUrl.dataSets + "?paging=false&fields=[:all]";
+            console.debug("Fetching " + url);
+            return $http.get(url).then(function(response) {
+                return response.data;
             });
         };
 
@@ -168,10 +183,13 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
                 .then(loadMetadata);
         };
 
+
         this.sync = function() {
             return getLastUpdatedTime()
                 .then(getMetadata)
                 .then(upsertMetadata)
+                .then(getDataSet)
+                .then(upsertDataSets)
                 .then(getSystemSettings)
                 .then(upsertSystemSettings)
                 .then(getTranslations)

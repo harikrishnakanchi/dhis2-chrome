@@ -1,6 +1,6 @@
 define(["metadataService", "properties", "utils", "angularMocks"], function(MetadataService, properties, utils) {
     describe("Metadata service", function() {
-        var httpBackend, http, db, q, mockStore, category1, data, systemSettings, translations;
+        var httpBackend, http, db, q, mockStore, category1, data, systemSettings, translations, dataSets;
         var today = "2014-03-24T09:02:49.870Z";
         var yesterday = "2014-03-23T09:02:49.870Z";
         var tomorrow = "2014-03-25T09:02:49.870Z";
@@ -33,6 +33,16 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 "translations": [{
                     "id": "blah",
                     "locale": "es"
+                }]
+            };
+
+            dataSets = {
+                "dataSets": [{
+                    "id": "DS_Physio",
+                    "organisationUnits": [{
+                        "name": "Mod1",
+                        "id": "hvybNW8qEov"
+                    }]
                 }]
             };
 
@@ -149,6 +159,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 "Accept": "application/json, text/plain, */*"
             };
             httpBackend.expectGET(properties.dhis.url + "/api/metadata?lastUpdated=2014-03-24T09:02:49.870Z").respond(200, data);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?paging=false&fields=[:all]").respond(200, dataSets);
             httpBackend.expectGET(properties.dhis.url + "/api/systemSettings", headers).respond(200, systemSettings);
             httpBackend.expectGET(properties.dhis.url + "/api/translations", headers).respond(200, translations);
 
@@ -185,6 +196,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 "Accept": "application/json, text/plain, */*"
             };
             httpBackend.expectGET(properties.dhis.url + "/api/metadata").respond(200, data);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?paging=false&fields=[:all]").respond(200, dataSets);
             httpBackend.expectGET(properties.dhis.url + "/api/systemSettings", headers).respond(200, systemSettings);
             httpBackend.expectGET(properties.dhis.url + "/api/translations", headers).respond(200, translations);
 

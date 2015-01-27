@@ -18,6 +18,7 @@ define(["properties"], function(properties) {
         "orgUnitGroups": with_host("/api/organisationUnitGroups.json"),
         "orgUnits": with_host("/api/organisationUnits.json"),
         "users": with_host("/api/users"),
-        "programs": with_host("/api/programs.json")
+        "programs": with_host("/api/programs.json"),
+        "dataSets": with_host("/api/dataSets.json")
     };
 });
