@@ -1,6 +1,6 @@
 define([], function() {
     var url = "/* @echo DHIS_URL */";
-    var auth_header = "Basic " + "/* @echo DHIS_AUTH */";
+    var auth_header = "/* @echo DHIS_AUTH */";
     var metdataSyncInterval = "/* @echo METADATA_SYNC_INTERVAL */";
 
     return {
