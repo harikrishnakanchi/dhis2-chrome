@@ -3,13 +3,14 @@
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Module" ng-if="!isDisabled" ng-click="openInNewMode('Module')" />
     </div>
     <div class="panel panel-default">
-        
+
         <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorOpUnit }}</div>
         <div class="panel-heading">
             <h3 class="panel-title">Operation Unit Details</h3>
-            <div class="actions">
+            <!--             <div class="actions">
                 <input type="button" class="btn btn-add btn-xs" ng-click="addOpUnits()" ng-if="isNewMode" value="Add Operation Unit" />
             </div>
+ -->
         </div>
         <div class="panel-body">
             <form name="form" class="form-horizontal" role="form" ng-submit="save(opUnits)" novalidate>

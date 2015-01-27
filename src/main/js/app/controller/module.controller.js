@@ -355,10 +355,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
             };
 
-            var saveExcludedDataElementsSystemSettings = function(data) {
-                return saveSystemSettingsForExcludedDataElements($scope.orgUnit.id, data[0], data[1]);
-            };
-
             var createOrgUnitGroups = function() {
                 var modulesToAdd = [];
                 var parent = $scope.orgUnit;
@@ -375,9 +371,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
             var aggregateModules = getModulesOfServiceType("Aggregate", modules);
             var linelistModules = getModulesOfServiceType("Linelist", modules);
-
-            $q.all([saveAggregateModules(), saveLinelistModules()])
-                .then(saveExcludedDataElementsSystemSettings)
+            var savedAggregateModule, savedLinelistModules;
+            saveAggregateModules()
+                .then(function(agg) {
+                    savedAggregateModule = agg;
+                })
+                .then(saveLinelistModules)
+                .then(function(ll) {
+                    savedLinelistModules = ll;
+                })
+                .then(function() {
+                    saveSystemSettingsForExcludedDataElements($scope.orgUnit.id, savedAggregateModule, savedLinelistModules);
+                })
                 .then(createOrgUnitGroups)
                 .then(onSuccess, $scope.onError);
         };
