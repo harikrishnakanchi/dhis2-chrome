@@ -17,7 +17,8 @@ var path = require('path');
 var ChromeExtension = require("crx");
 var preprocess = require("gulp-preprocess");
 var cat = require("gulp-cat");
-var base_url = argv.url || "http://localhost:8080";
+var baseUrl = argv.url || "http://localhost:8080";
+var baseIntUrl = argv.int_url || baseUrl;
 var metadata_sync_interval = argv.metadataSyncInterval || "1";
 var Q = require('q');
 var auth = argv.auth || "c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA==";
@@ -164,7 +165,7 @@ gulp.task('config', function() {
     return gulp.src('./conf/overrides.js')
         .pipe(preprocess({
             context: {
-                DHIS_URL: base_url,
+                DHIS_URL: baseUrl,
                 DHIS_AUTH: auth,
                 METADATA_SYNC_INTERVAL: metadata_sync_interval
             }
@@ -187,35 +188,35 @@ gulp.task('watch', function() {
 
 
 gulp.task('download-org', function() {
-    return download(base_url + "/api/organisationUnits.json?fields=:all&paging=false", auth)
+    return download(baseIntUrl + "/api/organisationUnits.json?fields=:all&paging=false", auth)
         .pipe(rename("organisationUnits.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/organisationUnits.json")));
 });
 
 gulp.task('download-org-unit-groups', function() {
-    return download(base_url + "/api/organisationUnitGroups.json?paging=false&fields=[:all]", auth)
+    return download(baseIntUrl + "/api/organisationUnitGroups.json?paging=false&fields=[:all]", auth)
         .pipe(rename("organisationUnitGroups.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/organisationUnitGroups.json")));
 });
 
 gulp.task('download-systemSettings', function() {
-    return download(base_url + "/api/systemSettings.json", auth)
+    return download(baseIntUrl + "/api/systemSettings.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
 });
 
 gulp.task('download-translations', function() {
-    return download(base_url + "/api/translations.json", auth)
+    return download(baseIntUrl + "/api/translations.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/translations.json")));
 });
 
 gulp.task('download-programs', function() {
-    return download(base_url + "/api/programs.json?fields=:all&paging=false", auth)
+    return download(baseIntUrl + "/api/programs.json?fields=:all&paging=false", auth)
         .pipe(rename("programs.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/programs.json")));
 });
 
 gulp.task('download-metadata', ['download-org', 'download-org-unit-groups', 'download-systemSettings', 'download-translations', 'download-programs'], function() {
-    return download(base_url + "/api/metadata.json", auth)
+    return download(baseIntUrl + "/api/metadata.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });
 
