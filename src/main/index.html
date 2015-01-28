@@ -1,51 +1,61 @@
 <!DOCTYPE html>
 <html>
+
 <head>
- <title>DHIS2</title>
- <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
- <link rel="stylesheet" type="text/css" href="js/lib/angular/angular-csp.css">
- <link rel="stylesheet" type="text/css" href="css/main.css">
-  <script src="js/lib/requirejs/require.js" data-main="js/app/bootstrap.js"></script>
+    <title>DHIS2</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="js/lib/angular/angular-csp.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script src="js/lib/requirejs/require.js" data-main="js/app/bootstrap.js"></script>
 </head>
 
-<body >
-  <a id="top"></a>
-  <div id="dhis2" name="dhis2" ng-csp ng-controller="mainController" ng-cloak>
-    <header>
-      <div class="container">
-        <a class="navbar-brand" href="#/dashboard"><img src="img/logo.png" alt="" title="DHIS" id="logoImg"></a>
-        <ul class="nav navbar-nav navbar-right">
-          <li><a  href="#/dashboard">Home</a></li>
-          
-          <li><p class="navbar-text" ng-show="isDhisOnline"  id="loggedInUser"> <span class="online">{{currentUser.userCredentials.username}}</span> </p></li>
-          <li>
-            <select id="languageSelectButton" ng-model="currentUser.locale" ng-if="currentUser" class="input-sm"> 
-              <option value="en">English</option>
-              <option dir="rtl" lang="fr" value="fr">Français</option>
-              <option dir="rtl" lang="ar" value="ar">العربية</option>
-            </select>
-          </li>
+<body>
+    <a id="top"></a>
+    <div id="dhis2" name="dhis2" ng-csp ng-controller="mainController" ng-cloak>
+        <header>
+            <div class="container">
+                <a class="navbar-brand" href="#/dashboard"><img src="img/logo.png" alt="" title="DHIS" id="logoImg">
+                </a>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#/dashboard">Home</a>
+                    </li>
 
-          <li  ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a></li>
-        </ul>
-      </div>
-      <div class="container">
-        <ul class="nav navbar-nav navbar-right">
-          <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Superuser']))">
-            <select name="project" class="select_project input-sm" ng-model="currentUserProject" ng-options="getFormattedOption(p) for p in projects | orderBy:getFormattedOption" ng-change="saveUser()">
-            </select>
-          </li>
-        </ul>
-      </div>
-    </header>
-    <div class="container">
-     <div class="loading" ng-show="loading">
-      <img src="img/ajax-loader.gif" class="spinner"/>
+                    <li>
+                        <p class="navbar-text" ng-show="isDhisOnline" id="loggedInUser"> <span class="online">{{currentUser.userCredentials.username}}</span> </p>
+                    </li>
+                    <li>
+                        <p class="navbar-text" ng-show="!isDhisOnline" id="userOffline"> <span class="offline">{{currentUser.userCredentials.username}}</span> </p>
+                    </li>
+                    <li>
+                        <select id="languageSelectButton" ng-model="currentUser.locale" ng-if="currentUser" class="input-sm">
+                            <option value="en">English</option>
+                            <option dir="rtl" lang="fr" value="fr">Français</option>
+                            <option dir="rtl" lang="ar" value="ar">العربية</option>
+                        </select>
+                    </li>
+
+                    <li ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="container">
+                <ul class="nav navbar-nav navbar-right">
+                    <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Superuser']))">
+                        <select name="project" class="select_project input-sm" ng-model="currentUserProject" ng-options="getFormattedOption(p) for p in projects | orderBy:getFormattedOption" ng-change="saveUser()">
+                        </select>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <div class="container">
+            <div class="loading" ng-show="loading">
+                <img src="img/ajax-loader.gif" class="spinner" />
+            </div>
+            <div ng-view="ng-view">
+            </div>
+        </div>
     </div>
-    <div ng-view="ng-view">
-    </div>
-  </div>
-</div>
 
 </body>
+
 </html>
