@@ -46,9 +46,11 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
             };
 
             var isLocalDataStale = function(ouFromDHIS, ouFromIDB) {
+                var networkDelay = 1;
                 if (!ouFromIDB) return true;
                 var lastUpdatedInDhis = dateUtils.max(lastUpdatedTimeIncludingAttributes(ouFromDHIS));
                 var lastUpdatedInIDB = dateUtils.max(lastUpdatedTimeIncludingAttributes(ouFromIDB));
+                lastUpdatedInIDB = lastUpdatedInIDB.add(networkDelay, "minutes");
                 return lastUpdatedInDhis.isAfter(lastUpdatedInIDB);
             };
 
