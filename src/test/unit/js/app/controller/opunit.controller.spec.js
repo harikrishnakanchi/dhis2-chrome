@@ -331,7 +331,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "parent": {
                     "name": "Parent",
                     "id": "ParentId"
-                }
+                },
+                "children": []
             };
 
             var expectedOpUnits = [{
@@ -344,6 +345,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "name": "Parent",
                     "id": "ParentId"
                 },
+                "children": [],
                 "attributeValues": [{
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",

@@ -84,6 +84,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     'shortName': opUnit.name,
                     'level': $scope.orgUnit.level,
                     'parent': _.pick($scope.orgUnit.parent, "name", "id"),
+                    'children': $scope.orgUnit.children,
                     "attributeValues": [{
                         "created": moment().toISOString(),
                         "lastUpdated": moment().toISOString(),

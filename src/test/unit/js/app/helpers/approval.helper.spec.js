@@ -94,7 +94,8 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     "openingDate": "2014-05-30",
                     "parent": {
                         "name": "parent"
-                    }
+                    },
+                    "displayName": "parent - mod1"
                 }];
 
                 var dataValues = [];
@@ -134,14 +135,16 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     "openingDate": "2013-01-01",
                     "parent": {
                         "name": "parent"
-                    }
+                    },
+                    "displayName": "parent - mod1"
                 }, {
                     "id": "234",
                     "name": "mod2",
                     "openingDate": "2013-01-01",
                     "parent": {
                         "name": "parent"
-                    }
+                    },
+                    "displayName": "parent - mod2"
                 }];
 
                 var dataValues = [{
