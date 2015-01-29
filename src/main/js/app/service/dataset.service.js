@@ -1,6 +1,6 @@
 define(["dhisUrl"], function(dhisUrl) {
     return function($http) {
-        var associateDataSetsToOrgUnit = function(payload) {
+        this.associateDataSetsToOrgUnit = function(payload) {
             payload = {
                 'dataSets': payload
             };
@@ -14,8 +14,12 @@ define(["dhisUrl"], function(dhisUrl) {
             return saveToDhis(payload);
         };
 
-        return {
-            "associateDataSetsToOrgUnit": associateDataSetsToOrgUnit
+        this.getAll = function() {
+            var url = dhisUrl.dataSets + '?fields=:all&paging=false';
+            return $http.get(url).then(function(response) {
+                return response.data.dataSets;
+            });
         };
+
     };
 });

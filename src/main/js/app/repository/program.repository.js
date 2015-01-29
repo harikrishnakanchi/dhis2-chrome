@@ -6,8 +6,8 @@ define(["lodash"], function(_) {
             return store.each(query);
         };
 
-        this.upsert = function(programs) {
-            programs = _.isArray(programs) ? programs : [programs];
+        this.upsert = function(payload) {
+            var programs = _.isArray(payload) ? payload : [payload];
             programs = _.transform(programs, function(acc, program) {
                 if (!_.isEmpty(program.organisationUnits))
                     program.orgUnitIds = _.pluck(program.organisationUnits, 'id');

@@ -1,5 +1,5 @@
 define(["moment", "properties", "lodash", "dateUtils"], function(moment, properties, _, dateUtils) {
-    return function(dataSetRepository, userPreferenceRepository, $q, approvalService, approvalDataRepository) {
+    return function(datasetRepository, userPreferenceRepository, $q, approvalService, approvalDataRepository) {
         var downloadApprovalData = function(metadata) {
             var userModuleIds = metadata[0];
             var allDataSetIds = metadata[1];
@@ -104,7 +104,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
         };
 
         this.run = function() {
-            return $q.all([userPreferenceRepository.getUserModuleIds(), dataSetRepository.getAllDatasetIds()]).then(function(metadata) {
+            return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAllDatasetIds()]).then(function(metadata) {
                 return $q.all([downloadCompletionData(metadata), downloadApprovalData(metadata)]);
             });
         };

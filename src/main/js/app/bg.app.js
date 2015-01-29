@@ -51,6 +51,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             "type": "downloadProgram",
                             "data": []
                         }, "dataValues");
+                        
+                        $hustle.publish({
+                            "type": "downloadDatasets",
+                            "data": []
+                        }, "dataValues");
                     };
 
                     var projectDataSync = function() {
