@@ -4,9 +4,6 @@ define(["programTransformer"], function(programTransformer) {
             var allPrograms = [{
                 "id": "ll1",
                 "name": "Line List1",
-                "orgUnitIds": [
-                    "org1"
-                ],
                 "organisationUnits": [{
                     "id": "org1",
                     "name": "org unit 1"
@@ -27,9 +24,6 @@ define(["programTransformer"], function(programTransformer) {
             var expectedPrograms = [{
                 "id": "ll1",
                 "name": "Line List1",
-                "orgUnitIds": [
-                    "org1", "mod1"
-                ],
                 "organisationUnits": [{
                     "id": "org1",
                     "name": "org unit 1"

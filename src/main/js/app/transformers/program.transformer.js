@@ -15,7 +15,6 @@ define(["lodash", "programTransformer"], function(_, programTransformer) {
             });
 
             program.organisationUnits = program.organisationUnits.concat(orgUnitsToAssociate);
-            program.orgUnitIds = _.pluck(program.organisationUnits, "id");
             return program;
         });
     };

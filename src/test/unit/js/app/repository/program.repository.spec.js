@@ -27,8 +27,8 @@ define(["programRepository", "angularMocks", "utils"], function(ProgramRepositor
             expect(actualValues).toEqual(programDataForOrgUnit);
         });
 
-        it("should save org hierarchy", function() {
-            var program = [{
+        it("should save programs", function() {
+            var programs = [{
                 "id": "prg1",
                 "name": "program1",
                 "organisationUnits": [{
@@ -37,10 +37,24 @@ define(["programRepository", "angularMocks", "utils"], function(ProgramRepositor
                 }]
             }];
 
-            programRepository.upsert(program).then(function(data) {
-                expect(data).toEqual(program);
+            var expectedUpsertedPrograms = [{
+                "id": "prg1",
+                "name": "program1",
+                "orgUnitIds": ["orgUnit1"],
+                "organisationUnits": [{
+                    "id": "orgUnit1",
+                    "name": "orgUnit1"
+                }]
+            }];
+
+            var actualUpsertResult;
+            programRepository.upsert(programs).then(function(data) {
+                actualUpsertResult = data;
             });
-            expect(mockStore.upsert).toHaveBeenCalledWith(program);
+            scope.$apply();
+
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpsertedPrograms);
+            expect(actualUpsertResult).toEqual(expectedUpsertedPrograms);
         });
 
         it("should return undefined", function() {

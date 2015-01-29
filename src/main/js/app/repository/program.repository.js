@@ -6,10 +6,16 @@ define(["lodash"], function(_) {
             return store.each(query);
         };
 
-        this.upsert = function(payload) {
+        this.upsert = function(programs) {
+            programs = _.transform(programs, function(acc, program) {
+                if (!_.isEmpty(program.organisationUnits))
+                    program.orgUnitIds = _.pluck(program.organisationUnits, 'id');
+                acc.push(program);
+            });
+
             var store = db.objectStore("programs");
-            return store.upsert(payload).then(function() {
-                return payload;
+            return store.upsert(programs).then(function() {
+                return programs;
             });
         };
 

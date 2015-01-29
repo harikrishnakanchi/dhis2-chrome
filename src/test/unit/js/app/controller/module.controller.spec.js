@@ -412,8 +412,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 'organisationUnits': [{
                     id: 'a1ab18b5fdd',
                     name: 'Module2'
-                }],
-                "orgUnitIds": ['a1ab18b5fdd']
+                }]
             }];
 
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));

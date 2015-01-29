@@ -280,8 +280,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         var associatePrograms = function(programWiseModules, enrichedModules) {
             var programs = programTransformer.addModules($scope.allPrograms, programWiseModules, enrichedModules);
-            return programRepository.upsert(programs).then(function() {
-                publishMessage(programs, "uploadProgram");
+            return programRepository.upsert(programs).then(function(upsertedPrograms) {
+                publishMessage(upsertedPrograms, "uploadProgram");
                 return enrichedModules;
             });
         };
