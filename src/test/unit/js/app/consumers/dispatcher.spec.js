@@ -2,7 +2,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
     describe("dispatcher", function() {
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, scope,
             systemSettingConsumer, createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
-            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer;
+            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, datasetConsumer;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -28,6 +28,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             downloadOrgUnitGroupConsumer = {
                 'run': jasmine.createSpy("downloadOrgUnitGroupConsumer")
+            };
+            downloadDatasetConsumer = {
+                'run': jasmine.createSpy("downloadDatasetConsumer")
             };
             datasetConsumer = {
                 'run': jasmine.createSpy("datasetConsumer")
@@ -77,7 +80,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadOrgUnitGroupConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadProgramConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
-            dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
+            dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer);
         }));

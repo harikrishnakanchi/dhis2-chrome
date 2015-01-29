@@ -1,6 +1,6 @@
 define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUnitRepository, utils, mocks, timecop) {
     describe("Org Unit Repository specs", function() {
-        var mockOrgStore, mockDb, orgUnitRepository, q, orgUnits, scope, dataSetRepository;
+        var mockOrgStore, mockDb, orgUnitRepository, q, orgUnits, scope, datasetRepository;
         var getAttr = function(key, value) {
             return {
                 "attribute": {
@@ -58,7 +58,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 }
             }];
             scope = $rootScope.$new();
-            dataSetRepository = {
+            datasetRepository = {
                 "getAll": function() {
                     return utils.getPromise(q, []);
                 }
@@ -91,7 +91,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 }]
             };
 
-            dataSetRepository = {
+            datasetRepository = {
                 "getAll": function() {
                     return utils.getPromise(q, [newDataSet, currentDataSet]);
                 }
@@ -99,7 +99,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
 
             mockDb = utils.getMockDB(q, {}, _.clone(orgUnits, true));
             mockOrgStore = mockDb.objectStore;
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, q);
         }));
 
         afterEach(function() {
@@ -195,7 +195,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             orgUnits = [project, country];
             mockDb = utils.getMockDB(q, {}, orgUnits);
             mockOrgStore = mockDb.objectStore;
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, q);
 
             orgUnitRepository.getAllProjects().then(function(data) {
                 expect(data.length).toEqual(1);
@@ -410,7 +410,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             var allOrgUnits = [project1, project2, project3, module1, module2, module3, module4, module5, opunit1, opunit2];
             mockDb = utils.getMockDB(q, {}, allOrgUnits);
 
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, q);
             scope.$apply();
             orgUnitRepository.getAllModulesInProjects(["prj1", "prj2"]).then(function(userModules) {
                 modules = userModules;
@@ -610,7 +610,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             var allOrgUnits = [project1, project2, project3, module1, module2, module3, module4, opunit1, opunit2];
             mockDb = utils.getMockDB(q, {}, allOrgUnits);
 
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, q);
             scope.$apply();
             orgUnitRepository.getAllModulesInProjects(["prj1", "prj2"], true).then(function(userModules) {
                 modules = userModules;
@@ -663,7 +663,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
 
             mockDb = utils.getMockDB(q, {}, allOrgUnits);
 
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, q);
             scope.$apply();
 
             var modules;
@@ -816,7 +816,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             mockDb = utils.getMockDB(q, {}, _.clone(allOrgUnits, true));
             mockOrgStore = mockDb.objectStore;
 
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, dataSetRepository, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, q);
 
             var actualOrgUnits = [];
             orgUnitRepository.getAllOrgUnitsExceptCurrentOrgUnits().then(function(data) {

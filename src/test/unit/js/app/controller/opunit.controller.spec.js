@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment) {
     describe("op unit controller", function() {
 
         var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper;

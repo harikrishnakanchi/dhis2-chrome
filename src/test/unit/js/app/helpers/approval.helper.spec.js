@@ -1,7 +1,7 @@
-define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepository", "dataSetRepository", "dataRepository", "utils", "moment", "timecop", "lodash"],
-    function(ApprovalHelper, mocks, ApprovalDataRepository, OrgUnitRepository, DataSetRepository, DataRepository, utils, moment, timecop, _) {
+define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepository", "datasetRepository", "dataRepository", "utils", "moment", "timecop", "lodash"],
+    function(ApprovalHelper, mocks, ApprovalDataRepository, OrgUnitRepository, DatasetRepository, DataRepository, utils, moment, timecop, _) {
         describe("approval helper", function() {
-            var hustle, approvalDataRepository, orgUnitRepository, dataSetRepository, dataRepository, q, approvalHelper, scope;
+            var hustle, approvalDataRepository, orgUnitRepository, datasetRepository, dataRepository, q, approvalHelper, scope;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($hustle, $q, $rootScope) {
@@ -14,14 +14,14 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 spyOn(approvalDataRepository, "saveLevelTwoApproval").and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitRepository = new OrgUnitRepository();
-                dataSetRepository = new DataSetRepository();
+                datasetRepository = new DatasetRepository();
                 dataRepository = new DataRepository();
 
                 spyOn(hustle, "publish");
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
-                approvalHelper = new ApprovalHelper(hustle, q, scope, orgUnitRepository, dataSetRepository, approvalDataRepository, dataRepository);
+                approvalHelper = new ApprovalHelper(hustle, q, scope, orgUnitRepository, datasetRepository, approvalDataRepository, dataRepository);
             }));
 
             afterEach(function() {
@@ -405,7 +405,7 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
 
                 spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, modules));
                 spyOn(dataRepository, "getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, dataValues));
-                spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
+                spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
                 spyOn(approvalHelper, "markDataAsComplete");
 
                 approvalHelper.autoApproveExistingData(project);

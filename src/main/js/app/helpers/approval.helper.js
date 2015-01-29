@@ -1,5 +1,5 @@
 define(["properties", "datasetTransformer", "moment", "approvalDataTransformer", "dateUtils"], function(properties, datasetTransformer, moment, approvalDataTransformer, dateUtils) {
-    return function($hustle, $q, $rootScope, orgUnitRepository, dataSetRepository, approvalDataRepository, dataRepository) {
+    return function($hustle, $q, $rootScope, orgUnitRepository, datasetRepository, approvalDataRepository, dataRepository) {
         var approveData = function(approvalData, approvalFn, approvalType) {
             var saveToDhis = function() {
                 return $hustle.publish({
@@ -67,7 +67,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
             };
 
             return orgUnitRepository.getAllModulesInProjects([orgUnitId], false).then(function(modules) {
-                return $q.all([getSubmittedPeriodsForModules(modules, properties.weeksForAutoApprove), dataSetRepository.getAll()])
+                return $q.all([getSubmittedPeriodsForModules(modules, properties.weeksForAutoApprove), datasetRepository.getAll()])
                     .then(autoApprove)
                     .then(function(data) {
                         return data;

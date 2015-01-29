@@ -1,8 +1,8 @@
-define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "dataSetRepository", "userPreferenceRepository", "moment"],
-    function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DataSetRepository, UserPreferenceRepository, moment) {
+define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "moment"],
+    function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DatasetRepository, UserPreferenceRepository, moment) {
         describe("download data consumer", function() {
 
-            var dataService, dataRepository, approvalDataRepository, dataSetRepository, userPreferenceRepository, q, scope, downloadDataConsumer, message, approvalService;
+            var dataService, dataRepository, approvalDataRepository, datasetRepository, userPreferenceRepository, q, scope, downloadDataConsumer, message, approvalService;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
@@ -12,7 +12,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "getUserModuleIds": jasmine.createSpy("getUserModuleIds").and.returnValue(utils.getPromise(q, ["org_0"]))
                 };
 
-                dataSetRepository = {
+                datasetRepository = {
                     "getAllDatasetIds": jasmine.createSpy("getAllDatasetIds").and.returnValue(utils.getPromise(q, ["DS_OPD"]))
                 };
 
@@ -38,13 +38,13 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "save": jasmine.createSpy("save")
                 };
 
-                downloadDataConsumer = new DownloadDataConsumer(dataService, dataRepository, dataSetRepository, userPreferenceRepository, q, approvalDataRepository);
+                downloadDataConsumer = new DownloadDataConsumer(dataService, dataRepository, datasetRepository, userPreferenceRepository, q, approvalDataRepository);
             }));
 
             it("should download data values from dhis based on user preferences and dataset", function() {
                 userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
 
-                dataSetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, ["ds1"]));
+                datasetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, ["ds1"]));
 
                 message = {
                     "data": {
@@ -56,7 +56,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 scope.$apply();
 
                 expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
-                expect(dataSetRepository.getAllDatasetIds).toHaveBeenCalled();
+                expect(datasetRepository.getAllDatasetIds).toHaveBeenCalled();
                 expect(dataService.downloadAllData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ['ds1']);
             });
 
@@ -74,7 +74,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
             });
 
             it("should not download data values if dataSets is not present", function() {
-                dataSetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, []));
+                datasetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, []));
 
                 message = {
                     "data": {

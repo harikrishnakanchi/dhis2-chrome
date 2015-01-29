@@ -1,5 +1,10 @@
 define(["lodash"], function(_) {
     return function(db) {
+        var get = function(datasetId){
+            var store = db.objectStore("dataSets");
+            return store.find(datasetId);
+        };
+
         var getAll = function() {
             var store = db.objectStore("dataSets");
             return store.getAll();
@@ -19,6 +24,7 @@ define(["lodash"], function(_) {
         };
 
         return {
+            "get": get,
             "getAll": getAll,
             "getAllDatasetIds": getAllDatasetIds,
             "upsert": upsert
