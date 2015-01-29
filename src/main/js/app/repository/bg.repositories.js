@@ -1,11 +1,11 @@
-define(["dataRepository", "datasetRepository", "userPreferenceRepository", "approvalDataRepository", "orgUnitRepository",
+define(["dataRepository", "dataSetRepository", "userPreferenceRepository", "approvalDataRepository", "orgUnitRepository",
     "programEventRepository", "orgUnitGroupRepository", "changeLogRepository", "programRepository"
-], function(dataRepository, datasetRepository, userPreferenceRepository, approvalDataRepository, orgUnitRepository,
+], function(dataRepository, dataSetRepository, userPreferenceRepository, approvalDataRepository, orgUnitRepository,
     programEventRepository, orgUnitGroupRepository, changeLogRepository, programRepository) {
     var init = function(app) {
         app.service('dataRepository', ['$indexedDB', dataRepository]);
-        app.service('datasetRepository', ['$indexedDB', datasetRepository]);
-        app.service('orgUnitRepository', ['$indexedDB', 'datasetRepository', '$q', orgUnitRepository]);
+        app.service('dataSetRepository', ['$indexedDB', dataSetRepository]);
+        app.service('orgUnitRepository', ['$indexedDB', 'dataSetRepository', '$q', orgUnitRepository]);
         app.service('userPreferenceRepository', ['$indexedDB', 'orgUnitRepository', userPreferenceRepository]);
         app.service('approvalDataRepository', ['$indexedDB', approvalDataRepository]);
         app.service('programEventRepository', ['$indexedDB', '$q', programEventRepository]);

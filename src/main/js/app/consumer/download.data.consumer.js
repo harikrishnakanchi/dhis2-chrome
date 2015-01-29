@@ -1,5 +1,5 @@
 define(["moment", "properties", "lodash", "dateUtils"], function(moment, properties, _, dateUtils) {
-    return function(dataService, dataRepository, datasetRepository, userPreferenceRepository, $q, approvalDataRepository) {
+    return function(dataService, dataRepository, dataSetRepository, userPreferenceRepository, $q, approvalDataRepository) {
         var merge = function(list1, list2, equalsPred, lastUpdateDateProperty) {
             lastUpdateDateProperty = lastUpdateDateProperty || "lastUpdated";
             equalsPred = _.curry(equalsPred);
@@ -76,7 +76,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
         };
 
         this.run = function() {
-            return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAllDatasetIds()]).then(downloadDataValues);
+            return $q.all([userPreferenceRepository.getUserModuleIds(), dataSetRepository.getAllDatasetIds()]).then(downloadDataValues);
         };
     };
 });

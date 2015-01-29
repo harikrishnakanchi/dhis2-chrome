@@ -30,26 +30,5 @@ define(["datasetService", "angularMocks", "properties"], function(DatasetService
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
-
-        it("should download datasets", function() {
-
-            var actualDataSets;
-            datasetService.getAll().then(function(data) {
-                actualDataSets = data;
-            });
-
-            var datasets = [{
-                'id': 'ds1'
-            }];
-
-            var responsePayload = {
-                'dataSets': datasets
-            };
-
-            httpBackend.expectGET(properties.dhis.url + "/api/datasets.json?fields=:all&paging=false").respond(200, responsePayload);
-            httpBackend.flush();
-
-            expect(actualDataSets).toEqual(responsePayload.dataSets);
-        });
     });
 });

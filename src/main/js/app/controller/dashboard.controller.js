@@ -1,5 +1,5 @@
 define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], function(moment, approvalDataTransformer, properties, _, md5) {
-    return function($scope, $hustle, $q, $rootScope, approvalHelper, datasetRepository, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location) {
+    return function($scope, $hustle, $q, $rootScope, approvalHelper, dataSetRepository, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location) {
         var dataValues = [];
         $scope.approveSuccessForLevelOne = false;
         $scope.approveSuccessForLevelTwo = false;
@@ -169,7 +169,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
             };
 
             var approve = function() {
-                return datasetRepository.getAll().then(function(dataSets) {
+                return dataSetRepository.getAll().then(function(dataSets) {
                     var bulkApprovalData = approvalDataTransformer.generateBulkApprovalData(getPeriodsToBeApproved(), dataSets, $rootScope.currentUser.userCredentials.username);
                     var approvalFunction = getApprovalFunction();
 

@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer", "programTransformer", "md5"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer, programTransformer, md5) {
-    return function($scope, $hustle, orgUnitService, orgUnitRepository, datasetRepository, systemSettingRepository, db, $location, $q, $modal, programRepository, orgUnitGroupRepository, orgUnitGroupHelper) {
+    return function($scope, $hustle, orgUnitService, orgUnitRepository, dataSetRepository, systemSettingRepository, db, $location, $q, $modal, programRepository, orgUnitGroupRepository, orgUnitGroupHelper) {
 
         $scope.isopen = {};
         $scope.modules = [];
@@ -269,7 +269,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.associateDatasets = function(enrichedModules) {
             var parent = $scope.orgUnit;
             var datasets = orgUnitMapper.mapToDataSets(enrichedModules, parent, $scope.originalDatasets);
-            return $q.all([datasetRepository.upsert(datasets), publishMessage(datasets, "associateDataset")]).then(function() {
+            return $q.all([dataSetRepository.upsert(datasets), publishMessage(datasets, "associateDataset")]).then(function() {
                 return enrichedModules;
             });
         };
@@ -398,9 +398,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var linelistModules = getModulesOfServiceType("Linelist", modules);
             var enrichedModules = orgUnitMapper.mapToModules(modules, $scope.orgUnit.parent, $scope.orgUnit.id, 6);
 
-            return $q.all([saveSystemSettingsForExcludedDataElements($scope.orgUnit.parent.id, aggregateModules, linelistModules), 
-                orgUnitRepository.upsert(enrichedModules), 
-                publishMessage(enrichedModules, "upsertOrgUnit")])
+            return $q.all([saveSystemSettingsForExcludedDataElements($scope.orgUnit.parent.id, aggregateModules, linelistModules), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
                 .then(onSuccess, $scope.onError);
         };
 

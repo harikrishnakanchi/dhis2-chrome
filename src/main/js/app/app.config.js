@@ -66,7 +66,7 @@ require.config({
         "repositories": "app/repository/repositories",
         "dataRepository": "app/repository/data.repository",
         "approvalDataRepository": "app/repository/approval.data.repository",
-        "datasetRepository": "app/repository/dataset.repository",
+        "dataSetRepository": "app/repository/dataset.repository",
         "systemSettingRepository": "app/repository/system.setting.repository",
         "userPreferenceRepository": "app/repository/userpreference.repository",
         "orgUnitRepository": "app/repository/orgunit.repository",

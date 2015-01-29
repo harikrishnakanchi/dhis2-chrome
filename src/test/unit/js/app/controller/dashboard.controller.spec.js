@@ -1,6 +1,6 @@
-define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datasetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5"], function(DashboardController, mocks, utils, ApprovalHelper, DatasetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5) {
+define(["dashboardController", "angularMocks", "utils", "approvalHelper", "dataSetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5"], function(DashboardController, mocks, utils, ApprovalHelper, DataSetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5) {
     describe("dashboard controller", function() {
-        var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, datasetRepository, filesystemService, indexeddbUtils, idbDump, sessionHelper, location;
+        var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, dataSetRepository, filesystemService, indexeddbUtils, idbDump, sessionHelper, location;
 
         beforeEach(module("hustle"));
 
@@ -46,11 +46,11 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
 
             approvalHelper = new ApprovalHelper();
             filesystemService = new FilesystemService(q);
-            datasetRepository = new DatasetRepository();
+            dataSetRepository = new DataSetRepository();
             indexeddbUtils = new IndexeddbUtils();
             sessionHelper = new SessionHelper();
 
-            spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
+            spyOn(dataSetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
             spyOn(indexeddbUtils, "backupEntireDB").and.returnValue(utils.getPromise(q, idbDump));
             spyOn(indexeddbUtils, "restore").and.returnValue(utils.getPromise(q, {}));
             spyOn(sessionHelper, "logout");
@@ -69,7 +69,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30 12:43:54"));
 
-            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, datasetRepository, fakeModal, timeout, indexeddbUtils, filesystemService, sessionHelper, location);
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout, indexeddbUtils, filesystemService, sessionHelper, location);
         }));
 
         afterEach(function() {
@@ -127,7 +127,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
                     return false;
             };
 
-            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, datasetRepository, fakeModal, timeout);
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
 
             scope.$apply();
 
@@ -152,7 +152,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             };
 
             spyOn(approvalHelper, "getApprovalStatus").and.returnValue(utils.getPromise(q, {}));
-            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, datasetRepository, fakeModal, timeout);
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
 
             scope.$apply();
             timeout.flush();
@@ -238,7 +238,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             }];
 
             spyOn(approvalHelper, "getApprovalStatus").and.returnValue(utils.getPromise(q, approvalStatusData));
-            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, datasetRepository, fakeModal, timeout);
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, dataSetRepository, fakeModal, timeout);
 
             scope.$apply();
             timeout.flush();

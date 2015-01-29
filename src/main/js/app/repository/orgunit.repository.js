@@ -1,5 +1,5 @@
 define(["moment", "lodash"], function(moment, _) {
-    return function(db, datasetRepository, q) {
+    return function(db, dataSetRepository, q) {
         var isOfType = function(orgUnit, type) {
             return _.any(orgUnit.attributeValues, {
                 attribute: {
@@ -28,7 +28,7 @@ define(["moment", "lodash"], function(moment, _) {
                 });
                 return attr.value === 'true';
             };
-            return datasetRepository.getAll().then(function(datasets) {
+            return dataSetRepository.getAll().then(function(datasets) {
                 return _.pluck(_.filter(datasets, isNewDataModel), "id");
             });
         };
