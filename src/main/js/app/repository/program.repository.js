@@ -7,6 +7,7 @@ define(["lodash"], function(_) {
         };
 
         this.upsert = function(programs) {
+            programs = _.isArray(programs) ? programs : [programs];
             programs = _.transform(programs, function(acc, program) {
                 if (!_.isEmpty(program.organisationUnits))
                     program.orgUnitIds = _.pluck(program.organisationUnits, 'id');
