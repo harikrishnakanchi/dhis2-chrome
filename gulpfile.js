@@ -215,7 +215,13 @@ gulp.task('download-programs', function() {
         .pipe(gulp.dest(path.dirname("src/main/data/programs.json")));
 });
 
-gulp.task('download-metadata', ['download-org', 'download-org-unit-groups', 'download-systemSettings', 'download-translations', 'download-programs'], function() {
+gulp.task('download-datasets', function() {
+    return download(baseIntUrl + "/api/dataSets.json?fields=:all&paging=false", auth)
+        .pipe(rename("dataSets.json"))
+        .pipe(gulp.dest(path.dirname("src/main/data/dataSets.json")));
+});
+
+gulp.task('download-metadata', ['download-org', 'download-org-unit-groups', 'download-systemSettings', 'download-translations', 'download-programs', 'download-datasets'], function() {
     return download(baseIntUrl + "/api/metadata.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });

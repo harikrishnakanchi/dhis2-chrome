@@ -46,7 +46,7 @@ define(["datasetService", "angularMocks", "properties"], function(DatasetService
                 'dataSets': datasets
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/datasets.json?fields=:all&paging=false").respond(200, responsePayload);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all&paging=false").respond(200, responsePayload);
             httpBackend.flush();
 
             expect(actualDataSets).toEqual(responsePayload.dataSets);

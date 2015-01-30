@@ -52,14 +52,6 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
             });
         };
 
-        var getDataSet = function() {
-            var url = dhisUrl.dataSets + "?paging=false&fields=[:all]";
-            console.debug("Fetching " + url);
-            return $http.get(url).then(function(response) {
-                return response.data;
-            });
-        };
-
         var updateChangeLog = function(data) {
             var store = db.objectStore("changeLog");
             var createdDate = new Date(data.created);
@@ -94,7 +86,9 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
                         .then(getLocalTranslations)
                         .then(upsertTranslations)
                         .then(getLocalPrograms)
-                        .then(upsertPrograms);
+                        .then(upsertPrograms)
+                        .then(getLocalDataSets)
+                        .then(upsertDataSets);
                 return metadataChangeLog;
             });
         };
@@ -128,6 +122,11 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
         var getLocalPrograms = function() {
             console.debug("Fetching /data/programs.json");
             return $http.get("/data/programs.json").then(getDataFromResponse);
+        };
+
+        var getLocalDataSets = function() {
+            console.debug("Fetching /data/dataSets.json");
+            return $http.get("/data/dataSets.json").then(getDataFromResponse);
         };
 
         var tryParseJson = function(val) {
@@ -188,8 +187,6 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
             return getLastUpdatedTime()
                 .then(getMetadata)
                 .then(upsertMetadata)
-                .then(getDataSet)
-                .then(upsertDataSets)
                 .then(getSystemSettings)
                 .then(upsertSystemSettings)
                 .then(getTranslations)

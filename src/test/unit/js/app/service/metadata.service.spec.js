@@ -77,6 +77,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             httpBackend.expectGET("/data/systemSettings.json").respond(200, {});
             httpBackend.expectGET("/data/translations.json").respond(200, {});
             httpBackend.expectGET("/data/programs.json").respond(200, {});
+            httpBackend.expectGET("/data/dataSets.json").respond(200, {});
 
             var metadataService = new MetadataService(http, db, q);
             metadataService.loadMetadataFromFile();
@@ -91,7 +92,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             expect(mockStore.upsert.calls.count()).toEqual(6);
         });
 
-        it("should trasform and sync program data", function() {
+        it("should load program metadata from file", function() {
             var headers = {
                 "Accept": "application/json, text/plain, */*"
             };
@@ -118,7 +119,7 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
             httpBackend.expectGET("/data/systemSettings.json", headers).respond(200, {});
             httpBackend.expectGET("/data/translations.json", headers).respond(200, {});
             httpBackend.expectGET("/data/programs.json").respond(200, data);
-
+            httpBackend.expectGET("/data/dataSets.json").respond(200, {});
 
             var metadataService = new MetadataService(http, db, q);
             metadataService.loadMetadataFromFile();
@@ -159,7 +160,6 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 "Accept": "application/json, text/plain, */*"
             };
             httpBackend.expectGET(properties.dhis.url + "/api/metadata?lastUpdated=2014-03-24T09:02:49.870Z").respond(200, data);
-            httpBackend.expectGET(properties.dhis.url + "/api/datasets.json?paging=false&fields=[:all]").respond(200, dataSets);
             httpBackend.expectGET(properties.dhis.url + "/api/systemSettings", headers).respond(200, systemSettings);
             httpBackend.expectGET(properties.dhis.url + "/api/translations", headers).respond(200, translations);
 
@@ -196,7 +196,6 @@ define(["metadataService", "properties", "utils", "angularMocks"], function(Meta
                 "Accept": "application/json, text/plain, */*"
             };
             httpBackend.expectGET(properties.dhis.url + "/api/metadata").respond(200, data);
-            httpBackend.expectGET(properties.dhis.url + "/api/datasets.json?paging=false&fields=[:all]").respond(200, dataSets);
             httpBackend.expectGET(properties.dhis.url + "/api/systemSettings", headers).respond(200, systemSettings);
             httpBackend.expectGET(properties.dhis.url + "/api/translations", headers).respond(200, translations);
 

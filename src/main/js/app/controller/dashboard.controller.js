@@ -53,7 +53,12 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
                 "type": "downloadEventData"
             }, "dataValues");
 
-            return $q.all([downloadData, downloadEvents, downloadMetadata, downloadOrgUnit, downloadOrgUnitGroups, downloadProgram]).then(onSuccess);
+            var downloadDatasets = $hustle.publish({
+                "type": "downloadDatasets",
+                "data": []
+            }, "dataValues");
+
+            return $q.all([downloadMetadata, downloadOrgUnit, downloadOrgUnitGroups, downloadProgram, downloadData, downloadEvents, downloadDatasets]).then(onSuccess);
         };
 
         $scope.formatPeriods = function(period) {
