@@ -26,13 +26,8 @@ define(['moment', "lodashUtils"], function(moment, _) {
             };
 
             var mergeOrgUnits = function(remoteDataset, localDataset) {
-                var mergedOrgUnits = _.transform(localDataset.organisationUnits, function(acc, ou) {
-                    if (!_.any(remoteDataset.organisationUnits, {'id': ou.id}))
-                        acc.push(ou);
-                }, remoteDataset.organisationUnits);
-
+                var mergedOrgUnits = _.unionBy([remoteDataset.organisationUnits, localDataset.organisationUnits], 'id');
                 mergedOrgUnits = _.sortBy(mergedOrgUnits, 'id');
-
                 return mergedOrgUnits;
             };
 

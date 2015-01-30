@@ -39,11 +39,13 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
             it("should overwrite local dataset with dhis copy when dataset is newer in dhis", function() {
                 var localDataset = {
                     'id': 'ds1',
-                    'lastUpdated': '2015-01-01T09:00:00.000+0000'
+                    'lastUpdated': '2015-01-01T09:00:00.000+0000',
+                    'organisationUnits': [  ]
                 };
                 var dhisDatasets = [{
                     'id': 'ds1',
-                    'lastUpdated': '2015-01-01T10:00:00.000+0000'
+                    'lastUpdated': '2015-01-01T10:00:00.000+0000',
+                    'organisationUnits': [  ]
                 }];
 
                 spyOn(datasetRepository, 'upsert');
