@@ -16,6 +16,12 @@ define(["lodash"], function(_) {
             });
         };
 
+        var getAllForOrgUnit = function(orgUnitId) {
+            var store = db.objectStore("dataSets");
+            var query = db.queryBuilder().$eq(orgUnitId).$index("by_organisationUnit").compile();
+            return store.each(query);
+        };
+
         var upsert = function(payload) {
             var dataSets = !_.isArray(payload) ? [payload] : payload;
             dataSets = _.map(dataSets, function(ds) {
@@ -33,7 +39,8 @@ define(["lodash"], function(_) {
             "get": get,
             "getAll": getAll,
             "getAllDatasetIds": getAllDatasetIds,
-            "upsert": upsert
+            "upsert": upsert,
+            "getAllForOrgUnit": getAllForOrgUnit
         };
     };
 });

@@ -405,12 +405,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 .then(onSuccess, $scope.onError);
         };
 
-        $scope.getIsExpanded =
-            function(module) {
-                module.timestamp = module.timestamp || new Date().getTime();
-                $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
-                return $scope.isExpanded[module.timestamp];
-            };
+        $scope.getIsExpanded = function(module) {
+            module.timestamp = module.timestamp || new Date().getTime();
+            $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
+            return $scope.isExpanded[module.timestamp];
+        };
 
         $scope.changeDataModel = function(module, dataModel) {
             module.allDatasets = filterAllDataSetsBasedOnDataModelType($scope.allDatasets, dataModel);

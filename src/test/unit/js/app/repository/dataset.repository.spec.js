@@ -23,6 +23,23 @@ define(["datasetRepository", "angularMocks", "utils"], function(DatasetRepositor
             expect(result).toEqual(allDataSets);
         });
 
+        it("should get datasets for OrgUnit", function() {
+            var expectedDatasets = [{
+                'id': 'ds1'
+            }];
+            mockStore.each.and.returnValue(utils.getPromise(q, expectedDatasets));
+
+            var actualValues;
+            datasetRepository.getAllForOrgUnit("ou1").then(function(data) {
+                actualValues = data;
+            });
+
+            scope.$apply();
+
+            expect(actualValues).toEqual(expectedDatasets);
+        });
+
+
         it("should update data sets", function() {
             var datasets = [{
                 "id": "DS_Physio",
