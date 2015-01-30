@@ -1,6 +1,6 @@
-define(["datasetConsumer"], function(DatasetConsumer) {
-    describe("datasetConsumer", function() {
-        var datasetConsumer, message, payload, orgunitService;
+define(["uploadDatasetConsumer"], function(UploadDatasetConsumer) {
+    describe("uploadDatasetConsumer", function() {
+        var uploadDatasetConsumer, message, payload, orgunitService;
 
         beforeEach(function() {
             payload = {
@@ -15,7 +15,7 @@ define(["datasetConsumer"], function(DatasetConsumer) {
 
             orgunitService = jasmine.createSpyObj({}, ['associateDataSetsToOrgUnit']);
 
-            datasetConsumer = new DatasetConsumer(orgunitService);
+            uploadDatasetConsumer = new UploadDatasetConsumer(orgunitService);
 
             message = {
                 data: {
@@ -27,7 +27,7 @@ define(["datasetConsumer"], function(DatasetConsumer) {
         });
 
         it("should create org unit", function() {
-            datasetConsumer.run(message);
+            uploadDatasetConsumer.run(message);
             expect(orgunitService.associateDataSetsToOrgUnit).toHaveBeenCalledWith(payload);
         });
 

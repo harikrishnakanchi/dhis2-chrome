@@ -1,5 +1,5 @@
 define([], function() {
-    return function($q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, datasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
+    return function($q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
         downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
         downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer) {
         this.run = function(message) {
@@ -44,7 +44,7 @@ define([], function() {
                 case "downloadDatasets":
                     return downloadDatasetConsumer.run(message);
                 case "associateDataset":
-                    return datasetConsumer.run(message);
+                    return uploadDatasetConsumer.run(message);
                 case "excludeDataElements":
                     return systemSettingConsumer.run(message);
                 case "createUser":
