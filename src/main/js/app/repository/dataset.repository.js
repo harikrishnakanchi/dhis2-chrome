@@ -16,13 +16,15 @@ define(["lodash"], function(_) {
             });
         };
 
-        var upsert = function(dataSets) {
-            _.forEach(dataSets, function(ds) {
+        var upsert = function(payload) {
+            var dataSets = !_.isArray(payload) ? [payload] : payload;
+            dataSets = _.map(dataSets, function(ds) {
                 ds.orgUnitIds = _.pluck(ds.organisationUnits, "id");
+                return ds;
             });
 
             var store = db.objectStore("dataSets");
-            return store.upsert(dataSets).then(function(id) {
+            return store.upsert(dataSets).then(function() {
                 return dataSets;
             });
         };
