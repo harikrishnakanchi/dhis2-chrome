@@ -1,35 +1,41 @@
-define(["uploadDatasetConsumer"], function(UploadDatasetConsumer) {
+define(["uploadDatasetConsumer", "utils", "angularMocks", "datasetService", "datasetRepository"], function(UploadDatasetConsumer, utils, mocks, DatasetService, DatasetRepository) {
     describe("uploadDatasetConsumer", function() {
-        var uploadDatasetConsumer, message, payload, orgunitService;
+        var uploadDatasetConsumer, message, datasetService, datasetRepository, q, allDatasets, scope;
 
-        beforeEach(function() {
-            payload = {
-                dataSets: [{
-                    "id": "DS_Physio",
-                    "organisationUnits": [{
-                        "name": "Mod1",
-                        "id": "hvybNW8qEov"
-                    }]
-                }]
-            };
+        beforeEach(mocks.inject(function($q, $rootScope) {
+            q = $q;
+            scope = $rootScope.$new();
 
-            orgunitService = jasmine.createSpyObj({}, ['associateDataSetsToOrgUnit']);
+            datasetService = new DatasetService();
+            datasetRepository = new DatasetRepository();
 
-            uploadDatasetConsumer = new UploadDatasetConsumer(orgunitService);
+            allDatasets = [{
+                "id": "ds1",
+                "name": "Dataset1"
+            }, {
+                "id": "ds2",
+                "name": "Dataset2"
+            }, {
+                "id": "ds3",
+                "name": "Dataset3"
+            }];
+        }));
+
+        it("should save datasets to dhis", function() {
+            spyOn(datasetService, "associateDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
+            spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
+            uploadDatasetConsumer = new UploadDatasetConsumer(datasetService, datasetRepository);
 
             message = {
                 data: {
-                    data: payload,
+                    data: ["ds1", "ds2"],
                     type: "associateDataset"
                 }
             };
 
-        });
-
-        it("should create org unit", function() {
             uploadDatasetConsumer.run(message);
-            expect(orgunitService.associateDataSetsToOrgUnit).toHaveBeenCalledWith(payload);
+            scope.$apply();
+            expect(datasetService.associateDataSetsToOrgUnit).toHaveBeenCalledWith([allDatasets[0], allDatasets[1]]);
         });
-
     });
 });

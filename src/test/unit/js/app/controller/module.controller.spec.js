@@ -547,8 +547,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             expect(dataSetRepo.upsert).toHaveBeenCalledWith(expectedDatasets);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: expectedDatasets,
-                type: "associateDataset"
+                data: ['DS_OPD'],
+                type: "associateOrgUnitToDataset"
             }, "dataValues");
         });
 

@@ -119,7 +119,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                             $scope.modules.push({
                                 'id': $scope.orgUnit.id,
                                 'name': $scope.orgUnit.name,
-                                'openingDate':moment($scope.orgUnit.openingDate).toDate(), 
+                                'openingDate': moment($scope.orgUnit.openingDate).toDate(),
                                 'enrichedProgram': $scope.orgUnit.enrichedProgram,
                                 'allDatasets': getNonAssociatedDatasets(),
                                 'dataSets': associatedDatasets,
@@ -269,7 +269,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.associateDatasets = function(enrichedModules) {
             var parent = $scope.orgUnit;
             var datasets = orgUnitMapper.mapToDataSets(enrichedModules, parent, $scope.originalDatasets);
-            return $q.all([datasetRepository.upsert(datasets), publishMessage(datasets, "associateDataset")]).then(function() {
+            return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]).then(function() {
                 return enrichedModules;
             });
         };
@@ -398,9 +398,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var linelistModules = getModulesOfServiceType("Linelist", modules);
             var enrichedModules = orgUnitMapper.mapToModules(modules, $scope.orgUnit.parent, $scope.orgUnit.id, 6);
 
-            return $q.all([saveSystemSettingsForExcludedDataElements($scope.orgUnit.parent.id, aggregateModules, linelistModules), 
-                orgUnitRepository.upsert(enrichedModules), 
-                publishMessage(enrichedModules, "upsertOrgUnit")])
+            return $q.all([saveSystemSettingsForExcludedDataElements($scope.orgUnit.parent.id, aggregateModules, linelistModules),
+                    orgUnitRepository.upsert(enrichedModules),
+                    publishMessage(enrichedModules, "upsertOrgUnit")
+                ])
                 .then(onSuccess, $scope.onError);
         };
 
@@ -409,7 +410,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 module.timestamp = module.timestamp || new Date().getTime();
                 $scope.isExpanded[module.timestamp] = $scope.isExpanded[module.timestamp] || {};
                 return $scope.isExpanded[module.timestamp];
-        };
+            };
 
         $scope.changeDataModel = function(module, dataModel) {
             module.allDatasets = filterAllDataSetsBasedOnDataModelType($scope.allDatasets, dataModel);
@@ -516,7 +517,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.isAfterMaxDate = function(module) {
-            if(module.openingDate === undefined)
+            if (module.openingDate === undefined)
                 return true;
             return false;
         };

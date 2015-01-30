@@ -79,6 +79,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadOrgUnitConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadOrgUnitGroupConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadProgramConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadDatasetConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
@@ -164,9 +165,11 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should call dataset consumer", function() {
             message.data = {
                 "data": {},
-                "type": "associateDataset"
+                "type": "associateOrgUnitToDataset"
             };
             dispatcher.run(message);
+            scope.$apply();
+            expect(downloadDatasetConsumer.run).toHaveBeenCalled();
             expect(uploadDatasetConsumer.run).toHaveBeenCalledWith(message);
         });
 

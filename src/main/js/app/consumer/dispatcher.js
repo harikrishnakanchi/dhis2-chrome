@@ -43,8 +43,10 @@ define([], function() {
                     return downloadOrgUnitGroupConsumer.run(message);
                 case "downloadDatasets":
                     return downloadDatasetConsumer.run(message);
-                case "associateDataset":
-                    return uploadDatasetConsumer.run(message);
+                case "associateOrgUnitToDataset":
+                    return downloadDatasetConsumer.run().then(function() {
+                        return uploadDatasetConsumer.run(message);
+                    });
                 case "excludeDataElements":
                     return systemSettingConsumer.run(message);
                 case "createUser":

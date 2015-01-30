@@ -2,7 +2,6 @@ define(['moment', "lodashUtils"], function(moment, _) {
     return function(datasetService, datasetRepository, $q) {
 
         this.run = function(message) {
-            console.debug("Syncing datasets: ", message.data.data);
             return download().then(mergeAll);
         };
 
@@ -32,23 +31,22 @@ define(['moment', "lodashUtils"], function(moment, _) {
             };
 
             var merge = function(remoteDataset, localDataset) {
-                if(!localDataset){
+                if (!localDataset) {
                     datasetRepository.upsert(remoteDataset);
                     return;
                 }
 
                 if (!isLocalDataStale(remoteDataset, localDataset))
                     return;
-                
+
                 var dataset = _.clone(remoteDataset);
                 dataset.organisationUnits = mergeOrgUnits(remoteDataset, localDataset);
-                datasetRepository.upsert(dataset);
+                return datasetRepository.upsert(dataset);
             };
 
             return $q.all(_.map(remoteDatasets, function(remoteDataset) {
                 return datasetRepository.get(remoteDataset.id).then(_.curry(merge)(remoteDataset));
             }));
         };
-
     };
 });
