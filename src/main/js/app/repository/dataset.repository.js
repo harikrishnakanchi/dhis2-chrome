@@ -1,6 +1,6 @@
 define(["lodash"], function(_) {
     return function(db) {
-        var get = function(datasetId){
+        var get = function(datasetId) {
             var store = db.objectStore("dataSets");
             return store.find(datasetId);
         };
@@ -17,6 +17,10 @@ define(["lodash"], function(_) {
         };
 
         var upsert = function(dataSets) {
+            _.forEach(dataSets, function(ds) {
+                ds.orgUnitIds = _.pluck(ds.organisationUnits, "id");
+            });
+
             var store = db.objectStore("dataSets");
             return store.upsert(dataSets).then(function(id) {
                 return dataSets;

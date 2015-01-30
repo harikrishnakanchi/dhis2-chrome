@@ -21,7 +21,7 @@ define([], function() {
     };
 
     var add_object_stores = function(db, tx) {
-        syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "programStages", "optionSets"];
+        syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "sections", "programStages", "optionSets"];
         create_data_store(syncable_types, db);
     };
 
@@ -116,6 +116,11 @@ define([], function() {
         create_store_with_key("orgUnitGroups", ["id"], db);
     };
 
+    var add_dataset_store = function(db, tx) {
+        var datasetStore = create_store_with_key("dataSets", "id", db);
+        create_index(datasetStore, "by_organisationUnit", "orgUnitIds", false, true);
+    };
+
     return [add_object_stores,
         change_log_stores,
         add_organisation_units_and_level_store,
@@ -131,6 +136,7 @@ define([], function() {
         add_complete_datasets_store,
         add_approval_datasets_store,
         add_programs_store,
-        add_program_events_store
+        add_program_events_store,
+        add_dataset_store
     ];
 });

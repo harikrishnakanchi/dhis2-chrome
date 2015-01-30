@@ -28,6 +28,9 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
 
         var upsertDataSets = function(data) {
             if (!_.isEmpty(data.dataSets)) {
+                _.forEach(data.dataSets, function(ds) {
+                    ds.orgUnitIds = _.pluck(ds.organisationUnits, "id");
+                });
                 var store = db.objectStore("dataSets");
                 return store.upsert(data.dataSets);
             }
