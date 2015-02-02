@@ -5,7 +5,7 @@ define(["httpUtils"], function(httpUtils) {
             var filterValues = ["n1", "n2", "n3"];
 
             var actualString = httpUtils.getParamString(filterKey, filterValues);
-            expect(actualString).toEqual("filter=name:eq:n1&filter=name:eq:n2&filter=name:eq:n3&fields=:all&paging=false");
+            expect(actualString).toEqual("filter=name:eq:n1&filter=name:eq:n2&filter=name:eq:n3&paging=false&fields=:all");
         });
     });
 });

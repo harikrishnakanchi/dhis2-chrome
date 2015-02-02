@@ -5,7 +5,7 @@ define([], function() {
             return acc;
         }, "");
 
-        return paramString.substring(0, paramString.length - 1) + "&fields=:all&paging=false";
+        return paramString.substring(0, paramString.length - 1) + "&paging=false&fields=:all";
     };
 
     return {

@@ -1,5 +1,5 @@
 define(["orgUnitGroupService", "angularMocks", "properties"], function(OrgUnitGroupService, mocks, properties) {
-    describe("dataset service", function() {
+    describe("orgUnitGroupService", function() {
         var http, httpBackend, orgUnitGroupService;
 
         beforeEach(mocks.inject(function($httpBackend, $http) {
@@ -45,7 +45,7 @@ define(["orgUnitGroupService", "angularMocks", "properties"], function(OrgUnitGr
             orgUnitGroupService.get(orgUnitGroupIds);
 
             httpBackend.expectGET(properties.dhis.url +
-                    "/api/organisationUnitGroups.json?filter=id:eq:id1&filter=id:eq:id2&filter=id:eq:id3&fields=:all&paging=false")
+                    "/api/organisationUnitGroups.json?filter=id:eq:id1&filter=id:eq:id2&filter=id:eq:id3&paging=false&fields=:all")
                 .respond(200, "ok");
             httpBackend.flush();
         });
