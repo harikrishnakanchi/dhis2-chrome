@@ -1,4 +1,4 @@
-define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUnitRepository, utils, mocks, timecop) {
+define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetRepository"], function(OrgUnitRepository, utils, mocks, timecop, DatasetRepository) {
     describe("Org Unit Repository specs", function() {
         var mockOrgStore, mockDb, orgUnitRepository, q, orgUnits, scope, datasetRepository;
         var getAttr = function(key, value) {
@@ -14,10 +14,12 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             q = $q;
             orgUnits = [{
                 "id": "0",
-                "name": "MSF"
+                "name": "MSF",
+                "attributeValues": []
             }, {
                 "id": "c1",
                 "name": "country1",
+                "attributeValues": [],
                 "parent": {
                     "id": "0",
                     "name": "MSF"
@@ -25,6 +27,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             }, {
                 "id": "p1",
                 "name": "project1",
+                "attributeValues": [],
                 "parent": {
                     "id": "c1",
                     "name": "country1"
@@ -32,6 +35,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             }, {
                 "id": "m1",
                 "name": "module1",
+                "attributeValues": [],
                 "parent": {
                     "id": "p1",
                     "name": "project1"
@@ -52,20 +56,61 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             }, {
                 "id": "m2",
                 "name": "module2",
+                "attributeValues": [],
                 "parent": {
                     "id": "op1",
                     "name": "opUnit1"
                 }
             }];
-            scope = $rootScope.$new();
-            datasetRepository = {
-                "getAll": function() {
-                    return utils.getPromise(q, []);
-                }
-            };
 
-            Timecop.install();
-            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
+            var datasets = [{
+                "id": "ds1",
+                "organisationUnits": [{
+                    "id": "mod1",
+                    "name": "mod1"
+                }],
+                "attributeValues": [{
+                    "value": "true",
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    }
+                }]
+            }, {
+                "id": "ds2",
+                "organisationUnits": [{
+                    "id": "mod2",
+                    "name": "mod2"
+                }],
+                "attributeValues": [{
+                    "value": "true",
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    }
+                }]
+            }];
+
+            scope = $rootScope.$new();
+            datasetRepository = new DatasetRepository();
+            spyOn(datasetRepository, "getAllForOrgUnit").and.callFake(function(orgUnitId) {
+                if (orgUnitId === "currentMod") {
+                    return utils.getPromise(q, [{
+                        "id": "ds5",
+                        "organisationUnits": [{
+                            "id": "currentMod",
+                            "name": "currentMod"
+                        }],
+                        "attributeValues": [{
+                            "value": "false",
+                            "attribute": {
+                                "code": "isNewDataModel"
+                            }
+                        }]
+                    }]);
+                } else {
+                    return utils.getPromise(q, datasets);
+                }
+            });
+
             var currentDataSet = {
                 "id": "currentDs",
                 "name": "OBGY_OPD - V1",
@@ -78,6 +123,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                     }
                 }]
             };
+
             var newDataSet = {
                 "id": "newDs",
                 "name": "NeoNat",
@@ -91,14 +137,12 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 }]
             };
 
-            datasetRepository = {
-                "getAll": function() {
-                    return utils.getPromise(q, [newDataSet, currentDataSet]);
-                }
-            };
-
             mockDb = utils.getMockDB(q, {}, _.clone(orgUnits, true));
             mockOrgStore = mockDb.objectStore;
+
+            Timecop.install();
+            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
+
             orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, q);
         }));
 
@@ -213,13 +257,13 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "prj1",
                 "id": "prj1",
                 "parent": {
-                    id: "cnt1"
+                    "id": "cnt1"
                 },
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Project"
+                    "value": "Project"
                 }],
                 "children": [{
                     "id": "mod1",
@@ -232,13 +276,13 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "prj2",
                 "id": "prj2",
                 "parent": {
-                    id: "cnt1"
+                    "id": "cnt1"
                 },
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Project"
+                    "value": "Project"
                 }],
                 "children": [{
                     "id": "opunit1",
@@ -251,13 +295,13 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "prj3",
                 "id": "prj3",
                 "parent": {
-                    id: "cnt1"
+                    "id": "cnt1"
                 },
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Project"
+                    "value": "Project"
                 }],
                 "children": [{
                     "id": "mod3",
@@ -273,7 +317,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "mod1",
                 "id": "mod1",
                 "parent": {
-                    id: "prj1"
+                    "id": "prj1"
                 },
                 "dataSets": [{
                     "id": "newDs",
@@ -283,7 +327,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Module"
+                    "value": "Module"
                 }],
                 "children": []
             };
@@ -293,13 +337,13 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "opunit1",
                 "id": "opunit1",
                 "parent": {
-                    id: "prj2"
+                    "id": "prj2"
                 },
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Operation Unit"
+                    "value": "Operation Unit"
                 }],
                 "children": [{
                     "id": "mod2",
@@ -312,7 +356,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "mod2",
                 "id": "mod2",
                 "parent": {
-                    id: "opunit1"
+                    "id": "opunit1"
                 },
                 "dataSets": [{
                     "id": "newDs",
@@ -322,7 +366,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Module"
+                    "value": "Module"
                 }],
                 "children": []
             };
@@ -332,7 +376,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "mod5",
                 "id": "mod5",
                 "parent": {
-                    id: "opunit1"
+                    "id": "opunit1"
                 },
                 "dataSets": [{
                     "id": "currentDs",
@@ -342,7 +386,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Module"
+                    "value": "Module"
                 }],
                 "children": []
             };
@@ -352,7 +396,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "mod3",
                 "id": "mod3",
                 "parent": {
-                    id: "prj3"
+                    "id": "prj3"
                 },
                 "dataSets": [{
                     "id": "newDs",
@@ -362,24 +406,23 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Module"
+                    "value": "Module"
                 }],
                 "children": []
             };
-
 
             var opunit2 = {
                 "name": "opunit2",
                 "displayName": "opunit2",
                 "id": "opunit2",
                 "parent": {
-                    id: "prj3"
+                    "id": "prj3"
                 },
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Operation Unit"
+                    "value": "Operation Unit"
                 }],
                 "children": [{
                     "id": "mod4",
@@ -392,7 +435,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "mod4",
                 "id": "mod4",
                 "parent": {
-                    id: "opunit2"
+                    "id": "opunit2"
                 },
                 "dataSets": [{
                     "id": "newDs",
@@ -402,7 +445,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Module"
+                    "value": "Module"
                 }],
                 "children": []
             };
@@ -428,13 +471,13 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "prj1",
                 "id": "prj1",
                 "parent": {
-                    id: "cnt1"
+                    "id": "cnt1"
                 },
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Project"
+                    "value": "Project"
                 }],
                 "children": [{
                     "id": "mod1",
@@ -447,13 +490,13 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "prj2",
                 "id": "prj2",
                 "parent": {
-                    id: "cnt1"
+                    "id": "cnt1"
                 },
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Project"
+                    "value": "Project"
                 }],
                 "children": [{
                     "id": "opunit1",
@@ -466,13 +509,13 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "prj3",
                 "id": "prj3",
                 "parent": {
-                    id: "cnt1"
+                    "id": "cnt1"
                 },
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Project"
+                    "value": "Project"
                 }],
                 "children": [{
                     "id": "mod3",
@@ -488,7 +531,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "mod1",
                 "id": "mod1",
                 "parent": {
-                    id: "prj1"
+                    "id": "prj1"
                 },
                 "dataSets": [{
                     "id": "newDs",
@@ -498,12 +541,12 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Module"
+                    "value": "Module"
                 }, {
                     "attribute": {
                         "code": "isDisabled"
                     },
-                    value: true
+                    "value": "true"
                 }],
                 "children": []
             };
@@ -513,13 +556,13 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "opunit1",
                 "id": "opunit1",
                 "parent": {
-                    id: "prj2"
+                    "id": "prj2"
                 },
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Operation Unit"
+                    "value": "Operation Unit"
                 }],
                 "children": [{
                     "id": "mod2",
@@ -532,7 +575,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "mod2",
                 "id": "mod2",
                 "parent": {
-                    id: "opunit1"
+                    "id": "opunit1"
                 },
                 "dataSets": [{
                     "id": "newDs",
@@ -542,7 +585,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Module"
+                    "value": "Module"
                 }],
                 "children": []
             };
@@ -552,7 +595,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "mod3",
                 "id": "mod3",
                 "parent": {
-                    id: "prj3"
+                    "id": "prj3"
                 },
                 "dataSets": [{
                     "id": "newDs",
@@ -562,24 +605,23 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Module"
+                    "value": "Module"
                 }],
                 "children": []
             };
-
 
             var opunit2 = {
                 "name": "opunit2",
                 "displayName": "opunit2",
                 "id": "opunit2",
                 "parent": {
-                    id: "prj3"
+                    "id": "prj3"
                 },
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Operation Unit"
+                    "value": "Operation Unit"
                 }],
                 "children": [{
                     "id": "mod4",
@@ -592,7 +634,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "displayName": "mod4",
                 "id": "mod4",
                 "parent": {
-                    id: "opunit2"
+                    "id": "opunit2"
                 },
                 "dataSets": [{
                     "id": "newDs",
@@ -602,7 +644,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                     "attribute": {
                         "code": "Type"
                     },
-                    value: "Module"
+                    "value": "Module"
                 }],
                 "children": []
             };
@@ -629,6 +671,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             var opUnit1 = {
                 "name": "opunit1",
                 "id": "opunit1",
+                "attributeValues": [],
                 "parent": {
                     "id": "prj1"
                 }
@@ -637,6 +680,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             var opUnit2 = {
                 "name": "opunit2",
                 "id": "opunit2",
+                "attributeValues": [],
                 "parent": {
                     "id": "prj2"
                 }
@@ -645,6 +689,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
             var module1 = {
                 "name": "module1",
                 "id": "module1",
+                "attributeValues": [],
                 "parent": {
                     "id": "opunit1"
                 }
@@ -654,6 +699,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 "name": "module2",
                 "displayName": "module2",
                 "id": "module2",
+                "attributeValues": [],
                 "parent": {
                     "id": "opunit2"
                 }
@@ -811,7 +857,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
                 }]
             };
 
-            var allOrgUnits = [testCountry, testProject, opUnit1, currentModule, aggModuleWithoutDataset, newModule, lineListModule];
+            var allOrgUnits = [testCountry, testProject, opUnit1, currentModule, newModule, lineListModule, aggModuleWithoutDataset];
 
             mockDb = utils.getMockDB(q, {}, _.clone(allOrgUnits, true));
             mockOrgStore = mockDb.objectStore;
@@ -825,7 +871,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop"], function(OrgUn
 
             scope.$apply();
 
-            var expectedOrgUnits = [testCountry, testProject, opUnit1, newModule, lineListModule];
+            var expectedOrgUnits = [testCountry, testProject, opUnit1, lineListModule, newModule, aggModuleWithoutDataset];
             expect(actualOrgUnits).toEqual(expectedOrgUnits);
         });
     });

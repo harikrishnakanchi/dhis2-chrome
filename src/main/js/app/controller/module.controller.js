@@ -52,7 +52,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                     });
 
                     return linelistAttribute ? linelistAttribute.value === "true" : false;
-
                 };
 
                 var setUpNewMode = function() {
