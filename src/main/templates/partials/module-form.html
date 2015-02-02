@@ -60,10 +60,10 @@
                             <section class="module-details">
                                 <div class="add-item-ctrl">
                                     <div ng-show="areDatasetsNotSelected([module]) &amp;&amp; isNewModule([module])" class="mb5">
-                                        <span class="glyphicon glyphicon-info-sign"></span>     
+                                        <span class="glyphicon glyphicon-info-sign"></span>
                                         <span>{{resourceBundle.selectDatasets}}</span>
                                     </div>
-                                    <multiselect left-list="module.allDatasets" name="name" ng-model="module.dataSets" disabled="!isNewMode" on-right-item-select="selectDataSet(module, item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
+                                    <multiselect left-list="module.allDatasets" name="name" ng-model="module.associatedDatasets" disabled="!isNewMode" on-right-item-select="selectDataSet(module, item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
                                 </div>
                                 <div class="details" ng-show="module.selectedDataset.sections.length > 0" ng-if="module.dataModelType==='New'">
                                     <span ng-show="areNoSectionsSelectedForDataset(module.selectedDataset)">{{resourceBundle.selectDatasetSection}}</span>

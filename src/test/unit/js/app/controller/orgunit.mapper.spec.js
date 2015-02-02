@@ -267,7 +267,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 "name": "Module1",
                 "service": "Aggregate",
                 "openingDate": new Date(),
-                "dataSets": [{
+                "associatedDatasets": [{
                     "id": "ds_11",
                     "name": "dataset11",
                 }, {
@@ -278,7 +278,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 "name": "Module2",
                 "service": "Aggregate",
                 "openingDate": new Date(),
-                "dataSets": [{
+                "associatedDatasets": [{
                     "id": "ds_21",
                     "name": "dataset21",
                 }, {
@@ -294,7 +294,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
 
             expect(actualModules).toEqual([{
                 "name": "Module1",
-                "dataSets": [{
+                "associatedDatasets": [{
                     "id": "ds_11",
                     "name": "dataset11",
                 }, {
@@ -330,7 +330,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 }
             }, {
                 "name": "Module2",
-                "dataSets": [{
+                "associatedDatasets": [{
                     "id": "ds_21",
                     "name": "dataset21",
                 }, {
@@ -378,7 +378,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 "name": "Module1",
                 "openingDate": new Date(),
                 "service": "Aggregate",
-                "dataSets": [{
+                "associatedDatasets": [{
                     "id": "ds_11",
                     "name": "dataset11",
                 }, {
@@ -394,7 +394,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
 
             expect(actualModules).toEqual([{
                 "name": "Module1",
-                "dataSets": [{
+                "associatedDatasets": [{
                     "id": "ds_11",
                     "name": "dataset11",
                 }, {
@@ -467,7 +467,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
 
             var modules = [{
                 "name": "Module1",
-                "dataSets": [{
+                "associatedDatasets": [{
                     "id": "ds_11",
                     "name": "dataset11",
                 }, {
@@ -476,7 +476,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 }]
             }, {
                 "name": "Module2",
-                "dataSets": [{
+                "associatedDatasets": [{
                     "id": "ds_11",
                     "name": "dataset21",
                 }]

@@ -154,7 +154,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 name: "test1",
                 id: projectId,
                 serviceType: "Aggregate",
-                dataSets: [{
+                associatedDatasets: [{
                     sections: [{
                         dataElements: [{
                             "id": "1",
@@ -200,7 +200,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             spyOn(scope, "createModules").and.returnValue(utils.getPromise(q, modules));
-            spyOn(scope, "associateDatasets").and.returnValue(utils.getPromise(q, modules));
 
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {
                 "key": projectId,
@@ -226,7 +225,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var aggregateModule = {
                 'name': "Module1",
                 'serviceType': "Aggregate",
-                'dataSets': [{
+                'associatedDatasets': [{
                     'id': 'DS_OPD',
                     'name': 'dataset11',
                     'sections': [{
@@ -359,7 +358,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "level": NaN,
                 "openingDate": moment(new Date()).toDate(),
                 "selectedDataset": undefined,
-                "dataSets": undefined,
+                "associatedDatasets": undefined,
                 "enrichedProgram": {
                     "programStages": [{
                         "programStageSections": [{
@@ -447,7 +446,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 'name': "Module1",
                 'serviceType': "Aggregate",
                 'openingDate': new Date(),
-                'dataSets': [{
+                'associatedDatasets': [{
                     'id': 'DS_OPD',
                     'name': 'dataset11',
                     'sections': [{
@@ -464,7 +463,12 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var enrichedAggregateModules = [{
                 name: 'Module1',
-                dataSets: [{
+                shortName: 'Module1',
+                id: 'adba40b7157',
+                level: NaN,
+                openingDate: moment(new Date()).toDate(),
+                selectedDataset: undefined,
+                associatedDatasets: [{
                     'id': 'DS_OPD',
                     'name': 'dataset11',
                     'sections': [{
@@ -478,11 +482,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     }]
                 }],
                 enrichedProgram: undefined,
-                shortName: 'Module1',
-                id: 'adba40b7157',
-                level: NaN,
-                openingDate: moment(new Date()).toDate(),
-                selectedDataset: undefined,
                 attributeValues: [{
                     created: moment().toISOString(),
                     lastUpdated: moment().toISOString(),
@@ -602,8 +601,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.$apply();
 
             expect(scope.isDisabled).toBeFalsy();
-            expect(scope.modules[0].dataSets.length).toEqual(1);
-            expect(scope.modules[0].selectedDataset).toEqual(scope.modules[0].dataSets[0]);
+            expect(scope.modules[0].associatedDatasets.length).toEqual(1);
+            expect(scope.modules[0].selectedDataset).toEqual(scope.modules[0].associatedDatasets[0]);
             expect(scope.modules[0].allDatasets).toEqual([newDataSet2]);
         });
 
@@ -652,7 +651,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 name: "module NEW name",
                 id: "newId",
                 serviceType: "Aggregate",
-                dataSets: [{
+                associatedDatasets: [{
                     sections: [{
                         dataElements: [{
                             "id": "1",
@@ -721,7 +720,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 id: "newId",
                 openingDate: new Date(),
                 serviceType: "Aggregate",
-                dataSets: [{
+                associatedDatasets: [{
                     sections: [{
                         dataElements: [{
                             "id": "1",
@@ -753,7 +752,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 openingDate: new Date(),
                 selectedDataset: undefined,
                 enrichedProgram: undefined,
-                dataSets: [{
+                associatedDatasets: [{
                     sections: [{
                         dataElements: [{
                             id: '1',
@@ -799,7 +798,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 level: 6,
                 openingDate: moment(new Date()).toDate(),
                 selectedDataset: undefined,
-                dataSets: [{
+                associatedDatasets: [{
                     sections: [{
                         dataElements: [{
                             id: '1',
@@ -847,7 +846,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var modules = [{
                 'name': "Module1",
                 'serviceType': "Aggregate",
-                'dataSets': [{
+                'associatedDatasets': [{
                     'id': 'ds_11',
                     'name': 'dataset11',
                 }, {
@@ -862,7 +861,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         it("should return true if dataset is not selected", function() {
             var modules = [{
                 'name': "Module1",
-                'dataSets': [],
+                'associatedDatasets': [],
                 'serviceType': "Aggregate"
             }];
 
@@ -978,7 +977,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         it("should return true if no section is selected from each dataset", function() {
             var module = {
                 'serviceType': "Aggregate",
-                'dataSets': [{
+                'associatedDatasets': [{
                     "sections": [{
                         "name": "section1",
                         "id": "section_1",
@@ -1007,7 +1006,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             var module = {
                 'serviceType': "Aggregate",
-                'dataSets': [{
+                'associatedDatasets': [{
                     "sections": [{
                         "name": "section1",
                         "id": "section_1",

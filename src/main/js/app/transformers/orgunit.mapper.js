@@ -179,7 +179,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 level: moduleLevel || parseInt(moduleParent.level) + 1,
                 openingDate: moment(module.openingDate).toDate(),
                 selectedDataset: module.selectedDataset,
-                dataSets: module.dataSets,
+                associatedDatasets: module.associatedDatasets,
                 enrichedProgram: module.enrichedProgram,
                 attributeValues: [{
                     created: moment().toISOString(),
@@ -210,14 +210,14 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
     this.mapToDataSets = function(modules, moduleParent, originalDatasets) {
         var currentDatasets = _.filter(originalDatasets, function(ds) {
             return _.any(modules, {
-                "dataSets": [{
+                "associatedDatasets": [{
                     "id": ds.id
                 }]
             });
         });
         return _.map(currentDatasets, function(ds) {
             var belongsToThisDataSet = {
-                "dataSets": [{
+                "associatedDatasets": [{
                     "id": ds.id
                 }]
             };

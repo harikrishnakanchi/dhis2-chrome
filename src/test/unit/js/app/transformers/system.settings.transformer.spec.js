@@ -7,7 +7,7 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
             modules = [{
                 name: "mod1 name",
                 id: "mod1",
-                dataSets: [{
+                associatedDatasets: [{
                     sections: [{
                         dataElements: [{
                             "id": "1",
@@ -57,8 +57,8 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
             }];
 
             expect(systemSettingsTransformer.constructSystemSettings(modules, true)).toEqual({
-                    "mod1": ["2"]
-                });
+                "mod1": ["2"]
+            });
         });
     });
 });

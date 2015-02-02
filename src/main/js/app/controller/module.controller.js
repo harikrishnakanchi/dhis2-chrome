@@ -122,7 +122,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                                 'openingDate': moment($scope.orgUnit.openingDate).toDate(),
                                 'enrichedProgram': $scope.orgUnit.enrichedProgram,
                                 'allDatasets': getNonAssociatedDatasets(),
-                                'dataSets': associatedDatasets,
+                                'associatedDatasets': associatedDatasets,
                                 'selectedDataset': associatedDatasets ? associatedDatasets[0] : [],
                                 'serviceType': isLinelistService() ? "Linelist" : "Aggregate",
                                 'program': findAssociatedModule(),
@@ -266,14 +266,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             }, $scope.resourceBundle.disableOrgUnitConfirmationMessage);
         };
 
-        $scope.associateDatasets = function(enrichedModules) {
-            var parent = $scope.orgUnit;
-            var datasets = orgUnitMapper.mapToDataSets(enrichedModules, parent, $scope.originalDatasets);
-            return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]).then(function() {
-                return enrichedModules;
-            });
-        };
-
         $scope.onError = function(data) {
             $scope.saveFailure = true;
         };
@@ -336,10 +328,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 return enrichedModules;
             };
 
+            var associateDatasets = function(enrichedModules) {
+                var parent = $scope.orgUnit;
+                var datasets = orgUnitMapper.mapToDataSets(enrichedModules, parent, $scope.originalDatasets);
+                return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]).then(function() {
+                    return enrichedModules;
+                });
+            };
+
             var saveAggregateModules = function() {
                 if (aggregateModules.length === 0) return $q.when([]);
                 return $scope.createModules(aggregateModules)
-                    .then($scope.associateDatasets)
+                    .then(associateDatasets)
                     .then(onSuccess, $scope.onError);
             };
 
@@ -414,14 +414,14 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.changeDataModel = function(module, dataModel) {
             module.allDatasets = filterAllDataSetsBasedOnDataModelType($scope.allDatasets, dataModel);
             module.dataModelType = dataModel;
-            module.datasets = [];
+            module.associatedDatasets = [];
             module.selectedDataset = {};
         };
 
         $scope.addModules = function() {
             $scope.modules.push({
                 'openingDate': moment().toDate(),
-                'dataSets': [],
+                'associatedDatasets': [],
                 'allDatasets': _.filter(_.cloneDeep($scope.allDatasets), isNewDataModel),
                 'selectedDataset': {},
                 'timestamp': new Date().getTime(),
@@ -439,13 +439,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
         $scope.areDatasetsNotSelected = function(modules) {
             return _.any(modules, function(module) {
-                return module.serviceType === "Aggregate" && _.isEmpty(module.dataSets);
+                return module.serviceType === "Aggregate" && _.isEmpty(module.associatedDatasets);
             });
         };
 
         $scope.areNoSectionsSelected = function(modules) {
             return _.any(modules, function(module) {
-                return _.any(module.dataSets, function(dataSet) {
+                return _.any(module.associatedDatasets, function(dataSet) {
                     return module.serviceType === "Aggregate" && $scope.areNoSectionsSelectedForDataset(dataSet);
                 });
             });
