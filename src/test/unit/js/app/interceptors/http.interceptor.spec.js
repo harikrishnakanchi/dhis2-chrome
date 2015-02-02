@@ -51,5 +51,61 @@ define(["httpInterceptor", "angularMocks", "properties", "chromeRuntime"], funct
             expect(expectedConfig.headers.Authorization).toEqual(properties.dhis.auth_header);
         });
 
+        it("should remove last updated from http request payload", function() {
+            var config = {
+                'method': "POST",
+                'url': properties.dhis.url,
+                'headers': {},
+                'timeout': properties.http.timeout,
+                'data': {
+                    "organisationUnits": [{
+                        "name": "OpUnit1",
+                        "id": "opUnit1",
+                        "level": 5,
+                        "lastUpdated": "2015-02-02T07:00:51.496Z",
+                        "created": "2015-02-02T05:22:24.867+0000"
+
+                    }]
+                }
+            };
+
+            var expectedConfig = httpInterceptor.request(config);
+
+            var expectedPayload = {
+                "organisationUnits": [{
+                    "name": "OpUnit1",
+                    "id": "opUnit1",
+                    "level": 5
+                }]
+            };
+            expect(expectedConfig.data).toEqual(expectedPayload);
+        });
+
+        it("should remove last updated from http request payload", function() {
+            var config = {
+                'method': "POST",
+                'url': properties.dhis.url,
+                'headers': {},
+                'timeout': properties.http.timeout,
+                'data': {
+                    "name": "OpUnit1",
+                    "id": "opUnit1",
+                    "level": 5,
+                    "lastUpdated": "2015-02-02T07:00:51.496Z",
+                    "created": "2015-02-02T05:22:24.867+0000"
+
+                }
+            };
+
+            var expectedConfig = httpInterceptor.request(config);
+
+            var expectedPayload = {
+                "name": "OpUnit1",
+                "id": "opUnit1",
+                "level": 5
+            };
+            expect(expectedConfig.data).toEqual(expectedPayload);
+        });
+
     });
 });
