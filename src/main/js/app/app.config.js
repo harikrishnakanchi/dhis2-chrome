@@ -97,9 +97,6 @@ require.config({
         "dhisMonitor": "app/monitors/dhis.monitor",
         "monitors": "app/monitors/monitors",
 
-        //Interceptors
-        "httpInterceptor": "app/interceptors/http.interceptor",
-
         //Queue
         "failureStrategyFactory": "app/queue/failure.strategy.factory",
 

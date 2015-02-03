@@ -72,7 +72,9 @@ require.config({
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
 
         //Interceptors
-        "httpInterceptor": "app/interceptors/http.interceptor",
+        "cleanupPayloadInterceptor": "app/interceptors/cleanup.payload.interceptor",
+        "configureRequestInterceptor": "app/interceptors/configure.request.interceptor",
+        "handleTimeoutInterceptor": "app/interceptors/handle.timeout.interceptor",
 
         //Queue
         "failureStrategyFactory": "app/queue/failure.strategy.factory",

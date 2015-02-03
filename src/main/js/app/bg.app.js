@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "httpInterceptor", "properties", "failureStrategyFactory", "monitors", "angular-indexedDB"],
-    function(angular, Q, services, repositories, consumers, hustleModule, httpInterceptor, properties, failureStrategyFactory, monitors) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "failureStrategyFactory", "monitors", "angular-indexedDB"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, failureStrategyFactory, monitors) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
             services.init(app);
@@ -8,11 +8,17 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             monitors.init(app);
 
 
-            app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
+            app.factory('configureRequestInterceptor', [configureRequestInterceptor]);
+            app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
+            app.factory('handleTimeoutInterceptor', ['$q', handleTimeoutInterceptor]);
+
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider',
                 function($indexedDBProvider, $httpProvider, $hustleProvider) {
                     $indexedDBProvider.connection('msf');
-                    $httpProvider.interceptors.push('httpInterceptor');
+                    $httpProvider.interceptors.push('configureRequestInterceptor');
+                    $httpProvider.interceptors.push('cleanupPayloadInterceptor');
+                    $httpProvider.interceptors.push('handleTimeoutInterceptor');
+
                     $hustleProvider.init("hustle", 1, ["dataValues"], failureStrategyFactory);
                 }
             ]);
