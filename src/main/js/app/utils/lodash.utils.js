@@ -3,5 +3,9 @@ define(["lodash"], function(_) {
         return _.uniq(_.flatten(lists), key);
     };
 
+    _.xorBy = function(list1, list2, key) {
+        return _.xor(_.pluck(list1, key), _.pluck(list2, key));
+    };
+
     return _;
 });

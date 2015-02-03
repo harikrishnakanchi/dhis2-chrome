@@ -20,5 +20,27 @@ define(["lodashUtils"], function(_) {
 
             expect(actualResult).toEqual([list1[0], list1[1], list2[0]]);
         });
+
+        it("should do a xor of two lists based on the key", function() {
+            var list1 = [{
+                'name': "test1",
+                "id": "t1"
+            }, {
+                'name': "test2",
+                "id": "t2"
+            }];
+
+            var list2 = [{
+                'name': "test1",
+                "id": "t1"
+            }, {
+                'name': "test3",
+                "id": "t3"
+            }];
+
+            var actualResult = _.xorBy(list1, list2, "name");
+
+            expect(actualResult).toEqual(["test2", "test3"]);
+        });
     });
 });

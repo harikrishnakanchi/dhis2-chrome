@@ -15,9 +15,7 @@ define(['moment', "lodashUtils"], function(moment, _) {
             };
 
             var areDatasetOrgUnitsDifferent = function(remoteDataset, localDataset) {
-                var remoteDsOrgUnitIds = _.pluck(remoteDataset.organisationUnits, 'id');
-                var localDsOrgUnitIds = _.pluck(localDataset.organisationUnits, 'id');
-                return !_.isEmpty(_.difference(remoteDsOrgUnitIds, localDsOrgUnitIds)) || !_.isEmpty(_.difference(localDsOrgUnitIds, remoteDsOrgUnitIds));
+                return !_.isEmpty(_.xorBy(remoteDataset.organisationUnits, localDataset.organisationUnits, "id"));
             };
 
             var isLocalDataStale = function(remoteDataset, localDataset) {
