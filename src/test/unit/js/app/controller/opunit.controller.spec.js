@@ -298,7 +298,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": expectedOrgUnits,
                 "type": "upsertOrgUnit"
             };
-            orgUnitRepo.getAllModulesInProjects = jasmine.createSpy("getAllModulesInProjects").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
+            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             spyOn(hustle, "publish");
             spyOn(fakeModal, "open").and.returnValue({
                 result: utils.getPromise(q, {})
@@ -383,7 +383,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": expectedOpUnits,
                 "type": "upsertOrgUnit"
             }, "dataValues");
-            expect(orgUnitRepo.getAllModulesInOpUnit).toHaveBeenCalledWith("opUnit1Id");
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
         });
     });

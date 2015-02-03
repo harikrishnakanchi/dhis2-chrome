@@ -59,7 +59,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 }];
 
                 orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, allModules));
+                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, allModules));
 
                 programRepository = new ProgramRepository();
                 spyOn(programRepository, "getProgramsForOrgUnit").and.returnValue(utils.getPromise(q, []));
@@ -73,7 +73,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 }];
 
                 orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, "getAllModulesInProjects").and.returnValue(utils.getPromise(q, modules));
+                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
 
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
@@ -113,7 +113,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             it("should load the list-list entry template", function() {
                 programRepository = new ProgramRepository();
-                spyOn(programRepository, "getProgramsForOrgUnit").and.returnValue(utils.getPromise(q, [{'id': 'p1'}]));
+                spyOn(programRepository, "getProgramsForOrgUnit").and.returnValue(utils.getPromise(q, [{
+                    'id': 'p1'
+                }]));
 
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();

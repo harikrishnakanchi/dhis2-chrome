@@ -28,7 +28,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             });
 
             var setAvailableModules = function() {
-                return orgUnitRepository.getAllModulesInProjects(_.pluck($rootScope.currentUser.organisationUnits, "id"), true).then(function(modules) {
+                return orgUnitRepository.getAllModulesInOrgUnits(_.pluck($rootScope.currentUser.organisationUnits, "id"), true).then(function(modules) {
                     $scope.modules = modules;
                 });
             };

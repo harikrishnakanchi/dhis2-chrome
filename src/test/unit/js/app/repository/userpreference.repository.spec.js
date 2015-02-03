@@ -1,4 +1,4 @@
-define(["userPreferenceRepository", "angularMocks", "utils"], function(UserPreferenceRepository, mocks, utils) {
+define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"], function(UserPreferenceRepository, mocks, utils, OrgUnitRepository) {
     describe("User Preference repository", function() {
         var db, mockStore, q, scope, orgUnitRepository;
 
@@ -8,9 +8,8 @@ define(["userPreferenceRepository", "angularMocks", "utils"], function(UserPrefe
             scope = $rootScope.$new();
             q = $q;
 
-            orgUnitRepository = {
-                "getAllModulesInProjects": jasmine.createSpy("getAllModulesInProjects").and.returnValue(utils.getPromise(q, ["mod1"])),
-            };
+            orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, ["mod1"]));
 
             userPreferenceRepository = new UserPreferenceRepository(mockDB.db, orgUnitRepository);
         }));
@@ -74,7 +73,7 @@ define(["userPreferenceRepository", "angularMocks", "utils"], function(UserPrefe
                 }]
             }];
 
-            orgUnitRepository.getAllModulesInProjects.and.returnValue(utils.getPromise(q, [{
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [{
                 "id": "mod1"
             }, {
                 "id": "mod2"

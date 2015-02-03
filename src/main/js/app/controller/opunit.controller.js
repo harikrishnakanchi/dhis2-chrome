@@ -111,7 +111,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             });
 
             var updateOrgUnitGroupsForModules = function() {
-                return orgUnitRepository.getAllModulesInOpUnit($scope.orgUnit.id).then(function(modules) {
+                return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
                     return orgUnitGroupHelper.createOrgUnitGroups(modules, true);
                 });
             };
@@ -126,7 +126,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         };
 
         var disableOpunit = function(orgUnit) {
-            return orgUnitRepository.getAllModulesInProjects([orgUnit.id]).then(function(orgUnitsToDisable) {
+            return orgUnitRepository.getAllModulesInOrgUnits([orgUnit.id]).then(function(orgUnitsToDisable) {
                 orgUnitsToDisable.push(orgUnit);
                 var payload = orgUnitMapper.disable(orgUnitsToDisable);
                 $scope.isDisabled = true;

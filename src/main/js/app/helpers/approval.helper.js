@@ -66,7 +66,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
                 }));
             };
 
-            return orgUnitRepository.getAllModulesInProjects([orgUnitId], false).then(function(modules) {
+            return orgUnitRepository.getAllModulesInOrgUnits([orgUnitId], false).then(function(modules) {
                 return $q.all([getSubmittedPeriodsForModules(modules, properties.weeksForAutoApprove), datasetRepository.getAll()])
                     .then(autoApprove)
                     .then(function(data) {
@@ -152,7 +152,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
                 });
             };
 
-            return orgUnitRepository.getAllModulesInProjects([orgUnitId], true).then(function(modules) {
+            return orgUnitRepository.getAllModulesInOrgUnits([orgUnitId], true).then(function(modules) {
                 modules = _.reject(modules, function(m) {
                     return isLinelistService(m);
                 });

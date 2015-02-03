@@ -62,7 +62,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
         $scope.update = function(newOrgUnit, orgUnit) {
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
             saveToDbAndPublishMessage(dhisProject).then(function(data) {
-                orgUnitRepository.getAllModulesInProjects([dhisProject.id], true).then(function(modules) {
+                orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id], true).then(function(modules) {
                     orgUnitGroupHelper.createOrgUnitGroups(modules, true);
                     if (newOrgUnit.autoApprove) {
                         return approvalHelper.autoApproveExistingData(data);

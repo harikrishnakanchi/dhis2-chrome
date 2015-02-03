@@ -95,8 +95,7 @@ define(["moment", "lodash"], function(moment, _) {
             return store.find(orgUnitId);
         };
 
-        var getAllModulesInProjects = function(projectIds, rejectDisabled) {
-
+        var getAllModulesInOrgUnits = function(orgUnitIds, rejectDisabled) {
             var filterModulesInProjects = function(orgUnits) {
                 var allOrgUnitsById = _.indexBy(orgUnits, "id");
 
@@ -111,8 +110,8 @@ define(["moment", "lodash"], function(moment, _) {
                 };
 
 
-                var modules = _.flatten(_.transform(projectIds, function(acc, projectId) {
-                    acc.push(getChildModules(projectId));
+                var modules = _.flatten(_.transform(orgUnitIds, function(acc, orgUnitId) {
+                    acc.push(getChildModules(orgUnitId));
                 }));
 
                 return modules;
@@ -137,16 +136,6 @@ define(["moment", "lodash"], function(moment, _) {
                 .then(filterModulesInProjects)
                 .then(rejectOrgUnitsWithCurrentDatasets)
                 .then(rejectDisabledOrgUnits);
-        };
-
-        var getAllModulesInOpUnit = function(opUnitId) {
-            return getAll().then(function(allOrgUnits) {
-                return _.filter(allOrgUnits, function(orgUnit) {
-                    if (orgUnit.parent && orgUnit.parent.id === opUnitId) {
-                        return orgUnit;
-                    }
-                });
-            });
         };
 
         var getProjectAndOpUnitAttributes = function(module) {
@@ -215,8 +204,7 @@ define(["moment", "lodash"], function(moment, _) {
             "upsert": upsert,
             "getAll": getAll,
             "getOrgUnit": getOrgUnit,
-            "getAllModulesInProjects": getAllModulesInProjects,
-            "getAllModulesInOpUnit": getAllModulesInOpUnit,
+            "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
             "getProjectAndOpUnitAttributes": getProjectAndOpUnitAttributes,
             "getAllProjects": getAllProjects,
             "getAllOrgUnitsExceptCurrentOrgUnits": getAllOrgUnitsExceptCurrentOrgUnits
