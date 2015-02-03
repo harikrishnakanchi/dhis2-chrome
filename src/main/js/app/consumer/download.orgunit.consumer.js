@@ -55,7 +55,7 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
             };
 
             var syncPromises = _.map(orgUnitsFromDHIS, function(ouFromDHIS) {
-                return orgUnitRepository.getOrgUnit(ouFromDHIS.id).then(function(ouFromIDB) {
+                return orgUnitRepository.get(ouFromDHIS.id).then(function(ouFromIDB) {
                     if (isLocalDataStale(ouFromDHIS, ouFromIDB)) {
                         console.debug("upserting orgnization : id " + ouFromDHIS.id + " name : " + ouFromDHIS.name);
                         return orgUnitRepository.upsert(ouFromDHIS);

@@ -90,7 +90,7 @@ define(["moment", "lodash"], function(moment, _) {
             });
         };
 
-        var getOrgUnit = function(orgUnitId) {
+        var get = function(orgUnitId) {
             var store = db.objectStore("organisationUnits");
             return store.find(orgUnitId);
         };
@@ -203,7 +203,7 @@ define(["moment", "lodash"], function(moment, _) {
         return {
             "upsert": upsert,
             "getAll": getAll,
-            "getOrgUnit": getOrgUnit,
+            "get": get,
             "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
             "getProjectAndOpUnitAttributes": getProjectAndOpUnitAttributes,
             "getAllProjects": getAllProjects,

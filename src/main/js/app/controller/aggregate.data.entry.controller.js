@@ -316,7 +316,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         var init = function() {
             var getParentProjectId = function(parentId) {
-                return orgUnitRepository.getOrgUnit(parentId).then(function(parentOrgUnit) {
+                return orgUnitRepository.get(parentId).then(function(parentOrgUnit) {
                     var type = orgUnitMapper.getAttributeValue(parentOrgUnit, "Type");
                     if (type === 'Project') {
                         return parentOrgUnit.id;
@@ -339,7 +339,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             getAllData.then(setData).then(transformDataSet).then(function() {
 
                 getParentProjectId($scope.currentModule.parent.id).then(function(parentProjectId) {
-                    orgUnitRepository.getOrgUnit(parentProjectId).then(function(orgUnit) {
+                    orgUnitRepository.get(parentProjectId).then(function(orgUnit) {
                         var project = orgUnitMapper.mapToProject(orgUnit);
                         $scope.projectIsAutoApproved = (project.autoApprove === "true");
                     });

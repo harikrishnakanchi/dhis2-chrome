@@ -35,7 +35,7 @@ define(["uploadOrgUnitConsumer", "angularMocks", "orgUnitService", "orgUnitRepos
             orgUnitRepository = new OrgUnitRepository();
             orgUnitService = new OrgUnitService();
 
-            spyOn(orgUnitRepository, "getOrgUnit").and.callFake(function(orgUnitId) {
+            spyOn(orgUnitRepository, "get").and.callFake(function(orgUnitId) {
                 var idbData = {
                     "a4acf9115a7": orgUnit1FromIDB,
                     "a4acf9115a8": orgUnit2FromIDB

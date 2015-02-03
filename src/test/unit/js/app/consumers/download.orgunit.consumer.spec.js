@@ -85,7 +85,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'upsert');
-            spyOn(orgUnitRepository, 'getOrgUnit').and.returnValue(utils.getPromise(q, localCopy));
+            spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, localCopy));
 
             downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
 
@@ -94,7 +94,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
 
             expect(orgUnitService.get).toHaveBeenCalledWith(["a4acf9115a7"]);
             expect(orgUnitService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
-            expect(orgUnitRepository.getOrgUnit).toHaveBeenCalledWith("a4acf9115a7");
+            expect(orgUnitRepository.get).toHaveBeenCalledWith("a4acf9115a7");
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
             expect(orgUnitRepository.upsert).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnits[0]);
         });
@@ -138,7 +138,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'upsert');
-            spyOn(orgUnitRepository, 'getOrgUnit').and.returnValue(utils.getPromise(q, localCopy));
+            spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, localCopy));
 
             downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
 
@@ -147,7 +147,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
 
             expect(orgUnitService.get).toHaveBeenCalledWith(["a4acf9115a7"]);
             expect(orgUnitService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
-            expect(orgUnitRepository.getOrgUnit).toHaveBeenCalledWith("a4acf9115a7");
+            expect(orgUnitRepository.get).toHaveBeenCalledWith("a4acf9115a7");
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
             expect(orgUnitRepository.upsert).not.toHaveBeenCalled();
         });
@@ -190,7 +190,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
 
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitService, 'upsert');
-            spyOn(orgUnitRepository, 'getOrgUnit').and.returnValue(utils.getPromise(q, localCopy));
+            spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, localCopy));
 
             downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
             downloadOrgunitConsumer.run(message);
@@ -239,7 +239,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
 
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitService, 'upsert');
-            spyOn(orgUnitRepository, 'getOrgUnit').and.returnValue(utils.getPromise(q, localCopy));
+            spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, localCopy));
 
             downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
             downloadOrgunitConsumer.run(message);
@@ -311,7 +311,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
 
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitService, 'upsert');
-            spyOn(orgUnitRepository, 'getOrgUnit').and.returnValue(utils.getPromise(q, undefined));
+            spyOn(orgUnitRepository, 'get').and.returnValue(utils.getPromise(q, undefined));
 
             downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
             downloadOrgunitConsumer.run(message);

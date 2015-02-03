@@ -153,7 +153,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
 
         it("should get orgUnit", function() {
             var projectId = "proj1";
-            var orgUnit = orgUnitRepository.getOrgUnit(projectId);
+            var orgUnit = orgUnitRepository.get(projectId);
             scope.$apply();
 
             expect(mockOrgStore.find).toHaveBeenCalledWith(projectId);

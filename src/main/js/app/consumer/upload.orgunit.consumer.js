@@ -2,7 +2,7 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
     return function(orgUnitService, orgUnitRepository, $q) {
         var retrieveFromIDB = function(orgUnits) {
             return $q.all(_.map(orgUnits, function(o) {
-                return orgUnitRepository.getOrgUnit(o.id);
+                return orgUnitRepository.get(o.id);
             }));
         };
 
