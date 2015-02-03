@@ -668,6 +668,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
                 "id": "testCountry",
                 "level": 3,
                 "name": "A Test Country",
+                "displayName": "A Test Country",
                 "dataSets": [],
                 "attributeValues": [{
                     "value": "Country",
@@ -683,6 +684,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
                 "id": "testProject",
                 "level": 4,
                 "name": "A Test Proj",
+                "displayName": "A Test Proj",
                 "dataSets": [],
                 "attributeValues": [{
                     "value": "Project",
@@ -698,6 +700,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
                 "id": "opUnit1",
                 "level": 5,
                 "name": "OpUnit1",
+                "displayName": "OpUnit1",
                 "dataSets": [],
                 "attributeValues": [{
                     "value": "Operation Unit",
@@ -739,6 +742,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
                 "id": "aggModuleWithoutDataset",
                 "level": 6,
                 "name": "Operating Theatre",
+                "displayName": "Operating Theatre",
                 "children": [],
                 "dataSets": [],
                 "attributeValues": [{
@@ -755,6 +759,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
                 "id": "newMod",
                 "level": 6,
                 "name": "m2",
+                "displayName": "m2",
                 "dataSets": [{
                     "id": "newDs",
                     "name": "NeoNat"
@@ -780,6 +785,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
                 "id": "lineListMod",
                 "level": 6,
                 "name": "l1",
+                "displayName": "l1",
                 "dataSets": [],
                 "attributeValues": [{
                     "value": "Module",
@@ -806,7 +812,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, q);
 
             var actualOrgUnits = [];
-            orgUnitRepository.getAllOrgUnitsExceptCurrentOrgUnits().then(function(data) {
+            orgUnitRepository.getAll(false).then(function(data) {
                 actualOrgUnits = data;
             });
 

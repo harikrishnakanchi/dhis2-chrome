@@ -88,7 +88,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                 getAll: function() {}
             };
             orgUnitRepository = new OrgUnitRepository();
-            spyOn(orgUnitRepository, "getAllOrgUnitsExceptCurrentOrgUnits").and.returnValue(utils.getPromise(q, allOrgUnits));
+            spyOn(orgUnitRepository, "getAll").and.returnValue(utils.getPromise(q, allOrgUnits));
             var stores = {
                 "organisationUnits": mockOrgStore,
                 "organisationUnitLevels": mockOrgUnitLevelStore
@@ -124,7 +124,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             spyOn(scope, 'onOrgUnitSelect');
             scope.$apply();
 
-            expect(orgUnitRepository.getAllOrgUnitsExceptCurrentOrgUnits).toHaveBeenCalled();
+            expect(orgUnitRepository.getAll).toHaveBeenCalled();
             expect(scope.organisationUnits).toEqual(expectedOrgUnitTree);
             expect(scope.onOrgUnitSelect).not.toHaveBeenCalled();
             expect(scope.state).toEqual(undefined);

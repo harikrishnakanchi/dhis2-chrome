@@ -74,7 +74,8 @@ define(["moment", "lodash"], function(moment, _) {
             });
         };
 
-        var getAll = function() {
+        var getAll = function(includeCurrent) {
+            includeCurrent = includeCurrent === undefined ? true : includeCurrent;
             var populateDisplayName = function(allOrgUnits, orgUnit) {
                 var parent = _.find(allOrgUnits, {
                     'id': orgUnit.parent ? orgUnit.parent.id : undefined
@@ -85,9 +86,14 @@ define(["moment", "lodash"], function(moment, _) {
             };
 
             var store = db.objectStore("organisationUnits");
-            return store.getAll().then(function(allOrgUnits) {
+            var orgUnits = store.getAll().then(function(allOrgUnits) {
                 return _.map(allOrgUnits, _.curry(populateDisplayName)(allOrgUnits));
             });
+
+            if (!includeCurrent)
+                return orgUnits.then(rejectOrgUnitsWithCurrentDatasets);
+
+            return orgUnits;
         };
 
         var get = function(orgUnitId) {
@@ -191,23 +197,13 @@ define(["moment", "lodash"], function(moment, _) {
                 .then(mapProjectCode);
         };
 
-        var getAllOrgUnitsExceptCurrentOrgUnits = function() {
-            var getAllOrgUnits = function() {
-                var store = db.objectStore("organisationUnits");
-                return store.getAll();
-            };
-
-            return getAllOrgUnits().then(rejectOrgUnitsWithCurrentDatasets);
-        };
-
         return {
             "upsert": upsert,
             "getAll": getAll,
             "get": get,
             "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
             "getProjectAndOpUnitAttributes": getProjectAndOpUnitAttributes,
-            "getAllProjects": getAllProjects,
-            "getAllOrgUnitsExceptCurrentOrgUnits": getAllOrgUnitsExceptCurrentOrgUnits
+            "getAllProjects": getAllProjects
         };
     };
 });

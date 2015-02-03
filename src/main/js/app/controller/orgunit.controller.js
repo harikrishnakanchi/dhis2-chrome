@@ -18,7 +18,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         var getAllOrgUnitsExceptCurrentModules = function() {
-            return orgUnitRepository.getAllOrgUnitsExceptCurrentOrgUnits();
+            return orgUnitRepository.getAll(false);
         };
 
         var selectCurrentNode = function(transformedOrgUnits) {
