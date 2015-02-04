@@ -40,12 +40,12 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                 var localDataset = {
                     'id': 'ds1',
                     'lastUpdated': '2015-01-01T09:00:00.000+0000',
-                    'organisationUnits': [  ]
+                    'organisationUnits': []
                 };
                 var dhisDatasets = [{
                     'id': 'ds1',
                     'lastUpdated': '2015-01-01T10:00:00.000+0000',
-                    'organisationUnits': [  ]
+                    'organisationUnits': []
                 }];
 
                 spyOn(datasetRepository, 'upsert');
@@ -67,7 +67,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                 var expectedUpsertedDataset = {
                     'id': 'ds1',
                     'lastUpdated': '2015-01-01T10:00:00.000+0000',
-                    'organisationUnits': [  ]
+                    'organisationUnits': []
                 };
 
                 expect(datasetRepository.upsert).toHaveBeenCalledWith(expectedUpsertedDataset);

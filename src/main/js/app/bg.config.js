@@ -69,6 +69,9 @@ require.config({
         "downloadMetadataConsumer": "app/consumer/download.metadata.consumer",
         "deleteApprovalConsumer": "app/consumer/delete.approval.consumer",
 
+        //merge strategies
+        "mergeByUnion": "app/consumer/mergestrategies/merge.by.union",
+
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
 
         //Interceptors

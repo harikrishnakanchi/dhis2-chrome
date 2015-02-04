@@ -1,4 +1,4 @@
-define(['moment', "lodashUtils"], function(moment, _) {
+define(['moment', 'mergeByUnion', 'lodashUtils'], function(moment, mergeByUnion, _) {
     return function(datasetService, datasetRepository, $q) {
 
         this.run = function(message) {
@@ -10,40 +10,12 @@ define(['moment', "lodashUtils"], function(moment, _) {
         };
 
         var mergeAll = function(remoteDatasets) {
-            var isDhisDatasetNewer = function(remoteDataset, localDataset) {
-                return moment(remoteDataset.lastUpdated).isAfter(moment(localDataset.lastUpdated));
-            };
-
-            var areDatasetOrgUnitsDifferent = function(remoteDataset, localDataset) {
-                return !_.isEmpty(_.xorBy(remoteDataset.organisationUnits, localDataset.organisationUnits, "id"));
-            };
-
-            var isLocalDataStale = function(remoteDataset, localDataset) {
-                return isDhisDatasetNewer(remoteDataset, localDataset) || areDatasetOrgUnitsDifferent(remoteDataset, localDataset);
-            };
-
-            var mergeOrgUnits = function(remoteDataset, localDataset) {
-                var mergedOrgUnits = _.unionBy([remoteDataset.organisationUnits, localDataset.organisationUnits], 'id');
-                mergedOrgUnits = _.sortBy(mergedOrgUnits, 'id');
-                return mergedOrgUnits;
-            };
-
-            var merge = function(remoteDataset, localDataset) {
-                if (!localDataset) {
-                    datasetRepository.upsert(remoteDataset);
-                    return;
-                }
-
-                if (!isLocalDataStale(remoteDataset, localDataset))
-                    return;
-
-                var dataset = _.clone(remoteDataset);
-                dataset.organisationUnits = mergeOrgUnits(remoteDataset, localDataset);
-                return datasetRepository.upsert(dataset);
-            };
-
-            return $q.all(_.map(remoteDatasets, function(remoteDataset) {
-                return datasetRepository.get(remoteDataset.id).then(_.curry(merge)(remoteDataset));
+            return $q.all(_.map(remoteDatasets, function(ds) {
+                return datasetRepository.get(ds.id)
+                    .then(_.curry(mergeByUnion)("organisationUnits", ds))
+                    .then(function(data) {
+                        return data ? datasetRepository.upsert(data) : $q.when([]);
+                    });
             }));
         };
     };
