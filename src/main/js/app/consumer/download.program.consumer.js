@@ -1,6 +1,5 @@
-define(['moment', "lodashUtils"], function(moment, _) {
+define(['moment', 'mergeByUnion', 'lodashUtils'], function(moment, mergeByUnion, _) {
     return function(programService, programRepository, changeLogRepository, $q) {
-
         this.run = function(message) {
             console.debug("Syncing programs: ", message.data.data);
             return download().then(mergeAll).then(updateChangeLog);
@@ -15,19 +14,13 @@ define(['moment', "lodashUtils"], function(moment, _) {
         };
 
         var mergeAll = function(remotePrograms) {
-
-            var isLocalDataStale = function(remoteProgram, localProgram) {
-                return !localProgram || moment(remoteProgram.lastUpdated).isAfter(moment(localProgram.lastUpdated));
-            };
-
-            var merge = function(remoteProgram, localProgram) {
-                return isLocalDataStale(remoteProgram, localProgram) ? programRepository.upsert(remoteProgram) : $q.when({});
-            };
-
             return $q.all(_.map(remotePrograms, function(remoteProgram) {
-                return programRepository.get(remoteProgram.id).then(_.curry(merge)(remoteProgram));
+                return programRepository.get(remoteProgram.id)
+                    .then(_.curry(mergeByUnion)("organisationUnits", remoteProgram))
+                    .then(function(mergedProgram) {
+                        return mergedProgram ? programRepository.upsert(mergedProgram) : $q.when([]);
+                    });
             }));
         };
-
     };
 });

@@ -103,7 +103,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             }];
             spyOn(programService, 'getAll').and.returnValue(utils.getPromise(q, programsFromDhis));
             spyOn(programService, 'upsert');
-            spyOn(programRepository, 'get').and.returnValue(utils.getPromise(q, localCopy));
+            spyOn(programRepository, 'get').and.returnValue(utils.getPromise(q, localCopy.programs[0]));
 
             downloadProgramConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q);
             downloadProgramConsumer.run(message);
