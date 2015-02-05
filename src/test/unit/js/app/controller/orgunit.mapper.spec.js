@@ -433,11 +433,24 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
 
         it("should return all the projects under a orgUnit", function() {
             var allOrgUnit = [{
+                "id": 1,
+                "name": "blah1",
+                "parent": {},
+                "children": [{
+                    "id": "blah1",
+                    "name": "blah1",
+                }, {
+                    "id": "blah2",
+                    "name": "blah2",
+                }]
+            }, {
+                "id": "blah1",
                 "name": "blah1",
                 "parent": {
                     "id": 1
                 }
             }, {
+                "id": "blah2",
                 "name": "blah2",
                 "parent": {
                     "id": 1
