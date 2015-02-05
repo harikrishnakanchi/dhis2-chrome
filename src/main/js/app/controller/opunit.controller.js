@@ -164,6 +164,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             if (!$scope.isNewMode) {
                 $scope.opUnits = [{
                     'name': $scope.orgUnit.name,
+                    'openingDate': $scope.orgUnit.openingDate,
                     'type': _.find($scope.orgUnit.attributeValues, {
                         "attribute": {
                             "code": "opUnitType"
