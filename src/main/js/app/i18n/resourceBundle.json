@@ -23,6 +23,7 @@
     "syncComplete": "Data sync scheduled successfully.",
     "openingDateValidation": "Opening Date is required.",
     "endDateValidation": "End Date is required.",
+    "invalidDateError": "Date is invalid",
     "beyondMaxDate": "Date cannot exceed today's date.",
     "nameValidation": "Name is required.",
     "consultDaysValidation": "Consultation days is required.",

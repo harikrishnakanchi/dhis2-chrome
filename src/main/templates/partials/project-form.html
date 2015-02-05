@@ -91,14 +91,18 @@
                             <input type="date" class="msf-date-input" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required>
                             <div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid || isAfterMaxDate()">
                                 <span ng-show="createForm.newOrgUnitOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
-                                <span ng-show="isAfterMaxDate()" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
+                                <span ng-show="createForm.newOrgUnitOpeningDate.$invalid" class="errortxt">{{resourceBundle.invalidDateError}}</span>
+                                <span ng-show="isAfterMaxDate() &amp;&amp; !createForm.newOrgUnitOpeningDate.$invalid" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
                             </div>
                         </div>
                     </li>
                     <li class="form-group">
                         <label for="newOrgUnitEndDate" class="col-sm-4 col-md-4 control-label">End Date</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="date" class="msf-date-input" min={{thisDate}} name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate">
+                            <input type="date" class="msf-date-input" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate">
+                            <div ng-show="createForm.newOrgUnitEndDate.$dirty &amp;&amp; createForm.newOrgUnitEndDate.$invalid">
+                                <span ng-show="createForm.newOrgUnitEndDate.$error" class="errortxt">{{resourceBundle.invalidDateError}}</span>
+                            </div>
                         </div>
                     </li>
                     <li class="form-group">
