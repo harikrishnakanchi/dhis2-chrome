@@ -11,7 +11,7 @@
     "dataSubmitSuccess": "Data submitted successfully",
     "dataSubmitAndApproved": "Data submitted and auto-approved successfully",
     "dataSubmitFailure": "Error submitting data. Please try again later",
-    "firstLevelApproveSuccess": "Data sent for co ordination level approval.",
+    "firstLevelApproveSuccess": "Data sent for coordination level approval.",
     "secondLevelApproveSuccess": "Data sent for desk level approval.",
     "thirdLevelApproveSuccess": "Data approved at desk level.",
     "dataApprovalConfirmationMessage": "Are you sure you want to approve?",
