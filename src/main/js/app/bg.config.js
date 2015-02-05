@@ -71,6 +71,7 @@ require.config({
 
         //merge strategies
         "mergeByUnion": "app/consumer/mergestrategies/merge.by.union",
+        "mergeByLastUpdated": "app/consumer/mergestrategies/merge.by.lastupdated",
 
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
 

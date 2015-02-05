@@ -1,4 +1,4 @@
-define(["moment", "lodash"], function(moment, _) {
+define(["moment", "lodash", "mergeByLastUpdated"], function(moment, _, mergeByLastUpdated) {
     return function(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, $q) {
         this.run = function(message) {
             console.debug("Syncing org unit groups: ", message.data.data);
@@ -36,21 +36,12 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var merge = function(orgUnitGroupsFromDHIS) {
-            var isLocalDataStale = function(ougFromDHIS, ougFromIDB) {
-                if (!ougFromIDB) return true;
-                var lastUpdatedInDhis = moment(ougFromDHIS.lastUpdated);
-                var lastUpdatedInIDB = moment(ougFromIDB.lastUpdated);
-                return lastUpdatedInDhis.isAfter(lastUpdatedInIDB);
-            };
             var syncPromises = _.map(orgUnitGroupsFromDHIS, function(ougFromDHIS) {
-                return orgUnitGroupRepository.get(ougFromDHIS.id).then(function(ougFromIDB) {
-                    if (isLocalDataStale(ougFromDHIS, ougFromIDB)) {
-                        console.debug("upserting orgunitgroup : id " + ougFromDHIS.id + " name : " + ougFromDHIS.name);
-                        return orgUnitGroupRepository.upsert(ougFromDHIS);
-                    } else {
-                        $q.when({});
-                    }
-                });
+                return orgUnitGroupRepository.get(ougFromDHIS.id)
+                    .then(_.curry(mergeByLastUpdated)(ougFromDHIS))
+                    .then(function(data) {
+                        return data ? orgUnitGroupRepository.upsert(ougFromDHIS) : $q.when({});
+                    });
             });
 
             return $q.all(syncPromises);
