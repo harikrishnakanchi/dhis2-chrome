@@ -12,7 +12,7 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
         };
 
         var download = function(orgUnits) {
-            var downloadLocallyChanged = function(orgUnits) {
+            var downloadDhisCopyOfLocallyChangedOrgUnits = function(orgUnits) {
                 if (_.isEmpty(orgUnits))
                     return [];
 
@@ -30,7 +30,7 @@ define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
                 });
             };
 
-            return $q.all([downloadLocallyChanged(orgUnits), downloadRemotelyChanged()]).then(function(data) {
+            return $q.all([downloadDhisCopyOfLocallyChangedOrgUnits(orgUnits), downloadRemotelyChanged()]).then(function(data) {
                 var locallyChanged = data[0];
                 var remotelyChanged = data[1];
 
