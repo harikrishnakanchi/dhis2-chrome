@@ -1,4 +1,4 @@
-define(["lodashUtils"], function(_) {
+define(["lodashUtils", "moment"], function(_, moment) {
     return function(fieldToMerge, remoteData, localData) {
         var isDhisDataNewer = function() {
             return moment(remoteData.lastUpdated).isAfter(moment(localData.lastUpdated));
