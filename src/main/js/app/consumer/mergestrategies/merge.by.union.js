@@ -1,15 +1,7 @@
 define(["lodashUtils", "moment"], function(_, moment) {
     return function(fieldToMerge, remoteData, localData) {
-        var isDhisDataNewer = function() {
-            return moment(remoteData.lastUpdated).isAfter(moment(localData.lastUpdated));
-        };
-
-        var areFieldsDifferent = function() {
-            return !_.isEmpty(_.xorBy(remoteData[fieldToMerge], localData[fieldToMerge], "id"));
-        };
-
         var isLocalDataStale = function() {
-            return isDhisDataNewer() || areFieldsDifferent();
+            return !_.isEmpty(_.xorBy(remoteData[fieldToMerge], localData[fieldToMerge], "id"));
         };
 
         var mergeFields = function() {
@@ -22,7 +14,7 @@ define(["lodashUtils", "moment"], function(_, moment) {
             return remoteData;
         }
 
-        if (!isLocalDataStale(remoteData, localData)) {
+        if (!isLocalDataStale()) {
             return;
         }
 

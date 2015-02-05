@@ -113,6 +113,67 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             expect(programRepository.upsert).toHaveBeenCalledWith(programsFromDhis[0]);
         });
 
+        it("should overwrite local program with dhis copy if local data is stale", function() {
+            var localCopy = payload;
+            localCopy.lastUpdated = "2014-01-01T09:28:16.467+0000";
+            var message = {
+                "data": {
+                    "data": [],
+                    "type": "downloadPrograms"
+                },
+                "created": "2014-10-24T09:01:12.020+0000"
+            };
+
+            programsFromDhis = [{
+                "id": "a625b2495e7",
+                "created": "2015-01-01T09:28:16.467+0000",
+                "name": "ER - Presenting Line List",
+                "lastUpdated": "2015-01-21T11:42:09.312+0000",
+                "type": 3,
+                "user": {
+                    "id": "iWhpLAC0f1H",
+                    "name": "admin admin",
+                    "created": "2015-01-19T09:26:05.394+0000",
+                    "lastUpdated": "2015-01-19T09:26:05.394+0000"
+                },
+                "validationCriterias": [],
+                "programStages": [{
+                    "id": "ab17f8e7729",
+                    "name": "ER - Presenting Line List Stage",
+                    "created": "2015-01-19T09:28:16.639+0000",
+                    "lastUpdated": "2015-01-19T09:28:16.639+0000"
+                }],
+                "organisationUnits": [{
+                    "id": "adebf794823",
+                    "name": "foomod",
+                    "created": "2015-01-20T10:41:59.529+0000",
+                    "lastUpdated": "2015-01-20T10:41:59.243+0000"
+                }, {
+                    "id": "adebf794824",
+                    "name": "barmod",
+                    "created": "2015-01-20T10:41:59.529+0000",
+                    "lastUpdated": "2015-01-20T10:41:59.243+0000"
+                }],
+                "attributeValues": [],
+                "userRoles": [{
+                    "id": "8d32f0f1336",
+                    "name": "Data entry user",
+                    "created": "2015-01-19T09:26:48.781+0000",
+                    "lastUpdated": "2015-01-19T09:26:48.781+0000"
+                }]
+            }];
+            spyOn(programService, 'getAll').and.returnValue(utils.getPromise(q, programsFromDhis));
+            spyOn(programService, 'upsert');
+            spyOn(programRepository, 'get').and.returnValue(utils.getPromise(q, localCopy.programs[0]));
+
+            downloadProgramConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q);
+            downloadProgramConsumer.run(message);
+            scope.$apply();
+
+            expect(programService.upsert).not.toHaveBeenCalled();
+            expect(programRepository.upsert).toHaveBeenCalledWith(programsFromDhis[0]);
+        });
+
         it("should upsert lastUpdated time in change log", function() {
             var message = {
                 "data": {
