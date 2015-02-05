@@ -464,60 +464,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
             expect(expectedProjects).toEqual(projects);
         });
 
-        it("should map datasets for dhis", function() {
-            var originalDataSets = [{
-                "id": "ds_11",
-                "name": "dataset11",
-            }, {
-                "id": "ds_12",
-                "name": "dataset12"
-            }];
-
-            var projectOrgUnit = {
-                "id": "Project1Id",
-                "name": "Project1"
-            };
-
-            var modules = [{
-                "name": "Module1",
-                "associatedDatasets": [{
-                    "id": "ds_11",
-                    "name": "dataset11",
-                }, {
-                    "id": "ds_12",
-                    "name": "dataset12"
-                }]
-            }, {
-                "name": "Module2",
-                "associatedDatasets": [{
-                    "id": "ds_11",
-                    "name": "dataset21",
-                }]
-            }];
-
-            var datasets = orgUnitMapper.mapToDataSets(modules, projectOrgUnit, originalDataSets);
-            var expectedDatasets = [{
-                "id": "ds_11",
-                "name": "dataset11",
-                "organisationUnits": [{
-                    "name": "Module1",
-                    "id": "aac1bbd0985"
-                }, {
-                    "name": "Module2",
-                    "id": "acccf1dda36"
-                }]
-            }, {
-                "id": "ds_12",
-                "name": "dataset12",
-                "organisationUnits": [{
-                    "name": "Module1",
-                    "id": "aac1bbd0985"
-                }]
-            }];
-
-            expect(datasets).toEqual(expectedDatasets);
-        });
-
         it("should filter modules from org units", function() {
             var project = {
                 "name": "Project1",

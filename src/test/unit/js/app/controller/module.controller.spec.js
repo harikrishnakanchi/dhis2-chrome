@@ -1,8 +1,8 @@
 /*global Date:true*/
 define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop) {
     describe("module controller", function() {
-        var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
-            dataElements, sectionsdata, datasetsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
+        var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
+            dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -20,9 +20,19 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             orgUnitRepo = utils.getMockRepo(q);
             orgunitGroupRepo = utils.getMockRepo(q);
             dataSetRepo = utils.getMockRepo(q);
+            datasetsdata = testData.get("dataSets");
+            
+            dataSetRepo = {
+                getAllForOrgUnit: function() {},
+                get: function() {},
+                getEnrichedDatasets: function() {},
+                upsert: function() {},
+                getAll: jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, datasetsdata))
+            };
+
             systemSettingRepo = utils.getMockRepo(q);
             systemSettingRepo.getAllWithProjectId = function() {};
-            systemSettingRepo.upsert = function() {};
+
             programsRepo = utils.getMockRepo(q);
             programsRepo.get = function() {};
             orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
@@ -39,18 +49,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             Timecop.install();
             Timecop.freeze(new Date("2014-04-01T00:00:00.000Z"));
 
-            var getMockStore = function(data) {
-                var getAll = function() {
-                    return utils.getPromise(q, data);
-                };
-                var upsert = function() {};
-                var find = function() {};
-                return {
-                    getAll: getAll,
-                    upsert: upsert,
-                    find: find
-                };
-            };
 
             fakeModal = {
                 close: function() {
@@ -68,15 +66,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 'organisationUnits': []
             }];
 
-            sectionsdata = testData.get("sections");
-            datasetsdata = testData.get("dataSets");
-            dataElementsdata = testData.get("dataElements");
-
-            sections = getMockStore(sectionsdata);
-            datasets = getMockStore(datasetsdata);
-            dataElements = getMockStore(dataElementsdata);
-            programs = getMockStore(allPrograms);
-
             scope.orgUnit = {
                 'name': 'SomeName',
                 'id': 'someId',
@@ -86,17 +75,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
             scope.isNewMode = true;
 
-            spyOn(db, 'objectStore').and.callFake(function(storeName) {
-                if (storeName === "dataSets")
-                    return datasets;
-                if (storeName === "sections")
-                    return sections;
-                if (storeName === "dataElements")
-                    return dataElements;
-                if (storeName === "programs")
-                    return programs;
-                return getMockStore(testData.get(storeName));
-            });
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
         }));
 
@@ -105,383 +83,72 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             Timecop.uninstall();
         });
 
-        it("should fetch is expanded for a particular module based on timestamp", function() {
-            var module = {
-                "timestamp": "2014-12-22"
-            };
-            expect(scope.getIsExpanded(module)).toEqual({});
-        });
-
-        it("should fetch is expanded for existing modules that don't have a timestamp", function() {
-            var module = {};
-            expect(scope.getIsExpanded(module)).toEqual({});
-            expect(module.timestamp).toEqual(1396310400000);
-        });
-
-        it('should filter in new data models when adding new modules', function() {
-            scope.$apply();
-
-            scope.addModules();
-
-            expect(scope.modules[1].allDatasets.length).toEqual(1);
-            expect(scope.modules.length).toBe(2);
-        });
-
-        it('should delete module', function() {
-            scope.modules = [{
-                'name': 'Module1'
-            }, {
-                'name': 'Module2'
-            }, {
-                'name': 'Module1'
-            }, {
-                'name': 'Module4'
-            }];
-
-            scope.deleteModule(2);
-            scope.$apply();
-
-            expect(scope.modules[0].name).toEqual('Module1');
-            expect(scope.modules[1].name).toEqual('Module2');
-            expect(scope.modules[2].name).toEqual('Module4');
-        });
-
-        it('should exclude data elements', function() {
-
-            var projectId = 1;
-
-            var modules = [{
-                name: "test1",
-                id: projectId,
-                serviceType: "Aggregate",
-                associatedDatasets: [{
-                    sections: [{
-                        dataElements: [{
-                            "id": "1",
-                            "isIncluded": false
-                        }, {
-                            "id": "2",
-                            "isIncluded": true
-                        }, {
-                            "id": "3",
-                            "isIncluded": false
-                        }]
-                    }]
-                }]
-            }];
-
-            scope.orgUnit = {
-                name: "test1",
-                id: projectId
-            };
-
-            var expectedSystemSettings = {
-                "excludedDataElements": {
-                    "1": ["1", "3"]
-                }
-            };
-
-            var expectedPayload = {
-                projectId: projectId,
-                settings: expectedSystemSettings
-            };
-
-            var expectedHustleMessage = {
-                data: {
-                    projectId: projectId,
-                    settings: expectedSystemSettings,
-                    indexedDbOldSystemSettings: {
-                        excludedDataElements: {
-                            1: ['1', '3']
-                        }
-                    }
-                },
-                type: "excludeDataElements",
-            };
-
-            spyOn(scope, "createModules").and.returnValue(utils.getPromise(q, modules));
-
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {
+        it("should save aggregate modules and set system settings for excluded data elements", function() {
+            var projectId = "someid";
+            var existingSystemSettings = {
                 "key": projectId,
-                "value": expectedSystemSettings
-            }));
-            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
-
-            scope.save(modules);
-            scope.$apply();
-
-            expect(scope.saveFailure).toBe(false);
-            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedPayload);
-            expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
-        });
-
-        it("should save aggregate and linelist module excludeDataElement system-setting", function() {
-            scope.orgUnit = {
-                "name": "Project1",
-                "id": "someid",
-                "children": []
-            };
-
-            var aggregateModule = {
-                'name': "Module1",
-                'serviceType': "Aggregate",
-                'associatedDatasets': [{
-                    'id': 'DS_OPD',
-                    'name': 'dataset11',
-                    'sections': [{
-                        'dataElements': [{
-                            'isIncluded': false,
-                            'id': 'de1'
-                        }, {
-                            'isIncluded': true,
-                            'id': 'de2'
-                        }]
-                    }]
-                }]
-            };
-
-            var LinelistModule = {
-                'name': "Module2",
-                'serviceType': "Linelist",
-                'enrichedProgram': {
-                    'programStages': [{
-                        'programStageSections': [{
-                            'programStageDataElements': [{
-                                'dataElement': {
-                                    'isIncluded': false,
-                                    'id': 'de3'
-                                }
-                            }, {
-                                'dataElement': {
-                                    'isIncluded': true,
-                                    'id': 'de4'
-                                }
-                            }]
-                        }]
-                    }]
-                },
-                'program': {
-                    'id': 'prog1',
-                    'name': 'ER Linelist',
-                    'organisationUnits': []
-                }
-            };
-
-            var modules = [aggregateModule, LinelistModule];
-
-            var data = {
-                "key": "someid",
                 "value": {
                     "excludedDataElements": {
-                        "module3": ["de3", "de4"],
-                        "adba40b7157": ["de4"]
+                        "test2": ["1", "3"]
                     }
                 }
             };
 
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, data));
-            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
-            scope.save(modules);
+            spyOn(dataSetRepo, "upsert");
+            spyOn(dataSetRepo, "get").and.returnValue(utils.getPromise(q, datasetsdata[0]));
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, existingSystemSettings));
             scope.$apply();
-
-            expect(scope.saveFailure).toBe(false);
-            expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith("someid");
-
-            var expectedSystemSettingsPayload = {
-                "projectId": "someid",
-                "settings": {
-                    "excludedDataElements": {
-                        "module3": ["de3", "de4"],
-                        "adba40b7157": ["de1"],
-                        "a1ab18b5fdd": ["de3"]
-                    }
-                }
-            };
-            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettingsPayload);
-
-            var hustlePayload = {
-                "projectId": "someid",
-                "settings": expectedSystemSettingsPayload.settings,
-                "indexedDbOldSystemSettings": {
-                    "excludedDataElements": {
-                        "module3": ["de3", "de4"],
-                        "adba40b7157": ["de4"]
-                    }
-                }
-            };
-
-            expect(hustle.publish).toHaveBeenCalledWith({
-                data: hustlePayload,
-                type: "excludeDataElements"
-            }, "dataValues");
-        });
-
-        it("should save linelist modules", function() {
-            scope.orgUnit = {
+            var parent = {
                 "name": "Project1",
-                "id": "someid",
+                "id": projectId,
                 "children": []
             };
+            scope.orgUnit = parent;
 
-            var modules = [{
-                'name': "Module2",
-                'openingDate': new Date(),
-                'serviceType': "Linelist",
-                'enrichedProgram': {
-                    'programStages': [{
-                        'programStageSections': [{
-                            'programStageDataElements': [{
-                                'dataElement': {
-                                    'isIncluded': false,
-                                    'id': 'de3'
-                                }
-                            }, {
-                                'dataElement': {
-                                    'isIncluded': true,
-                                    'id': 'de4'
-                                }
-                            }]
-                        }]
-                    }]
-                },
-                'program': {
-                    'id': 'prog1',
-                    'name': 'ER Linelist',
-                    'organisationUnits': []
-                }
-            }];
-
-            var enrichedLineListModules = [{
-                "name": "Module2",
-                "shortName": "Module2",
-                "id": "a1ab18b5fdd",
-                "level": NaN,
-                "openingDate": moment(new Date()).toDate(),
-                "selectedDataset": undefined,
-                "associatedDatasets": undefined,
-                "enrichedProgram": {
-                    "programStages": [{
-                        "programStageSections": [{
-                            "programStageDataElements": [{
-                                "dataElement": {
-                                    "isIncluded": false,
-                                    "id": "de3"
-                                }
-                            }, {
-                                "dataElement": {
-                                    "isIncluded": true,
-                                    "id": "de4"
-                                }
-                            }]
-                        }]
-                    }]
-                },
-                "attributeValues": [{
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Module"
-                }, {
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "isLineListService",
-                        "name": "Is Linelist Service"
-                    },
-                    "value": "true"
+            var enrichedAssociatedDatasets = [{
+                "name": "OPD",
+                "id": "DS_OPD",
+                "organisationUnits": [{
+                    "id": "mod1"
                 }],
-                "parent": {
-                    "name": "Project1",
-                    "id": "someid"
-                }
-            }];
-
-            var modifiedParent = {
-                "name": "Project1",
-                "id": "someid",
-                "children": enrichedLineListModules
-            };
-
-            var programs = [{
-                'id': 'prog1',
-                'name': 'ER Linelist',
-                'organisationUnits': [{
-                    id: 'a1ab18b5fdd',
-                    name: 'Module2'
+                "attributeValues": [{
+                    "attribute": {
+                        "id": "wFC6joy3I8Q",
+                        "code": "isNewDataModel",
+                    },
+                    "value": "false"
+                }],
+                "sections": [{
+                    "dataElements": [{
+                        "id": "1",
+                        "isIncluded": false
+                    }, {
+                        "id": "2",
+                        "isIncluded": true
+                    }, {
+                        "id": "3",
+                        "isIncluded": false
+                    }]
                 }]
             }];
 
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
-            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
-            scope.save(modules);
-            scope.$apply();
 
-            expect(scope.saveFailure).toBe(false);
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(modifiedParent);
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedLineListModules);
-
-            expect(hustle.publish).toHaveBeenCalledWith({
-                data: enrichedLineListModules,
-                type: "upsertOrgUnit"
-            }, "dataValues");
-
-            expect(programsRepo.upsert).toHaveBeenCalledWith(programs);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                data: programs,
-                type: "uploadProgram"
-            }, "dataValues");
-        });
-
-        it("should save aggregate modules", function() {
-            scope.orgUnit = {
-                "name": "Project1",
-                "id": "someid",
-                "children": []
-            };
-
-            var modules = [{
+            scope.associatedDatasets = enrichedAssociatedDatasets;
+            scope.module = {
                 'name': "Module1",
                 'serviceType': "Aggregate",
                 'openingDate': new Date(),
-                'associatedDatasets': [{
-                    'id': 'DS_OPD',
-                    'name': 'dataset11',
-                    'sections': [{
-                        'dataElements': [{
-                            'isIncluded': false,
-                            'id': 'de1'
-                        }, {
-                            'isIncluded': true,
-                            'id': 'de2'
-                        }]
-                    }]
-                }]
-            }];
+                'parent': parent
+            };
 
-            var enrichedAggregateModules = [{
+
+            var enrichedAggregateModule = {
                 name: 'Module1',
                 shortName: 'Module1',
                 id: 'adba40b7157',
                 level: NaN,
                 openingDate: moment(new Date()).toDate(),
                 selectedDataset: undefined,
-                associatedDatasets: [{
-                    'id': 'DS_OPD',
-                    'name': 'dataset11',
-                    'sections': [{
-                        "dataElements": [{
-                            "isIncluded": false,
-                            "id": "de1"
-                        }, {
-                            "isIncluded": true,
-                            "id": "de2"
-                        }]
-                    }]
-                }],
-                enrichedProgram: undefined,
                 attributeValues: [{
                     created: moment().toISOString(),
                     lastUpdated: moment().toISOString(),
@@ -503,26 +170,24 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     name: 'Project1',
                     id: 'someid'
                 }
-            }];
+            };
 
             var enrichedParent = {
                 "name": "Project1",
                 "id": "someid",
-                "children": enrichedAggregateModules
+                "children": [enrichedAggregateModule]
             };
 
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
-            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
-            scope.save(modules);
+            scope.save();
             scope.$apply();
 
             expect(scope.saveFailure).toBe(false);
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedParent);
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedAggregateModules);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedAggregateModule);
 
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: enrichedAggregateModules,
+                data: enrichedAggregateModule,
                 type: "upsertOrgUnit"
             }, "dataValues");
 
@@ -549,9 +214,40 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 data: ['DS_OPD'],
                 type: "associateOrgUnitToDataset"
             }, "dataValues");
+
+            expect(scope.saveFailure).toBe(false);
+
+            var expectedSystemSettings = {
+                "excludedDataElements": {
+                    "test2": ["1", "3"],
+                    "adba40b7157": ["1", "3"]
+                }
+            };
+            var expectedPayload = {
+                projectId: projectId,
+                settings: expectedSystemSettings
+            };
+
+            var expectedHustleMessage = {
+                data: {
+                    projectId: projectId,
+                    settings: expectedSystemSettings,
+                    indexedDbOldSystemSettings: {
+                        excludedDataElements: {
+                            'test2': ['1', '3']
+                        }
+                    }
+                },
+                type: "excludeDataElements",
+            };
+
+            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedPayload);
+            expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
+
         });
 
         it("should set datasets associated with module for edit", function() {
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
             scope.orgUnit = {
                 "id": "mod2",
                 "parent": {
@@ -559,54 +255,22 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }
             };
 
-            var newDataSet1 = {
-                "id": "dataSet1",
-                "name": "NeoNat",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": 'true'
-                }]
-            };
-
-            var newDataSet2 = {
-                "id": "dataSet2",
-                "name": "IPD",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": 'true'
-                }]
-            };
-
-            var currentDataSet = {
-                "id": "dataSet2",
-                "name": "Neonat - V1",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": 'false'
-                }]
-            };
-
-
             scope.isNewMode = false;
 
-            spyOn(datasetTransformer, "getAssociatedDatasets").and.returnValue([newDataSet1]);
-            spyOn(datasetTransformer, 'enrichDatasets').and.returnValue([newDataSet1, newDataSet2, currentDataSet]);
+            spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, [datasetsdata[1]]));
+            spyOn(dataSetRepo, "getEnrichedDatasets").and.callFake(function(ds){ return ds;});
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             scope.$apply();
 
             expect(scope.isDisabled).toBeFalsy();
-            expect(scope.modules[0].associatedDatasets.length).toEqual(1);
-            expect(scope.modules[0].selectedDataset).toEqual(scope.modules[0].associatedDatasets[0]);
-            expect(scope.modules[0].allDatasets).toEqual([newDataSet2]);
+            expect(scope.associatedDatasets.length).toEqual(1);
+            expect(scope.allDatasets).toEqual([datasetsdata[0]]);
+            // expect(scope.selectedDataset).toEqual(scope.associatedDatasets[0]);
         });
 
-        it("should disable update and diable if orgunit is disabled", function() {
+        it("should disable update button", function() {
+            spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, []));
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
             scope.orgUnit = {
                 "id": "mod2",
                 "parent": {
@@ -630,6 +294,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             };
             scope.isNewMode = false;
+
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
 
             scope.$apply();
@@ -638,41 +303,56 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should update system setting while updating module", function() {
-            scope.orgUnit = {
-                "id": "mod2",
-                "name": "module OLD name",
-                "parent": {
-                    "id": "par1",
-                    "name": "Par1"
+            spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, []));
+            expectedSystemSettings = {
+                "excludedDataElements": {
+                    oldid: ['1', '2']
                 }
             };
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {
+                "key": 1,
+                "value": expectedSystemSettings
+            }));
+            var oldid = "oldid";
+            var parent = {
+                "id": "par1",
+                "name": "Par1"
+            };
+            scope.orgUnit = {
+                "id": oldid,
+                "name": "module OLD name",
+                "parent": parent
+            };
 
-            var modules = [{
-                name: "module NEW name",
-                id: "newId",
-                serviceType: "Aggregate",
-                associatedDatasets: [{
-                    sections: [{
-                        dataElements: [{
-                            "id": "1",
-                            "isIncluded": false
-                        }, {
-                            "id": "2",
-                            "isIncluded": true
-                        }, {
-                            "id": "3",
-                            "isIncluded": false
-                        }]
+            scope.isNewMode = false;
+
+            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+            scope.$apply();
+
+            scope.associatedDatasets = [{
+                sections: [{
+                    dataElements: [{
+                        "id": "1",
+                        "isIncluded": false
+                    }, {
+                        "id": "2",
+                        "isIncluded": true
+                    }, {
+                        "id": "3",
+                        "isIncluded": false
                     }]
                 }]
             }];
 
-            scope.isNewMode = false;
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
-            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
-
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
-            scope.update(modules);
+            var updatedModule = {
+                name: "module NEW name",
+                id: oldid,
+                openingDate: new Date(),
+                serviceType: "Aggregate",
+                parent: parent
+            };
+            scope.module = updatedModule;
+            scope.update();
             scope.$apply();
 
             expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith("par1");
@@ -681,7 +361,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 projectId: 'par1',
                 settings: {
                     excludedDataElements: {
-                        "newId": ['1', '3']
+                        oldid: ['1', '3']
                     }
                 }
             };
@@ -691,11 +371,13 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 "projectId": "par1",
                 "settings": {
                     "excludedDataElements": {
-                        "newId": ["1", "3"]
+                        oldid: ["1", "3"]
                     }
                 },
                 "indexedDbOldSystemSettings": {
-                    "excludedDataElements": {}
+                    "excludedDataElements": {
+                        oldid: ['1', '2']
+                    }
                 }
             };
 
@@ -706,66 +388,42 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should update module name", function() {
+            spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, []));
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            var oldid = "oldid";
+            var parent = {
+                "id": "par1",
+                "name": "Par1"
+            };
             scope.orgUnit = {
-                "id": "mod2",
+                "id": oldid,
                 "name": "module OLD name",
-                "parent": {
-                    "id": "par1",
-                    "name": "Par1"
-                }
+                "parent": parent
             };
 
-            var modules = [{
+            var updatedModule = {
                 name: "module NEW name",
-                id: "newId",
+                id: oldid,
                 openingDate: new Date(),
                 serviceType: "Aggregate",
-                associatedDatasets: [{
-                    sections: [{
-                        dataElements: [{
-                            "id": "1",
-                            "isIncluded": false
-                        }, {
-                            "id": "2",
-                            "isIncluded": true
-                        }, {
-                            "id": "3",
-                            "isIncluded": false
-                        }]
-                    }]
-                }]
-            }];
+                parent: parent
+            };
 
             scope.isNewMode = false;
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
-            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
-
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
-            scope.update(modules);
             scope.$apply();
 
-            var expectedModules = [{
+            scope.module = updatedModule;
+            scope.update();
+            scope.$apply();
+
+            var expectedModule = {
                 name: 'module NEW name',
                 shortName: 'module NEW name',
-                id: 'mod2',
+                id: oldid,
                 level: 6,
                 openingDate: new Date(),
                 selectedDataset: undefined,
-                enrichedProgram: undefined,
-                associatedDatasets: [{
-                    sections: [{
-                        dataElements: [{
-                            id: '1',
-                            isIncluded: false
-                        }, {
-                            id: '2',
-                            isIncluded: true
-                        }, {
-                            id: '3',
-                            isIncluded: false
-                        }]
-                    }]
-                }],
                 attributeValues: [{
                     created: moment().toISOString(),
                     lastUpdated: moment().toISOString(),
@@ -787,110 +445,38 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     name: "Par1",
                     id: 'par1'
                 }
-            }];
+            };
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModules);
-
-            var expectedPayload = [{
-                name: 'module NEW name',
-                shortName: 'module NEW name',
-                id: 'mod2',
-                level: 6,
-                openingDate: moment(new Date()).toDate(),
-                selectedDataset: undefined,
-                associatedDatasets: [{
-                    sections: [{
-                        dataElements: [{
-                            id: '1',
-                            isIncluded: false
-                        }, {
-                            id: '2',
-                            isIncluded: true
-                        }, {
-                            id: '3',
-                            isIncluded: false
-                        }]
-                    }]
-                }],
-                enrichedProgram: undefined,
-                attributeValues: [{
-                    created: moment().toISOString(),
-                    lastUpdated: moment().toISOString(),
-                    attribute: {
-                        code: 'Type',
-                        name: 'Type'
-                    },
-                    value: 'Module'
-                }, {
-                    created: moment().toISOString(),
-                    lastUpdated: moment().toISOString(),
-                    attribute: {
-                        code: 'isLineListService',
-                        name: 'Is Linelist Service'
-                    },
-                    value: 'false'
-                }],
-                parent: {
-                    name: 'Par1',
-                    id: 'par1'
-                }
-            }];
-
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: expectedPayload,
+                data: expectedModule,
                 type: "upsertOrgUnit"
             }, "dataValues");
         });
 
         it("should return false if datasets for modules are selected", function() {
-            var modules = [{
-                'name': "Module1",
-                'serviceType': "Aggregate",
-                'associatedDatasets': [{
-                    'id': 'ds_11',
-                    'name': 'dataset11',
-                }, {
-                    'id': 'ds_12',
-                    'name': 'dataset12'
-                }]
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+            scope.associatedDatasets = [{
+                'id': 'ds_11',
+                'name': 'dataset11',
+            }, {
+                'id': 'ds_12',
+                'name': 'dataset12'
             }];
 
-            expect(scope.areDatasetsNotSelected(modules)).toEqual(false);
+            expect(scope.areDatasetsNotSelected()).toEqual(false);
         });
 
         it("should return true if dataset is not selected", function() {
-            var modules = [{
-                'name': "Module1",
-                'associatedDatasets': [],
-                'serviceType': "Aggregate"
-            }];
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+            scope.associatedDatasets = [];
 
-            expect(scope.areDatasetsNotSelected(modules)).toEqual(true);
+            expect(scope.areDatasetsNotSelected()).toEqual(true);
         });
 
-        it("should return false if program for module is selected", function() {
-            var modules = [{
-                'name': "Module1",
-                'program': {
-                    "name": "ER Linelist"
-                },
-                'serviceType': "Linelist"
-            }];
 
-            expect(scope.areNoProgramsSelected(modules)).toEqual(false);
-        });
-
-        it("should return true if no program for module is selected", function() {
-            var modules = [{
-                'name': "Module1",
-                'program': {
-                    "name": ""
-                },
-                'serviceType': "Linelist"
-            }];
-
-            expect(scope.areNoProgramsSelected(modules)).toEqual(true);
-        });
 
         it("should de-select all data elements if the section containing it is de-selected", function() {
             var section = {
@@ -953,11 +539,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should select a dataset", function() {
-            var timestamp = "2014-2-23";
-            var module = {
-                "id": "mod1",
-                "timestamp": timestamp
-            };
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
 
             var dataset = {
                 name: "Malaria",
@@ -968,14 +551,20 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     'id': 'Id2'
                 }]
             };
-            scope.selectDataSet(module, dataset);
-            expect(module.selectedDataset).toEqual(dataset);
-            expect(scope.isExpanded[timestamp].Id1).toEqual(true);
-            expect(scope.isExpanded[timestamp].Id2).toEqual(false);
+
+            scope.selectDataSet(dataset);
+            scope.$apply();
+
+            expect(scope.selectedDataset).toEqual(dataset);
+            expect(scope.isExpanded.Id1).toEqual(true);
+            expect(scope.isExpanded.Id2).toEqual(false);
         });
 
         it("should return true if no section is selected from each dataset", function() {
-            var module = {
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+
+            scope.module = {
                 'serviceType': "Aggregate",
                 'associatedDatasets': [{
                     "sections": [{
@@ -998,67 +587,32 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     }]
                 }]
             };
+            scope.$apply();
 
-            expect(scope.areNoSectionsSelected([module])).toEqual(true);
+            expect(scope.areNoSectionsSelected()).toEqual(true);
         });
 
         it("should return false if any one section is selected from each dataset", function() {
-
-            var module = {
-                'serviceType': "Aggregate",
-                'associatedDatasets': [{
-                    "sections": [{
-                        "name": "section1",
-                        "id": "section_1",
-                        "dataElements": [{
-                            "id": "de1",
-                            "isIncluded": true
-                        }, {
-                            "id": "de2",
-                            "isIncluded": true
-                        }]
-                    }, {
-                        "name": "section2",
-                        "id": "section_2",
-                        "dataElements": [{
-                            "id": "de3",
-                            "isIncluded": false
-                        }]
-                    }]
-                }]
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+            scope.selectedDataset = {
+                "id": "atfc_service"
             };
 
-            expect(scope.areNoSectionsSelected([module])).toEqual(false);
+            expect(scope.areNoSectionsSelected()).toEqual(false);
         });
 
         it("should return true if no section is selected for dataset", function() {
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+            scope.selectedDataset = {};
 
-            var dataset = {
-                "sections": [{
-                    "name": "section1",
-                    "id": "section_1",
-                    "dataElements": [{
-                        "id": "de1",
-                        "isIncluded": false
-                    }, {
-                        "id": "de2",
-                        "isIncluded": false
-                    }]
-                }, {
-                    "name": "section2",
-                    "id": "section_2",
-                    "dataElements": [{
-                        "id": "de3",
-                        "isIncluded": false
-                    }]
-                }]
-            };
 
-            expect(scope.areNoSectionsSelectedForDataset(dataset)).toEqual(true);
+            expect(scope.areNoSectionsSelected()).toEqual(true);
         });
 
         it("should return false if no dataset is selected", function() {
-            expect(scope.areNoSectionsSelectedForDataset(undefined)).toEqual(false);
+            expect(scope.areNoDataElementsSelectedForSection(undefined)).toEqual(false);
         });
 
         it("should return false if any one section is selected for dataset", function() {
@@ -1084,24 +638,51 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             };
 
-            expect(scope.areNoSectionsSelectedForDataset(dataset)).toEqual(false);
+            expect(scope.areNoDataElementsSelectedForSection(dataset)).toEqual(false);
         });
 
-        it("should disable modules", function() {
+        it("should disable module", function() {
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            var parent = {
+                "id": "par1",
+                "name": "Par1"
+            };
             scope.$parent.closeNewForm = jasmine.createSpy();
             scope.resourceBundle = {};
+            scope.$apply();
             var module = {
                 name: "test1",
                 id: "projectId",
                 dataSets: [],
-                attributeValues: []
+                attributeValues: [],
+                parent: parent
             };
+            scope.module = module;
 
             var expectedModule = {
                 name: 'test1',
+                shortName: 'test1',
                 id: 'projectId',
-                dataSets: [],
+                level: 6,
+                openingDate: moment(new Date()).toDate(),
+                selectedDataset: undefined,
                 attributeValues: [{
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
+                    attribute: {
+                        code: 'Type',
+                        name: 'Type'
+                    },
+                    value: 'Module'
+                }, {
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
+                    attribute: {
+                        code: 'isLineListService',
+                        name: 'Is Linelist Service'
+                    },
+                    value: 'false'
+                }, {
                     created: '2014-04-01T00:00:00.000Z',
                     lastUpdated: '2014-04-01T00:00:00.000Z',
                     attribute: {
@@ -1109,7 +690,11 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                         name: 'Is Disabled'
                     },
                     value: true
-                }]
+                }],
+                parent: {
+                    name: 'Par1',
+                    id: 'par1'
+                }
             };
             var expectedHustleMessage = {
                 data: expectedModule,
@@ -1119,7 +704,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 result: utils.getPromise(q, {})
             });
 
-            scope.disable(module);
+            scope.disable();
             scope.$apply();
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
@@ -1128,148 +713,9 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(scope.isDisabled).toEqual(true);
         });
 
-        it("should load current datasets for a module if dataModelType is current", function() {
-            var module = {
-                'id': "Mod1",
-                'name': "Module1"
-            };
-
-            scope.allDatasets = [{
-                'id': 'ds1',
-                'name': 'Neonat',
-                'attributeValues': [{
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": "true"
-                }]
-            }, {
-                'id': 'ds2',
-                'name': 'NeoNat = V1',
-                'attributeValues': [{
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": "false"
-                }]
-            }];
-
-            scope.changeDataModel(module, "Current");
-            scope.$apply();
-
-            expect(module.allDatasets).toEqual([{
-                'id': 'ds2',
-                'name': 'NeoNat = V1',
-                'attributeValues': [{
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": "false"
-                }]
-            }]);
-        });
-
-        it("should load current datasets for a module if dataModelType is new", function() {
-            var module = {
-                'id': "Mod1",
-                'name': "Module1"
-            };
-
-            scope.allDatasets = [{
-                'id': 'ds1',
-                'name': 'Neonat',
-                'attributeValues': [{
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": "true"
-                }]
-            }, {
-                'id': 'ds2',
-                'name': 'NeoNat = V1',
-                'attributeValues': [{
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": "false"
-                }]
-            }];
-
-            scope.changeDataModel(module, "New");
-            scope.$apply();
-
-            expect(module.allDatasets).toEqual([{
-                'id': 'ds1',
-                'name': 'Neonat',
-                'attributeValues': [{
-                    "attribute": {
-                        "code": 'isNewDataModel'
-                    },
-                    "value": "true"
-                }]
-            }]);
-        });
-
-        it("should set program on scope", function() {
-            var program = {
-                "id": "surgery1",
-                "name": "Surgery",
-                "programStages": [{
-                    "programStageSections": [{
-                        "id": "sectionId",
-                        "programStageDataElements": [{
-                            "dataElement": {
-                                "id": "de1"
-                            }
-                        }]
-                    }]
-                }]
-            };
-
-            var module1 = {
-                "id": "mod1",
-                "program": {
-                    "id": "surgery1",
-                    "name": "Surgery"
-                }
-            };
-
-            var expectedModule = {
-                "id": "mod1",
-                "program": {
-                    "id": "surgery1",
-                    "name": "Surgery"
-                },
-                "enrichedProgram": {
-                    "id": "surgery1",
-                    "name": "Surgery",
-                    "programStages": [{
-                        "programStageSections": [{
-                            "id": "sectionId",
-                            "programStageDataElements": [{
-                                "dataElement": {
-                                    "id": "de1",
-                                    "isIncluded": true
-                                }
-                            }]
-                        }]
-                    }]
-                }
-            };
-
-            spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
-
-            scope.getDetailedProgram(module1).then(function(data) {
-                expect(data).toEqual(expectedModule);
-                expect(scope.collapseSection).toEqual({
-                    sectionId: false
-                });
-            });
-
-            scope.$apply();
-        });
-
         it("should change collapsed", function() {
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+
             scope.collapseSection = {
                 "sectionId": true
             };

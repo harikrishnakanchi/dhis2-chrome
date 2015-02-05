@@ -1,9 +1,13 @@
 define(["lodash"], function(_) {
     return function(db, $q) {
-        this.getProgramsForOrgUnit = function(orgUnitId) {
+        this.getProgramForOrgUnit = function(orgUnitId) {
             var store = db.objectStore("programs");
-            var query = db.queryBuilder().$eq(orgUnitId).$index("by_organisationUnit").compile();
-            return store.each(query);
+            return store.find("by_organisationUnit", orgUnitId);
+        };
+
+        this.getAll = function() {
+            var store = db.objectStore("programs");
+            return store.getAll();
         };
 
         this.upsert = function(payload) {
@@ -20,7 +24,7 @@ define(["lodash"], function(_) {
             });
         };
 
-        this.get = function(programId) {
+        this.get = function(programId, excludedDataElements) {
             var getProgram = function(programId) {
                 var programsStore = db.objectStore("programs");
                 return programsStore.find(programId);
@@ -48,6 +52,7 @@ define(["lodash"], function(_) {
                     _.each(stage.programStageSections, function(section) {
                         _.each(section.programStageDataElements, function(sde) {
                             promises.push(dataElementsStore.find(sde.dataElement.id).then(function(de) {
+                                de.isIncluded = _.isEmpty(excludedDataElements) || !_.contains(excludedDataElements, de.id);
                                 sde.dataElement = de;
                             }));
                         });

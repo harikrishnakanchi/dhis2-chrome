@@ -1,13 +1,44 @@
-define(["lodash"], function(_) {
-    return function(db) {
+define(["lodash", "datasetTransformer"], function(_, datasetTransformer) {
+    return function(db, $q) {
         var get = function(datasetId) {
             var store = db.objectStore("dataSets");
             return store.find(datasetId);
         };
 
+        var getEntitiesFromDb = function(storeName) {
+            var store = db.objectStore(storeName);
+            return store.getAll();
+        };
+
+        var getEnriched = function(datasetId) {
+            var dataSetPromise = getEntitiesFromDb('dataSets');
+            var sectionPromise = getEntitiesFromDb("sections");
+            var dataElementsPromise = getEntitiesFromDb("dataElements");
+            return $q.all([get(datasetId), sectionPromise, dataElementsPromise]).then(function(data) {
+                if (_.isEmpty(data[0])) return undefined;
+                return datasetTransformer.enrichDatasets([data[0]], data[1], data[2])[0];
+            });
+        };
+
+        var getEnrichedDatasets = function(dataSets) {
+            return $q.all(_.map(dataSets, function(ds) {
+                return getEnriched(ds.id);
+            }));
+        };
+
         var getAll = function() {
             var store = db.objectStore("dataSets");
-            return store.getAll();
+            var filtered = store.getAll().then(function(all) {
+                return _.filter(all, function(ds) {
+                    var attr = _.find(ds.attributeValues, {
+                        "attribute": {
+                            "code": 'isNewDataModel'
+                        }
+                    });
+                    return attr && attr.value === 'true';
+                });
+            });
+            return filtered;
         };
 
         var getAllDatasetIds = function() {
@@ -40,7 +71,9 @@ define(["lodash"], function(_) {
             "getAll": getAll,
             "getAllDatasetIds": getAllDatasetIds,
             "upsert": upsert,
-            "getAllForOrgUnit": getAllForOrgUnit
+            "getAllForOrgUnit": getAllForOrgUnit,
+            "getEnriched": getEnriched,
+            "getEnrichedDatasets": getEnrichedDatasets
         };
     };
 });

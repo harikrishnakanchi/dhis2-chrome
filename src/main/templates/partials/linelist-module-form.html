@@ -1,4 +1,4 @@
-<div class="panel panel-default" ng-controller="moduleController">
+<div class="panel panel-default" ng-controller="lineListModuleController">
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorModule }}</div>
     <div class="panel-heading">
         <h3 class="panel-title">Module Details</h3>
@@ -6,6 +6,7 @@
     <div class="panel-body">
         <form class="form-horizontal" name="form" role="form" novalidate>
             <div class="well">
+                <input type="button" class="btn-delete" ng-hide="$first || !isNewMode" ng-click="deleteModule($index)" value="X Delete">
                 <ul>
                     <li class="form-group">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label">Module name</label>
@@ -27,47 +28,48 @@
                             </div>
                         </div>
                     </li>
-                    <li class="form-group add-service-label">
-                        <label for="moduleName" class="col-sm-4 col-md-4 control-label " ng-show="isNewMode">Add service</label>
-                        <label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-hide="isNewMode">Services</label>
-                    </li>
                     <li class="form-group">
+                        <label for="program" class="col-sm-4 col-md-4 control-label">{{resourceBundle.selectProgramLabel}}</label>
+                        <div class="col-sm-6 col-md-6">
+                            <select type="text" ng-change="getEnrichedProgram(module.program.id)" name="programsDropDown" id="programsDropDown" ng-model="module.program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <div>
+
+                        </div>
+                    </li>
+                    <li class="form-group" ng-if="module.program.name !== ''">
                         <div class="col-sm-12">
                             <section class="module-details">
-                                <div class="add-item-ctrl">
-                                    <div ng-show="areDatasetsNotSelected()" class="mb5">
-                                        <span class="glyphicon glyphicon-info-sign"></span>
-                                        <span>{{resourceBundle.selectDatasets}}</span>
-                                    </div>
-                                    <multiselect left-list="allDatasets" name="name" ng-model="associatedDatasets" disabled="!isNewMode" on-right-item-select="selectDataSet(item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
-                                </div>
-                                <div class="details" ng-show="selectedDataset.sections.length > 0">
-                                    <span ng-show="areNoDataElementsSelectedForSection(selectedDataset)">{{resourceBundle.selectDatasetSection}}</span>
-                                    <h4 ng-class="{cur: true}">{{selectedDataset.name}}</h4>
-                                    <div ng-repeat="section in selectedDataset.sections">
-                                        <div class="collapse-head">
-                                            <h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">{{section.name}}</h5>
-                                            <input type="checkbox" ng-disabled="updateDisabled" ng-change="changeSectionSelection(section)" ng-model="getSection(selectedDataset, section.id)['isIncluded']">
-                                        </div>
-                                        <div collapse="!isExpanded[section.id]" class="collapse-body">
-                                            <ul>
-                                                <li ng-repeat="element in section.dataElements">
-                                                    <label>
-                                                        <input type="checkbox" ng-disabled="updateDisabled" ng-model="getDataElement(section, element.id)['isIncluded']" ng-change="changeDataElementSelection(section)">{{element.formName}}
-                                                    </label>
-                                                </li>
-                                            </ul>
+                                <div class="details">
+                                    <div ng-repeat="programStage in module.enrichedProgram.programStages" ng-if="module.enrichedProgram !== undefined">
+                                        <div ng-repeat="section in programStage.programStageSections">
+                                            <div class="collapse-head">
+                                                <h5 ng-click="changeCollapsed(section.id)" ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</h5>
+                                                <h5 ng-click="changeCollapsed(section.id)" ng-if="!resourceBundle[section.id]">{{section.name}}</h5>
+                                            </div>
+                                            <div collapse="getCollapsed(section.id)" class="collapse-body">
+                                                <ul>
+                                                    <li ng-repeat="de in section.programStageDataElements">
+                                                        <label>
+                                                            <input type="checkbox" ng-disabled="de.compulsory || isDisabled" ng-model="de.dataElement.isIncluded">{{de.dataElement.formName}}
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </section>
                         </div>
                     </li>
+
                 </ul>
             </div>
             <input type="button" class="btn btn-main pull-right" ng-click="save(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton()" value="Save" ng-if="isNewMode" />
             <input type="button" class="btn btn-main pull-right" ng-click="update(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton() || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode &amp;&amp; !isDisabled" />
-            <input type="button" class="btn btn-main pull-right" ng-click="disable()" value="Disable" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !isDisabled" />
+            <input type="button" class="btn btn-main pull-right" ng-click="disable(module)" value="Disable" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !isDisabled" />
         </form>
     </div>
 </div>

@@ -168,6 +168,39 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         };
     };
 
+    this.mapToModule = function(module, moduleId, moduleLevel) {
+        return {
+            name: module.name,
+            shortName: module.name,
+            id: moduleId || dhisId.get(module.name + module.parent.id),
+            level: moduleLevel || parseInt(module.parent.level) + 1,
+            openingDate: moment(module.openingDate).toDate(),
+            selectedDataset: module.selectedDataset,
+            attributeValues: [{
+                created: moment().toISOString(),
+                lastUpdated: moment().toISOString(),
+                attribute: {
+                    "code": "Type",
+                    "name": "Type"
+                },
+                value: "Module"
+            }, {
+                created: moment().toISOString(),
+                lastUpdated: moment().toISOString(),
+                attribute: {
+                    "code": "isLineListService",
+                    "name": "Is Linelist Service"
+                },
+                value: module.serviceType === "Linelist" ? "true" : "false"
+            }],
+            parent: {
+                name: module.parent.name,
+                id: module.parent.id
+            }
+        };
+    };
+
+
     this.mapToModules = function(modules, moduleParent, moduleId, moduleLevel) {
         var result = _.map(modules, function(module) {
             return {
@@ -203,34 +236,6 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             };
         });
         return result;
-    };
-
-    this.mapToDataSets = function(modules, moduleParent, originalDatasets) {
-        var currentDatasets = _.filter(originalDatasets, function(ds) {
-            return _.any(modules, {
-                "associatedDatasets": [{
-                    "id": ds.id
-                }]
-            });
-        });
-        return _.map(currentDatasets, function(ds) {
-            var belongsToThisDataSet = {
-                "associatedDatasets": [{
-                    "id": ds.id
-                }]
-            };
-            var intoOrgUnits = function(module) {
-                return {
-                    "name": module.name,
-                    "id": dhisId.get(module.name + moduleParent.id)
-                };
-            };
-
-            var modulesWithThisDataset = _.map(_.filter(modules, belongsToThisDataSet), intoOrgUnits);
-            ds.organisationUnits = ds.organisationUnits || [];
-            ds.organisationUnits = ds.organisationUnits.concat(modulesWithThisDataset);
-            return ds;
-        });
     };
 
     var isOfType = function(orgUnit, type) {

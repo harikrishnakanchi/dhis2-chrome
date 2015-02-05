@@ -40,6 +40,7 @@ require.config({
         "orgUnitContoller": "app/controller/orgunit.controller",
         "opUnitController": "app/controller/opunit.controller",
         "moduleController": "app/controller/module.controller",
+        "lineListModuleController": "app/controller/line.list.module.controller",
         "mainController": "app/controller/main.controller",
         "projectController": "app/controller/project.controller",
         "loginController": "app/controller/login.controller",

@@ -1,26 +1,85 @@
-define(["datasetRepository", "angularMocks", "utils"], function(DatasetRepository, mocks, utils) {
+define(["datasetRepository", "angularMocks", "utils", "testData"], function(DatasetRepository, mocks, utils, testData) {
     describe("dataset repository", function() {
-        var db, mockStore, datasetRepository, q, scope;
+        var db, mockDB, mockStore, datasetRepository, q, scope, sectionsdata, datasetsdata, dataElementsdata, sectionStore, dataElementStore;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
-            var mockDB = utils.getMockDB($q);
+            mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
             scope = $rootScope.$new();
 
-            datasetRepository = new DatasetRepository(mockDB.db);
+
+            sectionsdata = testData.get("sections");
+            datasetsdata = testData.get("dataSets");
+            dataElementsdata = testData.get("dataElements");
+
+            sectionStore = utils.getMockStore(q, '', sectionsdata);
+            dataElementStore = utils.getMockStore(q, '', dataElementsdata);
+            datasetRepository = new DatasetRepository(mockDB.db, q);
         }));
 
         it("should get all data sets", function() {
             var allDataSets = [{
-                "id": 123
+                "id": 123,
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": 'true'
+                }]
             }];
-            mockStore.getAll.and.returnValue(allDataSets);
-
-            var result = datasetRepository.getAll();
-
+            mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
+            var result;
+            datasetRepository.getAll().then(function(r) {
+                result = r;
+            });
+            scope.$apply();
             expect(mockStore.getAll).toHaveBeenCalled();
             expect(result).toEqual(allDataSets);
+        });
+
+        it("should get all new data sets", function() {
+            var allDataSets = [{
+                "id": "dataSet1",
+                "name": "NeoNat",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": 'true'
+                }]
+            }, {
+                "id": "dataSet2",
+                "name": "Obgyn",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": 'false'
+                }]
+            }, {
+                "id": "dataSet3",
+                "name": "Ped-v1"
+            }];
+
+            var expected = [{
+                "id": "dataSet1",
+                "name": "NeoNat",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": 'true'
+                }]
+            }];
+            mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
+            var result;
+            datasetRepository.getAll().then(function(r) {
+                result = r;
+            });
+            scope.$apply();
+            expect(mockStore.getAll).toHaveBeenCalled();
+            expect(result).toEqual(expected);
         });
 
         it("should get datasets for OrgUnit", function() {
@@ -85,7 +144,13 @@ define(["datasetRepository", "angularMocks", "utils"], function(DatasetRepositor
             var result;
 
             var allDataSets = [{
-                "id": 123
+                "id": 123,
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": 'true'
+                }]
             }];
             mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
 
@@ -96,6 +161,101 @@ define(["datasetRepository", "angularMocks", "utils"], function(DatasetRepositor
 
             expect(mockStore.getAll).toHaveBeenCalled();
             expect(result).toEqual([123]);
+        });
+
+        it("should get enriched dataset", function() {
+            var dataSet = {
+                "name": "OPD",
+                "id": "DS_OPD",
+                "organisationUnits": [{
+                    "id": "mod1"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "id": "wFC6joy3I8Q",
+                        "code": "isNewDataModel",
+                    },
+                    "value": "false"
+                }]
+            };
+
+            var enrichedDataSet = {
+                name: 'OPD',
+                id: 'DS_OPD',
+                organisationUnits: [{
+                    id: 'mod1'
+                }],
+                attributeValues: [{
+                    attribute: {
+                        id: 'wFC6joy3I8Q',
+                        code: 'isNewDataModel'
+                    },
+                    value: 'false'
+                }],
+                dataElements: [],
+                sections: [{
+                    id: 'Sec1',
+                    dataSet: {
+                        name: 'OPD',
+                        id: 'DS_OPD'
+                    },
+                    isIncluded: true,
+                    dataElements: [{
+                        id: 'DE1',
+                        name: 'DE1 - ITFC',
+                        isIncluded: true,
+                        formName: 'DE1'
+                    }, {
+                        id: 'DE2',
+                        name: 'DE2 - ITFC',
+                        isIncluded: true,
+                        formName: 'DE2'
+                    }, {
+                        id: 'DE4',
+                        name: 'DE4 - ITFC',
+                        isIncluded: true,
+                        formName: 'DE4'
+                    }]
+                }, {
+                    id: 'Sec2',
+                    dataSet: {
+                        name: 'OPD',
+                        id: 'DS_OPD'
+                    },
+                    isIncluded: true,
+                    dataElements: [{
+                        id: 'DE1',
+                        name: 'DE1 - ITFC',
+                        isIncluded: true,
+                        formName: 'DE1'
+                    }]
+                }]
+            };
+            var db = {
+                "objectStore": {}
+            };
+            var datasetStore = utils.getMockStore(q, dataSet, datasetsdata);
+
+            spyOn(db, 'objectStore').and.callFake(function(storeName) {
+                if (storeName === "dataSets")
+                    return datasetStore;
+                if (storeName === "sections")
+                    return sectionStore;
+                if (storeName === "dataElements")
+                    return dataElementStore;
+                return utils.getMockStore(q, '', testData.get(storeName));
+            });
+
+            mockStore.find.and.returnValue(utils.getPromise(q, dataSet));
+
+            datasetRepository = new DatasetRepository(db, q);
+            var result;
+            datasetRepository.getEnriched('ds1').then(function(data) {
+                result = data;
+            });
+
+            scope.$apply();
+            expect(result).toEqual(enrichedDataSet);
         });
     });
 });

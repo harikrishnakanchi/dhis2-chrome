@@ -1,26 +1,18 @@
 <section class="panel org-units main-columns">
 
-	<div class="treeview-col">
-		
-		<div class="treeview-cont">
+    <div class="treeview-col">
 
-			<div class="content">
-				<treeview
-				tree-model="organisationUnits"
-				node-id="id"
-				node-label="name"
-				node-children="children"
-				on-node-select="onOrgUnitSelect"
-				state="state"
-				allow-multi-selection=false
-				/>
-			</div>
-		</div>
-	</div>
-	<div class="main-content">
-	    <div ng-show="showMessage" class="alert alert-success">{{ resourceBundle[message] }}</div>
-		<div ng-include="templateUrl">
-		</div>
-	</div>
+        <div class="treeview-cont">
+
+            <div class="content">
+                <treeview tree-model="organisationUnits" node-id="id" node-label="name" node-children="children" on-node-select="onOrgUnitSelect" state="state" allow-multi-selection=false />
+            </div>
+        </div>
+    </div>
+    <div class="main-content">
+        <div ng-show="showMessage" class="alert alert-success">{{ resourceBundle[message] }}</div>
+        <div ng-include="templateUrl">
+        </div>
+    </div>
 </section>
 <script>

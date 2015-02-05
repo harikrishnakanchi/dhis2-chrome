@@ -20,35 +20,46 @@ define(["lodash"], function(_) {
         return returnVal;
     };
 
-    var createLineListModulesSystemSetting = function(modules) {
-        var returnVal = {};
+    var excludedDataElementsForAggregateModule = function(associatedDatasets) {
+        var excludedDataElements = [];
+        _.each(associatedDatasets, function(ds) {
+            _.each(ds.sections, function(section) {
+                var filteredDataElements =
+                    _.pluck(_.filter(section.dataElements, {
+                        "isIncluded": false
+                    }), "id");
+                excludedDataElements = excludedDataElements.concat(filteredDataElements);
+            });
+        });
+        return excludedDataElements;
+    };
 
-        _.each(modules, function(module) {
-            var excludedDataElements = [];
-            var program = module.enrichedProgram;
-            _.each(program.programStages, function(programStage) {
-                _.each(programStage.programStageSections, function(section) {
-                    var filteredDataElements = _.filter(section.programStageDataElements, {
-                        "dataElement": {
-                            "isIncluded": false
-                        }
-                    });
-                    _.each(filteredDataElements, function(de) {
-                        excludedDataElements.push(de.dataElement.id);
-                    });
+
+    var excludedDataElementsForLinelistModule = function(module) {
+        var excludedDataElements = [];
+        var program = module.enrichedProgram;
+        _.each(program.programStages, function(programStage) {
+            _.each(programStage.programStageSections, function(section) {
+                var filteredDataElements = _.filter(section.programStageDataElements, {
+                    "dataElement": {
+                        "isIncluded": false
+                    }
+                });
+                _.each(filteredDataElements, function(de) {
+                    excludedDataElements.push(de.dataElement.id);
                 });
             });
-            returnVal[module.id] = excludedDataElements;
         });
-
-        return returnVal;
+        return excludedDataElements;
     };
 
     var constructSystemSettings = function(modules, isLineList) {
-        return isLineList ? createLineListModulesSystemSetting(modules) : createAggregateModulesSystemSetting(modules);
+        return isLineList ? excludedDataElements(modules) : createAggregateModulesSystemSetting(modules);
     };
 
     return {
-        "constructSystemSettings": constructSystemSettings
+        "constructSystemSettings": constructSystemSettings,
+        "excludedDataElementsForLinelistModule": excludedDataElementsForLinelistModule,
+        "excludedDataElementsForAggregateModule": excludedDataElementsForAggregateModule
     };
 });

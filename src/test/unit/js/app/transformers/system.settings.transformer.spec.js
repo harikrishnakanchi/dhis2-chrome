@@ -28,8 +28,8 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
             });
         });
 
-        it("should construct system settings for line list modules", function() {
-            modules = [{
+        it("should give excluded data elements for line list module", function() {
+            module = {
                 name: "mod1 name",
                 id: "mod1",
                 enrichedProgram: {
@@ -54,11 +54,11 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
                         }]
                     }]
                 }
-            }];
+            };
 
-            expect(systemSettingsTransformer.constructSystemSettings(modules, true)).toEqual({
-                "mod1": ["2"]
-            });
+            expect(systemSettingsTransformer.excludedDataElementsForLinelistModule(module, true)).toEqual(
+                ["2"]
+            );
         });
     });
 });

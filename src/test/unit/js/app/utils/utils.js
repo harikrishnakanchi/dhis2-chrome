@@ -12,8 +12,8 @@ define([], function() {
         return deferred.promise;
     };
 
-    var getMockDB = function(q, findResult, allResult, eachResult, dbInfo) {
-        var mockStore = {
+    var getMockStore = function(q, findResult, allResult, eachResult) {
+        return {
             "upsert": jasmine.createSpy("upsert").and.callFake(function(data) {
                 return getPromise(q, data);
             }),
@@ -26,6 +26,10 @@ define([], function() {
             "each": jasmine.createSpy("each").and.returnValue(getPromise(q, eachResult)),
             "clear": jasmine.createSpy("clear").and.returnValue(getPromise(q, {}))
         };
+    };
+
+    var getMockDB = function(q, findResult, allResult, eachResult, dbInfo) {
+        var mockStore = getMockStore(q, findResult, allResult, eachResult);
         var queryBuilder = function() {
 
             this.$index = function(index) {
@@ -79,6 +83,7 @@ define([], function() {
         'getPromise': getPromise,
         'getRejectedPromise': getRejectedPromise,
         'getMockDB': getMockDB,
-        'getMockRepo': getMockRepo
+        'getMockRepo': getMockRepo,
+        'getMockStore': getMockStore
     };
 });

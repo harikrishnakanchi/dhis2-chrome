@@ -39,6 +39,22 @@ define(['moment', "lodashUtils", "dateUtils", "mergeByLastUpdated"], function(mo
         };
 
         var mergeAndSave = function(orgUnitsFromDHIS) {
+            var lastUpdatedTimeIncludingAttributes = function(orgUnit) {
+                var lastUpdated = _.pluck(orgUnit.attributeValues, "lastUpdated");
+                lastUpdated.push(orgUnit.lastUpdated);
+                return lastUpdated;
+            };
+
+            var isLocalDataStale = function(ouFromDHIS, ouFromIDB) {
+                // K1,HACK - NEED TO REMOVE THIS 
+                var networkDelay = 5;
+                if (!ouFromIDB) return true;
+                var lastUpdatedInDhis = dateUtils.max(lastUpdatedTimeIncludingAttributes(ouFromDHIS));
+                var lastUpdatedInIDB = dateUtils.max(lastUpdatedTimeIncludingAttributes(ouFromIDB));
+                lastUpdatedInIDB = lastUpdatedInIDB.add(networkDelay, "minutes");
+                return lastUpdatedInDhis.isAfter(lastUpdatedInIDB);
+            };
+
             var syncPromises = _.map(orgUnitsFromDHIS, function(ouFromDHIS) {
                 return orgUnitRepository.get(ouFromDHIS.id)
                     .then(_.curry(mergeByLastUpdated)(ouFromDHIS))

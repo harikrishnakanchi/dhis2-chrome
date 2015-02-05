@@ -39,6 +39,10 @@ require.config({
         "changeLogRepository": "app/repository/changelog.repository",
         "programRepository": "app/repository/program.repository",
 
+        //Transformers
+        "datasetTransformer": "app/transformers/dataset.transformer",
+
+
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",
         "monitors": "app/monitors/monitors",

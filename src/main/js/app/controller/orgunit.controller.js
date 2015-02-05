@@ -6,6 +6,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             'Country': 'templates/partials/country-form.html',
             'Project': 'templates/partials/project-form.html',
             'Module': 'templates/partials/module-form.html',
+            'LineListModule': 'templates/partials/linelist-module-form.html',
             'Operation Unit': 'templates/partials/op-unit-form.html',
             'User': 'templates/partials/project-user-form.html'
         };
@@ -67,11 +68,20 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
 
         $scope.getOrgUnitType = function(orgUnit) {
             if (!_.isEmpty(orgUnit)) {
-                return _.find(orgUnit.attributeValues, {
+                var type = _.find(orgUnit.attributeValues, {
                     "attribute": {
                         "code": "Type"
                     }
                 }).value;
+
+                if (type == "Module") {
+                    type = _.find(orgUnit.attributeValues, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        }
+                    }).value === "true" ? "LineListModule" : "Module";
+                }
+                return type;
             }
         };
 
