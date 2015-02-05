@@ -1,153 +1,155 @@
 <div ng-controller="projectController">
-	<div class="top-actions" ng-if="!isNewMode">
-		<input type="button" class="btn btn-sub btn-sm pull-right" value="Create Operation Unit" ng-click="openInNewMode('Operation Unit')" />
-		<input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />
-	</div>
-	<div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
-	<form name="createForm" class="form-horizontal" role="form" novalidate>
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 ng-if="isNewMode" class="panel-title">Create Project</h3>
-				<h3 ng-if="!isNewMode" class="panel-title">Project Details</h3>
-			</div>
-			<div class="panel-body">
-				<ul>
-					<li class="form-group">
-						<label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label">Name</label>
-						<div class="col-sm-6 col-md-6" >
-							<input type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" not-in="peerProjects" required/>
-							<div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
-								<span ng-show="createForm.newOrgUnitName.$error.required" class="errortxt">{{resourceBundle.nameValidation}}</span>
-								<span ng-show="createForm.newOrgUnitName.$error.isWithin" class="errortxt">{{resourceBundle.projectExists}}</span>
-							</div>
-						</div>
-					</li>
-					<li class="form-group">
-						<label for="newOrgUnitProjCode" class="col-sm-4 col-md-4  control-label">Project Code</label>
-						<div class="col-sm-6 col-md-6" >
-							<input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitProjCode" id="newOrgUnitProjCode" ng-model="newOrgUnit.projectCode" not-in="existingProjectCodes" required/>
-							<div ng-show="createForm.newOrgUnitProjCode.$dirty &amp;&amp; createForm.newOrgUnitProjCode.$invalid">
-								<span ng-show="createForm.newOrgUnitProjCode.$error.required"class="errortxt">{{resourceBundle.projectCodeValidation}}</span>
-								<span ng-show="createForm.newOrgUnitProjCode.$error.isWithin" class="errortxt">{{resourceBundle.projectCodeExists}}</span>
-							</div>
-						</div>
-					</li>
-					<li class="form-group">
-						<label for="newOrgUnitLocation" class="col-sm-4 col-md-4  control-label">Location</label>
-						<div class="col-sm-6 col-md-6" >
-							<input type="text" class="form-control" name="newOrgUnitLocation" id="newOrgUnitLocation" ng-model="newOrgUnit.location"/>
-						</div>
-					</li>
-					<li class="form-group">
-						<label for="newOrgUnitContext" class="col-sm-4 col-md-4 control-label">Context</label>
-						<div class="col-sm-6 col-md-6" >
-							<select type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" title="{{newOrgUnit.context}}" ng-options="o as o for o in allContexts">
-								<option value=""></option>
-							</select>
-						</div>
-					</li>
-					<li class="form-group">
-						<label for="newOrgUnitPopType" class="col-sm-4 col-md-4 control-label">Type of population</label>
-						<div class="col-sm-6 col-md-6" >
-							<select type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" title="{{newOrgUnit.populationType}}" ng-options="o as o for o in allPopTypes">
-								<option value=""></option>
-							</select>
-						</div>
-					</li>
-					<li class="form-group">
-						<label for="newOrgUnitReasonForIntervention" class="col-sm-4 col-md-4 control-label">Reason for intervention</label>
-						<div class="col-sm-6 col-md-6" >
-							<select type="text" class="form-control" name="newOrgUnitReasonForIntervention" id="newOrgUnitReasonForIntervention" ng-model="newOrgUnit.reasonForIntervention" title="{{newOrgUnit.reasonForIntervention}}" ng-options="r as r for r in reasonForIntervention" required>
-								<option value=""></option>
-							</select>
-							<div ng-show="createForm.newOrgUnitReasonForIntervention.$dirty &amp;&amp; createForm.newOrgUnitReasonForIntervention.$invalid">
-								<span ng-show="createForm.newOrgUnitReasonForIntervention.$error.required"class="errortxt">{{resourceBundle.reasonForInterventionValidation}}</span>
-							</div>
-						</div>
-					</li>
-					<li class="form-group">
-						<label for="newOrgUnitModeOfOperation" class="col-sm-4 col-md-4 control-label">Mode of operation</label>
-						<div class="col-sm-6 col-md-6" >
-							<select type="text" class="form-control" name="newOrgUnitModeOfOperation" id="newOrgUnitModeOfOperation" ng-model="newOrgUnit.modeOfOperation" title="{{newOrgUnit.modeOfOperation}}" ng-options="mode as mode for mode in modeOfOperation">
-								<option value=""></option>
-							</select>
-						</div>
-					</li>
-					<li class="form-group">
-						<label for="newOrgUnitModelOfManagement" class="col-sm-4 col-md-4 control-label">Model of management</label>
-						<div class="col-sm-6 col-md-6" >
-							<select type="text" class="form-control" name="newOrgUnitModelOfManagement" id="newOrgUnitModelOfManagement" ng-model="newOrgUnit.modelOfManagement" title="{{newOrgUnit.modelOfManagement}}" ng-options="model as model for model in modelOfManagement" required>
-								<option value=""></option>
-							</select>
-							<div ng-show="createForm.newOrgUnitModelOfManagement.$dirty &amp;&amp; createForm.newOrgUnitModelOfManagement.$invalid">
-								<span ng-show="createForm.newOrgUnitModelOfManagement.$error.required"class="errortxt">{{resourceBundle.modelOfManagementValidation}}</span>
-							</div>
-						</div>
-					</li>
+    <div class="top-actions" ng-if="!isNewMode">
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Operation Unit" ng-click="openInNewMode('Operation Unit')" />
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />
+    </div>
+    <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
+    <form name="createForm" class="form-horizontal" role="form" novalidate>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 ng-if="isNewMode" class="panel-title">Create Project</h3>
+                <h3 ng-if="!isNewMode" class="panel-title">Project Details</h3>
+            </div>
+            <div class="panel-body">
+                <ul>
+                    <li class="form-group">
+                        <label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label">Name</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" not-in="peerProjects" required/>
+                            <div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
+                                <span ng-show="createForm.newOrgUnitName.$error.required" class="errortxt">{{resourceBundle.nameValidation}}</span>
+                                <span ng-show="createForm.newOrgUnitName.$error.isWithin" class="errortxt">{{resourceBundle.projectExists}}</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newOrgUnitProjCode" class="col-sm-4 col-md-4  control-label">Project Code</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitProjCode" id="newOrgUnitProjCode" ng-model="newOrgUnit.projectCode" not-in="existingProjectCodes" required/>
+                            <div ng-show="createForm.newOrgUnitProjCode.$dirty &amp;&amp; createForm.newOrgUnitProjCode.$invalid">
+                                <span ng-show="createForm.newOrgUnitProjCode.$error.required" class="errortxt">{{resourceBundle.projectCodeValidation}}</span>
+                                <span ng-show="createForm.newOrgUnitProjCode.$error.isWithin" class="errortxt">{{resourceBundle.projectCodeExists}}</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newOrgUnitLocation" class="col-sm-4 col-md-4  control-label">Location</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="text" class="form-control" name="newOrgUnitLocation" id="newOrgUnitLocation" ng-model="newOrgUnit.location" />
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newOrgUnitContext" class="col-sm-4 col-md-4 control-label">Context</label>
+                        <div class="col-sm-6 col-md-6">
+                            <select type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" title="{{newOrgUnit.context}}" ng-options="o as o for o in allContexts">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newOrgUnitPopType" class="col-sm-4 col-md-4 control-label">Type of population</label>
+                        <div class="col-sm-6 col-md-6">
+                            <select type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" title="{{newOrgUnit.populationType}}" ng-options="o as o for o in allPopTypes">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newOrgUnitReasonForIntervention" class="col-sm-4 col-md-4 control-label">Reason for intervention</label>
+                        <div class="col-sm-6 col-md-6">
+                            <select type="text" class="form-control" name="newOrgUnitReasonForIntervention" id="newOrgUnitReasonForIntervention" ng-model="newOrgUnit.reasonForIntervention" title="{{newOrgUnit.reasonForIntervention}}" ng-options="r as r for r in reasonForIntervention" required>
+                                <option value=""></option>
+                            </select>
+                            <div ng-show="createForm.newOrgUnitReasonForIntervention.$dirty &amp;&amp; createForm.newOrgUnitReasonForIntervention.$invalid">
+                                <span ng-show="createForm.newOrgUnitReasonForIntervention.$error.required" class="errortxt">{{resourceBundle.reasonForInterventionValidation}}</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newOrgUnitModeOfOperation" class="col-sm-4 col-md-4 control-label">Mode of operation</label>
+                        <div class="col-sm-6 col-md-6">
+                            <select type="text" class="form-control" name="newOrgUnitModeOfOperation" id="newOrgUnitModeOfOperation" ng-model="newOrgUnit.modeOfOperation" title="{{newOrgUnit.modeOfOperation}}" ng-options="mode as mode for mode in modeOfOperation">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newOrgUnitModelOfManagement" class="col-sm-4 col-md-4 control-label">Model of management</label>
+                        <div class="col-sm-6 col-md-6">
+                            <select type="text" class="form-control" name="newOrgUnitModelOfManagement" id="newOrgUnitModelOfManagement" ng-model="newOrgUnit.modelOfManagement" title="{{newOrgUnit.modelOfManagement}}" ng-options="model as model for model in modelOfManagement" required>
+                                <option value=""></option>
+                            </select>
+                            <div ng-show="createForm.newOrgUnitModelOfManagement.$dirty &amp;&amp; createForm.newOrgUnitModelOfManagement.$invalid">
+                                <span ng-show="createForm.newOrgUnitModelOfManagement.$error.required" class="errortxt">{{resourceBundle.modelOfManagementValidation}}</span>
+                            </div>
+                        </div>
+                    </li>
 
-					<li class="form-group">
-						<label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
-						<div class="col-sm-6 col-md-6" >
-							<input type="date" class="msf-date-input" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required>
-							<div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid || isAfterMaxDate()">
-								<span ng-show="createForm.newOrgUnitOpeningDate.$error.required"class="errortxt">{{resourceBundle.openingDateValidation}}</span>
-								<span ng-show="isAfterMaxDate()" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
-							</div>
-						</div>
-					</li>
-					<li class="form-group">
-						<label for="newOrgUnitEndDate" class="col-sm-4 col-md-4 control-label">End Date</label>
-						<div class="col-sm-6 col-md-6" >
-							<input type="date" class="msf-date-input" min={{thisDate}} name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate">
-						</div>
-					</li>
-					<li class="form-group">
-						<label for="newOrgUnitEndDate" class="col-sm-4 col-md-4 control-label">Auto approve?</label>
-						<div class="col-sm-6 col-md-6" >
-							<input type="radio" id="newOrgUnitAutoApproveYes" name="newOrgUnitAutoApprove" ng-model="newOrgUnit.autoApprove" value="true" />&nbsp;<label for="newOrgUnitAutoApproveYes">Yes</label>&nbsp;
-							<input type="radio" id="newOrgUnitAutoApproveNo" name="newOrgUnitAutoApprove" ng-model="newOrgUnit.autoApprove" value="false" />&nbsp;<label for="newOrgUnitAutoApproveNo">No</label>&nbsp;
-						</div>
-					</li>					
-					<li>
-						<div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
-							<input type="button" class="btn btn-main" ng-if="isNewMode" ng-click="save(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Save"/>
-							<input type="button" class="btn btn-main" ng-if="!isNewMode" ng-click="update(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate() || !createForm.$dirty" value="Update"/>
-							<input type="button" class="btn" ng-click="reset()" ng-if="isNewMode" value="Reset" />
-						</div>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</form>
-	<div class="panel panel-default" ng-if="!isNewMode &amp;&amp; projectUsers.length !== 0">
-		<div class="panel-heading">
-			<h3 class="panel-title">Project User List</h3>
-		</div>
-		<div class="panel-body">
-			<div ng-show="isUserToBeDisabled &amp;&amp; userStateSuccessfullyToggled" class = "alert alert-success">{{ resourceBundle.userDisableSuccess }}</div>
-			<div ng-show="!isUserToBeDisabled &amp;&amp; userStateSuccessfullyToggled" class = "alert alert-success">{{ resourceBundle.userEnableSuccess }}</div>
-			<table class="table table-bordered">
-				<thead>
-					<tr>
-						<th>Username</th>
-						<th>Role</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="user in projectUsers | orderBy: 'userCredentials.username'">
-						<td> {{user.userCredentials.username}}</td>
-						<td> {{user.roles}}</td>
-						<td>
+                    <li class="form-group">
+                        <label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="date" class="msf-date-input" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required>
+                            <div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid || isAfterMaxDate()">
+                                <span ng-show="createForm.newOrgUnitOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
+                                <span ng-show="isAfterMaxDate()" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newOrgUnitEndDate" class="col-sm-4 col-md-4 control-label">End Date</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="date" class="msf-date-input" min={{thisDate}} name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate">
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newOrgUnitEndDate" class="col-sm-4 col-md-4 control-label">Auto approve?</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="radio" id="newOrgUnitAutoApproveYes" name="newOrgUnitAutoApprove" ng-model="newOrgUnit.autoApprove" value="true" />&nbsp;
+                            <label for="newOrgUnitAutoApproveYes">Yes</label>&nbsp;
+                            <input type="radio" id="newOrgUnitAutoApproveNo" name="newOrgUnitAutoApprove" ng-model="newOrgUnit.autoApprove" value="false" />&nbsp;
+                            <label for="newOrgUnitAutoApproveNo">No</label>&nbsp;
+                        </div>
+                    </li>
+                    <li>
+                        <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
+                            <input type="button" class="btn btn-main" ng-if="isNewMode" ng-click="save(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Save" />
+                            <input type="button" class="btn btn-main" ng-if="!isNewMode" ng-click="update(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate() || !createForm.$dirty" value="Update" />
+                            <input type="button" class="btn" ng-click="reset()" ng-if="isNewMode" value="Reset" />
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </form>
+    <div class="panel panel-default" ng-if="!isNewMode &amp;&amp; projectUsers.length !== 0">
+        <div class="panel-heading">
+            <h3 class="panel-title">Project User List</h3>
+        </div>
+        <div class="panel-body">
+            <div ng-show="isUserToBeDisabled &amp;&amp; userStateSuccessfullyToggled" class="alert alert-success">{{ resourceBundle.userDisableSuccess }}</div>
+            <div ng-show="!isUserToBeDisabled &amp;&amp; userStateSuccessfullyToggled" class="alert alert-success">{{ resourceBundle.userEnableSuccess }}</div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in projectUsers | orderBy: 'userCredentials.username'">
+                        <td> {{user.userCredentials.username}}</td>
+                        <td> {{user.roles}}</td>
+                        <td>
 
-							<a href="" title="Delete" class="delete" ng-if="user.roles != 'Superuser'" ng-click="toggleUserDisabledState(user)">
-								<span class="glyphicon glyphicon-remove" ng-show="!user.userCredentials.disabled"></span>
-								<span class="glyphicon glyphicon-ok" ng-show="user.userCredentials.disabled"></span>
-							</a> 
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
+                            <a href="" title="Delete" class="delete" ng-if="user.roles != 'Superuser'" ng-click="toggleUserDisabledState(user)">
+                                <span class="glyphicon glyphicon-remove" ng-show="!user.userCredentials.disabled"></span>
+                                <span class="glyphicon glyphicon-ok" ng-show="user.userCredentials.disabled"></span>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
