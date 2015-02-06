@@ -75,7 +75,8 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
-        var upsertDhisDownloadedData = function(dataSets) {
+        var upsertDhisDownloadedData = function(payload) {
+            var dataSets = !_.isArray(payload) ? [payload] : payload;
             dataSets = extractOrgUnitIdsForIndexing(dataSets);
             var store = db.objectStore("dataSets");
             return store.upsert(dataSets).then(function() {

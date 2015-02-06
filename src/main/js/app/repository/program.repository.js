@@ -32,7 +32,8 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
-        this.upsertDhisDownloadedData = function(programs) {
+        this.upsertDhisDownloadedData = function(payload) {
+            var programs = _.isArray(payload) ? payload : [payload];
             programs = getOrgUnitsForIndexing(programs);
 
             var store = db.objectStore("programs");
