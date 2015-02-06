@@ -25,7 +25,7 @@ define(['moment', 'mergeByUnion', 'lodashUtils', 'mergeByLastUpdated'], function
                     }
 
                     if (mergedProgram)
-                        return programRepository.upsert(mergedProgram);
+                        return programRepository.upsertDhisDownloadedData(mergedProgram);
 
                     return $q.when({});
                 });

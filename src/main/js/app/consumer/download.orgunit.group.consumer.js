@@ -40,7 +40,7 @@ define(["moment", "lodash", "mergeByLastUpdated"], function(moment, _, mergeByLa
                 return orgUnitGroupRepository.get(ougFromDHIS.id)
                     .then(_.curry(mergeByLastUpdated)(ougFromDHIS))
                     .then(function(data) {
-                        return data ? orgUnitGroupRepository.upsert(ougFromDHIS) : $q.when({});
+                        return data ? orgUnitGroupRepository.upsertDhisDownloadedData(ougFromDHIS) : $q.when({});
                     });
             });
 

@@ -1,4 +1,4 @@
-define(["datasetRepository", "angularMocks", "utils", "testData"], function(DatasetRepository, mocks, utils, testData) {
+define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], function(DatasetRepository, mocks, utils, testData, timecop) {
     describe("dataset repository", function() {
         var db, mockDB, mockStore, datasetRepository, q, scope, sectionsdata, datasetsdata, dataElementsdata, sectionStore, dataElementStore;
 
@@ -16,7 +16,15 @@ define(["datasetRepository", "angularMocks", "utils", "testData"], function(Data
             sectionStore = utils.getMockStore(q, '', sectionsdata);
             dataElementStore = utils.getMockStore(q, '', dataElementsdata);
             datasetRepository = new DatasetRepository(mockDB.db, q);
+
+            Timecop.install();
+            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
         }));
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
 
         it("should get all data sets", function() {
             var allDataSets = [{
@@ -112,6 +120,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData"], function(Data
 
             var expectedDatasets = [{
                 "id": "DS_Physio",
+                "clientLastUpdated": "2014-05-30T12:43:54.972Z",
                 "organisationUnits": [{
                     "name": "Mod1",
                     "id": "hvybNW8qEov"

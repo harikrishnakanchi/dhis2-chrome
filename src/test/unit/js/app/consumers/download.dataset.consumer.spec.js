@@ -18,6 +18,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                 }];
 
                 spyOn(datasetRepository, 'upsert');
+                spyOn(datasetRepository, 'upsertDhisDownloadedData');
                 spyOn(datasetRepository, 'get').and.returnValue(utils.getPromise(q, undefined));
                 spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, dhisDatasets));
 
@@ -33,7 +34,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                 downloadDatasetConsumer.run(message);
                 scope.$apply();
 
-                expect(datasetRepository.upsert).toHaveBeenCalledWith(dhisDatasets[0]);
+                expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(dhisDatasets[0]);
             });
 
             it("should overwrite local dataset with dhis copy when dataset is newer in dhis", function() {
@@ -48,7 +49,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                     'organisationUnits': []
                 }];
 
-                spyOn(datasetRepository, 'upsert');
+                spyOn(datasetRepository, 'upsertDhisDownloadedData');
                 spyOn(datasetRepository, 'get').and.returnValue(utils.getPromise(q, localDataset));
                 spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, dhisDatasets));
 
@@ -70,7 +71,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                     'organisationUnits': []
                 };
 
-                expect(datasetRepository.upsert).toHaveBeenCalledWith(expectedUpsertedDataset);
+                expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(expectedUpsertedDataset);
             });
 
             it("should merge local dataset with dhis copy when new orgunits are associated to the dataset either in dhis or locally", function() {
@@ -95,6 +96,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                 }];
 
                 spyOn(datasetRepository, 'upsert');
+                spyOn(datasetRepository, 'upsertDhisDownloadedData');
                 spyOn(datasetRepository, 'get').and.returnValue(utils.getPromise(q, localDataset));
                 spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, dhisDatasets));
 
@@ -121,7 +123,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                         'id': 'ou3'
                     }]
                 };
-                expect(datasetRepository.upsert).toHaveBeenCalledWith(expectedUpsertedDataset);
+                expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(expectedUpsertedDataset);
             });
 
             it("should retain the local dataset when the dataset or the orgunits associated to it newer than dhis", function() {
@@ -148,6 +150,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                         return utils.getPromise(q, {
                             'id': 'ds1',
                             'lastUpdated': '2015-01-01T10:00:00.000+0000',
+                            'clientLastUpdated': '2015-01-01T11:00:00.000+0000',
                             'organisationUnits': [{
                                 'id': 'ou1',
                                 'lastUpdated': '2015-01-01T09:00:00.000+0000'
@@ -157,6 +160,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                         return utils.getPromise(q, {
                             'id': 'ds2',
                             'lastUpdated': '2015-01-01T09:00:00.000+0000',
+                            'clientLastUpdated': '2015-01-01T11:00:00.000+0000',
                             'organisationUnits': [{
                                 'id': 'ou1',
                                 'lastUpdated': '2015-01-01T10:00:00.000+0000'

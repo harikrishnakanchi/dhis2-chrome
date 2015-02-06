@@ -26,6 +26,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             orgUnitGroupService = new OrgUnitGroupService();
             orgUnitGroupRepository = new OrgUnitGroupRepository();
             spyOn(orgUnitGroupRepository, "upsert");
+            spyOn(orgUnitGroupRepository, "upsertDhisDownloadedData");
 
             changeLogRepository = {
                 "get": jasmine.createSpy("get").and.returnValue(utils.getPromise(q, "2014-10-24T09:01:12.020+0000")),
@@ -85,7 +86,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             expect(orgUnitGroupService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
             expect(orgUnitGroupRepository.get).toHaveBeenCalledWith("a35778ed565");
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsert).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnitGroups[0]);
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnitGroups[0]);
         });
 
         it("should ignore dhis data for upsertOrgUnitGroups message", function() {
@@ -176,7 +177,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             scope.$apply();
 
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsert).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnitGroups[0]);
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnitGroups[0]);
         });
 
         it("should ignore dhis data for downloadOrgUnitGroups message", function() {
@@ -288,7 +289,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             scope.$apply();
 
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsert).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnitGroups[0]);
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnitGroups[0]);
         });
     });
 });

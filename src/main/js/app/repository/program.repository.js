@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define(["lodash", "moment"], function(_, moment) {
     return function(db, $q) {
         this.getProgramForOrgUnit = function(orgUnitId) {
             var store = db.objectStore("programs");
@@ -10,13 +10,30 @@ define(["lodash"], function(_) {
             return store.getAll();
         };
 
+        var getOrgUnitsForIndexing = function(programs) {
+            return _.map(programs, function(program) {
+                program.orgUnitIds = _.pluck(program.organisationUnits, 'id');
+                return program;
+            });
+        };
+
         this.upsert = function(payload) {
             var programs = _.isArray(payload) ? payload : [payload];
-            programs = _.transform(programs, function(acc, program) {
-                if (!_.isEmpty(program.organisationUnits))
-                    program.orgUnitIds = _.pluck(program.organisationUnits, 'id');
-                acc.push(program);
+
+            programs = _.map(programs, function(program) {
+                program.clientLastUpdated = moment().toISOString();
+                return program;
             });
+            programs = getOrgUnitsForIndexing(programs);
+
+            var store = db.objectStore("programs");
+            return store.upsert(programs).then(function() {
+                return programs;
+            });
+        };
+
+        this.upsertDhisDownloadedData = function(programs) {
+            programs = getOrgUnitsForIndexing(programs);
 
             var store = db.objectStore("programs");
             return store.upsert(programs).then(function() {

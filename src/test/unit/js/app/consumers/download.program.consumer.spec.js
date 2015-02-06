@@ -51,6 +51,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             programService = new ProgramService();
             programRepository = new ProgramRepository();
             spyOn(programRepository, "upsert");
+            spyOn(programRepository, "upsertDhisDownloadedData");
         }));
 
         it("should overwrite local program with dhis copy", function() {
@@ -110,7 +111,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             scope.$apply();
 
             expect(programService.upsert).not.toHaveBeenCalled();
-            expect(programRepository.upsert).toHaveBeenCalledWith(programsFromDhis[0]);
+            expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programsFromDhis[0]);
         });
 
         it("should overwrite local program with dhis copy if local data is stale", function() {
@@ -171,7 +172,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             scope.$apply();
 
             expect(programService.upsert).not.toHaveBeenCalled();
-            expect(programRepository.upsert).toHaveBeenCalledWith(programsFromDhis[0]);
+            expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programsFromDhis[0]);
         });
 
         it("should upsert lastUpdated time in change log", function() {

@@ -1,4 +1,4 @@
-define(["programRepository", "angularMocks", "utils"], function(ProgramRepository, mocks, utils) {
+define(["programRepository", "angularMocks", "utils", "timecop"], function(ProgramRepository, mocks, utils, timecop) {
     describe("programRepository", function() {
         var scope, q, programRepository;
 
@@ -9,7 +9,15 @@ define(["programRepository", "angularMocks", "utils"], function(ProgramRepositor
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
             programRepository = new ProgramRepository(mockDB.db, q);
+
+            Timecop.install();
+            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
         }));
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
 
         it("should get Programs for OrgUnit", function() {
             var programDataForOrgUnit = {
@@ -41,6 +49,7 @@ define(["programRepository", "angularMocks", "utils"], function(ProgramRepositor
                 "id": "prg1",
                 "name": "program1",
                 "orgUnitIds": ["orgUnit1"],
+                "clientLastUpdated": "2014-05-30T12:43:54.972Z",
                 "organisationUnits": [{
                     "id": "orgUnit1",
                     "name": "orgUnit1"

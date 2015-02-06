@@ -9,7 +9,11 @@ define(["lodashUtils", "moment"], function(_, moment) {
 
         var isLocalDataStale = function() {
             if (!dataFromIDB) return true;
-            return moment(dataFromDHIS.lastUpdated).isAfter(moment(dataFromIDB.lastUpdated));
+
+            if (dataFromIDB.clientLastUpdated === undefined)
+                return moment(dataFromDHIS.lastUpdated).isAfter(moment(dataFromIDB.lastUpdated));
+
+            return moment(dataFromDHIS.lastUpdated).isAfter(moment(dataFromIDB.clientLastUpdated));
         };
 
         if (isLocalDataStale()) {

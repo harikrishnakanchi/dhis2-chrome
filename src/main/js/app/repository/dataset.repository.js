@@ -1,4 +1,4 @@
-define(["lodash", "datasetTransformer"], function(_, datasetTransformer) {
+define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransformer, moment) {
     return function(db, $q) {
         var get = function(datasetId) {
             var store = db.objectStore("dataSets");
@@ -53,13 +53,30 @@ define(["lodash", "datasetTransformer"], function(_, datasetTransformer) {
             return store.each(query);
         };
 
-        var upsert = function(payload) {
-            var dataSets = !_.isArray(payload) ? [payload] : payload;
-            dataSets = _.map(dataSets, function(ds) {
+        var extractOrgUnitIdsForIndexing = function(dataSets) {
+            return _.map(dataSets, function(ds) {
                 ds.orgUnitIds = _.pluck(ds.organisationUnits, "id");
                 return ds;
             });
+        };
 
+        var upsert = function(payload) {
+            var dataSets = !_.isArray(payload) ? [payload] : payload;
+
+            dataSets = _.map(dataSets, function(ds) {
+                ds.clientLastUpdated = moment().toISOString();
+                return ds;
+            });
+
+            dataSets = extractOrgUnitIdsForIndexing(dataSets);
+            var store = db.objectStore("dataSets");
+            return store.upsert(dataSets).then(function() {
+                return dataSets;
+            });
+        };
+
+        var upsertDhisDownloadedData = function(dataSets) {
+            dataSets = extractOrgUnitIdsForIndexing(dataSets);
             var store = db.objectStore("dataSets");
             return store.upsert(dataSets).then(function() {
                 return dataSets;
@@ -68,6 +85,7 @@ define(["lodash", "datasetTransformer"], function(_, datasetTransformer) {
 
         return {
             "get": get,
+            "upsertDhisDownloadedData": upsertDhisDownloadedData,
             "getAll": getAll,
             "getAllDatasetIds": getAllDatasetIds,
             "upsert": upsert,

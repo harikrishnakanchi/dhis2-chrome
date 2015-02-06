@@ -33,6 +33,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             orgUnitService = new OrgUnitService();
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "upsert");
+            spyOn(orgUnitRepository, "upsertDhisDownloadedData");
 
             changeLogRepository = {
                 "get": jasmine.createSpy("get").and.returnValue(utils.getPromise(q, "2014-10-24T09:01:12.020+0000")),
@@ -96,11 +97,12 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             expect(orgUnitService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
             expect(orgUnitRepository.get).toHaveBeenCalledWith("a4acf9115a7");
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnits[0]);
+            expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnits[0]);
         });
 
         it("should ignore dhis data for upsertOrgUnit message", function() {
             var localCopy = payload;
+            payload.clientLastUpdated = "2014-09-24T10:01:12.020+0000";
             var message = {
                 "data": {
                     "data": payload,
@@ -198,11 +200,12 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             scope.$apply();
 
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(orgUnitFromDHISSinceLastUpdatedTime.data.organisationUnits[0]);
+            expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHISSinceLastUpdatedTime.data.organisationUnits[0]);
         });
 
         it("should ignore dhis data for downloadOrgUnit message", function() {
             var localCopy = payload;
+            payload.clientLastUpdated = "2014-09-24T10:01:12.020+0000";
             var message = {
                 "data": {
                     "data": [],
@@ -319,7 +322,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             scope.$apply();
 
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(orgUnitFromDHISSinceLastUpdatedTime.data.organisationUnits[0]);
+            expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHISSinceLastUpdatedTime.data.organisationUnits[0]);
         });
     });
 });

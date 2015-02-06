@@ -20,7 +20,7 @@ define(['mergeByUnion', 'lodashUtils', "mergeByLastUpdated"], function(mergeByUn
                     }
 
                     if (mergedDataset)
-                        return datasetRepository.upsert(mergedDataset);
+                        return datasetRepository.upsertDhisDownloadedData(mergedDataset);
 
                     return $q.when({});
                 });

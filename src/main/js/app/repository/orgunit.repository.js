@@ -58,17 +58,24 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var upsert = function(payload) {
-            payload = _.isArray(payload) ? payload : [payload];
-            var addLastUpdatedField = function(payload) {
+            var addClientLastUpdatedField = function(payload) {
                 return _.map(payload, function(p) {
-                    p.lastUpdated = moment().toISOString();
+                    p.clientLastUpdated = moment().toISOString();
                     return p;
                 });
             };
 
-            var store = db.objectStore("organisationUnits");
-            payload = addLastUpdatedField(payload);
+            payload = _.isArray(payload) ? payload : [payload];
+            payload = addClientLastUpdatedField(payload);
 
+            var store = db.objectStore("organisationUnits");
+            return store.upsert(payload).then(function() {
+                return payload;
+            });
+        };
+
+        var upsertDhisDownloadedData = function(payload) {
+            var store = db.objectStore("organisationUnits");
             return store.upsert(payload).then(function() {
                 return payload;
             });
@@ -199,6 +206,7 @@ define(["moment", "lodash"], function(moment, _) {
 
         return {
             "upsert": upsert,
+            "upsertDhisDownloadedData": upsertDhisDownloadedData,
             "getAll": getAll,
             "get": get,
             "getAllModulesInOrgUnits": getAllModulesInOrgUnits,

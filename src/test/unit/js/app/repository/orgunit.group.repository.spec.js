@@ -1,4 +1,4 @@
-define(["orgUnitGroupRepository", "angularMocks", "utils"], function(OrgUnitGroupRepository, mocks, utils) {
+define(["orgUnitGroupRepository", "angularMocks", "utils", "timecop"], function(OrgUnitGroupRepository, mocks, utils, timecop) {
     describe("orgunitgroup repository", function() {
         var db, mockStore, orgUnitGroupRepository;
 
@@ -6,7 +6,16 @@ define(["orgUnitGroupRepository", "angularMocks", "utils"], function(OrgUnitGrou
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
             orgUnitGroupRepository = new OrgUnitGroupRepository(mockDB.db);
+
+            Timecop.install();
+            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
         }));
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
+
 
         it("should get all org unit groups", function() {
             var allOrgunitGroups = [{
@@ -20,12 +29,19 @@ define(["orgUnitGroupRepository", "angularMocks", "utils"], function(OrgUnitGrou
             expect(result).toEqual(allOrgunitGroups);
         });
 
-        it("should upsert org unit group to repo", function() {
+        it("should upsert org unit group to repo when local data is recently changed and add clientLastUpdatedField", function() {
             var allOrgunitGroups = [{
-                "id": 123
+                "id": 123,
+                "lastUpdated": "2014-05-30T12:43:54.972Z"
             }];
 
-            orgUnitGroupRepository.upsert(allOrgunitGroups);
+            var expectedData = [{
+                "id": 123,
+                "lastUpdated": "2014-05-30T12:43:54.972Z",
+                "clientLastUpdated": "2014-05-30T12:43:54.972Z"
+            }];
+
+            orgUnitGroupRepository.upsert(allOrgunitGroups, true);
 
             expect(mockStore.upsert).toHaveBeenCalledWith(allOrgunitGroups);
         });
