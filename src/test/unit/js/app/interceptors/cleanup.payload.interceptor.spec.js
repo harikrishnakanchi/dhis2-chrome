@@ -188,5 +188,19 @@ define(["cleanupPayloadInterceptor", "angularMocks", "moment"], function(Cleanup
             expect(expectedConfig.data).toEqual(expectedPayload);
         });
 
+        it("should not change payload if payload type is string", function() {
+            var originalPayload = "{'excludedDataElements': {'a85b2f524dd': []}}";
+            var config = {
+                'method': "PUT",
+                'headers': {},
+                'data': originalPayload
+            };
+
+            var expectedConfig = cleanupPayloadInterceptor.request(config);
+
+            expect(expectedConfig.data).toEqual(originalPayload);
+        });
+
+
     });
 });

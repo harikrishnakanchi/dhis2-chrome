@@ -21,7 +21,7 @@ define(["lodash"], function(_) {
                     return payload;
                 };
 
-                if ((config.method === "POST" || config.method === "PUT") && !_.isEmpty(config.data)) {
+                if ((config.method === "POST" || config.method === "PUT") && !_.isEmpty(config.data) && !_.isString(config.data)) {
                     config.data = cleanUp(config.data);
                 }
                 return config;
