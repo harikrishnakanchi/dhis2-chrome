@@ -168,18 +168,25 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             expect(mockOrgStore.each.calls.argsFor(0)[0].inList).toEqual(projectIds);
         });
 
-        it("should save org hierarchy when data is changed locally and should add clientlastupdated field", function() {
+        it("should save org hierarchy when data is changed locally and should add clientlastupdated and parentId field", function() {
             var orgUnit = [{
                 "id": "org_0",
                 "level": 1,
-                "lastUpdated": "2014-05-30T12:43:54.972Z"
+                "lastUpdated": "2014-05-30T12:43:54.972Z",
+                "parent": {
+                    "id": "p1"
+                }
             }];
 
             var expectedUpsertPayload = [{
                 "id": "org_0",
                 "level": 1,
                 "lastUpdated": "2014-05-30T12:43:54.972Z",
-                "clientLastUpdated": "2014-05-30T12:43:54.972Z"
+                "clientLastUpdated": "2014-05-30T12:43:54.972Z",
+                "parent": {
+                    "id": "p1"
+                },
+                "parentId": "p1"
             }];
 
             orgUnitRepository.upsert(orgUnit).then(function(data) {
@@ -195,12 +202,19 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             var orgUnit = [{
                 "id": "org_0",
                 "level": 1,
-                "lastUpdated": "2014-05-30T12:43:54.972Z"
+                "lastUpdated": "2014-05-30T12:43:54.972Z",
+                "parent": {
+                    "id": "p1"
+                }
             }];
 
             var expectedUpsertPayload = [{
                 "id": "org_0",
                 "level": 1,
+                "parent": {
+                    "id": "p1"
+                },
+                "parentId": "p1",
                 "lastUpdated": "2014-05-30T12:43:54.972Z"
             }];
 

@@ -57,6 +57,13 @@ define(["moment", "lodash"], function(moment, _) {
             });
         };
 
+        var addParentIdField = function(payload) {
+            return _.map(payload, function(p) {
+                p.parentId = p.parent ? p.parent.id : undefined;
+                return p;
+            });
+        };
+
         var upsert = function(payload) {
             var addClientLastUpdatedField = function(payload) {
                 return _.map(payload, function(p) {
@@ -67,6 +74,7 @@ define(["moment", "lodash"], function(moment, _) {
 
             payload = _.isArray(payload) ? payload : [payload];
             payload = addClientLastUpdatedField(payload);
+            payload = addParentIdField(payload);
 
             var store = db.objectStore("organisationUnits");
             return store.upsert(payload).then(function() {
@@ -75,6 +83,7 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var upsertDhisDownloadedData = function(payload) {
+            payload = addParentIdField(payload);
             var store = db.objectStore("organisationUnits");
             return store.upsert(payload).then(function() {
                 return payload;

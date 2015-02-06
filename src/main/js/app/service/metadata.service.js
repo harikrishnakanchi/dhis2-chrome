@@ -171,6 +171,10 @@ define(["properties", "dhisUrl", "lodash"], function(properties, dhisUrl, _) {
         var upsertOrgUnits = function(data) {
             console.debug("Processing organisationUnits ", data);
             var store = db.objectStore("organisationUnits");
+            var organisationUnits = _.map(data.organisationUnits, function(ou) {
+                ou.parentId = ou.parent ? ou.parent.id : undefined;
+                return ou;
+            });
             return store.upsert(data.organisationUnits);
         };
 

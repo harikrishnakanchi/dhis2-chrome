@@ -21,7 +21,7 @@ define([], function() {
     };
 
     var add_object_stores = function(db, tx) {
-        syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "sections", "programStages", "optionSets"];
+        syncable_types = ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "sections", "programStages", "optionSets", "organisationUnitLevels"];
         create_data_store(syncable_types, db);
     };
 
@@ -36,11 +36,6 @@ define([], function() {
     var create_datavalues_store = function(db, tx) {
         var dataValueStore = create_store_with_key("dataValues", ["period", "orgUnit"], db);
         create_index(dataValueStore, "by_period", "period", false);
-    };
-
-    var add_organisation_units_and_level_store = function(db, tx) {
-        syncable_types = ["organisationUnits", "organisationUnitLevels"];
-        create_data_store(syncable_types, db);
     };
 
     var add_user_store_for_dhis_users = function(db, tx) {
@@ -106,6 +101,11 @@ define([], function() {
         create_index(programStore, "by_organisationUnit", "orgUnitIds", false, true);
     };
 
+    var add_org_unit_store = function(db, tx) {
+        var orgUnitStore = create_store_with_key("organisationUnits", "id", db);
+        create_index(orgUnitStore, "by_parent", "parentId", false, true);
+    };
+
     var add_program_events_store = function(db, tx) {
         var programEventsStore = create_store_with_key("programEvents", "event", db);
         create_index(programEventsStore, "by_program_period_orgunit", ["program", "period", "orgUnit"], false);
@@ -123,7 +123,6 @@ define([], function() {
 
     return [add_object_stores,
         change_log_stores,
-        add_organisation_units_and_level_store,
         create_datavalues_store,
         add_user_store_for_dhis_users,
         add_local_user_credentials_store,
@@ -137,6 +136,7 @@ define([], function() {
         add_approval_datasets_store,
         add_programs_store,
         add_program_events_store,
-        add_dataset_store
+        add_dataset_store,
+        add_org_unit_store
     ];
 });
