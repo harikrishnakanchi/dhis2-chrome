@@ -1,30 +1,25 @@
-define(['mergeByUnion', 'lodashUtils', "mergeByLastUpdated"], function(mergeByUnion, _, mergeByLastUpdated) {
+define(['moment', 'mergeByUnion', 'lodashUtils', "mergeByLastUpdated"], function(moment, mergeByUnion, _, mergeByLastUpdated) {
     return function(datasetService, datasetRepository, $q) {
         this.run = function(message) {
-            return download().then(mergeAll);
+            return download()
+                .then(mergeAndSave)
+                .then(updateChangeLog);
+        };
+
+        var updateChangeLog = function() {
+            return changeLogRepository.upsert("datasets", moment().toISOString());
         };
 
         var download = function() {
-            return datasetService.getAll();
+            return changeLogRepository.get("datasets").then(datasetService.getAll);
         };
 
-        var mergeAll = function(remoteDatasets) {
-            return $q.all(_.map(remoteDatasets, function(remoteDataset) {
-                return datasetRepository.get(remoteDataset.id).then(function(datasetFromIdb) {
-                    var mergedDataset = mergeByLastUpdated(remoteDataset, datasetFromIdb);
-
-                    var mergedOrgUnits = mergeByUnion("organisationUnits", remoteDataset, datasetFromIdb);
-                    if (mergedOrgUnits) {
-                        mergedDataset = mergedDataset || remoteDataset;
-                        mergedDataset.organisationUnits = mergedOrgUnits.organisationUnits;
-                    }
-
-                    if (mergedDataset)
-                        return datasetRepository.upsertDhisDownloadedData(mergedDataset);
-
-                    return $q.when({});
-                });
-            }));
+        var mergeAndSave = function(allDhisDatasets) {
+            var dataSetIds = _.pluck(allDhisDatasets, "id");
+            return datasetRepository.findAll(dataSetIds)
+                .then(_.curry(mergeByUnion)("organisationUnits", allDhisDatasets))
+                .then(_.curry(mergeByLastUpdated)(allDhisDatasets))
+                .then(datasetRepository.upsertDhisDownloadedData);
         };
     };
 });

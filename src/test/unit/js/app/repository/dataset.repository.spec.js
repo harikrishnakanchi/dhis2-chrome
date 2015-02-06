@@ -26,6 +26,16 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             Timecop.uninstall();
         });
 
+
+        it("should find all datasets", function() {
+            var datasetIds = ["ds1", "ds2"];
+            datasetRepository.findAll(datasetIds);
+            scope.$apply();
+
+            expect(mockStore.each).toHaveBeenCalled();
+            expect(mockStore.each.calls.argsFor(0)[0].inList).toEqual(datasetIds);
+        });
+
         it("should get all data sets", function() {
             var allDataSets = [{
                 "id": 123,

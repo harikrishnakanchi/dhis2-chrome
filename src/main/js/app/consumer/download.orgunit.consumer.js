@@ -2,13 +2,10 @@ define(['moment', "lodashUtils", "dateUtils", "mergeByLastUpdated"], function(mo
     return function(orgUnitService, orgUnitRepository, changeLogRepository, $q) {
 
         this.run = function(message) {
-            console.debug("Syncing org unit: ", message.data.data);
             var orgUnits = _.isArray(message.data.data) ? message.data.data : [message.data.data];
-            return download(orgUnits).then(mergeAndSave).then(updateChangeLog);
-        };
-
-        var updateChangeLog = function() {
-            return changeLogRepository.upsert("orgUnits", moment().toISOString());
+            return download(orgUnits)
+                .then(mergeAndSave)
+                .then(updateChangeLog);
         };
 
         var download = function(orgUnits) {
@@ -39,15 +36,14 @@ define(['moment', "lodashUtils", "dateUtils", "mergeByLastUpdated"], function(mo
         };
 
         var mergeAndSave = function(orgUnitsFromDHIS) {
-            var syncPromises = _.map(orgUnitsFromDHIS, function(ouFromDHIS) {
-                return orgUnitRepository.get(ouFromDHIS.id)
-                    .then(_.curry(mergeByLastUpdated)(ouFromDHIS))
-                    .then(function(data) {
-                        return data ? orgUnitRepository.upsertDhisDownloadedData(ouFromDHIS) : $q.when({});
-                    });
-            });
+            var orgUnitIdsToMerge = _.pluck(orgUnitsFromDHIS, "id");
+            return orgUnitRepository.findAll(orgUnitIdsToMerge)
+                .then(_.curry(mergeByLastUpdated)(orgUnitsFromDHIS))
+                .then(orgUnitRepository.upsertDhisDownloadedData);
+        };
 
-            return $q.all(syncPromises);
+        var updateChangeLog = function() {
+            return changeLogRepository.upsert("orgUnits", moment().toISOString());
         };
     };
 });

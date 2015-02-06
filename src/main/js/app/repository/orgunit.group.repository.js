@@ -33,5 +33,13 @@ define(["moment"], function(moment) {
             var store = db.objectStore("orgUnitGroups");
             return store.find([orgUnitGroupId]);
         };
+
+        this.findAll = function(orgUnitGroupIds) {
+            var store = db.objectStore("orgUnitGroups");
+
+            var query = db.queryBuilder().$in(orgUnitGroupIds).compile();
+            return store.each(query);
+        };
+
     };
 });

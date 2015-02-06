@@ -29,6 +29,15 @@ define(["orgUnitGroupRepository", "angularMocks", "utils", "timecop"], function(
             expect(result).toEqual(allOrgunitGroups);
         });
 
+        it("should find all orgunits", function() {
+            var orgUnitGroupIds = ["proj1", "proj2"];
+            var orgUnit = orgUnitGroupRepository.findAll(orgUnitGroupIds);
+            scope.$apply();
+
+            expect(mockStore.each).toHaveBeenCalled();
+            expect(mockStore.each.calls.argsFor(0)[0].inList).toEqual(orgUnitGroupIds);
+        });
+
         it("should upsert org unit group to repo when local data is recently changed and add clientLastUpdatedField", function() {
             var allOrgunitGroups = [{
                 "id": 123,

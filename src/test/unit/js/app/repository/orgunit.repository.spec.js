@@ -159,6 +159,15 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             expect(mockOrgStore.find).toHaveBeenCalledWith(projectId);
         });
 
+        it("should find all orgunits", function() {
+            var projectIds = ["proj1", "proj2"];
+            var orgUnit = orgUnitRepository.findAll(projectIds);
+            scope.$apply();
+
+            expect(mockOrgStore.each).toHaveBeenCalled();
+            expect(mockOrgStore.each.calls.argsFor(0)[0].inList).toEqual(projectIds);
+        });
+
         it("should save org hierarchy when data is changed locally and should add clientlastupdated field", function() {
             var orgUnit = [{
                 "id": "org_0",

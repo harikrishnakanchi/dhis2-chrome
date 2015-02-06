@@ -108,6 +108,13 @@ define(["moment", "lodash"], function(moment, _) {
             return store.find(orgUnitId);
         };
 
+        var findAll = function(orgUnitIds) {
+            var store = db.objectStore("organisationUnits");
+
+            var query = db.queryBuilder().$in(orgUnitIds).compile();
+            return store.each(query);
+        };
+
         var getAllModulesInOrgUnits = function(orgUnitIds, rejectDisabled) {
             var filterModulesInProjects = function(orgUnits) {
                 var allOrgUnitsById = _.indexBy(orgUnits, "id");
@@ -209,6 +216,7 @@ define(["moment", "lodash"], function(moment, _) {
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
             "getAll": getAll,
             "get": get,
+            "findAll": findAll,
             "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
             "getProjectAndOpUnitAttributes": getProjectAndOpUnitAttributes,
             "getAllProjects": getAllProjects

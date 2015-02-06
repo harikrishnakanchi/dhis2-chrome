@@ -36,6 +36,10 @@ define([], function() {
                 this.index = index;
                 return this;
             };
+            this.$in = function(inList) {
+                this.inList = inList;
+                return this;
+            };
             this.$eq = function(eq) {
                 this.eq = eq;
                 return this;

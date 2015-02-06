@@ -1,26 +1,23 @@
 define(["lodashUtils", "moment"], function(_, moment) {
-    return function(dataFromDHIS, dataFromIDB) {
+    return function(remoteList, localList) {
 
-        var lastUpdatedTimeIncludingAttributes = function(orgUnit) {
-            var lastUpdated = _.pluck(orgUnit.attributeValues, "lastUpdated");
-            lastUpdated.push(orgUnit.lastUpdated);
-            return lastUpdated;
+        var isLocalDataStale = function(remoteItem, localItem) {
+            if (!localItem)
+                return true;
+
+            if (localItem.clientLastUpdated === undefined)
+                return moment(remoteItem.lastUpdated).isAfter(moment(localItem.lastUpdated));
+
+            return moment(remoteItem.lastUpdated).isAfter(moment(localItem.clientLastUpdated));
         };
 
-        var isLocalDataStale = function() {
-            if (!dataFromIDB) return true;
+        var groupedLocalItems = _.indexBy(localList, "id");
 
-            if (dataFromIDB.clientLastUpdated === undefined)
-                return moment(dataFromDHIS.lastUpdated).isAfter(moment(dataFromIDB.lastUpdated));
-
-            return moment(dataFromDHIS.lastUpdated).isAfter(moment(dataFromIDB.clientLastUpdated));
-        };
-
-        if (isLocalDataStale()) {
-            return dataFromDHIS;
-        } else {
-            return;
-        }
+        return _.transform(remoteList, function(acc, remoteItem) {
+            if (isLocalDataStale(remoteItem, groupedLocalItems[remoteItem.id])) {
+                acc.push(remoteItem);
+            }
+        });
 
     };
 });

@@ -5,12 +5,19 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             return store.find(datasetId);
         };
 
-        var getEntitiesFromDb = function(storeName) {
-            var store = db.objectStore(storeName);
-            return store.getAll();
+        var findAll = function(datasetIds) {
+            var store = db.objectStore("dataSets");
+
+            var query = db.queryBuilder().$in(datasetIds).compile();
+            return store.each(query);
         };
 
         var getEnriched = function(datasetId) {
+            var getEntitiesFromDb = function(storeName) {
+                var store = db.objectStore(storeName);
+                return store.getAll();
+            };
+
             var dataSetPromise = getEntitiesFromDb('dataSets');
             var sectionPromise = getEntitiesFromDb("sections");
             var dataElementsPromise = getEntitiesFromDb("dataElements");
@@ -86,6 +93,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
 
         return {
             "get": get,
+            "findAll": findAll,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
             "getAll": getAll,
             "getAllDatasetIds": getAllDatasetIds,

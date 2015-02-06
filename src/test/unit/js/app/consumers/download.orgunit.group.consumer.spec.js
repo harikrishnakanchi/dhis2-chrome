@@ -75,7 +75,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'upsert');
-            spyOn(orgUnitGroupRepository, 'get').and.returnValue(utils.getPromise(q, localCopy[0]));
+            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
 
             downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q);
 
@@ -84,9 +84,9 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
 
             expect(orgUnitGroupService.get).toHaveBeenCalledWith(["a35778ed565"]);
             expect(orgUnitGroupService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
-            expect(orgUnitGroupRepository.get).toHaveBeenCalledWith("a35778ed565");
+            expect(orgUnitGroupRepository.findAll).toHaveBeenCalledWith(["a35778ed565"]);
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnitGroups[0]);
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith([orgUnitFromDHIS.data.organisationUnitGroups[0]]);
         });
 
         it("should ignore dhis data for upsertOrgUnitGroups message", function() {
@@ -122,7 +122,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'upsert');
-            spyOn(orgUnitGroupRepository, 'get').and.returnValue(utils.getPromise(q, localCopy[0]));
+            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
 
             downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q);
 
@@ -131,7 +131,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
 
             expect(orgUnitGroupService.get).toHaveBeenCalledWith(["a35778ed565"]);
             expect(orgUnitGroupService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
-            expect(orgUnitGroupRepository.get).toHaveBeenCalledWith("a35778ed565");
+            expect(orgUnitGroupRepository.findAll).toHaveBeenCalledWith(["a35778ed565"]);
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
             expect(orgUnitGroupRepository.upsert).not.toHaveBeenCalled();
         });
@@ -169,7 +169,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'upsert');
-            spyOn(orgUnitGroupRepository, 'get').and.returnValue(utils.getPromise(q, localCopy[0]));
+            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
 
             downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q);
 
@@ -177,7 +177,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             scope.$apply();
 
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnitGroups[0]);
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith([orgUnitFromDHIS.data.organisationUnitGroups[0]]);
         });
 
         it("should ignore dhis data for downloadOrgUnitGroups message", function() {
@@ -213,7 +213,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'upsert');
-            spyOn(orgUnitGroupRepository, 'get').and.returnValue(utils.getPromise(q, localCopy[0]));
+            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
 
             downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q);
 
@@ -240,6 +240,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
 
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'upsert');
+            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
             downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q);
             downloadOrgUnitGroupConsumer.run(message);
@@ -281,7 +282,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'upsert');
-            spyOn(orgUnitGroupRepository, 'get').and.returnValue(utils.getPromise(q, undefined));
+            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
             downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q);
 
@@ -289,7 +290,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             scope.$apply();
 
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS.data.organisationUnitGroups[0]);
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith([orgUnitFromDHIS.data.organisationUnitGroups[0]]);
         });
     });
 });

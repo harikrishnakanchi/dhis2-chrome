@@ -1,7 +1,7 @@
 define(["mergeByUnion"], function(mergeByUnion) {
     describe("merge by union", function() {
         it("should return merged data if local copy is stale", function() {
-            var remoteCopy = {
+            var remoteCopy = [{
                 "id": "data1",
                 "name": "data1",
                 "lastUpdated": "2014-05-30T12:43:54.972Z",
@@ -12,9 +12,9 @@ define(["mergeByUnion"], function(mergeByUnion) {
                     "id": "org2",
                     "name": "org2"
                 }]
-            };
+            }];
 
-            var localCopy = {
+            var localCopy = [{
                 "id": "data1",
                 "name": "data1",
                 "lastUpdated": "2014-05-29T12:43:54.972Z",
@@ -25,9 +25,9 @@ define(["mergeByUnion"], function(mergeByUnion) {
                     "id": "org3",
                     "name": "org3"
                 }]
-            };
+            }];
 
-            var expectedMergedCopy = {
+            var expectedMergedCopy = [{
                 "id": "data1",
                 "name": "data1",
                 "lastUpdated": "2014-05-30T12:43:54.972Z",
@@ -41,7 +41,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
                     "id": "org3",
                     "name": "org3"
                 }]
-            };
+            }];
 
             var actualMergedCopy = mergeByUnion("organisationUnits", remoteCopy, localCopy);
 
@@ -49,7 +49,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
         });
 
         it("should not merge the data and return undefined if local copy is not stale", function() {
-            var remoteCopy = {
+            var remoteCopy = [{
                 "id": "data1",
                 "name": "data1",
                 "lastUpdated": "2014-05-28T12:43:54.972Z",
@@ -60,9 +60,9 @@ define(["mergeByUnion"], function(mergeByUnion) {
                     "id": "org2",
                     "name": "org2"
                 }]
-            };
+            }];
 
-            var localCopy = {
+            var localCopy = [{
                 "id": "data1",
                 "name": "data1",
                 "lastUpdated": "2014-05-29T12:43:54.972Z",
@@ -73,15 +73,15 @@ define(["mergeByUnion"], function(mergeByUnion) {
                     "id": "org2",
                     "name": "org2"
                 }]
-            };
+            }];
 
             var actualMergedCopy = mergeByUnion("organisationUnits", remoteCopy, localCopy);
 
-            expect(actualMergedCopy).toBeUndefined();
+            expect(actualMergedCopy.length).toEqual(0);
         });
 
         it("should return remote data if there is no local data", function() {
-            var remoteCopy = {
+            var remoteCopy = [{
                 "id": "data1",
                 "name": "data1",
                 "lastUpdated": "2014-05-28T12:43:54.972Z",
@@ -92,7 +92,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
                     "id": "org2",
                     "name": "org2"
                 }]
-            };
+            }];
 
             var localCopy;
 
