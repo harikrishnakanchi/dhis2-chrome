@@ -506,7 +506,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 isIncluded: false
             };
 
-            scope.changeSectionSelection(section);
+            scope.changeDataElementSelection(section);
             expect(section).toEqual(expectedSection);
         });
 
@@ -534,7 +534,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 isIncluded: false
             };
 
-            scope.changeDataElementSelection(section);
+            scope.changeSectionSelection(section);
             expect(section).toEqual(expectedSection);
         });
 

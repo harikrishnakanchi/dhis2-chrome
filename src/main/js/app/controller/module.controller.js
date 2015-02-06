@@ -278,13 +278,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
         };
 
-        $scope.changeSectionSelection = function(section) {
+        $scope.changeDataElementSelection = function(section) {
             _.each(section.dataElements, function(dataElement) {
                 dataElement.isIncluded = section.isIncluded;
             });
         };
 
-        $scope.changeDataElementSelection = function(section) {
+        $scope.changeSectionSelection = function(section) {
             section.isIncluded = _.any(section.dataElements, {
                 "isIncluded": true
             });
