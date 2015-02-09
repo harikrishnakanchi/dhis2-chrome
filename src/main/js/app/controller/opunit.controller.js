@@ -65,13 +65,9 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 });
             });
 
-            parent.children = parent.children.concat(newOpUnits);
-
-            return orgUnitRepository.upsert(parent).then(function() {
-                return orgUnitRepository.upsert(newOpUnits)
-                    .then(saveToDhis)
-                    .then(onSuccess, onError);
-            });
+            return orgUnitRepository.upsert(newOpUnits)
+                .then(saveToDhis)
+                .then(onSuccess, onError);
         };
 
         $scope.update = function(opUnits) {

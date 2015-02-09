@@ -75,12 +75,7 @@ define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, org
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
             var dhisProject = orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit);
-
-            parentOrgUnit.children.push(dhisProject);
-
-            orgUnitRepository.upsert(parentOrgUnit).then(function() {
-                saveToDbAndPublishMessage(dhisProject);
-            });
+            saveToDbAndPublishMessage(dhisProject);
         };
 
         $scope.toggleUserDisabledState = function(user) {

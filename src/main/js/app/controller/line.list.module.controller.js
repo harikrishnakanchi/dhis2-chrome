@@ -117,8 +117,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
         var createModule = function(module) {
             var parent = module.parent;
             var enrichedModules = orgUnitMapper.mapToModules([module], module.parent);
-            parent.children = parent.children.concat(enrichedModules);
-            return $q.all([orgUnitRepository.upsert(parent), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
+            return $q.all([orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
                 .then(function() {
                     return enrichedModules[0];
                 });
@@ -181,7 +180,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
         var saveSystemSettingsForExcludedDataElements = function(parent, enrichedModule) {
             var saveSystemSettings = function(excludedDataElements, opunitId) {
                 return systemSettingRepository.getAllWithProjectId(opunitId).then(function(data) {
-                    var existingSystemSettings = (_.isEmpty(data) || _.isEmpty(data.value) || _.isEmpty(data.value.excludedDataElements))  ? {} : data.value.excludedDataElements;
+                    var existingSystemSettings = (_.isEmpty(data) || _.isEmpty(data.value) || _.isEmpty(data.value.excludedDataElements)) ? {} : data.value.excludedDataElements;
                     var systemSettingsPayload = _.cloneDeep(existingSystemSettings);
                     systemSettingsPayload[enrichedModule.id] = excludedDataElements;
                     var systemSettings = {

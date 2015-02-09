@@ -21,7 +21,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             orgunitGroupRepo = utils.getMockRepo(q);
             dataSetRepo = utils.getMockRepo(q);
             datasetsdata = testData.get("dataSets");
-            
+
             dataSetRepo = {
                 getAllForOrgUnit: function() {},
                 get: function() {},
@@ -172,17 +172,10 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }
             };
 
-            var enrichedParent = {
-                "name": "Project1",
-                "id": "someid",
-                "children": [enrichedAggregateModule]
-            };
-
             scope.save();
             scope.$apply();
 
             expect(scope.saveFailure).toBe(false);
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedParent);
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedAggregateModule);
 
@@ -258,7 +251,9 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.isNewMode = false;
 
             spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, [datasetsdata[1]]));
-            spyOn(dataSetRepo, "getEnrichedDatasets").and.callFake(function(ds){ return ds;});
+            spyOn(dataSetRepo, "getEnrichedDatasets").and.callFake(function(ds) {
+                return ds;
+            });
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             scope.$apply();
 

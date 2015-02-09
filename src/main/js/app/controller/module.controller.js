@@ -58,7 +58,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 $scope.updateDisabled = $scope.isDisabled;
             };
 
-            var dataSetPromise = function(){
+            var dataSetPromise = function() {
                 return datasetRepository.getAll().then(function(ds) {
                     return datasetRepository.getEnrichedDatasets(ds);
                 });
@@ -127,8 +127,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.createModules = function(module) {
             var parent = $scope.module.parent;
             var enrichedModule = orgUnitMapper.mapToModule(module);
-            parent.children = parent.children.concat(enrichedModule);
-            return $q.all([orgUnitRepository.upsert(parent), orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
+            return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
                 .then(function() {
                     return enrichedModule;
                 });
@@ -214,7 +213,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                             });
                             return d;
                         });
-                    }); 
+                    });
                 };
 
                 var updateDataSets = function(datasets) {

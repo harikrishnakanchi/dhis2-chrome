@@ -71,7 +71,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             Timecop.uninstall();
         });
 
-
         it("should save exclude DataElement", function() {
             scope.orgUnit = {
                 "name": "Project1",
@@ -242,12 +241,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }
             }];
 
-            var modifiedParent = {
-                "name": "Project1",
-                "id": "someid",
-                "children": enrichedLineListModules
-            };
-
             var program = {
                 'id': 'prog1',
                 'name': 'ER Linelist',
@@ -267,7 +260,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             scope.$apply();
 
             expect(scope.saveFailure).toBe(false);
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(modifiedParent);
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedLineListModules);
 
             expect(hustle.publish).toHaveBeenCalledWith({
@@ -281,8 +273,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 type: "uploadProgram"
             }, "dataValues");
         });
-
-
 
         it("should disable update and diable if orgunit is disabled", function() {
             var program = {
@@ -541,7 +531,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             expect(scope.areNoProgramsSelected(modules)).toEqual(true);
         });
 
-
         it("should disable modules", function() {
             var disableAttrInHustle = {};
             var disablesAttInDb = {};
@@ -601,7 +590,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             expect(disableAttrInHustle.value).toEqual(true);
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(module, "disabledModule");
         });
-
 
         it("should set program on scope", function() {
             var program = {

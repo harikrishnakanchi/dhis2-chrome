@@ -28,8 +28,6 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 }]
             };
 
-            parentOrgUnit.children.push(newOrgUnit);
-
             var onSuccess = function(data) {
                 if ($scope.$parent.closeNewForm)
                     $scope.$parent.closeNewForm(data[0], "savedCountry");
@@ -48,11 +46,9 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 });
             };
 
-            return orgUnitRepository.upsert(parentOrgUnit).then(function() {
-                return orgUnitRepository.upsert(newOrgUnit)
-                    .then(saveToDhis)
-                    .then(onSuccess, onError);
-            });
+            return orgUnitRepository.upsert(newOrgUnit)
+                .then(saveToDhis)
+                .then(onSuccess, onError);
         };
 
         $scope.reset = function() {
