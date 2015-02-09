@@ -27,7 +27,7 @@ define(["moment", "lodash"], function(moment, _) {
                             "code": 'isNewDataModel'
                         }
                     });
-                    return attr.value === 'true';
+                    return attr && attr.value === 'true';
                 };
 
                 return datasetRepository.getAllForOrgUnit(module.id).then(function(datasets) {
