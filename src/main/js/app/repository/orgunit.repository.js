@@ -119,31 +119,38 @@ define(["moment", "lodash"], function(moment, _) {
 
         var findAll = function(orgUnitIds) {
             var store = db.objectStore("organisationUnits");
-
             var query = db.queryBuilder().$in(orgUnitIds).compile();
             return store.each(query);
         };
 
+        var findAllByParent = function(parentIds) {
+            var store = db.objectStore("organisationUnits");
+            var query = db.queryBuilder().$in(parentIds).$index("by_parent").compile();
+            return store.each(query);
+        };
+
         var getAllModulesInOrgUnits = function(orgUnitIds, rejectDisabled) {
-            var filterModulesInProjects = function(orgUnits) {
-                var allOrgUnitsById = _.indexBy(orgUnits, "id");
+            var getChildModules = function(orgUnitIds) {
+                return findAllByParent(orgUnitIds).then(function(children) {
+                    var moduleOrgUnits = [];
+                    var nonModuleOrgUnits = [];
 
-                var getChildModules = function(orgUnitId) {
-                    return _.flatten(_.transform(allOrgUnitsById[orgUnitId].children, function(acc, child) {
-                        child = allOrgUnitsById[child.id];
-                        if (isOfType(child, "Module"))
-                            acc.push(child);
-                        else
-                            acc.push(getChildModules(child.id));
-                    }));
-                };
+                    _.forEach(children, function(ou) {
+                        if (isOfType(ou, 'Module')) {
+                            moduleOrgUnits.push(ou);
+                        } else {
+                            nonModuleOrgUnits.push(ou);
+                        }
+                    });
 
+                    if (_.isEmpty(nonModuleOrgUnits)) {
+                        return moduleOrgUnits;
+                    }
 
-                var modules = _.flatten(_.transform(orgUnitIds, function(acc, orgUnitId) {
-                    acc.push(getChildModules(orgUnitId));
-                }));
-
-                return modules;
+                    return getChildModules(_.pluck(nonModuleOrgUnits, "id")).then(function(data) {
+                        return moduleOrgUnits.concat(data);
+                    });
+                });
             };
 
             var rejectDisabledOrgUnits = function(allOrgUnits) {
@@ -161,8 +168,7 @@ define(["moment", "lodash"], function(moment, _) {
                 });
             };
 
-            return getAll()
-                .then(filterModulesInProjects)
+            return getChildModules(orgUnitIds)
                 .then(rejectOrgUnitsWithCurrentDatasets)
                 .then(rejectDisabledOrgUnits);
         };
@@ -226,6 +232,7 @@ define(["moment", "lodash"], function(moment, _) {
             "getAll": getAll,
             "get": get,
             "findAll": findAll,
+            "findAllByParent": findAllByParent,
             "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
             "getProjectAndOpUnitAttributes": getProjectAndOpUnitAttributes,
             "getAllProjects": getAllProjects
