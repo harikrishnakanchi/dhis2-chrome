@@ -461,7 +461,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 'name': 'dataset12'
             }];
 
-            expect(scope.areDatasetsNotSelected()).toEqual(false);
+            expect(scope.areDatasetsSelected()).toEqual(true);
         });
 
         it("should return true if dataset is not selected", function() {
@@ -469,7 +469,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.$apply();
             scope.associatedDatasets = [];
 
-            expect(scope.areDatasetsNotSelected()).toEqual(true);
+            expect(scope.areDatasetsSelected()).toEqual(false);
         });
 
 

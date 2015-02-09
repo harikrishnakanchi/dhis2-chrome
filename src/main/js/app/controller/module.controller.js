@@ -255,12 +255,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 .then(onSuccess, $scope.onError);
         };
 
-        $scope.areDatasetsNotSelected = function() {
-            return _.isEmpty($scope.associatedDatasets);
+        $scope.areDatasetsSelected = function() {
+            return !_.isEmpty($scope.associatedDatasets);
         };
 
         $scope.shouldDisableSaveOrUpdateButton = function() {
-            return $scope.areDatasetsNotSelected() || !$scope.areDataElementsSelectedForSection();
+            return !$scope.areDatasetsSelected() || !$scope.areDataElementsSelectedForSection();
         };
 
         $scope.areDataElementsSelectedForSection = function() {
