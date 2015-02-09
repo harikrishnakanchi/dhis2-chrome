@@ -1,8 +1,9 @@
 define(["orgUnitGroupRepository", "angularMocks", "utils", "timecop"], function(OrgUnitGroupRepository, mocks, utils, timecop) {
     describe("orgunitgroup repository", function() {
-        var db, mockStore, orgUnitGroupRepository;
+        var db, mockStore, scope, orgUnitGroupRepository;
 
-        beforeEach(mocks.inject(function($q) {
+        beforeEach(mocks.inject(function($q, $rootScope) {
+            scope = $rootScope.$new();
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
             orgUnitGroupRepository = new OrgUnitGroupRepository(mockDB.db);
