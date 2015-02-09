@@ -1,6 +1,6 @@
 define(["lodash"], function(_) {
 
-    var enrichDatasets = function(allDatasets, allSections, allDataElements, moduleId, excludedDataElements) {
+    var enrichDatasets = function(allDatasets, allSections, allDataElements, excludedDataElements) {
         allDatasets = _.cloneDeep(allDatasets);
         allSections = _.cloneDeep(allSections);
         allDataElements = _.groupBy(allDataElements, "id");
@@ -17,7 +17,7 @@ define(["lodash"], function(_) {
 
         _.each(allSections, function(section) {
             section.dataElements = _.map(section.dataElements, function(dataElement) {
-                dataElement.isIncluded = moduleId && excludedDataElements ? !_.contains(excludedDataElements[moduleId], dataElement.id) : true;
+                dataElement.isIncluded = _.isEmpty(excludedDataElements) ? true : !_.contains(excludedDataElements, dataElement.id);
                 return addFormNameToDataElement(dataElement);
             });
         });

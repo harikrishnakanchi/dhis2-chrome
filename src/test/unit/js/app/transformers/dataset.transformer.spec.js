@@ -89,10 +89,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 }]
             }];
 
-            expect(datasetTransformer.enrichDatasets(datasets, sections, dataelements, "mod2", {
-                "mod2": ['DE3'],
-                "mod3": ['DE3']
-            })).toEqual(expectedEnrichedDatasets);
+            expect(datasetTransformer.enrichDatasets(datasets, sections, dataelements, ['DE3'])).toEqual(expectedEnrichedDatasets);
         });
 
         it("should get datasets associated with org units", function() {

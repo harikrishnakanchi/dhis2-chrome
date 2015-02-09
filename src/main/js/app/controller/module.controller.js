@@ -73,9 +73,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 return allDatasetsExceptAssociatedDataSets;
             };
 
-            var setUpData = function(data) {
+            var setDataSets = function(data) {
                 $scope.originalDatasets = data[0];
-                $scope.excludedDataElements = data[2] && data[2].value && data[2].value.excludedDataElements ? data[2].value.excludedDataElements : {};
                 $scope.associatedDatasets = data[1];
                 $scope.allDatasets = getAllDataSets($scope.associatedDatasets);
                 $scope.selectedDataset = $scope.associatedDatasets ? $scope.associatedDatasets[0] : [];
@@ -83,18 +82,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             var getAllAssociatedDataSets = function() {
                 if (!$scope.module.id) return [];
                 return datasetRepository.getAllForOrgUnit($scope.module.id).then(function(ds) {
-                    return datasetRepository.getEnrichedDatasets(ds);
+                    return datasetRepository.getEnrichedDatasets(ds, $scope.excludedDataElements);
                 });
             };
 
-            var getAllData = function() {
+            var getDataSets = function() {
                 return $q.all([dataSetPromise(),
                     getAllAssociatedDataSets(),
                     systemSettingRepository.getAllWithProjectId($scope.module.parent.id)
                 ]);
             };
 
-            initModule().then(getAllData).then(setUpData).then(getAllModules).then(getExcludedDataElements).then(setUpModule);
+            initModule().then(getExcludedDataElements).then(getDataSets).then(setDataSets).then(getAllModules).then(setUpModule);
         };
 
         $scope.changeCollapsed = function(sectionId) {

@@ -260,7 +260,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(scope.isDisabled).toBeFalsy();
             expect(scope.associatedDatasets.length).toEqual(1);
             expect(scope.allDatasets).toEqual([datasetsdata[0]]);
-            // expect(scope.selectedDataset).toEqual(scope.associatedDatasets[0]);
+            expect(scope.selectedDataset).toEqual(scope.associatedDatasets[0]);
+            expect(scope.getEnrichedDatasets);
         });
 
         it("should disable update button", function() {
