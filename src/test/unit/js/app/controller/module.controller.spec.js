@@ -259,7 +259,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             expect(scope.isDisabled).toBeFalsy();
             expect(scope.associatedDatasets.length).toEqual(1);
-            expect(scope.allDatasets).toEqual([datasetsdata[0]]);
+            expect(scope.nonAssociatedDataSets).toEqual([datasetsdata[0]]);
             expect(scope.selectedDataset).toEqual(scope.associatedDatasets[0]);
             expect(scope.getEnrichedDatasets);
         });
@@ -557,11 +557,11 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should return false if no dataset is selected", function() {
-                spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
-                scope.$apply();
-                scope.selectedDataset = undefined;
-                expect(scope.areDataElementsSelectedForSection()).toEqual(false);
-            });
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+            scope.selectedDataset = undefined;
+            expect(scope.areDataElementsSelectedForSection()).toEqual(false);
+        });
 
         it("should return true if any one section is selected for dataset", function() {
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));

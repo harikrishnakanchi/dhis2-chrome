@@ -7,7 +7,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.module = {};
         $scope.allModules = [];
 
-        $scope.allDatasets = [];
+        $scope.nonAssociatedDataSets = [];
         $scope.associatedDatasets = [];
         $scope.selectedDataset = {};
         $scope.excludedDataElements = [];
@@ -64,19 +64,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
             };
 
-            var getAllDataSets = function(associatedDatasets) {
-                var allDatasetsExceptAssociatedDataSets = _.reject($scope.originalDatasets, function(dataset) {
+            var getNonAssociatedDataSets = function(associatedDatasets) {
+                return _.reject($scope.originalDatasets, function(dataset) {
                     return _.any(associatedDatasets, {
                         "id": dataset.id
                     });
                 });
-                return allDatasetsExceptAssociatedDataSets;
             };
 
             var setDataSets = function(data) {
                 $scope.originalDatasets = data[0];
                 $scope.associatedDatasets = data[1];
-                $scope.allDatasets = getAllDataSets($scope.associatedDatasets);
+                $scope.nonAssociatedDataSets = getNonAssociatedDataSets($scope.associatedDatasets);
                 $scope.selectedDataset = $scope.associatedDatasets ? $scope.associatedDatasets[0] : [];
             };
             var getAllAssociatedDataSets = function() {
