@@ -35,6 +35,16 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
             expect(actualValues).toEqual(programDataForOrgUnit);
         });
 
+
+        it("should find all propgrams", function() {
+            var programIds = ["p1", "p2"];
+            programRepository.findAll(programIds);
+            scope.$apply();
+
+            expect(mockStore.each).toHaveBeenCalled();
+            expect(mockStore.each.calls.argsFor(0)[0].inList).toEqual(programIds);
+        });
+
         it("should save programs", function() {
             var programs = [{
                 "id": "prg1",

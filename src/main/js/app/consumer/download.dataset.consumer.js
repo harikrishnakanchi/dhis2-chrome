@@ -1,5 +1,5 @@
 define(['moment', 'mergeByUnion', 'lodashUtils', "mergeByLastUpdated"], function(moment, mergeByUnion, _, mergeByLastUpdated) {
-    return function(datasetService, datasetRepository, $q) {
+    return function(datasetService, datasetRepository, $q, changeLogRepository) {
         this.run = function(message) {
             return download()
                 .then(mergeAndSave)

@@ -23,7 +23,8 @@ define(["lodashUtils", "moment"], function(_, moment) {
                 var mergedItem = _.cloneDeep(remoteItem);
                 mergedItem[fieldToMerge] = mergeFields(remoteItem, groupedLocalItems[remoteItem.id]);
                 acc.push(mergedItem);
-            }
+            } else
+                acc.push(groupedLocalItems[remoteItem.id]);
         });
     };
 });

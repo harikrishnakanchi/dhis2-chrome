@@ -1,7 +1,7 @@
 define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
     describe("merge by last updated", function() {
 
-        it("should merge dhis and local lists even when they are not in the same order", function() {
+        it("should merge dhis and local lists correctly even when they are not in the same order", function() {
 
             var test1Data = {
                 'id': 'test1',
@@ -25,7 +25,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
             var dataFromDB = [staleTest2Data, test1Data];
 
             var actualData = mergeByLastUpdated(dataFromDhis, dataFromDB);
-            expect(actualData).toEqual([updatedTest2Data]);
+            expect(actualData).toEqual([test1Data, updatedTest2Data]);
         });
 
         it("should return dhis data if local data does not exist", function() {
@@ -58,7 +58,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
             expect(actualData).toEqual(dataFromDhis);
         });
 
-        it("should return empty array if local data has been updated after dhis", function() {
+        it("should return local data if local data has been updated after dhis", function() {
             var dataFromDhis = [{
                 'id': 'test1',
                 'name': 'test2',
@@ -73,10 +73,10 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
             }];
 
             var actualData = mergeByLastUpdated(dataFromDhis, dataFromDB);
-            expect(actualData.length).toEqual(0);
+            expect(actualData).toEqual(dataFromDB);
         });
 
-        it("should return empty array even if dhis has been updated after download as long as local data timestamp is greater", function() {
+        it("should return local data even if dhis has been updated after download as long as local data timestamp is greater", function() {
             var dataFromDhis = [{
                 'id': 'test1',
                 'name': 'test2',
@@ -91,7 +91,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
             }];
 
             var actualData = mergeByLastUpdated(dataFromDhis, dataFromDB);
-            expect(actualData.length).toEqual(0);
+            expect(actualData).toEqual(dataFromDB);
         });
 
         it("should return dhis data if dhis data has changed after download and after local data was updated", function() {

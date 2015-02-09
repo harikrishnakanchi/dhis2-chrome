@@ -16,7 +16,8 @@ define(["lodashUtils", "moment"], function(_, moment) {
         return _.transform(remoteList, function(acc, remoteItem) {
             if (isLocalDataStale(remoteItem, groupedLocalItems[remoteItem.id])) {
                 acc.push(remoteItem);
-            }
+            } else
+                acc.push(groupedLocalItems[remoteItem.id]);
         });
 
     };

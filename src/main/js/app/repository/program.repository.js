@@ -42,6 +42,13 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
+        this.findAll = function(programIds) {
+            var store = db.objectStore("programs");
+
+            var query = db.queryBuilder().$in(programIds).compile();
+            return store.each(query);
+        };
+
         this.get = function(programId, excludedDataElements) {
             var getProgram = function(programId) {
                 var programsStore = db.objectStore("programs");
