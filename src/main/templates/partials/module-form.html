@@ -42,7 +42,7 @@
                                     <multiselect left-list="allDatasets" name="name" ng-model="associatedDatasets" disabled="!isNewMode" on-right-item-select="selectDataSet(item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
                                 </div>
                                 <div class="details" ng-show="selectedDataset.sections.length > 0">
-                                    <span ng-show="areNoDataElementsSelectedForSection(selectedDataset)">{{resourceBundle.selectDatasetSection}}</span>
+                                    <span ng-hide="areDataElementsSelectedForSection()">{{resourceBundle.selectDatasetSection}}</span>
                                     <h4 ng-class="{cur: true}">{{selectedDataset.name}}</h4>
                                     <div ng-repeat="section in selectedDataset.sections">
                                         <div class="collapse-head">

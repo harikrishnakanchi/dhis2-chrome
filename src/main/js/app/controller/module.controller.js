@@ -260,19 +260,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             return _.isEmpty($scope.associatedDatasets);
         };
 
-        $scope.areNoSectionsSelected = function() {
-            return _.isEmpty($scope.selectedDataset);
-        };
-
         $scope.shouldDisableSaveOrUpdateButton = function() {
-            return $scope.areDatasetsNotSelected() || $scope.areNoDataElementsSelectedForSection();
+            return $scope.areDatasetsNotSelected() || !$scope.areDataElementsSelectedForSection();
         };
 
-        $scope.areNoDataElementsSelectedForSection = function() {
-            return !_.isEmpty($scope.selectedDataset) && _.all($scope.selectedDataset.sections, function(section) {
-                return _.all(section.dataElements, {
-                    "isIncluded": false
-                });
+        $scope.areDataElementsSelectedForSection = function() {
+            return !_.isEmpty($scope.selectedDataset) && _.some($scope.selectedDataset.sections, function(section) {
+                return _.some(section.dataElements, "isIncluded");
             });
         };
 

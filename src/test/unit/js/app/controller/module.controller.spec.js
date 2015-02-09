@@ -556,64 +556,18 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(scope.isExpanded.Id2).toEqual(false);
         });
 
-        it("should return true if no section is selected from each dataset", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
-            scope.$apply();
-
-            scope.module = {
-                'serviceType': "Aggregate",
-                'associatedDatasets': [{
-                    "sections": [{
-                        "name": "section1",
-                        "id": "section_1",
-                        "dataElements": [{
-                            "id": "de1",
-                            "isIncluded": false
-                        }, {
-                            "id": "de2",
-                            "isIncluded": false
-                        }]
-                    }, {
-                        "name": "section2",
-                        "id": "section_2",
-                        "dataElements": [{
-                            "id": "de3",
-                            "isIncluded": false
-                        }]
-                    }]
-                }]
-            };
-            scope.$apply();
-
-            expect(scope.areNoSectionsSelected()).toEqual(true);
-        });
-
-        it("should return false if any one section is selected from each dataset", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
-            scope.$apply();
-            scope.selectedDataset = {
-                "id": "atfc_service"
-            };
-
-            expect(scope.areNoSectionsSelected()).toEqual(false);
-        });
-
-        it("should return true if no section is selected for dataset", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
-            scope.$apply();
-            scope.selectedDataset = {};
-
-
-            expect(scope.areNoSectionsSelected()).toEqual(true);
-        });
-
         it("should return false if no dataset is selected", function() {
-            expect(scope.areNoDataElementsSelectedForSection(undefined)).toEqual(false);
-        });
+                spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+                scope.$apply();
+                scope.selectedDataset = undefined;
+                expect(scope.areDataElementsSelectedForSection()).toEqual(false);
+            });
 
-        it("should return false if any one section is selected for dataset", function() {
+        it("should return true if any one section is selected for dataset", function() {
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
 
-            var dataset = {
+            scope.selectedDataset = {
                 "sections": [{
                     "name": "section1",
                     "id": "section_1",
@@ -634,7 +588,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             };
 
-            expect(scope.areNoDataElementsSelectedForSection(dataset)).toEqual(false);
+            expect(scope.areDataElementsSelectedForSection()).toEqual(true);
         });
 
         it("should disable module", function() {
