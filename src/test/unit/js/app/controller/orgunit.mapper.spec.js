@@ -273,7 +273,11 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 }, {
                     "id": "ds_12",
                     "name": "dataset12"
-                }]
+                }],
+                "parent": {
+                    "name": "Parent",
+                    "id": "Par1"
+                }
             }, {
                 "name": "Module2",
                 "service": "Aggregate",
@@ -284,7 +288,11 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 }, {
                     "id": "ds_22",
                     "name": "dataset22"
-                }]
+                }],
+                "parent": {
+                    "name": "Parent",
+                    "id": "Par1"
+                }
             }];
 
             var today = new Date("2010-01-01T00:00:00");
@@ -294,6 +302,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
 
             expect(actualModules).toEqual([{
                 "name": "Module1",
+                "displayName": "Parent - Module1",
                 "associatedDatasets": [{
                     "id": "ds_11",
                     "name": "dataset11",
@@ -330,6 +339,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 }
             }, {
                 "name": "Module2",
+                "displayName": "Parent - Module2",
                 "associatedDatasets": [{
                     "id": "ds_21",
                     "name": "dataset21",
@@ -384,7 +394,11 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 }, {
                     "id": "ds_12",
                     "name": "dataset12"
-                }]
+                }],
+                "parent": {
+                    "name": "Parent",
+                    "id": "Par1"
+                }
             }];
 
             var today = new Date("2010-01-01T00:00:00");
@@ -394,6 +408,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
 
             expect(actualModules).toEqual([{
                 "name": "Module1",
+                "displayName": "Parent - Module1",
                 "associatedDatasets": [{
                     "id": "ds_11",
                     "name": "dataset11",

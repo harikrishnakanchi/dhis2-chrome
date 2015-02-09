@@ -174,6 +174,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return {
             name: module.name,
             shortName: module.name,
+            displayName: module.parent.name + " - " + module.name,
             id: moduleId || dhisId.get(module.name + module.parent.id),
             level: moduleLevel || parseInt(module.parent.level) + 1,
             openingDate: moment(module.openingDate).toDate(),
@@ -208,6 +209,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             return {
                 name: module.name,
                 shortName: module.name,
+                displayName: module.parent.name + " - " + module.name,
                 id: moduleId || dhisId.get(module.name + moduleParent.id),
                 level: moduleLevel || parseInt(moduleParent.level) + 1,
                 openingDate: moment(module.openingDate).toDate(),

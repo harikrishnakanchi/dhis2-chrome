@@ -196,6 +196,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             var enrichedLineListModules = [{
                 "name": "Module2",
                 "shortName": "Module2",
+                "displayName": "Project1 - Module2",
                 "id": "a1ab18b5fdd",
                 "level": NaN,
                 "openingDate": moment(new Date()).toDate(),
@@ -444,6 +445,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             var enrichedLineListModules = [{
                 "name": "new name",
                 "shortName": "new name",
+                "displayName": "Par1 - new name",
                 "id": oldid,
                 "level": 6,
                 "openingDate": moment(new Date()).toDate(),

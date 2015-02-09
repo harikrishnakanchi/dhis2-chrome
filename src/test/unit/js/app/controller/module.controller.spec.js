@@ -145,6 +145,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var enrichedAggregateModule = {
                 name: 'Module1',
                 shortName: 'Module1',
+                displayName: 'Project1 - Module1',
                 id: 'adba40b7157',
                 level: NaN,
                 openingDate: moment(new Date()).toDate(),
@@ -236,7 +237,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedPayload);
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
-
         });
 
         it("should set datasets associated with module for edit", function() {
@@ -416,6 +416,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var expectedModule = {
                 name: 'module NEW name',
                 shortName: 'module NEW name',
+                displayName: 'Par1 - module NEW name',
                 id: oldid,
                 level: 6,
                 openingDate: new Date(),
@@ -471,8 +472,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             expect(scope.areDatasetsSelected()).toEqual(false);
         });
-
-
 
         it("should de-select all data elements if the section containing it is de-selected", function() {
             var section = {
@@ -612,6 +611,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var expectedModule = {
                 name: 'test1',
                 shortName: 'test1',
+                displayName: 'Par1 - test1',
                 id: 'projectId',
                 level: 6,
                 openingDate: moment(new Date()).toDate(),
