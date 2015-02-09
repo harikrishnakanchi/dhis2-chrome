@@ -31,7 +31,7 @@ define(["moment"], function(moment) {
 
         this.get = function(orgUnitGroupId) {
             var store = db.objectStore("orgUnitGroups");
-            return store.find([orgUnitGroupId]);
+            return store.find(orgUnitGroupId);
         };
 
         this.findAll = function(orgUnitGroupIds) {

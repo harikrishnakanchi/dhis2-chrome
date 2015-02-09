@@ -61,7 +61,7 @@ define(["orgUnitGroupRepository", "angularMocks", "utils", "timecop"], function(
 
             orgUnitGroupRepository.get(id);
 
-            expect(mockStore.find).toHaveBeenCalledWith([id]);
+            expect(mockStore.find).toHaveBeenCalledWith(id);
         });
     });
 });
