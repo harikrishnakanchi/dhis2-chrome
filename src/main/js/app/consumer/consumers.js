@@ -18,7 +18,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("uploadOrgUnitConsumer", ["orgUnitService", "orgUnitRepository", "$q", uploadOrgUnitConsumer]);
             app.service("downloadOrgUnitGroupConsumer", ["orgUnitGroupService", "orgUnitGroupRepository", "changeLogRepository", "$q", downloadOrgUnitGroupConsumer]);
             app.service("uploadOrgUnitGroupConsumer", ["orgUnitGroupService", "orgUnitGroupRepository", "$q", uploadOrgUnitGroupConsumer]);
-            app.service("downloadDatasetConsumer", ["datasetService", "datasetRepository", "$q", downloadDatasetConsumer]);
+            app.service("downloadDatasetConsumer", ["datasetService", "datasetRepository", "$q", "changeLogRepository", downloadDatasetConsumer]);
             app.service("uploadDatasetConsumer", ["datasetService", "datasetRepository", uploadDatasetConsumer]);
             app.service("systemSettingConsumer", ["systemSettingService", systemSettingConsumer]);
             app.service("createUserConsumer", ["userService", createUserConsumer]);
