@@ -113,7 +113,7 @@ define([], function() {
     };
 
     var add_org_unit_group_store = function(db, tx) {
-        create_store_with_key("orgUnitGroups", ["id"], db);
+        create_store_with_key("orgUnitGroups", "id", db);
     };
 
     var add_dataset_store = function(db, tx) {
