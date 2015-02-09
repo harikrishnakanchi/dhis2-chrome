@@ -18,7 +18,7 @@ define(['moment', 'mergeByUnion', 'lodashUtils', "mergeByLastUpdated"], function
             var dataSetIds = _.pluck(allDhisDatasets, "id");
             return datasetRepository.findAll(dataSetIds)
                 .then(_.curry(mergeByUnion)("organisationUnits", allDhisDatasets))
-                .then(_.curry(mergeByLastUpdated)(allDhisDatasets))
+                .then(_.curry(mergeByLastUpdated)(undefined, allDhisDatasets))
                 .then(datasetRepository.upsertDhisDownloadedData);
         };
     };

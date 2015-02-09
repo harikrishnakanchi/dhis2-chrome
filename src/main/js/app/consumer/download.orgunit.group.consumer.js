@@ -37,7 +37,7 @@ define(["moment", "lodash", "mergeByLastUpdated"], function(moment, _, mergeByLa
         var mergeAndSave = function(orgUnitGroupsFromDHIS) {
             var orgUnitGroupIdsToMerge = _.pluck(orgUnitGroupsFromDHIS, "id");
             return orgUnitGroupRepository.findAll(orgUnitGroupIdsToMerge)
-                .then(_.curry(mergeByLastUpdated)(orgUnitGroupsFromDHIS))
+                .then(_.curry(mergeByLastUpdated)(undefined, orgUnitGroupsFromDHIS))
                 .then(orgUnitGroupRepository.upsertDhisDownloadedData);
         };
 

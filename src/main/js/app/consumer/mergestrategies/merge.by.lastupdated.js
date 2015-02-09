@@ -1,5 +1,8 @@
 define(["lodashUtils", "moment"], function(_, moment) {
-    return function(remoteList, localList) {
+    return function(equalsPred, remoteList, localList) {
+        var defaultEqualsPredicate = function(item1, item2) {
+            return item1.id === item2.id;
+        };
 
         var isLocalDataStale = function(remoteItem, localItem) {
             if (!localItem)
@@ -11,14 +14,22 @@ define(["lodashUtils", "moment"], function(_, moment) {
             return moment(remoteItem.lastUpdated).isAfter(moment(localItem.clientLastUpdated));
         };
 
-        var groupedLocalItems = _.indexBy(localList, "id");
+        equalsPred = _.isFunction(equalsPred) ? equalsPred : defaultEqualsPredicate;
 
-        return _.transform(remoteList, function(acc, remoteItem) {
-            if (isLocalDataStale(remoteItem, groupedLocalItems[remoteItem.id])) {
-                acc.push(remoteItem);
-            } else
-                acc.push(groupedLocalItems[remoteItem.id]);
+        var mergedList = _.clone(remoteList);
+
+        _.each(localList, function(localItem) {
+            var indexOfLocalItemInMergedList = _.findIndex(mergedList, _.curry(equalsPred)(localItem));
+            if (indexOfLocalItemInMergedList >= 0) {
+                var remoteItem = mergedList[indexOfLocalItemInMergedList];
+                if (!isLocalDataStale(remoteItem, localItem)) {
+                    mergedList[indexOfLocalItemInMergedList] = localItem;
+                }
+            } else {
+                mergedList.push(localItem)
+            }
         });
 
+        return mergedList;
     };
 });

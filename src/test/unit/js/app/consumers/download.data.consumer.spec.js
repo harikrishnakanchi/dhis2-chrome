@@ -149,23 +149,21 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 downloadDataConsumer.run(message);
                 scope.$apply();
 
-                var expected = {
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W11",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z",
-                        "value": 5
-                    }, {
-                        "dataElement": "DE2",
-                        "period": "2014W11",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z",
-                        "value": 10
-                    }]
-                };
+                var expected = [{
+                    "dataElement": "DE1",
+                    "period": "2014W11",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": 5
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2014W11",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": 10
+                }];
 
                 expect(dataRepository.save).toHaveBeenCalledWith(expected);
             });
@@ -178,14 +176,14 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                         "orgUnit": "MSF_0",
                         "categoryOptionCombo": "C1",
                         "lastUpdated": "2014-05-27T09:00:00.120Z",
-                        "value": 2
+                        "value": 1
                     }, {
                         "dataElement": "DE2",
                         "period": "2014W12",
                         "orgUnit": "MSF_0",
                         "categoryOptionCombo": "C1",
                         "lastUpdated": "2014-05-20T09:00:00.120Z",
-                        "value": 1
+                        "value": 2
                     }]
                 };
 
@@ -198,7 +196,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                         "orgUnit": "MSF_0",
                         "categoryOptionCombo": "C1",
                         "lastUpdated": "2014-05-24T09:00:00.120Z",
-                        "value": 1
+                        "value": 3
                     }]
                 }, {
                     "orgUnit": "MSF_0",
@@ -208,8 +206,8 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                         "period": "2014W12",
                         "orgUnit": "MSF_0",
                         "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-25T09:00:00.120Z",
-                        "value": 2
+                        "lastUpdated": "2014-05-23T09:00:00.120Z",
+                        "value": 4
                     }]
                 }];
 
@@ -226,23 +224,21 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 downloadDataConsumer.run(message);
                 scope.$apply();
 
-                var expectedDataConsumer = {
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z",
-                        "value": 2
-                    }, {
-                        "dataElement": "DE2",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-25T09:00:00.120Z",
-                        "value": 2
-                    }]
-                };
+                var expectedDataConsumer = [{
+                    "dataElement": "DE1",
+                    "period": "2014W12",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": 1
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2014W12",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-23T09:00:00.120Z",
+                    "value": 4
+                }];
 
                 expect(approvalDataRepository.deleteLevelTwoApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
                 expect(dataRepository.save).toHaveBeenCalledWith(expectedDataConsumer);
