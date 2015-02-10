@@ -10,6 +10,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
         $scope.allPrograms = [];
         $scope.program = {};
         $scope.enrichedProgram = {};
+        $scope.thisDate = moment().toDate();
 
         var init = function() {
             var initModule = function() {
@@ -234,10 +235,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             return _.isEmpty($scope.program.name);
         };
 
-        $scope.isAfterMaxDate = function(module) {
-            if (module.openingDate === undefined)
-                return true;
-            return false;
+         $scope.isAfterMaxDate = function() {
+            return moment($scope.module.openingDate).isAfter(moment($scope.thisDate));
         };
 
         init();

@@ -11,6 +11,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.associatedDatasets = [];
         $scope.selectedDataset = {};
         $scope.excludedDataElements = [];
+        $scope.thisDate = moment().toDate();
 
         var init = function() {
             var initModule = function() {
@@ -297,10 +298,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             module.selectedDataset = undefined;
         };
 
-        $scope.isAfterMaxDate = function(module) {
-            if (module.openingDate === undefined)
-                return true;
-            return false;
+        $scope.isAfterMaxDate = function() {
+            return moment($scope.module.openingDate).isAfter(moment($scope.thisDate));
         };
 
         init();
