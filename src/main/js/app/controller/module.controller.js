@@ -131,15 +131,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
         };
 
-        var disableModule = function(module) {
-            var enrichedModules = orgUnitMapper.mapToModule(module, module.id, 6);
-            var payload = orgUnitMapper.disable([enrichedModules]);
-            $scope.isDisabled = true;
-            $q.all([orgUnitRepository.upsert(payload[0]), publishMessage(payload[0], "upsertOrgUnit")]).then(function() {
-                if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(module, "disabledModule");
-            });
-        };
-
         var showModal = function(okCallback, message) {
             $scope.modalMessage = message;
             var modalInstance = $modal.open({
@@ -151,10 +142,17 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             modalInstance.result.then(okCallback);
         };
 
-        $scope.disable = function() {
-            showModal(function() {
-                disableModule($scope.module);
-            }, $scope.resourceBundle.disableOrgUnitConfirmationMessage);
+        var disableModule = function(module) {
+            var enrichedModules = orgUnitMapper.mapToModule(module, module.id, 6);
+            var payload = orgUnitMapper.disable(enrichedModules);
+            $scope.isDisabled = true;
+            $q.all([orgUnitRepository.upsert(payload), publishMessage(payload, "upsertOrgUnit")]).then(function() {
+                if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(module, "disabledModule");
+            });
+        };
+
+        $scope.disable = function(module) {
+            showModal(_.bind(disableModule, {}, module), $scope.resourceBundle.disableOrgUnitConfirmationMessage);
         };
 
         $scope.onError = function(data) {

@@ -27,7 +27,7 @@
                             </div>
                         </div>
                     </li>
-                    <li class="form-group">
+                    <li class="form-group" ng-show="isNewMode">
                         <label for="program" class="col-sm-4 col-md-4 control-label">{{resourceBundle.selectProgramLabel}}</label>
                         <div class="col-sm-6 col-md-6">
                             <select type="text" ng-change="getEnrichedProgram(program.id)" name="programsDropDown" id="programsDropDown" ng-model="program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
