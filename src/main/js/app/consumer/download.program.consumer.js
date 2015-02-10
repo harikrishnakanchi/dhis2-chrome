@@ -18,7 +18,7 @@ define(['moment', 'mergeByUnion', 'lodashUtils', 'mergeByLastUpdated'], function
             var programIds = _.pluck(remotePrograms, "id");
             return programRepository.findAll(programIds)
                 .then(_.curry(mergeByUnion)("organisationUnits", remotePrograms))
-                .then(_.curry(mergeByLastUpdated)(remotePrograms))
+                .then(_.curry(mergeByLastUpdated)(undefined, remotePrograms))
                 .then(programRepository.upsertDhisDownloadedData);
         };
     };
