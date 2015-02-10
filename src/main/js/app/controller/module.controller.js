@@ -180,9 +180,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                     return systemSettingRepository.upsert(payload).then(function() {
                         var hustlePayload = _.cloneDeep(payload);
                         hustlePayload.indexedDbOldSystemSettings = oldIndexedDbSystemSettings;
-                        return publishMessage(hustlePayload, "excludeDataElements").then(function() {
-                            return;
-                        });
+                        return publishMessage(hustlePayload, "excludeDataElements");
                     });
                 });
             };
