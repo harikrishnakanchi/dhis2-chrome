@@ -26,7 +26,7 @@ define(["lodashUtils", "moment"], function(_, moment) {
                     mergedList[indexOfLocalItemInMergedList] = localItem;
                 }
             } else {
-                mergedList.push(localItem)
+                mergedList.push(localItem);
             }
         });
 
