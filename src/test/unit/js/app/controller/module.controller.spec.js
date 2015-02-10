@@ -651,7 +651,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 result: utils.getPromise(q, {})
             });
 
-            scope.disable();
+            scope.disable(module);
             scope.$apply();
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
