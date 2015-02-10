@@ -74,6 +74,7 @@ require.config({
         "deleteApprovalConsumer": "app/consumer/delete.approval.consumer",
 
         //merge strategies
+        "mergeBy": "app/consumer/mergestrategies/merge.by",
         "mergeByUnion": "app/consumer/mergestrategies/merge.by.union",
         "mergeByLastUpdated": "app/consumer/mergestrategies/merge.by.lastupdated",
 

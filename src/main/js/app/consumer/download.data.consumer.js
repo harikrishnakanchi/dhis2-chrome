@@ -1,4 +1,4 @@
-define(["moment", "properties", "lodash", "dateUtils", "mergeByLastUpdated"], function(moment, properties, _, dateUtils, mergeByLastUpdated) {
+define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(moment, properties, _, dateUtils, mergeBy) {
     return function(dataService, dataRepository, datasetRepository, userPreferenceRepository, $q, approvalDataRepository) {
         this.run = function() {
             return downloadDataValues()
@@ -31,7 +31,7 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeByLastUpdated"], fu
                 };
 
                 dataValuesFromDb = _.flatten(dataValuesFromDb, "dataValues");
-                return mergeByLastUpdated(dataValuesEquals, dataValuesFromDhis, dataValuesFromDb);
+                return mergeBy.lastUpdatedUsingCustomEquals(dataValuesEquals, dataValuesFromDhis, dataValuesFromDb);
             };
 
             var clearApprovals = function(originalData, mergedData) {

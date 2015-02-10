@@ -1,4 +1,4 @@
-define(['moment', "lodashUtils", "dateUtils", "mergeByLastUpdated"], function(moment, _, dateUtils, mergeByLastUpdated) {
+define(['moment', "lodashUtils", "dateUtils", "mergeBy"], function(moment, _, dateUtils, mergeBy) {
     return function(orgUnitService, orgUnitRepository, changeLogRepository, $q) {
 
         this.run = function(message) {
@@ -38,7 +38,7 @@ define(['moment', "lodashUtils", "dateUtils", "mergeByLastUpdated"], function(mo
         var mergeAndSave = function(orgUnitsFromDHIS) {
             var orgUnitIdsToMerge = _.pluck(orgUnitsFromDHIS, "id");
             return orgUnitRepository.findAll(orgUnitIdsToMerge)
-                .then(_.curry(mergeByLastUpdated)(undefined, orgUnitsFromDHIS))
+                .then(_.curry(mergeBy.lastUpdated)(orgUnitsFromDHIS))
                 .then(orgUnitRepository.upsertDhisDownloadedData);
         };
 

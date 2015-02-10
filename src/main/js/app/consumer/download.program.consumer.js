@@ -1,4 +1,4 @@
-define(['moment', 'mergeByUnion', 'lodashUtils', 'mergeByLastUpdated'], function(moment, mergeByUnion, _, mergeByLastUpdated) {
+define(['moment', 'mergeBy', 'lodashUtils'], function(moment, mergeBy, _) {
     return function(programService, programRepository, changeLogRepository, $q) {
         this.run = function(message) {
             return download()
@@ -17,8 +17,8 @@ define(['moment', 'mergeByUnion', 'lodashUtils', 'mergeByLastUpdated'], function
         var mergeAndSave = function(remotePrograms) {
             var programIds = _.pluck(remotePrograms, "id");
             return programRepository.findAll(programIds)
-                .then(_.curry(mergeByUnion)("organisationUnits", remotePrograms))
-                .then(_.curry(mergeByLastUpdated)(undefined, remotePrograms))
+                .then(_.curry(mergeBy.union)("organisationUnits", remotePrograms))
+                .then(_.curry(mergeBy.lastUpdated)(remotePrograms))
                 .then(programRepository.upsertDhisDownloadedData);
         };
     };
