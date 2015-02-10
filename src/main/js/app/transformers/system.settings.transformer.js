@@ -35,10 +35,9 @@ define(["lodash"], function(_) {
     };
 
 
-    var excludedDataElementsForLinelistModule = function(module) {
+    var excludedDataElementsForLinelistModule = function(enrichedProgram) {
         var excludedDataElements = [];
-        var program = module.enrichedProgram;
-        _.each(program.programStages, function(programStage) {
+        _.each(enrichedProgram.programStages, function(programStage) {
             _.each(programStage.programStageSections, function(section) {
                 var filteredDataElements = _.filter(section.programStageDataElements, {
                     "dataElement": {

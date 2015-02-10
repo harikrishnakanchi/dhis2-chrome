@@ -8,6 +8,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
         $scope.collapseSection = {};
         $scope.excludedDataElements = [];
         $scope.allPrograms = [];
+        $scope.program = {};
+        $scope.enrichedProgram = {};
 
         var init = function() {
             var initModule = function() {
@@ -16,9 +18,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                         'openingDate': moment().toDate(),
                         'timestamp': new Date().getTime(),
                         "serviceType": "Linelist",
-                        "program": {
-                            "name": ""
-                        },
                         "dataModelType": "New",
                         "parent": $scope.orgUnit
                     };
@@ -27,7 +26,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                         'id': $scope.orgUnit.id,
                         'name': $scope.orgUnit.name,
                         'openingDate': moment($scope.orgUnit.openingDate).toDate(),
-                        'enrichedProgram': $scope.orgUnit.enrichedProgram,
                         'serviceType': "Linelist",
                         "dataModelType": "New",
                         "parent": $scope.orgUnit.parent,
@@ -52,14 +50,26 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
 
             var getProgram = function() {
                 return programRepository.getProgramForOrgUnit($scope.module.id).then(function(prg) {
-                    if (!_.isEmpty(prg)) {
+                    if (_.isEmpty(prg)) {
+                        $scope.program = {
+                            "name": ""
+                        };
+                    } else {
+                        $scope.program = prg;
                         $scope.getEnrichedProgram(prg.id);
                     }
                 });
             };
 
+            $scope.getEnrichedProgram = function(progId) {
+                return programRepository.get(progId, $scope.excludedDataElements).then(function(data) {
+                    $scope.enrichedProgram = data;
+                    resetCollapse();
+                });
+            };
+
             var setUpModule = function() {
-                if (!_.isEmpty($scope.module.enrichedProgram))
+                if (!_.isEmpty($scope.enrichedProgram))
                     resetCollapse();
 
                 var isDisabled = _.find($scope.module.attributeValues, {
@@ -71,22 +81,15 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                 $scope.updateDisabled = $scope.isDisabled;
             };
 
-            var setUpData = function(data) {
+            var setPrograms = function(data) {
                 $scope.allPrograms = data[0];
             };
 
-            var getAllData = function() {
+            var getPrograms = function() {
                 return $q.all([programRepository.getAll()]);
             };
 
-            initModule().then(getAllData).then(setUpData).then(getAllModules).then(getExcludedDataElements).then(getProgram).then(setUpModule);
-        };
-
-        $scope.getEnrichedProgram = function(progId) {
-            return programRepository.get(progId, $scope.excludedDataElements).then(function(data) {
-                $scope.module.enrichedProgram = data;
-                resetCollapse();
-            });
+            initModule().then(getPrograms).then(setPrograms).then(getAllModules).then(getExcludedDataElements).then(getProgram).then(setUpModule);
         };
 
         $scope.changeCollapsed = function(sectionId) {
@@ -106,7 +109,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
 
         var resetCollapse = function() {
             $scope.collapseSection = {};
-            _.forEach($scope.module.enrichedProgram.programStages, function(programStage) {
+            _.forEach($scope.enrichedProgram.programStages, function(programStage) {
                 _.forEach(programStage.programStageSections, function(programStageSection) {
                     $scope.collapseSection[programStageSection.id] = true;
                 });
@@ -116,32 +119,32 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
 
         var createModule = function(module) {
             var parent = module.parent;
-            var enrichedModules = orgUnitMapper.mapToModules([module], module.parent);
-            return $q.all([orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
+            var enrichedModule = orgUnitMapper.mapToModule(module);
+            return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
                 .then(function() {
-                    return enrichedModules[0];
+                    return enrichedModule;
                 });
         };
 
         var disableModule = function(module) {
-            var enrichedModules = orgUnitMapper.mapToModules([module], module.parent, module.id, 6);
-            var payload = orgUnitMapper.disable(enrichedModules);
+            var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
+            var payload = orgUnitMapper.disable(enrichedModule);
             $scope.isDisabled = true;
-            $q.all([orgUnitRepository.upsert(payload[0]), publishMessage(payload[0], "upsertOrgUnit")]).then(function() {
+            $q.all([orgUnitRepository.upsert(payload), publishMessage(payload, "upsertOrgUnit")]).then(function() {
                 if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(module, "disabledModule");
             });
         };
 
         $scope.update = function(module) {
-            var onSuccess = function(data) {
+            var onSuccess = function() {
                 $scope.saveFailure = false;
                 if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm(enrichedModules[0], "savedModule");
+                    $scope.$parent.closeNewForm(enrichedModule, "savedModule");
             };
 
-            var enrichedModules = orgUnitMapper.mapToModules([module], module.parent, module.id, 6);
+            var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
 
-            return $q.all([saveSystemSettingsForExcludedDataElements(module.parent, enrichedModules[0]), orgUnitRepository.upsert(enrichedModules), publishMessage(enrichedModules, "upsertOrgUnit")])
+            return $q.all([saveSystemSettingsForExcludedDataElements(module.parent, enrichedModule), orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
                 .then(onSuccess, $scope.onError);
         };
 
@@ -204,7 +207,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                     });
                 });
             };
-            var excludedDataElements = systemSettingsTransformer.excludedDataElementsForLinelistModule(enrichedModule);
+            var excludedDataElements = systemSettingsTransformer.excludedDataElementsForLinelistModule($scope.enrichedProgram);
             return saveSystemSettings(excludedDataElements, parent.id);
         };
 
@@ -217,25 +220,18 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             };
 
             var createOrgUnitGroups = function() {
-                var enrichedLineListModules = orgUnitMapper.mapToModules([module], module.parent);
-                return orgUnitGroupHelper.createOrgUnitGroups(enrichedLineListModules, false);
+                var enrichedLineListModule = orgUnitMapper.mapToModule(module);
+                return orgUnitGroupHelper.createOrgUnitGroups([enrichedLineListModule], false);
             };
 
-            createModule(module).then(_.curry(associatePrograms)(module.program))
+            createModule(module).then(_.curry(associatePrograms)($scope.program))
                 .then(_.curry(saveSystemSettingsForExcludedDataElements)(module.parent))
                 .then(createOrgUnitGroups)
                 .then(onSuccess, $scope.onError);
         };
 
-        $scope.areNoProgramsSelected = function(modules) {
-            return _.any(modules, function(module) {
-                return module.serviceType === "Linelist" && _.isEmpty(module.program.name);
-            });
-        };
-
-
-        $scope.shouldDisableSaveOrUpdateButton = function(modules) {
-            return $scope.areNoProgramsSelected(modules);
+        $scope.shouldDisableSaveOrUpdateButton = function() {
+            return _.isEmpty($scope.program.name);
         };
 
         $scope.isAfterMaxDate = function(module) {

@@ -30,7 +30,7 @@
                     <li class="form-group">
                         <label for="program" class="col-sm-4 col-md-4 control-label">{{resourceBundle.selectProgramLabel}}</label>
                         <div class="col-sm-6 col-md-6">
-                            <select type="text" ng-change="getEnrichedProgram(module.program.id)" name="programsDropDown" id="programsDropDown" ng-model="module.program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
+                            <select type="text" ng-change="getEnrichedProgram(program.id)" name="programsDropDown" id="programsDropDown" ng-model="program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
                                 <option value=""></option>
                             </select>
                         </div>
@@ -38,11 +38,11 @@
 
                         </div>
                     </li>
-                    <li class="form-group" ng-if="module.program.name !== ''">
+                    <li class="form-group" ng-if="program.name !== ''">
                         <div class="col-sm-12">
                             <section class="module-details">
                                 <div class="details">
-                                    <div ng-repeat="programStage in module.enrichedProgram.programStages" ng-if="module.enrichedProgram !== undefined">
+                                    <div ng-repeat="programStage in enrichedProgram.programStages" ng-if="enrichedProgram !== undefined">
                                         <div ng-repeat="section in programStage.programStageSections">
                                             <div class="collapse-head">
                                                 <h5 ng-click="changeCollapsed(section.id)" ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</h5>

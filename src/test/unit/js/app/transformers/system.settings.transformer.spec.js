@@ -29,34 +29,30 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
         });
 
         it("should give excluded data elements for line list module", function() {
-            module = {
-                name: "mod1 name",
-                id: "mod1",
-                enrichedProgram: {
-                    programStages: [{
-                        programStageSections: [{
-                            programStageDataElements: [{
-                                "dataElement": {
-                                    "id": "1",
-                                    "isIncluded": true
-                                }
-                            }, {
-                                "dataElement": {
-                                    "id": "2",
-                                    "isIncluded": false
-                                }
-                            }, {
-                                "dataElement": {
-                                    "id": "3",
-                                    "isIncluded": true
-                                }
-                            }]
+            var enrichedProgram = {
+                programStages: [{
+                    programStageSections: [{
+                        programStageDataElements: [{
+                            "dataElement": {
+                                "id": "1",
+                                "isIncluded": true
+                            }
+                        }, {
+                            "dataElement": {
+                                "id": "2",
+                                "isIncluded": false
+                            }
+                        }, {
+                            "dataElement": {
+                                "id": "3",
+                                "isIncluded": true
+                            }
                         }]
                     }]
-                }
+                }]
             };
 
-            expect(systemSettingsTransformer.excludedDataElementsForLinelistModule(module, true)).toEqual(
+            expect(systemSettingsTransformer.excludedDataElementsForLinelistModule(enrichedProgram)).toEqual(
                 ["2"]
             );
         });

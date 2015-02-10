@@ -257,13 +257,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
         });
 
         it("should map modules for dhis if id and level are not given", function() {
-            var projectOrgUnit = {
-                "id": "Project1Id",
-                "name": "Project1",
-                "level": "3",
-            };
-
-            var modules = [{
+            var module = {
                 "name": "Module1",
                 "service": "Aggregate",
                 "openingDate": new Date(),
@@ -276,46 +270,23 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 }],
                 "parent": {
                     "name": "Parent",
-                    "id": "Par1"
+                    "id": "Par1",
+                    "level": 3
                 }
-            }, {
-                "name": "Module2",
-                "service": "Aggregate",
-                "openingDate": new Date(),
-                "associatedDatasets": [{
-                    "id": "ds_21",
-                    "name": "dataset21",
-                }, {
-                    "id": "ds_22",
-                    "name": "dataset22"
-                }],
-                "parent": {
-                    "name": "Parent",
-                    "id": "Par1"
-                }
-            }];
+            };
 
             var today = new Date("2010-01-01T00:00:00");
             spyOn(window, "Date").and.returnValue(today);
 
-            var actualModules = orgUnitMapper.mapToModules(modules, projectOrgUnit);
+            var actualModule = orgUnitMapper.mapToModule(module);
 
-            expect(actualModules).toEqual([{
+            expect(actualModule).toEqual({
                 "name": "Module1",
                 "displayName": "Parent - Module1",
-                "associatedDatasets": [{
-                    "id": "ds_11",
-                    "name": "dataset11",
-                }, {
-                    "id": "ds_12",
-                    "name": "dataset12"
-                }],
                 "shortName": "Module1",
-                "id": "aac1bbd0985",
+                "id": "aff28030986",
                 "level": 4,
                 "openingDate": moment(new Date()).toDate(),
-                "selectedDataset": undefined,
-                "enrichedProgram": undefined,
                 "attributeValues": [{
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
@@ -334,57 +305,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                     "value": "false"
                 }],
                 "parent": {
-                    "name": "Project1",
-                    "id": "Project1Id"
+                    "name": "Parent",
+                    "id": "Par1"
                 }
-            }, {
-                "name": "Module2",
-                "displayName": "Parent - Module2",
-                "associatedDatasets": [{
-                    "id": "ds_21",
-                    "name": "dataset21",
-                }, {
-                    "id": "ds_22",
-                    "name": "dataset22"
-                }],
-                "shortName": "Module2",
-                "id": "acccf1dda36",
-                "level": 4,
-                "openingDate": moment(new Date()).toDate(),
-                "selectedDataset": undefined,
-                "enrichedProgram": undefined,
-                "attributeValues": [{
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Module"
-                }, {
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "isLineListService",
-                        "name": "Is Linelist Service"
-                    },
-                    "value": "false"
-                }],
-                "parent": {
-                    "name": "Project1",
-                    "id": "Project1Id"
-                }
-            }]);
+            });
         });
 
         it("should map modules for dhis if id and level are given", function() {
-            var projectOrgUnit = {
-                "id": "Project1Id",
-                "name": "Project1",
-                "level": "3",
-            };
-
-            var modules = [{
+            var module = {
                 "name": "Module1",
                 "openingDate": new Date(),
                 "service": "Aggregate",
@@ -397,31 +325,23 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 }],
                 "parent": {
                     "name": "Parent",
-                    "id": "Par1"
+                    "id": "Par1",
+                    "level": 3
                 }
-            }];
+            };
 
             var today = new Date("2010-01-01T00:00:00");
             spyOn(window, "Date").and.returnValue(today);
 
-            var actualModules = orgUnitMapper.mapToModules(modules, projectOrgUnit, "someId", "someLevel");
+            var actualModule = orgUnitMapper.mapToModule(module, "someId", "someLevel");
 
-            expect(actualModules).toEqual([{
+            expect(actualModule).toEqual({
                 "name": "Module1",
                 "displayName": "Parent - Module1",
-                "associatedDatasets": [{
-                    "id": "ds_11",
-                    "name": "dataset11",
-                }, {
-                    "id": "ds_12",
-                    "name": "dataset12"
-                }],
                 "shortName": "Module1",
                 "id": "someId",
                 "level": "someLevel",
                 "openingDate": moment(new Date()).toDate(),
-                "selectedDataset": undefined,
-                "enrichedProgram": undefined,
                 "attributeValues": [{
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
@@ -440,10 +360,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                     "value": "false"
                 }],
                 "parent": {
-                    "name": "Project1",
-                    "id": "Project1Id"
+                    "name": "Parent",
+                    "id": "Par1"
                 }
-            }]);
+            });
         });
 
         it("should return all the projects under a orgUnit", function() {

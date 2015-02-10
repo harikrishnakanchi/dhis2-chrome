@@ -149,7 +149,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 id: 'adba40b7157',
                 level: NaN,
                 openingDate: moment(new Date()).toDate(),
-                selectedDataset: undefined,
                 attributeValues: [{
                     created: moment().toISOString(),
                     lastUpdated: moment().toISOString(),
@@ -420,7 +419,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 id: oldid,
                 level: 6,
                 openingDate: new Date(),
-                selectedDataset: undefined,
                 attributeValues: [{
                     created: moment().toISOString(),
                     lastUpdated: moment().toISOString(),
@@ -615,7 +613,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 id: 'projectId',
                 level: 6,
                 openingDate: moment(new Date()).toDate(),
-                selectedDataset: undefined,
                 attributeValues: [{
                     created: moment().toISOString(),
                     lastUpdated: moment().toISOString(),

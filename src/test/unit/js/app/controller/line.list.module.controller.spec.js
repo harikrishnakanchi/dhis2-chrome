@@ -71,10 +71,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             Timecop.uninstall();
         });
 
-        it("should save exclude DataElement", function() {
+        it("should save excluded DataElement", function() {
             scope.orgUnit = {
                 "name": "Project1",
                 "id": "someid",
+                "level": 3,
                 "children": []
             };
             var program = {
@@ -82,29 +83,31 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 'name': 'ER Linelist',
                 'organisationUnits': []
             };
+            scope.program = program;
             var linelistModule = {
                 'name': "Module2",
                 'serviceType': "Linelist",
-                'enrichedProgram': {
-                    'programStages': [{
-                        'programStageSections': [{
-                            'programStageDataElements': [{
-                                'dataElement': {
-                                    'isIncluded': false,
-                                    'id': 'de3'
-                                }
-                            }, {
-                                'dataElement': {
-                                    'isIncluded': true,
-                                    'id': 'de4'
-                                }
-                            }]
-                        }]
-                    }]
-                },
-                'program': program,
                 'parent': scope.orgUnit
             };
+
+            scope.enrichedProgram = {
+                'programStages': [{
+                    'programStageSections': [{
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'isIncluded': false,
+                                'id': 'de3'
+                            }
+                        }, {
+                            'dataElement': {
+                                'isIncluded': true,
+                                'id': 'de4'
+                            }
+                        }]
+                    }]
+                }]
+            };
+            
             var data = {
                 "key": "someid",
                 "value": {
@@ -160,65 +163,24 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             scope.orgUnit = {
                 "name": "Project1",
                 "id": "someid",
-                "children": []
+                "children": [],
+                "level": 3
             };
 
             var module = {
                 'name': "Module2",
                 'openingDate': new Date(),
                 'serviceType': "Linelist",
-                'enrichedProgram': {
-                    'programStages': [{
-                        'programStageSections': [{
-                            'programStageDataElements': [{
-                                'dataElement': {
-                                    'isIncluded': false,
-                                    'id': 'de3'
-                                }
-                            }, {
-                                'dataElement': {
-                                    'isIncluded': true,
-                                    'id': 'de4'
-                                }
-                            }]
-                        }]
-                    }]
-                },
-                'program': {
-                    'id': 'prog1',
-                    'name': 'ER Linelist',
-                    'organisationUnits': []
-                },
                 'parent': scope.orgUnit
-
             };
 
-            var enrichedLineListModules = [{
+            var enrichedLineListModule = {
                 "name": "Module2",
                 "shortName": "Module2",
                 "displayName": "Project1 - Module2",
                 "id": "a1ab18b5fdd",
-                "level": NaN,
+                "level": 4,
                 "openingDate": moment(new Date()).toDate(),
-                "selectedDataset": undefined,
-                "associatedDatasets": undefined,
-                "enrichedProgram": {
-                    "programStages": [{
-                        "programStageSections": [{
-                            "programStageDataElements": [{
-                                "dataElement": {
-                                    "isIncluded": false,
-                                    "id": "de3"
-                                }
-                            }, {
-                                "dataElement": {
-                                    "isIncluded": true,
-                                    "id": "de4"
-                                }
-                            }]
-                        }]
-                    }]
-                },
                 "attributeValues": [{
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
@@ -240,9 +202,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "name": "Project1",
                     "id": "someid"
                 }
-            }];
+            };
 
-            var program = {
+            scope.program = {
                 'id': 'prog1',
                 'name': 'ER Linelist',
                 'organisationUnits': [{
@@ -251,28 +213,27 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }]
             };
 
-            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
-            spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
+            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, scope.program));
+            spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, scope.program));
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-
             scope.save(module);
             scope.$apply();
 
-            expect(scope.saveFailure).toBe(false);
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedLineListModules);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedLineListModule);
 
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: enrichedLineListModules,
+                data: enrichedLineListModule,
                 type: "upsertOrgUnit"
             }, "dataValues");
 
-            expect(programsRepo.upsert).toHaveBeenCalledWith(program);
+            expect(programsRepo.upsert).toHaveBeenCalledWith(scope.program);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: program,
+                data: scope.program,
                 type: "uploadProgram"
             }, "dataValues");
+            expect(scope.saveFailure).toBe(false);
         });
 
         it("should disable update and diable if orgunit is disabled", function() {
@@ -316,50 +277,47 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         });
 
         it("should update system setting while updating module", function() {
+            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+
             scope.isNewMode = false;
             lineListModuleController = new LineListModuleController(scope, hustle, orgUnitService, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
             var parent = {
                 "id": "par1",
                 "name": "Par1"
             };
-            scope.orgUnit = {
-                "id": "mod2",
-                "name": "module OLD name",
-                "parent": parent
-            };
-            var program = {
+
+            scope.program = {
                 'id': 'prog1',
                 'name': 'ER Linelist',
                 'organisationUnits': []
             };
+            scope.enrichedProgram = {
+                'programStages': [{
+                    'programStageSections': [{
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'isIncluded': false,
+                                'id': 'de3'
+                            }
+                        }, {
+                            'dataElement': {
+                                'isIncluded': true,
+                                'id': 'de4'
+                            }
+                        }]
+                    }]
+                }]
+            };
+
             var module = {
                 'name': "module NEW name",
                 'id': "newId",
                 'serviceType': "Linelist",
-                'enrichedProgram': {
-                    'programStages': [{
-                        'programStageSections': [{
-                            'programStageDataElements': [{
-                                'dataElement': {
-                                    'isIncluded': false,
-                                    'id': 'de3'
-                                }
-                            }, {
-                                'dataElement': {
-                                    'isIncluded': true,
-                                    'id': 'de4'
-                                }
-                            }]
-                        }]
-                    }]
-                },
-                'program': program,
                 'parent': parent
             };
 
-            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
-            spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
@@ -397,77 +355,31 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         });
 
         it("should update module name", function() {
+            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+
             var oldid = "oldid";
             var parent = {
                 "id": "par1",
                 "name": "Par1"
             };
-            scope.orgUnit = {
-                "id": oldid,
-                "name": "module OLD name",
-                "parent": parent
-            };
-            var program = {
-                'id': 'prog1',
-                'name': 'ER Linelist',
-                'organisationUnits': []
-            };
+
             var module = {
                 'name': "new name",
                 'id': oldid,
                 'openingDate': new Date(),
                 'serviceType': "Linelist",
-                'enrichedProgram': {
-                    'programStages': [{
-                        'programStageSections': [{
-                            'programStageDataElements': [{
-                                'dataElement': {
-                                    'isIncluded': false,
-                                    'id': 'de3'
-                                }
-                            }, {
-                                'dataElement': {
-                                    'isIncluded': true,
-                                    'id': 'de4'
-                                }
-                            }]
-                        }]
-                    }]
-                },
-                'program': {
-                    'id': 'prog1',
-                    'name': 'ER Linelist',
-                    'organisationUnits': []
-                },
                 'parent': parent
             };
 
-            var enrichedLineListModules = [{
+            var enrichedLineListModule = {
                 "name": "new name",
                 "shortName": "new name",
                 "displayName": "Par1 - new name",
                 "id": oldid,
                 "level": 6,
                 "openingDate": moment(new Date()).toDate(),
-                "selectedDataset": undefined,
-                "associatedDatasets": undefined,
-                "enrichedProgram": {
-                    "programStages": [{
-                        "programStageSections": [{
-                            "programStageDataElements": [{
-                                "dataElement": {
-                                    "isIncluded": false,
-                                    "id": "de3"
-                                }
-                            }, {
-                                "dataElement": {
-                                    "isIncluded": true,
-                                    "id": "de4"
-                                }
-                            }]
-                        }]
-                    }]
-                },
                 "attributeValues": [{
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
@@ -485,16 +397,10 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     },
                     "value": "true"
                 }],
-                "parent": {
-                    "name": "Par1",
-                    "id": "par1"
-                }
-            }];
+                "parent": parent
+            };
 
             scope.isNewMode = false;
-            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
-            spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
@@ -502,35 +408,33 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             scope.update(module);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedLineListModules);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedLineListModule);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: enrichedLineListModules,
+                data: enrichedLineListModule,
                 type: "upsertOrgUnit"
             }, "dataValues");
         });
 
-        it("should return false if program for module is selected", function() {
-            var modules = [{
-                'name': "Module1",
-                'program': {
-                    "name": "ER Linelist"
-                },
-                'serviceType': "Linelist"
-            }];
+        it("should not disable save or update button if program is selected", function() {
+            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+            scope.program = {
+                "name": "ER Linelist"
+            };
 
-            expect(scope.areNoProgramsSelected(modules)).toEqual(false);
+            expect(scope.shouldDisableSaveOrUpdateButton()).toEqual(false);
         });
 
-        it("should return true if no program for module is selected", function() {
-            var modules = [{
-                'name': "Module1",
-                'program': {
-                    "name": ""
-                },
-                'serviceType': "Linelist"
-            }];
+        it("should disable save or update button if program is not selected", function() {
+            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+            scope.program = {
+                "name": ""
+            };
 
-            expect(scope.areNoProgramsSelected(modules)).toEqual(true);
+            expect(scope.shouldDisableSaveOrUpdateButton()).toEqual(true);
         });
 
         it("should disable modules", function() {
@@ -621,7 +525,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
 
             scope.getEnrichedProgram("surgery1").then(function(data) {
-                expect(scope.module.enrichedProgram).toEqual(program);
+                expect(scope.enrichedProgram).toEqual(program);
                 expect(scope.collapseSection).toEqual({
                     sectionId1: false,
                     sectionId2: true
