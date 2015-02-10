@@ -192,6 +192,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-23T09:00:00.120Z",
+                    "clientLastUpdated": "2014-05-23T09:00:00.120Z",
                     "value": 4
                 }];
 
@@ -221,6 +222,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-23T09:00:00.120Z",
+                    "clientLastUpdated": "2014-05-23T09:00:00.120Z",
                     "value": 4
                 }];
 

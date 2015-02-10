@@ -20,7 +20,7 @@ define(['moment', 'mergeBy', 'lodashUtils'], function(moment, mergeBy, _) {
                 .then(_.curry(mergeBy.union)("organisationUnits", remotePrograms))
                 .then(programRepository.upsertDhisDownloadedData)
                 .then(_.bind(programRepository.findAll, programIds))
-                .then(_.curry(mergeBy.lastUpdated)(remotePrograms))
+                .then(_.curry(mergeBy.lastUpdated)({}, remotePrograms))
                 .then(programRepository.upsertDhisDownloadedData);
         };
     };

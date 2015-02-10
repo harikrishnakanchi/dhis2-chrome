@@ -1,10 +1,8 @@
 define(['mergeByUnion', 'mergeByLastUpdated'], function(mergeByUnion, mergeByLastUpdated) {
-    var lastUpdatedUsingCustomEquals = function(equalsPred, remoteList, localList) {
-        return mergeByLastUpdated(equalsPred, remoteList, localList);
-    };
 
-    var lastUpdated = function(remoteList, localList) {
-        return mergeByLastUpdated(undefined, remoteList, localList);
+    var lastUpdated = function(opts, remoteList, localList) {
+        opts = opts || {};
+        return mergeByLastUpdated(opts.eq, opts.remoteTimeField, opts.localTimeField, remoteList, localList);
     };
 
     var union = function(fieldToMerge, remoteList, localList) {
@@ -12,7 +10,6 @@ define(['mergeByUnion', 'mergeByLastUpdated'], function(mergeByUnion, mergeByLas
     };
 
     return {
-        "lastUpdatedUsingCustomEquals": lastUpdatedUsingCustomEquals,
         "lastUpdated": lastUpdated,
         "union": union
     };

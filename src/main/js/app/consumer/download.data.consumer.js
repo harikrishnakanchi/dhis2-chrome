@@ -34,7 +34,9 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
                     return d1.dataElement === d2.dataElement && d1.period === d2.period && d1.orgUnit === d2.orgUnit && d1.categoryOptionCombo === d2.categoryOptionCombo;
                 };
 
-                return mergeBy.lastUpdatedUsingCustomEquals(dataValuesEquals, dataValuesFromDhis, dataValuesFromDb);
+                return mergeBy.lastUpdated({
+                    eq: dataValuesEquals
+                }, dataValuesFromDhis, dataValuesFromDb);
             };
 
             var clearApprovals = function(originalData, mergedData) {

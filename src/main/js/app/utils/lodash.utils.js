@@ -21,5 +21,23 @@ define(["lodash"], function(_) {
         return groupedObject;
     };
 
+    _.startsWith = function(string, target) {
+        return string.indexOf(target) === 0;
+    }
+
+    //k1 - https://github.com/lodash/lodash/issues/146
+    // Just like _.result, but also works for nested objects
+    _.extract = function extract(object, property, defaultValue) {
+        var obj = object,
+            parts = property.split('.'),
+            part = parts.shift();
+
+        while (part && obj) {
+            obj = obj[part];
+            part = parts.shift();
+        }
+        return obj || defaultValue;
+    }
+
     return _;
 });

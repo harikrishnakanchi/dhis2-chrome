@@ -1,6 +1,22 @@
-define(["dhisUrl", "md5"], function(dhisUrl, md5) {
+define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, moment, _) {
     return function($http) {
-        this.excludeDataElements = function(data) {
+        var exclude = function(moduleid, excludedDataElements) {
+            var key = "exclude_" + moduleid;
+            var payload = {
+                "clientLastUpdated": moment(),
+                "dataElements": excludedDataElements
+            };
+            return $http({
+                method: 'POST',
+                url: dhisUrl.systemSettings + '/' + key,
+                data: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'text/plain'
+                }
+            });
+        };
+
+        var excludeDataElements = function(data) {
             var postExcludedDataElements = function(systemSettingsToPost) {
                 return $http({
                     method: 'POST',
@@ -39,6 +55,28 @@ define(["dhisUrl", "md5"], function(dhisUrl, md5) {
 
         var getExcludedDataElements = function(projectId) {
             return $http.get(dhisUrl.systemSettings + '/' + projectId);
+        };
+        var transform = function(response) {
+            var result = [];
+            _.transform(response.data, function(acc, value, key) {
+                if (_.startsWith(key, 'exclude_')) {
+                    result.push({
+                        "key": key.replace('exclude_', ''),
+                        "value": value
+                    });
+                }
+            });
+            return result;
+        };
+
+        var getAll = function() {
+            return $http.get(dhisUrl.systemSettings).then(transform);
+        };
+
+        return {
+            "excludeDataElements": excludeDataElements,
+            "exclude": exclude,
+            "getAll": getAll
         };
     };
 });

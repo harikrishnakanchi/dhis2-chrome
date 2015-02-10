@@ -72,6 +72,8 @@ require.config({
         "dispatcher": "app/consumer/dispatcher",
         "downloadMetadataConsumer": "app/consumer/download.metadata.consumer",
         "deleteApprovalConsumer": "app/consumer/delete.approval.consumer",
+        "downloadSystemSettingConsumer": "app/consumer/download.system.setting.consumer",
+        "uploadSystemSettingConsumer": "app/consumer/upload.system.setting.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",

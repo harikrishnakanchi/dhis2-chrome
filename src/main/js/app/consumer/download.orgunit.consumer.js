@@ -38,7 +38,7 @@ define(['moment', "lodashUtils", "dateUtils", "mergeBy"], function(moment, _, da
         var mergeAndSave = function(orgUnitsFromDHIS) {
             var orgUnitIdsToMerge = _.pluck(orgUnitsFromDHIS, "id");
             return orgUnitRepository.findAll(orgUnitIdsToMerge)
-                .then(_.curry(mergeBy.lastUpdated)(orgUnitsFromDHIS))
+                .then(_.curry(mergeBy.lastUpdated)({}, orgUnitsFromDHIS))
                 .then(orgUnitRepository.upsertDhisDownloadedData);
         };
 

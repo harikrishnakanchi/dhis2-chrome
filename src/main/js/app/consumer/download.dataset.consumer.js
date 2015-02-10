@@ -20,7 +20,7 @@ define(['moment', 'mergeBy', 'lodashUtils'], function(moment, mergeBy, _) {
                 .then(_.curry(mergeBy.union)("organisationUnits", allDhisDatasets))
                 .then(datasetRepository.upsertDhisDownloadedData)
                 .then(_.bind(datasetRepository.findAll, dataSetIds))
-                .then(_.curry(mergeBy.lastUpdated)(allDhisDatasets))
+                .then(_.curry(mergeBy.lastUpdated)({}, allDhisDatasets))
                 .then(datasetRepository.upsertDhisDownloadedData);
         };
     };
