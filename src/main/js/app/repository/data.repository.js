@@ -25,12 +25,6 @@ define(["lodash"], function(_) {
             });
         };
 
-        this.saveDhisData = function(payload) {
-            return dataValuesStore.upsert(payload).then(function() {
-                return payload;
-            });
-        };
-
         this.getDataValues = function(period, orgUnitId) {
             var store = db.objectStore('dataValues');
             return store.find([period, orgUnitId]);
