@@ -141,11 +141,11 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 "lastUpdated": "2015-04-16T00:00:00.000"
             };
 
-            mockStore.find.and.returnValue(utils.getPromise(q, [{
+            mockStore.find.and.returnValue(utils.getPromise(q, {
                 "period": "2014W15",
                 "orgUnit": "company_0",
                 "dataValues": [dataValueFromClient, dataValueFromDhis]
-            }]));
+            }));
 
             var actualDataValues;
             dataRepository.getDataValues('period', 'orgUnitId').then(function(data) {

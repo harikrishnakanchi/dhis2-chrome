@@ -51,7 +51,9 @@ define(["lodash", "moment"], function(_, moment) {
         this.getDataValues = function(period, orgUnitId) {
             var store = db.objectStore("dataValues");
             return store.find([period, orgUnitId]).then(function(data) {
-                return _.flatten(data, "dataValues");
+                if (!_.isEmpty(data))
+                    return data.dataValues;
+                return undefined;
             });
         };
 
