@@ -455,20 +455,17 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         id: 'parent'
                     }
                 };
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, {
-                    "dataValues": [{
-                        "dataElement": "DE_Oedema",
-                        "categoryOptionCombo": "32",
-                        "value": "3",
-                        "dataset": "abbc"
-                    }, {
-                        "dataElement": "DE_Oedema",
-                        "categoryOptionCombo": "33",
-                        "value": "12",
-                        "dataset": "abbc"
-                    }],
-                    "blah": "some"
-                }));
+                getDataValuesSpy.and.returnValue(utils.getPromise(q, [{
+                    "dataElement": "DE_Oedema",
+                    "categoryOptionCombo": "32",
+                    "value": "3",
+                    "dataset": "abbc"
+                }, {
+                    "dataElement": "DE_Oedema",
+                    "categoryOptionCombo": "33",
+                    "value": "12",
+                    "dataset": "abbc"
+                }]));
 
                 scope.$apply();
 

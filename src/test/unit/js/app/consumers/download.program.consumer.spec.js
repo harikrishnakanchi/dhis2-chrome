@@ -1,5 +1,5 @@
 define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "programRepository", "timecop"], function(DownloadProgramConsumer, ProgramService, utils, mocks, ProgramRepository, timecop) {
-    xdescribe("download program consumer", function() {
+    describe("download program consumer", function() {
         var downloadProgramConsumer, changeLogRepository, q, scope, payload, programService, programRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
@@ -111,7 +111,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             scope.$apply();
 
             expect(programService.upsert).not.toHaveBeenCalled();
-            expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programsFromDhis[0]);
+            expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programsFromDhis);
         });
 
         it("should overwrite local program with dhis copy if local data is stale", function() {
@@ -172,7 +172,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             scope.$apply();
 
             expect(programService.upsert).not.toHaveBeenCalled();
-            expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programsFromDhis[0]);
+            expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programsFromDhis);
         });
 
         it("should upsert lastUpdated time in change log", function() {

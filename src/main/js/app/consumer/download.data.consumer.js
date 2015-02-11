@@ -9,14 +9,22 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
             var getAllDataValues = function(vals) {
                 var orgUnitIds = vals[0];
                 var allDataSetIds = vals[1];
-                return $q.when(orgUnitIds.length > 0 && allDataSetIds.length > 0 ? dataService.downloadAllData(orgUnitIds, allDataSetIds) : []);
+
+                if (orgUnitIds.length === 0 || allDataSetIds.length === 0)
+                    return $q.when([]);
+
+                return dataService.downloadAllData(orgUnitIds, allDataSetIds).then(function(data) {
+                    if (_.isEmpty(data))
+                        return [];
+                    return data.dataValues;
+                });
             };
 
             return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAllDatasetIds()])
                 .then(getAllDataValues);
         };
 
-        var mergeAndSaveDataValues = function(data) {
+        var mergeAndSaveDataValues = function(dataValuesFromDhis) {
             var getDataFromDb = function() {
                 var m = moment();
                 var startPeriod = dateUtils.toDhisFormat(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
@@ -30,7 +38,6 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
                     return d1.dataElement === d2.dataElement && d1.period === d2.period && d1.orgUnit === d2.orgUnit && d1.categoryOptionCombo === d2.categoryOptionCombo;
                 };
 
-                dataValuesFromDb = _.flatten(dataValuesFromDb, "dataValues");
                 return mergeBy.lastUpdatedUsingCustomEquals(dataValuesEquals, dataValuesFromDhis, dataValuesFromDb);
             };
 
@@ -58,15 +65,13 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
                 });
             };
 
-            if (_.isEmpty(data))
+            if (_.isEmpty(dataValuesFromDhis))
                 return;
-
-            var dataValuesFromDhis = data.dataValues;
 
             return getDataFromDb()
                 .then(_.curry(merge)(dataValuesFromDhis))
                 .then(_.curry(clearApprovals)(dataValuesFromDhis))
-                .then(dataRepository.save);
+                .then(dataRepository.saveDhisData);
         };
     };
 });

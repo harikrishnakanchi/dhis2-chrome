@@ -19,7 +19,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 dataRepository = {
                     "getDataValues": jasmine.createSpy("getDataValues").and.returnValue(utils.getPromise(q, {})),
                     "getDataValuesForPeriodsOrgUnits": jasmine.createSpy("getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, {})),
-                    "save": jasmine.createSpy("save")
+                    "saveDhisData": jasmine.createSpy("saveDhisData")
                 };
 
                 approvalDataRepository = {
@@ -91,16 +91,12 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 dataService.downloadAllData.and.returnValue(utils.getPromise(q, []));
 
                 var dbDataValues = [{
-                    "orgUnit": "MSF_0",
+                    "dataElement": "DE1",
                     "period": "2014W11",
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W11",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z",
-                        "value": 5
-                    }]
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": 5
                 }];
 
                 dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbDataValues));
@@ -114,7 +110,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 downloadDataConsumer.run(message);
                 scope.$apply();
 
-                expect(dataRepository.save).not.toHaveBeenCalled();
+                expect(dataRepository.saveDhisData).not.toHaveBeenCalled();
             });
 
             it("should save downloaded data to indexeddb if no data already exists in db", function() {
@@ -165,7 +161,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "value": 10
                 }];
 
-                expect(dataRepository.save).toHaveBeenCalledWith(expected);
+                expect(dataRepository.saveDhisData).toHaveBeenCalledWith(expected);
             });
 
             it("should merge dhisData with existing db data, clear approvals where necessary, do the laundry and save to indexeddb", function() {
@@ -188,27 +184,19 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 };
 
                 var dbDataValues = [{
-                    "orgUnit": "MSF_0",
+                    "dataElement": "DE1",
                     "period": "2014W12",
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-24T09:00:00.120Z",
-                        "value": 3
-                    }]
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-24T09:00:00.120Z",
+                    "value": 3
                 }, {
-                    "orgUnit": "MSF_0",
+                    "dataElement": "DE2",
                     "period": "2014W12",
-                    "dataValues": [{
-                        "dataElement": "DE2",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-23T09:00:00.120Z",
-                        "value": 4
-                    }]
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-23T09:00:00.120Z",
+                    "value": 4
                 }];
 
                 dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
@@ -241,7 +229,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 }];
 
                 expect(approvalDataRepository.deleteLevelTwoApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
-                expect(dataRepository.save).toHaveBeenCalledWith(expectedDataConsumer);
+                expect(dataRepository.saveDhisData).toHaveBeenCalledWith(expectedDataConsumer);
             });
         });
     });

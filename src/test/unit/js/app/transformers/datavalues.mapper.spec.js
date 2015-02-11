@@ -26,50 +26,41 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                     }
                 }
             };
-            var _Date = Date;
-            var today = new _Date();
-            spyOn(window, 'Date').and.returnValue(today);
 
             period = "2014W14";
-            domain = {
-                "dataValues": [{
-                    "dataElement": "DE_Oedema",
-                    "categoryOptionCombo": "32",
-                    "period": "2014W14",
-                    "orgUnit": "company_0",
-                    "storedBy": "user",
-                    "formula": "1+2",
-                    "value": 3,
-                    "lastUpdated": today.toISOString()
-                }, {
-                    "dataElement": "DE_Oedema",
-                    "categoryOptionCombo": "33",
-                    "period": "2014W14",
-                    "orgUnit": "company_0",
-                    "storedBy": "user",
-                    "formula": "12",
-                    "value": 12,
-                    "lastUpdated": today.toISOString()
-                }, {
-                    "dataElement": "DE_MLT115",
-                    "categoryOptionCombo": "32",
-                    "period": "2014W14",
-                    "orgUnit": "company_0",
-                    "storedBy": "user",
-                    "formula": "49",
-                    "value": 49,
-                    "lastUpdated": today.toISOString()
-                }, {
-                    "dataElement": "DE_MLT115",
-                    "categoryOptionCombo": "37",
-                    "period": "2014W14",
-                    "orgUnit": "company_0",
-                    "storedBy": "user",
-                    "formula": "67",
-                    "value": 67,
-                    "lastUpdated": today.toISOString()
-                }]
-            };
+            domain = [{
+                "dataElement": "DE_Oedema",
+                "categoryOptionCombo": "32",
+                "period": "2014W14",
+                "orgUnit": "company_0",
+                "storedBy": "user",
+                "formula": "1+2",
+                "value": 3
+            }, {
+                "dataElement": "DE_Oedema",
+                "categoryOptionCombo": "33",
+                "period": "2014W14",
+                "orgUnit": "company_0",
+                "storedBy": "user",
+                "formula": "12",
+                "value": 12
+            }, {
+                "dataElement": "DE_MLT115",
+                "categoryOptionCombo": "32",
+                "period": "2014W14",
+                "orgUnit": "company_0",
+                "storedBy": "user",
+                "formula": "49",
+                "value": 49
+            }, {
+                "dataElement": "DE_MLT115",
+                "categoryOptionCombo": "37",
+                "period": "2014W14",
+                "orgUnit": "company_0",
+                "storedBy": "user",
+                "formula": "67",
+                "value": 67
+            }];
         }));
 
         it("should construct a valid json filtering out empty values given the data values", function() {

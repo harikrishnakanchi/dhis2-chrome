@@ -9,21 +9,18 @@ define(["moment"], function(moment) {
                     "storedBy": storedBy,
                     "categoryOptionCombo": categoryOptionComboId,
                     "formula": dataValue.formula,
-                    "value": dataValue.value,
-                    "lastUpdated": new Date().toISOString()
+                    "value": dataValue.value
                 };
             });
         }), true);
         var nonEmptyValues = _.filter(resultValues, function(de) {
             return de.value !== "";
         });
-        return {
-            "dataValues": nonEmptyValues
-        };
+        return nonEmptyValues;
     };
 
-    var mapToView = function(data) {
-        return _.reduce(data.dataValues, function(dataValues, v) {
+    var mapToView = function(dataValues) {
+        return _.reduce(dataValues, function(dataValues, v) {
             dataValues[v.dataElement] = dataValues[v.dataElement] || {};
             dataValues[v.dataElement][v.categoryOptionCombo] = {
                 formula: v.formula || v.value,
