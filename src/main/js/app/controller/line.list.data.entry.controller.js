@@ -13,15 +13,11 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
         };
 
         var loadPrograms = function() {
-            var getProgramAndStagesPromises = [];
-            _.each($scope.programsInCurrentModule, function(programId) {
-                getProgramAndStagesPromises.push(programRepository.get(programId));
+            return programRepository.get($scope.programsInCurrentModule).then(function(program) {
+                $scope.program = program;
+                return $scope.program;
             });
-
-            return $q.all(getProgramAndStagesPromises).then(function(allPrograms) {
-                $scope.programs = allPrograms;
-                return $scope.programs;
-            });
+            
         };
 
         var loadOptionSets = function() {
@@ -32,38 +28,27 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             });
         };
 
-        var setExcludedPropertyForDataElements = function(programs) {
+        var setExcludedPropertyForDataElements = function(program) {
             var loadSystemSettings = function() {
                 return systemSettingRepository.getAllWithProjectId($scope.currentModule.parent.id).then(function(data) {
                     if (data === undefined) return [];
-                    var excludedDataElementIds = data.value.excludedDataElements[$scope.currentModule.id];
-                    return excludedDataElementIds;
+                    var excludedDataElements = data.value.excludedDataElements[$scope.currentModule.id];
+                    return excludedDataElements;
                 });
             };
 
-            var setDataElements = function(excludedDataElementIds) {
-                _.forEach(programs, function(program) {
-                    _.forEach(program.programStages, function(programStage) {
-                        _.forEach(programStage.programStageSections, function(section) {
-                            _.forEach(section.programStageDataElements, function(psde) {
-                                psde.dataElement.isExcluded = (_.indexOf(excludedDataElementIds, psde.dataElement.id) !== -1) ? true : false;
-                            });
-                        });
-                    });
-                });
-                return programs;
+            var setDataElements = function(excludedDataElements) {
+                return programRepository.get(program.id, excludedDataElements);
             };
+
             return loadSystemSettings().then(setDataElements);
         };
 
         var reloadEventsView = function() {
             var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
-            var programIdsInCurrentModule = $scope.programsInCurrentModule;
             $scope.allEvents = [];
-            return _.forEach(programIdsInCurrentModule, function(programId) {
-                programEventRepository.getEventsFor(programId, period, $scope.currentModule.id).then(function(events) {
-                    $scope.allEvents = $scope.allEvents.concat(events);
-                });
+            programEventRepository.getEventsFor($scope.programsInCurrentModule, period, $scope.currentModule.id).then(function(events) {
+                $scope.allEvents = $scope.allEvents.concat(events);
             });
         };
 
@@ -315,8 +300,8 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
                 return getProgramInfoNgModel(eventToBeEdited.program).then(function(program) {
                     eventToBeEdited.eventDate = new Date(eventToBeEdited.eventDate);
-                    setExcludedPropertyForDataElements([program]).then(function(modifiedPrograms) {
-                        eventToBeEdited.program = modifiedPrograms[0];
+                    setExcludedPropertyForDataElements(program).then(function(modifiedProgram) {
+                        eventToBeEdited.program = modifiedProgram;
                         eventToBeEdited.dataElementValues = getDataElementValues(eventToBeEdited);
                         $scope.eventToBeEdited = _.cloneDeep(eventToBeEdited);
                         return;

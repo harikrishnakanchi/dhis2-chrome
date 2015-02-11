@@ -8,7 +8,7 @@
             <div ng-show="resultMessageType === 'failure'" class="alert alert-danger">{{resultMessage}}</div>
             <form name="form.eventDataEntryForm" id="form.eventDataEntryForm" class="form-horizontal">
                 <accordion close-others="false">
-                    <accordion-group ng-repeat="program in programs" is-open="true">
+                    <accordion-group is-open="true">
                         <accordion-heading>
                             <span ng-if="resourceBundle[program.id]">{{ resourceBundle[program.id] }}</span>
                             <span ng-if="!resourceBundle[program.id]">{{ program.name }}</span>
