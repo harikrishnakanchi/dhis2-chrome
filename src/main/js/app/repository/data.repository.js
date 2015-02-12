@@ -63,9 +63,10 @@ define(["lodash", "moment"], function(_, moment) {
             return store.each(query).then(function(data) {
                 return _.flatten(data, "dataValues");
             }).then(function(dataValues) {
-                return _.filter(dataValues, function(dv) {
+                var filteredDV = _.filter(dataValues, function(dv) {
                     return _.contains(orgUnits, dv.orgUnit);
                 });
+                return _.flatten(_.pluck(filteredDV, 'dataValues'));
             });
         };
     };

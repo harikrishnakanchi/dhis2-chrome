@@ -1,7 +1,7 @@
 require.config({
     paths: {
         "Q": "lib/q/q",
-        "lodash": "lib/lodash/dist/lodash",
+        "lodash": "lib/lodash/lodash",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
         "indexedDBLogger": "app/utils/indexeddb.logger",

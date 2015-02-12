@@ -96,7 +96,6 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             }]);
         });
 
-
         it("should save data values sent from DHIS", function() {
             dataRepository.saveDhisData(dataValuesFromDHIS);
 

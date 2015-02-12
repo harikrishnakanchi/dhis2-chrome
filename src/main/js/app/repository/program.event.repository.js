@@ -56,7 +56,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             };
 
             var updateEvents = function(events) {
-                var eventsToBeSubmitted = _.filter(events, function(e){
+                var eventsToBeSubmitted = _.filter(events, function(e) {
                     return e.localStatus === "DRAFT";
                 });
 
@@ -89,9 +89,16 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             };
 
             var getDataElements = function() {
+                var getDataElementIds = function(programStages) {
+                    var programStageSections = _.flatten(_.pluck(programStages, "programStageSections"));
+                    var programStageDataElements = _.flatten(_.pluck(programStageSections, "programStageDataElements"));
+                    var dataElements = _.pluck(programStageDataElements, "dataElement");
+                    return _.pluck(dataElements, "id");
+                };
+
                 return getProgram().then(getProgramStages).then(function(programStages) {
                     var store = db.objectStore("dataElements");
-                    var dataElementIds = _.pluck(_.flatten(_.flatten(_.flatten(programStages, 'programStageSections'), 'programStageDataElements'), 'dataElement'), 'id');
+                    var dataElementIds = getDataElementIds(programStages);
 
                     return $q.all(_.map(dataElementIds, function(dataElementId) {
                         return store.find(dataElementId).then(function(dataElement) {

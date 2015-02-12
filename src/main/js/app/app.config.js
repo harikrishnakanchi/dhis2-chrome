@@ -2,7 +2,7 @@ require.config({
     paths: {
         "angular": "lib/angular/angular",
         "Q": "lib/q/q",
-        "lodash": "lib/lodash/dist/lodash",
+        "lodash": "lib/lodash/lodash",
         "ng-i18n": "lib/ng-i18n/src/js/ng-i18n",
         "angular-route": "lib/angular-route/angular-route",
         "angular-resource": "lib/angular-resource/angular-resource",

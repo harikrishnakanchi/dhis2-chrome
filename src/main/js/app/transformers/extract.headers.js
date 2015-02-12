@@ -8,25 +8,34 @@ define(["findCategoryComboOption"], function(findCategoryComboOption) {
         });
 
         var cartesianProductOf = function(arr) {
-            return _.reduce(arr, function(a, b) {
-                headers.push(a);
-                return _.flatten(_.map(a, function(x) {
-                    return _.map(b, function(y) {
-                        return x.concat([y]);
+            var multiply = function(arrA, arrB) {
+                return _.flatten(_.map(arrA, function(a) {
+                    return _.map(arrB, function(b) {
+                        a = _.isArray(a) ? a : [a];
+                        b = _.isArray(b) ? b : [b];
+                        return a.concat(b);
                     });
-                }), true);
-            }, [
-                []
-            ]);
+                }));
+            };
+
+            if (arr.length === 1) {
+                return _.map(arr[0], function(a) {
+                    return [a];
+                });
+            }
+
+            return _.reduce(arr, function(result, a) {
+                headers.push(result);
+                return multiply(result, a);
+            });
         };
 
         prod = cartesianProductOf(categoryOptions);
         headers.push(prod);
-        headers.shift();
 
         var headerLabels = _.map(headers, function(a) {
             return _.map(a, function(b) {
-                return _.last(b);
+                return _.isArray(b) ? _.last(b) : b;
             });
         });
 
