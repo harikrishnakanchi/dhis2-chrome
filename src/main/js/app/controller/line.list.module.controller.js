@@ -132,7 +132,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             var payload = orgUnitMapper.disable(enrichedModule);
             $scope.isDisabled = true;
             $q.all([orgUnitRepository.upsert(payload), publishMessage(payload, "upsertOrgUnit")]).then(function() {
-                if ($scope.$parent.closeNewForm) $scope.$parent.closeNewForm(module, "disabledModule");
+                if ($scope.$parent.closeNewForm) {
+                    $scope.$parent.closeNewForm(module, "disabledModule");
+                }
             });
         };
 
@@ -209,20 +211,23 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                 });
             };
             var excludedDataElements = systemSettingsTransformer.excludedDataElementsForLinelistModule($scope.enrichedProgram);
-            return saveSystemSettings(excludedDataElements, parent.id);
+            return saveSystemSettings(excludedDataElements, parent.id).then(function() {
+                return enrichedModule;
+            });
         };
 
         $scope.save = function(module) {
-            var onSuccess = function(enrichedModules) {
+            var onSuccess = function(enrichedModule) {
                 $scope.saveFailure = false;
                 if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm($scope.orgUnit, "savedModule");
+                    $scope.$parent.closeNewForm(enrichedModule, "savedModule");
                 return [$scope.module];
             };
 
-            var createOrgUnitGroups = function() {
-                var enrichedLineListModule = orgUnitMapper.mapToModule(module);
-                return orgUnitGroupHelper.createOrgUnitGroups([enrichedLineListModule], false);
+            var createOrgUnitGroups = function(enrichedModule) {
+                return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false).then(function() {
+                    return enrichedModule;
+                });
             };
 
             createModule(module).then(_.curry(associatePrograms)($scope.program))
@@ -235,7 +240,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             return _.isEmpty($scope.program.name);
         };
 
-         $scope.isAfterMaxDate = function() {
+        $scope.isAfterMaxDate = function() {
             return moment($scope.module.openingDate).isAfter(moment($scope.thisDate));
         };
 

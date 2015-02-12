@@ -44,7 +44,7 @@ define([], function() {
                         if (res !== undefined && isOrgUnitAbsent) {
                             orgUnitGroup.organisationUnits.push(moduleToAdd);
                             modifiedOrgUnitGroups.push(orgUnitGroup);
-                        } 
+                        }
                     });
                     return modifiedOrgUnitGroups;
                 };
@@ -63,7 +63,7 @@ define([], function() {
                 });
             };
 
-            getOrgUnitGroups().then(addModulesToOrgUnitGroups);
+            return getOrgUnitGroups().then(addModulesToOrgUnitGroups);
         };
     };
 });

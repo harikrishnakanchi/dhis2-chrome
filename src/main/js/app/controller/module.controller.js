@@ -186,14 +186,16 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
             };
             var excludedDataElements = systemSettingsTransformer.excludedDataElementsForAggregateModule($scope.associatedDatasets);
-            return saveSystemSettings(excludedDataElements, parent.id);
+            return saveSystemSettings(excludedDataElements, parent.id).then(function() {
+                return enrichedModule;
+            });
         };
 
         $scope.save = function(module) {
             var onSuccess = function(enrichedModule) {
                 $scope.saveFailure = false;
                 if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm($scope.module, "savedModule");
+                    $scope.$parent.closeNewForm(enrichedModule, "savedModule");
                 return enrichedModule;
             };
 
@@ -225,12 +227,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                     .then(associateDatasets);
             };
 
-            var createOrgUnitGroups = function() {
-                var enrichedmodule = orgUnitMapper.mapToModule($scope.module);
-                return orgUnitGroupHelper.createOrgUnitGroups([enrichedmodule], false);
+            var createOrgUnitGroups = function(enrichedmodule) {
+                return orgUnitGroupHelper.createOrgUnitGroups([enrichedmodule], false).then(function() {
+                    return enrichedmodule;
+                });
             };
 
-            saveAggregateModules()
+            return saveAggregateModules()
                 .then(_.curry(saveSystemSettingsForExcludedDataElements)($scope.module.parent))
                 .then(createOrgUnitGroups)
                 .then(onSuccess, $scope.onError);
