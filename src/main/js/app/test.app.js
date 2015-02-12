@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "httpInterceptor", "properties", "failureStrategyFactory", "monitors", "migrator", "migrations", "angular-indexedDB"],
-    function(angular, Q, services, repositories, consumers, hustleModule, httpInterceptor, properties, failureStrategyFactory, monitors, migrator, migrations) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "failureStrategyFactory", "monitors", "migrator", "migrations", "angular-indexedDB"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, failureStrategyFactory, monitors, migrator, migrations) {
         var init = function() {
             var app = angular.module('DHIS2_TEST', ["xc.indexedDB", "hustle"]);
             services.init(app);
@@ -7,7 +7,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             repositories.init(app);
             monitors.init(app);
 
-            app.factory('httpInterceptor', ['$rootScope', '$q', httpInterceptor]);
+            app.factory('configureRequestInterceptor', [configureRequestInterceptor]);
+            app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
+            app.factory('handleTimeoutInterceptor', ['$q', handleTimeoutInterceptor]);
+
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider',
                 function($indexedDBProvider, $httpProvider, $hustleProvider) {
                     $indexedDBProvider.connection('msf')
@@ -27,7 +30,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     $httpProvider.defaults.headers.post = {
                         "Content-Type": "application/json;charset=utf-8"
                     };
-                    $httpProvider.interceptors.push('httpInterceptor');
+                    $httpProvider.interceptors.push('configureRequestInterceptor');
+                    $httpProvider.interceptors.push('cleanupPayloadInterceptor');
+                    $httpProvider.interceptors.push('handleTimeoutInterceptor');
+
                 }
             ]);
 
@@ -46,6 +52,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         doPublish("downloadMetadata");
                         doPublish("downloadOrgUnit");
                         doPublish("downloadOrgUnitGroups");
+                        doPublish("downloadProgram");
+                        doPublish("downloadDatasets");
 
                         console.log("Starting project data sync");
                         doPublish("downloadData");

@@ -41,7 +41,6 @@ gulp.task('check-jetty-home', function() {
     }
 });
 
-
 gulp.task('check-war-path', function() {
     if (!process.env.DHIS_WAR_PATH) {
         console.error("Tell us where to find dhis by setting DHIS_WAR_PATH");
@@ -67,7 +66,6 @@ gulp.task('update-webdriver', shell.task([
     './node_modules/protractor/bin/webdriver-manager update'
 ]));
 
-
 gulp.task('reset-db', shell.task(['dropdb dhis_test  --if-exists && createdb dhis_test -O dhis && psql dhis_test < src/test/integration/db/dhis2.backup'], {
     quiet: true
 }));
@@ -84,7 +82,7 @@ gulp.task('start-dhis', ['check-jetty-home', 'check-war-path', 'deploy-war', 're
     var checkForDhis = function() {
         rest.get('http://localhost:8888/dhis').on('complete', function(result) {
             if (result instanceof Error) {
-                console.log('Wait for dhis to boot');
+                console.log('Waiting for dhis to boot');
                 this.retry(10000);
             } else {
                 deferred.resolve();
@@ -185,7 +183,6 @@ gulp.task('less', function() {
 gulp.task('watch', function() {
     return gulp.watch('./src/main/less/main.less', ['less']);
 });
-
 
 gulp.task('download-org', function() {
     return download(baseIntUrl + "/api/organisationUnits.json?fields=:all&paging=false", auth)
