@@ -83,6 +83,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "dataElement": "DE1",
                     "categoryOptionCombo": "COC1",
                     "value": 1,
+                    "isDraft": true,
                     "clientLastUpdated": "2015-04-15T00:00:00.000Z"
                 }, {
                     "period": '2014W15',
@@ -90,9 +91,9 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "dataElement": "DE2",
                     "categoryOptionCombo": "COC2",
                     "value": 2,
+                    "isDraft": true,
                     "clientLastUpdated": "2015-04-15T00:00:00.000Z"
-                }],
-                "isDraft": true
+                }]
             }]);
         });
 
@@ -178,7 +179,8 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "dataElement": "DE2",
                     "categoryOptionCombo": "COC2",
                     "value": 4,
-                    "lastUpdated": "2014-01-22T00:00:00.000"
+                    "isDraft": true,
+                    "clientLastUpdated": "2014-01-22T00:00:00.000"
                 }]
             }, {
                 "orgUnit": "ou3",
@@ -213,7 +215,8 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 "dataElement": "DE2",
                 "categoryOptionCombo": "COC2",
                 "value": 4,
-                "lastUpdated": "2014-01-22T00:00:00.000"
+                "isDraft": true,
+                "clientLastUpdated": "2014-01-22T00:00:00.000"
             }]);
         });
     });

@@ -63,7 +63,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             var endDate = moment().format("YYYY-MM-DD");
 
             var dhisApprovalData = {
-                "completeDataSetRegistrationList": [{
+                "completeDataSetRegistrations": [{
                     "dataSet": {
                         "id": "d1"
                     },

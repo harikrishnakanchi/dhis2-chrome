@@ -114,23 +114,21 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
             });
 
             it("should save downloaded data to indexeddb if no data already exists in db", function() {
-                var dhisDataValues = {
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W11",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z",
-                        "value": 5
-                    }, {
-                        "dataElement": "DE2",
-                        "period": "2014W11",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z",
-                        "value": 10
-                    }]
-                };
+                var dhisDataValues = [{
+                    "dataElement": "DE1",
+                    "period": "2014W11",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": 5
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2014W11",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": 10
+                }];
 
                 dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
 
@@ -165,23 +163,21 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
             });
 
             it("should merge dhisData with existing db data, clear approvals where necessary, do the laundry and save to indexeddb", function() {
-                var dhisDataValues = {
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-27T09:00:00.120Z",
-                        "value": 1
-                    }, {
-                        "dataElement": "DE2",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-20T09:00:00.120Z",
-                        "value": 2
-                    }]
-                };
+                var dhisDataValues = [{
+                    "dataElement": "DE1",
+                    "period": "2014W12",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": 1
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2014W12",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-20T09:00:00.120Z",
+                    "value": 2
+                }];
 
                 var dbDataValues = [{
                     "dataElement": "DE1",

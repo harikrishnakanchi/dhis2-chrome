@@ -53,8 +53,8 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
         };
 
         this.getAllLevelOneApprovalData = function(orgUnits, dataSets) {
-            var transform = function(completeDataSetRegistrationList) {
-                var registrationsGroupedByPeriodAndOu = _.groupBy(completeDataSetRegistrationList, function(registration) {
+            var transform = function(completeDataSetRegistrations) {
+                var registrationsGroupedByPeriodAndOu = _.groupBy(completeDataSetRegistrations, function(registration) {
                     return [registration.period.id, registration.organisationUnit.id];
                 });
 
@@ -71,8 +71,8 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
 
             var onSuccess = function(response) {
                 var deferred = $q.defer();
-                if (response.data.completeDataSetRegistrationList)
-                    deferred.resolve(transform(response.data.completeDataSetRegistrationList));
+                if (response.data.completeDataSetRegistrations)
+                    deferred.resolve(transform(response.data.completeDataSetRegistrations));
                 else
                     deferred.resolve([]);
                 return deferred.promise;

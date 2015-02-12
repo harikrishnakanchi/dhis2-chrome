@@ -615,28 +615,25 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should show not-ready-for-approval message if data has been saved as draft", function() {
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, {
+                getDataValuesSpy.and.returnValue(utils.getPromise(q, [{
+                    "dataElement": "b9634a78271",
                     "period": "2014W14",
                     "orgUnit": "mod2",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "12",
                     "isDraft": true,
-                    "dataValues": [{
-                        "dataElement": "b9634a78271",
-                        "period": "2014W14",
-                        "orgUnit": "mod2",
-                        "categoryOptionCombo": "h48rgCOjDTg",
-                        "value": "12",
-                        "storedBy": "service.account",
-                        "followUp": false
-                    }, {
-                        "dataElement": "b9634a78271",
-                        "period": "2014W14",
-                        "orgUnit": "mod2",
-                        "categoryOptionCombo": "h48rgCOjDTg",
-                        "value": "13",
-                        "storedBy": "service.account",
-                        "followUp": false
-                    }]
-                }));
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W14",
+                    "orgUnit": "mod2",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "13",
+                    "isDraft": true,
+                    "storedBy": "service.account",
+                    "followUp": false
+                }]));
 
                 scope.$apply();
 
@@ -644,27 +641,23 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should show ready-for-approval message if data has already been submitted for approval", function() {
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, {
+                getDataValuesSpy.and.returnValue(utils.getPromise(q, [{
+                    "dataElement": "b9634a78271",
                     "period": "2014W14",
                     "orgUnit": "mod2",
-                    "dataValues": [{
-                        "dataElement": "b9634a78271",
-                        "period": "2014W14",
-                        "orgUnit": "mod2",
-                        "categoryOptionCombo": "h48rgCOjDTg",
-                        "value": "12",
-                        "storedBy": "service.account",
-                        "followUp": false
-                    }, {
-                        "dataElement": "b9634a78271",
-                        "period": "2014W14",
-                        "orgUnit": "mod2",
-                        "categoryOptionCombo": "h48rgCOjDTg",
-                        "value": "13",
-                        "storedBy": "service.account",
-                        "followUp": false
-                    }]
-                }));
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "12",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }, {
+                    "dataElement": "b9634a78271",
+                    "period": "2014W14",
+                    "orgUnit": "mod2",
+                    "categoryOptionCombo": "h48rgCOjDTg",
+                    "value": "13",
+                    "storedBy": "service.account",
+                    "followUp": false
+                }]));
 
                 scope.$apply();
 
@@ -685,7 +678,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, {}));
+
                 spyOn(approvalHelper, "markDataAsComplete").and.callFake(function() {
                     levelOneApprovalDataSaved = true;
                     return utils.getPromise(q, {});
@@ -729,7 +722,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, {}));
 
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
 
@@ -797,11 +789,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should not submit data for approval", function() {
-
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, {}));
+
                 spyOn(approvalHelper, "markDataAsComplete").and.returnValue(utils.getRejectedPromise(q, {}));
 
                 scope.firstLevelApproval();
@@ -813,9 +804,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should mark data as complete if proccessed", function() {
-
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, {}));
-
                 scope.$apply();
 
                 spyOn(fakeModal, "open").and.returnValue({
@@ -835,8 +823,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     'blah': 'moreBlah'
                 }));
                 getLevelTwoApprovalDataSpy.and.returnValue(utils.getPromise(q, {}));
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, {}));
-
 
                 scope.$apply();
 
@@ -855,8 +841,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         });
                     return utils.getPromise(q, undefined);
                 });
-
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, {}));
 
                 scope.$apply();
 
@@ -887,8 +871,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 getLevelTwoApprovalDataSpy.and.returnValue(utils.getPromise(q, {
                     'isApproved': true
                 }));
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, {}));
-
 
                 scope.$apply();
 

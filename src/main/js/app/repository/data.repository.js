@@ -1,6 +1,6 @@
 define(["lodash", "moment"], function(_, moment) {
     return function(db) {
-        var transformAndSave = function(payload, isDraft) {
+        var transformAndSave = function(payload) {
             var groupedDataValues = _.groupBy(payload, function(dataValue) {
                 return [dataValue.period, dataValue.orgUnit];
             });
@@ -12,16 +12,12 @@ define(["lodash", "moment"], function(_, moment) {
                     "dataValues": dataValues,
                     "orgUnit": split[1]
                 };
-                if (isDraft)
-                    dataValue = _.merge(dataValue, {
-                        "isDraft": true
-                    });
                 result.push(dataValue);
             };
 
-            var dataValues = _.transform(groupedDataValues, dataValueSetsAggregator, []);
+            var indexableDataValues = _.transform(groupedDataValues, dataValueSetsAggregator, []);
             var dataValuesStore = db.objectStore("dataValues");
-            return dataValuesStore.upsert(dataValues).then(function() {
+            return dataValuesStore.upsert(indexableDataValues).then(function() {
                 return payload;
             });
         };
@@ -32,16 +28,17 @@ define(["lodash", "moment"], function(_, moment) {
                 return dataValue;
             });
 
-            return transformAndSave(payload, false);
+            return transformAndSave(payload);
         };
 
         this.saveAsDraft = function(payload) {
             payload = _.map(payload, function(dataValue) {
                 dataValue.clientLastUpdated = moment().toISOString();
+                dataValue.isDraft = true;
                 return dataValue;
             });
 
-            return transformAndSave(payload, true);
+            return transformAndSave(payload);
         };
 
         this.saveDhisData = function(payload) {
@@ -60,9 +57,7 @@ define(["lodash", "moment"], function(_, moment) {
         this.getDataValuesForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
             var store = db.objectStore("dataValues");
             var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
-            return store.each(query).then(function(data) {
-                return _.flatten(data, "dataValues");
-            }).then(function(dataValues) {
+            return store.each(query).then(function(dataValues) {
                 var filteredDV = _.filter(dataValues, function(dv) {
                     return _.contains(orgUnits, dv.orgUnit);
                 });

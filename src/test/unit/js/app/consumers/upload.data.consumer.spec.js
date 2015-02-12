@@ -12,48 +12,42 @@ define(["uploadDataConsumer", "angularMocks", "dataService", "dataRepository", "
             }));
 
             it("should upload data to DHIS", function() {
-                var dbDataValues = {
-                    "orgUnit": "MSF_0",
+                var dbDataValues = [{
+                    "dataElement": "DE1",
                     "period": "2014W12",
-                    "dataValues": [{
-                        "dataElement": "DE1",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-24T09:00:00.120Z",
-                        "value": 1
-                    }, {
-                        "dataElement": "DE2",
-                        "period": "2014W12",
-                        "orgUnit": "MSF_0",
-                        "categoryOptionCombo": "C1",
-                        "lastUpdated": "2014-05-24T09:00:00.120Z",
-                        "value": 2
-                    }]
-                };
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-24T09:00:00.120Z",
+                    "value": 1
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2014W12",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-24T09:00:00.120Z",
+                    "value": 2
+                }];
 
                 spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, dbDataValues));
                 spyOn(dataService, "save");
 
                 message = {
                     "data": {
-                        "data": {
-                            "dataValues": [{
-                                "dataElement": "DE1",
-                                "period": "2014W12",
-                                "orgUnit": "MSF_0",
-                                "categoryOptionCombo": "C1",
-                                "lastUpdated": "2014-05-24T09:00:00.120Z",
-                                "value": 1
-                            }, {
-                                "dataElement": "DE2",
-                                "period": "2014W12",
-                                "orgUnit": "MSF_0",
-                                "categoryOptionCombo": "C1",
-                                "lastUpdated": "2014-05-24T09:00:00.120Z",
-                                "value": 2
-                            }]
-                        },
+                        "data": [{
+                            "dataElement": "DE1",
+                            "period": "2014W12",
+                            "orgUnit": "MSF_0",
+                            "categoryOptionCombo": "C1",
+                            "lastUpdated": "2014-05-24T09:00:00.120Z",
+                            "value": 1
+                        }, {
+                            "dataElement": "DE2",
+                            "period": "2014W12",
+                            "orgUnit": "MSF_0",
+                            "categoryOptionCombo": "C1",
+                            "lastUpdated": "2014-05-24T09:00:00.120Z",
+                            "value": 2
+                        }],
                         "type": "uploadDataValues"
                     }
                 };
@@ -61,6 +55,7 @@ define(["uploadDataConsumer", "angularMocks", "dataService", "dataRepository", "
                 uploadDataConsumer.run(message);
                 scope.$apply();
 
+                expect(dataRepository.getDataValues).toHaveBeenCalledWith("2014W12", "MSF_0");
                 expect(dataService.save).toHaveBeenCalledWith(dbDataValues);
             });
         });

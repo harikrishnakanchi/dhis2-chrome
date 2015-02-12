@@ -1,6 +1,6 @@
 define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], function(moment, approvalDataTransformer, properties, _, md5) {
     return function($scope, $hustle, $q, $rootScope, approvalHelper, datasetRepository, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location) {
-        var dataValues = [];
+
         $scope.approveSuccessForLevelOne = false;
         $scope.approveSuccessForLevelTwo = false;
         $scope.approveSuccessForLevelThree = false;

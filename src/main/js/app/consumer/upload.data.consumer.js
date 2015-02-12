@@ -1,10 +1,9 @@
 define(["moment", "properties", "lodash"], function(moment, properties, _) {
     return function(dataService, dataRepository) {
-        var preparePayload = function(dataToUpload) {
-            var dataValues = dataToUpload.dataValues[0];
-            return dataRepository.getDataValues(dataValues.period, dataValues.orgUnit).then(function(data) {
-                return data;
-            });
+        var preparePayload = function(dataValues) {
+            var period = dataValues[0].period;
+            var orgUnit = dataValues[0].orgUnit;
+            return dataRepository.getDataValues(period, orgUnit);
         };
 
         var uploadData = function(data) {

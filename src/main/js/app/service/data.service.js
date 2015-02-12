@@ -3,7 +3,9 @@ define(["lodash", "moment", "dhisUrl"], function(_, moment, dhisUrl) {
         this.downloadAllData = function(orgUnitIds, dataSetIds) {
             var today = moment().format("YYYY-MM-DD");
             var onSuccess = function(response) {
-                return response.data;
+                if (_.isEmpty(response.data))
+                    return [];
+                return response.data.dataValues;
             };
 
             return $http.get(dhisUrl.dataValueSets, {
@@ -17,7 +19,8 @@ define(["lodash", "moment", "dhisUrl"], function(_, moment, dhisUrl) {
             }).then(onSuccess);
         };
 
-        this.save = function(payload) {
+        this.save = function(dataValues) {
+
             var sucessResponse = function(response) {
                 if (response.data.status === "ERROR") {
                     return $q.reject(response);
@@ -29,6 +32,9 @@ define(["lodash", "moment", "dhisUrl"], function(_, moment, dhisUrl) {
                 return $q.reject(response);
             };
 
+            var payload = {
+                "dataValues": dataValues
+            };
             return $http.post(dhisUrl.dataValueSets, payload).then(sucessResponse, errorResponse);
         };
     };

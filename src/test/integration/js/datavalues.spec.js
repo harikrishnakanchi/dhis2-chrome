@@ -20,12 +20,10 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
         });
 
         var publishUploadMessage = function(period, orgUnitId, requestId) {
-            var hustleData = {
-                "dataValues": [{
-                    "period": period,
-                    "orgUnit": orgUnitId
-                }]
-            };
+            var hustleData = [{
+                "period": period,
+                "orgUnit": orgUnitId
+            }];
 
             return hustle.publish({
                 "data": hustleData,
@@ -35,10 +33,7 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "lodash"], function(idb
         };
 
         var setUpVerify = function(getActualDataCallback, expectedData, requestId, done) {
-            var verify = function(actual, expected) {
-                var expectedDataValues = expected.dataValues;
-                var actualDataValues = actual.dataValues;
-
+            var verify = function(actualDataValues, expectedDataValues) {
                 var findCorrespondingActualDV = function(expectedDV) {
                     return _.find(actualDataValues, {
                         'dataElement': expectedDV.dataElement,

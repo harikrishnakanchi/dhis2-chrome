@@ -148,45 +148,29 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 }];
 
                 var dataValues = [{
+                    "categoryOptionCombo": "co123",
+                    "dataElement": "de123",
+                    "orgUnit": "123",
                     "period": "2014W17",
-                    "orgUnit": "123",
-                    "dataValues": [{
-                        "categoryOptionCombo": "co123",
-                        "dataElement": "de123",
-                        "orgUnit": "123",
-                        "period": "2014W17",
-                        "value": 9
-                    }]
+                    "value": 9
                 }, {
+                    "categoryOptionCombo": "co123",
+                    "dataElement": "de123",
+                    "orgUnit": "123",
                     "period": "2014W18",
-                    "orgUnit": "123",
-                    "dataValues": [{
-                        "categoryOptionCombo": "co123",
-                        "dataElement": "de123",
-                        "orgUnit": "123",
-                        "period": "2014W18",
-                        "value": 9
-                    }]
+                    "value": 9
                 }, {
+                    "categoryOptionCombo": "co123",
+                    "dataElement": "de123",
+                    "orgUnit": "123",
                     "period": "2014W19",
-                    "orgUnit": "123",
-                    "dataValues": [{
-                        "categoryOptionCombo": "co123",
-                        "dataElement": "de123",
-                        "orgUnit": "123",
-                        "period": "2014W19",
-                        "value": 9
-                    }]
+                    "value": 9
                 }, {
-                    "period": "2014W20",
+                    "categoryOptionCombo": "co123",
+                    "dataElement": "de123",
                     "orgUnit": "123",
-                    "dataValues": [{
-                        "categoryOptionCombo": "co123",
-                        "dataElement": "de123",
-                        "orgUnit": "123",
-                        "period": "2014W20",
-                        "value": 9
-                    }]
+                    "period": "2014W20",
+                    "value": 9
                 }];
 
                 var completedDatasets = [{
@@ -363,15 +347,11 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 };
 
                 var dataValues = [{
-                    "period": "2014W17",
+                    "categoryOptionCombo": "co123",
+                    "dataElement": "de123",
                     "orgUnit": "123",
-                    "dataValues": [{
-                        "categoryOptionCombo": "co123",
-                        "dataElement": "de123",
-                        "orgUnit": "123",
-                        "period": "2014W17",
-                        "value": 9
-                    }]
+                    "period": "2014W17",
+                    "value": 9
                 }];
 
                 var allDatasets = [{

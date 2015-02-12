@@ -354,10 +354,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     $scope.isAccepted = !_.isEmpty(data) && data.isAccepted;
                 });
 
-                dataRepository.getDataValues(getPeriod(), $scope.currentModule.id).then(function(data) {
-                    data = data || {};
-                    $scope.dataValues = dataValuesMapper.mapToView(data);
-                    $scope.isSubmitted = (!_.isEmpty(data) && !data.isDraft);
+                dataRepository.getDataValues(getPeriod(), $scope.currentModule.id).then(function(dataValues) {
+                    dataValues = dataValues || [];
+                    var isDraft = !_.some(dataValues, {
+                        "isDraft": true
+                    });
+                    $scope.dataValues = dataValuesMapper.mapToView(dataValues);
+                    $scope.isSubmitted = (!_.isEmpty(dataValues) && isDraft);
                     $scope.isDataFormInitialized = true;
                 });
 

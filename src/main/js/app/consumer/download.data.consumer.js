@@ -13,11 +13,7 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
                 if (orgUnitIds.length === 0 || allDataSetIds.length === 0)
                     return $q.when([]);
 
-                return dataService.downloadAllData(orgUnitIds, allDataSetIds).then(function(data) {
-                    if (_.isEmpty(data))
-                        return [];
-                    return data.dataValues;
-                });
+                return dataService.downloadAllData(orgUnitIds, allDataSetIds);
             };
 
             return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAllDatasetIds()])

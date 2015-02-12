@@ -27,12 +27,10 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
         };
 
         var publishUploadMessage = function(period, orgUnitId, dataSetId) {
-            var hustleDataValuesData = {
-                "dataValues": [{
-                    "period": period,
-                    "orgUnit": orgUnitId
-                }]
-            };
+            var hustleDataValuesData = [{
+                "period": period,
+                "orgUnit": orgUnitId
+            }];
 
             var hustleDeleteApprovalData = {
                 "ds": [dataSetId],
@@ -266,12 +264,10 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
             };
 
             var publishMessage = function() {
-                var hustleDataValuesData = {
-                    "dataValues": [{
-                        "period": period,
-                        "orgUnit": orgUnitId
-                    }]
-                };
+                var hustleDataValuesData = [{
+                    "period": period,
+                    "orgUnit": orgUnitId
+                }];
 
                 var hustleDeleteApprovalData = {
                     "ds": [datasetId],
