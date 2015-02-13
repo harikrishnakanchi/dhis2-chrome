@@ -1,8 +1,9 @@
 define(["systemSettingRepository", "angularMocks", "utils"], function(SystemSettingRepository, mocks, utils) {
     describe("systemSettingRepository", function() {
-        var repo, downloadedSettings;
+        var repo, downloadedSettings, scope;
 
-        beforeEach(mocks.inject(function($q) {
+        beforeEach(mocks.inject(function($q, $rootScope) {
+            scope = $rootScope.$new();
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
             repo = new SystemSettingRepository(mockDB.db);
