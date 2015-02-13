@@ -1,15 +1,11 @@
 define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, moment, _) {
     return function($http) {
-        var exclude = function(moduleid, excludedDataElements) {
-            var key = "exclude_" + moduleid;
-            var payload = {
-                "clientLastUpdated": moment(),
-                "dataElements": excludedDataElements
-            };
+        var upsert = function(args) {
+            var key = "exclude_" + args.key;
             return $http({
                 method: 'POST',
                 url: dhisUrl.systemSettings + '/' + key,
-                data: JSON.stringify(payload),
+                data: JSON.stringify(args.value),
                 headers: {
                     'Content-Type': 'text/plain'
                 }
@@ -75,7 +71,7 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
 
         return {
             "excludeDataElements": excludeDataElements,
-            "exclude": exclude,
+            "upsert": upsert,
             "getAll": getAll
         };
     };

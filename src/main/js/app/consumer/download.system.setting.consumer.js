@@ -1,6 +1,6 @@
 define(['moment', 'lodashUtils', 'mergeBy'], function(moment, _, mergeBy) {
     return function(systemSettingService, systemSettingRepository, changeLogRepository, $q) {
-        this.run = function(message) {
+        var run = function(message) {
             return download().then(mergeAndSave);
         };
 
@@ -21,6 +21,10 @@ define(['moment', 'lodashUtils', 'mergeBy'], function(moment, _, mergeBy) {
             return systemSettingRepository.findAll(moduleIds)
                 .then(_.curry(mergeBy.lastUpdated)(mergeOpts, remoteSettings))
                 .then(systemSettingRepository.upsertDhisDownloadedData);
+        };
+
+        return {
+            "run": run
         };
     };
 });

@@ -16,6 +16,11 @@ define(["lodash"], function(_) {
             return store.find(parentId);
         };
 
+        var get = function(moduleId) {
+            var store = db.objectStore("systemSettings");
+            return store.find(parentId);
+        };
+
         var upsertDhisDownloadedData = function(settings) {
             var result = [];
             _.map(settings, function(value, key) {
@@ -38,6 +43,7 @@ define(["lodash"], function(_) {
 
         return {
             "upsert": upsert,
+            "get": get,
             "findAll": findAll,
             "getAllWithProjectId": getAllWithProjectId,
             "upsertDhisDownloadedData": upsertDhisDownloadedData

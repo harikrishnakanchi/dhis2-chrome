@@ -56,12 +56,20 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
 
         it("should post excluded data elements settings for a module", function() {
             var moduleId = "mod1";
+            var args = {
+                key: moduleId,
+                value: {
+                    clientLastUpdated: "2014-05-30T12:43:54.972Z",
+                    dataElements: ["de1", "de2"]
+                }
+            };
+
             var key = "exclude_" + moduleId;
             var excludedDataElements = ["de1", "de2"];
-            service.exclude("mod1", excludedDataElements);
+            service.upsert(args);
             var expectedPayload = {
                 clientLastUpdated: "2014-05-30T12:43:54.972Z",
-                dataElements: excludedDataElements
+                dataElements: ["de1", "de2"]
             };
             httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/" + key, expectedPayload).respond(200, "ok");
             httpBackend.flush();
