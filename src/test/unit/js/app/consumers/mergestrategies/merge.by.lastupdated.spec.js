@@ -175,5 +175,62 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
             expect(actualData).toEqual([test1Data, updatedTest2Data, updatedTest3Data]);
         });
 
+        it("should compare based on custom timestamp fields and local copy wins", function() {
+            var eq = function(item1, item2) {
+                return item1.key === item2.key;
+            };
+
+            var dataFromDhis = [{
+                key: "key",
+                "value": {
+                    'id': 'test1',
+                    'name': 'test2',
+                    'lastUpdated': '2015-01-01T10:00:00.000+0000',
+                }
+            }];
+
+            var dataFromDB = [{
+                key: "key",
+                "value": {
+                    'id': 'test1',
+                    'name': 'test3',
+                    'lastUpdated': '2014-12-02T10:00:00.000+0000',
+                    'clientLastUpdated': '2015-01-02T11:00:00.000+0000',
+                }
+            }];
+
+            var actualData = mergeByLastUpdated(eq, "value.lastUpdated", "value.clientLastUpdated", dataFromDhis, dataFromDB);
+            expect(actualData).toEqual(dataFromDB);
+        });
+
+        it("should compare based on custom timestamp fields and dhis copy wins", function() {
+
+            var eq = function(item1, item2) {
+                return item1.key === item2.key;
+            };
+
+            var dataFromDhis = [{
+                key: "key",
+                value: {
+                    'id': 'test1',
+                    'name': 'test2',
+                    'lastUpdated': '2015-01-02T10:00:00.000+0000',
+                }
+            }];
+
+            var dataFromDB = [{
+                key: "key",
+                "value": {
+                    'id': 'test1',
+                    'name': 'test3',
+                    'lastUpdated': '2015-01-01T10:00:00.000+0000',
+                }
+            }];
+
+            var actualData = mergeByLastUpdated(eq, "value.lastUpdated", "value.lastUpdated", dataFromDhis, dataFromDB);
+            expect(actualData).toEqual(dataFromDhis);
+        });
+
+
     });
 });

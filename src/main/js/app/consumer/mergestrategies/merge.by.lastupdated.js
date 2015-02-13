@@ -6,13 +6,13 @@ define(["lodashUtils", "moment"], function(_, moment) {
         var mergedList = _.clone(remoteList);
 
         var defaultEquals = function(item1, item2) {
-            return item1.id === item2.id;
+            return item1.id && item1.id === item2.id;
         };
         var eq = _.isFunction(equalsPred) ? equalsPred : defaultEquals;
 
         var isLocalDataStale = function(remoteItem, localItem) {
             if (!localItem) return true;
-            return moment(_.extract(remoteItem, remoteTimeField , epoc)).isAfter(moment(_.extract(localItem, localTimeField, epoc)));
+            return moment(_.extract(remoteItem, remoteTimeField, epoc)).isAfter(moment(_.extract(localItem, localTimeField, epoc)));
         };
 
         _.each(localList, function(localItem) {
