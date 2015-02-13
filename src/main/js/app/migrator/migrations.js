@@ -121,6 +121,10 @@ define([], function() {
         create_index(datasetStore, "by_organisationUnit", "orgUnitIds", false, true);
     };
 
+    var add_indicators_store = function(db, tx){
+        create_store_with_key("indicators", "id", db);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -137,6 +141,7 @@ define([], function() {
         add_programs_store,
         add_program_events_store,
         add_dataset_store,
-        add_org_unit_store
+        add_org_unit_store,
+        add_indicators_store
     ];
 });
