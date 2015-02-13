@@ -92,18 +92,13 @@ define(["moment", "lodash"], function(moment, _) {
 
         var getAll = function(includeCurrent) {
             includeCurrent = includeCurrent === undefined ? true : includeCurrent;
-            var populateDisplayName = function(allOrgUnits, orgUnit) {
-                var parent = _.find(allOrgUnits, {
-                    'id': orgUnit.parent ? orgUnit.parent.id : undefined
-                });
-                return _.merge(orgUnit, {
-                    displayName: parent && isOfType(parent, "Operation Unit") ? parent.name + " - " + orgUnit.name : orgUnit.name
-                });
-            };
 
             var store = db.objectStore("organisationUnits");
             var orgUnits = store.getAll().then(function(allOrgUnits) {
-                return _.map(allOrgUnits, _.curry(populateDisplayName)(allOrgUnits));
+                return _.map(allOrgUnits, function(orgUnit) {
+                    orgUnit.displayName = orgUnit.parent && isOfType(orgUnit, "Module") ? orgUnit.parent.name + " - " + orgUnit.name : orgUnit.name;
+                    return orgUnit;
+                });
             });
 
             if (!includeCurrent)
