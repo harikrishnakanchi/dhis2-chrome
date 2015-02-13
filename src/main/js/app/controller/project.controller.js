@@ -1,4 +1,4 @@
-define(["moment", "orgUnitMapper", "toTree", "properties"], function(moment, orgUnitMapper, toTree, properties) {
+define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper, properties) {
 
     return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal, approvalHelper, orgUnitGroupHelper) {
 

@@ -13,7 +13,7 @@ define(["lodash"], function(_) {
 
     return function(orgUnits, selectedNodeId) {
         var groupedOrgUnits = _.groupBy(orgUnits, 'level');
-        var sortedLevels = _.sortBy(_.keys(groupedOrgUnits), parseInt);
+        var sortedLevels = _.sortBy(_.keys(groupedOrgUnits));
         var selectedNode;
         var allOrgUnits = _.reduceRight(sortedLevels, function(everyOne, level) {
             var withChildren = function(parent) {
