@@ -1,10 +1,7 @@
 define(["lodashUtils", "moment"], function(_, moment) {
     return function(fieldToMerge, remoteList, localList) {
         var isLocalDataStale = function(remoteItem, localItem) {
-            if (!localItem)
-                return true;
-
-            return !_.isEmpty(_.xorBy(remoteItem[fieldToMerge], localItem[fieldToMerge], "id"));
+            return localItem && !_.isEmpty(_.xorBy(remoteItem[fieldToMerge], localItem[fieldToMerge], "id"));
         };
 
         var mergeFields = function(remoteItem, localItem) {
@@ -19,12 +16,15 @@ define(["lodashUtils", "moment"], function(_, moment) {
         var groupedLocalItems = _.indexBy(localList, "id");
 
         return _.transform(remoteList, function(acc, remoteItem) {
-            if (isLocalDataStale(remoteItem, groupedLocalItems[remoteItem.id])) {
+            var localItem = groupedLocalItems[remoteItem.id];
+            if (isLocalDataStale(remoteItem, localItem)) {
                 var mergedItem = _.cloneDeep(remoteItem);
-                mergedItem[fieldToMerge] = mergeFields(remoteItem, groupedLocalItems[remoteItem.id]);
+                mergedItem[fieldToMerge] = mergeFields(remoteItem, localItem);
                 acc.push(mergedItem);
-            } else
-                acc.push(groupedLocalItems[remoteItem.id]);
+            } else {
+                if (localItem)
+                    acc.push(localItem);
+            }
         });
     };
 });

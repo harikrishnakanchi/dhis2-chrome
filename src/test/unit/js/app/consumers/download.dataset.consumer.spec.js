@@ -130,13 +130,15 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
             it("should retain the local dataset when the dataset or the orgunits associated to it are newer than dhis", function() {
                 var dhisDatasets = [{
                     'id': 'ds1',
-                    'lastUpdated': '2015-01-01T09:00:00.000+0000',
+                    'name': 'old ds1 name',
+                    'lastUpdated': '2015-01-01T10:00:00.000+0000',
                     'organisationUnits': [{
                         'id': 'ou1',
                         'lastUpdated': '2015-01-01T09:00:00.000+0000'
                     }]
                 }, {
                     'id': 'ds2',
+                    'name': 'old ds2 name',
                     'lastUpdated': '2015-01-01T09:00:00.000+0000',
                     'organisationUnits': [{
                         'id': 'ou1',
@@ -146,6 +148,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
 
                 var localDatasets = [{
                     'id': 'ds1',
+                    'name': 'new ds1 name',
                     'lastUpdated': '2015-01-01T10:00:00.000+0000',
                     'clientLastUpdated': '2015-01-01T11:00:00.000+0000',
                     'organisationUnits': [{
@@ -154,6 +157,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                     }]
                 }, {
                     'id': 'ds2',
+                    'name': 'new ds2 name',
                     'lastUpdated': '2015-01-01T09:00:00.000+0000',
                     'clientLastUpdated': '2015-01-01T11:00:00.000+0000',
                     'organisationUnits': [{
@@ -179,7 +183,8 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                 downloadDatasetConsumer.run(message);
                 scope.$apply();
 
-                expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(localDatasets);
+                expect(datasetRepository.upsertDhisDownloadedData.calls.argsFor(0)).toEqual([localDatasets]);
+                expect(datasetRepository.upsertDhisDownloadedData.calls.argsFor(1)).toEqual([localDatasets]);
             });
         });
     });
