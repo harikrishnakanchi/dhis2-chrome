@@ -48,6 +48,7 @@ require.config({
         "confirmDialogController": "app/controller/confirm.dialog.controller",
         "projectUserController": "app/controller/project.user.controller",
         "selectProjectController": "app/controller/select.project.controller",
+        "indicatorController": "app/controller/indicator.controller",
 
         //Services
         "services": "app/service/services",
@@ -77,6 +78,7 @@ require.config({
         "dataElementRepository": "app/repository/data.element.repository",
         "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
         "changeLogRepository": "app/repository/changelog.repository",
+        "indicatorRepository": "app/repository/indicator.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",

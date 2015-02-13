@@ -1,8 +1,8 @@
 define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'moduleController', 'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController',
-        'projectUserController', 'selectProjectController', 'aggregateDataEntryController', 'lineListDataEntryController', 'programRepository', 'programEventRepository', 'dataElementRepository'
+        'projectUserController', 'selectProjectController', 'aggregateDataEntryController', 'lineListDataEntryController', 'programRepository', 'programEventRepository', 'dataElementRepository', 'indicatorController'
     ],
     function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, moduleController, lineListModuleController, projectController, countryController, confirmDialogController,
-        projectUserController, selectProjectController, aggregateDataEntryController, lineListDataEntryController, programRepository, programEventRepository, dataElementRepository) {
+        projectUserController, selectProjectController, aggregateDataEntryController, lineListDataEntryController, programRepository, programEventRepository, dataElementRepository, indicatorController) {
         var init = function(app) {
             app.controller('dashboardController', ['$scope', '$hustle', '$q', '$rootScope', 'approvalHelper', 'datasetRepository', '$modal', '$timeout', 'indexeddbUtils', 'filesystemService', 'sessionHelper', '$location', dashboardController]);
             app.controller('dataEntryController', ['$scope', '$routeParams', '$q', '$location', '$rootScope', 'orgUnitRepository', 'programRepository', dataEntryController]);
@@ -19,6 +19,7 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('confirmDialogController', ['$scope', '$modalInstance', confirmDialogController]);
             app.controller('projectUserController', ['$scope', '$hustle', 'userRepository', projectUserController]);
             app.controller('selectProjectController', ['$scope', '$location', '$rootScope', 'orgUnitRepository', 'userRepository', 'userPreferenceRepository', selectProjectController]);
+            app.controller('indicatorController', ['$scope', indicatorController]);
         };
         return {
             init: init
