@@ -2,7 +2,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
     describe("dispatcher", function() {
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, scope,
             systemSettingConsumer, createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
-            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer;
+            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
+            downloadSystemSettingConsumer, uploadSystemSettingConsumer;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -68,6 +69,12 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadMetadataConsumer = {
                 'run': jasmine.createSpy("downloadMetadataConsumer")
             };
+            downloadSystemSettingConsumer = {
+                'run': jasmine.createSpy("downloadSystemSettingConsumer")
+            };
+            uploadSystemSettingConsumer = {
+                'run': jasmine.createSpy("uploadSystemSettingConsumer")
+            };
 
             message = {};
             q = $q;
@@ -80,10 +87,12 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadOrgUnitGroupConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadProgramConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadDatasetConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadSystemSettingConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
-                downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer);
+                downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer,
+                uploadSystemSettingConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -96,20 +105,20 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadDataConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadDataConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call download data consumer for downloading data values as a fire-and-forget", function() {
+            var message = {};
             message.data = {
                 "data": {},
                 "type": "downloadData"
             };
-
             var returnValue = dispatcher.run(message);
             scope.$apply();
 
             expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
-            expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call completion data consumer for uploading completion data", function() {
@@ -121,8 +130,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
 
-            expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadCompletionDataConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(uploadCompletionDataConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call approval data consumer for uploading approval data", function() {
@@ -135,8 +145,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
-            expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadApprovalDataConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(uploadApprovalDataConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call upload org units consumer", function() {
@@ -148,7 +158,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(downloadOrgUnitConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadOrgUnitConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadOrgUnitConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call download org units consumer", function() {
@@ -170,7 +180,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
             expect(downloadDatasetConsumer.run).toHaveBeenCalled();
-            expect(uploadDatasetConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadDatasetConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call system setting consumer", function() {
@@ -221,7 +231,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
             expect(downloadProgramConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadProgramConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadProgramConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call download program consumer", function() {
@@ -244,7 +254,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(downloadEventDataConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadEventDataConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadEventDataConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call delete event consumer", function() {
@@ -281,7 +291,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(downloadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call downloadOrgUnitGroupConsumer", function() {
@@ -305,6 +315,30 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
 
             expect(deleteApprovalConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should download  system setting consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "downloadSystemSetting"
+            };
+
+            dispatcher.run(message);
+
+            expect(downloadSystemSettingConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should upload system setting consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "uploadSystemSetting"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(downloadSystemSettingConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadSystemSettingConsumer.run).toHaveBeenCalledWith(message, {});
         });
     });
 });

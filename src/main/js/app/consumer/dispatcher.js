@@ -1,70 +1,80 @@
-define([], function() {
-    return function($q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
-        downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
-        downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer) {
+define(["lodash"], function(_) {
+    return function($q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, systemSettingConsumer,
+        createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
+        downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
+        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer) {
+
         this.run = function(message) {
             console.debug("Processing message: " + message.data.type);
             switch (message.data.type) {
                 case "downloadMetadata":
                     return downloadMetadataConsumer.run(message);
+
                 case "downloadData":
-                    return downloadDataConsumer.run(message).then(function() {
-                        return downloadApprovalConsumer.run(message);
-                    });
+                    return downloadDataConsumer.run(message)
+                        .then(_.partial(downloadApprovalConsumer.run, message));
+
                 case "uploadDataValues":
-                    return downloadDataConsumer.run(message).then(function() {
-                        return uploadDataConsumer.run(message);
-                    });
+                    return downloadDataConsumer.run(message)
+                        .then(_.partial(uploadDataConsumer.run, message));
+
                 case "uploadCompletionData":
-                    return downloadDataConsumer.run(message).then(function() {
-                        return downloadApprovalConsumer.run(message).then(function() {
-                            return uploadCompletionDataConsumer.run(message);
-                        });
-                    });
+                    return downloadDataConsumer.run(message)
+                        .then(_.partial(downloadApprovalConsumer.run, message))
+                        .then(_.partial(uploadCompletionDataConsumer.run, message));
+
                 case "deleteApproval":
                     return deleteApprovalConsumer.run(message);
+
                 case "uploadApprovalData":
-                    return downloadDataConsumer.run(message).then(function() {
-                        return downloadApprovalConsumer.run(message).then(function() {
-                            return uploadApprovalDataConsumer.run(message);
-                        });
-                    });
+                    return downloadDataConsumer.run(message)
+                        .then(_.partial(downloadApprovalConsumer.run, message))
+                        .then(_.partial(uploadApprovalDataConsumer.run, message));
+
                 case "upsertOrgUnit":
-                    return downloadOrgUnitConsumer.run(message).then(function() {
-                        return uploadOrgUnitConsumer.run(message);
-                    });
+                    return downloadOrgUnitConsumer.run(message)
+                        .then(_.partial(uploadOrgUnitConsumer.run, message));
+
                 case "downloadOrgUnit":
                     return downloadOrgUnitConsumer.run(message);
+
                 case "upsertOrgUnitGroups":
-                    return downloadOrgUnitGroupConsumer.run(message).then(function() {
-                        return uploadOrgUnitGroupConsumer.run(message);
-                    });
+                    return downloadOrgUnitGroupConsumer.run(message)
+                        .then(_.partial(uploadOrgUnitGroupConsumer.run, message));
+
                 case "downloadOrgUnitGroups":
                     return downloadOrgUnitGroupConsumer.run(message);
+
                 case "downloadDatasets":
                     return downloadDatasetConsumer.run(message);
+
                 case "associateOrgUnitToDataset":
-                    return downloadDatasetConsumer.run().then(function() {
-                        return uploadDatasetConsumer.run(message);
-                    });
+                    return downloadDatasetConsumer.run()
+                        .then(_.partial(uploadDatasetConsumer.run, message));
+
                 case "excludeDataElements":
                     return systemSettingConsumer.run(message);
+
                 case "createUser":
                     return createUserConsumer.run(message);
+
                 case "updateUser":
                     return updateUserConsumer.run(message);
+
                 case "downloadProgram":
                     return downloadProgramConsumer.run(message);
+
                 case "uploadProgram":
-                    return downloadProgramConsumer.run(message).then(function() {
-                        return uploadProgramConsumer.run(message);
-                    });
+                    return downloadProgramConsumer.run(message)
+                        .then(_.partial(uploadProgramConsumer.run, message));
+
                 case "uploadProgramEvents":
-                    return downloadEventDataConsumer.run(message).then(function() {
-                        return uploadEventDataConsumer.run(message);
-                    });
+                    return downloadEventDataConsumer.run(message)
+                        .then(_.partial(uploadEventDataConsumer.run, message));
+
                 case "downloadEventData":
                     return downloadEventDataConsumer.run(message);
+
                 case "deleteEvent":
                     return deleteEventConsumer.run(message);
 
@@ -72,9 +82,8 @@ define([], function() {
                     return downloadSystemSettingConsumer.run(message);
 
                 case "uploadSystemSetting":
-                    return downloadSystemSettingConsumer.run(message).then(function() {
-                        return uploadSystemSettingConsumer.run(message);
-                    });
+                    return downloadSystemSettingConsumer.run(message)
+                        .then(_.partial(uploadSystemSettingConsumer.run, message));
 
                 default:
                     return $q.reject();
