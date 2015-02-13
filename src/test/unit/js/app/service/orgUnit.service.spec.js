@@ -26,7 +26,7 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.verifyNoOutstandingRequest();
         });
 
-        it("should save organization units in dhis and generate resource tables", function() {
+        it("should save organization units in dhis", function() {
             var orgUnit = [{
                 "id": "org_0",
                 "level": 1
@@ -48,11 +48,10 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             orgUnitService.upsert(orgUnit);
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
-            httpBackend.expectPOST(properties.dhis.url + "/api/resourceTables").respond(200, "ok");
             httpBackend.flush();
         });
 
-        it("should save organization unit in dhis and generate resource tables", function() {
+        it("should save organization unit in dhis", function() {
             var orgUnit = {
                 "id": "org_0",
                 "level": 1
@@ -68,11 +67,10 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             orgUnitService.upsert(orgUnit);
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
-            httpBackend.expectPOST(properties.dhis.url + "/api/resourceTables").respond(200, "ok");
             httpBackend.flush();
         });
 
-        it("should send attributes along with metadata for project org units and generate reource tables", function() {
+        it("should send attributes along with metadata for project org units", function() {
 
             var payload = [{
                 'id': 'a4acf9115a7',
@@ -137,7 +135,6 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             orgUnitService.upsert(payload);
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
-            httpBackend.expectPOST(properties.dhis.url + "/api/resourceTables").respond(200, "ok");
             httpBackend.flush();
         });
 

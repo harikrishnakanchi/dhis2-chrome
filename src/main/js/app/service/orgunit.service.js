@@ -5,14 +5,10 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
             return $http.get(dhisUrl.orgUnits + '?' + httpUtils.getParamString('id', orgUnitIds) + ',!dataSets,!access,!href,!uuid');
         };
 
-        var rebuildResourceTables = function() {
-            return $http.post(dhisUrl.resourceTables);
-        };
-
         this.upsert = function(orgUnitRequest) {
             return $http.post(dhisUrl.metadata, {
                 'organisationUnits': angular.isArray(orgUnitRequest) ? orgUnitRequest : [orgUnitRequest]
-            }).then(rebuildResourceTables);
+            });
         };
 
         this.getAll = function(lastUpdatedTime) {
