@@ -91,25 +91,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
 
             scope = $rootScope.$new();
             datasetRepository = new DatasetRepository();
-            spyOn(datasetRepository, "getAllForOrgUnit").and.callFake(function(orgUnitId) {
-                if (orgUnitId === "currentMod") {
-                    return utils.getPromise(q, [{
-                        "id": "ds5",
-                        "organisationUnits": [{
-                            "id": "currentMod",
-                            "name": "currentMod"
-                        }],
-                        "attributeValues": [{
-                            "value": "false",
-                            "attribute": {
-                                "code": "isNewDataModel"
-                            }
-                        }]
-                    }]);
-                } else {
-                    return utils.getPromise(q, datasets);
-                }
-            });
+            spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, datasets));
 
             var currentDataSet = {
                 "id": "currentDs",
@@ -705,6 +687,36 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
         });
 
         it("should get all org units except current modules", function() {
+            var datasets = [{
+                "id": "currentDs",
+                "name": "OBGY_OPD - V1",
+                "organisationUnits": [{
+                    "id": "currentMod",
+                    "name": "c2"
+                }],
+                "orgUnitIds": ["currentMod"],
+                "attributeValues": [{
+                    "value": "false",
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    }
+                }]
+            }, {
+                "id": "newDs",
+                "name": "NeoNat",
+                "organisationUnits": [{
+                    "id": "newMod",
+                    "name": "m2"
+                }],
+                "orgUnitIds": ["newMod"],
+                "attributeValues": [{
+                    "value": "true",
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    }
+                }]
+            }];
+
             var testCountry = {
                 "id": "testCountry",
                 "level": 3,
@@ -765,14 +777,12 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
                 "attributeValues": [{
                     "value": "false",
                     "attribute": {
-                        "id": "ca6958d702e",
                         "name": "Is Linelist Service",
                         "code": "isLineListService",
                     }
                 }, {
                     "value": "Module",
                     "attribute": {
-                        "id": "a1fa2777924",
                         "name": "Type",
                         "code": "Type",
                     }
@@ -851,6 +861,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             mockOrgStore = mockDb.objectStore;
 
             orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, q);
+            datasetRepository.getAll.and.returnValue(utils.getPromise(q, datasets));
 
             var actualOrgUnits = [];
             orgUnitRepository.getAll(false).then(function(data) {

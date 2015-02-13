@@ -1,4 +1,4 @@
-define(["moment", "lodash"], function(moment, _) {
+define(["moment", "lodashUtils"], function(moment, _) {
     return function(db, datasetRepository, $q) {
         var isOfType = function(orgUnit, type) {
             return _.any(orgUnit.attributeValues, {
@@ -10,51 +10,55 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var rejectOrgUnitsWithCurrentDatasets = function(orgUnits) {
-            var isLinelistService = function(orgUnit) {
-                var linelistAttribute = _.find(orgUnit.attributeValues, {
+            var getBooleanAttributeValue = function(attributeValues, attributeCode) {
+                var attr = _.find(attributeValues, {
                     "attribute": {
-                        "code": "isLineListService"
+                        "code": attributeCode
                     }
                 });
 
-                return linelistAttribute ? linelistAttribute.value === "true" : false;
+                return attr && attr.value === 'true';
             };
 
-            var isModuleWithNewDatasets = function(module) {
-                var isNewDataModel = function(ds) {
-                    var attr = _.find(ds.attributeValues, {
-                        "attribute": {
-                            "code": 'isNewDataModel'
-                        }
-                    });
-                    return attr && attr.value === 'true';
-                };
+            var isLinelistService = function(orgUnit) {
+                return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
+            };
 
-                return datasetRepository.getAllForOrgUnit(module.id).then(function(datasets) {
-                    return _.any(datasets, function(ds) {
-                        return isNewDataModel(ds);
-                    });
+            var indexDatasetsByOrgUnits = function() {
+                return datasetRepository.getAll().then(function(datasets) {
+                    return _.groupByArray(datasets, "orgUnitIds");
                 });
             };
 
-            var promises = [];
+            var hasAnyNewDataset = function(datasets) {
+                var isNewDataModel = function(ds) {
+                    return getBooleanAttributeValue(ds.attributeValues, "isNewDataModel");
+                };
 
-            var returnOrgUnits = [];
+                return _.any(datasets, function(ds) {
+                    return isNewDataModel(ds);
+                });
+            };
 
-            _.forEach(orgUnits, function(orgUnit) {
-                if (!isOfType(orgUnit, "Module") || isLinelistService(orgUnit)) {
-                    returnOrgUnits.push(orgUnit);
-                } else {
-                    promises.push(isModuleWithNewDatasets(orgUnit).then(function(answer) {
-                        if (answer === true)
-                            returnOrgUnits.push(orgUnit);
-                    }));
-                }
+            var filterModulesWithNewDatasets = function(aggregateModules, datasetsIndexedByOU) {
+                return _.filter(aggregateModules, function(mod) {
+                    var associatedDatasets = datasetsIndexedByOU[mod.id];
+                    return _.isEmpty(associatedDatasets) || hasAnyNewDataset(associatedDatasets);
+                });
+            };
+
+            var partitionedOrgUnits = _.partition(orgUnits, function(ou) {
+                return !isOfType(ou, "Module") || isLinelistService(ou);
             });
 
-            return $q.all(promises).then(function() {
-                return returnOrgUnits;
-            });
+            var otherOrgUnits = partitionedOrgUnits[0];
+            var aggregateModules = partitionedOrgUnits[1];
+
+            return indexDatasetsByOrgUnits()
+                .then(_.curry(filterModulesWithNewDatasets)(aggregateModules))
+                .then(function(modulesWithNewDatasets) {
+                    return otherOrgUnits.concat(modulesWithNewDatasets);
+                });
         };
 
         var addParentIdField = function(payload) {

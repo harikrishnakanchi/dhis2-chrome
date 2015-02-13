@@ -42,5 +42,38 @@ define(["lodashUtils"], function(_) {
 
             expect(actualResult).toEqual(["test2", "test3"]);
         });
+
+        it("should group objects by a key which is collection", function() {
+            var ds1 = {
+                "id": "ds1",
+                "name": "ds1",
+                "orgUnitIds": ["ou1", "ou2", "ou3"]
+            };
+
+            var ds2 = {
+                "id": "ds2",
+                "name": "ds2",
+                "orgUnitIds": ["ou2", "ou3"]
+            };
+
+            var ds3 = {
+                "id": "ds3",
+                "name": "ds3",
+                "orgUnitIds": ["ou2", "ou3", "ou4"]
+            };
+
+            var datasets = [ds1, ds2, ds3];
+
+            var expectedResult = {
+                "ou1": [ds1],
+                "ou2": [ds1, ds2, ds3],
+                "ou3": [ds1, ds2, ds3],
+                "ou4": [ds3]
+            };
+
+            var actualResult = _.groupByArray(datasets, "orgUnitIds");
+
+            expect(actualResult).toEqual(expectedResult);
+        });
     });
 });
