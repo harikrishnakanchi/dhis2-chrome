@@ -11,7 +11,7 @@ require.config({
     baseUrl: '/base/main/js',
     paths: {
         angular: 'lib/angular/angular',
-        lodash: 'lib/lodash/dist/lodash',
+        lodash: 'lib/lodash/lodash',
         moment: "lib/moment/min/moment-with-locales",
         utils: '../../test/integration/js/utils/utils',
         idbUtils: '../../test/integration/js/utils/idb.utils',
