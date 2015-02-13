@@ -1,8 +1,17 @@
 define([], function() {
-    return function($scope) {
+    return function($scope, indicatorRepository) {
+
+    	$scope.parseIndicator = function(indicator){
+
+    	};
 
         var init = function() {
-           console.log("indicator controller");
+           var getAllIndicators = function(){
+           		return indicatorRepository.getAll();
+           };
+
+           getAllIndicators();
+
         };
 
         init();
