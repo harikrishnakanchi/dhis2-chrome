@@ -38,6 +38,8 @@ require.config({
         "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
         "changeLogRepository": "app/repository/changelog.repository",
         "programRepository": "app/repository/program.repository",
+        "systemSettingRepository": "app/repository/system.setting.repository",
+
 
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",

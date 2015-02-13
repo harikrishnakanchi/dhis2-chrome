@@ -1,7 +1,7 @@
 define([], function() {
     return function($q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
         downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
-        downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer) {
+        downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer) {
         this.run = function(message) {
             console.debug("Processing message: " + message.data.type);
             switch (message.data.type) {
@@ -67,6 +67,15 @@ define([], function() {
                     return downloadEventDataConsumer.run(message);
                 case "deleteEvent":
                     return deleteEventConsumer.run(message);
+
+                case "downloadSystemSetting":
+                    return downloadSystemSettingConsumer.run(message);
+
+                case "uploadSystemSetting":
+                    return downloadSystemSettingConsumer.run(message).then(function() {
+                        return uploadSystemSettingConsumer.run(message);
+                    });
+
                 default:
                     return $q.reject();
             }
