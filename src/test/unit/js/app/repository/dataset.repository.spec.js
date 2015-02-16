@@ -13,8 +13,8 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             datasetsdata = testData.get("dataSets");
             dataElementsdata = testData.get("dataElements");
 
-            sectionStore = utils.getMockStore(q, '', sectionsdata);
-            dataElementStore = utils.getMockStore(q, '', dataElementsdata);
+            sectionStore = utils.getMockStore(q, "", sectionsdata);
+            dataElementStore = utils.getMockStore(q, "", dataElementsdata);
             datasetRepository = new DatasetRepository(mockDB.db, q);
 
             Timecop.install();
@@ -25,7 +25,6 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             Timecop.returnToPresent();
             Timecop.uninstall();
         });
-
 
         it("should find all datasets", function() {
             var datasetIds = ["ds1", "ds2"];
@@ -43,7 +42,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                     "attribute": {
                         "code": "isNewDataModel"
                     },
-                    "value": 'true'
+                    "value": "true"
                 }]
             }];
             mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
@@ -64,7 +63,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                     "attribute": {
                         "code": "isNewDataModel"
                     },
-                    "value": 'true'
+                    "value": "true"
                 }]
             }, {
                 "id": "dataSet2",
@@ -73,7 +72,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                     "attribute": {
                         "code": "isNewDataModel"
                     },
-                    "value": 'false'
+                    "value": "false"
                 }]
             }, {
                 "id": "dataSet3",
@@ -87,7 +86,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                     "attribute": {
                         "code": "isNewDataModel"
                     },
-                    "value": 'true'
+                    "value": "true"
                 }]
             }];
             mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
@@ -102,7 +101,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
 
         it("should get datasets for OrgUnit", function() {
             var expectedDatasets = [{
-                'id': 'ds1'
+                "id": "ds1"
             }];
             mockStore.each.and.returnValue(utils.getPromise(q, expectedDatasets));
 
@@ -115,7 +114,6 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
 
             expect(actualValues).toEqual(expectedDatasets);
         });
-
 
         it("should update data sets", function() {
             var datasets = [{
@@ -145,17 +143,17 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             var result;
 
             var dataset = {
-                'id': 'ds1'
+                "id": "ds1"
             };
 
             mockStore.find.and.returnValue(utils.getPromise(q, dataset));
 
-            datasetRepository.get('ds1').then(function(data) {
+            datasetRepository.get("ds1").then(function(data) {
                 result = data;
             });
             scope.$apply();
 
-            expect(mockStore.find).toHaveBeenCalledWith('ds1');
+            expect(mockStore.find).toHaveBeenCalledWith("ds1");
             expect(result).toEqual(dataset);
         });
 
@@ -168,7 +166,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                     "attribute": {
                         "code": "isNewDataModel"
                     },
-                    "value": 'true'
+                    "value": "true"
                 }]
             }];
             mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
@@ -182,99 +180,98 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             expect(result).toEqual([123]);
         });
 
-        it("should get enriched dataset", function() {
-            var dataSet = {
-                "name": "OPD",
+        it("should get enriched datasets", function() {
+            var datasets = [{
                 "id": "DS_OPD",
+                "name": "DS_OPD",
                 "organisationUnits": [{
                     "id": "mod1"
                 }],
                 "attributeValues": [{
                     "attribute": {
-                        "id": "wFC6joy3I8Q",
                         "code": "isNewDataModel",
                     },
                     "value": "false"
                 }]
-            };
+            }];
 
-            var enrichedDataSet = {
-                name: 'OPD',
-                id: 'DS_OPD',
-                organisationUnits: [{
-                    id: 'mod1'
+            var expectedEnrichedDS = [{
+                "id": "DS_OPD",
+                "name": "DS_OPD",
+                "organisationUnits": [{
+                    "id": "mod1"
                 }],
-                attributeValues: [{
-                    attribute: {
-                        id: 'wFC6joy3I8Q',
-                        code: 'isNewDataModel'
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
                     },
-                    value: 'false'
+                    "value": "false"
                 }],
-                dataElements: [],
-                sections: [{
-                    id: 'Sec1',
-                    dataSet: {
-                        name: 'OPD',
-                        id: 'DS_OPD'
+                "dataElements": [
+
+                ],
+                "sections": [{
+                    "id": "Sec1",
+                    "dataSet": {
+                        "name": "OPD",
+                        "id": "DS_OPD"
                     },
-                    isIncluded: true,
-                    dataElements: [{
-                        id: 'DE1',
-                        name: 'DE1 - ITFC',
-                        isIncluded: true,
-                        formName: 'DE1'
+                    "dataElements": [{
+                        "id": "DE1",
+                        "name": "DE1 - ITFC",
+                        "isIncluded": true,
+                        "formName": "DE1"
                     }, {
-                        id: 'DE2',
-                        name: 'DE2 - ITFC',
-                        isIncluded: true,
-                        formName: 'DE2'
+                        "id": "DE2",
+                        "name": "DE2 - ITFC",
+                        "isIncluded": true,
+                        "formName": "DE2"
                     }, {
-                        id: 'DE4',
-                        name: 'DE4 - ITFC',
-                        isIncluded: true,
-                        formName: 'DE4'
-                    }]
+                        "id": "DE4",
+                        "name": "DE4 - ITFC",
+                        "isIncluded": true,
+                        "formName": "DE4"
+                    }],
+                    "isIncluded": true
                 }, {
-                    id: 'Sec2',
-                    dataSet: {
-                        name: 'OPD',
-                        id: 'DS_OPD'
+                    "id": "Sec2",
+                    "dataSet": {
+                        "name": "OPD",
+                        "id": "DS_OPD"
                     },
-                    isIncluded: true,
-                    dataElements: [{
-                        id: 'DE1',
-                        name: 'DE1 - ITFC',
-                        isIncluded: true,
-                        formName: 'DE1'
-                    }]
+                    "dataElements": [{
+                        "id": "DE1",
+                        "name": "DE1 - ITFC",
+                        "isIncluded": true,
+                        "formName": "DE1"
+                    }],
+                    "isIncluded": true
                 }]
-            };
-            var db = {
-                "objectStore": {}
-            };
-            var datasetStore = utils.getMockStore(q, dataSet, datasetsdata);
+            }];
 
-            spyOn(db, 'objectStore').and.callFake(function(storeName) {
-                if (storeName === "dataSets")
-                    return datasetStore;
+            var db = utils.getMockDB(q).db;
+            spyOn(datasetRepository, "findAll").and.returnValue(utils.getPromise(q, datasets));
+
+            db.objectStore.and.callFake(function(storeName) {
                 if (storeName === "sections")
                     return sectionStore;
                 if (storeName === "dataElements")
                     return dataElementStore;
-                return utils.getMockStore(q, '', testData.get(storeName));
+                if (storeName === "dataSets")
+                    return utils.getMockStore(q, "", "", datasets);
+                return utils.getMockStore(q, "", testData.get(storeName));
             });
 
-            mockStore.find.and.returnValue(utils.getPromise(q, dataSet));
-
             datasetRepository = new DatasetRepository(db, q);
-            var result;
-            datasetRepository.getEnriched('ds1').then(function(data) {
-                result = data;
+
+            var actualEnrichedDS;
+
+            datasetRepository.getEnrichedDatasets(datasets).then(function(data) {
+                actualEnrichedDS = data;
             });
 
             scope.$apply();
-            expect(result).toEqual(enrichedDataSet);
+            expect(actualEnrichedDS).toEqual(expectedEnrichedDS);
         });
     });
 });

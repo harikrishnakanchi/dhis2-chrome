@@ -7,29 +7,28 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
 
         var findAll = function(datasetIds) {
             var store = db.objectStore("dataSets");
-
             var query = db.queryBuilder().$in(datasetIds).compile();
             return store.each(query);
         };
 
-        var getEnriched = function(datasetId, excludedDataElements) {
+        var getEnrichedDatasets = function(dataSets, excludedDataElements) {
             var getEntitiesFromDb = function(storeName) {
                 var store = db.objectStore(storeName);
                 return store.getAll();
             };
-            var dataSetPromise = getEntitiesFromDb('dataSets');
+
+            var datasetIds = _.pluck(dataSets, "id");
+
+            var datasetPromise = findAll(datasetIds);
             var sectionPromise = getEntitiesFromDb("sections");
             var dataElementsPromise = getEntitiesFromDb("dataElements");
-            return $q.all([get(datasetId), sectionPromise, dataElementsPromise]).then(function(data) {
-                if (_.isEmpty(data[0])) return undefined;
-                return datasetTransformer.enrichDatasets([data[0]], data[1], data[2], excludedDataElements)[0];
-            });
-        };
 
-        var getEnrichedDatasets = function(dataSets, excludedDataElements) {
-            return $q.all(_.map(dataSets, function(ds) {
-                return getEnriched(ds.id, excludedDataElements);
-            }));
+            return $q.all([datasetPromise, sectionPromise, dataElementsPromise]).then(function(data) {
+                var datasets = data[0];
+                var sections = data[1];
+                var dataElements = data[2];
+                return datasetTransformer.enrichDatasets(datasets, sections, dataElements, excludedDataElements);
+            });
         };
 
         var getAll = function() {
@@ -98,7 +97,6 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             "getAllDatasetIds": getAllDatasetIds,
             "upsert": upsert,
             "getAllForOrgUnit": getAllForOrgUnit,
-            "getEnriched": getEnriched,
             "getEnrichedDatasets": getEnrichedDatasets
         };
     };
