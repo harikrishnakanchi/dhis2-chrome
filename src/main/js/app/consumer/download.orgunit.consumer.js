@@ -14,16 +14,12 @@ define(['moment', "lodashUtils", "dateUtils", "mergeBy"], function(moment, _, da
                     return [];
 
                 var orgUnitIds = _.pluck(orgUnits, "id");
-                return orgUnitService.get(orgUnitIds).then(function(data) {
-                    return data.data.organisationUnits;
-                });
+                return orgUnitService.get(orgUnitIds);
             };
 
             var downloadRemotelyChanged = function() {
                 return changeLogRepository.get("orgUnits").then(function(lastUpdatedTime) {
-                    return orgUnitService.getAll(lastUpdatedTime).then(function(data) {
-                        return data.data.organisationUnits;
-                    });
+                    return orgUnitService.getAll(lastUpdatedTime);
                 });
             };
 

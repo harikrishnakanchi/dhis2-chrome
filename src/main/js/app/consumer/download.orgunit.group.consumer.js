@@ -7,29 +7,24 @@ define(["moment", "lodash", "mergeBy"], function(moment, _, mergeBy) {
                 .then(updateChangeLog);
         };
 
-        var download = function(orgUnitGroups) {
-            var downloadLocallyChanged = function(orgUnitGroups) {
-                if (_.isEmpty(orgUnitGroups))
+        var download = function(locallyModifiedOrgUnitGroupIds) {
+            var downloadLocallyChanged = function() {
+                if (_.isEmpty(locallyModifiedOrgUnitGroupIds))
                     return [];
 
-                var orgUnitGroupIds = _.pluck(orgUnitGroups, "id");
-                return orgUnitGroupService.get(orgUnitGroupIds).then(function(data) {
-                    return data.data.organisationUnitGroups;
-                });
+                var orgUnitGroupIds = _.pluck(locallyModifiedOrgUnitGroupIds, "id");
+                return orgUnitGroupService.get(orgUnitGroupIds);
             };
 
             var downloadRemotelyChanged = function() {
                 return changeLogRepository.get("orgUnitGroups").then(function(lastUpdatedTime) {
-                    return orgUnitGroupService.getAll(lastUpdatedTime).then(function(data) {
-                        return data.data.organisationUnitGroups;
-                    });
+                    return orgUnitGroupService.getAll(lastUpdatedTime);
                 });
             };
 
-            return $q.all([downloadLocallyChanged(orgUnitGroups), downloadRemotelyChanged()]).then(function(data) {
+            return $q.all([downloadLocallyChanged(), downloadRemotelyChanged()]).then(function(data) {
                 var locallyChanged = data[0];
                 var remotelyChanged = data[1];
-
                 return _.unionBy([locallyChanged, remotelyChanged], "id");
             });
         };

@@ -10,10 +10,10 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
             ]);
             services.init(app);
             repositories.init(app);
-            controllers.init(app);
             monitors.init(app);
             helpers.init(app);
             dbutils.init(app);
+            controllers.init(app);
 
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider',
                 function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider) {

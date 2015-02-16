@@ -1,8 +1,8 @@
-define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "userRepository", "metadataService", "sessionHelper"],
-    function(MainController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, UserRepository, MetadataService, SessionHelper) {
+define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "userRepository", "metadataImporter", "sessionHelper"],
+    function(MainController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, UserRepository, MetadataImporter, SessionHelper) {
         describe("main controller", function() {
             var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, getAllProjectsSpy, db,
-                translationStore, userPreferenceRepository, location, orgUnitRepository, userRepository, metadataService, sessionHelper;
+                translationStore, userPreferenceRepository, location, orgUnitRepository, userRepository, metadataImporter, sessionHelper;
 
             beforeEach(mocks.inject(function($rootScope, $q, $location) {
                 scope = $rootScope.$new();
@@ -11,7 +11,7 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 userPreferenceRepository = new UserPreferenceRepository();
                 orgUnitRepository = new OrgUnitRepository();
                 userRepository = new UserRepository();
-                metadataService = new MetadataService();
+                metadataImporter = new MetadataImporter();
                 sessionHelper = new SessionHelper();
 
                 i18nResourceBundle = {
@@ -61,12 +61,12 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                     return translationStore;
                 });
 
-                spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, {}));
+                spyOn(metadataImporter, "run").and.returnValue(utils.getPromise(q, {}));
                 getAllProjectsSpy = spyOn(orgUnitRepository, "getAllProjects");
                 getAllProjectsSpy.and.returnValue(utils.getPromise(q, []));
 
                 mainController = new MainController(scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
-                    userRepository, metadataService, sessionHelper);
+                    userRepository, metadataImporter, sessionHelper);
             }));
 
             it("should load projects", function() {
@@ -76,10 +76,10 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
 
                 getAllProjectsSpy.and.returnValue(utils.getPromise(q, projectList));
                 mainController = new MainController(scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
-                    userRepository, metadataService, sessionHelper);
+                    userRepository, metadataImporter, sessionHelper);
                 scope.$apply();
 
-                expect(metadataService.loadMetadataFromFile).toHaveBeenCalled();
+                expect(metadataImporter.run).toHaveBeenCalled();
                 expect(scope.projects).toEqual(projectList);
             });
 

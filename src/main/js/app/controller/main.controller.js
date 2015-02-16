@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $location, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository, metadataService, sessionHelper) {
+    return function($scope, $location, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository, metadataImporter, sessionHelper) {
         var oldUserProject;
         $scope.projects = [];
 
@@ -69,7 +69,7 @@ define(["lodash"], function(_) {
             var assignCurrentProject = function() {
                 if (!_.isEmpty($rootScope.currentUser)) {
                     userPreferenceRepository.get($rootScope.currentUser.userCredentials.username).then(function(data) {
-                        if ( !_.isEmpty(data) && !_.isEmpty(data.orgUnits)) {
+                        if (!_.isEmpty(data) && !_.isEmpty(data.orgUnits)) {
                             $scope.currentUserProject = _.find($scope.projects, {
                                 "id": data.orgUnits[0].id
                             });
@@ -99,7 +99,7 @@ define(["lodash"], function(_) {
         $rootScope.$on('resetProjects', resetProjects);
 
         var init = function() {
-            metadataService.loadMetadataFromFile().then(resetProjects);
+            metadataImporter.run().then(resetProjects);
         };
 
         init();

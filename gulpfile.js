@@ -184,46 +184,19 @@ gulp.task('watch', function() {
     return gulp.watch('./src/main/less/main.less', ['less']);
 });
 
-gulp.task('download-org', function() {
-    return download(baseIntUrl + "/api/organisationUnits.json?fields=:all&paging=false", auth)
-        .pipe(rename("organisationUnits.json"))
-        .pipe(gulp.dest(path.dirname("src/main/data/organisationUnits.json")));
-});
-
-gulp.task('download-org-unit-groups', function() {
-    return download(baseIntUrl + "/api/organisationUnitGroups.json?paging=false&fields=[:all]", auth)
-        .pipe(rename("organisationUnitGroups.json"))
-        .pipe(gulp.dest(path.dirname("src/main/data/organisationUnitGroups.json")));
-});
 
 gulp.task('download-systemSettings', function() {
     return download(baseIntUrl + "/api/systemSettings.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
 });
 
-gulp.task('download-translations', function() {
-    return download(baseIntUrl + "/api/translations.json", auth)
-        .pipe(gulp.dest(path.dirname("src/main/data/translations.json")));
-});
 
-gulp.task('download-programs', function() {
-    return download(baseIntUrl + "/api/programs.json?fields=:all&paging=false", auth)
-        .pipe(rename("programs.json"))
-        .pipe(gulp.dest(path.dirname("src/main/data/programs.json")));
-});
-
-gulp.task('download-datasets', function() {
-    return download(baseIntUrl + "/api/dataSets.json?fields=:all&paging=false", auth)
-        .pipe(rename("dataSets.json"))
-        .pipe(gulp.dest(path.dirname("src/main/data/dataSets.json")));
-});
-
-gulp.task('download-metadata', ['download-org', 'download-org-unit-groups', 'download-systemSettings', 'download-translations', 'download-programs', 'download-datasets'], function() {
+gulp.task('download-metadata', function() {
     return download(baseIntUrl + "/api/metadata.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });
 
-gulp.task('pack', ['less', 'config', 'download-metadata'], function() {
+gulp.task('pack', ['less', 'config', 'download-metadata', 'download-systemSettings'], function() {
     var crx = new ChromeExtension({
         rootDirectory: "src/main",
         privateKey: fs.readFileSync("key.pem")

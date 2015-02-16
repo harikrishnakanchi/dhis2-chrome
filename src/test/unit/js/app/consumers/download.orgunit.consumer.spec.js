@@ -57,31 +57,27 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
                 "created": "2014-10-24T09:01:12.020+0000"
             };
 
-            var orgUnitFromDHIS = {
-                "data": {
-                    "organisationUnits": [{
-                        'id': 'a4acf9115a7',
-                        'name': 'Org1',
-                        'shortName': 'Org1',
-                        'level': 4,
-                        'openingDate': "YYYY-MM-DD",
-                        "lastUpdated": "2014-10-24T09:01:12.020+0000",
-                        "parent": {
-                            "name": 'Name1',
-                            "id": 'Id1'
-                        },
-                        "attributeValues": [{
-                            "attribute": {
-                                "code": "prjConDays",
-                                "name": "No of Consultation days per week",
-                                "id": "VKc7bvogtcP"
-                            },
-                            "lastUpdated": "2014-10-20T09:01:12.020+0000",
-                            "value": "val1"
-                        }]
-                    }]
-                }
-            };
+            var orgUnitFromDHIS = [{
+                'id': 'a4acf9115a7',
+                'name': 'Org1',
+                'shortName': 'Org1',
+                'level': 4,
+                'openingDate': "YYYY-MM-DD",
+                "lastUpdated": "2014-10-24T09:01:12.020+0000",
+                "parent": {
+                    "name": 'Name1',
+                    "id": 'Id1'
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "prjConDays",
+                        "name": "No of Consultation days per week",
+                        "id": "VKc7bvogtcP"
+                    },
+                    "lastUpdated": "2014-10-20T09:01:12.020+0000",
+                    "value": "val1"
+                }]
+            }];
 
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
@@ -97,7 +93,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             expect(orgUnitService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
             expect(orgUnitRepository.findAll).toHaveBeenCalledWith(["a4acf9115a7"]);
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith([orgUnitFromDHIS.data.organisationUnits[0]]);
+            expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS);
         });
 
         it("should ignore dhis data for upsertOrgUnit message", function() {
@@ -111,31 +107,27 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
                 "created": "2014-10-24T09:01:12.020+0000"
             };
 
-            var orgUnitFromDHIS = {
-                "data": {
-                    "organisationUnits": [{
-                        'id': 'a4acf9115a7',
-                        'name': 'Org1',
-                        'shortName': 'Org1',
-                        'level': 4,
-                        'openingDate': "YYYY-MM-DD",
-                        "lastUpdated": "2014-09-24T09:01:12.020+0000",
-                        "parent": {
-                            "name": 'Name1',
-                            "id": 'Id1'
-                        },
-                        "attributeValues": [{
-                            "attribute": {
-                                "code": "prjConDays",
-                                "name": "No of Consultation days per week",
-                                "id": "VKc7bvogtcP"
-                            },
-                            "lastUpdated": "2014-09-20T09:01:12.020+0000",
-                            "value": "val1"
-                        }]
-                    }]
-                }
-            };
+            var orgUnitFromDHIS = [{
+                'id': 'a4acf9115a7',
+                'name': 'Org1',
+                'shortName': 'Org1',
+                'level': 4,
+                'openingDate': "YYYY-MM-DD",
+                "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                "parent": {
+                    "name": 'Name1',
+                    "id": 'Id1'
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "prjConDays",
+                        "name": "No of Consultation days per week",
+                        "id": "VKc7bvogtcP"
+                    },
+                    "lastUpdated": "2014-09-20T09:01:12.020+0000",
+                    "value": "val1"
+                }]
+            }];
 
             spyOn(orgUnitService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
@@ -164,31 +156,27 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
                 "created": "2014-10-24T09:01:12.020+0000"
             };
 
-            var orgUnitFromDHISSinceLastUpdatedTime = {
-                "data": {
-                    "organisationUnits": [{
-                        'id': 'a4acf9115a7',
-                        'name': 'Org1',
-                        'shortName': 'Org1',
-                        'level': 4,
-                        'openingDate': "YYYY-MM-DD",
-                        "lastUpdated": "2014-10-24T09:01:12.020+0000",
-                        "parent": {
-                            "name": 'Name1',
-                            "id": 'Id1'
-                        },
-                        "attributeValues": [{
-                            "attribute": {
-                                "code": "prjConDays",
-                                "name": "No of Consultation days per week",
-                                "id": "VKc7bvogtcP"
-                            },
-                            "lastUpdated": "2014-10-20T09:01:12.020+0000",
-                            "value": "val1"
-                        }]
-                    }]
-                }
-            };
+            var orgUnitFromDHISSinceLastUpdatedTime = [{
+                'id': 'a4acf9115a7',
+                'name': 'Org1',
+                'shortName': 'Org1',
+                'level': 4,
+                'openingDate': "YYYY-MM-DD",
+                "lastUpdated": "2014-10-24T09:01:12.020+0000",
+                "parent": {
+                    "name": 'Name1',
+                    "id": 'Id1'
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "prjConDays",
+                        "name": "No of Consultation days per week",
+                        "id": "VKc7bvogtcP"
+                    },
+                    "lastUpdated": "2014-10-20T09:01:12.020+0000",
+                    "value": "val1"
+                }]
+            }];
 
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitService, 'upsert');
@@ -200,7 +188,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             scope.$apply();
 
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith([orgUnitFromDHISSinceLastUpdatedTime.data.organisationUnits[0]]);
+            expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHISSinceLastUpdatedTime);
         });
 
         it("should ignore dhis data for downloadOrgUnit message", function() {
@@ -287,31 +275,27 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
                 }
             };
 
-            var orgUnitFromDHISSinceLastUpdatedTime = {
-                "data": {
-                    "organisationUnits": [{
-                        'id': 'a4acf9115a8',
-                        'name': 'Org2',
-                        'shortName': 'Org2',
-                        'level': 4,
-                        'openingDate': "YYYY-MM-DD",
-                        "lastUpdated": "2014-09-24T09:01:12.020+0000",
-                        "parent": {
-                            "name": 'Name1',
-                            "id": 'Id1'
-                        },
-                        "attributeValues": [{
-                            "attribute": {
-                                "code": "prjConDays",
-                                "name": "No of Consultation days per week",
-                                "id": "VKc7bvogtcP"
-                            },
-                            "lastUpdated": "2014-09-20T09:01:12.020+0000",
-                            "value": "val1"
-                        }]
-                    }]
-                }
-            };
+            var orgUnitFromDHISSinceLastUpdatedTime = [{
+                'id': 'a4acf9115a8',
+                'name': 'Org2',
+                'shortName': 'Org2',
+                'level': 4,
+                'openingDate': "YYYY-MM-DD",
+                "lastUpdated": "2014-09-24T09:01:12.020+0000",
+                "parent": {
+                    "name": 'Name1',
+                    "id": 'Id1'
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "prjConDays",
+                        "name": "No of Consultation days per week",
+                        "id": "VKc7bvogtcP"
+                    },
+                    "lastUpdated": "2014-09-20T09:01:12.020+0000",
+                    "value": "val1"
+                }]
+            }];
 
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitService, 'upsert');
@@ -323,7 +307,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             scope.$apply();
 
             expect(orgUnitService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith([orgUnitFromDHISSinceLastUpdatedTime.data.organisationUnits[0]]);
+            expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHISSinceLastUpdatedTime);
         });
     });
 });

@@ -51,26 +51,22 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                 }
             };
 
-            var orgUnitFromDHIS = {
-                "data": {
-                    "organisationUnitGroups": [{
-                        "id": "a35778ed565",
-                        "name": "Most-at-risk Population",
-                        "organisationUnits": [{
-                            "id": "a119bd25ace",
-                            "name": "Out-patient General"
-                        }, {
-                            "id": "a0c51512f88",
-                            "name": "OBGYN"
-                        }, {
-                            "id": "a43bd484a05",
-                            "name": "Laboratory"
-                        }],
-                        "lastUpdated": "2014-10-28T09:01:12.020+0000",
-                        "shortName": "Most-at-risk Population"
-                    }]
-                }
-            };
+            var orgUnitFromDHIS = [{
+                "id": "a35778ed565",
+                "name": "Most-at-risk Population",
+                "organisationUnits": [{
+                    "id": "a119bd25ace",
+                    "name": "Out-patient General"
+                }, {
+                    "id": "a0c51512f88",
+                    "name": "OBGYN"
+                }, {
+                    "id": "a43bd484a05",
+                    "name": "Laboratory"
+                }],
+                "lastUpdated": "2014-10-28T09:01:12.020+0000",
+                "shortName": "Most-at-risk Population"
+            }];
 
             spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
@@ -86,7 +82,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             expect(orgUnitGroupService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
             expect(orgUnitGroupRepository.findAll).toHaveBeenCalledWith(["a35778ed565"]);
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith([orgUnitFromDHIS.data.organisationUnitGroups[0]]);
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS);
         });
 
         it("should ignore dhis data for upsertOrgUnitGroups message", function() {
@@ -98,26 +94,22 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                 }
             };
 
-            var orgUnitFromDHIS = {
-                "data": {
-                    "organisationUnitGroups": [{
-                        "id": "a35778ed565",
-                        "name": "Most-at-risk Population",
-                        "organisationUnits": [{
-                            "id": "a119bd25ace",
-                            "name": "Out-patient General"
-                        }, {
-                            "id": "a0c51512f88",
-                            "name": "OBGYN"
-                        }, {
-                            "id": "a43bd484a05",
-                            "name": "Laboratory"
-                        }],
-                        "lastUpdated": "2014-09-28T09:01:12.020+0000",
-                        "shortName": "Most-at-risk Population"
-                    }]
-                }
-            };
+            var orgUnitFromDHIS = [{
+                "id": "a35778ed565",
+                "name": "Most-at-risk Population",
+                "organisationUnits": [{
+                    "id": "a119bd25ace",
+                    "name": "Out-patient General"
+                }, {
+                    "id": "a0c51512f88",
+                    "name": "OBGYN"
+                }, {
+                    "id": "a43bd484a05",
+                    "name": "Laboratory"
+                }],
+                "lastUpdated": "2014-09-28T09:01:12.020+0000",
+                "shortName": "Most-at-risk Population"
+            }];
 
             spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
@@ -145,26 +137,22 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                 }
             };
 
-            var orgUnitFromDHIS = {
-                "data": {
-                    "organisationUnitGroups": [{
-                        "id": "a35778ed565",
-                        "name": "Most-at-risk Population",
-                        "organisationUnits": [{
-                            "id": "a119bd25ace",
-                            "name": "Out-patient General"
-                        }, {
-                            "id": "a0c51512f88",
-                            "name": "OBGYN"
-                        }, {
-                            "id": "a43bd484a05",
-                            "name": "Laboratory"
-                        }],
-                        "lastUpdated": "2014-10-28T09:01:12.020+0000",
-                        "shortName": "Most-at-risk Population"
-                    }]
-                }
-            };
+            var orgUnitFromDHIS = [{
+                "id": "a35778ed565",
+                "name": "Most-at-risk Population",
+                "organisationUnits": [{
+                    "id": "a119bd25ace",
+                    "name": "Out-patient General"
+                }, {
+                    "id": "a0c51512f88",
+                    "name": "OBGYN"
+                }, {
+                    "id": "a43bd484a05",
+                    "name": "Laboratory"
+                }],
+                "lastUpdated": "2014-10-28T09:01:12.020+0000",
+                "shortName": "Most-at-risk Population"
+            }];
 
             spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
@@ -177,7 +165,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             scope.$apply();
 
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith([orgUnitFromDHIS.data.organisationUnitGroups[0]]);
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS);
         });
 
         it("should ignore dhis data for downloadOrgUnitGroups message", function() {
@@ -258,26 +246,22 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                 }
             };
 
-            var orgUnitFromDHIS = {
-                "data": {
-                    "organisationUnitGroups": [{
-                        "id": "a35778ed565",
-                        "name": "Most-at-risk Population",
-                        "organisationUnits": [{
-                            "id": "a119bd25ace",
-                            "name": "Out-patient General"
-                        }, {
-                            "id": "a0c51512f88",
-                            "name": "OBGYN"
-                        }, {
-                            "id": "a43bd484a05",
-                            "name": "Laboratory"
-                        }],
-                        "lastUpdated": "2014-10-28T09:01:12.020+0000",
-                        "shortName": "Most-at-risk Population"
-                    }]
-                }
-            };
+            var orgUnitFromDHIS = [{
+                "id": "a35778ed565",
+                "name": "Most-at-risk Population",
+                "organisationUnits": [{
+                    "id": "a119bd25ace",
+                    "name": "Out-patient General"
+                }, {
+                    "id": "a0c51512f88",
+                    "name": "OBGYN"
+                }, {
+                    "id": "a43bd484a05",
+                    "name": "Laboratory"
+                }],
+                "lastUpdated": "2014-10-28T09:01:12.020+0000",
+                "shortName": "Most-at-risk Population"
+            }];
 
             spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
@@ -290,7 +274,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             scope.$apply();
 
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith([orgUnitFromDHIS.data.organisationUnitGroups[0]]);
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS);
         });
     });
 });

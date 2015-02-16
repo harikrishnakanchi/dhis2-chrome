@@ -115,6 +115,7 @@ require.config({
         "helpers": "app/helpers/helpers",
         "approvalHelper": "app/helpers/approval.helper",
         "orgUnitGroupHelper": "app/helpers/orgunit.group.helper",
+        "metadataImporter": "app/helpers/metadata.importer",
         "sessionHelper": "app/helpers/session.helper"
     },
     shim: {
