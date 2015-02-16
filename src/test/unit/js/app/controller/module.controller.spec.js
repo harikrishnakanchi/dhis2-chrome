@@ -83,64 +83,23 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             Timecop.uninstall();
         });
 
-        it("should save aggregate modules and set system settings for excluded data elements", function() {
-            var projectId = "someid";
-            var existingSystemSettings = {
-                "key": projectId,
-                "value": {
-                    "excludedDataElements": {
-                        "test2": ["1", "3"]
-                    }
-                }
-            };
-
-            spyOn(dataSetRepo, "upsert");
-            spyOn(dataSetRepo, "get").and.returnValue(utils.getPromise(q, datasetsdata[0]));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, existingSystemSettings));
+        it("should save aggregate module", function() {
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
+
             var parent = {
                 "name": "Project1",
-                "id": projectId,
+                "id": "someid",
                 "children": []
             };
+
             scope.orgUnit = parent;
-
-            var enrichedAssociatedDatasets = [{
-                "name": "OPD",
-                "id": "DS_OPD",
-                "organisationUnits": [{
-                    "id": "mod1"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "id": "wFC6joy3I8Q",
-                        "code": "isNewDataModel",
-                    },
-                    "value": "false"
-                }],
-                "sections": [{
-                    "dataElements": [{
-                        "id": "1",
-                        "isIncluded": false
-                    }, {
-                        "id": "2",
-                        "isIncluded": true
-                    }, {
-                        "id": "3",
-                        "isIncluded": false
-                    }]
-                }]
-            }];
-
-
-            scope.associatedDatasets = enrichedAssociatedDatasets;
             scope.module = {
                 'name': "Module1",
                 'serviceType': "Aggregate",
                 'openingDate': new Date(),
                 'parent': parent
             };
-
 
             var enrichedAggregateModule = {
                 name: 'Module1',
@@ -171,19 +130,65 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     id: 'someid'
                 }
             };
-
             scope.save();
             scope.$apply();
-
             expect(scope.saveFailure).toBe(false);
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedAggregateModule);
-
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: enrichedAggregateModule,
                 type: "upsertOrgUnit"
             }, "dataValues");
+        });
 
+        it("should asscoiate datasets with the module", function() {
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+            var parent = {
+                "name": "Project1",
+                "id": "someid",
+                "children": []
+            };
+
+            scope.orgUnit = parent;
+            scope.module = {
+                'name': "Module1",
+                'serviceType': "Aggregate",
+                'openingDate': new Date(),
+                'parent': parent
+            };
+            var enrichedAssociatedDatasets = [{
+                "name": "OPD",
+                "id": "DS_OPD",
+                "organisationUnits": [{
+                    "id": "mod1"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "id": "wFC6joy3I8Q",
+                        "code": "isNewDataModel",
+                    },
+                    "value": "false"
+                }],
+                "sections": [{
+                    "dataElements": [{
+                        "id": "1",
+                        "isIncluded": false
+                    }, {
+                        "id": "2",
+                        "isIncluded": true
+                    }, {
+                        "id": "3",
+                        "isIncluded": false
+                    }]
+                }]
+            }];
+            spyOn(dataSetRepo, "upsert");
+            spyOn(dataSetRepo, "get").and.returnValue(utils.getPromise(q, datasetsdata[0]));
+
+            scope.associatedDatasets = enrichedAssociatedDatasets;
+            scope.save();
+            scope.$apply();
             var expectedDatasets = [{
                 name: 'OPD',
                 id: 'DS_OPD',
@@ -209,11 +214,61 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 type: "associateOrgUnitToDataset"
             }, "dataValues");
 
-            expect(scope.saveFailure).toBe(false);
+        });
+
+        it("should save excluded data elements for the module", function() {
+            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
+            var projectId = "someid";
+            var parent = {
+                "name": "Project1",
+                "id": projectId,
+                "children": []
+            };
+
+            scope.orgUnit = parent;
+            scope.module = {
+                'name': "Module1",
+                'serviceType': "Aggregate",
+                'openingDate': new Date(),
+                'parent': parent
+            };
+            var enrichedAssociatedDatasets = [{
+                "name": "OPD",
+                "id": "DS_OPD",
+                "organisationUnits": [{
+                    "id": "mod1"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "id": "wFC6joy3I8Q",
+                        "code": "isNewDataModel",
+                    },
+                    "value": "false"
+                }],
+                "sections": [{
+                    "dataElements": [{
+                        "id": "1",
+                        "isIncluded": false
+                    }, {
+                        "id": "2",
+                        "isIncluded": true
+                    }, {
+                        "id": "3",
+                        "isIncluded": false
+                    }]
+                }]
+            }];
+
+            spyOn(dataSetRepo, "upsert");
+            spyOn(dataSetRepo, "get").and.returnValue(utils.getPromise(q, datasetsdata[0]));
+
+            scope.associatedDatasets = enrichedAssociatedDatasets;
+            scope.save();
+            scope.$apply();
 
             var expectedSystemSettings = {
                 "excludedDataElements": {
-                    "test2": ["1", "3"],
                     "adba40b7157": ["1", "3"]
                 }
             };
@@ -228,7 +283,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     settings: expectedSystemSettings,
                     indexedDbOldSystemSettings: {
                         excludedDataElements: {
-                            'test2': ['1', '3']
+
                         }
                     }
                 },
@@ -236,7 +291,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedPayload);
-            expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, 'dataValues');
+            expect(hustle.publish.calls.argsFor(2)).toEqual([expectedHustleMessage, 'dataValues']);
         });
 
         it("should set datasets associated with module for edit", function() {

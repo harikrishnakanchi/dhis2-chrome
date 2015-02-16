@@ -11,8 +11,9 @@ define(['moment', 'lodashUtils', 'mergeBy'], function(moment, _, mergeBy) {
         var mergeAndSave = function(remoteSettings) {
             var moduleIds = _.keys(remoteSettings);
             var eq = function(item1, item2) {
-                return item1.key === item2.key;
+                return item1.key && item1.key === item2.key;
             };
+
             var mergeOpts = {
                 eq: eq,
                 remoteTimeField: "value.clientLastUpdated",
