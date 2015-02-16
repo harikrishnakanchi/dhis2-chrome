@@ -4,7 +4,7 @@ define(["metadataService", "dataService", "orgUnitService", "userService", "appr
     function(metadataService, dataService, orgUnitService, userService, approvalService, datasetService, systemSettingService, programService,
         eventService, orgUnitGroupService, filesystemService) {
         var init = function(app) {
-            app.service('metadataService', ['$http', '$indexedDB', '$q', metadataService]);
+            app.service('metadataService', ['$http', metadataService]);
             app.service('dataService', ['$http', '$q', dataService]);
             app.service('orgUnitService', ['$http', '$indexedDB', orgUnitService]);
             app.service('orgUnitGroupService', ['$http', '$indexedDB', orgUnitGroupService]);

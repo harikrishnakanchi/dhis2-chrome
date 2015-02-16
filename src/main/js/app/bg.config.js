@@ -39,7 +39,7 @@ require.config({
         "changeLogRepository": "app/repository/changelog.repository",
         "programRepository": "app/repository/program.repository",
         "systemSettingRepository": "app/repository/system.setting.repository",
-
+        "metadataRepository": "app/repository/metadata.repository",
 
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",
