@@ -37,8 +37,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 }
             ]);
 
-            app.run(['metadataService', 'consumerRegistry', '$hustle',
-                function(metadataService, consumerRegistry, $hustle) {
+            app.run(['consumerRegistry', '$hustle',
+                function(consumerRegistry, $hustle) {
                     var syncWithDhis = function() {
                         var doPublish = function(messageType) {
                             $hustle.publish({

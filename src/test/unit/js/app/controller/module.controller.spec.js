@@ -1,7 +1,7 @@
 /*global Date:true*/
 define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop) {
     describe("module controller", function() {
-        var scope, moduleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
+        var scope, moduleController, mockOrgStore, db, q, location, _Date, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
             dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
 
         beforeEach(module('hustle'));
@@ -12,10 +12,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
             location = $location;
-
-            orgUnitService = {
-                "getAssociatedDatasets": function() {},
-            };
 
             orgUnitRepo = utils.getMockRepo(q);
             orgunitGroupRepo = utils.getMockRepo(q);
@@ -75,7 +71,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
             scope.isNewMode = true;
 
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
+            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
         }));
 
         afterEach(function() {
@@ -299,7 +295,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             spyOn(dataSetRepo, "getEnriched").and.callFake(function(ds) {
                 return ds;
             });
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             scope.$apply();
 
             expect(scope.isDisabled).toBeFalsy();
@@ -336,7 +332,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
             scope.isNewMode = false;
 
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
 
             scope.$apply();
 
@@ -358,7 +354,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             scope.isNewMode = false;
 
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             scope.$apply();
 
             scope.associatedDatasets = [{
@@ -427,7 +423,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             scope.isNewMode = false;
-            moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             scope.$apply();
 
             scope.module = updatedModule;

@@ -1,7 +1,7 @@
 /*global Date:true*/
 define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "md5", "timecop"], function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, md5, timecop) {
     describe("line list module controller", function() {
-        var scope, lineListModuleController, orgUnitService, mockOrgStore, db, q, location, _Date, datasets, sections,
+        var scope, lineListModuleController, mockOrgStore, db, q, location, _Date, datasets, sections,
             dataElements, sectionsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, systemSettingRepo, fakeModal, allPrograms, programsRepo;
 
         beforeEach(module('hustle'));
@@ -17,10 +17,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             }];
 
             location = $location;
-
-            orgUnitService = {
-                "getAssociatedDatasets": function() {},
-            };
 
             orgUnitRepo = utils.getMockRepo(q);
             orgunitGroupRepo = utils.getMockRepo(q);
@@ -63,7 +59,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }
             };
             scope.isNewMode = true;
-            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitService, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
+            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
         }));
 
         afterEach(function() {
@@ -107,7 +103,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }]
                 }]
             };
-            
+
             var data = {
                 "key": "someid",
                 "value": {
@@ -270,7 +266,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
 
-            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitService, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
+            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
 
             scope.$apply();
             expect(scope.isDisabled).toBeTruthy();
@@ -282,7 +278,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             scope.$apply();
 
             scope.isNewMode = false;
-            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitService, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
+            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
             var parent = {
                 "id": "par1",
                 "name": "Par1"
@@ -404,7 +400,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitService, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
+            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
             scope.update(module);
             scope.$apply();
 
@@ -488,7 +484,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             });
             scope.isNewMode = false;
 
-            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitService, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
+            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
             scope.disable(module);
             scope.$apply();
 

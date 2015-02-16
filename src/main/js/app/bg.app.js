@@ -23,8 +23,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 }
             ]);
 
-            app.run(['metadataService', 'consumerRegistry', 'dhisMonitor', '$hustle',
-                function(metadataService, consumerRegistry, dhisMonitor, $hustle) {
+            app.run(['consumerRegistry', 'dhisMonitor', '$hustle',
+                function(consumerRegistry, dhisMonitor, $hustle) {
 
                     var registerCallback = function(alarmName, callback) {
                         return function(alarm) {
@@ -57,7 +57,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             "type": "downloadProgram",
                             "data": []
                         }, "dataValues");
-                        
+
                         $hustle.publish({
                             "type": "downloadDatasets",
                             "data": []

@@ -9,8 +9,8 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                 "ui.multiselect", "ui.notIn", "ui.equals", "hustle"
             ]);
             services.init(app);
-            controllers.init(app);
             repositories.init(app);
+            controllers.init(app);
             monitors.init(app);
             helpers.init(app);
             dbutils.init(app);
