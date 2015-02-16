@@ -42,9 +42,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             };
 
             var getExcludedDataElements = function() {
-                return systemSettingRepository.getAllWithProjectId($scope.module.parent.id).then(function(systemSettings) {
-                    if (!_.isEmpty(systemSettings) && !_.isEmpty(systemSettings.value) && !_.isEmpty(systemSettings.value.excludedDataElements))
-                        $scope.excludedDataElements = systemSettings.value.excludedDataElements[$scope.module.id];
+                return systemSettingRepository.getAllWithProjectId($scope.module.id).then(function(systemSettings) {
+                    if (!_.isEmpty(systemSettings) && !_.isEmpty(systemSettings.value))
+                        $scope.excludedDataElements = systemSettings.value.dataElements;
                 });
             };
 
@@ -59,7 +59,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
             var getAllDatasets = function() {
                 return datasetRepository.getAll().then(function(ds) {
-                    return datasetRepository.getEnriched(ds);
+                    return datasetRepository.getEnriched(ds, $scope.excludedDataElements);
                 });
             };
 
@@ -107,14 +107,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             }, "dataValues");
         };
 
-        $scope.createModules = function(module) {
-            var parent = $scope.module.parent;
-            var enrichedModule = orgUnitMapper.mapToModule(module);
-            return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
-                .then(function() {
-                    return enrichedModule;
-                });
-        };
 
         var showModal = function(okCallback, message) {
             $scope.modalMessage = message;
@@ -140,50 +132,34 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             showModal(_.bind(disableModule, {}, module), $scope.resourceBundle.disableOrgUnitConfirmationMessage);
         };
 
-        $scope.onError = function(data) {
+        var onError = function(data) {
             $scope.saveFailure = true;
         };
 
-        var saveSystemSettingsForExcludedDataElements = function(parent, enrichedModule) {
-            var saveSystemSettings = function(excludedDataElements, projectId) {
-                return systemSettingRepository.getAllWithProjectId(projectId).then(function(data) {
-                    var existingSystemSettings = (_.isEmpty(data) || _.isEmpty(data.value) || _.isEmpty(data.value.excludedDataElements)) ? {} : data.value.excludedDataElements;
-                    var systemSettingsPayload = _.cloneDeep(existingSystemSettings);
-                    systemSettingsPayload[enrichedModule.id] = excludedDataElements;
-                    var systemSettings = {
-                        'excludedDataElements': systemSettingsPayload
-                    };
-                    var payload = {
-                        "projectId": projectId,
-                        "settings": systemSettings
-                    };
+        var onSuccess = function(enrichedModule) {
+            $scope.saveFailure = false;
+            if ($scope.$parent.closeNewForm)
+                $scope.$parent.closeNewForm(enrichedModule, "savedModule");
+            return enrichedModule;
+        };
 
-                    var oldIndexedDbSystemSettings = (_.isEmpty(data)) ? {
-                        'excludedDataElements': {}
-                    } : data.value;
-
-                    return systemSettingRepository.upsert(payload).then(function() {
-                        var hustlePayload = _.cloneDeep(payload);
-                        hustlePayload.indexedDbOldSystemSettings = oldIndexedDbSystemSettings;
-                        return publishMessage(hustlePayload, "excludeDataElements");
-                    });
-                });
-            };
+        var saveExcludedDataElements = function(enrichedModule) {
             var excludedDataElements = systemSettingsTransformer.excludedDataElementsForAggregateModule($scope.associatedDatasets);
-            return saveSystemSettings(excludedDataElements, parent.id).then(function() {
-                return enrichedModule;
-            });
+            var systemSetting = {
+                key: enrichedModule.id,
+                value: {
+                    clientLastUpdated: moment().toISOString(),
+                    dataElements: excludedDataElements
+                }
+            };
+            return systemSettingRepository.upsert(systemSetting).
+            then(_.partial(publishMessage, systemSetting, "uploadSystemSetting"));
         };
 
         $scope.save = function(module) {
-            var onSuccess = function(enrichedModule) {
-                $scope.saveFailure = false;
-                if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm(enrichedModule, "savedModule");
-                return enrichedModule;
-            };
+            var enrichedModule = {};
 
-            var associateDatasets = function(enrichedModule) {
+            var associateDatasets = function() {
                 var addOrgUnits = function() {
                     return _.map($scope.associatedDatasets, function(ds) {
                         return datasetRepository.get(ds.id).then(function(d) {
@@ -196,47 +172,37 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         });
                     });
                 };
-
                 var updateDataSets = function(datasets) {
                     return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]);
                 };
-
-                return $q.all(addOrgUnits()).then(updateDataSets).then(function() {
-                    return enrichedModule;
-                });
+                return $q.all(addOrgUnits()).then(updateDataSets);
+            };
+            var getEnrichedModule = function(module) {
+                enrichedModule = orgUnitMapper.mapToModule(module);
+                return $q.when(enrichedModule);
+            };
+            var createModules = function(module) {
+                return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")]);
             };
 
             var saveAggregateModules = function() {
-                return $scope.createModules($scope.module)
-                    .then(associateDatasets);
+                return createModules($scope.module).then(associateDatasets);
             };
 
-            var createOrgUnitGroups = function(enrichedmodule) {
-                return orgUnitGroupHelper.createOrgUnitGroups([enrichedmodule], false).then(function() {
-                    return enrichedmodule;
-                });
+            var createOrgUnitGroups = function(enrichedModule) {
+                return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false);
             };
 
-            return saveAggregateModules()
-                .then(_.curry(saveSystemSettingsForExcludedDataElements)($scope.module.parent))
-                .then(createOrgUnitGroups)
-                .then(onSuccess, $scope.onError);
+            return getEnrichedModule($scope.module).then(saveAggregateModules)
+                .then(_.partial(saveExcludedDataElements, enrichedModule))
+                .then(_.partial(createOrgUnitGroups, enrichedModule))
+                .then(_.partial(onSuccess, enrichedModule), _.partial(onError, enrichedModule));
         };
 
         $scope.update = function() {
-            var onSuccess = function(data) {
-                $scope.saveFailure = false;
-                if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm(enrichedModule, "savedModule");
-            };
-
             var enrichedModule = orgUnitMapper.mapToModule($scope.module, $scope.module.id, 6);
-
-            return $q.all([saveSystemSettingsForExcludedDataElements($scope.module.parent, enrichedModule),
-                    orgUnitRepository.upsert(enrichedModule),
-                    publishMessage(enrichedModule, "upsertOrgUnit")
-                ])
-                .then(onSuccess, $scope.onError);
+            return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
+                .then(_.partial(onSuccess, enrichedModule), _.partial(onError, enrichedModule));
         };
 
         $scope.areDatasetsSelected = function() {

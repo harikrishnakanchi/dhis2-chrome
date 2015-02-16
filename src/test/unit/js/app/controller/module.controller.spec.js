@@ -267,30 +267,20 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.save();
             scope.$apply();
 
-            var expectedSystemSettings = {
-                "excludedDataElements": {
-                    "adba40b7157": ["1", "3"]
+            var expectedSystemSetting = {
+                "key": "adba40b7157",
+                "value": {
+                    clientLastUpdated: "2014-04-01T00:00:00.000Z",
+                    dataElements: ["1", "3"]
                 }
-            };
-            var expectedPayload = {
-                projectId: projectId,
-                settings: expectedSystemSettings
             };
 
             var expectedHustleMessage = {
-                data: {
-                    projectId: projectId,
-                    settings: expectedSystemSettings,
-                    indexedDbOldSystemSettings: {
-                        excludedDataElements: {
-
-                        }
-                    }
-                },
-                type: "excludeDataElements",
+                data: expectedSystemSetting,
+                type: "uploadSystemSetting",
             };
 
-            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedPayload);
+            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSetting);
             expect(hustle.publish.calls.argsFor(2)).toEqual([expectedHustleMessage, 'dataValues']);
         });
 
@@ -354,21 +344,12 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should update system setting while updating module", function() {
-            spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, []));
-            expectedSystemSettings = {
-                "excludedDataElements": {
-                    oldid: ['1', '2']
-                }
-            };
             spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {
                 "key": 1,
-                "value": expectedSystemSettings
+                "value": {}
             }));
+
             var oldid = "oldid";
-            var parent = {
-                "id": "par1",
-                "name": "Par1"
-            };
             scope.orgUnit = {
                 "id": oldid,
                 "name": "module OLD name",
@@ -406,35 +387,20 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.update();
             scope.$apply();
 
-            expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith("par1");
+            expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith(oldid);
 
-            var expectedSystemSettingsPayload = {
-                projectId: 'par1',
-                settings: {
-                    excludedDataElements: {
-                        oldid: ['1', '3']
-                    }
-                }
-            };
-            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettingsPayload);
-
-            var hustlePayload = {
-                "projectId": "par1",
-                "settings": {
-                    "excludedDataElements": {
-                        oldid: ["1", "3"]
-                    }
-                },
-                "indexedDbOldSystemSettings": {
-                    "excludedDataElements": {
-                        oldid: ['1', '2']
-                    }
+            var expectedSystemSetting = {
+                "key": oldid,
+                "value": {
+                    clientLastUpdated: "2014-04-01T00:00:00.000Z",
+                    dataElements: ["1", "3"]
                 }
             };
 
+            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSetting);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: hustlePayload,
-                type: "excludeDataElements"
+                data: expectedSystemSetting,
+                type: "uploadSystemSetting"
             }, "dataValues");
         });
 

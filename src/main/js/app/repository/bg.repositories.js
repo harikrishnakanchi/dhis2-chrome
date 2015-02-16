@@ -13,7 +13,7 @@ define(["dataRepository", "datasetRepository", "userPreferenceRepository", "appr
             app.service('orgUnitGroupRepository', ['$indexedDB', orgUnitGroupRepository]);
             app.service('changeLogRepository', ['$indexedDB', changeLogRepository]);
             app.service('programRepository', ['$indexedDB', "$q", programRepository]);
-            app.service('systemSettingRepository', ['$indexedDB', systemSettingRepository]);
+            app.service('systemSettingRepository', ['$indexedDB', '$q', systemSettingRepository]);
             app.service('metadataRepository', ['$indexedDB', "$q", metadataRepository]);
         };
         return {

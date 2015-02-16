@@ -1,24 +1,22 @@
 define(["lodash"], function(_) {
-    return function(db) {
+    return function(db, $q) {
         var upsert = function(systemSettings) {
             var store = db.objectStore("systemSettings");
-            var payload = {
-                "key": systemSettings.projectId,
-                "value": systemSettings.settings
-            };
-            return store.upsert(payload).then(function() {
-                return payload;
+            return store.upsert(systemSettings).then(function() {
+                return systemSettings;
             });
         };
 
         var getAllWithProjectId = function(parentId) {
+            if (!parentId) return $q.when([]);
             var store = db.objectStore("systemSettings");
             return store.find(parentId);
         };
 
         var get = function(moduleId) {
+            if (!moduleId) return $q.when([]);
             var store = db.objectStore("systemSettings");
-            return store.find(parentId);
+            return store.find(moduleId);
         };
 
         var upsertDhisDownloadedData = function(settings) {

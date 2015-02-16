@@ -76,30 +76,39 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
             });
 
             it("should merge local dataset with dhis copy when new orgunits are associated to the dataset either in dhis or locally", function() {
-                var localDataset = [{
+                var originalDataset = {
                     'id': 'ds1',
                     'lastUpdated': '2015-01-01T09:00:00.000+0000',
+                    'organisationUnits': [{
+                        'id': 'ou1'
+                    }]
+                };
+
+                var locallyUpdatedDataset = {
+                    'id': 'ds1',
+                    'lastUpdated': '2015-01-01T09:00:00.000+0000',
+                    'clientLastUpdated': '2015-01-01T10:00:00.000Z',
                     'organisationUnits': [{
                         'id': 'ou1'
                     }, {
                         'id': 'ou3'
                     }]
-                }];
+                };
 
-                var dhisDatasets = [{
+                var dhisUpdatedDataset = {
                     'id': 'ds1',
-                    'lastUpdated': '2015-01-01T09:00:00.000+0000',
+                    'lastUpdated': '2015-01-01T11:00:00.000Z',
                     'organisationUnits': [{
-                        'id': 'ou2'
-                    }, {
                         'id': 'ou1'
+                    }, {
+                        'id': 'ou2'
                     }]
-                }];
+                };
 
                 spyOn(datasetRepository, 'upsert');
                 spyOn(datasetRepository, 'upsertDhisDownloadedData');
-                spyOn(datasetRepository, 'findAll').and.returnValue(utils.getPromise(q, localDataset));
-                spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, dhisDatasets));
+                spyOn(datasetRepository, 'findAll').and.returnValue(utils.getPromise(q, [locallyUpdatedDataset]));
+                spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, [dhisUpdatedDataset]));
 
                 var message = {
                     'data': {
@@ -115,7 +124,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
 
                 var expectedUpsertedDataset = [{
                     'id': 'ds1',
-                    'lastUpdated': '2015-01-01T09:00:00.000+0000',
+                    'lastUpdated': '2015-01-01T11:00:00.000Z',
                     'organisationUnits': [{
                         'id': 'ou1'
                     }, {

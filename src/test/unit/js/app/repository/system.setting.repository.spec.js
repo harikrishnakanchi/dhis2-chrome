@@ -11,23 +11,15 @@ define(["systemSettingRepository", "angularMocks", "utils"], function(SystemSett
         }));
 
         it("should upsert system settings", function() {
-            var projectId = "12445";
-            var expectedSystemSettings = {
-                "excludedDataElements": {
-                    "1": ["123452", "123457"]
+            var systemSetting = {
+                "key": "12445",
+                "value": {
+                    "clientLastUpdated": "2015-01-01T11:00:00.000Z",
+                    "dataElements": ["123452", "123457"]
                 }
             };
-            var systemSetting = {
-                projectId: projectId,
-                settings: expectedSystemSettings
-            };
             repo.upsert(systemSetting);
-
-            var expectedPayload = {
-                key: projectId,
-                value: expectedSystemSettings
-            };
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedPayload);
+            expect(mockStore.upsert).toHaveBeenCalledWith(systemSetting);
         });
 
         it("should find all settings for modules", function() {
