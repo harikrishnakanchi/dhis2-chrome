@@ -25,7 +25,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             dataSetRepo = {
                 getAllForOrgUnit: function() {},
                 get: function() {},
-                getEnrichedDatasets: function() {},
+                getEnriched: function() {},
                 upsert: function() {},
                 getAll: jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, datasetsdata))
             };
@@ -306,7 +306,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.isNewMode = false;
 
             spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, [datasetsdata[1]]));
-            spyOn(dataSetRepo, "getEnrichedDatasets").and.callFake(function(ds) {
+            spyOn(dataSetRepo, "getEnriched").and.callFake(function(ds) {
                 return ds;
             });
             moduleController = new ModuleController(scope, hustle, orgUnitService, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
@@ -316,7 +316,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(scope.associatedDatasets.length).toEqual(1);
             expect(scope.nonAssociatedDataSets).toEqual([datasetsdata[0]]);
             expect(scope.selectedDataset).toEqual(scope.associatedDatasets[0]);
-            expect(scope.getEnrichedDatasets);
+            expect(scope.getEnriched);
         });
 
         it("should disable update button", function() {

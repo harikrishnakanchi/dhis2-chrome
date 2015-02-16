@@ -59,7 +59,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
 
             var getAllDatasets = function() {
                 return datasetRepository.getAll().then(function(ds) {
-                    return datasetRepository.getEnrichedDatasets(ds);
+                    return datasetRepository.getEnriched(ds);
                 });
             };
 

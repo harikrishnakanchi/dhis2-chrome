@@ -11,7 +11,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             return store.each(query);
         };
 
-        var getEnrichedDatasets = function(datasets, excludedDataElements) {
+        var getEnriched = function(datasets, excludedDataElements) {
             var getEntitiesFromDb = function(storeName) {
                 var store = db.objectStore(storeName);
                 return store.getAll();
@@ -93,7 +93,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             "getAllDatasetIds": getAllDatasetIds,
             "upsert": upsert,
             "getAllForOrgUnit": getAllForOrgUnit,
-            "getEnrichedDatasets": getEnrichedDatasets
+            "getEnriched": getEnriched
         };
     };
 });

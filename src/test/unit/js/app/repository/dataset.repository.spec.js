@@ -263,7 +263,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
 
             var actualEnrichedDS;
 
-            datasetRepository.getEnrichedDatasets(datasets).then(function(data) {
+            datasetRepository.getEnriched(datasets).then(function(data) {
                 actualEnrichedDS = data;
             });
 
