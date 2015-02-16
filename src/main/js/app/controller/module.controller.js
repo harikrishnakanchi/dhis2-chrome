@@ -71,27 +71,23 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
             };
 
-            var setDataSets = function(data) {
-                $scope.originalDatasets = data[0];
-                $scope.associatedDatasets = data[1];
-                $scope.nonAssociatedDataSets = getNonAssociatedDataSets($scope.associatedDatasets);
-                $scope.selectedDataset = $scope.associatedDatasets ? $scope.associatedDatasets[0] : [];
-            };
-
-            var getAllAssociatedDataSets = function() {
+            var getAssociatedDataSets = function(allDatasets) {
                 if (!$scope.module.id) return [];
-                return datasetRepository.getAllForOrgUnit($scope.module.id).then(function(ds) {
-                    return datasetRepository.getEnrichedDatasets(ds, $scope.excludedDataElements);
+                return _.filter(allDatasets, function(ds) {
+                    return _.contains(ds.orgUnitIds, $scope.module.id);
                 });
             };
 
-            var getDataSets = function() {
-                return $q.all([getAllDatasets(),
-                    getAllAssociatedDataSets()
-                ]);
+            var getDatasets = function() {
+                return getAllDatasets().then(function(datasets) {
+                    $scope.originalDatasets = datasets;
+                    $scope.associatedDatasets = getAssociatedDataSets(datasets);
+                    $scope.nonAssociatedDataSets = getNonAssociatedDataSets($scope.associatedDatasets);
+                    $scope.selectedDataset = $scope.associatedDatasets ? $scope.associatedDatasets[0] : [];
+                });
             };
 
-            initModule().then(getExcludedDataElements).then(getDataSets).then(setDataSets).then(getAllModuleNames).then(setDisabled);
+            initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModuleNames).then(setDisabled);
         };
 
         $scope.changeCollapsed = function(sectionId) {

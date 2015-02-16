@@ -193,6 +193,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     name: 'Module1',
                     id: 'adba40b7157'
                 }],
+                orgUnitIds: ['mod1'],
                 attributeValues: [{
                     attribute: {
                         id: 'wFC6joy3I8Q',

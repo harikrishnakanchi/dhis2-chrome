@@ -6,6 +6,7 @@ define(["lodash"], function(_) {
         "organisationUnits": [{
             "id": "mod1"
         }],
+        "orgUnitIds": ["mod1"],
         "attributeValues": [{
             "attribute": {
                 "id": "wFC6joy3I8Q",
@@ -19,6 +20,7 @@ define(["lodash"], function(_) {
         "organisationUnits": [{
             "id": "mod2"
         }],
+        "orgUnitIds": ["mod2"],
         "attributeValues": [{
             "attribute": {
                 "id": "wFC6joy3I8Q",

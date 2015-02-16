@@ -1,6 +1,5 @@
 define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer, testData, _) {
     describe("datasetTransformer", function() {
-
         it("should enrich datasets", function() {
 
             var datasets, sections, dataelements;
@@ -14,6 +13,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 organisationUnits: [{
                     id: 'mod1'
                 }],
+                orgUnitIds: ['mod1'],
                 attributeValues: [{
                     attribute: {
                         id: 'wFC6joy3I8Q',
@@ -65,6 +65,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 organisationUnits: [{
                     id: 'mod2'
                 }],
+                orgUnitIds: ['mod2'],
                 attributeValues: [{
                     attribute: {
                         id: 'wFC6joy3I8Q',
@@ -136,5 +137,4 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
             expect(actualDatasets).toEqual([dataset1, dataset2]);
         });
     });
-
 });
