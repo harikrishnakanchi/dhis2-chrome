@@ -35,7 +35,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 return $q.when([]);
             };
 
-            var getAllModules = function() {
+            var getAllModuleNames = function() {
                 return orgUnitRepository.getAllModulesInOrgUnits([$scope.module.parent.id]).then(function(modules) {
                     $scope.allModules = _.pluck(modules, "name");
                 });
@@ -48,14 +48,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
             };
 
-            var setUpModule = function(data) {
+            var setDisabled = function() {
                 var isDisabled = _.find($scope.module.attributeValues, {
                     "attribute": {
                         "code": "isDisabled"
                     }
                 });
                 $scope.isDisabled = isDisabled && isDisabled.value;
-                $scope.updateDisabled = $scope.isDisabled;
             };
 
             var getAllDatasets = function() {
@@ -92,7 +91,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 ]);
             };
 
-            initModule().then(getExcludedDataElements).then(getDataSets).then(setDataSets).then(getAllModules).then(setUpModule);
+            initModule().then(getExcludedDataElements).then(getDataSets).then(setDataSets).then(getAllModuleNames).then(setDisabled);
         };
 
         $scope.changeCollapsed = function(sectionId) {

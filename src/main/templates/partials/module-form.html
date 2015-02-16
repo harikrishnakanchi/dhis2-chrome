@@ -47,13 +47,13 @@
                                     <div ng-repeat="section in selectedDataset.sections">
                                         <div class="collapse-head">
                                             <h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">{{section.name}}</h5>
-                                            <input type="checkbox" ng-disabled="updateDisabled" ng-change="changeDataElementSelection(section)" ng-model="getSection(selectedDataset, section.id)['isIncluded']">
+                                            <input type="checkbox" ng-disabled="isDisabled" ng-change="changeDataElementSelection(section)" ng-model="getSection(selectedDataset, section.id)['isIncluded']">
                                         </div>
                                         <div collapse="!isExpanded[section.id]" class="collapse-body">
                                             <ul>
                                                 <li ng-repeat="element in section.dataElements">
                                                     <label>
-                                                        <input type="checkbox" ng-disabled="updateDisabled" ng-model="getDataElement(section, element.id)['isIncluded']" ng-change="changeSectionSelection(section)">{{element.formName}}
+                                                        <input type="checkbox" ng-disabled="isDisabled" ng-model="getDataElement(section, element.id)['isIncluded']" ng-change="changeSectionSelection(section)">{{element.formName}}
                                                     </label>
                                                 </li>
                                             </ul>
@@ -67,7 +67,7 @@
             </div>
             <input type="button" class="btn btn-main pull-right" ng-click="save(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton()" value="Save" ng-if="isNewMode" />
             <input type="button" class="btn btn-main pull-right" ng-click="update(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton() || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode &amp;&amp; !isDisabled" />
-            <input type="button" class="btn btn-main pull-right" ng-click="disable(module)" value="Disable" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !isDisabled" />
+            <input type="button" class="btn btn-main pull-right" ng-click="disable(module)" value="Disable" ng-if="!isNewMode &amp;&amp; !isDisabled" />
         </form>
     </div>
 </div>
