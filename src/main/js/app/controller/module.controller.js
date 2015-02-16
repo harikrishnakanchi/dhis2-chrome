@@ -63,26 +63,16 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
             };
 
-            var getNonAssociatedDataSets = function(associatedDatasets) {
-                return _.reject($scope.originalDatasets, function(dataset) {
-                    return _.any(associatedDatasets, {
-                        "id": dataset.id
-                    });
-                });
-            };
-
-            var getAssociatedDataSets = function(allDatasets) {
-                if (!$scope.module.id) return [];
-                return _.filter(allDatasets, function(ds) {
-                    return _.contains(ds.orgUnitIds, $scope.module.id);
-                });
-            };
-
             var getDatasets = function() {
                 return getAllDatasets().then(function(datasets) {
                     $scope.originalDatasets = datasets;
-                    $scope.associatedDatasets = getAssociatedDataSets(datasets);
-                    $scope.nonAssociatedDataSets = getNonAssociatedDataSets($scope.associatedDatasets);
+
+                    var partitionedDatasets = _.partition(datasets, function(ds) {
+                        return _.contains(ds.orgUnitIds, $scope.module.id);
+                    });
+
+                    $scope.associatedDatasets = partitionedDatasets[0];
+                    $scope.nonAssociatedDataSets = partitionedDatasets[1];
                     $scope.selectedDataset = $scope.associatedDatasets ? $scope.associatedDatasets[0] : [];
                 });
             };
