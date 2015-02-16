@@ -250,15 +250,12 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             }];
 
             var db = utils.getMockDB(q).db;
-            spyOn(datasetRepository, "findAll").and.returnValue(utils.getPromise(q, datasets));
 
             db.objectStore.and.callFake(function(storeName) {
                 if (storeName === "sections")
                     return sectionStore;
                 if (storeName === "dataElements")
                     return dataElementStore;
-                if (storeName === "dataSets")
-                    return utils.getMockStore(q, "", "", datasets);
                 return utils.getMockStore(q, "", testData.get(storeName));
             });
 

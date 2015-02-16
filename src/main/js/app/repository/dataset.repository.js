@@ -11,22 +11,18 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             return store.each(query);
         };
 
-        var getEnrichedDatasets = function(dataSets, excludedDataElements) {
+        var getEnrichedDatasets = function(datasets, excludedDataElements) {
             var getEntitiesFromDb = function(storeName) {
                 var store = db.objectStore(storeName);
                 return store.getAll();
             };
 
-            var datasetIds = _.pluck(dataSets, "id");
-
-            var datasetPromise = findAll(datasetIds);
             var sectionPromise = getEntitiesFromDb("sections");
             var dataElementsPromise = getEntitiesFromDb("dataElements");
 
-            return $q.all([datasetPromise, sectionPromise, dataElementsPromise]).then(function(data) {
-                var datasets = data[0];
-                var sections = data[1];
-                var dataElements = data[2];
+            return $q.all([sectionPromise, dataElementsPromise]).then(function(data) {
+                var sections = data[0];
+                var dataElements = data[1];
                 return datasetTransformer.enrichDatasets(datasets, sections, dataElements, excludedDataElements);
             });
         };
