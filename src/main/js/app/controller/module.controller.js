@@ -48,7 +48,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
             };
 
-
             var setUpModule = function(data) {
                 var isDisabled = _.find($scope.module.attributeValues, {
                     "attribute": {
@@ -59,7 +58,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 $scope.updateDisabled = $scope.isDisabled;
             };
 
-            var dataSetPromise = function() {
+            var getAllDatasets = function() {
                 return datasetRepository.getAll().then(function(ds) {
                     return datasetRepository.getEnrichedDatasets(ds);
                 });
@@ -79,6 +78,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 $scope.nonAssociatedDataSets = getNonAssociatedDataSets($scope.associatedDatasets);
                 $scope.selectedDataset = $scope.associatedDatasets ? $scope.associatedDatasets[0] : [];
             };
+
             var getAllAssociatedDataSets = function() {
                 if (!$scope.module.id) return [];
                 return datasetRepository.getAllForOrgUnit($scope.module.id).then(function(ds) {
@@ -87,9 +87,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             };
 
             var getDataSets = function() {
-                return $q.all([dataSetPromise(),
-                    getAllAssociatedDataSets(),
-                    systemSettingRepository.getAllWithProjectId($scope.module.parent.id)
+                return $q.all([getAllDatasets(),
+                    getAllAssociatedDataSets()
                 ]);
             };
 
