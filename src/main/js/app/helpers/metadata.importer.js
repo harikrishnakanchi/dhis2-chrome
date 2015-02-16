@@ -1,5 +1,5 @@
 define([], function() {
-    return function($q, metadataService, systsemSettingService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository) {
+    return function($q, metadataService, systemSettingService, systemSettingRepository, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository) {
         this.run = function() {
             return verifyIsNewInstall().then(importData);
         };
@@ -16,7 +16,7 @@ define([], function() {
             if (!isNewInstall)
                 return;
 
-            return $q.all([importMetadata, importSystemSettings]).then(function(data) {
+            return $q.all([importMetadata(), importSystemSettings()]).then(function(data) {
                 var metadata = data[0];
                 return changeLogRepository.upsert("metaData", metadata.created);
             });
@@ -32,14 +32,10 @@ define([], function() {
                 promises.push(programRepository.upsertDhisDownloadedData(metadata.programs));
                 return $q.all(promises).then(function() {
                     return metadata;
-                })
+                });
             });
         };
 
-        var importSystemSettings = function(isNewInstall) {
-            return systsemSettingService.loadSystemSettingsFromFile().then(function(systemSettings) {
-
-            });
-        };
+        var importSystemSettings = function(isNewInstall) {};
     };
 });

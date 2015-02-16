@@ -12,7 +12,7 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
             var url = dhisUrl.orgUnitGroups + '?' + httpUtils.getParamString('id', orgUnitGroupIds);
             return $http.get(url).then(function(response) {
                 return response.data.organisationUnitGroups;
-            });;
+            });
         };
 
         this.getAll = function(lastUpdatedTime) {
