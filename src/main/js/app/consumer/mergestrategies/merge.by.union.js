@@ -18,8 +18,8 @@ define(["lodashUtils", "moment"], function(_, moment) {
                 var mergedItem = _.cloneDeep(remoteItem);
                 mergedItem[fieldToMerge] = mergeFields(remoteItem, localItem);
                 acc.push(mergedItem);
-            } else if (localItem) {
-                acc.push(localItem);
+            } else {
+                acc.push(remoteItem);
             }
         });
     };

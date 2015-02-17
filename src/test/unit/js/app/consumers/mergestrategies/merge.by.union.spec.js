@@ -48,10 +48,10 @@ define(["mergeByUnion"], function(mergeByUnion) {
             expect(actualMergedCopy).toEqual(expectedMergedCopy);
         });
 
-        it("should not merge the data and return local copy if local copy is not stale", function() {
+        it("should retain remote copy changes to fields other than the union field", function() {
             var remoteCopy = [{
                 "id": "data1",
-                "name": "data1",
+                "name": "new Name",
                 "lastUpdated": "2014-05-28T12:43:54.972Z",
                 "organisationUnits": [{
                     "id": "org1",
@@ -77,8 +77,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
             }];
 
             var actualMergedCopy = mergeByUnion("organisationUnits", remoteCopy, localCopy);
-
-            expect(actualMergedCopy).toEqual(localCopy);
+            expect(actualMergedCopy).toEqual(remoteCopy);
         });
 
         it("should return empty if there is no local data", function() {
@@ -99,7 +98,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
 
             var actualMergedCopy = mergeByUnion("organisationUnits", remoteCopy, localCopy);
 
-            expect(actualMergedCopy).toEqual([]);
+            expect(actualMergedCopy).toEqual(remoteCopy);
         });
 
     });

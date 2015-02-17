@@ -58,8 +58,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             scope.$apply();
 
             expect(programService.upsert).not.toHaveBeenCalled();
-            expect(programRepository.upsertDhisDownloadedData.calls.argsFor(0)).toEqual([programsFromDhis]);
-            expect(programRepository.upsertDhisDownloadedData.calls.argsFor(1)).toEqual([programsFromDhis]);
+            expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programsFromDhis);
         });
 
         it("should overwrite local program with dhis copy if local data is stale", function() {
@@ -100,8 +99,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             scope.$apply();
 
             expect(programService.upsert).not.toHaveBeenCalled();
-            expect(programRepository.upsertDhisDownloadedData.calls.argsFor(0)).toEqual([programsFromDb]);
-            expect(programRepository.upsertDhisDownloadedData.calls.argsFor(1)).toEqual([programsFromDhis]);
+            expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programsFromDhis);
         });
 
         it("should upsert lastUpdated time in change log", function() {
