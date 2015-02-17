@@ -37,9 +37,7 @@ define([], function() {
         };
 
         var importSystemSettings = function(isNewInstall) {
-            return systemSettingService.loadFromFile().then(function(systemSettings) {
-                return systemSettingRepository.upsert(systemSettings);
-            });
+            return systemSettingService.loadFromFile().then(systemSettingRepository.upsert);
         };
     };
 });
