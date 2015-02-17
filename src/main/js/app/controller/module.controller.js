@@ -35,7 +35,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 return $q.when([]);
             };
 
-            var getAllModuleNames = function() {
+            var getAllModules = function() {
                 return orgUnitRepository.getAllModulesInOrgUnits([$scope.module.parent.id]).then(function(modules) {
                     $scope.allModules = _.pluck(modules, "name");
                 });
@@ -77,7 +77,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
             };
 
-            initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModuleNames).then(setDisabled);
+            initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModules).then(setDisabled);
         };
 
         $scope.changeCollapsed = function(sectionId) {
@@ -132,7 +132,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             showModal(_.bind(disableModule, {}, module), $scope.resourceBundle.disableOrgUnitConfirmationMessage);
         };
 
-        var onError = function(data) {
+        var onError = function() {
             $scope.saveFailure = true;
         };
 
@@ -181,28 +181,26 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 enrichedModule = orgUnitMapper.mapToModule(module);
                 return $q.when(enrichedModule);
             };
-            var createModules = function(module) {
+            var createModules = function() {
                 return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")]);
             };
 
-            var saveAggregateModules = function() {
-                return createModules($scope.module).then(associateDatasets);
-            };
-
-            var createOrgUnitGroups = function(enrichedModule) {
+            var createOrgUnitGroups = function() {
                 return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false);
             };
 
-            return getEnrichedModule($scope.module).then(saveAggregateModules)
+            return getEnrichedModule($scope.module)
+                .then(createModules)
+                .then(associateDatasets)
                 .then(_.partial(saveExcludedDataElements, enrichedModule))
-                .then(_.partial(createOrgUnitGroups, enrichedModule))
-                .then(_.partial(onSuccess, enrichedModule), _.partial(onError, enrichedModule));
+                .then(createOrgUnitGroups)
+                .then(_.partial(onSuccess, enrichedModule), onError);
         };
 
         $scope.update = function() {
             var enrichedModule = orgUnitMapper.mapToModule($scope.module, $scope.module.id, 6);
             return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
-                .then(_.partial(onSuccess, enrichedModule), _.partial(onError, enrichedModule));
+                .then(_.partial(onSuccess, enrichedModule), onError);
         };
 
         $scope.areDatasetsSelected = function() {

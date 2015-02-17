@@ -68,6 +68,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         });
 
         it("should save excluded DataElement", function() {
+
+            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+
+            scope.$apply();
             scope.orgUnit = {
                 "name": "Project1",
                 "id": "someid",
@@ -81,7 +86,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             };
             scope.program = program;
 
-            var linelistModule = {
+            scope.module = {
                 'name': "Module2",
                 'serviceType': "Linelist",
                 'parent': scope.orgUnit
@@ -105,13 +110,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }]
             };
 
-            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
             spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
-            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-            scope.save(linelistModule);
+            scope.save();
             scope.$apply();
 
             expect(scope.saveFailure).toBe(false);
@@ -132,6 +135,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         });
 
         it("should save linelist modules", function() {
+            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, scope.program));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+            scope.$apply();
             scope.orgUnit = {
                 "name": "Project1",
                 "id": "someid",
@@ -139,7 +145,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 "level": 3
             };
 
-            var module = {
+            scope.module = {
                 'name': "Module2",
                 'openingDate': new Date(),
                 'serviceType': "Linelist",
@@ -185,12 +191,10 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }]
             };
 
-            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, scope.program));
             spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, scope.program));
-            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-            scope.save(module);
+            scope.save();
             scope.$apply();
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedLineListModule);

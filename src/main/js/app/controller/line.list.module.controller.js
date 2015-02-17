@@ -118,15 +118,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             });
         };
 
-        var createModule = function(module) {
-            var parent = module.parent;
-            var enrichedModule = orgUnitMapper.mapToModule(module);
-            return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
-                .then(function() {
-                    return enrichedModule;
-                });
-        };
-
         var disableModule = function(module) {
             var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
             var payload = orgUnitMapper.disable(enrichedModule);
@@ -136,19 +127,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                     $scope.$parent.closeNewForm(module, "disabledModule");
                 }
             });
-        };
-
-        $scope.update = function(module) {
-            var onSuccess = function() {
-                $scope.saveFailure = false;
-                if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm(enrichedModule, "savedModule");
-            };
-
-            var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
-
-            return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
-                .then(onSuccess, $scope.onError);
         };
 
         var showModal = function(okCallback, message) {
@@ -166,21 +144,15 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             showModal(_.bind(disableModule, {}, module), $scope.resourceBundle.disableOrgUnitConfirmationMessage);
         };
 
-        $scope.onError = function(data) {
+        var onError = function() {
             $scope.saveFailure = true;
         };
 
-        var associatePrograms = function(program, enrichedModule) {
-            var orgUnit = {
-                id: enrichedModule.id,
-                name: enrichedModule.name
-            };
-            program.organisationUnits = program.organisationUnits.concat(orgUnit);
-            return programRepository.upsert(program).then(function() {
-                publishMessage(program, "uploadProgram");
-            }).then(function() {
-                return enrichedModule;
-            });
+        var onSuccess = function(enrichedModule) {
+            $scope.saveFailure = false;
+            if ($scope.$parent.closeNewForm)
+                $scope.$parent.closeNewForm(enrichedModule, "savedModule");
+            return enrichedModule;
         };
 
         var saveExcludedDataElements = function(enrichedModule) {
@@ -196,25 +168,46 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             then(_.partial(publishMessage, systemSetting, "uploadSystemSetting"));
         };
 
-
         $scope.save = function(module) {
-            var onSuccess = function(enrichedModule) {
-                $scope.saveFailure = false;
-                if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm(enrichedModule, "savedModule");
-                return [$scope.module];
-            };
+            var enrichedModule = {};
 
-            var createOrgUnitGroups = function(enrichedModule) {
-                return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false).then(function() {
-                    return enrichedModule;
+            var associatePrograms = function(program) {
+                var orgUnit = {
+                    id: enrichedModule.id,
+                    name: enrichedModule.name
+                };
+                program.organisationUnits = program.organisationUnits.concat(orgUnit);
+                return programRepository.upsert(program).then(function() {
+                    publishMessage(program, "uploadProgram");
                 });
             };
 
-            createModule(module).then(_.curry(associatePrograms)($scope.program))
-                .then(_.curry(saveExcludedDataElements))
+            var getEnrichedModule = function(module) {
+                enrichedModule = orgUnitMapper.mapToModule(module);
+                return $q.when(enrichedModule);
+            };
+
+            var createModule = function() {
+                return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")]);
+            };
+
+            var createOrgUnitGroups = function() {
+                return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false);
+            };
+
+            return getEnrichedModule($scope.module)
+                .then(createModule)
+                .then(_.partial(associatePrograms, $scope.program))
+                .then(_.partial(saveExcludedDataElements, enrichedModule))
                 .then(createOrgUnitGroups)
-                .then(onSuccess, $scope.onError);
+                .then(_.partial(onSuccess, enrichedModule), onError);
+        };
+
+        $scope.update = function(module) {
+            var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
+
+            return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
+                .then(_.partial(onSuccess, enrichedModule), onError);
         };
 
         $scope.shouldDisableSaveOrUpdateButton = function() {
