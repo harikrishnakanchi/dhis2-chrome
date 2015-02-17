@@ -44,6 +44,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         }, "dataValues");
 
                         $hustle.publish({
+                            "type": "downloadSystemSetting"
+                        }, "dataValues");
+
+                        $hustle.publish({
                             "type": "downloadOrgUnit",
                             "data": []
                         }, "dataValues");

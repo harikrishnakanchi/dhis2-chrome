@@ -21,7 +21,7 @@ define(['moment', 'lodashUtils', 'mergeBy'], function(moment, _, mergeBy) {
             };
             return systemSettingRepository.findAll(moduleIds)
                 .then(_.curry(mergeBy.lastUpdated)(mergeOpts, remoteSettings))
-                .then(systemSettingRepository.upsertDhisDownloadedData);
+                .then(systemSettingRepository.upsert);
         };
 
         return {

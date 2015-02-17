@@ -19,20 +19,6 @@ define(["lodash"], function(_) {
             return store.find(moduleId);
         };
 
-        var upsertDhisDownloadedData = function(settings) {
-            var result = [];
-            _.map(settings, function(value, key) {
-                result.push({
-                    "key": key,
-                    "value": value
-                });
-            });
-            var store = db.objectStore("systemSettings");
-            return store.upsert(result).then(function() {
-                return result;
-            });
-        };
-
         var findAll = function(orgUnitIds) {
             var store = db.objectStore("systemSettings");
             var query = db.queryBuilder().$in(orgUnitIds).compile();
@@ -43,8 +29,7 @@ define(["lodash"], function(_) {
             "upsert": upsert,
             "get": get,
             "findAll": findAll,
-            "getAllWithProjectId": getAllWithProjectId,
-            "upsertDhisDownloadedData": upsertDhisDownloadedData
+            "getAllWithProjectId": getAllWithProjectId
         };
     };
 });

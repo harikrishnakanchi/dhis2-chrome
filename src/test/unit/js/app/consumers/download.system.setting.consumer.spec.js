@@ -24,14 +24,14 @@ define(["downloadSystemSettingConsumer", "systemSettingService", "utils", "angul
 
             it("should download excluded data elements", function() {
                 spyOn(systemSettingService, "getAll").and.returnValue(utils.getPromise(q, allSystemSettings));
-                spyOn(systemSettingRepository, "upsertDhisDownloadedData");
+                spyOn(systemSettingRepository, "upsert");
                 spyOn(systemSettingRepository, "findAll").and.returnValue(utils.getPromise(q, undefined));
                 downloadSystemSettingConsumer = new DownloadSystemSettingConsumer(systemSettingService, systemSettingRepository);
 
                 downloadSystemSettingConsumer.run();
                 scope.$apply();
                 expect(systemSettingService.getAll).toHaveBeenCalled();
-                expect(systemSettingRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(allSystemSettings);
+                expect(systemSettingRepository.upsert).toHaveBeenCalledWith(allSystemSettings);
             });
 
             it("should not overwrite locally modified setting", function() {
@@ -55,7 +55,7 @@ define(["downloadSystemSettingConsumer", "systemSettingService", "utils", "angul
                 ];
 
                 spyOn(systemSettingService, "getAll").and.returnValue(utils.getPromise(q, allSystemSettings));
-                spyOn(systemSettingRepository, "upsertDhisDownloadedData");
+                spyOn(systemSettingRepository, "upsert");
                 spyOn(systemSettingRepository, "findAll").and.returnValue(utils.getPromise(q, [locallyModifiedSetting]));
 
                 downloadSystemSettingConsumer = new DownloadSystemSettingConsumer(systemSettingService, systemSettingRepository);
@@ -64,7 +64,7 @@ define(["downloadSystemSettingConsumer", "systemSettingService", "utils", "angul
                 scope.$apply();
 
                 expect(systemSettingService.getAll).toHaveBeenCalled();
-                expect(systemSettingRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(expectedUpserts);
+                expect(systemSettingRepository.upsert).toHaveBeenCalledWith(expectedUpserts);
             });
 
             it("should overwrite locally modified setting", function() {
@@ -80,7 +80,7 @@ define(["downloadSystemSettingConsumer", "systemSettingService", "utils", "angul
                 var expectedUpserts = allSystemSettings;
 
                 spyOn(systemSettingService, "getAll").and.returnValue(utils.getPromise(q, allSystemSettings));
-                spyOn(systemSettingRepository, "upsertDhisDownloadedData");
+                spyOn(systemSettingRepository, "upsert");
                 spyOn(systemSettingRepository, "findAll").and.returnValue(utils.getPromise(q, [locallyModifiedSetting]));
 
                 downloadSystemSettingConsumer = new DownloadSystemSettingConsumer(systemSettingService, systemSettingRepository);
@@ -89,7 +89,7 @@ define(["downloadSystemSettingConsumer", "systemSettingService", "utils", "angul
                 scope.$apply();
 
                 expect(systemSettingService.getAll).toHaveBeenCalled();
-                expect(systemSettingRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(expectedUpserts);
+                expect(systemSettingRepository.upsert).toHaveBeenCalledWith(expectedUpserts);
             });
         });
     });

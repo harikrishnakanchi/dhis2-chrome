@@ -39,32 +39,5 @@ define(["systemSettingRepository", "angularMocks", "utils"], function(SystemSett
             expect(mockStore.find).toHaveBeenCalledWith(projectId);
         });
 
-        it("should upsert downloaded data", function() {
-            var settings1 = {
-                clientLastUpdated: "2014-05-30T12:43:54.972Z",
-                dataElements: ["de3", "de1"]
-            };
-
-            var settings2 = {
-                clientLastUpdated: "2014-05-30T12:43:54.972Z",
-                dataElements: ["de3", "de1"]
-            };
-
-            downloadedSettings = {
-                a467559322b: settings1,
-                b567559322c: settings2
-            };
-
-            var expectedPayload = [{
-                key: "a467559322b",
-                value: settings1
-            }, {
-                key: "b567559322c",
-                value: settings2
-            }];
-
-            repo.upsertDhisDownloadedData(downloadedSettings);
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedPayload);
-        });
     });
 });

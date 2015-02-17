@@ -10,15 +10,15 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
             service = new SystemSettingService(http);
 
             allSystemSettings = {
-                keyAccountRecovery: true,
-                exclude_a467559322b: {
+                "keyAccountRecovery": true,
+                "exclude_a467559322b": JSON.stringify({
                     clientLastUpdated: "2014-05-30T12:43:54.972Z",
                     dataElements: ["de1", "de2"]
-                },
-                exclude_b567559322c: {
+                }),
+                "exclude_b567559322c": JSON.stringify({
                     clientLastUpdated: "2014-05-30T12:43:54.972Z",
                     dataElements: ["de3", "de1"]
-                }
+                })
             };
 
             Timecop.install();

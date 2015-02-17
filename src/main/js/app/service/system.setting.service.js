@@ -58,7 +58,7 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
                 if (_.startsWith(key, 'exclude_')) {
                     result.push({
                         "key": key.replace('exclude_', ''),
-                        "value": value
+                        "value": JSON.parse(value)
                     });
                 }
             });
