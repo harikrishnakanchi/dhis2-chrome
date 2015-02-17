@@ -210,34 +210,14 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
         });
 
         it("should get all org units", function() {
-            var allOrgUnits;
+            var actualOrgUnits;
 
             orgUnitRepository.getAll().then(function(results) {
-                allOrgUnits = results;
+                actualOrgUnits = results;
             });
             scope.$apply();
             expect(mockOrgStore.getAll).toHaveBeenCalled();
-
-            expect(allOrgUnits[0]).toEqual(_.merge(orgUnits[0], {
-                "displayName": "MSF"
-            }));
-            expect(allOrgUnits[1]).toEqual(_.merge(orgUnits[1], {
-                "displayName": "country1"
-            }));
-            expect(allOrgUnits[2]).toEqual(_.merge(orgUnits[2], {
-                "displayName": "project1"
-            }));
-            expect(allOrgUnits[3]).toEqual(_.merge(orgUnits[3], {
-                "displayName": "module1"
-            }));
-            expect(allOrgUnits[4]).toEqual(_.merge(orgUnits[4], {
-                "displayName": "opUnit1"
-            }));
-            expect(_.merge(allOrgUnits[5], {
-                "displayName": "opUnit1 - module2"
-            })).toEqual(_.merge(orgUnits[5], {
-                "displayName": "opUnit1 - module2"
-            }));
+            expect(actualOrgUnits).toEqual(orgUnits);
         });
 
         it("should get all projects", function() {

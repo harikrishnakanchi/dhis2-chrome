@@ -146,7 +146,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
 
                     return {
                         "moduleId": mod.id,
-                        "moduleName": mod.displayName,
+                        "moduleName": mod.parent.name + " - " + mod.name,
                         "status": status
                     };
                 });

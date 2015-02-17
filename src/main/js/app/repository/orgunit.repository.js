@@ -98,16 +98,9 @@ define(["moment", "lodashUtils"], function(moment, _) {
             includeCurrent = includeCurrent === undefined ? true : includeCurrent;
 
             var store = db.objectStore("organisationUnits");
-            var orgUnits = store.getAll().then(function(allOrgUnits) {
-                return _.map(allOrgUnits, function(orgUnit) {
-                    orgUnit.displayName = orgUnit.parent && isOfType(orgUnit, "Module") ? orgUnit.parent.name + " - " + orgUnit.name : orgUnit.name;
-                    return orgUnit;
-                });
-            });
-
+            var orgUnits = store.getAll();
             if (!includeCurrent)
                 return orgUnits.then(rejectOrgUnitsWithCurrentDatasets);
-
             return orgUnits;
         };
 
