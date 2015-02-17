@@ -1,4 +1,4 @@
-define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datasetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5"], function(DashboardController, mocks, utils, ApprovalHelper, DatasetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5) {
+define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datasetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5", "moment"], function(DashboardController, mocks, utils, ApprovalHelper, DatasetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5, moment) {
     describe("dashboard controller", function() {
         var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, datasetRepository, filesystemService, indexeddbUtils, idbDump, sessionHelper, location;
 
@@ -94,7 +94,8 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         });
 
         it("should format periods to be shown on dashboard", function() {
-            expect(scope.formatPeriods("2014W42")).toEqual("W42 - 2014-10-13 - 2014-10-19");
+            var expectedPeriod = "W42 - " + moment('10-13-2014').startOf("isoWeek").toDate().toLocaleDateString() + " - " + moment('10-19-2014').endOf("isoWeek").toDate().toLocaleDateString();
+            expect(scope.formatPeriods("2014W42")).toEqual(expectedPeriod);
         });
 
         it("should set current users project", function() {
