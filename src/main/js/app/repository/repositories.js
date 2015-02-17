@@ -1,10 +1,10 @@
 define(["dataRepository", "datasetRepository", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository",
         "userRepository", "approvalDataRepository", "programRepository", "programEventRepository", "dataElementRepository",
-        "orgUnitGroupRepository", "changeLogRepository", "indicatorRepository"
+        "orgUnitGroupRepository", "changeLogRepository", "indicatorRepository", "metadataRepository"
     ],
     function(dataRepository, datasetRepository, userPreferenceRepository, orgUnitRepository, systemSettingRepository,
         userRepository, approvalDataRepository, programRepository, programEventRepository, dataElementRepository,
-        orgUnitGroupRepository, changeLogRepository, indicatorRepository) {
+        orgUnitGroupRepository, changeLogRepository, indicatorRepository, metadataRepository) {
         var init = function(app) {
             app.service('dataRepository', ['$indexedDB', dataRepository]);
             app.service('approvalDataRepository', ['$indexedDB', approvalDataRepository]);
@@ -19,6 +19,7 @@ define(["dataRepository", "datasetRepository", "userPreferenceRepository", "orgU
             app.service('orgUnitGroupRepository', ['$indexedDB', orgUnitGroupRepository]);
             app.service('changeLogRepository', ['$indexedDB', changeLogRepository]);
             app.service('indicatorRepository', ['$indexedDB', indicatorRepository]);
+            app.service('metadataRepository', ['$indexedDB', "$q", metadataRepository]);
         };
         return {
             init: init

@@ -79,6 +79,7 @@ require.config({
         "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
         "changeLogRepository": "app/repository/changelog.repository",
         "indicatorRepository": "app/repository/indicator.repository",
+        "metadataRepository": "app/repository/metadata.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
