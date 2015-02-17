@@ -56,7 +56,7 @@ define(["lodash"], function(_) {
                     "id": $scope.oldUserProject.id
                 });
             }
-
+            $rootScope.currentUser.organisationUnits = $rootScope.currentUser.organisationUnits ? $rootScope.currentUser.organisationUnits : [];
             $rootScope.currentUser.organisationUnits.push({
                 "id": $scope.currentUserProject.id,
                 "name": $scope.currentUserProject.name

@@ -46,16 +46,17 @@ define(["md5", "lodash"], function(md5, _) {
                 $scope.invalidCredentials = false;
                 $rootScope.isLoggedIn = true;
                 $rootScope.currentUser = user;
-                setLocale().
-                then(saveUserPreferences).
-                then(downloadDataValues).
-                then(function() {
-                    if (_.isEmpty($rootScope.currentUser.organisationUnits)) {
-                        $location.path("/selectproject");
-                    } else {
-                        $location.path("/dashboard");
-                    }
-                });
+
+                return setLocale()
+                    .then(saveUserPreferences)
+                    .then(downloadDataValues)
+                    .then(function() {
+                        if (_.isEmpty($rootScope.currentUser.organisationUnits)) {
+                            $location.path("/selectproject");
+                        } else {
+                            $location.path("/dashboard");
+                        }
+                    });
             }
         };
 
