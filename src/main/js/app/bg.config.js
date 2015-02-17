@@ -61,7 +61,6 @@ require.config({
         "uploadOrgUnitConsumer": "app/consumer/upload.orgunit.consumer",
         "downloadOrgUnitGroupConsumer": "app/consumer/download.orgunit.group.consumer",
         "uploadOrgUnitGroupConsumer": "app/consumer/upload.orgunit.group.consumer",
-        "systemSettingConsumer": "app/consumer/system.setting.consumer",
         "downloadDatasetConsumer": "app/consumer/download.dataset.consumer",
         "uploadDatasetConsumer": "app/consumer/upload.dataset.consumer",
         "createUserConsumer": "app/consumer/create.user.consumer",

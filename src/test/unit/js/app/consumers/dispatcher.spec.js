@@ -1,7 +1,7 @@
 define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, utils) {
     describe("dispatcher", function() {
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, scope,
-            systemSettingConsumer, createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
+            createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
             downloadSystemSettingConsumer, uploadSystemSettingConsumer;
 
@@ -35,9 +35,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             uploadDatasetConsumer = {
                 'run': jasmine.createSpy("uploadDatasetConsumer")
-            };
-            systemSettingConsumer = {
-                'run': jasmine.createSpy("systemSettingConsumer")
             };
             createUserConsumer = {
                 'run': jasmine.createSpy("createUserConsumer")
@@ -89,7 +86,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadDatasetConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadSystemSettingConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
-            dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, systemSettingConsumer, createUserConsumer, updateUserConsumer,
+            dispatcher = new Dispatcher(q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer,
                 uploadSystemSettingConsumer);
@@ -181,15 +178,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
             expect(downloadDatasetConsumer.run).toHaveBeenCalled();
             expect(uploadDatasetConsumer.run).toHaveBeenCalledWith(message, {});
-        });
-
-        it("should call system setting consumer", function() {
-            message.data = {
-                "data": {},
-                "type": "excludeDataElements"
-            };
-            dispatcher.run(message);
-            expect(systemSettingConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should fail if no hanlder found of payload type", function() {
