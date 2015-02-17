@@ -27,7 +27,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             systemSettingRepo = utils.getMockRepo(q);
-            systemSettingRepo.getAllWithProjectId = function() {};
+            systemSettingRepo.get = function() {};
 
             programsRepo = utils.getMockRepo(q);
             programsRepo.get = function() {};
@@ -80,7 +80,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should save aggregate module", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
 
             var parent = {
@@ -138,7 +138,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should asscoiate datasets with the module", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
             var parent = {
                 "name": "Project1",
@@ -213,7 +213,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should save excluded data elements for the module", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
             var projectId = "someid";
             var parent = {
@@ -281,7 +281,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should set datasets associated with module for edit", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.orgUnit = {
                 "id": "mod2",
                 "parent": {
@@ -307,7 +307,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should disable update button", function() {
             spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, []));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.orgUnit = {
                 "id": "mod2",
                 "parent": {
@@ -340,7 +340,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should update system setting while updating module", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {
                 "key": 1,
                 "value": {}
             }));
@@ -383,7 +383,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.update();
             scope.$apply();
 
-            expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith(oldid);
+            expect(systemSettingRepo.get).toHaveBeenCalledWith(oldid);
 
             var expectedSystemSetting = {
                 "key": oldid,
@@ -402,7 +402,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should update module name", function() {
             spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, []));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             var oldid = "oldid";
             var parent = {
                 "id": "par1",
@@ -468,7 +468,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should return false if datasets for modules are selected", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
             scope.associatedDatasets = [{
                 'id': 'ds_11',
@@ -482,7 +482,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should return true if dataset is not selected", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
             scope.associatedDatasets = [];
 
@@ -550,7 +550,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should select a dataset", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
 
             var dataset = {
@@ -572,14 +572,14 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should return false if no dataset is selected", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
             scope.selectedDataset = undefined;
             expect(scope.areDataElementsSelectedForSection()).toEqual(false);
         });
 
         it("should return true if any one section is selected for dataset", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
 
             scope.selectedDataset = {
@@ -607,7 +607,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should disable module", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             var parent = {
                 "id": "par1",
                 "name": "Par1"
@@ -679,7 +679,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should change collapsed", function() {
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
             scope.collapseSection = {
                 "sectionId": true

@@ -43,9 +43,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             };
 
             var getExcludedDataElements = function() {
-                return systemSettingRepository.getAllWithProjectId($scope.module.parent.id).then(function(systemSettings) {
-                    if (!_.isEmpty(systemSettings))
-                        $scope.excludedDataElements = systemSettings.value.excludedDataElements[$scope.module.id];
+                return systemSettingRepository.get($scope.module.id).then(function(systemSettings) {
+                    if (!_.isEmpty(systemSettings) && !_.isEmpty(systemSettings.value))
+                        $scope.excludedDataElements = systemSettings.value.dataElements;
                 });
             };
 
@@ -147,7 +147,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
 
             var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
 
-            return $q.all([saveSystemSettingsForExcludedDataElements(module.parent, enrichedModule), orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
+            return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
                 .then(onSuccess, $scope.onError);
         };
 
@@ -183,38 +183,19 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             });
         };
 
-        var saveSystemSettingsForExcludedDataElements = function(parent, enrichedModule) {
-            var saveSystemSettings = function(excludedDataElements, opunitId) {
-                return systemSettingRepository.getAllWithProjectId(opunitId).then(function(data) {
-                    var existingSystemSettings = (_.isEmpty(data) || _.isEmpty(data.value) || _.isEmpty(data.value.excludedDataElements)) ? {} : data.value.excludedDataElements;
-                    var systemSettingsPayload = _.cloneDeep(existingSystemSettings);
-                    systemSettingsPayload[enrichedModule.id] = excludedDataElements;
-                    var systemSettings = {
-                        'excludedDataElements': systemSettingsPayload
-                    };
-                    var payload = {
-                        "projectId": opunitId,
-                        "settings": systemSettings
-                    };
-
-                    var oldIndexedDbSystemSettings = (_.isEmpty(data)) ? {
-                        'excludedDataElements': {}
-                    } : data.value;
-
-                    return systemSettingRepository.upsert(payload).then(function() {
-                        var hustlePayload = _.cloneDeep(payload);
-                        hustlePayload.indexedDbOldSystemSettings = oldIndexedDbSystemSettings;
-                        return publishMessage(hustlePayload, "excludeDataElements").then(function() {
-                            return;
-                        });
-                    });
-                });
-            };
+        var saveExcludedDataElements = function(enrichedModule) {
             var excludedDataElements = systemSettingsTransformer.excludedDataElementsForLinelistModule($scope.enrichedProgram);
-            return saveSystemSettings(excludedDataElements, parent.id).then(function() {
-                return enrichedModule;
-            });
+            var systemSetting = {
+                key: enrichedModule.id,
+                value: {
+                    clientLastUpdated: moment().toISOString(),
+                    dataElements: excludedDataElements
+                }
+            };
+            return systemSettingRepository.upsert(systemSetting).
+            then(_.partial(publishMessage, systemSetting, "uploadSystemSetting"));
         };
+
 
         $scope.save = function(module) {
             var onSuccess = function(enrichedModule) {
@@ -231,7 +212,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             };
 
             createModule(module).then(_.curry(associatePrograms)($scope.program))
-                .then(_.curry(saveSystemSettingsForExcludedDataElements)(module.parent))
+                .then(_.curry(saveExcludedDataElements))
                 .then(createOrgUnitGroups)
                 .then(onSuccess, $scope.onError);
         };

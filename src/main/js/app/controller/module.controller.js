@@ -42,7 +42,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             };
 
             var getExcludedDataElements = function() {
-                return systemSettingRepository.getAllWithProjectId($scope.module.id).then(function(systemSettings) {
+                return systemSettingRepository.get($scope.module.id).then(function(systemSettings) {
                     if (!_.isEmpty(systemSettings) && !_.isEmpty(systemSettings.value))
                         $scope.excludedDataElements = systemSettings.value.dataElements;
                 });

@@ -21,7 +21,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             orgUnitRepo = utils.getMockRepo(q);
             orgunitGroupRepo = utils.getMockRepo(q);
             systemSettingRepo = utils.getMockRepo(q);
-            systemSettingRepo.getAllWithProjectId = function() {};
+            systemSettingRepo.get = function() {};
             systemSettingRepo.upsert = function() {};
             programsRepo = utils.getMockRepo(q, allPrograms);
             programsRepo.get = function() {};
@@ -80,6 +80,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 'organisationUnits': []
             };
             scope.program = program;
+
             var linelistModule = {
                 'name': "Module2",
                 'serviceType': "Linelist",
@@ -104,19 +105,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }]
             };
 
-            var data = {
-                "key": "someid",
-                "value": {
-                    "excludedDataElements": {
-                        "module3": ["de3", "de4"],
-                        "adba40b7157": ["de4"]
-                    }
-                }
-            };
-
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
             spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, data));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
@@ -124,34 +115,19 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             scope.$apply();
 
             expect(scope.saveFailure).toBe(false);
-            expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith("someid");
 
-            var expectedSystemSettingsPayload = {
-                "projectId": "someid",
-                "settings": {
-                    "excludedDataElements": {
-                        "module3": ["de3", "de4"],
-                        "adba40b7157": ["de4"],
-                        "a1ab18b5fdd": ["de3"]
-                    }
+            var expectedSystemSettings = {
+                "key": "a1ab18b5fdd",
+                "value": {
+                    "clientLastUpdated": "2014-04-01T00:00:00.000Z",
+                    "dataElements": ["de3"]
                 }
             };
-            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettingsPayload);
-
-            var hustlePayload = {
-                "projectId": "someid",
-                "settings": expectedSystemSettingsPayload.settings,
-                "indexedDbOldSystemSettings": {
-                    "excludedDataElements": {
-                        "module3": ["de3", "de4"],
-                        "adba40b7157": ["de4"]
-                    }
-                }
-            };
+            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettings);
 
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: hustlePayload,
-                type: "excludeDataElements"
+                data: expectedSystemSettings,
+                type: "uploadSystemSetting"
             }, "dataValues");
         });
 
@@ -211,7 +187,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, scope.program));
             spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, scope.program));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             scope.save(module);
@@ -263,7 +239,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             scope.isNewMode = false;
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
             spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
 
             lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
@@ -274,7 +250,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
         it("should update system setting while updating module", function() {
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
 
             scope.isNewMode = false;
@@ -320,39 +296,23 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             scope.update(module);
             scope.$apply();
 
-            expect(systemSettingRepo.getAllWithProjectId).toHaveBeenCalledWith("par1");
-
-            var expectedSystemSettingsPayload = {
-                projectId: 'par1',
-                settings: {
-                    excludedDataElements: {
-                        "newId": ['de3']
-                    }
+            var expectedSystemSettings = {
+                key: 'newId',
+                value: {
+                    "clientLastUpdated": "2014-04-01T00:00:00.000Z",
+                    "dataElements": ['de3']
                 }
             };
-            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettingsPayload);
-
-            var hustlePayload = {
-                "projectId": "par1",
-                "settings": {
-                    "excludedDataElements": {
-                        "newId": ['de3']
-                    }
-                },
-                "indexedDbOldSystemSettings": {
-                    "excludedDataElements": {}
-                }
-            };
-
-            expect(hustle.publish).toHaveBeenCalledWith({
-                data: hustlePayload,
-                type: "excludeDataElements"
-            }, "dataValues");
+            expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettings);
+            expect(hustle.publish.calls.argsFor(1)).toEqual([{
+                data: expectedSystemSettings,
+                type: "uploadSystemSetting"
+            }, "dataValues"]);
         });
 
         it("should update module name", function() {
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
 
             var oldid = "oldid";
@@ -413,7 +373,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
         it("should not disable save or update button if program is selected", function() {
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
             scope.program = {
                 "name": "ER Linelist"
@@ -424,7 +384,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
         it("should disable save or update button if program is not selected", function() {
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
             scope.program = {
                 "name": ""
@@ -473,7 +433,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
             spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, {}));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
             spyOn(hustle, "publish").and.callFake(function(payload) {
                 disableAttrInHustle = _.find(payload.data.attributeValues, {
@@ -518,7 +478,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
             spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
             scope.getEnrichedProgram("surgery1").then(function(data) {
                 expect(scope.enrichedProgram).toEqual(program);
@@ -538,7 +498,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
             scope.changeCollapsed("sectionId");
-            spyOn(systemSettingRepo, "getAllWithProjectId").and.returnValue(utils.getPromise(q, {}));
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
             scope.$apply();
 
