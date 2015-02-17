@@ -29,9 +29,14 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             return $http.get(dhisUrl.systemSettings).then(transform);
         };
 
+        var loadFromFile = function() {
+            return $http.get("/data/systemSettings.json").then(transform);
+        };
+
         return {
             "upsert": upsert,
-            "getAll": getAll
+            "getAll": getAll,
+            "loadFromFile": loadFromFile
         };
     };
 });

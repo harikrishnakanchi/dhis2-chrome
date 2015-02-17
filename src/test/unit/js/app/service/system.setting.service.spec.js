@@ -32,6 +32,35 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
             Timecop.uninstall();
         });
 
+        it("should get all sysettings from local file if syncing for the first time", function() {
+            var setting1 = "{\"clientLastUpdated\":\"2015-02-16T09:55:28.681Z\",\"dataElements\":[\"a3e1a48467b\",\"a8a704935cb\"]}";
+            var setting2 = "{\"clientLastUpdated\":\"2015-02-16T09:34:08.656Z\",\"dataElements\":[\"a21ac2e69d4\",\"acaeb258531\",\"a1cd332c676\"]}";
+            var actualSystemSettings = {};
+
+            var systemSettingsInInFile = {
+                "keyAccountRecovery": true,
+                "keyHideUnapprovedDataInAnalytics": true,
+                "exclude_ab5e8d18bd6": setting1,
+                "exclude_a2e4d473823": setting2
+            };
+
+            var expectedSystemSettings = [{
+                key: "ab5e8d18bd6",
+                value: JSON.parse(setting1)
+            }, {
+                key: "a2e4d473823",
+                value: JSON.parse(setting2)
+            }];
+
+            httpBackend.expectGET("/data/systemSettings.json").respond(200, systemSettingsInInFile);
+            service.loadFromFile().then(function(data) {
+                actualSystemSettings = data;
+            });
+
+            httpBackend.flush();
+            expect(actualSystemSettings).toEqual(expectedSystemSettings);
+        });
+
         it("should get all excluded data elements", function() {
             var result = {};
             httpBackend.expectGET(properties.dhis.url + "/api/systemSettings").respond(200, allSystemSettings);

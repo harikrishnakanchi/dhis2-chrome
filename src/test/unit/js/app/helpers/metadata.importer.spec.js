@@ -46,12 +46,25 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                     'programs': programs
                 };
 
+                var setting1 = "{\"clientLastUpdated\":\"2015-02-16T09:55:28.681Z\",\"dataElements\":[\"a3e1a48467b\",\"a8a704935cb\"]}";
+                var setting2 = "{\"clientLastUpdated\":\"2015-02-16T09:34:08.656Z\",\"dataElements\":[\"a21ac2e69d4\",\"acaeb258531\",\"a1cd332c676\"]}";
+
+                var systemSettings = {
+                    "keyAccountRecovery": true,
+                    "keyHideUnapprovedDataInAnalytics": true,
+                    "ab5e8d18bd6": JSON.parse(setting1),
+                    "a2e4d473823": JSON.parse(setting2)
+                };
+
                 spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, dhisMetadata));
+                spyOn(systemSettingService, "loadFromFile").and.returnValue(utils.getPromise(q, systemSettings));
+
                 spyOn(metadataRepository, "upsertMetadata");
                 spyOn(orgUnitRepository, "upsertDhisDownloadedData");
                 spyOn(orgUnitGroupRepository, "upsertDhisDownloadedData");
                 spyOn(datasetRepository, "upsertDhisDownloadedData");
                 spyOn(programRepository, "upsertDhisDownloadedData");
+                spyOn(systemSettingRepository, "upsert");
 
                 metadataImporter.run();
                 scope.$apply();
@@ -62,6 +75,7 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitGroups);
                 expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(dataSets);
                 expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programs);
+                expect(systemSettingRepository.upsert).toHaveBeenCalledWith(systemSettings);
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith("metaData", metadataCreateDate);
             });
 
@@ -73,6 +87,7 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 spyOn(orgUnitGroupRepository, "upsertDhisDownloadedData");
                 spyOn(datasetRepository, "upsertDhisDownloadedData");
                 spyOn(programRepository, "upsertDhisDownloadedData");
+                spyOn(systemSettingRepository, "upsert");
 
                 metadataImporter.run();
                 scope.$apply();
@@ -83,6 +98,7 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 expect(orgUnitGroupRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(datasetRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(programRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
+                expect(systemSettingRepository.upsert).not.toHaveBeenCalled();
                 expect(changeLogRepository.upsert).not.toHaveBeenCalled();
             });
         });
