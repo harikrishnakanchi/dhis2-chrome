@@ -7,12 +7,6 @@ define(["lodash"], function(_) {
             });
         };
 
-        var getAllWithProjectId = function(parentId) {
-            if (!parentId) return $q.when([]);
-            var store = db.objectStore("systemSettings");
-            return store.find(parentId);
-        };
-
         var get = function(moduleId) {
             if (!moduleId) return $q.when([]);
             var store = db.objectStore("systemSettings");
@@ -28,8 +22,7 @@ define(["lodash"], function(_) {
         return {
             "upsert": upsert,
             "get": get,
-            "findAll": findAll,
-            "getAllWithProjectId": getAllWithProjectId
+            "findAll": findAll
         };
     };
 });

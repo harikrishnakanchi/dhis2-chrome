@@ -32,11 +32,11 @@ define(["systemSettingRepository", "angularMocks", "utils"], function(SystemSett
         });
 
         it("should find all system settings given a project id", function() {
-            var projectId = "12445";
-            repo.getAllWithProjectId(projectId).then(function(data) {
+            var moduleId = "12445";
+            repo.get(moduleId).then(function(data) {
                 expect(data).toEqual({});
             });
-            expect(mockStore.find).toHaveBeenCalledWith(projectId);
+            expect(mockStore.find).toHaveBeenCalledWith(moduleId);
         });
 
     });

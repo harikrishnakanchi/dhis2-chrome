@@ -12,12 +12,17 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 $scope.form.eventDataEntryForm.$setPristine();
         };
 
-        var loadPrograms = function() {
-            return programRepository.get($scope.programsInCurrentModule).then(function(program) {
+        var loadPrograms = function(excludedDataElements) {
+            return programRepository.get($scope.programsInCurrentModule, excludedDataElements).then(function(program) {
                 $scope.program = program;
                 return $scope.program;
             });
-            
+
+        };
+        var getExcludedDataElements = function() {
+            return systemSettingRepository.get($scope.currentModule.id).then(function(data) {
+                return data && data.value ? data.value.dataElements : [];
+            });
         };
 
         var loadOptionSets = function() {
@@ -30,10 +35,8 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
         var setExcludedPropertyForDataElements = function(program) {
             var loadSystemSettings = function() {
-                return systemSettingRepository.getAllWithProjectId($scope.currentModule.parent.id).then(function(data) {
-                    if (data === undefined) return [];
-                    var excludedDataElements = data.value.excludedDataElements[$scope.currentModule.id];
-                    return excludedDataElements;
+                return systemSettingRepository.get($scope.currentModule.id).then(function(data) {
+                    return data && data.value ? data.value.dataElements : [];
                 });
             };
 
@@ -358,7 +361,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 resetForm();
                 $scope.showView = true;
                 reloadEventsView();
-                loadPrograms()
+                getExcludedDataElements().then(loadPrograms)
                     .then(setExcludedPropertyForDataElements)
                     .then(loadOptionSets);
                 $scope.loading = false;

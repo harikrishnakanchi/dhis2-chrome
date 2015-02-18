@@ -80,15 +80,15 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 systemSettings = {
-                    'value': {
-                        'excludedDataElements': {
-                            'currentModuleId': ['de1', 'de3']
-                        }
+                    "key": "currentModuleId",
+                    "value": {
+                        "clientLastUpdated": "2014-12-29T05:06:30.950+0000",
+                        'dataElements': ['de1', 'de3']
                     }
                 };
 
                 systemSettingRepo = {
-                    "getAllWithProjectId": jasmine.createSpy("getAllWithProjectId").and.returnValue(utils.getPromise(q, systemSettings))
+                    "get": jasmine.createSpy("get").and.returnValue(utils.getPromise(q, systemSettings))
                 };
 
                 programEventRepository.getEventsFor.and.callFake(function(programId) {
@@ -115,7 +115,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, mockDB.db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo);
                 scope.$apply();
 
-                expect(programRepository.get).toHaveBeenCalledWith('p1');
+                expect(programRepository.get).toHaveBeenCalledWith('p1', ['de1', 'de3']);
                 expect(scope.program).toEqual(programAndStageData);
             });
 
@@ -149,7 +149,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                                     "id": "de1",
                                     "name": "Patient ID - V1 - Surgery",
                                     "type": "string",
-                                     "isExcluded": true
+                                    "isExcluded": true
                                 }
                             }, {
                                 "dataElement": {
