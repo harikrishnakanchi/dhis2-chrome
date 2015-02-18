@@ -45,15 +45,11 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
         return returnVal;
     };
 
-    var filterDataElements = function(sections, moduleId, systemSettings, parentId) {
-        var systemSetting = _.find(systemSettings, function(s) {
-            return s.key === parentId;
-        });
+    var filterDataElements = function(sections, excludedDataElements) {
         var filteredSections = _.map(sections, function(section) {
             section = _.clone(section);
             section.dataElements = _.filter(section.dataElements, function(dataElement) {
-                var excludedList = systemSetting ? systemSetting.value.excludedDataElements : undefined;
-                return excludedList ? !_.contains(excludedList[moduleId], dataElement.id) : true;
+                return !_.contains(excludedDataElements, dataElement.id);
             });
             return section;
         });

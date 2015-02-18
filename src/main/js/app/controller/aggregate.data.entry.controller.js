@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
-    return function($scope, $routeParams, $q, $hustle, db, dataRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
+    return function($scope, $routeParams, $q, $hustle, db, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, approvalHelper) {
 
         $scope.validDataValuePattern = /^[0-9+]*$/;
@@ -45,6 +45,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $scope.approveSuccess = false;
             $scope.approveError = false;
             $scope.projectIsAutoApproved = false;
+            $scope.excludedDataElements = {};
         };
 
         $scope.sum = function(iterable) {
@@ -304,7 +305,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         var setData = function(data) {
             $scope.dataSets = data[0];
-            $scope.systemSettings = data[6];
+            $scope.excludedDataElements = data[6] && data[6].value ? data[6].value.dataElements : undefined;
             return data;
         };
 
@@ -332,8 +333,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var comboPromise = getAll("categoryCombos");
             var categoriesPromise = getAll("categories");
             var categoryOptionCombosPromise = getAll("categoryOptionCombos");
-            var systemSettingsPromise = getAll('systemSettings');
-            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, systemSettingsPromise]);
+            var excludedDataElementPromise = systemSettingRepository.get($scope.currentModule.id);
+
+            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, excludedDataElementPromise]);
 
             $scope.loading = true;
             getAllData.then(setData).then(transformDataSet).then(function() {
@@ -369,7 +371,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.currentGroupedSections = _.pick($scope.groupedSections, datasetsAssociatedWithModule);
                 var selectedDatasets = _.keys($scope.currentGroupedSections);
                 _.each(selectedDatasets, function(selectedDataset) {
-                    $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.currentModule.id, $scope.systemSettings, $scope.currentModule.parent.id);
+                    $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.excludedDataElements);
                 });
 
                 if ($scope.dataentryForm !== undefined)
