@@ -159,7 +159,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
                     return isDisabledAttribute && isDisabledAttribute.value === "true";
                 });
             };
-
+            orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
             return getChildModules(orgUnitIds)
                 .then(rejectOrgUnitsWithCurrentDatasets)
                 .then(rejectDisabledOrgUnits);
