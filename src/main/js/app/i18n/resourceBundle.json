@@ -115,6 +115,6 @@
     "newLabel": "New",
     "currentLabel": "Current",
     "loadCloneConfirmationMessage": "Loading clone will delete all the existing data and make an exact replica of the clone data. You will be logged out after successful cloning. This operation is irreversible. Are you sure you want to continue?",
-    "projectCodeExists": "Project code already exists",
+    "projectCodeExists": "Project code already exists.",
     "dateInvalid": "Not a valid date."
 }
