@@ -44,12 +44,26 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
                     return dataValue.orgUnit + dataValue.period;
                 };
 
+                var areEqual = function(originalDataValues, mergedDataValues) {
+                    var keysToPickForCompare = ["dataElement", "period", "orgUnit", "categoryOptionCombo", "value", "storedBy"];
+
+                    var originalDataValuesToCompare = _.map(originalDataValues, function(dv) {
+                        return _.pick(dv, keysToPickForCompare);
+                    });
+
+                    var mergedDataValuesToCompare = _.map(mergedDataValues, function(dv) {
+                        return _.pick(dv, keysToPickForCompare);
+                    });
+
+                    return _.isEqual(originalDataValuesToCompare, mergedDataValuesToCompare);
+                };
+
                 var groupedMergedData = _.groupBy(mergedData, orgUnitAndPeriod);
                 var groupedOriginalData = _.groupBy(originalData, orgUnitAndPeriod);
 
                 var deleteApprovals = [];
                 for (var data in groupedOriginalData) {
-                    if (groupedMergedData[data] && !_.isEqual(groupedMergedData[data], groupedOriginalData[data])) {
+                    if (groupedMergedData[data] && !areEqual(groupedOriginalData[data], groupedMergedData[data])) {
                         var firstDataValue = groupedOriginalData[data][0];
                         var deleteFirstLevelApproval = approvalDataRepository.deleteLevelOneApproval(firstDataValue.period, firstDataValue.orgUnit);
                         var deleteSecondLevelApproval = approvalDataRepository.deleteLevelTwoApproval(firstDataValue.period, firstDataValue.orgUnit);

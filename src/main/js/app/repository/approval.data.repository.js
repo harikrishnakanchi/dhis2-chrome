@@ -10,11 +10,6 @@ define([], function() {
             return store.upsert(payload);
         };
 
-        // this.saveLevelThreeApproval = function(payload) {
-        //     var store = db.objectStore("acceptedDataSets");
-        //     return store.upsert(payload);
-        // };
-
         this.deleteLevelOneApproval = function(period, orgUnitId) {
             var store = db.objectStore("completedDataSets");
             return store.delete([period, orgUnitId]);

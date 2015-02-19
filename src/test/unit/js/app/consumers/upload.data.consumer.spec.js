@@ -18,14 +18,14 @@ define(["uploadDataConsumer", "angularMocks", "dataService", "dataRepository", "
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-24T09:00:00.120Z",
-                    "value": 1
+                    "value": "1"
                 }, {
                     "dataElement": "DE2",
                     "period": "2014W12",
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-24T09:00:00.120Z",
-                    "value": 2
+                    "value": "2"
                 }];
 
                 spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, dbDataValues));
@@ -39,14 +39,14 @@ define(["uploadDataConsumer", "angularMocks", "dataService", "dataRepository", "
                             "orgUnit": "MSF_0",
                             "categoryOptionCombo": "C1",
                             "lastUpdated": "2014-05-24T09:00:00.120Z",
-                            "value": 1
+                            "value": "1"
                         }, {
                             "dataElement": "DE2",
                             "period": "2014W12",
                             "orgUnit": "MSF_0",
                             "categoryOptionCombo": "C1",
                             "lastUpdated": "2014-05-24T09:00:00.120Z",
-                            "value": 2
+                            "value": "2"
                         }],
                         "type": "uploadDataValues"
                     }

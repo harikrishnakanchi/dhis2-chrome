@@ -66,7 +66,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
             var autoApprove = function(data) {
                 var approvalData = approvalDataTransformer.generateBulkApprovalData(data[0], data[1], "service.account");
                 return $q.all(_.map(approvalData, function(datum) {
-                    return markDataAsComplete(datum).then(markDataAsApproved);
+                    return markDataAsComplete(datum).then(markDataAsAccepted);
                 }));
             };
 

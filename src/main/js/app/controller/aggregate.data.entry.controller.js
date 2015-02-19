@@ -9,7 +9,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 return;
             var cellValue = $scope.dataValues[elementId][option].value;
             $scope.dataValues[elementId][option].formula = cellValue;
-            $scope.dataValues[elementId][option].value = calculateSum(cellValue);
+            $scope.dataValues[elementId][option].value = calculateSum(cellValue) > 0 ? calculateSum(cellValue).toString() : "";
         };
 
         $scope.printWindow = function() {
@@ -120,14 +120,12 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 showModal(function() {
                     save(false)
                         .then(approvalHelper.markDataAsComplete)
-                        .then(approvalHelper.markDataAsApproved)
                         .then(approvalHelper.markDataAsAccepted)
                         .then(successPromise, errorPromise);
                 }, $scope.resourceBundle.reapprovalConfirmationMessage);
             } else {
                 save(false)
                     .then(approvalHelper.markDataAsComplete)
-                    .then(approvalHelper.markDataAsApproved)
                     .then(approvalHelper.markDataAsAccepted)
                     .then(successPromise, errorPromise);
             }

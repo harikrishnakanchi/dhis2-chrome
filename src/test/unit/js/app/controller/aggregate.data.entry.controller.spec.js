@@ -173,16 +173,16 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should return the sum of the list ", function() {
                 var list = {
                     "option1": {
-                        "value": 1
+                        "value": "1"
                     },
                     "option2": {
-                        "value": 2
+                        "value": "2"
                     },
                     "option3": {
-                        "value": 3
+                        "value": "3"
                     },
                     "option4": {
-                        "value": 4
+                        "value": "4"
                     }
                 };
 
@@ -192,16 +192,16 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should return the sum of valid values ", function() {
                 var list = {
                     "option1": {
-                        "value": 1
+                        "value": "1"
                     },
                     "option2": {
-                        "value": 2
+                        "value": "2"
                     },
                     "option3": {
                         "value": undefined
                     },
                     "option4": {
-                        "value": 4
+                        "value": "4"
                     }
                 };
 
@@ -212,16 +212,16 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 var list = {
                     "option1": {
                         "formula": "1 + 3",
-                        "value": 4
+                        "value": "4"
                     },
                     "option2": {
-                        "value": 2
+                        "value": "2"
                     },
                     "option3": {
-                        "value": 3
+                        "value": "3"
                     },
                     "option4": {
-                        "value": 4
+                        "value": "4"
                     }
                 };
 
@@ -231,22 +231,22 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should return the sum of the map ", function() {
                 var list = {
                     "option1": {
-                        "value": 1
+                        "value": "1"
                     },
                     "option2": {
-                        "value": 2
+                        "value": "2"
                     },
                     "option3": {
-                        "value": 3
+                        "value": "3"
                     },
                     "option4": {
-                        "value": 4
+                        "value": "4"
                     }
                 };
                 expect(scope.sum(list)).toBe(10);
             });
 
-            it("should evaluate expression on blur", function() {
+            it("should evaluate expression on blur and store as string", function() {
                 scope.dataValues = {
                     "blah": {
                         "some": {
@@ -257,7 +257,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 scope.evaluateExpression("blah", "some");
 
-                expect(scope.dataValues.blah.some.value).toEqual(10);
+                expect(scope.dataValues.blah.some.value).toEqual("10");
             });
 
             it("should group sections based on datasets", function() {
@@ -793,7 +793,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "storedBy": 'dataentryuser'
                 };
 
-                expect(approvalHelper.markDataAsApproved).toHaveBeenCalledWith(l2ApprovalPayload);
+                expect(approvalHelper.markDataAsApproved).not.toHaveBeenCalled();
+                expect(approvalHelper.markDataAsAccepted).toHaveBeenCalledWith(l2ApprovalPayload);
 
                 expect(scope.submitAndApprovalSuccess).toBe(true);
             });

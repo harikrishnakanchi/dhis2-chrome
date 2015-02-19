@@ -7,21 +7,21 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
             viewModel = {
                 "DE_Oedema": {
                     "32": {
-                        "value": 3,
+                        "value": "3",
                         "formula": "1+2"
                     },
                     "33": {
-                        "value": 12,
+                        "value": "12",
                         "formula": "12"
                     },
                 },
                 "DE_MLT115": {
                     "32": {
-                        "value": 49,
+                        "value": "49",
                         "formula": "49"
                     },
                     "37": {
-                        "value": 67,
+                        "value": "67",
                         "formula": "67"
                     }
                 }
@@ -35,7 +35,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                 "orgUnit": "company_0",
                 "storedBy": "user",
                 "formula": "1+2",
-                "value": 3
+                "value": "3"
             }, {
                 "dataElement": "DE_Oedema",
                 "categoryOptionCombo": "33",
@@ -43,7 +43,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                 "orgUnit": "company_0",
                 "storedBy": "user",
                 "formula": "12",
-                "value": 12
+                "value": "12"
             }, {
                 "dataElement": "DE_MLT115",
                 "categoryOptionCombo": "32",
@@ -51,7 +51,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                 "orgUnit": "company_0",
                 "storedBy": "user",
                 "formula": "49",
-                "value": 49
+                "value": "49"
             }, {
                 "dataElement": "DE_MLT115",
                 "categoryOptionCombo": "37",
@@ -59,7 +59,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                 "orgUnit": "company_0",
                 "storedBy": "user",
                 "formula": "67",
-                "value": 67
+                "value": "67"
             }];
         }));
 

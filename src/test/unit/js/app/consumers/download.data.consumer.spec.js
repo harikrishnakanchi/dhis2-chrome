@@ -96,7 +96,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-27T09:00:00.120Z",
-                    "value": 5
+                    "value": "5"
                 }];
 
                 dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbDataValues));
@@ -120,14 +120,14 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-27T09:00:00.120Z",
-                    "value": 5
+                    "value": "5"
                 }, {
                     "dataElement": "DE2",
                     "period": "2014W11",
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-27T09:00:00.120Z",
-                    "value": 10
+                    "value": "10"
                 }];
 
                 dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
@@ -149,14 +149,14 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-27T09:00:00.120Z",
-                    "value": 5
+                    "value": "5"
                 }, {
                     "dataElement": "DE2",
                     "period": "2014W11",
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-27T09:00:00.120Z",
-                    "value": 10
+                    "value": "10"
                 }];
 
                 expect(dataRepository.saveDhisData).toHaveBeenCalledWith(expected);
@@ -169,14 +169,14 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-27T09:00:00.120Z",
-                    "value": 1
+                    "value": "1"
                 }, {
                     "dataElement": "DE2",
                     "period": "2014W12",
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-20T09:00:00.120Z",
-                    "value": 2
+                    "value": "2"
                 }];
 
                 var dbDataValues = [{
@@ -185,7 +185,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-24T09:00:00.120Z",
-                    "value": 3
+                    "value": "3"
                 }, {
                     "dataElement": "DE2",
                     "period": "2014W12",
@@ -193,7 +193,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-23T09:00:00.120Z",
                     "clientLastUpdated": "2014-05-23T09:00:00.120Z",
-                    "value": 4
+                    "value": "4"
                 }];
 
                 dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
@@ -215,7 +215,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-27T09:00:00.120Z",
-                    "value": 1
+                    "value": "1"
                 }, {
                     "dataElement": "DE2",
                     "period": "2014W12",
@@ -223,11 +223,64 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-23T09:00:00.120Z",
                     "clientLastUpdated": "2014-05-23T09:00:00.120Z",
-                    "value": 4
+                    "value": "4"
                 }];
 
                 expect(approvalDataRepository.deleteLevelTwoApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
                 expect(dataRepository.saveDhisData).toHaveBeenCalledWith(expectedDataConsumer);
+            });
+
+            it("should not clear approvals if downloaded data is the same as db data", function() {
+                var dhisDataValues = [{
+                    "dataElement": "DE1",
+                    "period": "2014W12",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T10:00:00.120Z",
+                    "createdDate": "2014-05-27T10:00:00.120Z",
+                    "value": "1"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2014W12",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-20T10:00:00.120Z",
+                    "createdDate": "2014-05-27T10:00:00.120Z",
+                    "value": "2"
+                }];
+
+                var dbDataValues = [{
+                    "dataElement": "DE1",
+                    "period": "2014W12",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "clientLastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "1"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2014W12",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "clientLastUpdated": "2014-05-20T09:00:00.120Z",
+                    "value": "2"
+                }];
+
+                dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
+
+                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbDataValues));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
+
+                downloadDataConsumer.run(message);
+                scope.$apply();
+
+                expect(approvalDataRepository.deleteLevelOneApproval).not.toHaveBeenCalled();
+                expect(approvalDataRepository.deleteLevelTwoApproval).not.toHaveBeenCalled();
+                expect(dataRepository.saveDhisData).toHaveBeenCalledWith(dhisDataValues);
             });
         });
     });

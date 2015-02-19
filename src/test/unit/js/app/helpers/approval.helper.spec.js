@@ -87,6 +87,38 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 expect(hustle.publish).toHaveBeenCalledWith(hustlePublishData, "dataValues");
             });
 
+            it('should mark data as accepted', function() {
+                var data = {
+                    "dataSets": ["Vacc"],
+                    "period": "2014W14",
+                    "orgUnit": "mod2",
+                    "storedBy": "dataentryuser"
+                };
+
+                var l2ApprovalData = {
+                    "dataSets": ["Vacc"],
+                    "period": "2014W14",
+                    "orgUnit": "mod2",
+                    "createdByUsername": "dataentryuser",
+                    "createdDate": "2014-05-30T12:43:54.972Z",
+                    "isAccepted": true,
+                    "isApproved": true,
+                    "status": "NEW"
+                };
+
+                var hustlePublishData = {
+                    "data": l2ApprovalData,
+                    "type": "uploadApprovalData"
+                };
+
+                approvalHelper.markDataAsAccepted(data);
+
+                scope.$apply();
+
+                expect(approvalDataRepository.saveLevelTwoApproval).toHaveBeenCalledWith(l2ApprovalData);
+                expect(hustle.publish).toHaveBeenCalledWith(hustlePublishData, "dataValues");
+            });
+
             it("should get approval status from the starting date", function() {
                 var modules = [{
                     "id": "123",
@@ -152,25 +184,25 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     "dataElement": "de123",
                     "orgUnit": "123",
                     "period": "2014W17",
-                    "value": 9
+                    "value": "9"
                 }, {
                     "categoryOptionCombo": "co123",
                     "dataElement": "de123",
                     "orgUnit": "123",
                     "period": "2014W18",
-                    "value": 9
+                    "value": "9"
                 }, {
                     "categoryOptionCombo": "co123",
                     "dataElement": "de123",
                     "orgUnit": "123",
                     "period": "2014W19",
-                    "value": 9
+                    "value": "9"
                 }, {
                     "categoryOptionCombo": "co123",
                     "dataElement": "de123",
                     "orgUnit": "123",
                     "period": "2014W20",
-                    "value": 9
+                    "value": "9"
                 }];
 
                 var completedDatasets = [{
@@ -351,7 +383,7 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     "dataElement": "de123",
                     "orgUnit": "123",
                     "period": "2014W17",
-                    "value": 9
+                    "value": "9"
                 }];
 
                 var allDatasets = [{
@@ -373,14 +405,14 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 };
 
                 var l2ApprovalData = {
-                    dataSets: ['ds1'],
-                    period: '2014W17',
-                    orgUnit: '123',
-                    createdByUsername: 'service.account',
-                    createdDate: '2014-05-30T12:43:54.972Z',
-                    isAccepted: false,
-                    isApproved: true,
-                    status: 'NEW'
+                    "dataSets": ['ds1'],
+                    "period": '2014W17',
+                    "orgUnit": '123',
+                    "createdByUsername": 'service.account',
+                    "createdDate": '2014-05-30T12:43:54.972Z',
+                    "isAccepted": true,
+                    "isApproved": true,
+                    "status": 'NEW'
                 };
 
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));

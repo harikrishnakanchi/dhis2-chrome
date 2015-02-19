@@ -19,13 +19,13 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
                 "orgUnit": 'company_0',
                 "dataElement": "DE1",
                 "categoryOptionCombo": "COC1",
-                "value": 1,
+                "value": "1",
             }, {
                 "period": '2014W15',
                 "orgUnit": 'company_0',
                 "dataElement": "DE2",
                 "categoryOptionCombo": "COC2",
-                "value": 2,
+                "value": "2",
             }];
 
             var expectedPayload = {

@@ -13,13 +13,13 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 "orgUnit": 'company_0',
                 "dataElement": "DE1",
                 "categoryOptionCombo": "COC1",
-                "value": 1
+                "value": "1"
             }, {
                 "period": '2014W15',
                 "orgUnit": 'company_0',
                 "dataElement": "DE2",
                 "categoryOptionCombo": "COC2",
-                "value": 2
+                "value": "2"
             }];
 
             dataValuesFromDHIS = [{
@@ -27,14 +27,14 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 "orgUnit": 'company_0',
                 "dataElement": "DE1",
                 "categoryOptionCombo": "COC1",
-                "value": 1,
+                "value": "1",
                 "lastUpdated": "2014-05-20T00:00:00"
             }, {
                 "period": '2014W20',
                 "orgUnit": 'company_0',
                 "dataElement": "DE2",
                 "categoryOptionCombo": "COC2",
-                "value": 2,
+                "value": "2",
                 "lastUpdated": "2014-05-20T00:00:00"
             }];
 
@@ -58,14 +58,14 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "orgUnit": 'company_0',
                     "dataElement": "DE1",
                     "categoryOptionCombo": "COC1",
-                    "value": 1,
+                    "value": "1",
                     "clientLastUpdated": "2015-04-15T00:00:00.000Z"
                 }, {
                     "period": '2014W15',
                     "orgUnit": 'company_0',
                     "dataElement": "DE2",
                     "categoryOptionCombo": "COC2",
-                    "value": 2,
+                    "value": "2",
                     "clientLastUpdated": "2015-04-15T00:00:00.000Z"
                 }]
             }]);
@@ -82,7 +82,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "orgUnit": 'company_0',
                     "dataElement": "DE1",
                     "categoryOptionCombo": "COC1",
-                    "value": 1,
+                    "value": "1",
                     "isDraft": true,
                     "clientLastUpdated": "2015-04-15T00:00:00.000Z"
                 }, {
@@ -90,7 +90,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "orgUnit": 'company_0',
                     "dataElement": "DE2",
                     "categoryOptionCombo": "COC2",
-                    "value": 2,
+                    "value": "2",
                     "isDraft": true,
                     "clientLastUpdated": "2015-04-15T00:00:00.000Z"
                 }]
@@ -108,14 +108,14 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "orgUnit": 'company_0',
                     "dataElement": "DE1",
                     "categoryOptionCombo": "COC1",
-                    "value": 1,
+                    "value": "1",
                     "lastUpdated": "2014-05-20T00:00:00"
                 }, {
                     "period": '2014W20',
                     "orgUnit": 'company_0',
                     "dataElement": "DE2",
                     "categoryOptionCombo": "COC2",
-                    "value": 2,
+                    "value": "2",
                     "lastUpdated": "2014-05-20T00:00:00"
                 }]
             }]);
@@ -128,7 +128,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 "orgUnit": 'company_0',
                 "dataElement": "DE1",
                 "categoryOptionCombo": "COC1",
-                "value": 1,
+                "value": "1",
                 "clientLastUpdated": "2015-04-15T00:00:00.000"
             };
 
@@ -137,7 +137,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 "orgUnit": 'company_0',
                 "dataElement": "DE2",
                 "categoryOptionCombo": "COC2",
-                "value": 2,
+                "value": "2",
                 "lastUpdated": "2015-04-16T00:00:00.000"
             };
 
@@ -167,7 +167,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "orgUnit": 'ou1',
                     "dataElement": "DE2",
                     "categoryOptionCombo": "COC2",
-                    "value": 2,
+                    "value": "2",
                     "lastUpdated": "2014-01-15T00:00:00.000"
                 }]
             }, {
@@ -178,7 +178,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "orgUnit": 'ou1',
                     "dataElement": "DE2",
                     "categoryOptionCombo": "COC2",
-                    "value": 4,
+                    "value": "4",
                     "isDraft": true,
                     "clientLastUpdated": "2014-01-22T00:00:00.000"
                 }]
@@ -190,7 +190,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "orgUnit": 'ou3',
                     "dataElement": "DE2",
                     "categoryOptionCombo": "COC2",
-                    "value": 1,
+                    "value": "1",
                     "lastUpdated": "2014-01-15T00:00:00.000"
                 }]
             }]));
@@ -207,14 +207,14 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 "orgUnit": 'ou1',
                 "dataElement": "DE2",
                 "categoryOptionCombo": "COC2",
-                "value": 2,
+                "value": "2",
                 "lastUpdated": "2014-01-15T00:00:00.000"
             }, {
                 "period": '2014W03',
                 "orgUnit": 'ou1',
                 "dataElement": "DE2",
                 "categoryOptionCombo": "COC2",
-                "value": 4,
+                "value": "4",
                 "isDraft": true,
                 "clientLastUpdated": "2014-01-22T00:00:00.000"
             }]);
