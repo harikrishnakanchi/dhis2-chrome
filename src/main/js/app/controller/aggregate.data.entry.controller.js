@@ -36,13 +36,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $scope.dataValues = {};
             $scope.isopen = {};
             $scope.isDatasetOpen = {};
-            $scope.isDataFormInitialized = false;
             $scope.saveSuccess = false;
             $scope.saveError = false;
             $scope.submitSuccess = false;
             $scope.submitAndApprovalSuccess = false;
             $scope.submitError = false;
-            $scope.approveSuccess = false;
+            $scope.firstLevelApproveSuccess = false;
+            $scope.secondLevelApproveSuccess = false;
             $scope.approveError = false;
             $scope.projectIsAutoApproved = false;
             $scope.excludedDataElements = {};
@@ -118,7 +118,11 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
             if ($scope.isCompleted || $scope.isApproved) {
                 showModal(function() {
-                    save(false).then(approvalHelper.markDataAsComplete).then(approvalHelper.markDataAsApproved).then(successPromise, errorPromise);
+                    save(false)
+                        .then(approvalHelper.markDataAsComplete)
+                        .then(approvalHelper.markDataAsApproved)
+                        .then(approvalHelper.markDataAsAccepted)
+                        .then(successPromise, errorPromise);
                 }, $scope.resourceBundle.reapprovalConfirmationMessage);
             } else {
                 save(false)
@@ -131,13 +135,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         $scope.firstLevelApproval = function() {
             var onSuccess = function() {
-                $scope.approveSuccess = true;
+                $scope.firstLevelApproveSuccess = true;
                 $scope.approveError = false;
                 init();
             };
 
             var onError = function() {
-                $scope.approveSuccess = false;
+                $scope.firstLevelApproveSuccess = false;
                 $scope.approveError = true;
             };
 
@@ -155,13 +159,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         $scope.secondLevelApproval = function() {
             var onSuccess = function() {
-                $scope.approveSuccess = true;
+                $scope.secondLevelApproveSuccess = true;
                 $scope.approveError = false;
                 init();
             };
 
             var onError = function() {
-                $scope.approveSuccess = false;
+                $scope.secondLevelApproveSuccess = false;
                 $scope.approveError = true;
             };
 
@@ -363,7 +367,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     });
                     $scope.dataValues = dataValuesMapper.mapToView(dataValues);
                     $scope.isSubmitted = (!_.isEmpty(dataValues) && isDraft);
-                    $scope.isDataFormInitialized = true;
                 });
 
                 var datasetsAssociatedWithModule = _.pluck(datasetTransformer.getAssociatedDatasets($scope.currentModule.id, $scope.dataSets), 'id');

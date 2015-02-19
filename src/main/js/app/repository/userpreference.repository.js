@@ -18,7 +18,7 @@ define(["lodash"], function(_) {
         var getUserModuleIds = function() {
             return getAll().then(function(userPreferences) {
                 userPreferences = userPreferences || [];
-                var userProjectIds = _.uniq(_.pluck(_.flatten(userPreferences, "orgUnits"), 'id'));
+                var userProjectIds = _.uniq(_.pluck(_.flatten(_.pluck(userPreferences, "orgUnits")), "id"));
 
                 if (_.isEmpty(userProjectIds))
                     return [];

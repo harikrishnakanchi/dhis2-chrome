@@ -13,7 +13,11 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
                     return approvalDataRepository.saveLevelTwoApproval(_.omit(payload, "status"));
                 };
                 if (payload.isApproved === true && payload.isAccepted === true)
-                    return approvalService.markAsAccepted(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate).then(clearStatusFlag);
+                    return approvalService.markAsApproved(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate)
+                        .then(function() {
+                            approvalService.markAsAccepted(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate);
+                        })
+                        .then(clearStatusFlag);
                 else if (payload.isApproved === true)
                     return approvalService.markAsApproved(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate).then(clearStatusFlag);
             };

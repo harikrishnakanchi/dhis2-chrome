@@ -4,20 +4,18 @@
     </div>
     <section class="panel tab-panel" ng-if="week &amp;&amp; currentModule">
         <div ng-show="saveSuccess" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
-        <div ng-show="submitSuccess" class="alert alert-success">{{resourceBundle.dataSubmittedForApproval}}</div>
+        <div ng-show="isSubmitted &amp;&amp; !isCompleted &amp;&amp; !isApproved &amp;&amp; !isAccepted &amp;&amp; !hasRoles(['Project Level Approver'])" class="alert alert-success">{{resourceBundle.dataSubmittedForApproval}}</div>
+        <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !isAccepted &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
+        <div ng-show="isApproved &amp;&amp; !isAccepted" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
         <div ng-show="submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.dataSubmitAndApproved}}</div>
-        <div ng-show="(approveSuccess || isCompleted) &amp;&amp; !isAccepted" class="alert alert-success" ng-if="hasRoles(['Project Level Approver'])">{{resourceBundle.firstLevelApproveSuccess}}</div>
-        <div ng-show="(approveSuccess || isApproved) &amp;&amp; !isAccepted" class="alert alert-success" ng-if="hasRoles(['Coordination Level Approver'])">{{resourceBundle.secondLevelApproveSuccess}}</div>
-        <div ng-show="isAccepted &amp;&amp; week" class="alert alert-success">{{resourceBundle.thirdLevelApproveSuccess}}</div>
+        <div ng-show="isAccepted &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.thirdLevelApproveSuccess}}</div>
         <div ng-show="saveError" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
         <div ng-show="submitError" class="alert alert-danger">{{resourceBundle.dataSubmitFailure}}</div>
         <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-        <div class="alert alert-success" ng-if="!submitSuccess &amp;&amp; !submitAndApprovalSuccess &amp;&amp; isSubmitted &amp;&amp; !isAccepted &amp;&amp; hasRoles(['Data entry user'])">{{resourceBundle.dataSubmittedForApproval}}</div>
-        <div class="alert alert-danger" ng-if="isDataFormInitialized &amp;&amp; !isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
-        <div class="alert alert-danger" ng-if="isDataFormInitialized &amp;&amp; !isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
-        <form name="dataentryForm" id="dataentry" ng-if="(isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) || (isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || !hasRoles(['Project Level Approver', 'Coordination Level Approver'])">
+        <div class="alert alert-danger" ng-if="!isSubmitted &amp;&amp; hasRoles(['Project Level Approver', 'Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
+        <form name="dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user']) || (isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) || (isCompleted &amp;&amp; hasRoles(['Coordination Level Approver']))">
             <div class="text-right">
-                <input type="button"  class="printTallySheetBtn" ng-click="printWindow()" value="{{resourceBundle.printTallySheetBtnValue}}" ng-show="currentModule"></input>
+                <input type="button" class="printTallySheetBtn" ng-click="printWindow()" value="{{resourceBundle.printTallySheetBtnValue}}" ng-show="currentModule"></input>
             </div>
             <accordion close-others="false">
                 <accordion-group ng-repeat="(dataSetId, sections) in currentGroupedSections" is-open="getDatasetState(dataSetId, $first)[dataSetId]">
@@ -74,11 +72,11 @@
                 </accordion-group>
             </accordion>
             <div>
-                <input type="submit" class="btn btn-main" id="dataEntrySave" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid || isReadOnly || isAccepted" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}" />
-                <input type="submit" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || isReadOnly || !dataentryForm.$dirty" ng-if="hasRoles(['Data entry user']) && !projectIsAutoApproved" value="{{resourceBundle.submitBtnValue}}" />
-                <input type="submit" class="btn btn-main" id="dataEntrySubmitAndApprove" ng-click="submitAndApprove()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || isReadOnly || isAccepted || !dataentryForm.$dirty" ng-if="hasRoles(['Data entry user']) && projectIsAutoApproved" value="{{resourceBundle.submitBtnValue}}" />
+                <input type="submit" class="btn btn-main" id="dataEntrySave" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}" />
+                <input type="submit" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid" ng-if="hasRoles(['Data entry user']) && !projectIsAutoApproved" value="{{resourceBundle.submitBtnValue}}" />
+                <input type="submit" class="btn btn-main" id="dataEntrySubmitAndApprove" ng-click="submitAndApprove()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid" ng-if="hasRoles(['Data entry user']) && projectIsAutoApproved" value="{{resourceBundle.submitBtnValue}}" />
                 <input type="submit" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="dataentryForm.$invalid || isCompleted || isAccepted" ng-if="hasRoles(['Project Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
-                <input type="submit" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="dataentryForm.$invalid || isApproved || isAccepted" ng-if="hasRoles(['Coordination Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
+                <input type="submit" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="dataentryForm.$invalid || isApproved" ng-if="hasRoles(['Coordination Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
             </div>
         </form>
     </section>

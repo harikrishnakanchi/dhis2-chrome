@@ -54,22 +54,20 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
 
         it("should get all modules id for logged in user", function() {
             var userPrefs = [{
+                "username": "msfadmin",
+                "locale": "en",
+                "orgUnits": []
+            }, {
+                "username": "new_user",
+                "locale": "en",
                 "orgUnits": [{
-                    "id": "pro1Id",
-                    "name": "Pro1"
-                }, {
-                    "id": "pro2Id",
-                    "name": "Pro2"
+                    "id": "proj1"
                 }]
             }, {
+                "username": "new2_user",
+                "locale": "en",
                 "orgUnits": [{
-                    "id": "pro3Id",
-                    "name": "Pro3"
-                }]
-            }, {
-                "orgUnits": [{
-                    "id": "pro1Id",
-                    "name": "Pro1"
+                    "id": "proj2"
                 }]
             }];
 
@@ -89,6 +87,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
             });
 
             scope.$apply();
+            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1', 'proj2']);
             expect(actualUserModules).toEqual(["mod1", "mod2", "mod3"]);
         });
     });

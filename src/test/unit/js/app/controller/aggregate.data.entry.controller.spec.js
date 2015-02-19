@@ -704,13 +704,14 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(approvalHelper.markDataAsComplete).toHaveBeenCalledWith(data);
-                expect(scope.approveSuccess).toBe(true);
+                expect(scope.firstLevelApproveSuccess).toBe(true);
+                expect(scope.secondLevelApproveSuccess).toBe(false);
                 expect(scope.approveError).toBe(false);
                 expect(scope.isCompleted).toEqual(true);
             });
 
             it("should submit data for auto approval", function() {
-                var levelOneApprovalDataSaved = false;
+                var levelOneApprovalDataSaved, levelTwoApprovalDataSaved, acceptDataSaved = false;
                 getLevelOneApprovalDataSpy.and.callFake(function() {
                     if (levelOneApprovalDataSaved)
                         return utils.getPromise(q, {
@@ -741,6 +742,13 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 spyOn(approvalHelper, "markDataAsApproved").and.callFake(function() {
                     levelTwoApprovalDataSaved = true;
+                    return utils.getPromise(q, {
+                        "blah": "moreBlah"
+                    });
+                });
+
+                spyOn(approvalHelper, "markDataAsAccepted").and.callFake(function() {
+                    acceptDataSaved = true;
                     return utils.getPromise(q, {
                         "blah": "moreBlah"
                     });
@@ -800,7 +808,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.firstLevelApproval();
                 scope.$apply();
 
-                expect(scope.approveSuccess).toBe(false);
+                expect(scope.firstLevelApproveSuccess).toBe(false);
+                expect(scope.secondLevelApproveSuccess).toBe(false);
                 expect(scope.approveError).toBe(true);
                 expect(scope.isCompleted).toEqual(false);
             });
@@ -816,7 +825,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.firstLevelApproval();
                 scope.$apply();
 
-                expect(scope.approveSuccess).toBe(true);
+                expect(scope.firstLevelApproveSuccess).toBe(true);
+                expect(scope.secondLevelApproveSuccess).toBe(false);
                 expect(scope.approveError).toBe(false);
             });
 
@@ -860,7 +870,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.secondLevelApproval();
                 scope.$apply();
 
-                expect(scope.approveSuccess).toBe(true);
+                expect(scope.firstLevelApproveSuccess).toBe(false);
+                expect(scope.secondLevelApproveSuccess).toBe(true);
                 expect(scope.approveError).toBe(false);
                 expect(scope.isCompleted).toEqual(true);
                 expect(scope.isApproved).toEqual(true);

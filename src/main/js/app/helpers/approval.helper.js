@@ -38,7 +38,9 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
                 "status": "NEW"
             };
 
-            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData");
+            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData").then(function() {
+                return data;
+            });
         };
 
         var markDataAsAccepted = function(data) {
@@ -53,7 +55,9 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
                 "status": "NEW"
             };
 
-            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData");
+            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData").then(function() {
+                return data;
+            });
         };
 
         var autoApproveExistingData = function(orgUnit) {
@@ -226,6 +230,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
         return {
             "markDataAsComplete": markDataAsComplete,
             "markDataAsApproved": markDataAsApproved,
+            "markDataAsAccepted": markDataAsAccepted,
             "autoApproveExistingData": autoApproveExistingData,
             "getApprovalStatus": getApprovalStatus
         };

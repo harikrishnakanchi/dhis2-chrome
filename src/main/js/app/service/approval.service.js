@@ -39,7 +39,7 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
             });
         };
 
-        this.markAsAccepted = function(dataSets, period, orgUnit) {
+        this.markAsAccepted = function(dataSets, period, orgUnit, approvedBy, approvalDate) {
             var payload = _.transform(dataSets, function(result, ds) {
                 result.push({
                     "ds": ds,

@@ -94,7 +94,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         });
 
         it("should format periods to be shown on dashboard", function() {
-            var expectedPeriod = "W42 - " + moment('10-13-2014').startOf("isoWeek").toDate().toLocaleDateString() + " - " + moment('10-19-2014').endOf("isoWeek").toDate().toLocaleDateString();
+            var expectedPeriod = "W42 - " + moment('10-13-2014', 'MM-DD-YYYY').startOf("isoWeek").toDate().toLocaleDateString() + " - " + moment('10-19-2014', 'MM-DD-YYYY').endOf("isoWeek").toDate().toLocaleDateString();
             expect(scope.formatPeriods("2014W42")).toEqual(expectedPeriod);
         });
 
