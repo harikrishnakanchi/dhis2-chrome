@@ -77,6 +77,89 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             }, {
                 "id": "dataSet3",
                 "name": "Ped-v1"
+            }, {
+                "id": "dataSet4",
+                "name": "ER linelist",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    },
+                    "value": "true"
+                }]
+            }];
+
+            var expected = [{
+                "id": "dataSet1",
+                "name": "NeoNat",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }]
+            }, {
+                "id": "dataSet4",
+                "name": "ER linelist",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    },
+                    "value": "true"
+                }]
+            }];
+            mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
+            var result;
+            datasetRepository.getAll().then(function(r) {
+                result = r;
+            });
+            scope.$apply();
+            expect(mockStore.getAll).toHaveBeenCalled();
+            expect(result).toEqual(expected);
+        });
+
+        it("should get all new data sets except linelist datasets", function() {
+            var allDataSets = [{
+                "id": "dataSet1",
+                "name": "NeoNat",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }]
+            }, {
+                "id": "dataSet2",
+                "name": "Obgyn",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "false"
+                }]
+            }, {
+                "id": "dataSet3",
+                "name": "ER linelist",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    },
+                    "value": "true"
+                }]
             }];
 
             var expected = [{
@@ -91,7 +174,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             }];
             mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
             var result;
-            datasetRepository.getAll().then(function(r) {
+            datasetRepository.getAll(true).then(function(r) {
                 result = r;
             });
             scope.$apply();

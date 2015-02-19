@@ -57,14 +57,14 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 $scope.isDisabled = isDisabled && isDisabled.value;
             };
 
-            var getAllDatasets = function() {
-                return datasetRepository.getAll().then(function(ds) {
+            var getAllAggregateDatasets = function() {
+                return datasetRepository.getAll(true).then(function(ds) {
                     return datasetRepository.getEnriched(ds, $scope.excludedDataElements);
                 });
             };
 
             var getDatasets = function() {
-                return getAllDatasets().then(function(datasets) {
+                return getAllAggregateDatasets().then(function(datasets) {
                     $scope.originalDatasets = datasets;
 
                     var partitionedDatasets = _.partition(datasets, function(ds) {

@@ -137,7 +137,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             }, "dataValues");
         });
 
-        it("should asscoiate datasets with the module", function() {
+        it("should asscoiate aggregate datasets with the module", function() {
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             scope.$apply();
             var parent = {
@@ -204,6 +204,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             }];
 
+            expect(dataSetRepo.getAll).toHaveBeenCalledWith(true);
             expect(dataSetRepo.upsert).toHaveBeenCalledWith(expectedDatasets);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: ['DS_OPD'],

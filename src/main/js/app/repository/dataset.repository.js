@@ -27,19 +27,36 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
-        var getAll = function() {
-            var store = db.objectStore("dataSets");
-            var filtered = store.getAll().then(function(all) {
-                return _.filter(all, function(ds) {
-                    var attr = _.find(ds.attributeValues, {
-                        "attribute": {
-                            "code": 'isNewDataModel'
-                        }
-                    });
-                    return attr && attr.value === 'true';
+        var getAll = function(rejectLinelistTypeDataSets) {
+            var getBooleanAttributeValue = function(attributes, attributeCode) {
+                var attr = _.find(attributes, {
+                    "attribute": {
+                        "code": attributeCode
+                    }
                 });
+                return attr && attr.value === "true";
+            };
+
+            var filterNewDatasets = function(datasets) {
+                return _.filter(datasets, function(ds) {
+                    return getBooleanAttributeValue(ds.attributeValues, "isNewDataModel");
+                });
+            };
+
+            var rejectLineListDatasets = function(datasets) {
+                return _.reject(datasets, function(ds) {
+                    return getBooleanAttributeValue(ds.attributeValues, "isLineListService");
+                });
+            };
+
+            var store = db.objectStore("dataSets");
+            return store.getAll().then(function(all) {
+                var filtered = filterNewDatasets(all);
+                if (rejectLinelistTypeDataSets) {
+                    filtered = rejectLineListDatasets(filtered);
+                }
+                return filtered;
             });
-            return filtered;
         };
 
         var getAllDatasetIds = function() {
