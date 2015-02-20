@@ -20,9 +20,10 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }, "dataValues");
         };
 
-        var onSuccess = function(data) {
+        var onSuccess = function(hustlePayload) {
+            var opUnits = hustlePayload === undefined ? [$scope.orgUnit] : hustlePayload.data.data;
             if ($scope.$parent.closeNewForm)
-                $scope.$parent.closeNewForm($scope.orgUnit, "savedOpUnit");
+                $scope.$parent.closeNewForm(opUnits[0], "savedOpUnit");
         };
 
         var onError = function(data) {

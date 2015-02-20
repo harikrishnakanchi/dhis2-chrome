@@ -170,7 +170,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             spyOn(dhisId, "get").and.callFake(function(name){
                 return name;
             });
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {"data":{"data":[]}}));
 
             scope.save(opUnits);
             scope.$apply();
@@ -374,7 +374,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             spyOn(location, "hash");
 
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {"data":{"data":[]}}));
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
 
             scope.update(opUnits);
