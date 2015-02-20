@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop) {
+define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop","dhisId"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop,dhisId) {
     describe("module controller", function() {
         var scope, moduleController, mockOrgStore, db, q, location, _Date, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
             dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
@@ -81,6 +81,10 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should save aggregate module", function() {
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dhisId, "get").and.callFake(function(name){
+                return name;
+            });
+
             scope.$apply();
 
             var parent = {
@@ -101,7 +105,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 name: 'Module1',
                 shortName: 'Module1',
                 displayName: 'Project1 - Module1',
-                id: 'adba40b7157',
+                id: 'Module1someid',
                 level: NaN,
                 openingDate: moment(new Date()).toDate(),
                 attributeValues: [{
@@ -139,6 +143,10 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should asscoiate aggregate datasets with the module", function() {
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dhisId, "get").and.callFake(function(name){
+                return name;
+            });
+
             scope.$apply();
             var parent = {
                 "name": "Project1",
@@ -192,7 +200,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     id: 'mod1'
                 }, {
                     name: 'Module1',
-                    id: 'adba40b7157'
+                    id: 'Module1someid'
                 }],
                 orgUnitIds: ['mod1'],
                 attributeValues: [{
@@ -215,6 +223,10 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should save excluded data elements for the module", function() {
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dhisId, "get").and.callFake(function(name){
+                return name;
+            });
+            
             scope.$apply();
             var projectId = "someid";
             var parent = {
@@ -265,7 +277,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.$apply();
 
             var expectedSystemSetting = {
-                "key": "adba40b7157",
+                "key": "Module1someid",
                 "value": {
                     clientLastUpdated: "2014-04-01T00:00:00.000Z",
                     dataElements: ["1", "3"]

@@ -1,8 +1,8 @@
-define(["countryController", "angularMocks", "utils", "moment", "timecop"], function(CountryController, mocks, utils, moment, timecop) {
+define(["countryController", "angularMocks", "utils", "moment", "timecop","dhisId"], function(CountryController, mocks, utils, moment, timecop,dhisId) {
 
     describe("contry controller", function() {
 
-        var scope, timeout, q, location, anchorScroll, hustle, orgUnitRepo;
+        var scope, timeout, q, location, anchorScroll, hustle, orgUnitRepo,DhisId;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $hustle, $q, $timeout, $location) {
@@ -53,7 +53,7 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop"], func
         });
 
         it("should save country in dhis", function() {
-            var orgUnitId = 'a131658d54b';
+            var orgUnitId = 'Org1Id1';
 
             var newOrgUnit = {
                 'name': 'Org1',
@@ -89,6 +89,9 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop"], func
             };
 
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dhisId, "get").and.callFake(function(name){
+                return name;
+            });
 
             scope.save(newOrgUnit, parent);
             scope.$apply();

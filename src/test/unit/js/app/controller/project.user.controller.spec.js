@@ -1,4 +1,4 @@
-define(["projectUserController", "angularMocks", "utils"], function(ProjectUserController, mocks, utils) {
+define(["projectUserController", "angularMocks", "utils","dhisId"], function(ProjectUserController, mocks, utils,dhisId) {
 
     describe("projectUserControllerspec", function() {
         var scope, projectUserController, q, userRepository, hustle;
@@ -39,7 +39,7 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
             };
             var expectedUserPayload = {
                 "username": "proj_1_blah",
-                "id": 'a8521092d46',
+                "id": 'ProJ_1_Blah',
                 "surname": "LNU",
                 "firstName": "FNU",
                 "userCredentials": {
@@ -63,6 +63,10 @@ define(["projectUserController", "angularMocks", "utils"], function(ProjectUserC
                 data: expectedUserPayload,
                 type: "createUser"
             };
+
+            spyOn(dhisId, "get").and.callFake(function(name){
+                return name;
+            });
 
             scope.save(user);
             scope.$apply();

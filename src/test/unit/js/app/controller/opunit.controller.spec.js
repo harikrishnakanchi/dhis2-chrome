@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment","dhisId"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment,dhisId) {
     describe("op unit controller", function() {
 
         var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper;
@@ -103,7 +103,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             var expectedOpUnits = [{
                 "name": "OpUnit1",
                 "openingDate": moment().format("YYYY-MM-DD"),
-                "id": "a823e522c15",
+                "id": "OpUnit1ParentId",
                 "shortName": "OpUnit1",
                 "level": 5,
                 "parent": {
@@ -135,7 +135,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }, {
                 "name": "OpUnit2",
                 "openingDate": moment().format("YYYY-MM-DD"),
-                "id": "a764a0f84af",
+                "id": "OpUnit2ParentId",
                 "shortName": "OpUnit2",
                 "level": 5,
                 "parent": {
@@ -167,7 +167,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }];
 
             spyOn(location, "hash");
-
+            spyOn(dhisId, "get").and.callFake(function(name){
+                return name;
+            });
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
             scope.save(opUnits);

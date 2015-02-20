@@ -1,7 +1,8 @@
-define(["md5"], function(md5) {
+define(["md5","lodash"], function(md5,_) {
     var get = function(name) {
         if (!name) return undefined;
-        return "a" + md5(name.toLowerCase()).substring(0, 10);
+        name = name.toLowerCase() + _.random(0,9999999999) + new Date().getTime();
+        return "a" + md5(name).substring(0, 10);
     };
 
     return {

@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "md5", "timecop"], function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, md5, timecop) {
+define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "md5", "timecop","dhisId"], function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, md5, timecop,dhisId) {
     describe("line list module controller", function() {
         var scope, lineListModuleController, mockOrgStore, db, q, location, _Date, datasets, sections,
             dataElements, sectionsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, systemSettingRepo, fakeModal, allPrograms, programsRepo;
@@ -71,6 +71,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dhisId, "get").and.callFake(function(name){
+                return name;
+            });
 
             scope.$apply();
             scope.orgUnit = {
@@ -120,7 +123,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             expect(scope.saveFailure).toBe(false);
 
             var expectedSystemSettings = {
-                "key": "a1ab18b5fdd",
+                "key": "Module2someid",
                 "value": {
                     "clientLastUpdated": "2014-04-01T00:00:00.000Z",
                     "dataElements": ["de3"]
@@ -137,6 +140,10 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         it("should save linelist modules", function() {
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, scope.program));
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+             spyOn(dhisId, "get").and.callFake(function(name){
+                return name;
+            });
+             
             scope.$apply();
             scope.orgUnit = {
                 "name": "Project1",
@@ -156,7 +163,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 "name": "Module2",
                 "shortName": "Module2",
                 "displayName": "Project1 - Module2",
-                "id": "a1ab18b5fdd",
+                "id": "Module2someid",
                 "level": 4,
                 "openingDate": moment(new Date()).toDate(),
                 "attributeValues": [{

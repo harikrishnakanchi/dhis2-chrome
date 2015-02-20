@@ -1,4 +1,4 @@
-define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitMapper, mocks, moment, timecop) {
+define(["orgUnitMapper", "angularMocks", "moment", "timecop","dhisId"], function(orgUnitMapper, mocks, moment, timecop,dhisId) {
     describe("orgUnitMapper", function() {
         beforeEach(function() {
             Timecop.install();
@@ -158,10 +158,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 "level": "2",
             };
 
+            spyOn(dhisId, "get").and.callFake(function(name){
+                return name;
+            });
+
             var result = orgUnitMapper.mapToProjectForDhis(orgUnit, parentOrgUnit);
 
             var expectedResult = {
-                "id": "a131658d54b",
+                "id": "Org1Id1",
                 "name": "Org1",
                 "level": 3,
                 "shortName": "Org1",
@@ -251,7 +255,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                     },
                     "value": "2011-01-01"
                 }]
-            };
+            };             
 
             expect(result).toEqual(expectedResult);
         });
@@ -277,6 +281,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
 
             var today = new Date("2010-01-01T00:00:00");
             spyOn(window, "Date").and.returnValue(today);
+            spyOn(dhisId, "get").and.callFake(function(name){
+                return name;
+            });
 
             var actualModule = orgUnitMapper.mapToModule(module);
 
@@ -284,7 +291,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop"], function(orgUnitM
                 "name": "Module1",
                 "displayName": "Parent - Module1",
                 "shortName": "Module1",
-                "id": "aff28030986",
+                "id": "Module1Par1",
                 "level": 4,
                 "openingDate": moment(new Date()).toDate(),
                 "attributeValues": [{
