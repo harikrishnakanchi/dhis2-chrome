@@ -1,5 +1,5 @@
 define(["moment", "lodashUtils"], function(moment, _) {
-    return function(db, datasetRepository, $q) {
+    return function(db, datasetRepository, programRepository, $q) {
         var isOfType = function(orgUnit, type) {
             return _.any(orgUnit.attributeValues, {
                 attribute: {
@@ -24,40 +24,69 @@ define(["moment", "lodashUtils"], function(moment, _) {
                 return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
             };
 
-            var indexDatasetsByOrgUnits = function() {
-                return datasetRepository.getAll().then(function(datasets) {
-                    return _.groupByArray(datasets, "orgUnitIds");
-                });
+            var isNewDataModel = function(ds) {
+                return getBooleanAttributeValue(ds.attributeValues, "isNewDataModel");
             };
 
-            var hasAnyNewDataset = function(datasets) {
-                var isNewDataModel = function(ds) {
-                    return getBooleanAttributeValue(ds.attributeValues, "isNewDataModel");
+            var segragateOrgUnits = function(orgUnits) {
+                var partitionedOrgUnits = _.partition(orgUnits, function(ou) {
+                    return !isOfType(ou, "Module");
+                });
+
+                var nonModuleOrgUnits = partitionedOrgUnits[0];
+                var modules = partitionedOrgUnits[1];
+
+                var partitionedModules = _.partition(modules, function(mod) {
+                    return !isLinelistService(mod);
+                });
+
+                return {
+                    "aggregateModules": partitionedModules[0],
+                    "lineListModules": partitionedModules[1],
+                    "otherOrgUnits": nonModuleOrgUnits
+                };
+            };
+
+            var filterAggregateModules = function(aggregateModules) {
+                var indexDatasetsByOrgUnits = function() {
+                    return datasetRepository.getAll().then(function(datasets) {
+                        return _.groupByArray(datasets, "orgUnitIds");
+                    });
                 };
 
-                return _.any(datasets, function(ds) {
-                    return isNewDataModel(ds);
-                });
+                var filterModulesWithNewDatasets = function(datasetsIndexedByOU) {
+                    return _.filter(aggregateModules, function(mod) {
+                        var associatedDatasets = datasetsIndexedByOU[mod.id];
+                        return !_.isEmpty(associatedDatasets);
+                    });
+                };
+
+                return indexDatasetsByOrgUnits().then(filterModulesWithNewDatasets);
             };
 
-            var filterModulesWithNewDatasets = function(aggregateModules, datasetsIndexedByOU) {
-                return _.filter(aggregateModules, function(mod) {
-                    var associatedDatasets = datasetsIndexedByOU[mod.id];
-                    return !_.isEmpty(associatedDatasets) && hasAnyNewDataset(associatedDatasets);
-                });
+            var filterLineListModules = function(lineListModules) {
+                var indexProgramsByOrgUnits = function() {
+                    return programRepository.getAll().then(function(programs) {
+                        return _.groupByArray(programs, "orgUnitIds");
+                    });
+                };
+
+                var filterModulesWithNewPrograms = function(programsIndexedByOU) {
+                    return _.filter(lineListModules, function(mod) {
+                        var associatedPrograms = programsIndexedByOU[mod.id];
+                        return !_.isEmpty(associatedPrograms);
+                    });
+                };
+
+                return indexProgramsByOrgUnits().then(filterModulesWithNewPrograms);
             };
 
-            var partitionedOrgUnits = _.partition(orgUnits, function(ou) {
-                return !isOfType(ou, "Module") || isLinelistService(ou);
-            });
-
-            var otherOrgUnits = partitionedOrgUnits[0];
-            var aggregateModules = partitionedOrgUnits[1];
-
-            return indexDatasetsByOrgUnits()
-                .then(_.curry(filterModulesWithNewDatasets)(aggregateModules))
-                .then(function(modulesWithNewDatasets) {
-                    return otherOrgUnits.concat(modulesWithNewDatasets);
+            var segragatedOrgUnits = segragateOrgUnits(orgUnits);
+            return $q.all([filterAggregateModules(segragatedOrgUnits.aggregateModules),
+                    filterLineListModules(segragatedOrgUnits.lineListModules)
+                ])
+                .then(function(filteredModules) {
+                    return segragatedOrgUnits.otherOrgUnits.concat(filteredModules[0]).concat(filteredModules[1]);
                 });
         };
 
