@@ -250,19 +250,19 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 }];
 
                 var dbDataValues = [{
-                    "dataElement": "DE1",
-                    "period": "2014W12",
-                    "orgUnit": "MSF_0",
-                    "categoryOptionCombo": "C1",
-                    "clientLastUpdated": "2014-05-27T09:00:00.120Z",
-                    "value": "1"
-                }, {
                     "dataElement": "DE2",
                     "period": "2014W12",
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "clientLastUpdated": "2014-05-20T09:00:00.120Z",
                     "value": "2"
+                }, {
+                    "dataElement": "DE1",
+                    "period": "2014W12",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "clientLastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "1"
                 }];
 
                 dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));

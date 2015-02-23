@@ -29,11 +29,11 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
                 return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds);
             };
 
-            var merge = function(dataValuesFromDhis, dataValuesFromDb) {
-                var dataValuesEquals = function(d1, d2) {
-                    return d1.dataElement === d2.dataElement && d1.period === d2.period && d1.orgUnit === d2.orgUnit && d1.categoryOptionCombo === d2.categoryOptionCombo;
-                };
+            var dataValuesEquals = function(d1, d2) {
+                return d1.dataElement === d2.dataElement && d1.period === d2.period && d1.orgUnit === d2.orgUnit && d1.categoryOptionCombo === d2.categoryOptionCombo;
+            };
 
+            var merge = function(dataValuesFromDhis, dataValuesFromDb) {
                 return mergeBy.lastUpdated({
                     eq: dataValuesEquals
                 }, dataValuesFromDhis, dataValuesFromDb);
@@ -45,26 +45,20 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
                 };
 
                 var areEqual = function(originalDataValues, mergedDataValues) {
-                    var keysToPickForCompare = ["dataElement", "period", "orgUnit", "categoryOptionCombo", "value", "storedBy"];
-
-                    var originalDataValuesToCompare = _.map(originalDataValues, function(dv) {
-                        return _.pick(dv, keysToPickForCompare);
+                    return originalDataValues.length === mergedDataValues.length && _.all(originalDataValues, function(dv) {
+                        return _.any(mergedDataValues, function(mergedDv) {
+                            return dataValuesEquals(dv, mergedDv) && dv.value === mergedDv.value;
+                        });
                     });
-
-                    var mergedDataValuesToCompare = _.map(mergedDataValues, function(dv) {
-                        return _.pick(dv, keysToPickForCompare);
-                    });
-
-                    return _.isEqual(originalDataValuesToCompare, mergedDataValuesToCompare);
                 };
 
-                var groupedMergedData = _.groupBy(mergedData, orgUnitAndPeriod);
-                var groupedOriginalData = _.groupBy(originalData, orgUnitAndPeriod);
+                var mergedDataGroupedByOuAndPeriod = _.groupBy(mergedData, orgUnitAndPeriod);
+                var originalDataGroupedByOuAndPeriod = _.groupBy(originalData, orgUnitAndPeriod);
 
                 var deleteApprovals = [];
-                for (var data in groupedOriginalData) {
-                    if (groupedMergedData[data] && !areEqual(groupedOriginalData[data], groupedMergedData[data])) {
-                        var firstDataValue = groupedOriginalData[data][0];
+                for (var ouAndPeriod in originalDataGroupedByOuAndPeriod) {
+                    if (mergedDataGroupedByOuAndPeriod[ouAndPeriod] && !areEqual(originalDataGroupedByOuAndPeriod[ouAndPeriod], mergedDataGroupedByOuAndPeriod[ouAndPeriod])) {
+                        var firstDataValue = originalDataGroupedByOuAndPeriod[ouAndPeriod][0];
                         var deleteFirstLevelApproval = approvalDataRepository.deleteLevelOneApproval(firstDataValue.period, firstDataValue.orgUnit);
                         var deleteSecondLevelApproval = approvalDataRepository.deleteLevelTwoApproval(firstDataValue.period, firstDataValue.orgUnit);
                         deleteApprovals.push(deleteFirstLevelApproval);
@@ -81,9 +75,11 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
                 return;
 
             return getDataFromDb()
-                .then(_.curry(merge)(dataValuesFromDhis))
-                .then(_.curry(clearApprovals)(dataValuesFromDhis))
-                .then(dataRepository.saveDhisData);
+                .then(function(dataFromLocalDb) {
+                    var mergedData = merge(dataValuesFromDhis, dataFromLocalDb);
+                    return clearApprovals(dataFromLocalDb, mergedData)
+                        .then(dataRepository.saveDhisData);
+                });
         };
     };
 });

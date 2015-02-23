@@ -33,16 +33,16 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         var resetForm = function() {
-            $scope.dataValues = {};
             $scope.isopen = {};
             $scope.isDatasetOpen = {};
+            $scope.isSubmitted = false;
             $scope.saveSuccess = false;
-            $scope.saveError = false;
             $scope.submitSuccess = false;
             $scope.submitAndApprovalSuccess = false;
-            $scope.submitError = false;
             $scope.firstLevelApproveSuccess = false;
             $scope.secondLevelApproveSuccess = false;
+            $scope.saveError = false;
+            $scope.submitError = false;
             $scope.approveError = false;
             $scope.projectIsAutoApproved = false;
             $scope.excludedDataElements = {};
@@ -270,6 +270,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.safeGet = function(dataValues, id, option) {
+            if (dataValues === undefined)
+                return;
+
             dataValues[id] = dataValues[id] || {};
 
             dataValues[id][option] = dataValues[id][option] || {

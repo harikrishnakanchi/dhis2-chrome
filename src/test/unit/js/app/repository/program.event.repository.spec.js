@@ -59,7 +59,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
         it("should get last updated period if data is present in indexedDB", function() {
             var periodSevenWeeksAgo = moment().subtract(7, 'weeks').format("GGGG[W]W");
-            
+
             var allEvents = [{
                 'event': 'event_1',
                 'period': periodSevenWeeksAgo

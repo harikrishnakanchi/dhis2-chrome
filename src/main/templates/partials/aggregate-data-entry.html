@@ -12,7 +12,7 @@
         <div ng-show="saveError" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
         <div ng-show="submitError" class="alert alert-danger">{{resourceBundle.dataSubmitFailure}}</div>
         <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-        <div class="alert alert-danger" ng-if="!isSubmitted &amp;&amp; hasRoles(['Project Level Approver', 'Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
+        <div class="alert alert-danger" ng-if="dataValues !== undefined &amp;&amp; !isSubmitted &amp;&amp; hasRoles(['Project Level Approver', 'Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
         <form name="dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user']) || (isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) || (isCompleted &amp;&amp; hasRoles(['Coordination Level Approver']))">
             <div class="text-right">
                 <input type="button" class="printTallySheetBtn" ng-click="printWindow()" value="{{resourceBundle.printTallySheetBtnValue}}" ng-show="currentModule"></input>
