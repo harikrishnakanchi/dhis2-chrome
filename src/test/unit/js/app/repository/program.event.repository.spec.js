@@ -77,7 +77,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             expect(mockStore.getAll).toHaveBeenCalled();
 
-            var periodEightWeeksAgo = moment().subtract(properties.projectDataSync.numWeeksToSync, 'weeks').format("GGGG[W]WW");
+            var periodEightWeeksAgo = moment().subtract(properties.projectDataSync.numWeeksToSync, 'weeks').format("GGGG[W]W");
             expect(lastUpdatedPeriod).toEqual(periodEightWeeksAgo);
         });
 
