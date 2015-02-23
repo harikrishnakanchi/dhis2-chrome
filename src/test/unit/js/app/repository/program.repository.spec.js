@@ -35,7 +35,6 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
             expect(actualValues).toEqual(programDataForOrgUnit);
         });
 
-
         it("should find all propgrams", function() {
             var programIds = ["p1", "p2"];
             programRepository.findAll(programIds);
@@ -397,6 +396,40 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
 
                 }]
             });
+        });
+
+        it("should get all new data model programs", function() {
+            var allPrograms = [{
+                "id": "p1",
+                "name": "Program1",
+                "attributeValues": [{
+                    "value": "true",
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    }
+                }]
+            }, {
+                "id": "p2",
+                "name": "Program2",
+                "attributeValues": [{
+                    "value": "false",
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    }
+                }]
+            }];
+
+            mockStore.getAll.and.returnValue(utils.getPromise(q, allPrograms));
+
+            var expectedPrograms = [allPrograms[0]];
+            var actualPrograms;
+
+            programRepository.getAll().then(function(data) {
+                actualPrograms = data;
+            });
+
+            scope.$apply();
+            expect(actualPrograms).toEqual(expectedPrograms);
         });
     });
 });

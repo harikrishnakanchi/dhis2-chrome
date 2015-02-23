@@ -1,5 +1,15 @@
 define(["lodash", "moment"], function(_, moment) {
     return function(db, $q) {
+        var getBooleanAttributeValue = function(attributeValues, attributeCode) {
+            var attr = _.find(attributeValues, {
+                "attribute": {
+                    "code": attributeCode
+                }
+            });
+
+            return attr && attr.value === 'true';
+        };
+
         this.getProgramForOrgUnit = function(orgUnitId) {
             var store = db.objectStore("programs");
             return store.find("by_organisationUnit", orgUnitId);
@@ -7,7 +17,11 @@ define(["lodash", "moment"], function(_, moment) {
 
         this.getAll = function() {
             var store = db.objectStore("programs");
-            return store.getAll();
+            return store.getAll().then(function(programs) {
+                return _.filter(programs, function(p) {
+                    return getBooleanAttributeValue(p.attributeValues, "isNewDataModel");
+                });
+            });
         };
 
         var getOrgUnitsForIndexing = function(programs) {
