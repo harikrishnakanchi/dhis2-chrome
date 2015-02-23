@@ -43,7 +43,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
             var filterModulesWithNewDatasets = function(aggregateModules, datasetsIndexedByOU) {
                 return _.filter(aggregateModules, function(mod) {
                     var associatedDatasets = datasetsIndexedByOU[mod.id];
-                    return _.isEmpty(associatedDatasets) || hasAnyNewDataset(associatedDatasets);
+                    return !_.isEmpty(associatedDatasets) && hasAnyNewDataset(associatedDatasets);
                 });
             };
 

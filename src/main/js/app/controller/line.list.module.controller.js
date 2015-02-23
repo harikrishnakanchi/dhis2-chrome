@@ -49,14 +49,16 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                 });
             };
 
-            var getProgram = function() {
+            var getAssociatedProgram = function() {
                 return programRepository.getProgramForOrgUnit($scope.module.id).then(function(prg) {
                     if (_.isEmpty(prg)) {
                         $scope.program = {
                             "name": ""
                         };
                     } else {
-                        $scope.program = prg;
+                        $scope.program = _.find($scope.allPrograms, function(p) {
+                            return p.id == prg.id;
+                        });
                         $scope.getEnrichedProgram(prg.id);
                     }
                 });
@@ -90,7 +92,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                 return $q.all([programRepository.getAll()]);
             };
 
-            initModule().then(getPrograms).then(setPrograms).then(getAllModules).then(getExcludedDataElements).then(getProgram).then(setUpModule);
+            initModule().then(getPrograms).then(setPrograms).then(getAllModules).then(getExcludedDataElements).then(getAssociatedProgram).then(setUpModule);
         };
 
         $scope.changeCollapsed = function(sectionId) {

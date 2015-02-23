@@ -65,6 +65,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
 
             var datasets = [{
                 "id": "ds1",
+                "orgUnitIds": ["mod1"],
                 "organisationUnits": [{
                     "id": "mod1",
                     "name": "mod1"
@@ -81,6 +82,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
                     "id": "mod2",
                     "name": "mod2"
                 }],
+                "orgUnitIds": ["mod2"],
                 "attributeValues": [{
                     "value": "true",
                     "attribute": {
@@ -92,19 +94,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             scope = $rootScope.$new();
             datasetRepository = new DatasetRepository();
             spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, datasets));
-
-            var currentDataSet = {
-                "id": "currentDs",
-                "name": "OBGY_OPD - V1",
-                "attributeValues": [{
-                    "value": "false",
-                    "attribute": {
-                        "id": "wFC6joy3I8Q",
-                        "name": "Is New Data Model",
-                        "code": "isNewDataModel",
-                    }
-                }]
-            };
 
             var newDataSet = {
                 "id": "newDs",
@@ -750,10 +739,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
                 "level": 6,
                 "name": "c2",
                 "children": [],
-                "dataSets": [{
-                    "id": "currentDs",
-                    "name": "OBGY_OPD - V1"
-                }],
                 "attributeValues": [{
                     "value": "false",
                     "attribute": {
@@ -850,7 +835,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
 
             scope.$apply();
 
-            var expectedOrgUnits = [testCountry, testProject, opUnit1, lineListModule, newModule, aggModuleWithoutDataset];
+            var expectedOrgUnits = [testCountry, testProject, opUnit1, lineListModule, newModule];
             expect(actualOrgUnits).toEqual(expectedOrgUnits);
         });
 
