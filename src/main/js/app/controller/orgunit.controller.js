@@ -67,6 +67,15 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         $scope.getOrgUnitType = function(orgUnit) {
+            var isLineListService = function() {
+                var attr = _.find(orgUnit.attributeValues, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    }
+                });
+                return attr && attr.value == "true";
+            };
+
             if (!_.isEmpty(orgUnit)) {
                 var type = _.find(orgUnit.attributeValues, {
                     "attribute": {
@@ -75,11 +84,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
                 }).value;
 
                 if (type == "Module") {
-                    type = _.find(orgUnit.attributeValues, {
-                        "attribute": {
-                            "code": "isLineListService"
-                        }
-                    }).value === "true" ? "LineListModule" : "Module";
+                    type = isLineListService() ? "LineListModule" : "Module";
                 }
                 return type;
             }
