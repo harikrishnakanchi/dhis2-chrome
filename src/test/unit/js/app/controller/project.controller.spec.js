@@ -292,6 +292,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
         it('should set project users in view mode', function() {
             scope.orgUnit = {
                 "name": "anyname",
+                "parent": {
+                    "id": "someId"
+                }
             };
             scope.isNewMode = false;
             var users = [{

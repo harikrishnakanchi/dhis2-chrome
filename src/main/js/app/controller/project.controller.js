@@ -162,7 +162,10 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
         var prepareEditForm = function() {
             $scope.reset();
             $scope.newOrgUnit = orgUnitMapper.mapToProject($scope.orgUnit);
-            userRepository.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForEdit);
+            orgUnitRepository.getAllProjects().then(function(allProjects) {
+                $scope.peerProjects = _.without(orgUnitMapper.getChildOrgUnitNames(allProjects, $scope.orgUnit.parent.id), $scope.orgUnit.name);
+                userRepository.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForEdit);
+            });
         };
 
         var init = function() {

@@ -5,7 +5,6 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         $scope.opUnits = [{
             'openingDate': moment().format("YYYY-MM-DD")
         }];
-        var allOpUnits = [];
 
         $scope.addOpUnits = function() {
             $scope.opUnits.push({
@@ -151,12 +150,6 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }, $scope.resourceBundle.disableOrgUnitConfirmationMessage);
         };
 
-        $scope.getAllOpunits = function() {
-            $scope.allOpunitNames = _.reject(allOpUnits.concat(_.pluck($scope.opUnits, "name")), function(m) {
-                return m === undefined;
-            });
-        };
-
         var init = function() {
             if (!$scope.isNewMode) {
                 $scope.opUnits = [{
@@ -182,7 +175,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }
             orgUnitRepository.getAll().then(function(allOrgUnits) {
                 var parentId = $scope.isNewMode ? $scope.orgUnit.id : $scope.orgUnit.parent.id;
-                allOpUnits = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, parentId);
+                $scope.allOpunitNames = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, parentId);
             });
         };
 
