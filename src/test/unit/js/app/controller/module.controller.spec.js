@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop","dhisId"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop,dhisId) {
+define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop", "dhisId"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop, dhisId) {
     describe("module controller", function() {
         var scope, moduleController, mockOrgStore, db, q, location, _Date, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
             dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
@@ -81,7 +81,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should save aggregate module", function() {
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
-            spyOn(dhisId, "get").and.callFake(function(name){
+            spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
 
@@ -143,7 +143,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should asscoiate aggregate datasets with the module", function() {
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
-            spyOn(dhisId, "get").and.callFake(function(name){
+            spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
 
@@ -212,7 +212,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             }];
 
-            expect(dataSetRepo.getAll).toHaveBeenCalledWith(true);
+            expect(dataSetRepo.getAll).toHaveBeenCalled();
             expect(dataSetRepo.upsert).toHaveBeenCalledWith(expectedDatasets);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: ['DS_OPD'],
@@ -223,10 +223,10 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should save excluded data elements for the module", function() {
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
-            spyOn(dhisId, "get").and.callFake(function(name){
+            spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
-            
+
             scope.$apply();
             var projectId = "someid";
             var parent = {

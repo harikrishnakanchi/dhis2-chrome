@@ -27,35 +27,38 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
-        var getAll = function(rejectLinelistTypeDataSets) {
-            var getBooleanAttributeValue = function(attributes, attributeCode) {
-                var attr = _.find(attributes, {
-                    "attribute": {
-                        "code": attributeCode
-                    }
-                });
-                return attr && attr.value === "true";
-            };
+        var filterNewDatasets = function(datasets) {
+            return _.filter(datasets, function(ds) {
+                return getBooleanAttributeValue(ds.attributeValues, "isNewDataModel");
+            });
+        };
 
-            var filterNewDatasets = function(datasets) {
-                return _.filter(datasets, function(ds) {
-                    return getBooleanAttributeValue(ds.attributeValues, "isNewDataModel");
-                });
-            };
+        var getBooleanAttributeValue = function(attributes, attributeCode) {
+            var attr = _.find(attributes, {
+                "attribute": {
+                    "code": attributeCode
+                }
+            });
+            return attr && attr.value === "true";
+        };
 
-            var rejectLineListDatasets = function(datasets) {
-                return _.reject(datasets, function(ds) {
-                    return getBooleanAttributeValue(ds.attributeValues, "isLineListService");
-                });
-            };
-
+        var getAll = function() {
             var store = db.objectStore("dataSets");
             return store.getAll().then(function(all) {
                 var filtered = filterNewDatasets(all);
-                if (rejectLinelistTypeDataSets) {
-                    filtered = rejectLineListDatasets(filtered);
-                }
-                return filtered;
+                return _.reject(filtered, function(ds) {
+                    return getBooleanAttributeValue(ds.attributeValues, "isLineListService");
+                });
+            });
+        };
+
+        var getAllLinelistDatasets = function() {
+            var store = db.objectStore("dataSets");
+            return store.getAll().then(function(all) {
+                var filtered = filterNewDatasets(all);
+                return _.filter(filtered, function(ds) {
+                    return getBooleanAttributeValue(ds.attributeValues, "isLineListService");
+                });
             });
         };
 
@@ -110,7 +113,8 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             "getAllDatasetIds": getAllDatasetIds,
             "upsert": upsert,
             "getAllForOrgUnit": getAllForOrgUnit,
-            "getEnriched": getEnriched
+            "getEnriched": getEnriched,
+            "getAllLinelistDatasets": getAllLinelistDatasets
         };
     };
 });
