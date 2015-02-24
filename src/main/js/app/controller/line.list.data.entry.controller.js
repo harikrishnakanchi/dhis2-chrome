@@ -176,6 +176,10 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 });
         };
 
+        $scope.getFormattedDate = function(date) {
+            return moment(date).toDate().toLocaleDateString();
+        };
+
         $scope.update = function(programStage) {
 
             var showResultMessage = function() {

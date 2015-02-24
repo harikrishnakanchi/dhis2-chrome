@@ -104,9 +104,9 @@
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="event in allEvents">
-                                            <td>{{event.eventDate | date:'yyyy-MM-dd'}}</td>
+                                            <td>{{ getFormattedDate(event.eventDate) }}</td>
                                             <td ng-repeat="dataValue in event.dataValues" ng-if="dataValue.showInEventSummary">
-                                                <span ng-if="dataValue.type === 'date'">{{dataValue.value | date:'yyyy-MM-dd'}}</span>
+                                                <span ng-if="dataValue.type === 'date'">{{ getFormattedDate(dataValue.value) }}</span>
                                                 <span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'true'">{{resourceBundle.yes}}</span>
                                                 <span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'false'">{{resourceBundle.no}}</span>
                                                 <span ng-if="dataValue.type !== 'date' &amp;&amp; dataValue.type !== 'bool'">{{getDisplayValue(dataValue)}}</span>
