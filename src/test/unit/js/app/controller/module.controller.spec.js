@@ -23,7 +23,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 get: function() {},
                 getEnriched: function() {},
                 upsert: function() {},
-                getAll: jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, datasetsdata))
+                getAllAggregateDatasets: jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, datasetsdata))
             };
 
             systemSettingRepo = utils.getMockRepo(q);
@@ -212,7 +212,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             }];
 
-            expect(dataSetRepo.getAll).toHaveBeenCalled();
+            expect(dataSetRepo.getAllAggregateDatasets).toHaveBeenCalled();
             expect(dataSetRepo.upsert).toHaveBeenCalledWith(expectedDatasets);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: ['DS_OPD'],

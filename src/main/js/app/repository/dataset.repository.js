@@ -45,6 +45,13 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
         var getAll = function() {
             var store = db.objectStore("dataSets");
             return store.getAll().then(function(all) {
+                return filterNewDatasets(all);
+            });
+        };
+
+        var getAllAggregateDatasets = function() {
+            var store = db.objectStore("dataSets");
+            return store.getAll().then(function(all) {
                 var filtered = filterNewDatasets(all);
                 return _.reject(filtered, function(ds) {
                     return getBooleanAttributeValue(ds.attributeValues, "isLineListService");
@@ -114,7 +121,8 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             "upsert": upsert,
             "getAllForOrgUnit": getAllForOrgUnit,
             "getEnriched": getEnriched,
-            "getAllLinelistDatasets": getAllLinelistDatasets
+            "getAllLinelistDatasets": getAllLinelistDatasets,
+            "getAllAggregateDatasets": getAllAggregateDatasets
         };
     };
 });

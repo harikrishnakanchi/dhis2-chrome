@@ -93,7 +93,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
 
             scope = $rootScope.$new();
             datasetRepository = new DatasetRepository();
-            spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, datasets));
+            spyOn(datasetRepository, "getAllAggregateDatasets").and.returnValue(utils.getPromise(q, datasets));
 
             programRepository = new ProgramRepository();
             spyOn(programRepository, "getAll").and.returnValue(utils.getPromise(q, []));
@@ -849,7 +849,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             mockOrgStore = mockDb.objectStore;
 
             orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, programRepository, q);
-            datasetRepository.getAll.and.returnValue(utils.getPromise(q, datasets));
+            datasetRepository.getAllAggregateDatasets.and.returnValue(utils.getPromise(q, datasets));
             programRepository.getAll.and.returnValue(utils.getPromise(q, programs));
 
             var actualOrgUnits = [];

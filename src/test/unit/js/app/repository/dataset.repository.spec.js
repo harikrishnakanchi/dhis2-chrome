@@ -35,12 +35,61 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             expect(mockStore.each.calls.argsFor(0)[0].inList).toEqual(datasetIds);
         });
 
-        it("should get all data sets", function() {
+        it("should get all new data sets", function() {
             var allDataSets = [{
-                "id": 123,
+                "id": "dataSet1",
+                "name": "NeoNat",
                 "attributeValues": [{
                     "attribute": {
                         "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }]
+            }, {
+                "id": "dataSet2",
+                "name": "Obgyn",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "false"
+                }]
+            }, {
+                "id": "dataSet3",
+                "name": "ER linelist",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    },
+                    "value": "true"
+                }]
+            }];
+
+            var expected = [{
+                "id": "dataSet1",
+                "name": "NeoNat",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }]
+            }, {
+                "id": "dataSet3",
+                "name": "ER linelist",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService"
                     },
                     "value": "true"
                 }]
@@ -52,7 +101,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             });
             scope.$apply();
             expect(mockStore.getAll).toHaveBeenCalled();
-            expect(result).toEqual(allDataSets);
+            expect(result).toEqual(expected);
         });
 
         it("should get all new aggregate data sets", function() {
@@ -102,7 +151,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             }];
             mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
             var result;
-            datasetRepository.getAll().then(function(r) {
+            datasetRepository.getAllAggregateDatasets().then(function(r) {
                 result = r;
             });
             scope.$apply();

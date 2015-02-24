@@ -99,7 +99,14 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.currentModule).toEqual(allModules[0]);
             });
 
-            it("should load the data entry template", function() {
+            it("should load the aggregate data entry template if current module does not contain line list porgrams", function() {
+                rootScope.currentUser.userCredentials = {
+                    "username": "dataentryuser",
+                    "userRoles": [{
+                        "name": 'Data entry user'
+                    }]
+                };
+
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
 
@@ -111,9 +118,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.programsInCurrentModule).toBe(undefined);
             });
 
-            it("should load the list-list entry template", function() {
-                programRepository = new ProgramRepository();
+            it("should load the list-list entry template if current module contains line list porgrams", function() {
+                rootScope.currentUser.userCredentials = {
+                    "username": "dataentryuser",
+                    "userRoles": [{
+                        "name": 'Data entry user'
+                    }]
+                };
 
+                programRepository = new ProgramRepository();
                 spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {
                     'id': 'p1'
                 }));
@@ -127,6 +140,30 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
                 expect(scope.formTemplateUrl.indexOf("templates/partials/line-list-data-entry.html?")).toEqual(0);
                 expect(scope.programsInCurrentModule).toEqual('p1');
+            });
+
+            it("should load the data entry template if user is an approver and current module contains line list porgrams", function() {
+                rootScope.currentUser.userCredentials = {
+                    "username": "dataentryuser",
+                    "userRoles": [{
+                        "name": 'Not a Data entry user'
+                    }]
+                };
+
+                programRepository = new ProgramRepository();
+                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {
+                    'id': 'p1'
+                }));
+
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
+                scope.$apply();
+
+                scope.week = {};
+                scope.currentModule = {};
+                scope.$apply();
+
+                expect(scope.formTemplateUrl.indexOf("templates/partials/aggregate-data-entry.html?")).toEqual(0);
+                expect(scope.programsInCurrentModule).toBe(undefined);
             });
 
             it("should not load the template only if module is undefined", function() {

@@ -2,10 +2,16 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
     function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
         return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository, programRepository) {
 
+            var isDataEntryUser = function(user) {
+                return _.any(user.userCredentials.userRoles, function(userAuth) {
+                    return userAuth.name === 'Data entry user';
+                });
+            };
+
             $scope.$watchCollection('[week, currentModule]', function() {
                 if ($scope.week && $scope.currentModule) {
                     programRepository.getProgramForOrgUnit($scope.currentModule.id).then(function(program) {
-                        if (_.isEmpty(program)) {
+                        if (_.isEmpty(program) || !isDataEntryUser($rootScope.currentUser)) {
                             $scope.programsInCurrentModule = undefined;
                             $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
                         } else {

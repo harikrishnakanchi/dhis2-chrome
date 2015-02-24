@@ -49,7 +49,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
 
             var filterAggregateModules = function(aggregateModules) {
                 var indexDatasetsByOrgUnits = function() {
-                    return datasetRepository.getAll().then(function(datasets) {
+                    return datasetRepository.getAllAggregateDatasets().then(function(datasets) {
                         return _.groupByArray(datasets, "orgUnitIds");
                     });
                 };
