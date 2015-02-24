@@ -1,8 +1,8 @@
 /*global Date:true*/
-define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "md5", "timecop","dhisId"], function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, md5, timecop,dhisId) {
+define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "md5", "timecop", "dhisId"], function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, md5, timecop, dhisId) {
     describe("line list module controller", function() {
         var scope, lineListModuleController, mockOrgStore, db, q, location, _Date, datasets, sections,
-            dataElements, sectionsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, systemSettingRepo, fakeModal, allPrograms, programsRepo;
+            dataElements, sectionsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, systemSettingRepo, fakeModal, allPrograms, programsRepo, datasetRepo, allDatasets;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -17,7 +17,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             }];
 
             location = $location;
-
             orgUnitRepo = utils.getMockRepo(q);
             orgunitGroupRepo = utils.getMockRepo(q);
             systemSettingRepo = utils.getMockRepo(q);
@@ -26,6 +25,22 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             programsRepo = utils.getMockRepo(q, allPrograms);
             programsRepo.get = function() {};
             programsRepo.getProgramForOrgUnit = function() {};
+
+            allDatasets = [{
+                "id": "ds1",
+                "code": "ds1Code",
+                "name": "dataSet1",
+                "organisationUnits": [{
+                    id: 'Module1Id',
+                    name: 'Module1'
+                }]
+            }, {
+                "id": "ds2",
+                "code": "ds2Code",
+                "name": "dataSet2"
+            }];
+
+            datasetRepo = utils.getMockRepo(q, allDatasets);
             orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
 
             mockOrgStore = {
@@ -59,7 +74,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }
             };
             scope.isNewMode = true;
-            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
+            lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper, datasetRepo);
         }));
 
         afterEach(function() {
@@ -71,7 +86,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
-            spyOn(dhisId, "get").and.callFake(function(name){
+            spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
 
@@ -85,6 +100,12 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             var program = {
                 'id': 'prog1',
                 'name': 'ER Linelist',
+                'attributeValues': [{
+                    "attribute": {
+                        "code": "associatedDataSet"
+                    },
+                    "value": "ds1Code"
+                }],
                 'organisationUnits': []
             };
             scope.program = program;
@@ -138,34 +159,63 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         });
 
         it("should save linelist modules", function() {
-            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, scope.program));
+            spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, undefined));
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
-             spyOn(dhisId, "get").and.callFake(function(name){
+            spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
-             
+            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+
+            var today = new Date();
+
+            var selectOrgUnit = function() {
+                scope.orgUnit = {
+                    "name": "Project1",
+                    "id": "someid",
+                    "children": [],
+                    "level": 3
+                };
+                scope.$apply();
+            };
+
+            var fillNewModuleForm = function() {
+                scope.module = {
+                    'name': "Module2",
+                    'openingDate': today,
+                    'serviceType': "Linelist",
+                    'parent': scope.orgUnit
+                };
+            };
+
+            var selectProgram = function() {
+                scope.program = {
+                    'id': 'prog1',
+                    'name': 'ER Linelist',
+                    'attributeValues': [{
+                        "attribute": {
+                            "code": "associatedDataSet"
+                        },
+                        "value": "ds1Code"
+                    }]
+                };
+                scope.$apply();
+            };
+
+            selectOrgUnit();
+            fillNewModuleForm();
+            selectProgram();
+            scope.save();
             scope.$apply();
-            scope.orgUnit = {
-                "name": "Project1",
-                "id": "someid",
-                "children": [],
-                "level": 3
-            };
 
-            scope.module = {
-                'name': "Module2",
-                'openingDate': new Date(),
-                'serviceType': "Linelist",
-                'parent': scope.orgUnit
-            };
 
-            var enrichedLineListModule = {
+            var newLineListModule = {
                 "name": "Module2",
                 "shortName": "Module2",
                 "displayName": "Project1 - Module2",
                 "id": "Module2someid",
                 "level": 4,
-                "openingDate": moment(new Date()).toDate(),
+                "openingDate": today,
                 "attributeValues": [{
                     "created": moment().toISOString(),
                     "lastUpdated": moment().toISOString(),
@@ -189,33 +239,52 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }
             };
 
-            scope.program = {
-                'id': 'prog1',
-                'name': 'ER Linelist',
-                'organisationUnits': [{
-                    id: 'a1ab18b5fdd',
+            var datasetWithNewModule = {
+                "id": "ds1",
+                "code": "ds1Code",
+                "name": "dataSet1",
+                "organisationUnits": [{
+                    id: 'Module1Id',
+                    name: 'Module1'
+                }, {
+                    id: 'Module2someid',
                     name: 'Module2'
                 }]
             };
 
-            spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, scope.program));
-            spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-            scope.save();
-            scope.$apply();
-
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedLineListModule);
-
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(newLineListModule);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: enrichedLineListModule,
+                data: newLineListModule,
                 type: "upsertOrgUnit"
             }, "dataValues");
 
-            expect(programsRepo.upsert).toHaveBeenCalledWith(scope.program);
+            var programWithNewOrgUnit = {
+                'id': 'prog1',
+                'name': 'ER Linelist',
+                'attributeValues': [{
+                    "attribute": {
+                        "code": "associatedDataSet"
+                    },
+                    "value": "ds1Code"
+                }],
+                'organisationUnits': [{
+                    id: 'Module2someid',
+                    name: 'Module2'
+                }]
+            };
+
+            expect(programsRepo.upsert).toHaveBeenCalledWith(programWithNewOrgUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: scope.program,
+                data: programWithNewOrgUnit,
                 type: "uploadProgram"
             }, "dataValues");
+
+            expect(datasetRepo.upsert).toHaveBeenCalledWith(datasetWithNewModule);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                data: ["ds1"],
+                type: "associateOrgUnitToDataset"
+            }, "dataValues");
+
             expect(scope.saveFailure).toBe(false);
         });
 

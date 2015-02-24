@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "programTransformer", "md5"], function(_, orgUnitMapper, moment, systemSettingsTransformer, programTransformer, md5) {
-    return function($scope, $hustle, orgUnitRepository, systemSettingRepository, db, $location, $q, $modal, programRepository, orgUnitGroupRepository, orgUnitGroupHelper) {
+    return function($scope, $hustle, orgUnitRepository, systemSettingRepository, db, $location, $q, $modal, programRepository, orgUnitGroupRepository, orgUnitGroupHelper, datasetRepository) {
         $scope.module = {};
         $scope.isExpanded = {};
         $scope.isDisabled = false;
@@ -178,10 +178,42 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                     id: enrichedModule.id,
                     name: enrichedModule.name
                 };
+                program.organisationUnits = program.organisationUnits || [];
                 program.organisationUnits = program.organisationUnits.concat(orgUnit);
                 return programRepository.upsert(program).then(function() {
                     publishMessage(program, "uploadProgram");
                 });
+            };
+
+            var associateDataSets = function() {
+                var getAllDatasets = function() {
+                    return datasetRepository.getAll();
+                };
+
+                var getDataSetAssociatedWithProgram = function(allDataSets) {
+                    var datasetCode = _.find($scope.program.attributeValues, {
+                        "attribute": {
+                            "code": "associatedDataSet"
+                        }
+                    });
+
+                    return _.find(allDataSets, {
+                        "code": datasetCode.value
+                    });
+                };
+
+                var addOrgUnitToAssociatedDataSet = function(dataset) {
+                    dataset.organisationUnits = dataset.organisationUnits || [];
+                    dataset.organisationUnits = dataset.organisationUnits.concat({
+                        id: enrichedModule.id,
+                        name: enrichedModule.name
+                    });
+                    return datasetRepository.upsert(dataset).then(function() {
+                        publishMessage([dataset.id], "associateOrgUnitToDataset");
+                    });
+                };
+
+                return getAllDatasets().then(getDataSetAssociatedWithProgram).then(addOrgUnitToAssociatedDataSet);
             };
 
             var getEnrichedModule = function(module) {
@@ -202,6 +234,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                 .then(_.partial(associatePrograms, $scope.program))
                 .then(_.partial(saveExcludedDataElements, enrichedModule))
                 .then(createOrgUnitGroups)
+                .then(associateDataSets)
                 .then(_.partial(onSuccess, enrichedModule), onError);
         };
 
