@@ -1,11 +1,7 @@
 define([], function() {
     return function(datasetService, datasetRepository) {
         var retrieveFromIDB = function(datasetIds) {
-            return datasetRepository.getAll().then(function(data) {
-                return _.filter(data, function(d) {
-                    return _.contains(datasetIds, d.id);
-                });
-            });
+            return datasetRepository.findAll(datasetIds);
         };
 
         this.run = function(message) {

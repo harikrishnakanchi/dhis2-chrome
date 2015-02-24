@@ -15,15 +15,12 @@ define(["uploadDatasetConsumer", "utils", "angularMocks", "datasetService", "dat
             }, {
                 "id": "ds2",
                 "name": "Dataset2"
-            }, {
-                "id": "ds3",
-                "name": "Dataset3"
             }];
         }));
 
         it("should save datasets to dhis", function() {
             spyOn(datasetService, "associateDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
-            spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
+            spyOn(datasetRepository, "findAll").and.returnValue(utils.getPromise(q, allDatasets));
             uploadDatasetConsumer = new UploadDatasetConsumer(datasetService, datasetRepository);
 
             message = {

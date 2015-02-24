@@ -40,7 +40,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 "name": "dataSet2"
             }];
 
-            datasetRepo = utils.getMockRepo(q, allDatasets);
+            datasetRepo = utils.getMockRepo(q);
+            datasetRepo.getAllLinelistDatasets = function() {};
+            spyOn(datasetRepo, "getAllLinelistDatasets").and.returnValue(utils.getPromise(q, allDatasets));
             orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
 
             mockOrgStore = {

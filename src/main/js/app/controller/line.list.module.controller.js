@@ -187,7 +187,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
 
             var associateDataSets = function() {
                 var getAllDatasets = function() {
-                    return datasetRepository.getAll();
+                    return datasetRepository.getAllLinelistDatasets();
                 };
 
                 var getDataSetAssociatedWithProgram = function(allDataSets) {
