@@ -14,8 +14,7 @@ define([], function() {
         "metadata": {
             "sync": {
                 "intervalInMinutes": parseInt(metdataSyncInterval)
-            },
-            "types": ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "dataSets", "sections", "organisationUnits", "organisationUnitLevels", "users", "programStages", "optionSets"],
+            }
         },
         "devMode": false
     };
