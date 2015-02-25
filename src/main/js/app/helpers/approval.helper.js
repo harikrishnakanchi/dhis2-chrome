@@ -215,7 +215,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
             });
         };
 
-        var unapproveData = function(currentModuleId, dataSetIds, period, data) {
+        var unapproveData = function(currentModuleId, dataSetIds, period) {
             var unapproveOnDHIS = function() {
                 return $hustle.publish({
                     "data": {
@@ -233,9 +233,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
                 ]);
             };
 
-            return unapproveLocally().then(unapproveOnDHIS).then(function() {
-                return data;
-            });
+            return unapproveLocally().then(unapproveOnDHIS);
         };
 
         return {

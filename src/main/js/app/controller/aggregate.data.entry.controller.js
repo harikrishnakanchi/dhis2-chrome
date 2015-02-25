@@ -215,12 +215,18 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 }, "dataValues");
             };
 
+            var unapproveData = function(data) {
+                return approvalHelper.unapproveData($scope.currentModule.id, _.keys($scope.currentGroupedSections), getPeriod()).then(function() {
+                    return data;
+                });
+            };
+
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
             if (asDraft) {
                 return dataRepository.saveAsDraft(payload);
             } else {
                 return dataRepository.save(payload)
-                    .then(_.curry(approvalHelper.unapproveData)($scope.currentModule.id, _.keys($scope.currentGroupedSections), getPeriod()))
+                    .then(unapproveData)
                     .then(saveToDhis).then(function() {
                         return {
                             "dataSets": _.keys($scope.currentGroupedSections),

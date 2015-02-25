@@ -897,7 +897,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should delete approvals if data is edited", function() {
 
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                spyOn(approvalHelper, "unapproveData");
+                spyOn(approvalHelper, "unapproveData").and.returnValue(utils.getPromise(q, {}));
 
                 scope.currentGroupedSections = {
                     "ds1": [],
