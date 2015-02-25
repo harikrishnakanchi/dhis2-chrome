@@ -215,12 +215,36 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
             });
         };
 
+        var unapproveData = function(currentModuleId, dataSetIds, period, data) {
+            var unapproveOnDHIS = function() {
+                return $hustle.publish({
+                    "data": {
+                        "ds": dataSetIds,
+                        "pe": period,
+                        "ou": currentModuleId
+                    },
+                    "type": "deleteApproval"
+                }, "dataValues");
+            };
+
+            var unapproveLocally = function() {
+                return $q.all([approvalDataRepository.unapproveLevelTwoData(period, currentModuleId),
+                    approvalDataRepository.unapproveLevelOneData(period, currentModuleId)
+                ]);
+            };
+
+            return unapproveLocally().then(unapproveOnDHIS).then(function() {
+                return data;
+            });
+        };
+
         return {
             "markDataAsComplete": markDataAsComplete,
             "markDataAsApproved": markDataAsApproved,
             "markDataAsAccepted": markDataAsAccepted,
             "autoApproveExistingData": autoApproveExistingData,
-            "getApprovalStatus": getApprovalStatus
+            "getApprovalStatus": getApprovalStatus,
+            "unapproveData": unapproveData
         };
     };
 });

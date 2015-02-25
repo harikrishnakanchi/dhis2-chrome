@@ -215,41 +215,20 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 }, "dataValues");
             };
 
-            var unapproveData = function(payload) {
-                var unapproveOnDHIS = function() {
-                    return $hustle.publish({
-                        "data": {
-                            "ds": _.keys($scope.currentGroupedSections),
-                            "pe": getPeriod(),
-                            "ou": $scope.currentModule.id
-                        },
-                        "type": "deleteApproval"
-                    }, "dataValues");
-                };
-
-                var unapproveLocally = function() {
-                    return $q.all([approvalDataRepository.unapproveLevelTwoData(period, $scope.currentModule.id),
-                        approvalDataRepository.unapproveLevelOneData(period, $scope.currentModule.id)
-                    ]);
-                };
-
-                return unapproveLocally().then(unapproveOnDHIS).then(function() {
-                    return payload;
-                });
-            };
-
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
             if (asDraft) {
                 return dataRepository.saveAsDraft(payload);
             } else {
-                return dataRepository.save(payload).then(unapproveData).then(saveToDhis).then(function() {
-                    return {
-                        "dataSets": _.keys($scope.currentGroupedSections),
-                        "period": getPeriod(),
-                        "orgUnit": $scope.currentModule.id,
-                        "storedBy": $scope.currentUser.userCredentials.username
-                    };
-                });
+                return dataRepository.save(payload)
+                    .then(_.curry(approvalHelper.unapproveData)($scope.currentModule.id, _.keys($scope.currentGroupedSections), getPeriod()))
+                    .then(saveToDhis).then(function() {
+                        return {
+                            "dataSets": _.keys($scope.currentGroupedSections),
+                            "period": getPeriod(),
+                            "orgUnit": $scope.currentModule.id,
+                            "storedBy": $scope.currentUser.userCredentials.username
+                        };
+                    });
             }
         };
 

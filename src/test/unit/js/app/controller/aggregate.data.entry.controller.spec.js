@@ -279,8 +279,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should submit data values to indexeddb and dhis", function() {
-                spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, undefined));
-                spyOn(approvalDataRepository, "unapproveLevelTwoData").and.returnValue(utils.getPromise(q, undefined));
+                spyOn(approvalHelper, "unapproveData").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
                 spyOn(hustle, "publish");
                 spyOn(scope.dataentryForm, '$setPristine');
@@ -364,9 +363,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should let the user know of failures when saving to queue ", function() {
-
-                spyOn(approvalDataRepository, "unapproveLevelOneData").and.returnValue(utils.getPromise(q, {}));
-                spyOn(approvalDataRepository, "unapproveLevelTwoData").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalHelper, "unapproveData").and.returnValue(utils.getPromise(q, {}));
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
                 spyOn(hustle, "publish").and.returnValue(saveErrorPromise);
 
@@ -721,6 +718,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 });
                 getLevelTwoApprovalDataSpy.and.returnValue(utils.getPromise(q, undefined));
 
+                spyOn(approvalHelper, "unapproveData").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
@@ -892,10 +890,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should delete approvals if data is edited", function() {
-                spyOn(approvalDataRepository, "unapproveLevelOneData");
-                spyOn(approvalDataRepository, "unapproveLevelTwoData");
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                spyOn(hustle, "publish");
+                spyOn(approvalHelper, "unapproveData");
 
                 scope.currentGroupedSections = {
                     "ds1": [],
@@ -909,17 +905,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(dataRepository.save).toHaveBeenCalled();
-                expect(approvalDataRepository.unapproveLevelOneData).toHaveBeenCalledWith('2014W14', 'mod2');
-                expect(approvalDataRepository.unapproveLevelTwoData).toHaveBeenCalledWith('2014W14', 'mod2');
-
-                expect(hustle.publish.calls.argsFor(0)).toEqual([{
-                    data: {
-                        "ds": ["ds1", "ds2"],
-                        "pe": "2014W14",
-                        "ou": "mod2"
-                    },
-                    type: 'deleteApproval'
-                }, 'dataValues']);
+                expect(approvalHelper.unapproveData).toHaveBeenCalledWith('mod2', ["ds1", "ds2"], "2014W14");
             });
         });
     });

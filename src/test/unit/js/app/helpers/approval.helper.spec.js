@@ -457,5 +457,26 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     "type": "uploadApprovalData"
                 }, "dataValues"]);
             });
+
+
+            it("should unapprove data", function() {
+                spyOn(approvalDataRepository, "unapproveLevelOneData");
+                spyOn(approvalDataRepository, "unapproveLevelTwoData");
+
+                approvalHelper.unapproveData('mod2', ["ds1", "ds2"], "2014W14", {});
+                scope.$apply();
+
+                expect(approvalDataRepository.unapproveLevelOneData).toHaveBeenCalledWith('2014W14', 'mod2');
+                expect(approvalDataRepository.unapproveLevelTwoData).toHaveBeenCalledWith('2014W14', 'mod2');
+
+                expect(hustle.publish.calls.argsFor(0)).toEqual([{
+                    data: {
+                        "ds": ["ds1", "ds2"],
+                        "pe": "2014W14",
+                        "ou": "mod2"
+                    },
+                    type: 'deleteApproval'
+                }, 'dataValues']);
+            });
         });
     });
