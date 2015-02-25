@@ -132,7 +132,8 @@
                                 <ul>
                                     <li>
                                         <div class="text-center">
-                                            <input type="button" ng-disabled="isCurrentWeekSelected(week)" class="btn btn-main" value="Submit" ng-click="submit(program.id)" />
+                                            <input type="button" ng-disabled="isCurrentWeekSelected(week)" class="btn btn-main" value="Submit" ng-click="submit(program.id)" ng-if="!projectIsAutoApproved"/>
+                                            <input type="button" ng-disabled="isCurrentWeekSelected(week)" class="btn btn-main" value="Submit" ng-click="submitAndApprove(program.id)" ng-if="projectIsAutoApproved"/>
                                         </div>
                                     </li>
                                 </ul>

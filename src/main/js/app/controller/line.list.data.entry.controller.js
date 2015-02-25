@@ -1,6 +1,7 @@
-define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper"], function(_, moment, dhisId, properties, orgUnitMapper) {
+define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSections", "datasetTransformer"], function(_, moment, dhisId, properties, orgUnitMapper, groupSections, datasetTransformer) {
     return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepository,
-        orgUnitHelper, orgUnitRepository) {
+        orgUnitHelper, orgUnitRepository, approvalHelper) {
+
         var resetForm = function() {
             $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.showForm = false;
@@ -244,12 +245,22 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper"], function(_
                 $timeout(hideMessage, properties.messageTimeout);
             };
 
+            var unapproveData = function(data) {
+                var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
+                return approvalHelper.unapproveData($scope.currentModule.id, _.keys($scope.currentGroupedSections), period);
+            };
+
             var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
             var currentModule = $scope.currentModule.id;
 
             return programEventRepository.markEventsAsSubmitted(programId, period, currentModule)
+                .then(unapproveData)
                 .then(saveToDhis)
                 .then(showResultMessage);
+        };
+
+        $scope.submitAndApprove = function(programId) {
+            console.log("in submit and approve");
         };
 
         $scope.deleteEvent = function(event) {
@@ -359,6 +370,11 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper"], function(_
             }
         });
 
+        var getAll = function(storeName) {
+            var store = db.objectStore(storeName);
+            return store.getAll();
+        };
+
         var init = function() {
             var setUpNewForm = function() {
                 $scope.form = {};
@@ -373,12 +389,35 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper"], function(_
                 $scope.includeEditForm = false;
             };
 
-            setUpNewForm();
-            orgUnitHelper.getParentProjectId($scope.currentModule.parent.id).then(function(parentProjectId) {
-                orgUnitRepository.get(parentProjectId).then(function(orgUnit) {
-                    var project = orgUnitMapper.mapToProject(orgUnit);
-                    $scope.projectIsAutoApproved = (project.autoApprove === "true");
+            var setUpProjectAutoApprovedFlag = function() {
+                return orgUnitHelper.getParentProjectId($scope.currentModule.parent.id).then(function(parentProjectId) {
+                    orgUnitRepository.get(parentProjectId).then(function(orgUnit) {
+                        var project = orgUnitMapper.mapToProject(orgUnit);
+                        $scope.projectIsAutoApproved = (project.autoApprove === "true");
+                    });
                 });
+            };
+
+            var getAllData = function() {
+                var dataSetPromise = getAll('dataSets');
+                var sectionPromise = getAll("sections");
+                var dataElementsPromise = getAll("dataElements");
+                var comboPromise = getAll("categoryCombos");
+                var categoriesPromise = getAll("categories");
+                var categoryOptionCombosPromise = getAll("categoryOptionCombos");
+                return $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise]);
+            };
+
+            setUpNewForm();
+            $scope.loading = true;
+
+            setUpProjectAutoApprovedFlag().then(getAllData).then(function(data) {
+                var dataSets = data[0];
+                var groupedSections = groupSections.enrichGroupedSections(data);
+                var datasetsAssociatedWithModule = _.pluck(datasetTransformer.getAssociatedDatasets($scope.currentModule.id, dataSets), 'id');
+                $scope.currentGroupedSections = _.pick(groupedSections, datasetsAssociatedWithModule);
+            }).finally(function() {
+                $scope.loading = false;
             });
         };
 
