@@ -128,6 +128,20 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                         "name": "parent"
                     },
                     "displayName": "parent - mod1"
+                }, {
+                    "id": "456",
+                    "name": "mod2",
+                    "openingDate": "2014-05-30",
+                    "parent": {
+                        "name": "parent"
+                    },
+                    "displayName": "parent - mod2",
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "true"
+                    }]
                 }];
 
                 var dataValues = [];
@@ -139,6 +153,14 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 var expectedStatus = [{
                     "moduleId": "123",
                     "moduleName": "parent - mod1",
+                    "status": [{
+                        "period": "2014W22",
+                        "submitted": false,
+                        "nextApprovalLevel": undefined
+                    }]
+                }, {
+                    "moduleId": "456",
+                    "moduleName": "parent - mod2",
                     "status": [{
                         "period": "2014W22",
                         "submitted": false,

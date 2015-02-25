@@ -80,15 +80,6 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
         };
 
         var getApprovalStatus = function(orgUnitId) {
-            var isLinelistService = function(module) {
-                var linelistAttribute = _.find(module.attributeValues, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    }
-                });
-
-                return linelistAttribute ? linelistAttribute.value === "true" : false;
-            };
             var getStatus = function(modules, submittedPeriods, dataSetCompletePeriods, approvalData) {
 
                 var findIndex = function(array, orgUnitId) {
@@ -157,9 +148,6 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
             };
 
             return orgUnitRepository.getAllModulesInOrgUnits([orgUnitId], true).then(function(modules) {
-                modules = _.reject(modules, function(m) {
-                    return isLinelistService(m);
-                });
                 return $q.all([
                     getSubmittedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard),
                     getLevelOneApprovedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard),
