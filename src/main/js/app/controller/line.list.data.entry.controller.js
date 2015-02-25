@@ -1,5 +1,6 @@
-define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
-    return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepository) {
+define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper"], function(_, moment, dhisId, properties, orgUnitMapper) {
+    return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepository,
+        orgUnitHelper, orgUnitRepository) {
         var resetForm = function() {
             $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.showForm = false;
@@ -373,7 +374,12 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             };
 
             setUpNewForm();
-
+            orgUnitHelper.getParentProjectId($scope.currentModule.parent.id).then(function(parentProjectId) {
+                orgUnitRepository.get(parentProjectId).then(function(orgUnit) {
+                    var project = orgUnitMapper.mapToProject(orgUnit);
+                    $scope.projectIsAutoApproved = (project.autoApprove === "true");
+                });
+            });
         };
 
         init();
