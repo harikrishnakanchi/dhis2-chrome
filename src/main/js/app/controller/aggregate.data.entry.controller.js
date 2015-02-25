@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
     return function($scope, $routeParams, $q, $hustle, db, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
-        $timeout, orgUnitRepository, approvalHelper) {
+        $timeout, orgUnitRepository, approvalHelper, orgUnitHelper) {
 
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -300,17 +300,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
 
         var init = function() {
-            var getParentProjectId = function(parentId) {
-                return orgUnitRepository.get(parentId).then(function(parentOrgUnit) {
-                    var type = orgUnitMapper.getAttributeValue(parentOrgUnit, "Type");
-                    if (type === 'Project') {
-                        return parentOrgUnit.id;
-                    } else {
-                        return getParentProjectId(parentOrgUnit.parent.id);
-                    }
-                });
-            };
-
             var dataSetPromise = getAll('dataSets');
             var sectionPromise = getAll("sections");
             var dataElementsPromise = getAll("dataElements");
@@ -324,7 +313,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $scope.loading = true;
             getAllData.then(setData).then(transformDataSet).then(function() {
 
-                getParentProjectId($scope.currentModule.parent.id).then(function(parentProjectId) {
+                orgUnitHelper.getParentProjectId($scope.currentModule.parent.id).then(function(parentProjectId) {
                     orgUnitRepository.get(parentProjectId).then(function(orgUnit) {
                         var project = orgUnitMapper.mapToProject(orgUnit);
                         $scope.projectIsAutoApproved = (project.autoApprove === "true");

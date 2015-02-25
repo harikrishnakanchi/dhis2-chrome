@@ -1,10 +1,13 @@
 /*global Date:true*/
-define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "approvalHelper", "systemSettingRepository"],
-    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ApprovalHelper, SystemSettingRepository) {
+define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository",
+        "approvalHelper", "systemSettingRepository", "orgUnitHelper"
+    ],
+    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository,
+        ApprovalHelper, SystemSettingRepository, OrgUnitHelper) {
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, db, q, location, anchorScroll, aggregateDataEntryController, rootScope, approvalStore,
                 saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getLevelOneApprovalDataSpy, getLevelTwoApprovalDataSpy, getDataValuesSpy,
-                orgUnits, window, approvalStoreSpy, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, systemSettingRepository;
+                orgUnits, window, approvalStoreSpy, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, systemSettingRepository, orgUnitHelper;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -24,6 +27,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 dataRepository = new DataRepository();
                 approvalDataRepository = new ApprovalDataRepository();
                 approvalHelper = new ApprovalHelper();
+                orgUnitHelper = new OrgUnitHelper();
 
                 scope.currentModule = {
                     id: 'mod2',
@@ -162,7 +166,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     open: function(object) {}
                 };
 
-                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
+                spyOn(orgUnitHelper, "getParentProjectId").and.returnValue(utils.getPromise(q, {}));
+                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, orgUnitHelper);
             }));
 
             afterEach(function() {
@@ -284,7 +289,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(hustle, "publish");
                 spyOn(scope.dataentryForm, '$setPristine');
 
-                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
+                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, orgUnitHelper);
 
                 scope.submit();
                 scope.$apply();
@@ -310,7 +315,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(hustle, "publish");
                 spyOn(scope.dataentryForm, '$setPristine');
 
-                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
+                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, orgUnitHelper);
 
                 scope.saveAsDraft();
                 scope.$apply();
@@ -334,7 +339,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     result: utils.getPromise(q, {})
                 });
 
-                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
+                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, orgUnitHelper);
 
 
                 scope.$apply();
@@ -349,7 +354,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(hustle, "publish");
 
 
-                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
+                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, orgUnitHelper);
 
                 scope.submit();
                 scope.$apply();
@@ -367,7 +372,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
                 spyOn(hustle, "publish").and.returnValue(saveErrorPromise);
 
-                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
+                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, orgUnitHelper);
 
                 scope.submit();
                 scope.$apply();
@@ -890,6 +895,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should delete approvals if data is edited", function() {
+
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
                 spyOn(approvalHelper, "unapproveData");
 
@@ -899,7 +905,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 };
 
                 var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db,
-                    dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
+                    dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, orgUnitHelper);
 
                 scope.submit();
                 scope.$apply();
