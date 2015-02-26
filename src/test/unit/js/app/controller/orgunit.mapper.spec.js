@@ -1,4 +1,4 @@
-define(["orgUnitMapper", "angularMocks", "moment", "timecop","dhisId"], function(orgUnitMapper, mocks, moment, timecop,dhisId) {
+define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], function(orgUnitMapper, mocks, moment, timecop, dhisId) {
     describe("orgUnitMapper", function() {
         beforeEach(function() {
             Timecop.install();
@@ -158,7 +158,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop","dhisId"], function
                 "level": "2",
             };
 
-            spyOn(dhisId, "get").and.callFake(function(name){
+            spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
 
@@ -255,7 +255,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop","dhisId"], function
                     },
                     "value": "2011-01-01"
                 }]
-            };             
+            };
 
             expect(result).toEqual(expectedResult);
         });
@@ -281,7 +281,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop","dhisId"], function
 
             var today = new Date("2010-01-01T00:00:00");
             spyOn(window, "Date").and.returnValue(today);
-            spyOn(dhisId, "get").and.callFake(function(name){
+            spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
 
@@ -483,7 +483,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop","dhisId"], function
                         "code": "isDisabled",
                         "name": "Is Disabled"
                     },
-                    "value": false
+                    "value": "false"
                 }],
             };
 
@@ -496,7 +496,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop","dhisId"], function
                         "code": "isDisabled",
                         "name": "Is Disabled"
                     },
-                    "value": true
+                    "value": "true"
                 }],
             };
 
@@ -522,7 +522,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop","dhisId"], function
                         "code": "isDisabled",
                         "name": "Is Disabled"
                     },
-                    "value": true
+                    "value": "true"
                 }],
             }, {
                 "name": "Module2",
@@ -533,7 +533,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop","dhisId"], function
                         "code": "isDisabled",
                         "name": "Is Disabled"
                     },
-                    "value": true
+                    "value": "true"
                 }],
             }];
 

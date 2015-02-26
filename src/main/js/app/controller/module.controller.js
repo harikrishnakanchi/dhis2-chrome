@@ -54,7 +54,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                         "code": "isDisabled"
                     }
                 });
-                $scope.isDisabled = isDisabled && isDisabled.value;
+                $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
             };
 
             var getAllAggregateDatasets = function() {

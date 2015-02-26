@@ -10,7 +10,7 @@
                     <li class="form-group">
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label">Module name</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="Module Name" ng-model="module.name" not-in="allModules" ng-disabled="isDisabled" required>
+                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="Module Name" ng-model="module.name" not-in="allModules" ng-disabled="isDisabled=='true'" required>
                             <div ng-show="form.moduleName{{$index}}.$dirty &amp;&amp; form.moduleName{{$index}}.$invalid">
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
@@ -20,7 +20,7 @@
                     <li class="form-group">
                         <label for="moduleOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="date" max={{thisDate}} name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled" required>
+                            <input type="date" max={{thisDate}} name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled=='true'" required>
                             <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; (form.moduleOpeningDate.$invalid || isAfterMaxDate(module))">
                                 <span ng-show="form.moduleOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
                                 <span ng-show="isAfterMaxDate(module)" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
@@ -47,13 +47,13 @@
                                     <div ng-repeat="section in selectedDataset.sections">
                                         <div class="collapse-head">
                                             <h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">{{section.name}}</h5>
-                                            <input type="checkbox" ng-disabled="isDisabled" ng-change="changeDataElementSelection(section)" ng-model="getSection(selectedDataset, section.id)['isIncluded']">
+                                            <input type="checkbox" ng-disabled="isDisabled=='true'" ng-change="changeDataElementSelection(section)" ng-model="getSection(selectedDataset, section.id)['isIncluded']">
                                         </div>
                                         <div collapse="!isExpanded[section.id]" class="collapse-body">
                                             <ul>
                                                 <li ng-repeat="element in section.dataElements">
                                                     <label>
-                                                        <input type="checkbox" ng-disabled="isDisabled" ng-model="getDataElement(section, element.id)['isIncluded']" ng-change="changeSectionSelection(section)">{{element.formName}}
+                                                        <input type="checkbox" ng-disabled="isDisabled=='true'" ng-model="getDataElement(section, element.id)['isIncluded']" ng-change="changeSectionSelection(section)">{{element.formName}}
                                                     </label>
                                                 </li>
                                             </ul>
@@ -66,8 +66,8 @@
                 </ul>
             </div>
             <input type="button" class="btn btn-main pull-right" ng-click="save(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton()" value="Save" ng-if="isNewMode" />
-            <input type="button" class="btn btn-main pull-right" ng-click="update(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton() || isDisabled || !form.$dirty" value="Update" ng-if="!isNewMode &amp;&amp; !isDisabled" />
-            <input type="button" class="btn btn-main pull-right" ng-click="disable(module)" value="Disable" ng-if="!isNewMode &amp;&amp; !isDisabled" />
+            <input type="button" class="btn btn-main pull-right" ng-click="update(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton() || isDisabled=='true' || !form.$dirty" value="Update" ng-if="!isNewMode &amp;&amp; !(isDisabled=='true')" />
+            <input type="button" class="btn btn-main pull-right" ng-click="disable(module)" value="Disable" ng-if="!isNewMode &amp;&amp; !(isDisabled=='true')" />
         </form>
     </div>
 </div>

@@ -171,7 +171,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                         "code": "isDisabled"
                     }
                 });
-                $scope.isDisabled = isDisabled && isDisabled.value;
+                $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
             }
             orgUnitRepository.getAll().then(function(allOrgUnits) {
                 var parentId = $scope.isNewMode ? $scope.orgUnit.id : $scope.orgUnit.parent.id;

@@ -340,7 +340,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     "attribute": {
                         "code": "isDisabled"
                     },
-                    "value": true
+                    "value": "true"
                 }]
             };
             scope.isNewMode = false;
@@ -741,7 +741,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                         code: 'isDisabled',
                         name: 'Is Disabled'
                     },
-                    value: true
+                    value: "true"
                 }],
                 parent: {
                     name: 'Par1',

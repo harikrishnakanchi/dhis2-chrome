@@ -1,5 +1,5 @@
 /*global Date:true*/
-define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment","dhisId"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment,dhisId) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId) {
     describe("op unit controller", function() {
 
         var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper;
@@ -167,10 +167,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }];
 
             spyOn(location, "hash");
-            spyOn(dhisId, "get").and.callFake(function(name){
+            spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {"data":{"data":[]}}));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
+                "data": {
+                    "data": []
+                }
+            }));
 
             scope.save(opUnits);
             scope.$apply();
@@ -230,7 +234,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "attribute": {
                         "code": "isDisabled"
                     },
-                    "value": true
+                    "value": "true"
                 }, {
                     "attribute": {
                         "code": "hospitalUnitCode"
@@ -277,7 +281,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                         "code": "isDisabled",
                         "name": "Is Disabled"
                     },
-                    "value": true
+                    "value": "true"
                 }],
                 "parent": {
                     "id": "opunit1",
@@ -293,7 +297,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                         "code": "isDisabled",
                         "name": "Is Disabled"
                     },
-                    "value": true
+                    "value": "true"
                 }]
             }];
             var expectedHustleMessage = {
@@ -374,7 +378,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             spyOn(location, "hash");
 
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {"data":{"data":[]}}));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
+                "data": {
+                    "data": []
+                }
+            }));
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
 
             scope.update(opUnits);

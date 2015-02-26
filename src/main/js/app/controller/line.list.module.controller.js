@@ -80,7 +80,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                         "code": "isDisabled"
                     }
                 });
-                $scope.isDisabled = isDisabled && isDisabled.value;
+                $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
                 $scope.updateDisabled = $scope.isDisabled;
             };
 

@@ -315,7 +315,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "attribute": {
                         "code": "isDisabled"
                     },
-                    "value": true
+                    "value": "true"
                 }]
             };
             scope.isNewMode = false;
@@ -530,8 +530,8 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             scope.disable(module);
             scope.$apply();
 
-            expect(disablesAttInDb.value).toEqual(true);
-            expect(disableAttrInHustle.value).toEqual(true);
+            expect(disablesAttInDb.value).toEqual("true");
+            expect(disableAttrInHustle.value).toEqual("true");
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(module, "disabledModule");
         });
 

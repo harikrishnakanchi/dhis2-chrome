@@ -97,7 +97,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "code": "isDisabled",
                 "name": "Is Disabled"
             },
-            value: true
+            value: "true"
         };
 
         var disableOrgUnit = function(orgUnit) {
@@ -201,7 +201,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             }
         };
     };
-    
+
     var isOfType = function(orgUnit, type) {
         return _.any(orgUnit.attributeValues, {
             attribute: {
