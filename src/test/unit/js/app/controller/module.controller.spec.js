@@ -538,24 +538,98 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var section = {
                 'id': "sec1",
                 "dataElements": [{
-                    'id': "test1"
+                    'id': "test1",
+                    'isIncluded': false
                 }, {
-                    'id': "test2"
+                    'id': "test2",
+                    'isIncluded': false
                 }, {
-                    'id': "test3"
+                    'id': "test3",
+                    'isIncluded': false
                 }]
             };
 
             var expectedSection = {
                 id: 'sec1',
                 dataElements: [{
-                    id: 'test1'
+                    'id': "test1",
+                    'isIncluded': false
                 }, {
-                    id: 'test2'
+                    'id': "test2",
+                    'isIncluded': false
                 }, {
-                    id: 'test3'
+                    'id': "test3",
+                    'isIncluded': false
                 }],
                 isIncluded: false
+            };
+
+            scope.changeSectionSelection(section);
+            expect(section).toEqual(expectedSection);
+        });
+
+        it("should de-select the section if even one of the data elements under it are de-selected", function() {
+            var section = {
+                'id': "sec1",
+                "dataElements": [{
+                    'id': "test1",
+                    'isIncluded': true
+                }, {
+                    'id': "test2",
+                    'isIncluded': true
+                }, {
+                    'id': "test3",
+                    'isIncluded': false
+                }]
+            };
+
+            var expectedSection = {
+                id: 'sec1',
+                dataElements: [{
+                    'id': "test1",
+                    'isIncluded': true
+                }, {
+                    'id': "test2",
+                    'isIncluded': true
+                }, {
+                    'id': "test3",
+                    'isIncluded': false
+                }],
+                isIncluded: false
+            };
+
+            scope.changeSectionSelection(section);
+            expect(section).toEqual(expectedSection);
+        });
+
+        it("should select the section if all the data elements under it are selected", function() {
+            var section = {
+                'id': "sec1",
+                "dataElements": [{
+                    'id': "test1",
+                    'isIncluded': true
+                }, {
+                    'id': "test2",
+                    'isIncluded': true
+                }, {
+                    'id': "test3",
+                    'isIncluded': true
+                }]
+            };
+
+            var expectedSection = {
+                id: 'sec1',
+                dataElements: [{
+                    'id': "test1",
+                    'isIncluded': true
+                }, {
+                    'id': "test2",
+                    'isIncluded': true
+                }, {
+                    'id': "test3",
+                    'isIncluded': true
+                }],
+                isIncluded: true
             };
 
             scope.changeSectionSelection(section);

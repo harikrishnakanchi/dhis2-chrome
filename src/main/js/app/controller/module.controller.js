@@ -224,8 +224,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.changeSectionSelection = function(section) {
-            section.isIncluded = _.any(section.dataElements, {
-                "isIncluded": true
+            section.isIncluded = !_.any(section.dataElements, {
+                "isIncluded": false
             });
         };
 
