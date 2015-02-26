@@ -94,29 +94,33 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
 
         this.getAllLevelTwoApprovalData = function(orgUnits, dataSets) {
             var transform = function(dataApprovalStateResponses) {
+                var approvalStatusOrder = {
+                    "UNAPPROVED_READY": 0,
+                    "APPROVED_ABOVE": 1,
+                    "APPROVED_HERE": 1,
+                    "ACCEPTED_HERE": 2
+                };
 
                 var approvalDataGroupedByPeriodAndOu = _.groupBy(dataApprovalStateResponses, function(approvalData) {
                     return [approvalData.period.id, approvalData.organisationUnit.id];
                 });
 
                 return _.transform(approvalDataGroupedByPeriodAndOu, function(acc, groupedItems) {
-
                     var isApproved = false;
                     var isAccepted = false;
 
-                    _.each(groupedItems, function(item) {
-                        switch (item.state) {
-                            case "APPROVED_HERE":
-                            case "APPROVED_ELSEWHERE":
-                                isApproved = true;
-                                break;
-                            case "ACCEPTED_HERE":
-                            case "ACCEPTED_ELSEWHERE":
-                                isApproved = true;
-                                isAccepted = true;
-                                break;
-                        }
-                    });
+                    var itemAtLowestApprovalLevel = _.minWhile(groupedItems, "state", approvalStatusOrder);
+
+                    switch (itemAtLowestApprovalLevel.state) {
+                        case "APPROVED_ABOVE":
+                        case "APPROVED_HERE":
+                            isApproved = true;
+                            break;
+                        case "ACCEPTED_HERE":
+                            isApproved = true;
+                            isAccepted = true;
+                            break;
+                    }
 
                     if (isApproved || isAccepted)
                         acc.push({

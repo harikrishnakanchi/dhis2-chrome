@@ -162,7 +162,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             expect(actualApprovalData).toEqual(expectedApprovalData);
         });
 
-        it("should get level two approval data", function() {
+        it("should get level two approval data by considering the lowest approval level of associated datasets", function() {
             var startDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
             var endDate = moment().format("YYYY-MM-DD");
 
@@ -177,7 +177,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     "organisationUnit": {
                         "id": "ou1"
                     },
-                    "state": "APPROVED_ELSEWHERE",
+                    "state": "APPROVED_ABOVE",
                     "createdByUsername": "msfadmin",
                     "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": false,
@@ -194,7 +194,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     "organisationUnit": {
                         "id": "ou1"
                     },
-                    "state": "APPROVED_ELSEWHERE",
+                    "state": "APPROVED_ABOVE",
                     "createdByUsername": "msfadmin",
                     "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": false,
@@ -245,7 +245,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     "organisationUnit": {
                         "id": "ou1"
                     },
-                    "state": "ACCEPTED_ELSEWHERE",
+                    "state": "ACCEPTED_HERE",
                     "createdByUsername": "msfadmin",
                     "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": true,
@@ -286,7 +286,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     "mayUnaccept": true
                 }]
             };
-            
+
             httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&ds=d1&ds=d2&endDate=" + endDate + "&ou=ou1&ou=ou2&pe=Weekly&startDate=" + startDate).respond(200, dhisApprovalData);
 
             var actualApprovalData;
@@ -317,11 +317,6 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "orgUnit": "ou1",
                 "isApproved": true,
                 "isAccepted": true
-            }, {
-                "period": "2014W05",
-                "orgUnit": "ou1",
-                "isApproved": true,
-                "isAccepted": false
             }];
 
             expect(actualApprovalData).toEqual(expectedApprovalData);
