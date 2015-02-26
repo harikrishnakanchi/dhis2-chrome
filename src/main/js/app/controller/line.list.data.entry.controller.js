@@ -229,38 +229,49 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                 });
         };
 
-        $scope.submit = function(programId) {
+        var save = function(programId) {
+            var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
+            var currentModule = $scope.currentModule.id;
+
             var saveToDhis = function() {
                 return $hustle.publish({
                     "type": "uploadProgramEvents"
                 }, "dataValues");
             };
 
-            var showResultMessage = function() {
-                $scope.resultMessageType = "success";
-                $scope.resultMessage = $scope.resourceBundle.eventSubmitSuccess;
-                scrollToTop();
-                reloadEventsView();
-
-                $timeout(hideMessage, properties.messageTimeout);
-            };
-
             var unapproveData = function(data) {
-                var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
                 return approvalHelper.unapproveData($scope.currentModule.id, _.keys($scope.currentGroupedSections), period);
             };
 
-            var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
-            var currentModule = $scope.currentModule.id;
-
             return programEventRepository.markEventsAsSubmitted(programId, period, currentModule)
-                .then(unapproveData)
-                .then(saveToDhis)
-                .then(showResultMessage);
+                .then(unapproveData).then(saveToDhis).then(function(data) {
+                    return {
+                        "dataSets": _.keys($scope.currentGroupedSections),
+                        "period": period,
+                        "orgUnit": $scope.currentModule.id,
+                        "storedBy": $scope.currentUser.userCredentials.username
+                    };
+                });
+        };
+
+        var showResultMessage = function(messageType, message) {
+            $scope.resultMessageType = messageType;
+            $scope.resultMessage = message;
+            scrollToTop();
+            reloadEventsView();
+
+            $timeout(hideMessage, properties.messageTimeout);
+        };
+
+        $scope.submit = function(programId) {
+            return save(programId).then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitSuccess));
         };
 
         $scope.submitAndApprove = function(programId) {
-            console.log("in submit and approve");
+            return save(programId)
+                .then(approvalHelper.markDataAsComplete)
+                .then(approvalHelper.markDataAsAccepted)
+                .then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitAndApproveSuccess));
         };
 
         $scope.deleteEvent = function(event) {

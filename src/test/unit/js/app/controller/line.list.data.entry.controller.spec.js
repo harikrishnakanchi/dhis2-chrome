@@ -96,6 +96,17 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         'id': 'par1'
                     }
                 };
+                scope.currentUser = {
+                    "firstName": "foo",
+                    "lastName": "bar",
+                    "userCredentials": {
+                        "username": "dataentryuser",
+                        "userRoles": [{
+                            "id": "hxNB8lleCsl",
+                            "name": 'Data Entry User'
+                        }]
+                    }
+                };
 
                 event1 = {
                     event: 'event1',
@@ -491,6 +502,45 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 }, 'dataValues');
                 expect(scope.resultMessageType).toEqual("success");
                 expect(scope.resultMessage).toEqual("Event submitted succesfully");
+                expect(location.hash).toHaveBeenCalled();
+            });
+
+            it("should submit and auto approve event details", function() {
+                var approvalPayload = {
+                    dataSets: ['Vacc'],
+                    period: '2014W44',
+                    orgUnit: 'currentModuleId',
+                    storedBy: 'dataentryuser'
+                };
+
+                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
+                spyOn(location, "hash");
+
+                scope.resourceBundle = {
+                    "eventSubmitAndApproveSuccess": "Event(s) submitted and auto-approved successfully."
+                };
+
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalHelper, "unapproveData").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalHelper, "markDataAsComplete").and.returnValue(utils.getPromise(q, approvalPayload));
+                spyOn(approvalHelper, "markDataAsAccepted").and.returnValue(utils.getPromise(q, approvalPayload));
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitHelper, orgUnitRepository, approvalHelper);
+                scope.$apply();
+                scope.year = "2014";
+
+                scope.submitAndApprove("Prg1");
+                scope.$apply();
+
+                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("Prg1", "2014W44", "currentModuleId");
+                expect(approvalHelper.unapproveData).toHaveBeenCalledWith('currentModuleId', ["Vacc"], "2014W44");
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    type: 'uploadProgramEvents'
+                }, 'dataValues');
+                expect(approvalHelper.markDataAsComplete).toHaveBeenCalledWith(approvalPayload);
+                expect(approvalHelper.markDataAsAccepted).toHaveBeenCalledWith(approvalPayload);
+                expect(scope.resultMessageType).toEqual("success");
+                expect(scope.resultMessage).toEqual("Event(s) submitted and auto-approved successfully.");
                 expect(location.hash).toHaveBeenCalled();
             });
 
