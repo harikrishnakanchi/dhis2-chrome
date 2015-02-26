@@ -1,7 +1,7 @@
 <div ng-controller="opUnitController">
     <div class="top-actions" ng-if="!isNewMode">
-        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Module" ng-if="!isDisabled" ng-click="openInNewMode('Module')" />
-        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Linelist Module" ng-if="!isDisabled" ng-click="openInNewMode('LineListModule')" />
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Module" ng-if="!(isDisabled==true)" ng-click="openInNewMode('Module')" />
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Linelist Module" ng-if="!(isDisabled==true)" ng-click="openInNewMode('LineListModule')" />
     </div>
     <div class="panel panel-default">
 
@@ -23,22 +23,22 @@
                             <div class="col-sm-8 col-md-8 form-inline">
                                 <div class="radio-inline">
                                     <label for="hospital{{$index+1}}">
-                                        <input type="radio" ng-model="opUnit.type" id="hospital{{$index+1}}" value="Hospital" ng-disabled="isDisabled=='true'" required> Hospital </label>
+                                        <input type="radio" ng-model="opUnit.type" id="hospital{{$index+1}}" value="Hospital" ng-disabled="isDisabled==true" required> Hospital </label>
                                 </div>
                                 <div class="radio-inline">
                                     <label for="healthcenter{{$index+1}}">
-                                        <input type="radio" ng-model="opUnit.type" id="healthcenter{{$index+1}}" value="Health Center" ng-disabled="isDisabled=='true'" required> Health Center </label>
+                                        <input type="radio" ng-model="opUnit.type" id="healthcenter{{$index+1}}" value="Health Center" ng-disabled="isDisabled==true" required> Health Center </label>
                                 </div>
                                 <div class="radio-inline">
                                     <label for="community{{$index+1}}">
-                                        <input type="radio" ng-model="opUnit.type" id="community{{$index+1}}" value="Community" ng-disabled="isDisabled=='true'" required> Community </label>
+                                        <input type="radio" ng-model="opUnit.type" id="community{{$index+1}}" value="Community" ng-disabled="isDisabled==true" required> Community </label>
                                 </div>
                             </div>
                         </li>
                         <li class="form-group">
                             <label for="opUnitName" class="col-sm-4 col-md-4 control-label">Name of the unit</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control" name="opUnitName{{$index}}" id="opUnitName{{$index}}" placeholder="Operation Unit Name" ng-model="opUnit.name" not-in="allOpunitNames" ng-disabled="isDisabled=='true'" required />
+                                <input type="text" class="form-control" name="opUnitName{{$index}}" id="opUnitName{{$index}}" placeholder="Operation Unit Name" ng-model="opUnit.name" not-in="allOpunitNames" ng-disabled="isDisabled==true" required />
                                 <div ng-show="form.opUnitName{{$index}}.$dirty &amp;&amp; form.opUnitName{{$index}}.$invalid">
                                     <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                     <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
@@ -48,7 +48,7 @@
                         <li class="form-group">
                             <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label">Hospital Unit Code</label>
                             <div class="col-sm-6 col-md-6">
-                                <select type="text" class="form-control" name="hospitalUnitCode" id="hospitalUnitCode" ng-model="opUnit.hospitalUnitCode" title="{{newOrgUnit.hospitalUnitCode}}" ng-options="h as h for h in hospitalUnitCodes" ng-disabled="isDisabled=='true'">
+                                <select type="text" class="form-control" name="hospitalUnitCode" id="hospitalUnitCode" ng-model="opUnit.hospitalUnitCode" title="{{newOrgUnit.hospitalUnitCode}}" ng-options="h as h for h in hospitalUnitCodes" ng-disabled="isDisabled==true">
                                     <option value=""></option>
                                 </select>
                             </div>
@@ -56,8 +56,8 @@
                     </ul>
                 </div>
                 <input type="submit" class="btn btn-main pull-right" ng-disabled="form.$invalid" ng-if="isNewMode" value="Save" />
-                <input type="button" class="btn btn-main pull-right" ng-disabled="form.$invalid || !form.$dirty" ng-if="!isNewMode &amp;&amp; !(isDisabled=='true')" ng-click="update(opUnits) " value="Update " />
-                <input type="button " class="btn btn-main pull-right " ng-click="disable(orgUnit) " value="Disable " ng-if="!isNewMode &amp;&amp; !(isDisabled=='true' ) " />
+                <input type="button" class="btn btn-main pull-right" ng-disabled="form.$invalid || !form.$dirty" ng-if="!isNewMode &amp;&amp; !(isDisabled==true)" ng-click="update(opUnits) " value="Update " />
+                <input type="button " class="btn btn-main pull-right " ng-click="disable(orgUnit) " value="Disable " ng-if="!isNewMode &amp;&amp; !(isDisabled==true ) " />
             </form>
         </div>
     </div>
