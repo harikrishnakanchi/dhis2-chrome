@@ -1,6 +1,6 @@
 define(["lodash"], function(_) {
     _.unionBy = function(lists, key) {
-        return _.uniq(_.flatten(lists), key);
+        return _.uniq(_.flatten(_.without(lists, undefined)), key);
     };
 
     _.xorBy = function(list1, list2, key) {

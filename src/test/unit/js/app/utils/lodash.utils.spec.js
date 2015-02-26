@@ -1,6 +1,34 @@
 define(["lodashUtils"], function(_) {
     describe("lodashUtils", function() {
-        it("should do a union of two lists based on callback", function() {
+        it("should do a union of lists based on callback", function() {
+            var list1 = [{
+                "id": 1,
+                "name": "n1"
+            }, {
+                "id": 2,
+                "name": "n2"
+            }];
+            var list2 = [{
+                "id": 3,
+                "name": "n3"
+            }, {
+                "id": 2,
+                "name": "n2"
+            }];
+            var list3 = [{
+                "id": 4,
+                "name": "n3"
+            }, {
+                "id": 3,
+                "name": "n2"
+            }];
+
+            var actualResult = _.unionBy([list1, list2, list3], "id");
+
+            expect(actualResult).toEqual([list1[0], list1[1], list2[0], list3[0]]);
+        });
+
+        it("should ignore undefined lists while doing a union", function() {
             var list1 = [{
                 "id": 1,
                 "name": "n1"
@@ -16,7 +44,7 @@ define(["lodashUtils"], function(_) {
                 "name": "n2"
             }];
 
-            var actualResult = _.unionBy([list1, list2], "id");
+            var actualResult = _.unionBy([list1, undefined, list2], "id");
 
             expect(actualResult).toEqual([list1[0], list1[1], list2[0]]);
         });
