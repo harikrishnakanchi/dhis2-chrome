@@ -25,8 +25,8 @@ define(["lodash"], function(_) {
         _.each(allDatasets, function(dataset) {
             dataset.dataElements = [];
             dataset.sections = _.map(groupedSections[dataset.id], function(section) {
-                section.isIncluded = _.any(section.dataElements, {
-                    "isIncluded": true
+                section.isIncluded = !_.any(section.dataElements, {
+                    "isIncluded": false
                 });
                 return section;
             });
