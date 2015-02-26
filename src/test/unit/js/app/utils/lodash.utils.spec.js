@@ -145,26 +145,26 @@ define(["lodashUtils"], function(_) {
 
             it("should return first occurence of minimum object from a collection based on given custom order object", function() {
                 var collection = [{
-                    "name": "Engineer Level 1",
-                    "designation": "Engineer Level 1"
+                    "name": "Junior Manager Dept 1",
+                    "designation": "Junior Manager Dept 1"
                 }, {
-                    "name": "Consultant Level 1",
-                    "designation": "Consultant Level 1"
+                    "name": "Junior Manager Dept 2",
+                    "designation": "Junior Manager Dept 2"
                 }, {
-                    "name": "Engineer Level 2",
-                    "designation": "Engineer Level 2"
+                    "name": "Manager Dept 1",
+                    "designation": "Manager Dept 1"
                 }, {
-                    "name": "Consultant Level 3",
-                    "designation": "Consultant Level 3"
+                    "name": "Senior Manager Dept 1",
+                    "designation": "Senior Manager Dept 1"
                 }];
 
                 var customOrderOfDesignations = {
-                    "Engineer Level 1": 1,
-                    "Consultant Level 1": 1,
-                    "Engineer Level 2": 2,
-                    "Consultant Level 2": 2,
-                    "Engineer Level 3": 3,
-                    "Consultant Level 3": 3
+                    "Junior Manager Dept 1": 1,
+                    "Junior Manager Dept 2": 1,
+                    "Manager Dept 1": 2,
+                    "Manager Dept 2": 2,
+                    "Senior Manager Dept 1": 3,
+                    "Senior Manager Dept 2": 3
                 };
 
                 var expectedResult = collection[0];
