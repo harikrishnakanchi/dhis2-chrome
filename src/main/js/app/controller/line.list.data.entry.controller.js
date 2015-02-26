@@ -1,6 +1,6 @@
 define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSections", "datasetTransformer"], function(_, moment, dhisId, properties, orgUnitMapper, groupSections, datasetTransformer) {
     return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepository,
-        orgUnitHelper, orgUnitRepository, approvalHelper) {
+        orgUnitHelper, orgUnitRepository, approvalHelper, approvalDataRepository) {
 
         var resetForm = function() {
             $scope.numberPattern = "^[1-9][0-9]*$";
@@ -49,10 +49,13 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             return loadSystemSettings().then(setDataElements);
         };
 
+        var getPeriod = function() {
+            return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
+        };
+
         var reloadEventsView = function() {
-            var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
             $scope.allEvents = [];
-            programEventRepository.getEventsFor($scope.programsInCurrentModule, period, $scope.currentModule.id).then(function(events) {
+            programEventRepository.getEventsFor($scope.programsInCurrentModule, getPeriod(), $scope.currentModule.id).then(function(events) {
                 $scope.allEvents = $scope.allEvents.concat(events);
             });
         };
@@ -230,7 +233,7 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
         };
 
         var save = function(programId) {
-            var period = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
+            var period = getPeriod();
             var currentModule = $scope.currentModule.id;
 
             var saveToDhis = function() {
@@ -264,14 +267,29 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
         };
 
         $scope.submit = function(programId) {
-            return save(programId).then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitSuccess));
+            if ($scope.isCompleted || $scope.isApproved) {
+                showModal(function() {
+                    save(programId).then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitSuccess));
+                }, $scope.resourceBundle.reapprovalConfirmationMessage);
+            } else {
+                save(programId).then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitSuccess));
+            }
         };
 
         $scope.submitAndApprove = function(programId) {
-            return save(programId)
-                .then(approvalHelper.markDataAsComplete)
-                .then(approvalHelper.markDataAsAccepted)
-                .then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitAndApproveSuccess));
+            if ($scope.isCompleted || $scope.isApproved) {
+                showModal(function() {
+                    save(programId)
+                        .then(approvalHelper.markDataAsComplete)
+                        .then(approvalHelper.markDataAsAccepted)
+                        .then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitAndApproveSuccess));
+                }, $scope.resourceBundle.reapprovalConfirmationMessage);
+            } else {
+                save(programId)
+                    .then(approvalHelper.markDataAsComplete)
+                    .then(approvalHelper.markDataAsAccepted)
+                    .then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitAndApproveSuccess));
+            }
         };
 
         $scope.deleteEvent = function(event) {
@@ -409,6 +427,16 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                 });
             };
 
+            var setUpIsApprovedFlag = function() {
+                approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                    $scope.isCompleted = !_.isEmpty(data);
+                });
+
+                return approvalDataRepository.getLevelTwoApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                    $scope.isApproved = !_.isEmpty(data) && data.isApproved;
+                });
+            };
+
             var getAllData = function() {
                 var dataSetPromise = getAll('dataSets');
                 var sectionPromise = getAll("sections");
@@ -422,7 +450,7 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             setUpNewForm();
             $scope.loading = true;
 
-            setUpProjectAutoApprovedFlag().then(getAllData).then(function(data) {
+            setUpProjectAutoApprovedFlag().then(setUpIsApprovedFlag).then(getAllData).then(function(data) {
                 var dataSets = data[0];
                 var groupedSections = groupSections.enrichGroupedSections(data);
                 var datasetsAssociatedWithModule = _.pluck(datasetTransformer.getAssociatedDatasets($scope.currentModule.id, dataSets), 'id');
