@@ -104,25 +104,21 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
                     var isApproved = false;
                     var isAccepted = false;
 
-                    var dataSets = [];
-
                     _.each(groupedItems, function(item) {
                         switch (item.state) {
                             case "APPROVED_HERE":
                             case "APPROVED_ELSEWHERE":
                                 isApproved = true;
-                                dataSets.push(item.dataSet);
                                 break;
                             case "ACCEPTED_HERE":
                             case "ACCEPTED_ELSEWHERE":
                                 isApproved = true;
                                 isAccepted = true;
-                                dataSets.push(item.dataSet);
                                 break;
                         }
                     });
 
-                    if (!_.isEmpty(dataSets) && (isApproved || isAccepted))
+                    if (isApproved || isAccepted)
                         acc.push({
                             'period': _.pluck(groupedItems, 'period')[0].id,
                             'orgUnit': _.pluck(groupedItems, 'organisationUnit')[0].id,
