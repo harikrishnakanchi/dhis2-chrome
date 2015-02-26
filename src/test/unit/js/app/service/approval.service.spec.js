@@ -286,6 +286,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     "mayUnaccept": true
                 }]
             };
+            
             httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&ds=d1&ds=d2&endDate=" + endDate + "&ou=ou1&ou=ou2&pe=Weekly&startDate=" + startDate).respond(200, dhisApprovalData);
 
             var actualApprovalData;
@@ -299,46 +300,29 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             var expectedApprovalData = [{
                 "period": "2014W01",
                 "orgUnit": "ou1",
-                "dataSets": ["d1", "d2"],
                 "isApproved": true,
-                "isAccepted": false,
-                "createdByUsername": "msfadmin",
-                "createdDate": "2014-07-21T12:08:05.311+0000"
+                "isAccepted": false
             }, {
                 "period": "2014W02",
                 "orgUnit": "ou1",
-                "dataSets": ["d1"],
                 "isApproved": true,
-                "isAccepted": false,
-                "createdByUsername": "msfadmin",
-                "createdDate": "2014-07-21T12:08:05.311+0000"
+                "isAccepted": false
             }, {
                 "period": "2014W03",
                 "orgUnit": "ou1",
-                "dataSets": ["d1"],
                 "isApproved": true,
-                "isAccepted": true,
-                "createdByUsername": "msfadmin",
-                "createdDate": "2014-07-21T12:08:05.311+0000"
+                "isAccepted": true
             }, {
                 "period": "2014W04",
                 "orgUnit": "ou1",
-                "dataSets": ["d1"],
                 "isApproved": true,
-                "isAccepted": true,
-                "createdByUsername": "msfadmin",
-                "createdDate": "2014-07-21T12:08:05.311+0000"
+                "isAccepted": true
             }, {
                 "period": "2014W05",
                 "orgUnit": "ou1",
-                "dataSets": ["d2"],
                 "isApproved": true,
-                "isAccepted": false,
-                "createdByUsername": "msfadmin",
-                "createdDate": "2014-07-21T12:08:05.311+0000"
+                "isAccepted": false
             }];
-
-
 
             expect(actualApprovalData).toEqual(expectedApprovalData);
         });
@@ -356,7 +340,6 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
             expect(status).toBe(500);
         });
-
 
         it("should return a failure http promise if download all data fails", function() {
             httpBackend.expectGET().respond(500, {});

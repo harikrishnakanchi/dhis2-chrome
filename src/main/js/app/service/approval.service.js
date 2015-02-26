@@ -103,8 +103,6 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
 
                     var isApproved = false;
                     var isAccepted = false;
-                    var createdBy;
-                    var createdOn;
 
                     var dataSets = [];
 
@@ -114,16 +112,12 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
                             case "APPROVED_ELSEWHERE":
                                 isApproved = true;
                                 dataSets.push(item.dataSet);
-                                createdBy = item.createdByUsername;
-                                createdOn = item.createdDate;
                                 break;
                             case "ACCEPTED_HERE":
                             case "ACCEPTED_ELSEWHERE":
                                 isApproved = true;
                                 isAccepted = true;
                                 dataSets.push(item.dataSet);
-                                createdBy = item.createdByUsername;
-                                createdOn = item.createdDate;
                                 break;
                         }
                     });
@@ -132,11 +126,8 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
                         acc.push({
                             'period': _.pluck(groupedItems, 'period')[0].id,
                             'orgUnit': _.pluck(groupedItems, 'organisationUnit')[0].id,
-                            'dataSets': _.pluck(dataSets, 'id'),
                             "isApproved": isApproved,
-                            "isAccepted": isAccepted,
-                            "createdByUsername": createdBy,
-                            "createdDate": createdOn
+                            "isAccepted": isAccepted
                         });
                 }, []);
             };
@@ -152,7 +143,6 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
 
             var endDate = moment().format("YYYY-MM-DD");
             var startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
-
 
             return $http.get(dhisUrl.approvalStatus, {
                 "params": {
