@@ -1,6 +1,6 @@
 define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSections", "datasetTransformer"], function(_, moment, dhisId, properties, orgUnitMapper, groupSections, datasetTransformer) {
     return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepository,
-        orgUnitRepository, approvalHelper, approvalDataRepository) {
+        orgUnitRepository, approvalHelper, approvalDataRepository, datasetRepository) {
 
         var resetForm = function() {
             $scope.numberPattern = "^[1-9][0-9]*$";
@@ -243,13 +243,13 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             };
 
             var unapproveData = function(data) {
-                return approvalHelper.unapproveData($scope.currentModule.id, _.keys($scope.currentGroupedSections), period);
+                return approvalHelper.unapproveData($scope.currentModule.id, $scope.dataSetIds, period);
             };
 
             return programEventRepository.markEventsAsSubmitted(programId, period, currentModule)
                 .then(unapproveData).then(saveToDhis).then(function(data) {
                     return {
-                        "dataSets": _.keys($scope.currentGroupedSections),
+                        "dataSets": $scope.dataSetIds,
                         "period": period,
                         "orgUnit": $scope.currentModule.id,
                         "storedBy": $scope.currentUser.userCredentials.username
@@ -435,24 +435,15 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                 });
             };
 
-            var getAllData = function() {
-                var dataSetPromise = getAll('dataSets');
-                var sectionPromise = getAll("sections");
-                var dataElementsPromise = getAll("dataElements");
-                var comboPromise = getAll("categoryCombos");
-                var categoriesPromise = getAll("categories");
-                var categoryOptionCombosPromise = getAll("categoryOptionCombos");
-                return $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise]);
+            var getAllAssociatedDataSets = function() {
+                return datasetRepository.getAllForOrgUnit($scope.currentModule.id);
             };
 
             setUpNewForm();
             $scope.loading = true;
 
-            setUpProjectAutoApprovedFlag().then(setUpIsApprovedFlag).then(getAllData).then(function(data) {
-                var dataSets = data[0];
-                var groupedSections = groupSections.enrichGroupedSections(data);
-                var datasetsAssociatedWithModule = _.pluck(datasetTransformer.getAssociatedDatasets($scope.currentModule.id, dataSets), 'id');
-                $scope.currentGroupedSections = _.pick(groupedSections, datasetsAssociatedWithModule);
+            setUpProjectAutoApprovedFlag().then(setUpIsApprovedFlag).then(getAllAssociatedDataSets).then(function(dataSets) {
+                $scope.dataSetIds = _.pluck(dataSets, "id");
             }).finally(function() {
                 $scope.loading = false;
             });
