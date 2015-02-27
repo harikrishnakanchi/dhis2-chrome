@@ -266,30 +266,44 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             $timeout(hideMessage, properties.messageTimeout);
         };
 
+        var setUpIsApprovedFlag = function() {
+            approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                $scope.isCompleted = !_.isEmpty(data);
+            });
+
+            return approvalDataRepository.getLevelTwoApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                $scope.isApproved = !_.isEmpty(data) && data.isApproved;
+            });
+        };
+
         $scope.submit = function(programId) {
-            if ($scope.isCompleted || $scope.isApproved) {
-                showModal(function() {
+            setUpIsApprovedFlag().then(function() {
+                if ($scope.isCompleted || $scope.isApproved) {
+                    showModal(function() {
+                        save(programId).then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitSuccess));
+                    }, $scope.resourceBundle.reapprovalConfirmationMessage);
+                } else {
                     save(programId).then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitSuccess));
-                }, $scope.resourceBundle.reapprovalConfirmationMessage);
-            } else {
-                save(programId).then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitSuccess));
-            }
+                }
+            });
         };
 
         $scope.submitAndApprove = function(programId) {
-            if ($scope.isCompleted || $scope.isApproved) {
-                showModal(function() {
+            setUpIsApprovedFlag().then(function() {
+                if ($scope.isCompleted || $scope.isApproved) {
+                    showModal(function() {
+                        save(programId)
+                            .then(approvalHelper.markDataAsComplete)
+                            .then(approvalHelper.markDataAsAccepted)
+                            .then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitAndApproveSuccess));
+                    }, $scope.resourceBundle.reapprovalConfirmationMessage);
+                } else {
                     save(programId)
                         .then(approvalHelper.markDataAsComplete)
                         .then(approvalHelper.markDataAsAccepted)
                         .then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitAndApproveSuccess));
-                }, $scope.resourceBundle.reapprovalConfirmationMessage);
-            } else {
-                save(programId)
-                    .then(approvalHelper.markDataAsComplete)
-                    .then(approvalHelper.markDataAsAccepted)
-                    .then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitAndApproveSuccess));
-            }
+                }
+            });
         };
 
         $scope.deleteEvent = function(event) {
@@ -422,16 +436,6 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                 return orgUnitRepository.getParentProject($scope.currentModule.id).then(function(orgUnit) {
                     var project = orgUnitMapper.mapToProject(orgUnit);
                     $scope.projectIsAutoApproved = (project.autoApprove === "true");
-                });
-            };
-
-            var setUpIsApprovedFlag = function() {
-                approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
-                    $scope.isCompleted = !_.isEmpty(data);
-                });
-
-                return approvalDataRepository.getLevelTwoApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
-                    $scope.isApproved = !_.isEmpty(data) && data.isApproved;
                 });
             };
 
