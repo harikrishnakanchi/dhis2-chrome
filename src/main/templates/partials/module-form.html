@@ -23,7 +23,7 @@
                             <input type="date" max={{thisDate}} name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" required>
                             <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; (form.moduleOpeningDate.$invalid || isAfterMaxDate(module))">
                                 <span ng-show="form.moduleOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
-                                <span ng-show="isAfterMaxDate(module)" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
+                                <span ng-show="form.moduleOpeningDate.$invalid" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
                             </div>
                         </div>
                     </li>
