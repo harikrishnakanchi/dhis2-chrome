@@ -117,8 +117,7 @@ require.config({
         "approvalHelper": "app/helpers/approval.helper",
         "orgUnitGroupHelper": "app/helpers/orgunit.group.helper",
         "metadataImporter": "app/helpers/metadata.importer",
-        "sessionHelper": "app/helpers/session.helper",
-        "orgUnitHelper": "app/helpers/orgunit.helper"
+        "sessionHelper": "app/helpers/session.helper"
     },
     shim: {
         "ng-i18n": {

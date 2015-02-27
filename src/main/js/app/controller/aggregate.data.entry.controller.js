@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
     return function($scope, $routeParams, $q, $hustle, db, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
-        $timeout, orgUnitRepository, approvalHelper, orgUnitHelper) {
+        $timeout, orgUnitRepository, approvalHelper) {
 
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -319,11 +319,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $scope.loading = true;
             getAllData.then(setData).then(transformDataSet).then(function() {
 
-                orgUnitHelper.getParentProjectId($scope.currentModule.parent.id).then(function(parentProjectId) {
-                    orgUnitRepository.get(parentProjectId).then(function(orgUnit) {
-                        var project = orgUnitMapper.mapToProject(orgUnit);
-                        $scope.projectIsAutoApproved = (project.autoApprove === "true");
-                    });
+                orgUnitRepository.getParentProject($scope.currentModule.id).then(function(orgUnit) {
+                    var project = orgUnitMapper.mapToProject(orgUnit);
+                    $scope.projectIsAutoApproved = (project.autoApprove === "true");
                 });
 
                 approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {

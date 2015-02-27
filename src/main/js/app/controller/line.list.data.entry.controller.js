@@ -1,6 +1,6 @@
 define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSections", "datasetTransformer"], function(_, moment, dhisId, properties, orgUnitMapper, groupSections, datasetTransformer) {
     return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepository,
-        orgUnitHelper, orgUnitRepository, approvalHelper, approvalDataRepository) {
+        orgUnitRepository, approvalHelper, approvalDataRepository) {
 
         var resetForm = function() {
             $scope.numberPattern = "^[1-9][0-9]*$";
@@ -419,11 +419,9 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             };
 
             var setUpProjectAutoApprovedFlag = function() {
-                return orgUnitHelper.getParentProjectId($scope.currentModule.parent.id).then(function(parentProjectId) {
-                    orgUnitRepository.get(parentProjectId).then(function(orgUnit) {
-                        var project = orgUnitMapper.mapToProject(orgUnit);
-                        $scope.projectIsAutoApproved = (project.autoApprove === "true");
-                    });
+                return orgUnitRepository.getParentProject($scope.currentModule.id).then(function(orgUnit) {
+                    var project = orgUnitMapper.mapToProject(orgUnit);
+                    $scope.projectIsAutoApproved = (project.autoApprove === "true");
                 });
             };
 

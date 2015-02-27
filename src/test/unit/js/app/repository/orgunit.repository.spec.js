@@ -914,5 +914,91 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             scope.$apply();
             expect(actualOrgUnits).toEqual(expectedOrgUnits);
         });
+
+        it('should get parent project', function() {
+            var project = {
+                "id": "1",
+                "name": "Prj1",
+                "parent": {
+                    "id": "countryId"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Project"
+                }]
+            };
+
+            var opUnit = {
+                "id": "2",
+                "name": "Opunit1",
+                "parent": {
+                    "id": "1"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Operation Unit"
+                }]
+            };
+
+            var module = {
+                "id": "3",
+                "name": "Mod1",
+                "parent": {
+                    "id": "1"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Module"
+                }]
+            };
+
+            var getMockStore = function(q) {
+                return {
+                    "find": function() {}
+                };
+            };
+
+            var getMockDB = function(q) {
+                var mockStore = getMockStore(q);
+                var db = {
+                    "objectStore": jasmine.createSpy("objectStore").and.callFake(function() {
+                        return mockStore;
+                    })
+                };
+
+                return {
+                    "db": db,
+                    "objectStore": mockStore
+                };
+            };
+
+            var mockDb = getMockDB(q);
+            spyOn(mockDb.objectStore, 'find').and.callFake(function(id) {
+                if (id === "1")
+                    return utils.getPromise(q, project);
+                if (id === "2")
+                    return utils.getPromise(q, opUnit);
+                if (id === "3") {
+                    return utils.getPromise(q, module);
+                }
+                return utils.getPromise(q, {});
+            });
+
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, programRepository, q);
+
+            var result;
+            orgUnitRepository.getParentProject("3").then(function(data) {
+                result = data;
+            });
+            scope.$apply();
+
+            expect(result).toBe(project);
+        });
     });
 });

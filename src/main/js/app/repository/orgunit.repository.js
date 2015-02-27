@@ -247,6 +247,17 @@ define(["moment", "lodashUtils"], function(moment, _) {
                 .then(mapProjectCode);
         };
 
+        var getParentProject = function(orgUnitId) {
+            return get(orgUnitId).then(function(orgUnit) {
+                if (isOfType(orgUnit, 'Project')) {
+                    return orgUnit;
+                } else {
+                    return getParentProject(orgUnit.parent.id);
+                }
+            });
+        };
+
+
         return {
             "upsert": upsert,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
@@ -256,7 +267,8 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "findAllByParent": findAllByParent,
             "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
             "getProjectAndOpUnitAttributes": getProjectAndOpUnitAttributes,
-            "getAllProjects": getAllProjects
+            "getAllProjects": getAllProjects,
+            "getParentProject": getParentProject
         };
     };
 });
