@@ -196,5 +196,7 @@ gulp.task('download-metadata', function() {
 });
 
 gulp.task('pack', ['less', 'config', 'download-metadata', 'download-systemSettings'], function() {
-    shell(["./scripts/crxmake.sh ./src/main key.pem " + "dhis2_" + (argv.env || "dev")]);
+    var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "dhis2_" + (argv.env || "dev")]);
+    stream.write(process.stdout);
+    return stream;
 });
