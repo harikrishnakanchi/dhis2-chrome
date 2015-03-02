@@ -58,7 +58,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
         });
 
         it("should get last updated period if data is present in indexedDB", function() {
-            var periodSevenWeeksAgo = moment().subtract(7, 'weeks').format("GGGG[W]W");
+            var periodSevenWeeksAgo = moment().subtract(7, 'weeks').format("GGGG[W]WW");
 
             var allEvents = [{
                 'event': 'event_1',
@@ -130,13 +130,13 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
 
             var actualEvents;
-            programEventRepository.getEventsFromPeriod('2014W40').then(function(events) {
+            programEventRepository.getEventsFromPeriod('2014W4').then(function(events) {
                 actualEvents = events;
             });
 
             scope.$apply();
 
-            expect(mockStore.each.calls.argsFor(0)[0].betweenX).toEqual("2014W40");
+            expect(mockStore.each.calls.argsFor(0)[0].betweenX).toEqual("2014W04");
             expect(mockStore.each.calls.argsFor(0)[0].betweenY).toEqual(moment().format("GGGG[W]W"));
 
             expect(actualEvents).toEqual(listOfEvents);
@@ -228,7 +228,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
 
             var enrichedEvents;
-            programEventRepository.getEventsFor("p1", "2014W01", "mod1").then(function(data) {
+            programEventRepository.getEventsFor("p1", "2014W1", "mod1").then(function(data) {
                 enrichedEvents = data;
             });
             scope.$apply();
@@ -296,7 +296,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
 
-            programEventRepository.markEventsAsSubmitted("programId", "2014W07", "orgId");
+            programEventRepository.markEventsAsSubmitted("programId", "2014W7", "orgId");
             scope.$apply();
 
             var expectedPayload = [{

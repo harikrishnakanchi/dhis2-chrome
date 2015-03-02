@@ -1,10 +1,9 @@
 define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, properties, dateUtils) {
     return function(db, $q) {
-
         this.upsert = function(eventsPayload) {
             var updatePeriod = function(eventsPayload) {
                 _.each(eventsPayload.events, function(event) {
-                    event.period = event.period || moment(event.eventDate).format("GGGG[W]W");
+                    event.period = event.period || moment(event.eventDate).format("GGGG[W]WW");
                 });
                 return eventsPayload;
             };
@@ -25,9 +24,9 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
         };
 
         this.getEventsFromPeriod = function(startPeriod) {
-            var endPeriod = moment().format("GGGG[W]W");
+            var endPeriod = moment().format("GGGG[W]WW");
             var store = db.objectStore('programEvents');
-            var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
+            var query = db.queryBuilder().$between(dateUtils.getFormattedPeriod(startPeriod), endPeriod).$index("by_period").compile();
             return store.each(query);
         };
 
@@ -51,7 +50,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
         this.markEventsAsSubmitted = function(programId, period, orgUnit) {
             var getEvents = function() {
                 var store = db.objectStore('programEvents');
-                var query = db.queryBuilder().$eq([programId, period, orgUnit]).$index("by_program_period_orgunit").compile();
+                var query = db.queryBuilder().$eq([programId, dateUtils.getFormattedPeriod(period), orgUnit]).$index("by_program_period_orgunit").compile();
                 return store.each(query);
             };
 
@@ -129,7 +128,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
                 };
 
                 var store = db.objectStore('programEvents');
-                var query = db.queryBuilder().$eq([programId, period, orgUnit]).$index("by_program_period_orgunit").compile();
+                var query = db.queryBuilder().$eq([programId, dateUtils.getFormattedPeriod(period), orgUnit]).$index("by_program_period_orgunit").compile();
                 return store.each(query).then(excludeSoftDeletedEvents);
             };
 

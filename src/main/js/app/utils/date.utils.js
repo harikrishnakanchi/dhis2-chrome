@@ -3,6 +3,10 @@ define(["moment", "lodash"], function(moment, _) {
         return m.format("GGGG[W]WW");
     };
 
+    var getFormattedPeriod = function(period) {
+        return moment(period, "GGGG[W]W").format("GGGG[W]WW");
+    };
+
     var max = function(dateStrings) {
         var epochs = function(d) {
             return moment(d).valueOf();
@@ -13,6 +17,7 @@ define(["moment", "lodash"], function(moment, _) {
 
     return {
         "toDhisFormat": toDhisFormat,
-        "max": max
+        "max": max,
+        "getFormattedPeriod": getFormattedPeriod
     };
 });
