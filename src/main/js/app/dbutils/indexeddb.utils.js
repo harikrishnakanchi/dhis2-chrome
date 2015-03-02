@@ -1,6 +1,7 @@
 define(["lodash", "migrations"], function(_, migrations) {
     return function(db, $q) {
         var hustleDBVersion = 5001;
+        var msfLogsDBVersion = 5001;
 
         var backupStores = function(storeNames) {
             var backupPromises = _.map(storeNames, function(name) {
@@ -50,6 +51,16 @@ define(["lodash", "migrations"], function(_, migrations) {
             });
         };
 
+        var backupLogs = function() {
+            db.switchDB("msfLogs", msfLogsDBVersion);
+            return backupDB().then(function(logsData) {
+                db.switchDB("msf", migrations.length);
+                return {
+                    "msfLogs": logsData
+                };
+            });
+        };
+
         var restore = function(backupData) {
             var restoreDB = function(data) {
                 var storeNames = _.keys(data);
@@ -92,7 +103,8 @@ define(["lodash", "migrations"], function(_, migrations) {
         return {
             "backupEntireDB": backupEntireDB,
             "backupStores": backupStores,
-            "restore": restore
+            "restore": restore,
+            "backupLogs": backupLogs
         };
     };
 });

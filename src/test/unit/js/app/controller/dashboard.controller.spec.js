@@ -472,5 +472,31 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             expect(sessionHelper.logout).toHaveBeenCalled();
             expect(location.path).toHaveBeenCalledWith('#/login');
         });
+
+        it("should dump logs to a file", function() {
+            var logsContent = {
+                "logs": "foo bar"
+            };
+
+            spyOn(indexeddbUtils, "backupLogs").and.returnValue(utils.getPromise(q, logsContent));
+            var expectedFileContents = JSON.stringify(logsContent) + "\nchecksum: " + md5(JSON.stringify(logsContent));
+            spyOn(filesystemService, "writeFile").and.returnValue(utils.getPromise(q, {
+                "name": "Desktop"
+            }));
+
+            scope.resourceBundle = {
+                "createCloneSuccessMessage": "Clone created successfully at "
+            };
+
+            scope.dumpLogs();
+
+            scope.$apply();
+
+            expect(indexeddbUtils.backupLogs).toHaveBeenCalled();
+            expect(filesystemService.writeFile).toHaveBeenCalledWith('logs_dump_20140530-124354.logs', expectedFileContents,
+                'application/json');
+
+            expect(scope.showMessage).toBeTruthy();
+        });
     });
 });

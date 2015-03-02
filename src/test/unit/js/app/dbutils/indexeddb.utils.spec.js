@@ -92,6 +92,25 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             scope.$digest();
         });
 
+        it("should create a backup of logs database", function() {
+            var dbInfo = {
+                "objectStores": [{
+                    "name": "logs"
+                }]
+            };
+            db.dbInfo.and.returnValue(utils.getPromise(q, dbInfo));
+
+            var expectedBackup = {
+                "msfLogs": getExpectedBackupResult(["logs"])
+            };
+
+            indexeddbUtils.backupLogs().then(function(actualBackup) {
+                expect(actualBackup).toEqual(expectedBackup);
+            });
+
+            scope.$digest();
+        });
+
         var getExpectedBackupResult = function(storeNames) {
             return _.zipObject(storeNames, _.times(storeNames.length, function() {
                 return allResult;

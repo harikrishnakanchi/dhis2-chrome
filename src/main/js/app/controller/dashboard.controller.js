@@ -193,26 +193,12 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
             if (level === 3) return "Desk Level";
         };
 
+        $scope.dumpLogs = function() {
+            saveIdbBackup("logs_dump_", ".logs", indexeddbUtils.backupLogs);
+        };
+
         $scope.createClone = function() {
-            $scope.cloning = true;
-            var errorCallback = function(error) {
-                displayMessage($scope.resourceBundle.createCloneErrorMessage + error.name, true);
-            };
-
-            var successCallback = function(directory) {
-                displayMessage($scope.resourceBundle.createCloneSuccessMessage + directory.name, false);
-            };
-
-            var addChecksum = function(data) {
-                return data + "\nchecksum: " + md5(data);
-            };
-
-            indexeddbUtils.backupEntireDB().then(function(data) {
-                var cloneFileName = "dhis_idb_" + moment().format("YYYYMMDD-HHmmss") + ".clone";
-                var cloneFileContents = addChecksum(JSON.stringify(data));
-                $scope.cloning = false;
-                filesystemService.writeFile(cloneFileName, cloneFileContents, "application/json").then(successCallback, errorCallback);
-            });
+            saveIdbBackup("dhis_idb_", ".clone", indexeddbUtils.backupEntireDB);
         };
 
         $scope.loadClone = function() {
@@ -245,6 +231,28 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
             showModal(function() {
                 filesystemService.readFile(["clone"]).then(successCallback, errorCallback);
             }, $scope.resourceBundle.loadCloneConfirmationMessage);
+        };
+
+        var saveIdbBackup = function(fileNamePrefix, fileNameExtn, backupCallback) {
+            $scope.cloning = true;
+            var errorCallback = function(error) {
+                displayMessage($scope.resourceBundle.createCloneErrorMessage + error.name, true);
+            };
+
+            var successCallback = function(directory) {
+                displayMessage($scope.resourceBundle.createCloneSuccessMessage + directory.name, false);
+            };
+
+            var addChecksum = function(data) {
+                return data + "\nchecksum: " + md5(data);
+            };
+
+            backupCallback().then(function(data) {
+                var cloneFileName = fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + fileNameExtn;
+                var cloneFileContents = addChecksum(JSON.stringify(data));
+                $scope.cloning = false;
+                filesystemService.writeFile(cloneFileName, cloneFileContents, "application/json").then(successCallback, errorCallback);
+            });
         };
 
         var displayMessage = function(messageText, isErrorMessage) {
