@@ -26,6 +26,9 @@ define(['lodash', 'overrides'], function(_, overrides) {
         "queue": {
             "maxretries": 5
         },
+        "logging": {
+            "maxAgeinDays": 30
+        },
         "messageTimeout": 5000,
         "devMode": true,
         "weeksForAutoApprove": 8,
