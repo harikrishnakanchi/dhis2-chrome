@@ -5,7 +5,10 @@ define(["lodash", "moment", "dhisUrl"], function(_, moment, dhisUrl) {
             var onSuccess = function(response) {
                 if (_.isEmpty(response.data))
                     return [];
-                return response.data.dataValues;
+                return _.map(response.data.dataValues, function(dataValue) {
+                    dataValue.period = moment(dataValue.period, "GGGG[W]W").format("GGGG[W]WW");
+                    return dataValue;
+                });
             };
 
             return $http.get(dhisUrl.dataValueSets, {

@@ -27,11 +27,11 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                 }
             };
 
-            period = "2014W14";
+            period = "2014W4";
             domain = [{
                 "dataElement": "DE_Oedema",
                 "categoryOptionCombo": "32",
-                "period": "2014W14",
+                "period": "2014W04",
                 "orgUnit": "company_0",
                 "storedBy": "user",
                 "formula": "1+2",
@@ -39,7 +39,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
             }, {
                 "dataElement": "DE_Oedema",
                 "categoryOptionCombo": "33",
-                "period": "2014W14",
+                "period": "2014W04",
                 "orgUnit": "company_0",
                 "storedBy": "user",
                 "formula": "12",
@@ -47,7 +47,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
             }, {
                 "dataElement": "DE_MLT115",
                 "categoryOptionCombo": "32",
-                "period": "2014W14",
+                "period": "2014W04",
                 "orgUnit": "company_0",
                 "storedBy": "user",
                 "formula": "49",
@@ -55,7 +55,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
             }, {
                 "dataElement": "DE_MLT115",
                 "categoryOptionCombo": "37",
-                "period": "2014W14",
+                "period": "2014W04",
                 "orgUnit": "company_0",
                 "storedBy": "user",
                 "formula": "67",

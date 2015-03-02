@@ -45,7 +45,7 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
 
             var dataValues = [{
                 "dataElement": "b9634a78271",
-                "period": "2014W18",
+                "period": "2014W8",
                 "orgUnit": "c484c99b86d",
                 "categoryOptionCombo": "h48rgCOjDTg",
                 "value": "12",
@@ -66,7 +66,17 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
             });
 
             httpBackend.flush();
-            expect(actualDataValues).toEqual(dataValues);
+
+            var expectedPayload = [{
+                "dataElement": "b9634a78271",
+                "period": "2014W08",
+                "orgUnit": "c484c99b86d",
+                "categoryOptionCombo": "h48rgCOjDTg",
+                "value": "12",
+                "storedBy": "service.account",
+                "followUp": false
+            }];
+            expect(actualDataValues).toEqual(expectedPayload);
         });
 
 

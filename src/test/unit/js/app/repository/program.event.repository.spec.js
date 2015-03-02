@@ -77,12 +77,12 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             expect(mockStore.getAll).toHaveBeenCalled();
 
-            var periodEightWeeksAgo = moment().subtract(properties.projectDataSync.numWeeksToSync, 'weeks').format("GGGG[W]W");
+            var periodEightWeeksAgo = moment().subtract(properties.projectDataSync.numWeeksToSync, 'weeks').format("GGGG[W]WW");
             expect(lastUpdatedPeriod).toEqual(periodEightWeeksAgo);
         });
 
         it("should get last updated period from indexedDB if data was synched 8 weeks ago", function() {
-            var periodNineWeeksAgo = moment().subtract(9, 'weeks').format("GGGG[W]W");
+            var periodNineWeeksAgo = moment().subtract(9, 'weeks').format("GGGG[W]WW");
 
             var allEvents = [{
                 'event': 'event_1',

@@ -1,7 +1,7 @@
 define(["moment", "properties", "lodash"], function(moment, properties, _) {
     return function(dataService, dataRepository) {
         var preparePayload = function(dataValues) {
-            var period = dataValues[0].period;
+            var period = moment(dataValues[0].period, 'GGGG[W]W').format('GGGG[W]WW');
             var orgUnit = dataValues[0].orgUnit;
             return dataRepository.getDataValues(period, orgUnit);
         };

@@ -4,7 +4,7 @@ define(["moment"], function(moment) {
             return _.map(values, function(dataValue, categoryOptionComboId) {
                 return {
                     "dataElement": dataElement,
-                    "period": period,
+                    "period": moment(period, "GGGG[W]W").format("GGGG[W]WW"),
                     "orgUnit": orgUnit,
                     "storedBy": storedBy,
                     "categoryOptionCombo": categoryOptionComboId,
