@@ -1,23 +1,35 @@
-define([], function() {
+define(["moment", "lodash"], function(moment, _) {
     return function(db) {
+        var modifiedPayload = function(payload) {
+            payload = _.isArray(payload) ? payload : [payload];
+            return _.map(payload, function(datum) {
+                datum.period = moment(datum.period, "GGGG[W]W").format("GGGG[W]WW");
+                return datum;
+            });
+        };
+
+        var getFormattedPeriod = function(period) {
+            return moment(period, "GGGG[W]W").format("GGGG[W]WW");
+        };
+
         this.saveLevelOneApproval = function(payload) {
             var store = db.objectStore("completedDataSets");
-            return store.upsert(payload);
+            return store.upsert(modifiedPayload(payload));
         };
 
         this.saveLevelTwoApproval = function(payload) {
             var store = db.objectStore("approvedDataSets");
-            return store.upsert(payload);
+            return store.upsert(modifiedPayload(payload));
         };
 
         this.deleteLevelOneApproval = function(period, orgUnitId) {
             var store = db.objectStore("completedDataSets");
-            return store.delete([period, orgUnitId]);
+            return store.delete([getFormattedPeriod(period), orgUnitId]);
         };
 
         this.deleteLevelTwoApproval = function(period, orgUnitId) {
             var store = db.objectStore("approvedDataSets");
-            return store.delete([period, orgUnitId]);
+            return store.delete([getFormattedPeriod(period), orgUnitId]);
         };
 
         this.getLevelOneApprovalData = function(period, orgUnitId, shouldFilterSoftDeletes) {
@@ -26,7 +38,7 @@ define([], function() {
             };
 
             var store = db.objectStore('completedDataSets');
-            return store.find([period, orgUnitId]).then(filterSoftDeletedApprovals);
+            return store.find([getFormattedPeriod(period), orgUnitId]).then(filterSoftDeletedApprovals);
         };
 
         this.unapproveLevelOneData = function(period, orgUnit) {
@@ -62,12 +74,12 @@ define([], function() {
             };
 
             var store = db.objectStore('approvedDataSets');
-            return store.find([period, orgUnitId]).then(filterSoftDeletedApprovals);
+            return store.find([getFormattedPeriod(period), orgUnitId]).then(filterSoftDeletedApprovals);
         };
 
         this.getLevelOneApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
             var store = db.objectStore('completedDataSets');
-            var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
+            var query = db.queryBuilder().$between(getFormattedPeriod(startPeriod), getFormattedPeriod(endPeriod)).$index("by_period").compile();
             return store.each(query).then(function(approvalData) {
                 return _.filter(approvalData, function(ad) {
                     return _.contains(orgUnits, ad.orgUnit);
@@ -77,7 +89,7 @@ define([], function() {
 
         this.getLevelTwoApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
             var store = db.objectStore('approvedDataSets');
-            var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
+            var query = db.queryBuilder().$between(getFormattedPeriod(startPeriod), getFormattedPeriod(endPeriod)).$index("by_period").compile();
             return store.each(query).then(function(approvalData) {
                 return _.filter(approvalData, function(ad) {
                     return _.contains(orgUnits, ad.orgUnit);
