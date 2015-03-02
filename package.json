@@ -9,7 +9,6 @@
         "gulp-karma": "*",
         "gulp-protractor": "*",
         "gulp-rename": "*",
-        "crx": "~2.0.0",
         "gulp-preprocess": "*",
         "gulp-cat": "*",
         "fs": "*",

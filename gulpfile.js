@@ -14,7 +14,6 @@ var webserver;
 var fs = require('fs');
 var rename = require('gulp-rename');
 var path = require('path');
-var ChromeExtension = require("crx");
 var preprocess = require("gulp-preprocess");
 var cat = require("gulp-cat");
 var baseUrl = argv.url || "http://localhost:8080";
@@ -197,11 +196,5 @@ gulp.task('download-metadata', function() {
 });
 
 gulp.task('pack', ['less', 'config', 'download-metadata', 'download-systemSettings'], function() {
-    var crx = new ChromeExtension({
-        rootDirectory: "src/main",
-        privateKey: fs.readFileSync("key.pem")
-    });
-    return crx.pack().then(function(buf) {
-        fs.writeFile("dhis2_" + (argv.env || "dev") + ".crx", buf);
-    });
+    shell(["./scripts/crxmake.sh ./src/main key.pem " + "dhis2_" + (argv.env || "dev")]);
 });
