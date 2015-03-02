@@ -76,7 +76,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             var deferred = Q.defer();
             var injector = angular.bootstrap(document, ['DHIS2_TEST']);
             deferred.resolve([injector, appInit]);
-            console.debug("bootstrapping background app");
             return deferred.promise;
         };
 

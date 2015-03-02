@@ -5,7 +5,7 @@ define(["lodash"], function(_) {
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer) {
 
         this.run = function(message) {
-            console.debug("Processing message: " + message.data.type);
+            console.log("Processing message: " + message.data.type);
             switch (message.data.type) {
                 case "downloadMetadata":
                     return downloadMetadataConsumer.run(message);

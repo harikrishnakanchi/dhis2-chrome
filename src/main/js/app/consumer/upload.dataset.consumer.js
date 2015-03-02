@@ -5,7 +5,6 @@ define([], function() {
         };
 
         this.run = function(message) {
-            console.debug("Associating datasets to orgunits: ", message.data.data);
             return retrieveFromIDB(message.data.data).then(datasetService.associateDataSetsToOrgUnit);
         };
     };

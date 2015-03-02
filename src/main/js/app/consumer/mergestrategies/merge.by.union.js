@@ -16,6 +16,7 @@ define(["lodashUtils", "moment"], function(_, moment) {
             var localItem = groupedLocalItems[remoteItem.id];
             if (isMergeRequired(remoteItem, localItem)) {
                 var mergedItem = _.cloneDeep(remoteItem);
+                console.debug("Merging " + fieldToMerge + " from remoteItem: " + remoteItem + " and localItem: " + localItem);
                 mergedItem[fieldToMerge] = mergeFields(remoteItem, localItem);
                 acc.push(mergedItem);
             } else {

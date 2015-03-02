@@ -37,8 +37,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         if (!dhisMonitor.isOnline())
                             return;
 
-                        console.log("Starting metadata sync");
-
                         $hustle.publish({
                             "type": "downloadMetadata"
                         }, "dataValues");
@@ -71,8 +69,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     var projectDataSync = function() {
                         if (!dhisMonitor.isOnline())
                             return;
-
-                        console.log("Starting project data sync");
 
                         $hustle.publish({
                             "type": "downloadData"
@@ -120,7 +116,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             var deferred = Q.defer();
             var injector = angular.bootstrap(angular.element(document.querySelector('#dhis2')), ['DHIS2']);
             deferred.resolve([injector, appInit]);
-            console.debug("bootstrapping background app");
             return deferred.promise;
         };
 

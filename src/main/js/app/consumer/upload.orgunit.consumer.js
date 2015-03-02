@@ -8,7 +8,6 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
 
         this.run = function(message) {
             var orgUnits = _.isArray(message.data.data) ? message.data.data : [message.data.data];
-            console.debug("uploading orgs : " + orgUnits);
             return retrieveFromIDB(orgUnits).then(orgUnitService.upsert);
         };
     };

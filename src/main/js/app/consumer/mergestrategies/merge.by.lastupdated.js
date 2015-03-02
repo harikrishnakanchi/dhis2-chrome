@@ -20,6 +20,7 @@ define(["lodashUtils", "moment"], function(_, moment) {
             if (indexOfLocalItemInMergedList >= 0) {
                 var remoteItem = mergedList[indexOfLocalItemInMergedList];
                 if (!isLocalDataStale(remoteItem, localItem)) {
+                    console.debug("Retaining localItem: " + localItem + " as it is newer than remoteItem: " + remoteItem);
                     mergedList[indexOfLocalItemInMergedList] = localItem;
                 }
             } else {

@@ -1,7 +1,7 @@
 define(["properties"], function(properties) {
     var create = function(hustle) {
         return function(message, data) {
-            console.debug("retrying message: id", message.id, "releases:", message.releases);
+            console.log("Retry " + message.releases + " for message: ", message);
             var isRequestTimeout = data && data.status === 0;
             if (isRequestTimeout) {
                 return hustle.Queue.put(message.data, {

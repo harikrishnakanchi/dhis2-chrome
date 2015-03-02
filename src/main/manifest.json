@@ -12,7 +12,7 @@
             "page": "background.html"
         }
     },
-    "permissions": ["alarms", "https://*/", "http://*/", {
+    "permissions": ["alarms", "unlimitedStorage", "https://*/", "http://*/", {
         "fileSystem": ["write", "retainEntries", "directory"]
     }]
 }

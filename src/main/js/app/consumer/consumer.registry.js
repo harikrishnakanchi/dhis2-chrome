@@ -3,10 +3,10 @@ define([], function() {
         var allConsumers = [];
 
         this.register = function() {
-            console.debug("registering allconsumers", allConsumers);
+            console.log("registering allconsumers", allConsumers);
             return $q.all([$hustle.registerConsumer(dispatcher.run, "dataValues")]).then(function(data) {
                 allConsumers = data;
-                console.debug("registered allconsumers", allConsumers);
+                console.log("registered allconsumers", allConsumers);
             });
         };
 
@@ -14,14 +14,14 @@ define([], function() {
             for (var index in allConsumers) {
                 allConsumers[index].start();
             }
-            console.debug("started allconsumers", allConsumers);
+            console.log("started allconsumers", allConsumers);
         };
 
         this.stopAllConsumers = function() {
             for (var index in allConsumers) {
                 allConsumers[index].stop();
             }
-            console.debug("stopped allconsumers", allConsumers);
+            console.log("stopped allconsumers", allConsumers);
         };
     };
 });
