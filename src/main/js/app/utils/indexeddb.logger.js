@@ -85,7 +85,7 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
             return getItemsToDelete()
                 .then(deleteThem)
                 .then(function() {
-                    return logDb
+                    return logDb;
                 });
         };
 
