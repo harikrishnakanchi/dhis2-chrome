@@ -1,4 +1,4 @@
-define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
+define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer, properties) {
     return function($scope, $routeParams, $q, $hustle, db, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, approvalHelper) {
 
@@ -267,6 +267,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             return dataValues[id][option];
         };
 
+        $scope.isDataEntryAllowed = function() {
+            return moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
+        };
+
         var scrollToTop = function() {
             $location.hash();
             $anchorScroll();
@@ -303,7 +307,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $scope.groupedSections = groupSections.enrichGroupedSections(data);
             return data;
         };
-
 
         var init = function() {
             var dataSetPromise = getAll('dataSets');

@@ -911,5 +911,16 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(dataRepository.save).toHaveBeenCalled();
                 expect(approvalHelper.unapproveData).toHaveBeenCalledWith('mod2', ["ds1", "ds2"], "2014W14");
             });
+
+            it("should not allow data entry if selected week is beyond configured week", function() {
+                scope.week = {
+                    "startOfWeek": "2014-02-02",
+                    "weekNumber": 05,
+                    "weekYear": 2014
+                };
+
+                expect(scope.isDataEntryAllowed()).toBeFalsy();
+                scope.$apply();
+            });
         });
     });
