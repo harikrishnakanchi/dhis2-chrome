@@ -57,7 +57,9 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
                 "dataValues": dataValues
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=1900-01-01").respond(200, dataValuesFromDhis);
+            var startDate = moment().subtract(8, 'week').format("YYYY-MM-DD");
+
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&endDate=" + today + "&orgUnit=company_0&startDate=" + startDate).respond(200, dataValuesFromDhis);
 
             var actualDataValues;
             var dataService = new DataService(http, q);

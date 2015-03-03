@@ -1,4 +1,4 @@
-define(["lodash", "moment", "dhisUrl"], function(_, moment, dhisUrl) {
+define(["lodash", "moment", "dhisUrl", "properties"], function(_, moment, dhisUrl, properties) {
     return function($http, $q) {
         this.downloadAllData = function(orgUnitIds, dataSetIds) {
             var today = moment().format("YYYY-MM-DD");
@@ -16,7 +16,7 @@ define(["lodash", "moment", "dhisUrl"], function(_, moment, dhisUrl) {
                     "orgUnit": orgUnitIds,
                     "children": true,
                     "dataSet": dataSetIds,
-                    "startDate": "1900-01-01",
+                    "startDate": moment().subtract(properties.projectDataSync.numWeeksToSync, 'week').format("YYYY-MM-DD"),
                     "endDate": today
                 }
             }).then(onSuccess);
