@@ -23,7 +23,7 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                     'eventDate': '2014-09-29'
                 }];
 
-                spyOn(programEventRepository, "getLastUpdatedPeriod").and.returnValue(utils.getPromise(q, "2014W44"));
+                spyOn(programEventRepository, "isDataPresent").and.returnValue(utils.getPromise(q, true));
                 spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, events));
 
                 var dhisEventPayload = {

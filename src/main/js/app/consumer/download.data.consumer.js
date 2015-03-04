@@ -13,7 +13,10 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
                 if (orgUnitIds.length === 0 || allDataSetIds.length === 0)
                     return $q.when([]);
 
-                return dataService.downloadAllData(orgUnitIds, allDataSetIds);
+                return dataRepository.isDataPresent(orgUnitIds).then(function(data) {
+                    var startDate = data ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
+                    return dataService.downloadAllData(orgUnitIds, allDataSetIds, startDate);
+                });
             };
 
             return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAllDatasetIds()])

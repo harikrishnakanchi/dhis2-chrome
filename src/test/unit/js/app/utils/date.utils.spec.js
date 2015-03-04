@@ -28,5 +28,10 @@ define(["dateUtils", "moment", "timecop"], function(dateUtils, moment, timecop) 
             var actualResult = dateUtils.max(timeStrings);
             expect(actualResult).toEqual(moment("2014-05-30T18:00:00.000+0530"));
         });
+
+        it("should subtract the given number of weeks from today's date", function() {
+            var actualResult = dateUtils.subtractWeeks(8);
+            expect(actualResult).toEqual("2014-04-04");
+        });
     });
 });

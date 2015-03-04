@@ -24,7 +24,8 @@ define([], function() {
             "find": jasmine.createSpy("find").and.returnValue(getPromise(q, findResult)),
             "getAll": jasmine.createSpy("getAll").and.returnValue(getPromise(q, allResult)),
             "each": jasmine.createSpy("each").and.returnValue(getPromise(q, eachResult)),
-            "clear": jasmine.createSpy("clear").and.returnValue(getPromise(q, {}))
+            "clear": jasmine.createSpy("clear").and.returnValue(getPromise(q, {})),
+            "exists": jasmine.createSpy("exists").and.returnValue(getPromise(q, {}))
         };
     };
 

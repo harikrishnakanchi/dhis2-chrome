@@ -71,6 +71,34 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             }]);
         });
 
+        it("should return true if events are present for the given orgunitids", function() {
+            mockDB = utils.getMockDB(q);
+            mockStore = mockDB.objectStore;
+            dataRepository = new DataRepository(mockDB.db, q);
+
+            mockStore.exists.and.returnValue(utils.getPromise(q, true));
+
+            dataRepository.isDataPresent(['ou1', 'ou2']).then(function(actualResult) {
+                expect(actualResult).toBeTruthy();
+            });
+
+            scope.$apply();
+        });
+
+        it("should return false if events are not present for the given orgunitids", function() {
+            mockDB = utils.getMockDB(q);
+            mockStore = mockDB.objectStore;
+            dataRepository = new DataRepository(mockDB.db, q);
+
+            mockStore.exists.and.returnValue(utils.getPromise(q, false));
+
+            dataRepository.isDataPresent(['ou1', 'ou2']).then(function(actualResult) {
+                expect(actualResult).toBeFalsy();
+            });
+
+            scope.$apply();
+        });
+
         it("should save data values sent from client as draft", function() {
             dataRepository.saveAsDraft(dataValuesFromClient);
 

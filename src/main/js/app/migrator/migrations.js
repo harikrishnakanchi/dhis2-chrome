@@ -36,6 +36,7 @@ define([], function() {
     var create_datavalues_store = function(db, tx) {
         var dataValueStore = create_store_with_key("dataValues", ["period", "orgUnit"], db);
         create_index(dataValueStore, "by_period", "period", false);
+        create_index(dataValueStore, "by_organisationUnit", "orgUnit", false);
     };
 
     var add_user_store_for_dhis_users = function(db, tx) {
@@ -91,11 +92,6 @@ define([], function() {
         create_index(approvalDataSetsStore, "by_period", "period", false);
     };
 
-    // var add_accepted_datasets_store = function(db, tx) {
-    //     var acceptedDataSetsStore = create_store_with_key("acceptedDataSets", ["period", "orgUnit"], db);
-    //     create_index(acceptedDataSetsStore, "by_period", "period", false);
-    // };
-
     var add_programs_store = function(db, tx) {
         var programStore = create_store_with_key("programs", "id", db);
         create_index(programStore, "by_organisationUnit", "orgUnitIds", false, true);
@@ -110,6 +106,7 @@ define([], function() {
         var programEventsStore = create_store_with_key("programEvents", "event", db);
         create_index(programEventsStore, "by_program_period_orgunit", ["program", "period", "orgUnit"], false);
         create_index(programEventsStore, "by_period", "period", false);
+        create_index(programEventsStore, "by_organisationUnit", "orgUnit", false);
     };
 
     var add_org_unit_group_store = function(db, tx) {
@@ -121,7 +118,7 @@ define([], function() {
         create_index(datasetStore, "by_organisationUnit", "orgUnitIds", false, true);
     };
 
-    var add_indicators_store = function(db, tx){
+    var add_indicators_store = function(db, tx) {
         create_store_with_key("indicators", "id", db);
     };
 

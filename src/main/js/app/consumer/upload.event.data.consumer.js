@@ -1,4 +1,4 @@
-define(["moment"], function(moment) {
+define(["moment", "dateUtils", "properties"], function(moment, dateUtils, properties) {
     return function(eventService, programEventRepository, $q) {
 
         var changeEventLocalStatus = function(eventPayload) {
@@ -13,15 +13,15 @@ define(["moment"], function(moment) {
 
         var uploadEventData = function() {
             var getEvents = function() {
-                return programEventRepository.getLastUpdatedPeriod().then(function(lastUpdatedPeriod) {
-                    return programEventRepository.getEventsFromPeriod(lastUpdatedPeriod).then(function(events) {
+                return programEventRepository.isDataPresent().then(function(areEventsPresent) {
+                    var startDate = areEventsPresent ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
+                    return programEventRepository.getEventsFromPeriod(dateUtils.toDhisFormat(moment(startDate))).then(function(events) {
                         return _.filter(events, function(e) {
                             return e.localStatus === "NEW";
                         });
                     });
                 });
             };
-
             return getEvents().then(function(events) {
                 eventService.upsertEvents({
                     'events': events

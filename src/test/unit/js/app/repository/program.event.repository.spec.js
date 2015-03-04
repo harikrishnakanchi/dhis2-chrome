@@ -57,65 +57,32 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             expect(mockStore.delete).toHaveBeenCalledWith("eventId");
         });
 
-        it("should get last updated period if data is present in indexedDB", function() {
-            var periodSevenWeeksAgo = moment().subtract(7, 'weeks').format("GGGG[W]WW");
-
-            var allEvents = [{
-                'event': 'event_1',
-                'period': periodSevenWeeksAgo
-            }];
-
-            mockDB = utils.getMockDB(q, [], allEvents);
-            mockStore = mockDB.objectStore;
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
-
-            var lastUpdatedPeriod;
-            programEventRepository.getLastUpdatedPeriod().then(function(data) {
-                lastUpdatedPeriod = data;
-            });
-            scope.$apply();
-
-            expect(mockStore.getAll).toHaveBeenCalled();
-
-            var periodEightWeeksAgo = moment().subtract(properties.projectDataSync.numWeeksToSync, 'weeks').format("GGGG[W]WW");
-            expect(lastUpdatedPeriod).toEqual(periodEightWeeksAgo);
-        });
-
-        it("should get last updated period from indexedDB if data was synched 8 weeks ago", function() {
-            var periodNineWeeksAgo = moment().subtract(9, 'weeks').format("GGGG[W]WW");
-
-            var allEvents = [{
-                'event': 'event_1',
-                'period': periodNineWeeksAgo
-            }];
-
-            mockDB = utils.getMockDB(q, [], allEvents);
-            mockStore = mockDB.objectStore;
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
-
-            var lastUpdatedPeriod;
-            programEventRepository.getLastUpdatedPeriod().then(function(data) {
-                lastUpdatedPeriod = data;
-            });
-            scope.$apply();
-
-            expect(mockStore.getAll).toHaveBeenCalled();
-            expect(lastUpdatedPeriod).toEqual(periodNineWeeksAgo);
-        });
-
-        it("should get last updated period if no data is present in indexedDB", function() {
+        it("should return true if events are present for the given orgunitids", function() {
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
-            var lastUpdatedPeriod;
 
-            programEventRepository.getLastUpdatedPeriod().then(function(data) {
-                lastUpdatedPeriod = data;
+            mockStore.exists.and.returnValue(utils.getPromise(q, true));
+
+            programEventRepository.isDataPresent(['ou1', 'ou2']).then(function(actualResult) {
+                expect(actualResult).toBeTruthy();
             });
-            scope.$apply();
 
-            expect(mockStore.getAll).toHaveBeenCalled();
-            expect(lastUpdatedPeriod).toEqual('1900W01');
+            scope.$apply();
+        });
+
+        it("should return false if events are not present for the given orgunitids", function() {
+            mockDB = utils.getMockDB(q);
+            mockStore = mockDB.objectStore;
+            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+
+            mockStore.exists.and.returnValue(utils.getPromise(q, false));
+
+            programEventRepository.isDataPresent(['ou1', 'ou2']).then(function(actualResult) {
+                expect(actualResult).toBeFalsy();
+            });
+
+            scope.$apply();
         });
 
         it("should get all events from given period", function() {

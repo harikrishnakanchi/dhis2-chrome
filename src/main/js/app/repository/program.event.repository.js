@@ -30,15 +30,11 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             return store.each(query);
         };
 
-        this.getLastUpdatedPeriod = function() {
+        this.isDataPresent = function(orgUnitIds) {
+            var query = orgUnitIds ? db.queryBuilder().$in(orgUnitIds).$index("by_organisationUnit").compile() : db.queryBuilder().$index("by_organisationUnit").compile();
             var store = db.objectStore('programEvents');
-            return store.getAll().then(function(allEvents) {
-                if (_.isEmpty(allEvents)) {
-                    return "1900W01";
-                }
-                var periodXWeeksAgo = dateUtils.toDhisFormat(moment().isoWeek(moment().isoWeek() - (properties.projectDataSync.numWeeksToSync)));
-                var lastUpdatedPeriod = _.first(_.sortBy(allEvents, 'period').reverse()).period;
-                return _.first(_.sortBy([periodXWeeksAgo, lastUpdatedPeriod].reverse()));
+            return store.exists(query).then(function(data) {
+                return data;
             });
         };
 

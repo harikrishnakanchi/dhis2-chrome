@@ -1,5 +1,5 @@
-define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "moment"],
-    function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DatasetRepository, UserPreferenceRepository, moment) {
+define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "moment", "timecop"],
+    function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DatasetRepository, UserPreferenceRepository, moment, timecop) {
         describe("download data consumer", function() {
 
             var dataService, dataRepository, approvalDataRepository, datasetRepository, userPreferenceRepository, q, scope, downloadDataConsumer, message, approvalService;
@@ -7,6 +7,10 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
                 scope = $rootScope.$new();
+                thisMoment = moment("2014-01-01T");
+
+                Timecop.install();
+                Timecop.freeze(thisMoment.toDate());
 
                 userPreferenceRepository = {
                     "getUserModuleIds": jasmine.createSpy("getUserModuleIds").and.returnValue(utils.getPromise(q, ["org_0"]))
@@ -16,11 +20,11 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "getAllDatasetIds": jasmine.createSpy("getAllDatasetIds").and.returnValue(utils.getPromise(q, ["DS_OPD"]))
                 };
 
-                dataRepository = {
-                    "getDataValues": jasmine.createSpy("getDataValues").and.returnValue(utils.getPromise(q, {})),
-                    "getDataValuesForPeriodsOrgUnits": jasmine.createSpy("getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, {})),
-                    "saveDhisData": jasmine.createSpy("saveDhisData")
-                };
+                dataRepository = new DataRepository();
+                spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
+                spyOn(dataRepository, "getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, {}));
+                spyOn(dataRepository, "isDataPresent").and.returnValue(utils.getPromise(q, true));
+                spyOn(dataRepository, "saveDhisData");
 
                 approvalDataRepository = {
                     "getLevelOneApprovalData": jasmine.createSpy("getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {})),
@@ -41,6 +45,11 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 downloadDataConsumer = new DownloadDataConsumer(dataService, dataRepository, datasetRepository, userPreferenceRepository, q, approvalDataRepository);
             }));
 
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
             it("should download data values from dhis based on user preferences and dataset", function() {
                 userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
 
@@ -57,7 +66,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
                 expect(datasetRepository.getAllDatasetIds).toHaveBeenCalled();
-                expect(dataService.downloadAllData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ['ds1']);
+                expect(dataService.downloadAllData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ['ds1'], '2013-10-09');
             });
 
             it("should not download data values if org units is not present", function() {

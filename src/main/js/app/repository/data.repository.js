@@ -22,6 +22,14 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
+        this.isDataPresent = function(orgUnitIds) {
+            var query = orgUnitIds ? db.queryBuilder().$in(orgUnitIds).$index("by_organisationUnit").compile() : db.queryBuilder().$index("by_organisationUnit").compile();
+            var store = db.objectStore('dataValues');
+            return store.exists(query).then(function(data) {
+                return data;
+            });
+        };
+
         this.save = function(payload) {
             payload = _.map(payload, function(dataValue) {
                 dataValue.clientLastUpdated = moment().toISOString();

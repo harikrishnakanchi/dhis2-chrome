@@ -1,4 +1,4 @@
-define(["moment", "lodash"], function(moment, _) {
+define(["moment", "properties", "dateUtils", "lodash"], function(moment, properties, dateUtils, _) {
     return function(eventService, programEventRepository, $q) {
 
         var saveAllEvents = function(response) {
@@ -45,10 +45,9 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var downloadEventsData = function() {
-            return programEventRepository.getLastUpdatedPeriod().then(function(lastUpdatedPeriod) {
-                var m = moment(lastUpdatedPeriod, "GGGG[W]W");
-                var startDate = m.format("YYYY-MM-DD");
-                return $q.all([eventService.getRecentEvents(startDate), programEventRepository.getEventsFromPeriod(lastUpdatedPeriod)]);
+            return programEventRepository.isDataPresent().then(function(areEventsPresent) {
+                var startDate = areEventsPresent ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
+                return $q.all([eventService.getRecentEvents(startDate), programEventRepository.getEventsFromPeriod(dateUtils.toDhisFormat(moment(startDate)))]);
             });
         };
 

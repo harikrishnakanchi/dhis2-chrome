@@ -63,7 +63,7 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
 
             var actualDataValues;
             var dataService = new DataService(http, q);
-            dataService.downloadAllData('company_0', ["DS_OPD", "Vacc"]).then(function(result) {
+            dataService.downloadAllData('company_0', ["DS_OPD", "Vacc"], startDate).then(function(result) {
                 actualDataValues = result;
             });
 

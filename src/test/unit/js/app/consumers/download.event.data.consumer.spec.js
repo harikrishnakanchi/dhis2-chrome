@@ -21,7 +21,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                     }]
                 };
 
-                spyOn(programEventRepository, "getLastUpdatedPeriod").and.returnValue(utils.getPromise(q, "2014W40"));
+                spyOn(programEventRepository, "isDataPresent").and.returnValue(utils.getPromise(q, true));
                 spyOn(eventService, "getRecentEvents").and.returnValue(utils.getPromise(q, dhisEventList));
                 spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, []));
                 spyOn(programEventRepository, "upsert");
@@ -68,7 +68,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
 
                 var dbEventList = [dbEventPresentInDHIS, dbEventNotPresentInDHIS];
 
-                spyOn(programEventRepository, "getLastUpdatedPeriod").and.returnValue(utils.getPromise(q, "2014W40"));
+                spyOn(programEventRepository, "isDataPresent").and.returnValue(utils.getPromise(q, true));
                 spyOn(eventService, "getRecentEvents").and.returnValue(utils.getPromise(q, dhisEventList));
                 spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, dbEventList));
                 spyOn(programEventRepository, "delete");

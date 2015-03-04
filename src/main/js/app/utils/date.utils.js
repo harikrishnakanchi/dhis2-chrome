@@ -15,9 +15,14 @@ define(["moment", "lodash"], function(moment, _) {
         return moment(max);
     };
 
+    var subtractWeeks = function(numberOfWeeks) {
+        return moment().subtract(numberOfWeeks, 'week').format("YYYY-MM-DD");
+    };
+
     return {
         "toDhisFormat": toDhisFormat,
         "max": max,
-        "getFormattedPeriod": getFormattedPeriod
+        "getFormattedPeriod": getFormattedPeriod,
+        "subtractWeeks": subtractWeeks
     };
 });
