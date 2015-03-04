@@ -230,6 +230,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         };
 
         $scope.selectDataSet = function(item) {
+            if (_.isEmpty(item))
+                return;
             $scope.selectedDataset = item;
             _.each($scope.selectedDataset.sections, function(section) {
                 $scope.isExpanded[section.id] = false;
