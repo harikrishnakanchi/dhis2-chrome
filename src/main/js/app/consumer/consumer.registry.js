@@ -3,7 +3,7 @@ define([], function() {
         var allConsumers = [];
 
         this.register = function() {
-            console.log("registering allconsumers", allConsumers);
+            console.log("Registering allconsumers");
             return $q.all([$hustle.registerConsumer(dispatcher.run, "dataValues")]).then(function(data) {
                 allConsumers = data;
                 console.log("registered allconsumers", allConsumers);
