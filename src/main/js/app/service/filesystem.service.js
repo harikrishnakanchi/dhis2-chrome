@@ -16,19 +16,24 @@ define([], function() {
             };
 
             chrome.fileSystem.chooseEntry(entryType, function(entry) {
-                chrome.fileSystem.getWritableEntry(entry, function(writableEntry) {
-                    writableEntry.getFile(fileName, createStrategy, function(fileEntry) {
-                        fileEntry.createWriter(function(writer) {
-                            writer.onerror = errorHandler;
-                            writer.onwriteend = function() {
-                                deferred.resolve(entry);
-                            };
-                            writer.write(new Blob([contents], {
-                                type: blobType
-                            }));
+                if (chrome.runtime.lastError || entry === undefined) {
+                    // Need to evaluate chrome.runtime.lastError to avoid an unhandled User Cancelled exception
+                    deferred.reject("No download path was selected");
+                } else {
+                    chrome.fileSystem.getWritableEntry(entry, function(writableEntry) {
+                        writableEntry.getFile(fileName, createStrategy, function(fileEntry) {
+                            fileEntry.createWriter(function(writer) {
+                                writer.onerror = errorHandler;
+                                writer.onwriteend = function() {
+                                    deferred.resolve(entry);
+                                };
+                                writer.write(new Blob([contents], {
+                                    type: blobType
+                                }));
+                            }, errorHandler);
                         }, errorHandler);
-                    }, errorHandler);
-                });
+                    });
+                }
             });
 
             return deferred.promise;

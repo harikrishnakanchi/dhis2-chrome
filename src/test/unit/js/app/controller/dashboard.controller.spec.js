@@ -1,4 +1,4 @@
-define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datasetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5", "moment"], function(DashboardController, mocks, utils, ApprovalHelper, DatasetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5, moment) {
+define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datasetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5", "moment", "indexedDBLogger"], function(DashboardController, mocks, utils, ApprovalHelper, DatasetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5, moment, indexedDBLogger) {
     describe("dashboard controller", function() {
         var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, datasetRepository, filesystemService, indexeddbUtils, idbDump, sessionHelper, location;
 
@@ -414,8 +414,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         });
 
         it("should clone the entire indexed db successfully and save it to a file", function() {
-            idbDump = JSON.stringify(idbDump);
-            var expectedFileContents = idbDump + "\nchecksum: " + md5(idbDump);
+            var expectedFileContents = JSON.stringify(idbDump);
             spyOn(filesystemService, "writeFile").and.returnValue(utils.getPromise(q, {
                 "name": "Desktop"
             }));
@@ -436,8 +435,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         });
 
         it("should fail if cloning entire indexedDb fails", function() {
-            idbDump = JSON.stringify(idbDump);
-            var expectedFileContents = idbDump + "\nchecksum: " + md5(idbDump);
+            var expectedFileContents = JSON.stringify(idbDump);
             spyOn(filesystemService, "writeFile").and.returnValue(utils.getRejectedPromise(q, {
                 "name": "InvalidFile"
             }));
@@ -460,7 +458,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         it("should load clone to indexed db from selected file", function() {
             spyOn(filesystemService, "readFile").and.returnValue(utils.getPromise(q, {
                 "target": {
-                    "result": "{}\nchecksum: " + md5('{}')
+                    "result": "{}"
                 }
             }));
 
@@ -478,8 +476,8 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
                 "logs": "foo bar"
             };
 
-            spyOn(indexeddbUtils, "backupLogs").and.returnValue(utils.getPromise(q, logsContent));
-            var expectedFileContents = JSON.stringify(logsContent) + "\nchecksum: " + md5(JSON.stringify(logsContent));
+            spyOn(indexedDBLogger, "exportLogs").and.returnValue(utils.getPromise(q, logsContent));
+            var expectedFileContents = JSON.stringify(logsContent);
             spyOn(filesystemService, "writeFile").and.returnValue(utils.getPromise(q, {
                 "name": "Desktop"
             }));
@@ -492,7 +490,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
 
             scope.$apply();
 
-            expect(indexeddbUtils.backupLogs).toHaveBeenCalled();
+            expect(indexedDBLogger.exportLogs).toHaveBeenCalled();
             expect(filesystemService.writeFile).toHaveBeenCalledWith('logs_dump_20140530-124354.logs', expectedFileContents,
                 'application/json');
 

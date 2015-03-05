@@ -2,36 +2,36 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
 
     var logStoreName = 'logs';
 
-    var configure = function(dbName, loggerDelegate) {
+    var getLogDb = function(dbName) {
+        var d = Q.defer();
+        var request = indexedDB.open(dbName, 1);
 
-        var setupLogDb = function() {
-            var d = Q.defer();
-            var request = indexedDB.open(dbName, 1);
-
-            request.onupgradeneeded = function(e) {
-                var db = e.target.result;
-                var store = db.createObjectStore(logStoreName, {
-                    autoIncrement: true
-                });
-                store.createIndex("method", "method", {
-                    unique: false
-                });
-                store.createIndex("datetime", "datetime", {
-                    unique: false
-                });
-            };
-
-            request.onsuccess = function(e) {
-                d.resolve(e.target.result);
-            };
-
-            request.onerror = function(e) {
-                console.error("Could not set up log db", e);
-                d.reject(e.target.result);
-            };
-
-            return d.promise;
+        request.onupgradeneeded = function(e) {
+            var db = e.target.result;
+            var store = db.createObjectStore(logStoreName, {
+                autoIncrement: true
+            });
+            store.createIndex("method", "method", {
+                unique: false
+            });
+            store.createIndex("datetime", "datetime", {
+                unique: false
+            });
         };
+
+        request.onsuccess = function(e) {
+            d.resolve(e.target.result);
+        };
+
+        request.onerror = function(e) {
+            console.error("Could not set up log db", e);
+            d.reject(e.target.result);
+        };
+
+        return d.promise;
+    };
+
+    var configure = function(dbName, loggerDelegate) {
 
         var cleanupOldEntires = function(logDb) {
             var d = Q.defer();
@@ -107,12 +107,41 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
             return logDb;
         };
 
-        return setupLogDb()
+        return getLogDb(dbName)
             .then(cleanupOldEntires)
             .then(wireupLogging);
     };
 
+    var exportLogs = function(dbName) {
+        return getLogDb(dbName).then(function(logDb) {
+            var results = [];
+            var d = Q.defer();
+            var transaction = logDb.transaction(logStoreName, "readonly");
+            var store = transaction.objectStore(logStoreName);
+            req = store.openCursor();
+            req.onsuccess = function(e) {
+                var cursor = e.target.result;
+                if (cursor) {
+                    results.push(cursor.value);
+                    cursor.
+                    continue();
+                } else {
+                    d.resolve({
+                        "msfLogs": results
+                    });
+                }
+            };
+            req.onerror = function(e) {
+                console.error("Could not export logs", e);
+                d.reject(e.target.result);
+            };
+
+            return d.promise;
+        });
+    };
+
     return {
-        "configure": configure
+        "configure": configure,
+        "exportLogs": exportLogs
     };
 });

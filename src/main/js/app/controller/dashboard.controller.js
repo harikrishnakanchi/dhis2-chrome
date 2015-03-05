@@ -1,4 +1,4 @@
-define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], function(moment, approvalDataTransformer, properties, _, md5) {
+define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBLogger"], function(moment, approvalDataTransformer, properties, _, indexedDBLogger) {
     return function($scope, $hustle, $q, $rootScope, approvalHelper, datasetRepository, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location) {
 
         $scope.approveSuccessForLevelOne = false;
@@ -194,38 +194,44 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
         };
 
         $scope.dumpLogs = function() {
-            saveIdbBackup("logs_dump_", ".logs", indexeddbUtils.backupLogs);
+            var errorCallback = function(error) {
+                displayMessage($scope.resourceBundle.dumpLogsErrorMessage + error.name, true);
+            };
+
+            var successCallback = function(directory) {
+                displayMessage($scope.resourceBundle.dumpLogsSuccessMessage + directory.name, false);
+            };
+
+            saveIdbBackup("logs_dump_", ".logs", _.partial(indexedDBLogger.exportLogs, "msfLogs"))
+                .then(successCallback, errorCallback);
         };
 
         $scope.createClone = function() {
-            saveIdbBackup("dhis_idb_", ".clone", indexeddbUtils.backupEntireDB);
+            var errorCallback = function(error) {
+                displayMessage($scope.resourceBundle.createCloneErrorMessage + error.name, true);
+            };
+
+            var successCallback = function(directory) {
+                displayMessage($scope.resourceBundle.createCloneSuccessMessage + directory.name, false);
+            };
+
+            saveIdbBackup("dhis_idb_", ".clone", indexeddbUtils.backupEntireDB)
+                .then(successCallback, errorCallback);
         };
 
         $scope.loadClone = function() {
             var errorCallback = function(error) {
                 displayMessage($scope.resourceBundle.loadCloneErrorMessage + error, true);
-                $scope.cloning = false;
-            };
-
-            var isValidChecksum = function(data, checksum) {
-                return checksum === md5(data);
             };
 
             var successCallback = function(fileData) {
-                $scope.cloning = true;
                 var fileContents = fileData.target.result;
-                fileContents = fileContents.split("\nchecksum: ");
-
-                if (fileContents.length === 2 && isValidChecksum(fileContents[0], fileContents[1])) {
-                    indexeddbUtils.restore(JSON.parse(fileContents[0])).then(function() {
-                        $scope.cloning = false;
+                indexeddbUtils.restore(JSON.parse(fileContents))
+                    .then(function() {
                         sessionHelper.logout();
                         $location.path("#/login");
                     }, errorCallback);
-                } else {
-                    displayMessage($scope.resourceBundle.corruptFileMessage, true);
-                    $scope.cloning = false;
-                }
+
             };
 
             showModal(function() {
@@ -235,23 +241,13 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "md5"], fun
 
         var saveIdbBackup = function(fileNamePrefix, fileNameExtn, backupCallback) {
             $scope.cloning = true;
-            var errorCallback = function(error) {
-                displayMessage($scope.resourceBundle.createCloneErrorMessage + error.name, true);
-            };
-
-            var successCallback = function(directory) {
-                displayMessage($scope.resourceBundle.createCloneSuccessMessage + directory.name, false);
-            };
-
-            var addChecksum = function(data) {
-                return data + "\nchecksum: " + md5(data);
-            };
-
-            backupCallback().then(function(data) {
+            return backupCallback().then(function(data) {
                 var cloneFileName = fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + fileNameExtn;
-                var cloneFileContents = addChecksum(JSON.stringify(data));
+                var cloneFileContents = JSON.stringify(data);
                 $scope.cloning = false;
-                filesystemService.writeFile(cloneFileName, cloneFileContents, "application/json").then(successCallback, errorCallback);
+                return filesystemService.writeFile(cloneFileName, cloneFileContents, "application/json");
+            }).finally(function() {
+                $scope.cloning = false;
             });
         };
 
