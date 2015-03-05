@@ -120,6 +120,10 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             $scope.showView = true;
         };
 
+        $scope.isDataEntryAllowed = function() {
+            return moment($scope.minDateInCurrentPeriod).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
+        };
+
         $scope.isCurrentWeekSelected = function(week) {
             var today = moment().format("YYYY-MM-DD");
             if (week && today >= week.startOfWeek && today <= week.endOfWeek)

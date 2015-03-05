@@ -812,5 +812,20 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 });
                 scope.$apply();
             });
+
+            it("should not allow event creation , edit or deleting if selected week is beyond configured week", function() {
+                scope.week = {
+                    "startOfWeek": "2014-02-02",
+                    "weekNumber": 05,
+                    "weekYear": 2014
+                };
+
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalHelper, approvalDataRepository, datasetRepository);
+
+                expect(scope.isDataEntryAllowed()).toBeFalsy();
+                scope.$apply();
+            });
         });
     });
