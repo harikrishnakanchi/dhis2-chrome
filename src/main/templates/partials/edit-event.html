@@ -24,37 +24,39 @@
                                 <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
                             </accordion-heading>
                             <ul>
-                                <li class="form-group" ng-repeat="de in section.programStageDataElements">
-                                    <div ng-if="de.dataElement.isIncluded">
-                                        <label for="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="resourceBundle[de.dataElement.id]">{{ resourceBundle[de.dataElement.id] }}</label>
-                                        <label for="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</label>
-                                    </div>
-                                    <div class="col-sm-6 col-md-6" ng-if="de.dataElement.isIncluded">
-                                        <input type="text" class="form-control" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" name="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory" />
-                                        <input type="number" class="form-control" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" name="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory" ng-pattern="numberPattern" />
-                                        <input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" name="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory" />
-                                        <div ng-if="de.dataElement.type === 'bool' &amp;&amp; !de.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
-                                            <div class="radio-inline">
-                                                <label for="Yes">
-                                                    <input type="radio" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" value="true" ng-required="de.compulsory"> {{resourceBundle.yes}}
-                                                </label>
+                                <div ng-repeat="de in section.programStageDataElements">
+                                    <li class="form-group" ng-if="de.dataElement.isIncluded">
+                                        <div ng-if="de.dataElement.isIncluded">
+                                            <label for="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="resourceBundle[de.dataElement.id]">{{ resourceBundle[de.dataElement.id] }}</label>
+                                            <label for="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</label>
+                                        </div>
+                                        <div class="col-sm-6 col-md-6" ng-if="de.dataElement.isIncluded">
+                                            <input type="text" class="form-control" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" name="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory" />
+                                            <input type="number" class="form-control" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" name="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory" ng-pattern="numberPattern" />
+                                            <input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" name="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory" />
+                                            <div ng-if="de.dataElement.type === 'bool' &amp;&amp; !de.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
+                                                <div class="radio-inline">
+                                                    <label for="Yes">
+                                                        <input type="radio" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" value="true" ng-required="de.compulsory"> {{resourceBundle.yes}}
+                                                    </label>
+                                                </div>
+                                                <div class="radio-inline">
+                                                    <label for="No">
+                                                        <input type="radio" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" value="false" ng-required="de.compulsory"> {{resourceBundle.no}}
+                                                    </label>
+                                                </div>
                                             </div>
-                                            <div class="radio-inline">
-                                                <label for="No">
-                                                    <input type="radio" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" value="false" ng-required="de.compulsory"> {{resourceBundle.no}}
-                                                </label>
+                                            <select ng-options="o.code as o.displayName for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" name="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory">
+                                                <option value=""></option>
+                                            </select>
+                                            <div ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$dirty &amp;&amp; editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$invalid">
+                                                <span class="errortxt" ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.required"> {{de.dataElement.formName}} {{resourceBundle.required}}</span>
+                                                <span class="errortxt" ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.date"> {{resourceBundle.dateInvalid}}</span>
+                                                <span class="errortxt" ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.pattern"> {{de.dataElement.formName}} {{resourceBundle.invalidPattern}}</span>
                                             </div>
                                         </div>
-                                        <select ng-options="o.code as o.displayName for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="eventToBeEdited.dataElementValues[de.dataElement.id]" name="eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory">
-                                            <option value=""></option>
-                                        </select>
-                                        <div ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$dirty &amp;&amp; editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$invalid">
-                                            <span class="errortxt" ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.required"> {{de.dataElement.formName}} {{resourceBundle.required}}</span>
-                                            <span class="errortxt" ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.date"> {{resourceBundle.dateInvalid}}</span>
-                                            <span class="errortxt" ng-show="editEventDataEntryForm.eventValue_{{eventToBeEdited.program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$error.pattern"> {{de.dataElement.formName}} {{resourceBundle.invalidPattern}}</span>
-                                        </div>
-                                    </div>
-                                </li>
+                                    </li>
+                                </div>
                             </ul>
                         </accordion-group>
                     </accordion>
