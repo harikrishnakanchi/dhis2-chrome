@@ -28,7 +28,7 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
 
             var endDate = moment().format("YYYY-MM-DD");
             var startDate = '2014-09-25';
-            httpBackend.expectGET(properties.dhis.url + "/api/events?endDate=" + endDate + "&startDate=" + startDate).respond(200, expectedEvents);
+            httpBackend.expectGET(properties.dhis.url + "/api/events?endDate=" + endDate + "&paging=false&startDate=" + startDate).respond(200, expectedEvents);
 
             eventService.getRecentEvents(startDate).then(function(response) {
                 expect(response).toEqual(expectedEvents);

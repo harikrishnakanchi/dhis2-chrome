@@ -9,7 +9,8 @@ define(["moment", "dhisUrl"], function(moment, dhisUrl) {
             return $http.get(dhisUrl.events, {
                 "params": {
                     "startDate": startDate,
-                    "endDate": moment().format("YYYY-MM-DD")
+                    "endDate": moment().format("YYYY-MM-DD"),
+                    "paging": false
                 }
             }).then(onSuccess);
 
