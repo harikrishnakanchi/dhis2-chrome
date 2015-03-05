@@ -13,13 +13,19 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
                 if (orgUnitIds.length === 0 || allDataSetIds.length === 0)
                     return $q.when([]);
 
-                return dataRepository.isDataPresent(orgUnitIds).then(function(data) {
-                    var startDate = data ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
-                    return dataService.downloadAllData(orgUnitIds, allDataSetIds, startDate);
+                var downloadPromises = _.map(orgUnitIds, function(orgUnitId) {
+                    return dataRepository.isDataPresent(orgUnitId).then(function(data) {
+                        var startDate = data ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
+                        return dataService.downloadAllData([orgUnitId], allDataSetIds, startDate);
+                    });
+                });
+
+                return $q.all(downloadPromises).then(function(data) {
+                    return _.flatten(data);
                 });
             };
 
-            return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAllDatasetIds()])
+            return $q.all([userPreferenceRepository.getUserProjectIds(), datasetRepository.getAllDatasetIds()])
                 .then(getAllDataValues);
         };
 

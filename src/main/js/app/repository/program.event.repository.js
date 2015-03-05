@@ -30,8 +30,8 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             return store.each(query);
         };
 
-        this.isDataPresent = function(orgUnitIds) {
-            var query = orgUnitIds ? db.queryBuilder().$in(orgUnitIds).$index("by_organisationUnit").compile() : db.queryBuilder().$index("by_organisationUnit").compile();
+        this.isDataPresent = function(orgUnitId) {
+            var query = orgUnitId ? db.queryBuilder().$eq(orgUnitId).$index("by_organisationUnit").compile() : db.queryBuilder().$index("by_organisationUnit").compile();
             var store = db.objectStore('programEvents');
             return store.exists(query).then(function(data) {
                 return data;

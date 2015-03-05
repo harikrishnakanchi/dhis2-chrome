@@ -22,8 +22,8 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
-        this.isDataPresent = function(orgUnitIds) {
-            var query = orgUnitIds ? db.queryBuilder().$in(orgUnitIds).$index("by_organisationUnit").compile() : db.queryBuilder().$index("by_organisationUnit").compile();
+        this.isDataPresent = function(orgUnitId) {
+            var query = orgUnitId ? db.queryBuilder().$eq(orgUnitId).$index("by_organisationUnit").compile() : db.queryBuilder().$index("by_organisationUnit").compile();
             var store = db.objectStore('dataValues');
             return store.exists(query).then(function(data) {
                 return data;

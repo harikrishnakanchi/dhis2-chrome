@@ -12,9 +12,8 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 Timecop.install();
                 Timecop.freeze(thisMoment.toDate());
 
-                userPreferenceRepository = {
-                    "getUserModuleIds": jasmine.createSpy("getUserModuleIds").and.returnValue(utils.getPromise(q, ["org_0"]))
-                };
+                userPreferenceRepository = new UserPreferenceRepository();
+                spyOn(userPreferenceRepository, "getUserProjectIds").and.returnValue(utils.getPromise(q, ["org_0"]));
 
                 datasetRepository = {
                     "getAllDatasetIds": jasmine.createSpy("getAllDatasetIds").and.returnValue(utils.getPromise(q, ["DS_OPD"]))
@@ -51,7 +50,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
             });
 
             it("should download data values from dhis based on user preferences and dataset", function() {
-                userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
+                userPreferenceRepository.getUserProjectIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
 
                 datasetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, ["ds1"]));
 
@@ -64,13 +63,24 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 downloadDataConsumer.run(message);
                 scope.$apply();
 
-                expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
+                expect(userPreferenceRepository.getUserProjectIds).toHaveBeenCalled();
                 expect(datasetRepository.getAllDatasetIds).toHaveBeenCalled();
-                expect(dataService.downloadAllData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ['ds1'], '2013-10-09');
+                expect(dataService.downloadAllData.calls.argsFor(0)).toEqual([
+                    ["mod1"],
+                    ['ds1'], '2013-10-09'
+                ]);
+                expect(dataService.downloadAllData.calls.argsFor(1)).toEqual([
+                    ["mod2"],
+                    ['ds1'], '2013-10-09'
+                ]);
+                expect(dataService.downloadAllData.calls.argsFor(2)).toEqual([
+                    ["mod3"],
+                    ['ds1'], '2013-10-09'
+                ]);
             });
 
             it("should not download data values if org units is not present", function() {
-                userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, []));
+                userPreferenceRepository.getUserProjectIds.and.returnValue(utils.getPromise(q, []));
                 message = {
                     "data": {
                         "type": "downloadData"

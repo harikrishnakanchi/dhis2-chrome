@@ -29,11 +29,19 @@ define(["lodash"], function(_) {
             });
         };
 
+        var getUserProjectIds = function() {
+            return getAll().then(function(userPreferences) {
+                userPreferences = userPreferences || [];
+                return _.uniq(_.pluck(_.flatten(_.pluck(userPreferences, "orgUnits")), "id"));
+            });
+        };
+
         return {
             "get": get,
             "getAll": getAll,
             "save": save,
-            "getUserModuleIds": getUserModuleIds
+            "getUserModuleIds": getUserModuleIds,
+            "getUserProjectIds": getUserProjectIds
         };
     };
 });
