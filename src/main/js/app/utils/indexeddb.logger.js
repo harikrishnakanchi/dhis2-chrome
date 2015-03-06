@@ -16,7 +16,7 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
                 store.createIndex("method", "method", {
                     unique: false
                 });
-                store.createIndex("timestamp", "timestamp", {
+                store.createIndex("datetime", "datetime", {
                     unique: false
                 });
             };
@@ -36,8 +36,8 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
                 var d = Q.defer();
                 var results = [];
 
-                var boundKeyRange = IDBKeyRange.lowerBound(moment().subtract(properties.logging.maxAgeinDays, "days").format("x"));
-                var index = store.index("timestamp");
+                var boundKeyRange = IDBKeyRange.lowerBound(moment().subtract(properties.logging.maxAgeinDays, "days").toISOString());
+                var index = store.index("datetime");
                 var req = index.openCursor(boundKeyRange);
                 req.onsuccess = function(e) {
                     var onfound = function() {
@@ -91,10 +91,19 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
 
 
         var wireupLogging = function(logDb) {
-            console.log("qwe3");
             var _log = console.log,
+                _info = console.info,
                 _debug = console.debug,
                 _error = console.error;
+
+            var prepareArgs = function(args) {
+                return JSON.parse(JSON.stringify(args, function(key, value) {
+                    if (typeof value === 'function') {
+                        return undefined;
+                    }
+                    return value;
+                }));
+            };
 
             var putLog = function(logLevel, args) {
                 try {
@@ -102,8 +111,8 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
                     var store = transaction.objectStore(logStoreName);
                     var logObject = {
                         'method': logLevel,
-                        'timestamp': moment().format("x"),
-                        'arguments': args
+                        'datetime': moment().toISOString(),
+                        'arguments': prepareArgs(args)
                     };
                     store.put(logObject);
                 } catch (e) {
@@ -111,19 +120,19 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
                 }
             };
 
-            console.debug = function() {
-                putLog('debug', arguments);
-                return _debug.apply(console, arguments);
+            console.info = function() {
+                putLog('info', arguments);
+                _info.apply(this, arguments);
             };
 
             console.log = function() {
                 putLog('info', arguments);
-                return _log.apply(console, arguments);
+                _log.apply(this, arguments);
             };
 
             console.error = function() {
                 putLog('error', arguments);
-                return _error.apply(console, arguments);
+                _error.apply(this, arguments);
             };
 
             return logDb;

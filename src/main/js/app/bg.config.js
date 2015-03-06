@@ -87,6 +87,7 @@ require.config({
         "cleanupPayloadInterceptor": "app/interceptors/cleanup.payload.interceptor",
         "configureRequestInterceptor": "app/interceptors/configure.request.interceptor",
         "handleTimeoutInterceptor": "app/interceptors/handle.timeout.interceptor",
+        "logRequestReponseInterceptor": "app/interceptors/log.request.response.interceptor",
 
         //Queue
         "failureStrategyFactory": "app/queue/failure.strategy.factory",

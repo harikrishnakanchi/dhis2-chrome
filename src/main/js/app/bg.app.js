@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "failureStrategyFactory", "monitors", "angular-indexedDB"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, failureStrategyFactory, monitors) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "failureStrategyFactory", "monitors", "logRequestReponseInterceptor", "angular-indexedDB"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, failureStrategyFactory, monitors, logRequestReponseInterceptor) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
             services.init(app);
@@ -7,10 +7,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             repositories.init(app);
             monitors.init(app);
 
-
             app.factory('configureRequestInterceptor', [configureRequestInterceptor]);
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', handleTimeoutInterceptor]);
+            app.factory('logRequestReponseInterceptor', [logRequestReponseInterceptor]);
 
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider',
                 function($indexedDBProvider, $httpProvider, $hustleProvider) {
@@ -18,7 +18,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     $httpProvider.interceptors.push('configureRequestInterceptor');
                     $httpProvider.interceptors.push('cleanupPayloadInterceptor');
                     $httpProvider.interceptors.push('handleTimeoutInterceptor');
-
+                    $httpProvider.interceptors.push('logRequestReponseInterceptor');
                     $hustleProvider.init("hustle", 1, ["dataValues"], failureStrategyFactory);
                 }
             ]);
