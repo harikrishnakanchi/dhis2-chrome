@@ -11,7 +11,7 @@ define(["lodash"], function(_) {
                         return payload;
                     }
 
-                    payload = _.omit(payload, ["lastUpdated", "created"]);
+                    payload = _.omit(payload, ["lastUpdated", "created", "href"]);
                     var keys = _.keys(payload);
                     _.forEach(keys, function(key) {
                         if (_.isPlainObject(payload[key]) || _.isArray(payload[key]))
