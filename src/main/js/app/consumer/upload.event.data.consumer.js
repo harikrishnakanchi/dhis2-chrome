@@ -1,6 +1,5 @@
 define(["moment", "dateUtils", "properties"], function(moment, dateUtils, properties) {
-    return function(eventService, programEventRepository, $q) {
-
+    return function(eventService, programEventRepository, userPreferenceRepository, $q) {
         var changeEventLocalStatus = function(eventPayload) {
             var updatedEvents = _.map(eventPayload.events, function(event) {
                 return _.omit(event, "localStatus");
@@ -11,17 +10,17 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
             });
         };
 
-        var uploadEventData = function() {
+        var uploadEventData = function(projectIds) {
             var getEvents = function() {
-                return programEventRepository.isDataPresent().then(function(areEventsPresent) {
-                    var startDate = areEventsPresent ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
-                    return programEventRepository.getEventsFromPeriod(dateUtils.toDhisFormat(moment(startDate))).then(function(events) {
-                        return _.filter(events, function(e) {
-                            return e.localStatus === "NEW";
-                        });
+                var m = moment();
+                var startPeriod = dateUtils.toDhisFormat(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
+                return programEventRepository.getEventsFromPeriod(startPeriod, projectIds).then(function(events) {
+                    return _.filter(events, function(e) {
+                        return e.localStatus === "NEW";
                     });
                 });
             };
+
             return getEvents().then(function(events) {
                 eventService.upsertEvents({
                     'events': events
@@ -30,7 +29,9 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
         };
 
         this.run = function(message) {
-            return uploadEventData();
+            return userPreferenceRepository.getUserProjectIds().then(function(projectIds) {
+                return uploadEventData(projectIds);
+            });
         };
     };
 });

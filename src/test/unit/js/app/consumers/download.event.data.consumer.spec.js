@@ -1,14 +1,16 @@
-define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eventService", "programEventRepository"],
-    function(DownloadEventDataConsumer, mocks, properties, utils, EventService, ProgramEventRepository) {
+define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eventService", "programEventRepository", "userPreferenceRepository"],
+    function(DownloadEventDataConsumer, mocks, properties, utils, EventService, ProgramEventRepository, UserPreferenceRepository) {
         describe("download event data consumer", function() {
-            var eventService, downloadEventDataConsumer, programEventRepository;
+            var eventService, downloadEventDataConsumer, programEventRepository, userPreferenceRepository;
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
                 scope = $rootScope.$new();
 
+                userPreferenceRepository = new UserPreferenceRepository();
+                spyOn(userPreferenceRepository, "getUserModuleIds").and.returnValue(utils.getPromise(q, ["mod1"]));
                 eventService = new EventService();
                 programEventRepository = new ProgramEventRepository();
-                downloadEventDataConsumer = new DownloadEventDataConsumer(eventService, programEventRepository, q);
+                downloadEventDataConsumer = new DownloadEventDataConsumer(eventService, programEventRepository, userPreferenceRepository, q);
             }));
 
             it("should download events from dhis and save them to indexeddb", function() {

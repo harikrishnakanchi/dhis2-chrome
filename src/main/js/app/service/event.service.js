@@ -1,7 +1,6 @@
 define(["moment", "dhisUrl"], function(moment, dhisUrl) {
     return function($http, $q) {
-
-        this.getRecentEvents = function(startDate) {
+        this.getRecentEvents = function(startDate, orgUnitId) {
             var onSuccess = function(response) {
                 return response.data;
             };
@@ -10,7 +9,9 @@ define(["moment", "dhisUrl"], function(moment, dhisUrl) {
                 "params": {
                     "startDate": startDate,
                     "endDate": moment().format("YYYY-MM-DD"),
-                    "paging": false
+                    "paging": false,
+                    "orgUnit": orgUnitId,
+                    "children": true
                 }
             }).then(onSuccess);
 

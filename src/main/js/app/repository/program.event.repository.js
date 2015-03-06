@@ -23,11 +23,18 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             });
         };
 
-        this.getEventsFromPeriod = function(startPeriod) {
+        this.getEventsFromPeriod = function(startPeriod, orgUnitIds) {
             var endPeriod = moment().format("GGGG[W]WW");
             var store = db.objectStore('programEvents');
             var query = db.queryBuilder().$between(dateUtils.getFormattedPeriod(startPeriod), endPeriod).$index("by_period").compile();
-            return store.each(query);
+            return store.each(query).then(function(events) {
+                if (!orgUnitIds) {
+                    return events;
+                }
+                return _.filter(events, function(e) {
+                    return _.contains(orgUnitIds, e.orgUnit);
+                });
+            });
         };
 
         this.isDataPresent = function(orgUnitId) {

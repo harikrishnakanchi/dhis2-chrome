@@ -1,16 +1,18 @@
-define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "eventService", "programEventRepository"],
-    function(UploadEventDataConsumer, mocks, properties, utils, EventService, ProgramEventRepository) {
+define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "eventService", "programEventRepository", "userPreferenceRepository"],
+    function(UploadEventDataConsumer, mocks, properties, utils, EventService, ProgramEventRepository, UserPreferenceRepository) {
         describe("upload event data consumer", function() {
 
-            var eventService, uploadEventDataConsumer, programEventRepository;
+            var eventService, uploadEventDataConsumer, programEventRepository, userPreferenceRepository;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
                 scope = $rootScope.$new();
 
+                userPreferenceRepository = new UserPreferenceRepository();
+                spyOn(userPreferenceRepository, "getUserProjectIds").and.returnValue(utils.getPromise(q, ["prj1"]));
                 eventService = new EventService();
                 programEventRepository = new ProgramEventRepository();
-                uploadEventDataConsumer = new UploadEventDataConsumer(eventService, programEventRepository, q);
+                uploadEventDataConsumer = new UploadEventDataConsumer(eventService, programEventRepository, userPreferenceRepository, q);
             }));
 
             it("should save event data to DHIS and change local status in indexedDb", function() {
@@ -51,6 +53,5 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(dbEventPayload);
 
             });
-
         });
     });
