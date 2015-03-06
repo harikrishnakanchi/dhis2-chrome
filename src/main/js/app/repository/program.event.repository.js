@@ -38,9 +38,12 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             });
         };
 
-        this.delete = function(eventId) {
+        this.delete = function(eventIds) {
+            eventIds = _.isArray(eventIds) ? eventIds : [eventIds];
             var store = db.objectStore("programEvents");
-            return store.delete(eventId);
+            return $q.all(_.map(eventIds, function(id) {
+                return store.delete(id);
+            }));
         };
 
         this.markEventsAsSubmitted = function(programId, period, orgUnit) {

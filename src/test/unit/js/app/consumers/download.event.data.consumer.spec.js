@@ -1,9 +1,7 @@
 define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eventService", "programEventRepository"],
     function(DownloadEventDataConsumer, mocks, properties, utils, EventService, ProgramEventRepository) {
         describe("download event data consumer", function() {
-
             var eventService, downloadEventDataConsumer, programEventRepository;
-
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
                 scope = $rootScope.$new();
@@ -24,6 +22,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 spyOn(programEventRepository, "isDataPresent").and.returnValue(utils.getPromise(q, true));
                 spyOn(eventService, "getRecentEvents").and.returnValue(utils.getPromise(q, dhisEventList));
                 spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, []));
+                spyOn(programEventRepository, "delete").and.returnValue(utils.getPromise(q, []));
                 spyOn(programEventRepository, "upsert");
 
                 var message = {
@@ -88,9 +87,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 };
 
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(upsertPayload);
-                expect(programEventRepository.delete).toHaveBeenCalledWith(dbEventNotPresentInDHIS.event);
+                expect(programEventRepository.delete).toHaveBeenCalledWith([dbEventNotPresentInDHIS.event]);
             });
-
-
         });
     });

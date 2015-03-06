@@ -1,8 +1,7 @@
 define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(moment, properties, _, dateUtils, mergeBy) {
     return function(dataService, dataRepository, datasetRepository, userPreferenceRepository, $q, approvalDataRepository) {
         this.run = function() {
-            return downloadDataValues()
-                .then(mergeAndSaveDataValues);
+            return downloadDataValues().then(mergeAndSaveDataValues);
         };
 
         var downloadDataValues = function() {
@@ -83,12 +82,10 @@ define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(mome
             if (_.isEmpty(dataValuesFromDhis))
                 return;
 
-            return getDataFromDb()
-                .then(function(dataFromLocalDb) {
-                    var mergedData = merge(dataValuesFromDhis, dataFromLocalDb);
-                    return clearApprovals(dataFromLocalDb, mergedData)
-                        .then(dataRepository.saveDhisData);
-                });
+            return getDataFromDb().then(function(dataFromLocalDb) {
+                var mergedData = merge(dataValuesFromDhis, dataFromLocalDb);
+                return clearApprovals(dataFromLocalDb, mergedData).then(dataRepository.saveDhisData);
+            });
         };
     };
 });
