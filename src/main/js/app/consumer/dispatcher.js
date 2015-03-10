@@ -2,7 +2,7 @@ define(["lodash"], function(_) {
     return function($q, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
         createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
-        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer) {
+        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer) {
 
         this.run = function(message) {
             console.log("Processing message: " + message.data.type);
@@ -81,6 +81,9 @@ define(["lodash"], function(_) {
                 case "uploadSystemSetting":
                     return downloadSystemSettingConsumer.run(message)
                         .then(_.partial(uploadSystemSettingConsumer.run, message));
+                case "uploadPatientOriginDetails":
+                    return downloadPatientOriginConsumer.run(message)
+                        .then(_.partial(uploadPatientOriginConsumer.run, message));
 
                 default:
                     return $q.reject();

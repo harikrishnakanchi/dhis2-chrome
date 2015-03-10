@@ -20,7 +20,7 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('projectUserController', ['$scope', '$hustle', 'userRepository', projectUserController]);
             app.controller('selectProjectController', ['$scope', '$location', '$rootScope', 'orgUnitRepository', 'userRepository', 'userPreferenceRepository', selectProjectController]);
             app.controller('indicatorController', ['$scope', 'indicatorRepository', indicatorController]);
-            app.controller('patientOriginController', ['$scope', patientOriginController]);
+            app.controller('patientOriginController', ['$scope', '$hustle', 'patientOriginRepository', patientOriginController]);
         };
         return {
             init: init

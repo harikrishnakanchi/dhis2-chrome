@@ -29,7 +29,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("dispatcher", ["$q", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDatasetConsumer", "uploadDatasetConsumer", "createUserConsumer", "updateUserConsumer",
                 "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "uploadApprovalDataConsumer", "uploadProgramConsumer", "downloadProgramConsumer", "downloadEventDataConsumer",
                 "uploadEventDataConsumer", "deleteEventConsumer", "downloadApprovalConsumer", "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer",
-                "downloadSystemSettingConsumer", "uploadSystemSettingConsumer", dispatcher
+                "downloadSystemSettingConsumer", "uploadSystemSettingConsumer", "downloadPatientOriginConsumer", "uploadPatientOriginConsumer", dispatcher
             ]);
             app.service("consumerRegistry", ["$hustle", "$q", "dispatcher", consumerRegistry]);
             app.service("uploadProgramConsumer", ["programService", "programRepository", "$q", uploadProgramConsumer]);
@@ -40,7 +40,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("downloadMetadataConsumer", ["metadataService", "metadataRepository", "changeLogRepository", downloadMetadataConsumer]);
             app.service("deleteApprovalConsumer", ["approvalService", "$q", deleteApprovalConsumer]);
             app.service("downloadPatientOriginConsumer", ["patientOriginService", "patientOriginRepository", downloadPatientOriginConsumer]);
-            app.service("uploadPatientOriginConsumer", [uploadPatientOriginConsumer]);
+            app.service("uploadPatientOriginConsumer", ["patientOriginService", "patientOriginRepository", uploadPatientOriginConsumer]);
         };
         return {
             init: init

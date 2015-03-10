@@ -143,6 +143,7 @@ define([], function() {
         add_program_events_store,
         add_dataset_store,
         add_org_unit_store,
-        add_indicators_store
+        add_indicators_store,
+        add_patient_origin_store
     ];
 });
