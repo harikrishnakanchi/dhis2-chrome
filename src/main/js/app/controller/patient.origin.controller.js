@@ -1,11 +1,10 @@
 define([], function() {
     return function($scope) {
 
-        var init = function() {
-            console.log("abb");
+        $scope.save = function(patientOrigin) {
+            var projectId = $scope.orgUnit.id;
+
         };
 
-
-        init();
     };
 });

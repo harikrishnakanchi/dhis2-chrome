@@ -29,6 +29,10 @@ define([], function() {
         create_store_with_key("systemSettings", "key", db);
     };
 
+    var add_patient_origin_store = function(db, tx) {
+        create_store_with_key("patientOrigin", "key", db);
+    };
+
     var change_log_stores = function(db, tx) {
         create_store_with_key("changeLog", "type", db);
     };

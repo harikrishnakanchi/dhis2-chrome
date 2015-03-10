@@ -81,6 +81,7 @@ require.config({
         "changeLogRepository": "app/repository/changelog.repository",
         "indicatorRepository": "app/repository/indicator.repository",
         "metadataRepository": "app/repository/metadata.repository",
+        "patientOriginRepository": "app/repository/patient.origin.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",

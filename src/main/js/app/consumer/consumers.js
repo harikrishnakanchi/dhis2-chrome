@@ -1,12 +1,14 @@
 define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDatasetConsumer", "uploadDatasetConsumer",
         "createUserConsumer", "updateUserConsumer", "dispatcher", "consumerRegistry", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer",
         "orgUnitRepository", "programRepository", "uploadProgramConsumer", "downloadProgramConsumer", "downloadEventDataConsumer", "deleteEventConsumer", "eventService", "programEventRepository", "uploadEventDataConsumer",
-        "downloadApprovalConsumer", "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer", "downloadSystemSettingConsumer", "uploadSystemSettingConsumer", "metadataService", "metadataRepository"
+        "downloadApprovalConsumer", "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer", "downloadSystemSettingConsumer", "uploadSystemSettingConsumer", "metadataService", "metadataRepository",
+        "downloadPatientOriginConsumer", "uploadPatientOriginConsumer"
     ],
     function(uploadApprovalDataConsumer, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
         createUserConsumer, updateUserConsumer, dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer,
         orgUnitRepository, programRepository, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, deleteEventConsumer, eventService, programEventRepository, uploadEventDataConsumer,
-        downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, metadataService, metadataRepository) {
+        downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, metadataService, metadataRepository,
+        downloadPatientOriginConsumer, uploadPatientOriginConsumer) {
 
         var init = function(app) {
             app.service("downloadDataConsumer", ["dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "$q", "approvalDataRepository", downloadDataConsumer]);
@@ -37,6 +39,8 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("deleteEventConsumer", ["eventService", "programEventRepository", "$q", deleteEventConsumer]);
             app.service("downloadMetadataConsumer", ["metadataService", "metadataRepository", "changeLogRepository", downloadMetadataConsumer]);
             app.service("deleteApprovalConsumer", ["approvalService", "$q", deleteApprovalConsumer]);
+            app.service("downloadPatientOriginConsumer", ["patientOriginService", downloadPatientOriginConsumer]);
+            app.service("uploadPatientOriginConsumer", [uploadPatientOriginConsumer]);
         };
         return {
             init: init

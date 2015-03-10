@@ -26,6 +26,7 @@ require.config({
         "eventService": "app/service/event.service",
         "services": "app/service/bg.services",
         "orgUnitGroupService": "app/service/orgunit.group.service",
+        "patientOriginService": "app/service/patient.origin.service",
 
         //Repositories
         "repositories": "app/repository/bg.repositories",
@@ -39,6 +40,7 @@ require.config({
         "changeLogRepository": "app/repository/changelog.repository",
         "programRepository": "app/repository/program.repository",
         "systemSettingRepository": "app/repository/system.setting.repository",
+        "patientOriginRepository": "app/repository/patient.origin.repository",
         "metadataRepository": "app/repository/metadata.repository",
 
         //Transformers
@@ -75,6 +77,8 @@ require.config({
         "deleteApprovalConsumer": "app/consumer/delete.approval.consumer",
         "downloadSystemSettingConsumer": "app/consumer/download.system.setting.consumer",
         "uploadSystemSettingConsumer": "app/consumer/upload.system.setting.consumer",
+        "downloadPatientOriginConsumer": "app/consumer/download.patient.origin.consumer",
+        "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",
