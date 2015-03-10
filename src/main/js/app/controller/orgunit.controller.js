@@ -8,7 +8,8 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             'Module': 'templates/partials/module-form.html',
             'LineListModule': 'templates/partials/linelist-module-form.html',
             'Operation Unit': 'templates/partials/op-unit-form.html',
-            'User': 'templates/partials/project-user-form.html'
+            'User': 'templates/partials/project-user-form.html',
+            'Patient Origin': 'templates/partials/patient-origin-form.html'
         };
 
         $scope.organisationUnits = [];
