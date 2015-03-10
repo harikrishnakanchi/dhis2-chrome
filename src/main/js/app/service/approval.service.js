@@ -95,6 +95,7 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
         this.getAllLevelTwoApprovalData = function(orgUnits, dataSets) {
             var transform = function(dataApprovalStateResponses) {
                 var approvalStatusOrder = {
+                    "UNAPPROVABLE": -1,
                     "UNAPPROVED_READY": 0,
                     "APPROVED_ABOVE": 1,
                     "APPROVED_HERE": 1,

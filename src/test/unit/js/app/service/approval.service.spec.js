@@ -262,7 +262,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     "organisationUnit": {
                         "id": "ou1"
                     },
-                    "state": "UNAPPROVED_READY",
+                    "state": "UNAPPROVABLE",
                     "mayApprove": true,
                     "mayUnapprove": true,
                     "mayAccept": true,
@@ -277,7 +277,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                     "organisationUnit": {
                         "id": "ou1"
                     },
-                    "state": "APPROVED_HERE",
+                    "state": "UNAPPROVED_READY",
                     "createdByUsername": "msfadmin",
                     "createdDate": "2014-07-21T12:08:05.311+0000",
                     "mayApprove": true,
