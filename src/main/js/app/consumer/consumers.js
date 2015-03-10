@@ -39,7 +39,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("deleteEventConsumer", ["eventService", "programEventRepository", "$q", deleteEventConsumer]);
             app.service("downloadMetadataConsumer", ["metadataService", "metadataRepository", "changeLogRepository", downloadMetadataConsumer]);
             app.service("deleteApprovalConsumer", ["approvalService", "$q", deleteApprovalConsumer]);
-            app.service("downloadPatientOriginConsumer", ["patientOriginService", downloadPatientOriginConsumer]);
+            app.service("downloadPatientOriginConsumer", ["patientOriginService", "patientOriginRepository", downloadPatientOriginConsumer]);
             app.service("uploadPatientOriginConsumer", [uploadPatientOriginConsumer]);
         };
         return {
