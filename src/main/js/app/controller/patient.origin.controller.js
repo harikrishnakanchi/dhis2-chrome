@@ -1,4 +1,4 @@
-define(["lodash", "moment"], function(_, moment) {
+define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
     return function($scope, $hustle, patientOriginRepository) {
 
         var publishMessage = function(data, action) {
@@ -9,16 +9,6 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.save = function(patientOrigin) {
-            var projectOrigins = _.isEmpty($scope.projectOrigins) ? [] : $scope.projectOrigins;
-            projectOrigins.push(patientOrigin);
-
-            var payload = {
-                key: $scope.projectId,
-                value: {
-                    clientLastUpdated: moment().toISOString(),
-                    origins: projectOrigins
-                }
-            };
 
             var onSuccess = function(data) {
                 $scope.saveFailure = false;
@@ -33,6 +23,18 @@ define(["lodash", "moment"], function(_, moment) {
                 return error;
             };
 
+
+            var projectOrigins = _.isEmpty($scope.projectOrigins) ? [] : $scope.projectOrigins;
+            patientOrigin.id = dhisId.get(patientOrigin.originName);
+            projectOrigins.push(patientOrigin);
+
+            var payload = {
+                key: $scope.projectId,
+                value: {
+                    clientLastUpdated: moment().toISOString(),
+                    origins: projectOrigins
+                }
+            };
             return patientOriginRepository.upsert(payload).
             then(_.partial(publishMessage, payload, "uploadPatientOriginDetails")).then(onSuccess, onFailure);
         };
