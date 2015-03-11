@@ -1,5 +1,5 @@
-define(['moment', "lodashUtils", "dateUtils", "mergeBy"], function(moment, _, dateUtils, mergeBy) {
-    return function(orgUnitService, orgUnitRepository, changeLogRepository, $q) {
+define(['moment', "lodashUtils", "dateUtils"], function(moment, _, dateUtils) {
+    return function(orgUnitService, orgUnitRepository, changeLogRepository, $q, mergeBy) {
 
         this.run = function(message) {
             var orgUnits = _.isArray(message.data.data) ? message.data.data : [message.data.data];

@@ -1,5 +1,12 @@
 define(["mergeByUnion"], function(mergeByUnion) {
     describe("merge by union", function() {
+        var logger;
+        beforeEach(function() {
+            logger = {
+                "info": jasmine.createSpy()
+            };
+        });
+
         it("should return merged data if local copy is stale", function() {
             var remoteCopy = [{
                 "id": "data1",
@@ -43,7 +50,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
                 }]
             }];
 
-            var actualMergedCopy = mergeByUnion("organisationUnits", "id", remoteCopy, localCopy);
+            var actualMergedCopy = mergeByUnion("organisationUnits", "id", remoteCopy, localCopy, logger);
 
             expect(actualMergedCopy).toEqual(expectedMergedCopy);
         });
@@ -76,7 +83,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
                 }]
             }];
 
-            var actualMergedCopy = mergeByUnion("organisationUnits", "id", remoteCopy, localCopy);
+            var actualMergedCopy = mergeByUnion("organisationUnits", "id", remoteCopy, localCopy, logger);
             expect(actualMergedCopy).toEqual(remoteCopy);
         });
 
@@ -96,7 +103,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
 
             var localCopy;
 
-            var actualMergedCopy = mergeByUnion("organisationUnits", "id", remoteCopy, localCopy);
+            var actualMergedCopy = mergeByUnion("organisationUnits", "id", remoteCopy, localCopy, logger);
 
             expect(actualMergedCopy).toEqual(remoteCopy);
         });

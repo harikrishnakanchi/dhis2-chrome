@@ -1,8 +1,8 @@
-define(["downloadPatientOriginConsumer", "patientOriginService", "utils", "angularMocks", "patientOriginRepository", "timecop"],
-    function(DownloadPatientOriginConsumer, PatientOriginService, utils, mocks, PatientOriginRepository, timecop) {
-        var downloadPatientOriginConsumer, patientOriginService, q, dhisPatientOriginDetails, patientOriginRepository, scope;
+define(["downloadPatientOriginConsumer", "patientOriginService", "utils", "angularMocks", "patientOriginRepository", "timecop", "mergeBy"],
+    function(DownloadPatientOriginConsumer, PatientOriginService, utils, mocks, PatientOriginRepository, timecop, MergeBy) {
+        var downloadPatientOriginConsumer, patientOriginService, q, dhisPatientOriginDetails, patientOriginRepository, scope, mergeBy;
         describe("download patient origin consumer", function() {
-            beforeEach(mocks.inject(function($q, $rootScope) {
+            beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 scope = $rootScope.$new();
                 q = $q;
                 dhisPatientOriginDetails = [{
@@ -33,6 +33,7 @@ define(["downloadPatientOriginConsumer", "patientOriginService", "utils", "angul
                 }];
                 patientOriginService = new PatientOriginService();
                 patientOriginRepository = new PatientOriginRepository();
+                mergeBy = new MergeBy($log);
             }));
 
             it("should merge patient origin details", function() {
@@ -52,7 +53,7 @@ define(["downloadPatientOriginConsumer", "patientOriginService", "utils", "angul
                 spyOn(patientOriginRepository, "upsert");
                 spyOn(patientOriginRepository, "findAll").and.returnValue(utils.getPromise(q, [localOriginDetails]));
 
-                downloadPatientOriginConsumer = new DownloadPatientOriginConsumer(patientOriginService, patientOriginRepository);
+                downloadPatientOriginConsumer = new DownloadPatientOriginConsumer(patientOriginService, patientOriginRepository, mergeBy);
                 downloadPatientOriginConsumer.run();
 
                 scope.$apply();

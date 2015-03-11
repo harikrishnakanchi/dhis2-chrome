@@ -1,5 +1,5 @@
 define(["lodashUtils", "moment"], function(_, moment) {
-    return function(equalsPred, remoteTimeField, localTimeField, remoteList, localList) {
+    return function(equalsPred, remoteTimeField, localTimeField, remoteList, localList, logger) {
         var epoc = "1970-01-01T00:00";
         remoteTimeField = remoteTimeField || "lastUpdated";
         localTimeField = localTimeField || "clientLastUpdated";
@@ -22,7 +22,7 @@ define(["lodashUtils", "moment"], function(_, moment) {
                 if (!isLocalDataStale(remoteItem, localItem)) {
                     mergedList[indexOfLocalItemInMergedList] = localItem;
                     if (!_.isEqual(localItem, remoteItem))
-                        console.log("Retaining localItem as it is newer than remoteItem", localItem, remoteItem);
+                        logger.info("Retaining localItem as it is newer than remoteItem", localItem, remoteItem);
                 }
             } else {
                 mergedList.push(localItem);

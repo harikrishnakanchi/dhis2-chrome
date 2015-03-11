@@ -27,7 +27,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             app.run(['consumerRegistry', 'dhisMonitor', 'queuePostProcessInterceptor', '$hustle', '$log',
                 function(consumerRegistry, dhisMonitor, queuePostProcessInterceptor, $hustle, $log) {
 
-                    $hustle.registerFailureStrategy(queuePostProcessInterceptor);
+                    $hustle.registerInterceptor(queuePostProcessInterceptor);
 
                     var registerCallback = function(alarmName, callback) {
                         return function(alarm) {

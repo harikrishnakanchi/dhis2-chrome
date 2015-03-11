@@ -1,8 +1,8 @@
-define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "programRepository", "timecop"], function(DownloadProgramConsumer, ProgramService, utils, mocks, ProgramRepository, timecop) {
+define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "programRepository", "timecop", "mergeBy"], function(DownloadProgramConsumer, ProgramService, utils, mocks, ProgramRepository, timecop, MergeBy) {
     describe("download program consumer", function() {
-        var downloadProgramConsumer, changeLogRepository, q, scope, programService, programRepository;
+        var downloadProgramConsumer, changeLogRepository, q, scope, programService, programRepository, mergeBy;
 
-        beforeEach(mocks.inject(function($q, $rootScope) {
+        beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
             scope = $rootScope.$new();
 
@@ -15,6 +15,8 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
 
             programService = new ProgramService();
             programRepository = new ProgramRepository();
+            mergeBy = new MergeBy($log);
+            
             spyOn(programRepository, "upsert");
             spyOn(programRepository, "upsertDhisDownloadedData");
         }));
@@ -53,7 +55,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
                 },
                 "created": "2014-10-24T09:01:12.020+0000"
             };
-            downloadProgramConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q);
+            downloadProgramConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q, mergeBy);
             downloadProgramConsumer.run(message);
             scope.$apply();
 
@@ -94,7 +96,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
                 },
                 "created": "2014-10-24T09:01:12.020+0000"
             };
-            downloadProgramConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q);
+            downloadProgramConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q, mergeBy);
             downloadProgramConsumer.run(message);
             scope.$apply();
 
@@ -114,7 +116,7 @@ define(["downloadProgramConsumer", "programService", "utils", "angularMocks", "p
             spyOn(programService, 'upsert');
             spyOn(programRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
-            downloadOrgunitConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q);
+            downloadOrgunitConsumer = new DownloadProgramConsumer(programService, programRepository, changeLogRepository, q, mergeBy);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();

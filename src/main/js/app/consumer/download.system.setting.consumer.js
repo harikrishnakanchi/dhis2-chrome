@@ -1,5 +1,5 @@
-define(['moment', 'lodashUtils', 'mergeBy'], function(moment, _, mergeBy) {
-    return function(systemSettingService, systemSettingRepository, changeLogRepository, $q) {
+define(['moment', 'lodashUtils'], function(moment, _) {
+    return function(systemSettingService, systemSettingRepository, mergeBy) {
         var run = function(message) {
             return download().then(mergeAndSave);
         };

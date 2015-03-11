@@ -1,5 +1,5 @@
-define(["moment", "lodash", "mergeBy"], function(moment, _, mergeBy) {
-    return function(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, $q) {
+define(["moment", "lodash"], function(moment, _) {
+    return function(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, $q, mergeBy) {
         this.run = function(message) {
             var orgUnitGroups = _.isArray(message.data.data) ? message.data.data : [message.data.data];
             return download(orgUnitGroups)

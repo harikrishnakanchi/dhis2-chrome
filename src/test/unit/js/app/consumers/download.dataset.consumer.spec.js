@@ -1,9 +1,9 @@
-define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "datasetRepository"],
-    function(DownloadDatasetConsumer, DatasetService, utils, mocks, DatasetRepository) {
+define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "datasetRepository", "mergeBy"],
+    function(DownloadDatasetConsumer, DatasetService, utils, mocks, DatasetRepository, MergeBy) {
         describe("download dataset consumer", function() {
-            var scope, q, datasetService, datasetRepository, downloadDatasetConsumer, changeLogRepository;
+            var scope, q, datasetService, datasetRepository, downloadDatasetConsumer, changeLogRepository, mergeBy;
 
-            beforeEach(mocks.inject(function($q, $rootScope) {
+            beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 q = $q;
                 scope = $rootScope.$new();
 
@@ -14,6 +14,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
 
                 datasetService = new DatasetService();
                 datasetRepository = new DatasetRepository();
+                mergeBy = new MergeBy($log);
             }));
 
             it("should save new dataset from dhis into the local repo", function() {
@@ -36,7 +37,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                     'created': '2015-01-02T09:00:00.000+0000'
                 };
 
-                downloadDatasetConsumer = new DownloadDatasetConsumer(datasetService, datasetRepository, q, changeLogRepository);
+                downloadDatasetConsumer = new DownloadDatasetConsumer(datasetService, datasetRepository, q, changeLogRepository, mergeBy);
                 downloadDatasetConsumer.run(message);
                 scope.$apply();
 
@@ -68,7 +69,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                     'created': '2015-01-02T09:00:00.000+0000'
                 };
 
-                downloadDatasetConsumer = new DownloadDatasetConsumer(datasetService, datasetRepository, q, changeLogRepository);
+                downloadDatasetConsumer = new DownloadDatasetConsumer(datasetService, datasetRepository, q, changeLogRepository, mergeBy);
                 downloadDatasetConsumer.run(message);
                 scope.$apply();
 
@@ -118,7 +119,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                     'created': '2015-01-02T09:00:00.000+0000'
                 };
 
-                downloadDatasetConsumer = new DownloadDatasetConsumer(datasetService, datasetRepository, q, changeLogRepository);
+                downloadDatasetConsumer = new DownloadDatasetConsumer(datasetService, datasetRepository, q, changeLogRepository, mergeBy);
                 downloadDatasetConsumer.run(message);
                 scope.$apply();
 

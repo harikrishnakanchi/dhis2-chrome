@@ -1,5 +1,5 @@
-define(['lodashUtils', 'mergeBy'], function(_, mergeBy) {
-    return function(patientOriginService, patientOriginRepository) {
+define(['lodashUtils'], function(_) {
+    return function(patientOriginService, patientOriginRepository, mergeBy) {
         var run = function(message) {
             return download().then(mergeAndSave);
         };

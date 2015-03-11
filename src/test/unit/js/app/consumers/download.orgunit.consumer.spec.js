@@ -1,8 +1,8 @@
-define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "orgUnitRepository", "timecop"], function(DownloadOrgunitConsumer, OrgUnitService, utils, mocks, OrgUnitRepository, timecop) {
+define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "orgUnitRepository", "timecop", "mergeBy"], function(DownloadOrgunitConsumer, OrgUnitService, utils, mocks, OrgUnitRepository, timecop, MergeBy) {
     describe("downloadOrgunitConsumer", function() {
-        var downloadOrgunitConsumer, payload, orgUnitService, orgUnitRepository, q, scope, changeLogRepository;
+        var downloadOrgunitConsumer, payload, orgUnitService, orgUnitRepository, q, scope, changeLogRepository, mergeBy;
 
-        beforeEach(mocks.inject(function($q, $rootScope) {
+        beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
             scope = $rootScope.$new();
 
@@ -32,6 +32,8 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             };
             orgUnitService = new OrgUnitService();
             orgUnitRepository = new OrgUnitRepository();
+            mergeBy = new MergeBy($log);
+
             spyOn(orgUnitRepository, "upsert");
             spyOn(orgUnitRepository, "upsertDhisDownloadedData");
 
@@ -84,7 +86,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'upsert');
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
 
             downloadOrgunitConsumer.run(message);
             scope.$apply();
@@ -134,7 +136,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'upsert');
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
 
             downloadOrgunitConsumer.run(message);
             scope.$apply();
@@ -182,7 +184,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'upsert');
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();
@@ -232,7 +234,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'upsert');
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy]));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();
@@ -259,7 +261,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHISSinceLastUpdatedTime));
             spyOn(orgUnitService, 'upsert');
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();
@@ -301,7 +303,7 @@ define(["downloadOrgUnitConsumer", "orgUnitService", "utils", "angularMocks", "o
             spyOn(orgUnitService, 'upsert');
             spyOn(orgUnitRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
-            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q);
+            downloadOrgunitConsumer = new DownloadOrgunitConsumer(orgUnitService, orgUnitRepository, changeLogRepository, q, mergeBy);
             downloadOrgunitConsumer.run(message);
 
             scope.$apply();

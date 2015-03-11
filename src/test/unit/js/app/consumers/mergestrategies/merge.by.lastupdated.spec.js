@@ -1,5 +1,11 @@
 define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
     describe("merge by last updated", function() {
+        var logger;
+        beforeEach(function() {
+            logger = {
+                "info": jasmine.createSpy()
+            };
+        });
 
         it("should merge dhis and local lists correctly even when they are not in the same order", function() {
 
@@ -43,7 +49,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
             var dataFromDhis = [test1Data, updatedTest2Data, staleTest3Data];
             var dataFromDB = [staleTest2Data, updatedTest3Data, test1Data, newLocalTest4Data];
 
-            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB);
+            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB, logger);
             expect(actualData).toEqual([test1Data, updatedTest2Data, updatedTest3Data, newLocalTest4Data]);
         });
 
@@ -56,7 +62,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
 
             var dataFromDB;
 
-            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB);
+            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB, logger);
             expect(actualData).toEqual(dataFromDhis);
         });
 
@@ -73,7 +79,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
                 'lastUpdated': '2015-01-01T10:00:00.000+0000',
             }];
 
-            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB);
+            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB, logger);
             expect(actualData).toEqual(dataFromDhis);
         });
 
@@ -91,7 +97,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
                 'clientLastUpdated': '2015-01-02T11:00:00.000+0000',
             }];
 
-            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB);
+            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB, logger);
             expect(actualData).toEqual(dataFromDB);
         });
 
@@ -109,7 +115,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
                 'clientLastUpdated': '2015-01-02T11:00:00.000+0000',
             }];
 
-            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB);
+            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB, logger);
             expect(actualData).toEqual(dataFromDB);
         });
 
@@ -127,7 +133,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
                 'clientLastUpdated': '2015-01-02T11:00:00.000+0000',
             }];
 
-            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB);
+            var actualData = mergeByLastUpdated(undefined, undefined, undefined, dataFromDhis, dataFromDB, logger);
             expect(actualData).toEqual(dataFromDhis);
         });
 
@@ -171,7 +177,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
             var dataFromDhis = [test1Data, updatedTest2Data, staleTest3Data];
             var dataFromDB = [staleTest2Data, updatedTest3Data, test1Data];
 
-            var actualData = mergeByLastUpdated(equalsPred, undefined, undefined, dataFromDhis, dataFromDB);
+            var actualData = mergeByLastUpdated(equalsPred, undefined, undefined, dataFromDhis, dataFromDB, logger);
             expect(actualData).toEqual([test1Data, updatedTest2Data, updatedTest3Data]);
         });
 
@@ -199,7 +205,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
                 }
             }];
 
-            var actualData = mergeByLastUpdated(eq, "value.lastUpdated", "value.clientLastUpdated", dataFromDhis, dataFromDB);
+            var actualData = mergeByLastUpdated(eq, "value.lastUpdated", "value.clientLastUpdated", dataFromDhis, dataFromDB, logger);
             expect(actualData).toEqual(dataFromDB);
         });
 
@@ -227,7 +233,7 @@ define(["mergeByLastUpdated"], function(mergeByLastUpdated) {
                 }
             }];
 
-            var actualData = mergeByLastUpdated(eq, "value.lastUpdated", "value.lastUpdated", dataFromDhis, dataFromDB);
+            var actualData = mergeByLastUpdated(eq, "value.lastUpdated", "value.lastUpdated", dataFromDhis, dataFromDB, logger);
             expect(actualData).toEqual(dataFromDhis);
         });
 

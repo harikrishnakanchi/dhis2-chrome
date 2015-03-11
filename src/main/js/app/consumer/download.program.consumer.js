@@ -1,5 +1,5 @@
-define(['moment', 'mergeBy', 'lodashUtils'], function(moment, mergeBy, _) {
-    return function(programService, programRepository, changeLogRepository, $q) {
+define(['moment', 'lodashUtils'], function(moment, _) {
+    return function(programService, programRepository, changeLogRepository, $q, mergeBy) {
         this.run = function(message) {
             return download()
                 .then(mergeAndSave)

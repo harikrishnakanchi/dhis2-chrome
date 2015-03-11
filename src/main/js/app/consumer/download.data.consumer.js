@@ -1,5 +1,5 @@
-define(["moment", "properties", "lodash", "dateUtils", "mergeBy"], function(moment, properties, _, dateUtils, mergeBy) {
-    return function(dataService, dataRepository, datasetRepository, userPreferenceRepository, $q, approvalDataRepository) {
+define(["moment", "properties", "lodash", "dateUtils"], function(moment, properties, _, dateUtils) {
+    return function(dataService, dataRepository, datasetRepository, userPreferenceRepository, $q, approvalDataRepository, mergeBy) {
         this.run = function() {
             return downloadDataValues().then(mergeAndSaveDataValues);
         };

@@ -1,8 +1,8 @@
-define(["downloadSystemSettingConsumer", "systemSettingService", "utils", "angularMocks", "systemSettingRepository", "timecop"],
-    function(DownloadSystemSettingConsumer, SystemSettingService, utils, mocks, SystemSettingRepository, timecop) {
-        var downloadSystemSettingConsumer, systemSettingService, q, allSystemSettings, systemSettingRepository, scope;
+define(["downloadSystemSettingConsumer", "systemSettingService", "utils", "angularMocks", "systemSettingRepository", "timecop", "mergeBy"],
+    function(DownloadSystemSettingConsumer, SystemSettingService, utils, mocks, SystemSettingRepository, timecop, MergeBy) {
+        var downloadSystemSettingConsumer, systemSettingService, q, allSystemSettings, systemSettingRepository, scope, mergeBy;
         describe("download system setting consumer", function() {
-            beforeEach(mocks.inject(function($q, $rootScope) {
+            beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 scope = $rootScope.$new();
                 q = $q;
                 allSystemSettings = [{
@@ -20,13 +20,14 @@ define(["downloadSystemSettingConsumer", "systemSettingService", "utils", "angul
                 }];
                 systemSettingService = new SystemSettingService();
                 systemSettingRepository = new SystemSettingRepository();
+                mergeBy = new MergeBy($log);
             }));
 
             it("should download excluded data elements", function() {
                 spyOn(systemSettingService, "getAll").and.returnValue(utils.getPromise(q, allSystemSettings));
                 spyOn(systemSettingRepository, "upsert");
                 spyOn(systemSettingRepository, "findAll").and.returnValue(utils.getPromise(q, undefined));
-                downloadSystemSettingConsumer = new DownloadSystemSettingConsumer(systemSettingService, systemSettingRepository);
+                downloadSystemSettingConsumer = new DownloadSystemSettingConsumer(systemSettingService, systemSettingRepository, mergeBy);
 
                 downloadSystemSettingConsumer.run();
                 scope.$apply();
@@ -58,7 +59,7 @@ define(["downloadSystemSettingConsumer", "systemSettingService", "utils", "angul
                 spyOn(systemSettingRepository, "upsert");
                 spyOn(systemSettingRepository, "findAll").and.returnValue(utils.getPromise(q, [locallyModifiedSetting]));
 
-                downloadSystemSettingConsumer = new DownloadSystemSettingConsumer(systemSettingService, systemSettingRepository);
+                downloadSystemSettingConsumer = new DownloadSystemSettingConsumer(systemSettingService, systemSettingRepository, mergeBy);
                 downloadSystemSettingConsumer.run();
 
                 scope.$apply();
@@ -83,7 +84,7 @@ define(["downloadSystemSettingConsumer", "systemSettingService", "utils", "angul
                 spyOn(systemSettingRepository, "upsert");
                 spyOn(systemSettingRepository, "findAll").and.returnValue(utils.getPromise(q, [locallyModifiedSetting]));
 
-                downloadSystemSettingConsumer = new DownloadSystemSettingConsumer(systemSettingService, systemSettingRepository);
+                downloadSystemSettingConsumer = new DownloadSystemSettingConsumer(systemSettingService, systemSettingRepository, mergeBy);
                 downloadSystemSettingConsumer.run();
 
                 scope.$apply();

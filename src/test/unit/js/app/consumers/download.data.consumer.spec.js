@@ -1,10 +1,10 @@
-define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "moment", "timecop"],
-    function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DatasetRepository, UserPreferenceRepository, moment, timecop) {
+define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "moment", "timecop", "mergeBy"],
+    function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DatasetRepository, UserPreferenceRepository, moment, timecop, MergeBy) {
         describe("download data consumer", function() {
 
-            var dataService, dataRepository, approvalDataRepository, datasetRepository, userPreferenceRepository, q, scope, downloadDataConsumer, message, approvalService;
+            var dataService, dataRepository, approvalDataRepository, datasetRepository, userPreferenceRepository, q, scope, downloadDataConsumer, message, approvalService, mergeBy;
 
-            beforeEach(mocks.inject(function($q, $rootScope) {
+            beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 q = $q;
                 scope = $rootScope.$new();
                 thisMoment = moment("2014-01-01T");
@@ -41,7 +41,9 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "save": jasmine.createSpy("save")
                 };
 
-                downloadDataConsumer = new DownloadDataConsumer(dataService, dataRepository, datasetRepository, userPreferenceRepository, q, approvalDataRepository);
+                mergeBy = new MergeBy($log);
+
+                downloadDataConsumer = new DownloadDataConsumer(dataService, dataRepository, datasetRepository, userPreferenceRepository, q, approvalDataRepository, mergeBy);
             }));
 
             afterEach(function() {

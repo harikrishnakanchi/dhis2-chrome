@@ -66,7 +66,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
             app.run(['dhisMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', 
                 function(dhisMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle) {
 
-                    $hustle.registerFailureStrategy(queuePostProcessInterceptor);
+                    $hustle.registerInterceptor(queuePostProcessInterceptor);
 
                     $rootScope.$on('$locationChangeStart', function(e, newUrl, oldUrl) {
                         if (!$rootScope.isLoggedIn) {
