@@ -142,8 +142,10 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             });
         };
 
-        var setOriginDetailsForEdit = function(originDetails) {
-            $scope.originDetails = originDetails.value.origins;
+        var setOriginDetails = function(originDetails) {
+            if (!_.isEmpty(originDetails)) {
+                $scope.originDetails = originDetails.value.origins;
+            }
         };
 
         var prepareNewForm = function() {
@@ -169,7 +171,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             orgUnitRepository.getAllProjects().then(function(allProjects) {
                 $scope.peerProjects = _.without(orgUnitMapper.getChildOrgUnitNames(allProjects, $scope.orgUnit.parent.id), $scope.orgUnit.name);
                 userRepository.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForEdit);
-                patientOriginRepository.get($scope.orgUnit.id).then(setOriginDetailsForEdit);
+                patientOriginRepository.get($scope.orgUnit.id).then(setOriginDetails);
             });
         };
 

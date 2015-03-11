@@ -7,7 +7,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
                 "lastUpdated": "2014-05-30T12:43:54.972Z",
                 "organisationUnits": [{
                     "id": "org1",
-                    "name": "org1"
+                    "name": "org2"
                 }, {
                     "id": "org2",
                     "name": "org2"
@@ -33,7 +33,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
                 "lastUpdated": "2014-05-30T12:43:54.972Z",
                 "organisationUnits": [{
                     "id": "org1",
-                    "name": "org1"
+                    "name": "org2"
                 }, {
                     "id": "org2",
                     "name": "org2"
