@@ -328,14 +328,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             }];
 
             var patientOrigins = {
-                "key": "projid",
-                "value": {
-                    "origins": [{
-                        "originName": "test",
-                        "latitude": 78,
-                        "longitude": 80
-                    }]
-                }
+                "orgUnit": "projid",
+                "origins": [{
+                    "originName": "test",
+                    "latitude": 78,
+                    "longitude": 80
+                }]
             };
 
             var expectedUsers = [{
@@ -370,7 +368,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             scope.$apply();
 
             expect(scope.projectUsers).toEqual(expectedUsers);
-            expect(scope.originDetails).toEqual(patientOrigins.value.origins);
+            expect(scope.originDetails).toEqual(patientOrigins.origins);
         });
 
         it("should set user project as currently selected project", function() {

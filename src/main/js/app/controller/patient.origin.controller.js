@@ -25,15 +25,13 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
 
 
             var projectOrigins = _.isEmpty($scope.projectOrigins) ? [] : $scope.projectOrigins;
-            patientOrigin.id = dhisId.get(patientOrigin.originName);
+            patientOrigin.id = dhisId.get(patientOrigin.name);
+            patientOrigin.clientLastUpdated = moment().toISOString();
             projectOrigins.push(patientOrigin);
 
             var payload = {
-                key: $scope.projectId,
-                value: {
-                    clientLastUpdated: moment().toISOString(),
-                    origins: projectOrigins
-                }
+                orgUnit: $scope.projectId,
+                origins: projectOrigins
             };
             return patientOriginRepository.upsert(payload).
             then(_.partial(publishMessage, payload, "uploadPatientOriginDetails")).then(onSuccess, onFailure);
@@ -41,8 +39,8 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
 
         var getPatientOriginDetails = function() {
             return patientOriginRepository.get($scope.projectId).then(function(patientOriginDetails) {
-                if (!_.isEmpty(patientOriginDetails) && !_.isEmpty(patientOriginDetails.value))
-                    $scope.projectOrigins = patientOriginDetails.value.origins;
+                if (!_.isEmpty(patientOriginDetails) && !_.isEmpty(patientOriginDetails.origins))
+                    $scope.projectOrigins = patientOriginDetails.origins;
             });
         };
 

@@ -1,11 +1,14 @@
 define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, moment, _) {
     return function($http) {
         var upsert = function(patientOriginDetails) {
-            var payload = {};
-            payload[patientOriginDetails.key] = patientOriginDetails.value;
+            var key = "origin_details_" + patientOriginDetails.orgUnit;
+            var payload = {
+                'origins': patientOriginDetails.origins
+            };
+
             return $http({
                 method: 'POST',
-                url: dhisUrl.patientOriginDetails,
+                url: dhisUrl.systemSettings + '/' + key,
                 data: JSON.stringify(payload),
                 headers: {
                     'Content-Type': 'text/plain'
@@ -16,16 +19,18 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         var transform = function(response) {
             var result = [];
             _.transform(response.data, function(acc, value, key) {
-                result.push({
-                    "key": key,
-                    "value": value
-                });
+                if (_.startsWith(key, 'origin_details_')) {
+                    result.push({
+                        "orgUnit": key.replace('origin_details_', ''),
+                        "origins": JSON.parse(value).origins
+                    });
+                }
             });
             return result;
         };
 
         var getAll = function() {
-            return $http.get(dhisUrl.patientOriginDetails).then(transform);
+            return $http.get(dhisUrl.systemSettings).then(transform);
         };
 
         var loadFromFile = function() {};

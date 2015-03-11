@@ -22,9 +22,10 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
 
             origins = [{
                 'id': 'origin1',
-                'originName': 'Origin1',
+                'name': 'Origin1',
                 'longitude': 100,
-                'latitude': 80
+                'latitude': 80,
+                'clientLastUpdated': '2014-05-30T12:43:54.972Z'
             }];
 
             Timecop.install();
@@ -39,11 +40,8 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
 
         it("should set patientOriginDetails on scope on initialization", function() {
             spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {
-                'key': 'prj1',
-                'value': {
-                    'clientLastUpdated': "2014-05-30T12:43:54.972Z",
-                    'origins': origins
-                }
+                'orgUnit': 'prj1',
+                'origins': origins
             }));
             patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository);
             scope.$apply();
@@ -57,23 +55,21 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
             scope.$apply();
 
             scope.save({
-                'originName': 'Origin1',
+                'name': 'Origin1',
                 'longitude': 100,
                 'latitude': 80
             });
             scope.$apply();
 
             var expectedPayload = {
-                key: 'prj1',
-                value: {
+                orgUnit: 'prj1',
+                origins: [{
+                    'id': 'Origin1',
+                    'name': 'Origin1',
+                    'longitude': 100,
+                    'latitude': 80,
                     clientLastUpdated: '2014-04-01T00:00:00.000Z',
-                    origins: [{
-                        'id': 'Origin1',
-                        'originName': 'Origin1',
-                        'longitude': 100,
-                        'latitude': 80
-                    }]
-                }
+                }]
             };
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
             expect(hustle.publish).toHaveBeenCalledWith({
@@ -85,38 +81,34 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
 
         it("should save patientOriginDetails if origin details are already present", function() {
             spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {
-                'key': 'prj1',
-                'value': {
-                    'clientLastUpdated': "2014-05-30T12:43:54.972Z",
-                    'origins': origins
-                }
+                'orgUnit': 'prj1',
+                'origins': origins
             }));
             patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository);
             scope.$apply();
 
             scope.save({
-                'originName': 'Origin2',
+                'name': 'Origin2',
                 'longitude': 100,
                 'latitude': 80
             });
             scope.$apply();
 
             var expectedPayload = {
-                key: 'prj1',
-                value: {
-                    clientLastUpdated: '2014-04-01T00:00:00.000Z',
-                    origins: [{
-                        'id': 'origin1',
-                        'originName': 'Origin1',
-                        'longitude': 100,
-                        'latitude': 80
-                    }, {
-                        'id': 'Origin2',
-                        'originName': 'Origin2',
-                        'longitude': 100,
-                        'latitude': 80
-                    }]
-                }
+                orgUnit: 'prj1',
+                origins: [{
+                    'id': 'origin1',
+                    'name': 'Origin1',
+                    'longitude': 100,
+                    'latitude': 80,
+                    'clientLastUpdated': '2014-05-30T12:43:54.972Z'
+                }, {
+                    'id': 'Origin2',
+                    'name': 'Origin2',
+                    'longitude': 100,
+                    'latitude': 80,
+                    'clientLastUpdated': '2014-04-01T00:00:00.000Z',
+                }]
             };
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
             expect(hustle.publish).toHaveBeenCalledWith({

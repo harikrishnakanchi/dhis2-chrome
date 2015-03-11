@@ -10,22 +10,24 @@ define(["patientOriginService", "angularMocks", "properties", "utils", "md5", "t
             patientOriginService = new PatientOriginService(http);
 
             patientOriginDetails = {
-                "prj1": {
-                    clientLastUpdated: "2014-05-30T12:43:54.972Z",
-                    origins: [{
-                        'originName': 'origin1',
+                'origin_details_prj1': JSON.stringify({
+                    'origins': [{
+                        'id': 'origin1',
+                        'name': 'origin1',
                         'latitude': '80',
-                        'longitude': '180'
+                        'longitude': '180',
+                        'clientLastUpdated': "2014-05-30T12:43:54.972Z",
                     }, {
-                        'originName': 'origin2',
+                        'id': 'origin2',
+                        'name': 'origin2',
                         'latitude': '80',
-                        'longitude': '180'
+                        'longitude': '180',
+                        'clientLastUpdated': "2014-05-30T12:43:54.972Z",
                     }]
-                },
-                "prj2": {
-                    clientLastUpdated: "2014-05-30T12:43:54.972Z",
-                    origins: []
-                }
+                }),
+                'origin_details_prj2': JSON.stringify({
+                    'origins': []
+                })
             };
 
             Timecop.install();
@@ -42,59 +44,56 @@ define(["patientOriginService", "angularMocks", "properties", "utils", "md5", "t
 
         it("should get all patient origin details", function() {
             var result = {};
-            httpBackend.expectGET(properties.dhis.url + "/api/systemSettings/patientOriginDetails").respond(200, patientOriginDetails);
+            httpBackend.expectGET(properties.dhis.url + "/api/systemSettings").respond(200, patientOriginDetails);
             patientOriginService.getAll().then(function(result) {
                 expect(result).toEqual([{
-                    key: "prj1",
-                    value: {
-                        clientLastUpdated: "2014-05-30T12:43:54.972Z",
-                        origins: [{
-                            'originName': 'origin1',
-                            'latitude': '80',
-                            'longitude': '180'
-                        }, {
-                            'originName': 'origin2',
-                            'latitude': '80',
-                            'longitude': '180'
-                        }]
-                    }
+                    orgUnit: "prj1",
+                    origins: [{
+                        'id': 'origin1',
+                        'name': 'origin1',
+                        'latitude': '80',
+                        'longitude': '180',
+                        'clientLastUpdated': "2014-05-30T12:43:54.972Z",
+                    }, {
+                        'id': 'origin2',
+                        'name': 'origin2',
+                        'latitude': '80',
+                        'longitude': '180',
+                        'clientLastUpdated': "2014-05-30T12:43:54.972Z",
+                    }]
                 }, {
-                    key: "prj2",
-                    value: {
-                        clientLastUpdated: "2014-05-30T12:43:54.972Z",
-                        origins: []
-                    }
+                    orgUnit: "prj2",
+                    origins: []
                 }]);
             });
             httpBackend.flush();
         });
 
         it("should post patientOriginDetails for a project", function() {
-            var projectId = "prj1";
             var patientOriginDetails = {
-                key: projectId,
-                value: {
-                    clientLastUpdated: "2014-05-30T12:43:54.972Z",
-                    origins: [{
-                        'originName': 'origin1',
-                        'latitude': '80',
-                        'longitude': '180'
-                    }]
-                }
+                orgUnit: "prj1",
+                origins: [{
+                    'id': 'origin1',
+                    'name': 'origin1',
+                    'latitude': '80',
+                    'longitude': '180',
+                    'clientLastUpdated': "2014-05-30T12:43:54.972Z",
+                }]
             };
 
+            var expectedPayload = JSON.stringify({
+                "origins": [{
+                    "id": "origin1",
+                    "name": "origin1",
+                    "latitude": "80",
+                    "longitude": "180",
+                    "clientLastUpdated": "2014-05-30T12:43:54.972Z"
+                }]
+            });
+
             patientOriginService.upsert(patientOriginDetails);
-            var expectedPayload = {
-                "prj1": {
-                    clientLastUpdated: "2014-05-30T12:43:54.972Z",
-                    origins: [{
-                        'originName': 'origin1',
-                        'latitude': '80',
-                        'longitude': '180'
-                    }]
-                }
-            };
-            httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/patientOriginDetails", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/origin_details_prj1", expectedPayload).respond(200, "ok");
+
             httpBackend.flush();
         });
 

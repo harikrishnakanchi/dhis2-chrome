@@ -144,7 +144,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
         var setOriginDetails = function(originDetails) {
             if (!_.isEmpty(originDetails)) {
-                $scope.originDetails = originDetails.value.origins;
+                $scope.originDetails = originDetails.origins;
             }
         };
 

@@ -12,15 +12,14 @@ define(["uploadPatientOriginConsumer", "patientOriginService", "utils", "angular
 
             it("should upload system settings", function() {
                 var payload = {
-                    key: "prj1",
-                    value: {
-                        clientLastUpdated: "2014-05-30T12:43:54.972Z",
-                        origins: [{
-                            "originName": "origin1",
-                            "longitude": 180,
-                            "latitude": 80
-                        }]
-                    }
+                    orgUnit: "prj1",
+                    origins: [{
+                        "id": "origin1",
+                        "originName": "origin1",
+                        "longitude": 180,
+                        "latitude": 80,
+                        "clientLastUpdated": "2014-05-30T12:43:54.972Z"
+                    }]
                 };
 
                 var message = {
@@ -35,6 +34,8 @@ define(["uploadPatientOriginConsumer", "patientOriginService", "utils", "angular
                 var uploadPatientOriginConsumer = new UploadPatientOriginConsumer(patientOriginService, patientOriginRepository, q);
                 uploadPatientOriginConsumer.run(message);
                 scope.$apply();
+
+                expect(patientOriginRepository.get).toHaveBeenCalledWith("prj1");
                 expect(patientOriginService.upsert).toHaveBeenCalledWith(payload);
             });
         });

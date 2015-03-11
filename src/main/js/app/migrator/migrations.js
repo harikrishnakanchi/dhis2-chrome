@@ -30,7 +30,7 @@ define([], function() {
     };
 
     var add_patient_origin_store = function(db, tx) {
-        create_store_with_key("patientOrigin", "key", db);
+        create_store_with_key("patientOrigin", "orgUnit", db);
     };
 
     var change_log_stores = function(db, tx) {
