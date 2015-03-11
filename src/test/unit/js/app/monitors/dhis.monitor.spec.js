@@ -1,10 +1,11 @@
 define(["dhisMonitor", "utils", "angularMocks", "chromeRuntime", "mockChrome"], function(DhisMonitor, utils, mocks, chromeRuntime, MockChrome) {
     describe("dhis.monitor", function() {
-        var q, http, httpBackend;
+        var q, log, http, httpBackend;
         var callbacks = {};
 
-        beforeEach(mocks.inject(function($injector, $q) {
+        beforeEach(mocks.inject(function($injector, $q, $log) {
             q = $q;
+            log = $log;
             http = $injector.get('$http');
             httpBackend = $injector.get('$httpBackend');
             mockChrome = new MockChrome();
@@ -21,7 +22,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeRuntime", "mockChrome"], 
             var callback = jasmine.createSpy();
 
             httpBackend.expect("HEAD").respond(200, utils.getPromise(q, "ok"));
-            var dhisMonitor = new DhisMonitor(http);
+            var dhisMonitor = new DhisMonitor(http, log);
             dhisMonitor.online(function() {
                 callback();
             });
@@ -37,7 +38,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeRuntime", "mockChrome"], 
             var callback = jasmine.createSpy();
 
             httpBackend.expect("HEAD").respond(200, utils.getPromise(q, "ok"));
-            var dhisMonitor = new DhisMonitor(http);
+            var dhisMonitor = new DhisMonitor(http, log);
             dhisMonitor.offline(function() {
                 callback();
             });
@@ -57,7 +58,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeRuntime", "mockChrome"], 
             var offlineCallback = jasmine.createSpy();
 
             httpBackend.expect("HEAD").respond(0, utils.getPromise(q, {}));
-            var dhisMonitor = new DhisMonitor(http);
+            var dhisMonitor = new DhisMonitor(http, log);
 
             dhisMonitor.offline(function() {
                 offlineCallback();
@@ -78,7 +79,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeRuntime", "mockChrome"], 
             var offlineCallback = jasmine.createSpy();
 
             httpBackend.expect("HEAD").respond(200, utils.getPromise(q, "ok"));
-            var dhisMonitor = new DhisMonitor(http);
+            var dhisMonitor = new DhisMonitor(http, log);
 
             dhisMonitor.offline(function() {
                 offlineCallback();

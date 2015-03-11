@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "failureStrategyFactory", "monitors", "logRequestReponseInterceptor", "angular-indexedDB"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, failureStrategyFactory, monitors, logRequestReponseInterceptor) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "angular-indexedDB"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
             services.init(app);
@@ -10,7 +10,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             app.factory('configureRequestInterceptor', [configureRequestInterceptor]);
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', handleTimeoutInterceptor]);
-            app.factory('logRequestReponseInterceptor', [logRequestReponseInterceptor]);
+            app.factory('logRequestReponseInterceptor', ['$log', logRequestReponseInterceptor]);
+            app.factory('queuePostProcessInterceptor', ['$log', queuePostProcessInterceptor]);
 
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider',
                 function($indexedDBProvider, $httpProvider, $hustleProvider) {
@@ -19,12 +20,14 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     $httpProvider.interceptors.push('cleanupPayloadInterceptor');
                     $httpProvider.interceptors.push('handleTimeoutInterceptor');
                     $httpProvider.interceptors.push('logRequestReponseInterceptor');
-                    $hustleProvider.init("hustle", 1, ["dataValues"], failureStrategyFactory);
+                    $hustleProvider.init("hustle", 1, ["dataValues"]);
                 }
             ]);
 
-            app.run(['consumerRegistry', 'dhisMonitor', '$hustle',
-                function(consumerRegistry, dhisMonitor, $hustle) {
+            app.run(['consumerRegistry', 'dhisMonitor', 'queuePostProcessInterceptor', '$hustle', '$log',
+                function(consumerRegistry, dhisMonitor, queuePostProcessInterceptor, $hustle, $log) {
+
+                    $hustle.registerFailureStrategy(queuePostProcessInterceptor);
 
                     var registerCallback = function(alarmName, callback) {
                         return function(alarm) {
@@ -89,16 +92,15 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     });
                     chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
 
-                    console.log("Registering hustle consumers");
                     consumerRegistry.register().then(function() {
 
                         dhisMonitor.online(function() {
-                            console.log("Starting all hustle consumers");
+                            $log.info("Starting all hustle consumers");
                             consumerRegistry.startAllConsumers();
                         });
 
                         dhisMonitor.offline(function() {
-                            console.log("Stopping all hustle consumers");
+                            $log.info("Stopping all hustle consumers");
                             consumerRegistry.stopAllConsumers();
                         });
 

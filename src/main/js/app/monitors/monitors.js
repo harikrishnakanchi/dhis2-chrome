@@ -1,6 +1,6 @@
 define(["dhisMonitor"], function(dhisMonitor) {
     var init = function(app) {
-        app.service('dhisMonitor', ['$http', dhisMonitor]);
+        app.service('dhisMonitor', ['$http', '$log', dhisMonitor]);
     };
 
     return {

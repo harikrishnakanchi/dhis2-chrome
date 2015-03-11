@@ -1,5 +1,5 @@
 define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRuntime, _) {
-    return function($http) {
+    return function($http, $log) {
         var onlineEventHandlers = [];
         var offlineEventHandlers = [];
         var isDhisOnline;
@@ -19,26 +19,24 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
             return $http.head(pingUrl, {
                 "timeout": 1000 * properties.dhisPing.timeoutInSeconds
             }).then(function(response) {
-                console.log("DHIS is accessible");
+                $log.info("DHIS is accessible");
                 isDhisOnline = true;
                 chromeRuntime.sendMessage("dhisOnline");
             }).
             catch(function(response) {
-                console.log("DHIS is not accessible");
+                $log.info("DHIS is not accessible");
                 isDhisOnline = false;
                 chromeRuntime.sendMessage("dhisOffline");
             });
         };
 
         var onDhisOnline = function() {
-            console.log("calling online handlers", onlineEventHandlers);
             _.each(onlineEventHandlers, function(handler) {
                 handler.call({});
             });
         };
 
         var onDhisOffline = function() {
-            console.log("calling offline handlers", offlineEventHandlers);
             _.each(offlineEventHandlers, function(handler) {
                 handler.call({});
             });
@@ -46,7 +44,7 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
 
         var createAlarms = function() {
             if (chrome.alarms) {
-                console.log("Registering dhis monitor alarm");
+                $log.info("Registering dhis monitor alarm");
                 chrome.alarms.create("dhisConnectivityCheckAlarm", {
                     periodInMinutes: properties.dhisPing.retryIntervalInMinutes
                 });

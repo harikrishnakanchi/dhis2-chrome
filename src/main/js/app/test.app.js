@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "failureStrategyFactory", "monitors", "migrator", "migrations", "angular-indexedDB"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, failureStrategyFactory, monitors, migrator, migrations) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "monitors", "migrator", "migrations", "angular-indexedDB"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, monitors, migrator, migrations) {
         var init = function() {
             var app = angular.module('DHIS2_TEST', ["xc.indexedDB", "hustle"]);
             services.init(app);
@@ -21,7 +21,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                                 chrome.runtime.sendMessage("migrationComplete");
                             }
                         });
-                    $hustleProvider.init("hustle", 1, ["dataValues"], failureStrategyFactory);
+                    $hustleProvider.init("hustle", 1, ["dataValues"]);
 
                     $httpProvider.defaults.useXDomain = true;
                     $httpProvider.defaults.headers.common = {

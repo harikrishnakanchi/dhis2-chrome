@@ -1,8 +1,8 @@
-define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "migrator", "migrations", "properties", "failureStrategyFactory", "monitors", "helpers",
+define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "migrator", "migrations", "properties", "queuePostProcessInterceptor", "monitors", "helpers",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals", "angular-ui-dropdown"
     ],
-    function(angular, Q, services, dbutils, controllers, repositories, migrator, migrations, properties, failureStrategyFactory, monitors, helpers) {
+    function(angular, Q, services, dbutils, controllers, repositories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
@@ -15,7 +15,9 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
             dbutils.init(app);
             controllers.init(app);
 
-            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider',
+            app.factory('queuePostProcessInterceptor', ['$log', queuePostProcessInterceptor]);
+
+            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', 
                 function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider) {
                     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
                     $routeProvider.
@@ -52,7 +54,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                             }
                         });
 
-                    $hustleProvider.init("hustle", 1, ["dataValues"], failureStrategyFactory);
+                    $hustleProvider.init("hustle", 1, ["dataValues"]);
                 }
             ]);
             app.value('ngI18nConfig', {
@@ -61,8 +63,11 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['dhisMonitor', '$rootScope', '$location',
-                function(dhisMonitor, $rootScope, $location) {
+            app.run(['dhisMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', 
+                function(dhisMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle) {
+
+                    $hustle.registerFailureStrategy(queuePostProcessInterceptor);
+
                     $rootScope.$on('$locationChangeStart', function(e, newUrl, oldUrl) {
                         if (!$rootScope.isLoggedIn) {
                             $location.path("/login");

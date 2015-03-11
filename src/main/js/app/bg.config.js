@@ -10,8 +10,7 @@ require.config({
         "moment": "lib/moment/moment",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
         "angular": "lib/angular/angular",
-
-        //md5
+        "logger": "lib/loglevel/dist/loglevel",
         "md5": "lib/js-md5/js/md5",
 
         //services
@@ -94,7 +93,7 @@ require.config({
         "logRequestReponseInterceptor": "app/interceptors/log.request.response.interceptor",
 
         //Queue
-        "failureStrategyFactory": "app/queue/failure.strategy.factory",
+        "queuePostProcessInterceptor": "app/queue/queue.postprocess.interceptor",
 
         //Utils
         "chromeRuntime": "app/utils/chrome.runtime",

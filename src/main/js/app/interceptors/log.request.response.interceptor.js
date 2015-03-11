@@ -1,5 +1,5 @@
 define([], function() {
-    return function() {
+    return function($log) {
         return {
             'request': function(config) {
                 if (!config.method)
@@ -7,9 +7,9 @@ define([], function() {
 
                 var method = config.method;
                 if (method === "GET")
-                    console.log("Request", config.method, config.url);
+                    $log.info("Request", config.method, config.url);
                 if (method === "POST" || method === "PUT" || method === "DELETE")
-                    console.log("Request", config.method, config.url, config.data);
+                    $log.info("Request", config.method, config.url, config.data);
 
                 return config;
             },
@@ -19,9 +19,9 @@ define([], function() {
 
                 var method = response.config.method;
                 if (method === "GET")
-                    console.log("Response", response.config.method, response.config.url, response.data);
+                    $log.info("Response", response.config.method, response.config.url, response.data);
                 if (method === "POST" || method === "PUT" || method === "DELETE")
-                    console.log("Response", response.config.method, response.config.url, response.config.data, response.data);
+                    $log.info("Response", response.config.method, response.config.url, response.config.data, response.data);
 
                 return response;
             }

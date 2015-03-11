@@ -2,7 +2,7 @@ define(["consumerRegistry", "angularMocks", "hustleModule", "utils"], function(C
     describe("register consumers", function() {
         var hustle, consumerRegistry, dataValueConsumer, consumer, q, scope;
         beforeEach(module('hustle'));
-        beforeEach(mocks.inject(function($hustle, $q, $rootScope) {
+        beforeEach(mocks.inject(function($hustle, $q, $log, $rootScope) {
             hustle = $hustle;
             dataValueConsumer = {
                 "run": function() {}
@@ -13,7 +13,7 @@ define(["consumerRegistry", "angularMocks", "hustleModule", "utils"], function(C
             };
             q = $q;
             scope = $rootScope.$new();
-            consumerRegistry = new ConsumerRegistry($hustle, $q, dataValueConsumer);
+            consumerRegistry = new ConsumerRegistry($hustle, $q, $log, dataValueConsumer);
         }));
 
         it("should register and start consumers", function() {

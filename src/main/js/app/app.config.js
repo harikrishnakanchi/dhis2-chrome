@@ -14,6 +14,7 @@ require.config({
         "timecop": "lib/timecop/timecop-0.1.1",
         "hustle": "lib/hustle/hustle",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
+        "logger": "lib/loglevel/dist/loglevel",
 
 
         //3rd party angular modules
@@ -104,7 +105,7 @@ require.config({
         "monitors": "app/monitors/monitors",
 
         //Queue
-        "failureStrategyFactory": "app/queue/failure.strategy.factory",
+        "queuePostProcessInterceptor": "app/queue/queue.postprocess.interceptor",
 
         //Utils
         "chromeRuntime": "app/utils/chrome.runtime",

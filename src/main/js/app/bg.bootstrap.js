@@ -3,8 +3,7 @@ require.config({
 });
 
 require(["app/bg.config"], function(config) {
-    require(["indexedDBLogger", "app"], function(indexedDBLogger, app) {
-        indexedDBLogger.configure("msfLogs");
+    require(["app"], function(app) {
         require(["properties"], function(properties) {
             var bootstrapData;
             var onMigrationComplete = function(request, sender, sendResponse) {

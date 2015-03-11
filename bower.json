@@ -17,6 +17,7 @@
         "angularjs-directives": "https://github.com/DWB-eHealth/angularjs-directives.git",
         "moment": null,
         "js-md5": null,
+        "loglevel": null,
         "hustle": "https://github.com/orthecreedence/hustle.git",
         "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git",
         "timecop": null
