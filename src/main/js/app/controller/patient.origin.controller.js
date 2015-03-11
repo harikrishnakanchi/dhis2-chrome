@@ -19,8 +19,22 @@ define(["lodash", "moment"], function(_, moment) {
                     origins: projectOrigins
                 }
             };
+
+            var onSuccess = function(data) {
+                $scope.saveFailure = false;
+                if ($scope.$parent.closeNewForm)
+                    $scope.$parent.closeNewForm($scope.orgUnit, "savedOriginDetails");
+                return data;
+            };
+
+            var onFailure = function(error) {
+                $scope.saveSuccess = false;
+                $scope.saveFailure = true;
+                return error;
+            };
+
             return patientOriginRepository.upsert(payload).
-            then(_.partial(publishMessage, payload, "uploadPatientOriginDetails"));
+            then(_.partial(publishMessage, payload, "uploadPatientOriginDetails")).then(onSuccess, onFailure);
         };
 
         var getPatientOriginDetails = function() {

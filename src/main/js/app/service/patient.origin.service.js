@@ -18,7 +18,7 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             _.transform(response.data, function(acc, value, key) {
                 result.push({
                     "key": key,
-                    "value": JSON.parse(value)
+                    "value": value
                 });
             });
             return result;

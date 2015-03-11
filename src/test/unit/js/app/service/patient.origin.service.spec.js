@@ -10,7 +10,7 @@ define(["patientOriginService", "angularMocks", "properties", "utils", "md5", "t
             patientOriginService = new PatientOriginService(http);
 
             patientOriginDetails = {
-                "prj1": JSON.stringify({
+                "prj1": {
                     clientLastUpdated: "2014-05-30T12:43:54.972Z",
                     origins: [{
                         'originName': 'origin1',
@@ -21,11 +21,11 @@ define(["patientOriginService", "angularMocks", "properties", "utils", "md5", "t
                         'latitude': '80',
                         'longitude': '180'
                     }]
-                }),
-                "prj2": JSON.stringify({
+                },
+                "prj2": {
                     clientLastUpdated: "2014-05-30T12:43:54.972Z",
                     origins: []
-                })
+                }
             };
 
             Timecop.install();

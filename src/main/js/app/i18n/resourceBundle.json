@@ -122,5 +122,7 @@
     "longitudeValidation": "longitude is required",
     "latitudeValidation": "latitude is required",
     "longitudeRangeValidation": "longitude should be a number and within -180 and 180",
-    "latitudeRangeValidation": "latitude should be a number and within -90 and 90"
+    "latitudeRangeValidation": "latitude should be a number and within -90 and 90",
+    "errorAddingPatientOriginDetails": "Error adding patient origin details",
+    "savedOriginDetails": "Patient origin details added successfully"
 }
