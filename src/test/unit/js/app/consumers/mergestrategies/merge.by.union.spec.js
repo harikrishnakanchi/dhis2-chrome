@@ -43,7 +43,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
                 }]
             }];
 
-            var actualMergedCopy = mergeByUnion("organisationUnits", remoteCopy, localCopy);
+            var actualMergedCopy = mergeByUnion("organisationUnits", "id", remoteCopy, localCopy);
 
             expect(actualMergedCopy).toEqual(expectedMergedCopy);
         });
@@ -76,7 +76,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
                 }]
             }];
 
-            var actualMergedCopy = mergeByUnion("organisationUnits", remoteCopy, localCopy);
+            var actualMergedCopy = mergeByUnion("organisationUnits", "id", remoteCopy, localCopy);
             expect(actualMergedCopy).toEqual(remoteCopy);
         });
 
@@ -96,7 +96,7 @@ define(["mergeByUnion"], function(mergeByUnion) {
 
             var localCopy;
 
-            var actualMergedCopy = mergeByUnion("organisationUnits", remoteCopy, localCopy);
+            var actualMergedCopy = mergeByUnion("organisationUnits", "id", remoteCopy, localCopy);
 
             expect(actualMergedCopy).toEqual(remoteCopy);
         });

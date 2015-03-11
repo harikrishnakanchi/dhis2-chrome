@@ -1,7 +1,7 @@
 define(["lodashUtils", "moment"], function(_, moment) {
-    return function(fieldToMerge, remoteList, localList) {
+    return function(fieldToMerge, groupByField, remoteList, localList) {
         var isMergeRequired = function(remoteItem, localItem) {
-            return localItem && !_.isEmpty(_.xorBy(remoteItem[fieldToMerge], localItem[fieldToMerge], "id"));
+            return !_.isEmpty(localItem) && !_.isEmpty(_.xorBy(remoteItem[fieldToMerge], localItem[fieldToMerge], "id"));
         };
 
         var mergeFields = function(remoteItem, localItem) {
@@ -10,10 +10,10 @@ define(["lodashUtils", "moment"], function(_, moment) {
             return mergedField;
         };
 
-        var groupedLocalItems = _.indexBy(localList, "id");
+        var groupedLocalItems = _.indexBy(localList, groupByField);
 
         return _.transform(remoteList, function(acc, remoteItem) {
-            var localItem = groupedLocalItems[remoteItem.id];
+            var localItem = groupedLocalItems[remoteItem[groupByField]];
             if (isMergeRequired(remoteItem, localItem)) {
                 var mergedItem = _.cloneDeep(remoteItem);
                 console.log("Merging " + fieldToMerge + " from localItem and remoteItem", localItem, remoteItem);

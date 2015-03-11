@@ -5,8 +5,8 @@ define(['mergeByUnion', 'mergeByLastUpdated'], function(mergeByUnion, mergeByLas
         return mergeByLastUpdated(opts.eq, opts.remoteTimeField, opts.localTimeField, remoteList, localList);
     };
 
-    var union = function(fieldToMerge, remoteList, localList) {
-        return mergeByUnion(fieldToMerge, remoteList, localList);
+    var union = function(fieldToMerge, groupByField, remoteList, localList) {
+        return mergeByUnion(fieldToMerge, groupByField, remoteList, localList);
     };
 
     return {

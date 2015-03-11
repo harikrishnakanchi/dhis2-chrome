@@ -14,7 +14,7 @@ define(['lodashUtils', 'mergeBy'], function(_, mergeBy) {
             });
 
             return patientOriginRepository.findAll(projectIds)
-                .then(_.curry(mergeBy.union)("origins", remoteSettings))
+                .then(_.curry(mergeBy.union)("origins", "orgUnit", remoteSettings))
                 .then(patientOriginRepository.upsert);
         };
 

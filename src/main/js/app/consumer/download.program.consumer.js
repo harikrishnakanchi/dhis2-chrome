@@ -17,7 +17,7 @@ define(['moment', 'mergeBy', 'lodashUtils'], function(moment, mergeBy, _) {
         var mergeAndSave = function(remotePrograms) {
             var programIds = _.pluck(remotePrograms, "id");
             return programRepository.findAll(programIds)
-                .then(_.curry(mergeBy.union)("organisationUnits", remotePrograms))
+                .then(_.curry(mergeBy.union)("organisationUnits", "id", remotePrograms))
                 .then(programRepository.upsertDhisDownloadedData);
         };
     };
