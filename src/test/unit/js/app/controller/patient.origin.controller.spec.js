@@ -1,8 +1,8 @@
-define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"], function(PatientOriginController, mocks, utils, dhisId, timecop) {
+define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop", "orgUnitRepository", "patientOriginRepository"], function(PatientOriginController, mocks, utils, dhisId, timecop, OrgUnitRepository, PatientOriginRepository) {
     describe("patientOriginController", function() {
-        var scope, patientOriginController, q, patientOriginRepository, hustle, origins;
+        var scope, patientOriginController, q, patientOriginRepository, hustle, origins, orgUnitRepository;
 
-        beforeEach(module('hustle'));
+        beforeEach(module("hustle"));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
             scope = $rootScope.$new();
             q = $q;
@@ -17,20 +17,30 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
                 "id": "prj1"
             };
 
-            patientOriginRepository = utils.getMockRepo(q);
-            patientOriginRepository.get = function() {};
+            var modules = [{
+                "id": "mod1",
+                "name": "mod1",
+                "openingDate": "2014-12-12"
+            }];
+
+            patientOriginRepository = new PatientOriginRepository();
+            spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
+            spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+
+            orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
 
             origins = [{
-                'id': 'origin1',
-                'name': 'Origin1',
-                'longitude': 100,
-                'latitude': 80,
-                'clientLastUpdated': '2014-05-30T12:43:54.972Z'
+                "id": "origin1",
+                "name": "Origin1",
+                "longitude": 100,
+                "latitude": 80,
+                "clientLastUpdated": "2014-05-30T12:43:54.972Z"
             }];
 
             Timecop.install();
             Timecop.freeze(new Date("2014-04-01T00:00:00.000Z"));
-
         }));
 
         afterEach(function() {
@@ -40,25 +50,25 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
 
         it("should set patientOriginDetails on scope on initialization", function() {
             scope.orgUnit = {
-                'id': 'prj1'
+                "id": "prj1"
             };
-            spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {
-                'orgUnit': 'prj1',
-                'origins': origins
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, {
+                "orgUnit": "prj1",
+                "origins": origins
             }));
-            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository);
+            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository, orgUnitRepository);
             scope.$apply();
 
             expect(patientOriginRepository.get).toHaveBeenCalledWith("prj1");
         });
 
-        it("should save patientOriginDetails if no origin details are present", function() {
-            spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
-            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository);
+        it("should add patient origin if no origins are present", function() {
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, {}));
+            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository, orgUnitRepository);
             scope.patientOrigin = {
-                'name': 'Origin1',
-                'longitude': 100,
-                'latitude': 80
+                "name": "Origin1",
+                "longitude": 100,
+                "latitude": 80
             };
             scope.$apply();
 
@@ -66,13 +76,13 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
             scope.$apply();
 
             var expectedPayload = {
-                orgUnit: 'prj1',
+                orgUnit: "prj1",
                 origins: [{
-                    'id': 'Origin1',
-                    'name': 'Origin1',
-                    'longitude': 100,
-                    'latitude': 80,
-                    clientLastUpdated: '2014-04-01T00:00:00.000Z',
+                    "id": "Origin1",
+                    "name": "Origin1",
+                    "longitude": 100,
+                    "latitude": 80,
+                    clientLastUpdated: "2014-04-01T00:00:00.000Z",
                 }]
             };
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
@@ -83,16 +93,16 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
             expect(scope.saveFailure).toEqual(false);
         });
 
-        it("should save patientOriginDetails if origin details are already present", function() {
-            spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {
-                'orgUnit': 'prj1',
-                'origins': origins
+        it("should add new patient origins to existing patient origins", function() {
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, {
+                "orgUnit": "prj1",
+                "origins": origins
             }));
-            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository);
+            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository, orgUnitRepository);
             scope.patientOrigin = {
-                'name': 'Origin2',
-                'longitude': 100,
-                'latitude': 80
+                "name": "Origin2",
+                "longitude": 100,
+                "latitude": 80
             };
             scope.$apply();
 
@@ -100,19 +110,19 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
             scope.$apply();
 
             var expectedPayload = {
-                orgUnit: 'prj1',
+                orgUnit: "prj1",
                 origins: [{
-                    'id': 'origin1',
-                    'name': 'Origin1',
-                    'longitude': 100,
-                    'latitude': 80,
-                    'clientLastUpdated': '2014-05-30T12:43:54.972Z'
+                    "id": "origin1",
+                    "name": "Origin1",
+                    "longitude": 100,
+                    "latitude": 80,
+                    "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                 }, {
-                    'id': 'Origin2',
-                    'name': 'Origin2',
-                    'longitude': 100,
-                    'latitude': 80,
-                    'clientLastUpdated': '2014-04-01T00:00:00.000Z',
+                    "id": "Origin2",
+                    "name": "Origin2",
+                    "longitude": 100,
+                    "latitude": 80,
+                    "clientLastUpdated": "2014-04-01T00:00:00.000Z",
                 }]
             };
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
@@ -120,6 +130,57 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
                 data: expectedPayload,
                 type: "uploadPatientOriginDetails"
             }, "dataValues");
+        });
+
+        it("should create new orgunits under child modules on adding new patient origins", function() {
+            var modules = [{
+                "id": "p1",
+                "name": "p1",
+                "openingDate": "2014-02-02"
+            }];
+
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, {}));
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
+
+            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository, orgUnitRepository);
+
+            scope.patientOrigin = {
+                "name": "Origin1",
+                "longitude": 100,
+                "latitude": 80
+            };
+
+            scope.orgUnit = {
+                "id": "prj1"
+            };
+
+            scope.$apply();
+
+            scope.save();
+            scope.$apply();
+
+            var expectedUpserts = [{
+                "name": scope.patientOrigin.name,
+                "shortName": scope.patientOrigin.name,
+                "displayName": scope.patientOrigin.name,
+                "id": dhisId.get(scope.patientOrigin.name + "p1"),
+                "level": 7,
+                "openingDate": "2014-02-02",
+                "coordinates": "[" + scope.patientOrigin.longitude + "," + scope.patientOrigin.latitude + "]",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
+                    },
+                    "value": "Patient Origin"
+                }],
+                "parent": {
+                    "id": "p1"
+                }
+            }];
+
+            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("prj1");
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedUpserts);
         });
     });
 });

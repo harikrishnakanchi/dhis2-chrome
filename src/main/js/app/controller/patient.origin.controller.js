@@ -1,5 +1,5 @@
-define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
-    return function($scope, $hustle, patientOriginRepository) {
+define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhisId, orgUnitMapper) {
+    return function($scope, $hustle, patientOriginRepository, orgUnitRepository) {
         var patientOrigins = [];
 
         $scope.save = function() {
@@ -23,6 +23,13 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
                 return error;
             };
 
+            var createOrgUnits = function() {
+                return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
+                    var patientOriginPayload = orgUnitMapper.createPatientOriginPayload($scope.patientOrigin, modules);
+                    return orgUnitRepository.upsert(patientOriginPayload).then(_.partial(publishMessage, patientOriginPayload, "upsertOrgUnit"));
+                });
+            };
+
             $scope.patientOrigin.id = dhisId.get($scope.patientOrigin.name);
             $scope.patientOrigin.clientLastUpdated = moment().toISOString();
             patientOrigins.push($scope.patientOrigin);
@@ -34,6 +41,7 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
 
             return patientOriginRepository.upsert(payload)
                 .then(_.partial(publishMessage, payload, "uploadPatientOriginDetails"))
+                .then(createOrgUnits)
                 .then(onSuccess, onFailure);
         };
 
