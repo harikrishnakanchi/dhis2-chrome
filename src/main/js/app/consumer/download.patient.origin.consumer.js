@@ -8,13 +8,11 @@ define(['lodashUtils'], function(_) {
             return patientOriginService.getAll();
         };
 
-        var mergeAndSave = function(remoteSettings) {
-            var projectIds = _.map(remoteSettings, function(remoteSetting) {
-                return remoteSetting.key;
-            });
+        var mergeAndSave = function(remotePatientOrigins) {
+            var projectIds = _.pluck(remotePatientOrigins, "orgUnit");
 
             return patientOriginRepository.findAll(projectIds)
-                .then(_.curry(mergeBy.union)("origins", "orgUnit", remoteSettings))
+                .then(_.curry(mergeBy.union)("origins", "orgUnit", remotePatientOrigins))
                 .then(patientOriginRepository.upsert);
         };
 

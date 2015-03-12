@@ -37,7 +37,6 @@ define(["downloadPatientOriginConsumer", "patientOriginService", "utils", "angul
             }));
 
             it("should merge patient origin details", function() {
-
                 var localOriginDetails = {
                     orgUnit: "prj1",
                     origins: [{
