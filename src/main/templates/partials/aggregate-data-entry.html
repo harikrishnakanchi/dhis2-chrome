@@ -59,7 +59,7 @@
                                         </td>
                                         <td ng-repeat="option in section.categoryOptionComboIds">
                                             <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
-                                                <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option)['value']" ng-focus="restoreExpression(dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed()" />
+                                                <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, section.orgUnitIds)['value']" ng-focus="restoreExpression(dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed()" />
                                                 <br/>
                                             </ng-form>
                                         </td>

@@ -254,7 +254,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             }).name;
         };
 
-        $scope.safeGet = function(dataValues, id, option) {
+        $scope.safeGet = function(dataValues, id, option, allOrgUnitsAssociatedToDataSet) {
+            var currentOrgUnitIdIncludingChildrenIds = _.flatten([$scope.currentModule.id, $scope.moduleChildren]);
+            var orgUnitForWhichDataIsEntered = _.intersection(allOrgUnitsAssociatedToDataSet, currentOrgUnitIdIncludingChildrenIds);
             if (dataValues === undefined)
                 return;
 
@@ -262,7 +264,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
             dataValues[id][option] = dataValues[id][option] || {
                 'formula': '',
-                'value': ''
+                'value': '',
+                'orgUnitIds': orgUnitForWhichDataIsEntered
             };
             return dataValues[id][option];
         };
@@ -299,6 +302,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         var setData = function(data) {
             $scope.dataSets = data[0];
+            $scope.moduleChildren = _.pluck(data[8], "id");
             $scope.excludedDataElements = data[6] && data[6].value ? data[6].value.dataElements : undefined;
             return data;
         };
@@ -316,8 +320,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var categoriesPromise = getAll("categories");
             var categoryOptionCombosPromise = getAll("categoryOptionCombos");
             var excludedDataElementPromise = systemSettingRepository.get($scope.currentModule.id);
+            var organisationUnitPromise = getAll("organisationUnits");
+            var getChildrenPromise = orgUnitRepository.findAllByParent([$scope.currentModule.id]);
 
-            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, excludedDataElementPromise]);
+            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, excludedDataElementPromise, organisationUnitPromise, getChildrenPromise]);
 
             $scope.loading = true;
             getAllData.then(setData).then(transformDataSet).then(function() {

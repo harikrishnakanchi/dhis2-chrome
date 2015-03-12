@@ -7,7 +7,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, db, q, location, anchorScroll, aggregateDataEntryController, rootScope, approvalStore,
                 saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getLevelOneApprovalDataSpy, getLevelTwoApprovalDataSpy, getDataValuesSpy,
-                orgUnits, window, approvalStoreSpy, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, systemSettingRepository;
+                orgUnits, window, approvalStoreSpy, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, approvalHelper, systemSettingRepository, origin1, origin2;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -32,6 +32,18 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     id: 'mod2',
                     parent: {
                         id: 'parent'
+                    }
+                };
+                origin1 = {
+                    id: 'origin1',
+                    parent: {
+                        id: 'mod2'
+                    }
+                };
+                origin2 = {
+                    id: 'origin2',
+                    parent: {
+                        id: 'mod2'
                     }
                 };
                 scope.year = 2014;
@@ -165,6 +177,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     open: function(object) {}
                 };
 
+                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [origin1, origin2]));
                 aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, approvalHelper);
             }));
 
@@ -393,31 +406,35 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("safe get dataValues should initialize data value and option if not present", function() {
+                scope.$apply();
                 var dataValues = {};
-                var result = scope.safeGet(dataValues, "blah", "someOption");
+                var result = scope.safeGet(dataValues, "blah", "someOption", ["mod1", "mod2", "mod3"]);
 
                 expect(dataValues).toEqual({
                     blah: {
                         someOption: {
                             formula: '',
-                            value: ''
+                            value: '',
+                            orgUnitIds: ['mod2']
                         }
                     }
                 });
                 expect(result).toEqual({
                     formula: '',
-                    value: ''
+                    value: '',
+                    orgUnitIds: ['mod2']
                 });
             });
 
             it("safe get dataValues should return if already present", function() {
+                scope.$apply();
                 var dataValues = {
                     "blah": {
                         "someOption": "test"
                     }
                 };
 
-                var result = scope.safeGet(dataValues, "blah", "someOption");
+                var result = scope.safeGet(dataValues, "blah", "someOption", ["mod1", "mod2", "mod3"]);
 
                 expect(dataValues).toEqual({
                     blah: {

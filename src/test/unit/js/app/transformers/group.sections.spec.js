@@ -9,7 +9,8 @@ define(["groupSections", "testData"], function(groupSections, testData) {
                 testData.get('categoryCombos'),
                 testData.get("categories"),
                 testData.get('categoryOptionCombos'),
-                testData.get('systemSettings')
+                testData.get('systemSettings'),
+                testData.get('organisationUnits')
             ];
             groupedSections = groupSections.enrichGroupedSections(data);
         });
@@ -19,7 +20,9 @@ define(["groupSections", "testData"], function(groupSections, testData) {
             expect(dataSetKeys.length).toBe(2);
             expect(dataSetKeys).toContain("DS_OPD");
             expect(dataSetKeys).toContain("Vacc");
-
+            expect(groupedSections.DS_OPD[0].orgUnitIds).toEqual(["mod1"]);
+            expect(groupedSections.DS_OPD[1].orgUnitIds).toEqual(["mod1"]);
+            expect(groupedSections.Vacc[0].orgUnitIds).toEqual(["mod2"]);
             expect(groupedSections.DS_OPD.length).toBe(2);
             expect(groupedSections.Vacc.length).toBe(1);
         });
