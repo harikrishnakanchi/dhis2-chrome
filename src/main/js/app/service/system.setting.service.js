@@ -3,11 +3,11 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         var upsert = function(args) {
             var key = "exclude_" + args.key;
             return $http({
-                method: 'POST',
-                url: dhisUrl.systemSettings + '/' + key,
-                data: JSON.stringify(args.value),
-                headers: {
-                    'Content-Type': 'text/plain'
+                "method": "POST",
+                "url": dhisUrl.systemSettings + "/" + key,
+                "data": JSON.stringify(args.value),
+                "headers": {
+                    "Content-Type": "text/plain"
                 }
             });
         };
@@ -15,9 +15,9 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         var transform = function(response) {
             var result = [];
             _.transform(response.data, function(acc, value, key) {
-                if (_.startsWith(key, 'exclude_')) {
+                if (_.startsWith(key, "exclude_")) {
                     result.push({
-                        "key": key.replace('exclude_', ''),
+                        "key": key.replace("exclude_", ""),
                         "value": JSON.parse(value)
                     });
                 }
