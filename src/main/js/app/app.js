@@ -1,8 +1,8 @@
-define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "migrator", "migrations", "properties", "queuePostProcessInterceptor", "monitors", "helpers",
+define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "migrator", "migrations", "properties", "queuePostProcessInterceptor", "monitors", "helpers", "indexedDBLogger",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals", "angular-ui-dropdown"
     ],
-    function(angular, Q, services, dbutils, controllers, repositories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers) {
+    function(angular, Q, services, dbutils, controllers, repositories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers, indexedDBLogger) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
@@ -17,8 +17,8 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
 
             app.factory('queuePostProcessInterceptor', ['$log', queuePostProcessInterceptor]);
 
-            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', 
-                function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider) {
+            app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide',
+                function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide) {
                     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
                     $routeProvider.
                     when('/dashboard', {
@@ -45,13 +45,19 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         redirectTo: '/dashboard'
                     });
 
+                    $provide.decorator('$log', ['$delegate',
+                        function(loggerDelegate) {
+                            indexedDBLogger.configure("msfLogs", loggerDelegate);
+                            return loggerDelegate;
+                        }
+                    ]);
+
                     $indexedDBProvider.connection('msf')
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
                         }).dbReady(function(data) {
-                            if (chrome.runtime) {
+                            if (chrome.runtime)
                                 chrome.runtime.sendMessage("migrationComplete");
-                            }
                         });
 
                     $hustleProvider.init("hustle", 1, ["dataValues"]);
@@ -63,7 +69,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', 
+            app.run(['dhisMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle',
                 function(dhisMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle) {
 
                     $hustle.registerInterceptor(queuePostProcessInterceptor);

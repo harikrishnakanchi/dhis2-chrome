@@ -28,7 +28,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "maxretries": 5
         },
         "logging": {
-            "maxAgeinDays": 30
+            "maxAgeinHours": 720
         },
         "messageTimeout": 5000,
         "devMode": true,

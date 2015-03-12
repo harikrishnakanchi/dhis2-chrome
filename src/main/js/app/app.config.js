@@ -15,6 +15,7 @@ require.config({
         "hustle": "lib/hustle/hustle",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
         "logger": "lib/loglevel/dist/loglevel",
+        "indexedDBLogger": "app/utils/indexeddb.logger",
 
 
         //3rd party angular modules

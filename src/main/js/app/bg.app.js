@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "angular-indexedDB"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "angular-indexedDB"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
             services.init(app);
@@ -10,11 +10,18 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             app.factory('configureRequestInterceptor', [configureRequestInterceptor]);
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', handleTimeoutInterceptor]);
-            app.factory('logRequestReponseInterceptor', ['$log', logRequestReponseInterceptor]);
+            app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
             app.factory('queuePostProcessInterceptor', ['$log', queuePostProcessInterceptor]);
 
-            app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider',
-                function($indexedDBProvider, $httpProvider, $hustleProvider) {
+            app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider', '$provide',
+                function($indexedDBProvider, $httpProvider, $hustleProvider, $provide) {
+                    $provide.decorator('$log', ['$delegate',
+                        function(loggerDelegate) {
+                            indexedDBLogger.configure("msfLogs", loggerDelegate);
+                            return loggerDelegate;
+                        }
+                    ]);
+
                     $indexedDBProvider.connection('msf');
                     $httpProvider.interceptors.push('configureRequestInterceptor');
                     $httpProvider.interceptors.push('cleanupPayloadInterceptor');

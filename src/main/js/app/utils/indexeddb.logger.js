@@ -2,7 +2,7 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
 
     var logStoreName = 'logs';
 
-    var configure = function(dbName) {
+    var configure = function(dbName, loggerDelegate) {
 
         var setupLogDb = function() {
             var d = Q.defer();
@@ -25,85 +25,51 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
                 d.resolve(e.target.result);
             };
 
+            request.onerror = function(e) {
+                console.error("Could not set up log db", e);
+                d.reject(e.target.result);
+            };
+
             return d.promise;
         };
 
         var cleanupOldEntires = function(logDb) {
+            var d = Q.defer();
+
+            var boundKeyRange = IDBKeyRange.upperBound(moment().subtract(properties.logging.maxAgeinHours, "hours").toISOString());
             var transaction = logDb.transaction(logStoreName, "readwrite");
             var store = transaction.objectStore(logStoreName);
-
-            var getItemsToDelete = function() {
-                var d = Q.defer();
-                var results = [];
-
-                var boundKeyRange = IDBKeyRange.lowerBound(moment().subtract(properties.logging.maxAgeinDays, "days").toISOString());
-                var index = store.index("datetime");
-                var req = index.openCursor(boundKeyRange);
-                req.onsuccess = function(e) {
-                    var onfound = function() {
-                        results.push(cursor.key);
-                        cursor.continue();
-                    };
-
-                    var onfinish = function() {
-                        d.resolve(results);
-                    };
-
-                    var cursor = e.target.result;
-                    if (!cursor) {
-                        onfinish();
-                        return;
-                    }
-                    onfound();
+            var index = store.index("datetime");
+            var req = index.openCursor(boundKeyRange);
+            req.onsuccess = function(e) {
+                var onfound = function() {
+                    console.debug("Deleting log entry for " + cursor.key);
+                    store.delete(cursor.primaryKey);
+                    cursor.continue();
                 };
 
-                req.onerror = function(e) {
-                    d.reject(e.target.result);
+                var onfinish = function() {
+                    d.resolve(logDb);
                 };
 
-                return d.promise;
+                var cursor = e.target.result;
+                if (!cursor) {
+                    onfinish();
+                    return;
+                }
+                onfound();
             };
 
-            var deleteThem = function(ids) {
-                var d = Q.defer();
-                var deleteLogEntry = function(id) {
-                    var req = store.delete(id);
-                    req.onsuccess = req.onerror = function(e) {
-                        d.resolve(e.target.result);
-                    };
-                    return d.promise;
-                };
-
-                var promises = [];
-                _.each(ids, function(id) {
-                    promises.push(deleteLogEntry(id));
-                });
-
-                return Q.all(promises);
+            req.onerror = function(e) {
+                console.error("Could not clean up old entries", e);
+                d.resolve(logDb);
             };
 
-            return getItemsToDelete()
-                .then(deleteThem)
-                .then(function() {
-                    return logDb;
-                });
+            return d.promise;
         };
 
 
         var wireupLogging = function(logDb) {
-            var _log = console.log,
-                _info = console.info,
-                _debug = console.debug,
-                _error = console.error;
-
-            var prepareArgs = function(args) {
-                return JSON.parse(JSON.stringify(args, function(key, value) {
-                    if (typeof value === 'function') {
-                        return undefined;
-                    }
-                    return value;
-                }));
-            };
 
             var putLog = function(logLevel, args) {
                 try {
@@ -112,7 +78,7 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
                     var logObject = {
                         'method': logLevel,
                         'datetime': moment().toISOString(),
-                        'arguments': prepareArgs(args)
+                        'arguments': args
                     };
                     store.put(logObject);
                 } catch (e) {
@@ -120,25 +86,28 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
                 }
             };
 
-            console.info = function() {
+            var originalInfoLogger = loggerDelegate.info;
+            loggerDelegate.info = function() {
                 putLog('info', arguments);
-                _info.apply(this, arguments);
+                originalInfoLogger.apply(null, arguments);
             };
 
-            console.log = function() {
-                putLog('info', arguments);
-                _log.apply(this, arguments);
+            var originalWarningLogger = loggerDelegate.warn;
+            loggerDelegate.warn = function() {
+                putLog('warning', arguments);
+                originalWarningLogger.apply(null, arguments);
             };
 
-            console.error = function() {
+            var originalErrorLogger = loggerDelegate.error;
+            loggerDelegate.error = function() {
                 putLog('error', arguments);
-                _error.apply(this, arguments);
+                originalErrorLogger.apply(null, arguments);
             };
 
             return logDb;
         };
 
-        setupLogDb()
+        return setupLogDb()
             .then(cleanupOldEntires)
             .then(wireupLogging);
     };

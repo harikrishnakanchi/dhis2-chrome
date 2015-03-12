@@ -22,9 +22,10 @@ define(["properties", "chromeRuntime"], function(properties, chromeRuntime) {
                         hustleQueue.delete(job.id);
                     });
                 } else if (job.releases < properties.queue.maxretries) {
-                    $log.info("Retry " + job.releases + " for job: ", job);
+                    $log.warn("Retry " + job.releases + " for job", job);
                     return hustleQueue.release(job.id);
                 } else {
+                    $log.warn("Burried job", job);
                     return hustleQueue.bury(job.id);
                 }
             }
