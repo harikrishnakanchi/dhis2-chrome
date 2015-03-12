@@ -9,7 +9,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 return;
             var cellValue = $scope.dataValues[elementId][option].value;
             $scope.dataValues[elementId][option].formula = cellValue;
-            $scope.dataValues[elementId][option].value = calculateSum(cellValue) > 0 ? calculateSum(cellValue).toString() : "";
+            $scope.dataValues[elementId][option].value = calculateSum(cellValue).toString();
         };
 
         $scope.printWindow = function() {
