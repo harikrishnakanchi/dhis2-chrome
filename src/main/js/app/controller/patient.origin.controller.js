@@ -1,14 +1,14 @@
 define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
     return function($scope, $hustle, patientOriginRepository) {
+        var patientOrigins = [];
 
-        var publishMessage = function(data, action) {
-            return $hustle.publish({
-                "data": data,
-                "type": action
-            }, "dataValues");
-        };
-
-        $scope.save = function(patientOrigin) {
+        $scope.save = function() {
+            var publishMessage = function(data, action) {
+                return $hustle.publish({
+                    "data": data,
+                    "type": action
+                }, "dataValues");
+            };
 
             var onSuccess = function(data) {
                 $scope.saveFailure = false;
@@ -23,33 +23,28 @@ define(["lodash", "moment", "dhisId"], function(_, moment, dhisId) {
                 return error;
             };
 
-
-            var projectOrigins = _.isEmpty($scope.projectOrigins) ? [] : $scope.projectOrigins;
-            patientOrigin.id = dhisId.get(patientOrigin.name);
-            patientOrigin.clientLastUpdated = moment().toISOString();
-            projectOrigins.push(patientOrigin);
+            $scope.patientOrigin.id = dhisId.get($scope.patientOrigin.name);
+            $scope.patientOrigin.clientLastUpdated = moment().toISOString();
+            patientOrigins.push($scope.patientOrigin);
 
             var payload = {
-                orgUnit: $scope.projectId,
-                origins: projectOrigins
+                orgUnit: $scope.orgUnit.id,
+                origins: patientOrigins
             };
-            return patientOriginRepository.upsert(payload).
-            then(_.partial(publishMessage, payload, "uploadPatientOriginDetails")).then(onSuccess, onFailure);
-        };
 
-        var getPatientOriginDetails = function() {
-            return patientOriginRepository.get($scope.projectId).then(function(patientOriginDetails) {
-                if (!_.isEmpty(patientOriginDetails) && !_.isEmpty(patientOriginDetails.origins))
-                    $scope.projectOrigins = patientOriginDetails.origins;
-            });
+            return patientOriginRepository.upsert(payload)
+                .then(_.partial(publishMessage, payload, "uploadPatientOriginDetails"))
+                .then(onSuccess, onFailure);
         };
 
         var init = function() {
-            $scope.projectId = $scope.orgUnit.id;
-            return getPatientOriginDetails($scope.projectId);
+            $scope.patientOrigin = {};
+            return patientOriginRepository.get($scope.orgUnit.id).then(function(patientOriginDetails) {
+                if (!_.isEmpty(patientOriginDetails))
+                    patientOrigins = patientOriginDetails.origins;
+            });
         };
 
         init();
-
     };
 });

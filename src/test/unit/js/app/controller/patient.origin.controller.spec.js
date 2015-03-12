@@ -39,6 +39,9 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
         });
 
         it("should set patientOriginDetails on scope on initialization", function() {
+            scope.orgUnit = {
+                'id': 'prj1'
+            };
             spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {
                 'orgUnit': 'prj1',
                 'origins': origins
@@ -46,19 +49,20 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
             patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository);
             scope.$apply();
 
-            expect(scope.projectOrigins).toEqual(origins);
+            expect(patientOriginRepository.get).toHaveBeenCalledWith("prj1");
         });
 
         it("should save patientOriginDetails if no origin details are present", function() {
             spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
             patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository);
-            scope.$apply();
-
-            scope.save({
+            scope.patientOrigin = {
                 'name': 'Origin1',
                 'longitude': 100,
                 'latitude': 80
-            });
+            };
+            scope.$apply();
+
+            scope.save();
             scope.$apply();
 
             var expectedPayload = {
@@ -85,13 +89,14 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop"]
                 'origins': origins
             }));
             patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository);
-            scope.$apply();
-
-            scope.save({
+            scope.patientOrigin = {
                 'name': 'Origin2',
                 'longitude': 100,
                 'latitude': 80
-            });
+            };
+            scope.$apply();
+
+            scope.save();
             scope.$apply();
 
             var expectedPayload = {
