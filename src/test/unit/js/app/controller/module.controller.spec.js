@@ -1,8 +1,8 @@
 /*global Date:true*/
-define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop", "dhisId"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop, dhisId) {
+define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop", "dhisId", "patientOriginRepository", "orgUnitRepository"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop, dhisId, PatientOriginRepository, OrgUnitRepository) {
     describe("module controller", function() {
         var scope, moduleController, mockOrgStore, db, q, location, _Date, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
-            dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo;
+            dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo, patientOriginRepository;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -13,10 +13,19 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             location = $location;
 
-            orgUnitRepo = utils.getMockRepo(q);
+            orgUnitRepo = new OrgUnitRepository();
             orgunitGroupRepo = utils.getMockRepo(q);
             dataSetRepo = utils.getMockRepo(q);
             datasetsdata = testData.get("dataSets");
+
+            spyOn(orgUnitRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitRepo, "getParentProject").and.returnValue(utils.getPromise(q, {}));
+
+            patientOriginRepository = new PatientOriginRepository();
+            spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
+            spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
             dataSetRepo = {
                 getAllForOrgUnit: function() {},
@@ -71,7 +80,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
             scope.isNewMode = true;
 
-            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper);
+            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper, patientOriginRepository);
         }));
 
         afterEach(function() {
@@ -79,7 +88,24 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             Timecop.uninstall();
         });
 
-        it("should save aggregate module", function() {
+        it("should save aggregate module and create origin orgunits", function() {
+            var parent = {
+                "name": "Project1",
+                "id": "someid",
+                "children": []
+            };
+
+            var origins = {
+                "orgUnit": "someid",
+                "origins": [{
+                    "name": "or1",
+                    "latitude": 66.6,
+                    "longitude": 70.2
+                }]
+            };
+            orgUnitRepo.getParentProject.and.returnValue(utils.getPromise(q, parent));
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
+
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
@@ -87,11 +113,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             scope.$apply();
 
-            var parent = {
-                "name": "Project1",
-                "id": "someid",
-                "children": []
-            };
 
             scope.orgUnit = parent;
             scope.module = {
@@ -100,6 +121,26 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 'openingDate': new Date(),
                 'parent': parent
             };
+
+            var originOrgunits = [{
+                "name": 'or1',
+                "shortName": 'or1',
+                "displayName": 'or1',
+                "id": 'or1Module1someid',
+                "level": 7,
+                "openingDate": moment(new Date()).toDate(),
+                "coordinates": '[70.2,66.6]',
+                "attributeValues": [{
+                    "attribute": {
+                        "code": 'Type',
+                        "name": 'Type'
+                    },
+                    "value": 'Patient Origin'
+                }],
+                "parent": {
+                    "id": 'Module1someid'
+                }
+            }];
 
             var enrichedAggregateModule = {
                 name: 'Module1',
@@ -139,20 +180,35 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 data: enrichedAggregateModule,
                 type: "upsertOrgUnit"
             }, "dataValues");
+            expect(orgUnitRepo.getParentProject).toHaveBeenCalledWith(enrichedAggregateModule.parent.id);
+            expect(patientOriginRepository.get).toHaveBeenCalledWith("someid");
+            expect(orgUnitRepo.upsert.calls.argsFor(1)[0]).toEqual(originOrgunits);
         });
 
         it("should asscoiate aggregate datasets with the module", function() {
+            var parent = {
+                "name": "Project1",
+                "id": "someid",
+                "children": []
+            };
+
+            var origins = {
+                "orgUnit": "someid",
+                "origins": [{
+                    "name": "or1",
+                    "latitude": 66.6,
+                    "longitude": 70.2
+                }]
+            };
+            orgUnitRepo.getParentProject.and.returnValue(utils.getPromise(q, parent));
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
+
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
 
             scope.$apply();
-            var parent = {
-                "name": "Project1",
-                "id": "someid",
-                "children": []
-            };
 
             scope.orgUnit = parent;
             scope.module = {
@@ -222,6 +278,23 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
         });
 
         it("should save excluded data elements for the module", function() {
+            var parent = {
+                "name": "Project1",
+                "id": "someid",
+                "children": []
+            };
+
+            var origins = {
+                "orgUnit": "someid",
+                "origins": [{
+                    "name": "or1",
+                    "latitude": 66.6,
+                    "longitude": 70.2
+                }]
+            };
+            orgUnitRepo.getParentProject.and.returnValue(utils.getPromise(q, parent));
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
+
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
@@ -229,11 +302,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             scope.$apply();
             var projectId = "someid";
-            var parent = {
-                "name": "Project1",
-                "id": projectId,
-                "children": []
-            };
 
             scope.orgUnit = parent;
             scope.module = {

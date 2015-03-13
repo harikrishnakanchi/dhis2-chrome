@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer", "programTransformer", "md5"], function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer, programTransformer, md5) {
-    return function($scope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, db, $location, $q, $modal, programRepository, orgUnitGroupRepository, orgUnitGroupHelper) {
+    return function($scope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, db, $location, $q, $modal, programRepository, orgUnitGroupRepository, orgUnitGroupHelper, patientOriginRepository) {
         $scope.originalDatasets = [];
         $scope.isExpanded = {};
         $scope.isDisabled = false;
@@ -189,11 +189,21 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false);
             };
 
+            var createOriginOrgUnits = function() {
+                return orgUnitRepository.getParentProject(enrichedModule.parent.id).then(function(parentProject) {
+                    return patientOriginRepository.get(parentProject.id).then(function(patientOrigins) {
+                        var patientOriginPayload = orgUnitMapper.createPatientOriginPayload(patientOrigins.origins, enrichedModule);
+                        return orgUnitRepository.upsert(patientOriginPayload).then(_.partial(publishMessage, patientOriginPayload, "upsertOrgUnit"));
+                    });
+                });
+            };
+
             return getEnrichedModule($scope.module)
                 .then(createModules)
                 .then(associateDatasets)
                 .then(_.partial(saveExcludedDataElements, enrichedModule))
                 .then(createOrgUnitGroups)
+                .then(createOriginOrgUnits)
                 .then(_.partial(onSuccess, enrichedModule), onError);
         };
 

@@ -228,28 +228,34 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return _.map(modules, populateDisplayName);
     };
 
-    this.createPatientOriginPayload = function(patientOrigin, parentOrgUnits) {
-        return _.map(parentOrgUnits, function(parent) {
-            return {
-                "name": patientOrigin.name,
-                "shortName": patientOrigin.name,
-                "displayName": patientOrigin.name,
-                "id": dhisId.get(patientOrigin.name + parent.id),
-                "level": 7,
-                "openingDate": parent.openingDate,
-                "coordinates": "[" + patientOrigin.longitude + "," + patientOrigin.latitude + "]",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "Type",
-                        "name": "Type"
-                    },
-                    "value": "Patient Origin"
-                }],
-                "parent": {
-                    "id": parent.id
-                }
-            };
+    this.createPatientOriginPayload = function(patientOrigins, parentOrgUnits) {
+        patientOrigins = _.isArray(patientOrigins) ? patientOrigins : [patientOrigins];
+        parentOrgUnits = _.isArray(parentOrgUnits) ? parentOrgUnits : [parentOrgUnits];
+
+        var payload = _.map(patientOrigins, function(patientOrigin) {
+            return _.map(parentOrgUnits, function(parent) {
+                return {
+                    "name": patientOrigin.name,
+                    "shortName": patientOrigin.name,
+                    "displayName": patientOrigin.name,
+                    "id": dhisId.get(patientOrigin.name + parent.id),
+                    "level": 7,
+                    "openingDate": parent.openingDate,
+                    "coordinates": "[" + patientOrigin.longitude + "," + patientOrigin.latitude + "]",
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "Type",
+                            "name": "Type"
+                        },
+                        "value": "Patient Origin"
+                    }],
+                    "parent": {
+                        "id": parent.id
+                    }
+                };
+            });
         });
+        return _.flatten(payload);
     };
 
     return this;

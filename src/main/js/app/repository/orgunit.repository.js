@@ -27,7 +27,6 @@ define(["moment", "lodashUtils"], function(moment, _) {
             var isNewDataModel = function(ds) {
                 return getBooleanAttributeValue(ds.attributeValues, "isNewDataModel");
             };
-
             var segragateOrgUnits = function(orgUnits) {
                 var partitionedOrgUnits = _.partition(orgUnits, function(ou) {
                     return !isOfType(ou, "Module");

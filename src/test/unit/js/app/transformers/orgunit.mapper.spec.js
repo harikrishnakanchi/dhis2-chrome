@@ -674,20 +674,24 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "openingDate": "2015-02-02"
             }];
 
-            var patientOrigin = {
+            var patientOrigins = [{
                 "name": "Origin1",
                 "latitude": "23.21",
                 "longitude": "32.12"
-            };
+            }, {
+                "name": "Origin2",
+                "latitude": "43.96",
+                "longitude": "84.142"
+            }];
 
             var expectedPayload = [{
-                "name": patientOrigin.name,
-                "shortName": patientOrigin.name,
-                "displayName": patientOrigin.name,
-                "id": dhisId.get(patientOrigin.name + "p1"),
+                "name": patientOrigins[0].name,
+                "shortName": patientOrigins[0].name,
+                "displayName": patientOrigins[0].name,
+                "id": dhisId.get(patientOrigins[0].name + "p1"),
                 "level": 7,
                 "openingDate": "2014-02-02",
-                "coordinates": "[" + patientOrigin.longitude + "," + patientOrigin.latitude + "]",
+                "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type",
@@ -699,13 +703,49 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "id": "p1"
                 }
             }, {
-                "name": patientOrigin.name,
-                "shortName": patientOrigin.name,
-                "displayName": patientOrigin.name,
-                "id": dhisId.get(patientOrigin.name + "p2"),
+                "name": patientOrigins[0].name,
+                "shortName": patientOrigins[0].name,
+                "displayName": patientOrigins[0].name,
+                "id": dhisId.get(patientOrigins[0].name + "p2"),
                 "level": 7,
                 "openingDate": "2015-02-02",
-                "coordinates": "[" + patientOrigin.longitude + "," + patientOrigin.latitude + "]",
+                "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
+                    },
+                    "value": "Patient Origin"
+                }],
+                "parent": {
+                    "id": "p2"
+                }
+            }, {
+                "name": patientOrigins[1].name,
+                "shortName": patientOrigins[1].name,
+                "displayName": patientOrigins[1].name,
+                "id": dhisId.get(patientOrigins[1].name + "p1"),
+                "level": 7,
+                "openingDate": "2014-02-02",
+                "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
+                    },
+                    "value": "Patient Origin"
+                }],
+                "parent": {
+                    "id": "p1"
+                }
+            }, {
+                "name": patientOrigins[1].name,
+                "shortName": patientOrigins[1].name,
+                "displayName": patientOrigins[1].name,
+                "id": dhisId.get(patientOrigins[1].name + "p2"),
+                "level": 7,
+                "openingDate": "2015-02-02",
+                "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type",
@@ -718,7 +758,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 }
             }];
 
-            var actualPayload = orgUnitMapper.createPatientOriginPayload(patientOrigin, parents);
+            var actualPayload = orgUnitMapper.createPatientOriginPayload(patientOrigins, parents);
 
             expect(actualPayload).toEqual(expectedPayload);
         });
