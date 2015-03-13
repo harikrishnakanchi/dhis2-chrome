@@ -10,7 +10,11 @@
                     <li class="form-group">
                         <label for="name" class="col-sm-4 col-md-4 control-label">Enter a origin name</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="text" class="form-control" name="name" id="name" ng-model="patientOrigin.name" required/>
+                            <input type="text" class="form-control" name="name" id="name" ng-model="patientOrigin.name" not-in="existingPatientOrigins" required/>
+                            <div ng-show="createForm.name.$dirty &amp;&amp; createForm.name.$invalid">
+                                <span ng-show="createForm.name.$error.required" class="errortxt">{{resourceBundle.nameValidation}}</span>
+                                <span ng-show="createForm.name.$error.isWithin" class="errortxt">{{resourceBundle.patientOriginExists}}</span>
+                            </div>
                         </div>
                     </li>
                     <li class="form-group">

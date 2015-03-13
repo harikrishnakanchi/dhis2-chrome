@@ -80,9 +80,12 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
 
         var init = function() {
             $scope.patientOrigin = {};
+            $scope.existingPatientOrigins = [];
             return patientOriginRepository.get($scope.orgUnit.id).then(function(patientOriginDetails) {
-                if (!_.isEmpty(patientOriginDetails))
+                if (!_.isEmpty(patientOriginDetails)) {
                     patientOrigins = patientOriginDetails.origins;
+                    $scope.existingPatientOrigins = _.pluck(patientOrigins, "name");
+                }
             });
         };
 

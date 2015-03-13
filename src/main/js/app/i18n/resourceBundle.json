@@ -32,6 +32,7 @@
     "savedCountry": "Country saved successfully.",
     "errorCountry": "Error creating Country.",
     "countryExists": "Country already exists.",
+    "patientOriginExists": "Patient Origin already exists.",
     "savedProject": "Project saved successfully.",
     "errorProject": "Error creating Project.",
     "projectExists": "Project already exists under this country.",
