@@ -97,6 +97,7 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
                 var approvalStatusOrder = {
                     "UNAPPROVABLE": -1,
                     "UNAPPROVED_READY": 0,
+                    "UNAPPROVED_ABOVE": 0,
                     "APPROVED_ABOVE": 1,
                     "APPROVED_HERE": 1,
                     "ACCEPTED_HERE": 2
