@@ -78,6 +78,11 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 .then(onSuccess, onFailure);
         };
 
+        $scope.reset = function() {
+            $scope.patientOrigin = {};
+            $scope.createForm.$setPristine();
+        };
+
         var init = function() {
             $scope.patientOrigin = {};
             $scope.existingPatientOrigins = [];

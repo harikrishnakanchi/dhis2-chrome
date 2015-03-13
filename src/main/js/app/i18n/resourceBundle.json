@@ -122,10 +122,10 @@
     "loadCloneConfirmationMessage": "Loading clone will delete all the existing data and make an exact replica of the clone data. You will be logged out after successful cloning. This operation is irreversible. Are you sure you want to continue?",
     "projectCodeExists": "Project code already exists.",
     "dateInvalid": "Not a valid date.",
-    "longitudeValidation": "longitude is required",
-    "latitudeValidation": "latitude is required",
-    "longitudeRangeValidation": "longitude should be a number and within -180 and 180",
-    "latitudeRangeValidation": "latitude should be a number and within -90 and 90",
+    "longitudeValidation": "Longitude is required",
+    "latitudeValidation": "Latitude is required",
+    "longitudeRangeValidation": "Longitude should be a number between -180 and 180",
+    "latitudeRangeValidation": "Latitude should be a number between -90 and 90",
     "errorAddingPatientOriginDetails": "Error adding patient origin details",
     "savedOriginDetails": "Patient origin details added successfully"
 }
