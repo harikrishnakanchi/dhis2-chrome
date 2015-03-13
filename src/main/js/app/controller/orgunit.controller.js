@@ -37,9 +37,14 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
 
         var transformToTree = function(nodeToBeSelected, args) {
             var orgUnits = args[0];
+            orgUnits = _.filter(orgUnits, function(ou) {
+                return ou.level < 7;
+            });
+
             $scope.orgUnitLevelsMap = _.transform(args[1], function(result, orgUnit) {
                 result[orgUnit.level] = orgUnit.name;
             }, {});
+
             var transformedOrgUnits = toTree(orgUnits, nodeToBeSelected);
             $scope.organisationUnits = transformedOrgUnits.rootNodes;
             selectCurrentNode(transformedOrgUnits);
