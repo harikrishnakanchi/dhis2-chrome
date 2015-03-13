@@ -20,9 +20,15 @@ define(["groupSections", "testData"], function(groupSections, testData) {
             expect(dataSetKeys.length).toBe(3);
             expect(dataSetKeys).toContain("DS_OPD");
             expect(dataSetKeys).toContain("Vacc");
-            expect(groupedSections.DS_OPD[0].orgUnitIds).toEqual(["mod1"]);
-            expect(groupedSections.DS_OPD[1].orgUnitIds).toEqual(["mod1"]);
-            expect(groupedSections.Vacc[0].orgUnitIds).toEqual(["mod2"]);
+            expect(groupedSections.DS_OPD[0].orgUnits).toEqual([{
+                id: 'mod1'
+            }]);
+            expect(groupedSections.DS_OPD[1].orgUnits).toEqual([{
+                id: 'mod1'
+            }]);
+            expect(groupedSections.Vacc[0].orgUnits).toEqual([{
+                id: 'mod2'
+            }]);
             expect(groupedSections.DS_OPD.length).toBe(2);
             expect(groupedSections.Vacc.length).toBe(1);
         });

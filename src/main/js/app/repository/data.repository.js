@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function(db) {
+    return function($q, db) {
         var transformAndSave = function(payload) {
             var groupedDataValues = _.groupBy(payload, function(dataValue) {
                 return [dataValue.period, dataValue.orgUnit];
@@ -53,12 +53,16 @@ define(["lodash", "moment"], function(_, moment) {
             return transformAndSave(payload);
         };
 
-        this.getDataValues = function(period, orgUnitId) {
+        this.getDataValues = function(period, orgUnitIds) {
             var store = db.objectStore("dataValues");
-            return store.find([period, orgUnitId]).then(function(data) {
-                if (!_.isEmpty(data))
-                    return data.dataValues;
-                return undefined;
+            return $q.all(_.map(orgUnitIds, function(orgUnitId) {
+                return store.find([period, orgUnitId]).then(function(data) {
+                    if (!_.isEmpty(data))
+                        return data.dataValues;
+                    return undefined;
+                });
+            })).then(function(dataValues) {
+                return _.compact(_.flatten(dataValues));
             });
         };
 

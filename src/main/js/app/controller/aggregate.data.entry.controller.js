@@ -4,12 +4,12 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
-        $scope.evaluateExpression = function(elementId, option) {
-            if (!$scope.validDataValuePattern.test($scope.dataValues[elementId][option].value))
+        $scope.evaluateExpression = function(orgUnit, elementId, option) {
+            if (!$scope.validDataValuePattern.test($scope.dataValues[orgUnit][elementId][option].value))
                 return;
-            var cellValue = $scope.dataValues[elementId][option].value;
-            $scope.dataValues[elementId][option].formula = cellValue;
-            $scope.dataValues[elementId][option].value = calculateSum(cellValue).toString();
+            var cellValue = $scope.dataValues[orgUnit][elementId][option].value;
+            $scope.dataValues[orgUnit][elementId][option].formula = cellValue;
+            $scope.dataValues[orgUnit][elementId][option].value = calculateSum(cellValue).toString();
         };
 
         $scope.printWindow = function() {
@@ -19,10 +19,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             }, 0);
         };
 
-        $scope.restoreExpression = function(elementId, option) {
-            if (!$scope.validDataValuePattern.test($scope.dataValues[elementId][option].value))
+        $scope.restoreExpression = function(orgUnit, elementId, option) {
+            if (!$scope.validDataValuePattern.test($scope.dataValues[orgUnit][elementId][option].value))
                 return;
-            $scope.dataValues[elementId][option].value = $scope.dataValues[elementId][option].formula;
+            $scope.dataValues[orgUnit][elementId][option].value = $scope.dataValues[orgUnit][elementId][option].formula;
         };
 
         $scope.getDatasetState = function(id, isFirst) {
@@ -255,22 +255,21 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.shouldDataBeEnteredForOrgUnit = function(orgUnitId) {
-            var currentOrgUnitIdIncludingChildrenIds = _.flatten([$scope.currentModule.id, $scope.moduleChildren]);
-            return _.contains(currentOrgUnitIdIncludingChildrenIds, orgUnitId);
+            return _.contains($scope.currentOrgUnitIdIncludingChildrenIds, orgUnitId);
         };
 
         $scope.safeGet = function(dataValues, id, option, orgUnitId) {
             if (dataValues === undefined)
                 return;
 
-            dataValues[id] = dataValues[id] || {};
+            dataValues[orgUnitId] = dataValues[orgUnitId] || {};
+            dataValues[orgUnitId][id] = dataValues[orgUnitId][id] || {};
 
-            dataValues[id][option] = dataValues[id][option] || {
+            dataValues[orgUnitId][id][option] = dataValues[orgUnitId][id][option] || {
                 'formula': '',
-                'value': '',
-                'orgUnit': orgUnitId
+                'value': ''
             };
-            return dataValues[id][option];
+            return dataValues[orgUnitId][id][option];
         };
 
         $scope.isDataEntryAllowed = function() {
@@ -306,6 +305,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         var setData = function(data) {
             $scope.dataSets = data[0];
             $scope.moduleChildren = _.pluck(data[7], "id");
+            $scope.currentOrgUnitIdIncludingChildrenIds = _.flatten([$scope.currentModule.id, $scope.moduleChildren]);
             $scope.excludedDataElements = data[6] && data[6].value ? data[6].value.dataElements : undefined;
             return data;
         };
@@ -344,7 +344,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     $scope.isAccepted = !_.isEmpty(data) && data.isAccepted;
                 });
 
-                dataRepository.getDataValues(getPeriod(), $scope.currentModule.id).then(function(dataValues) {
+                dataRepository.getDataValues(getPeriod(), $scope.currentOrgUnitIdIncludingChildrenIds).then(function(dataValues) {
                     dataValues = dataValues || [];
                     var isDraft = !_.some(dataValues, {
                         "isDraft": true
@@ -363,7 +363,17 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     });
                 };
 
+                var setCurrentGroupedSectionsForOrigins = function() {
+                    var datasetsAssociatedWithOrigins = _.uniq(_.flatten(_.map($scope.moduleChildren, function(origin) {
+                        return _.pluck(datasetTransformer.getAssociatedDatasets(origin, $scope.dataSets), 'id');
+                    })));
+
+                    $scope.currentGroupedSectionsForOrigins = _.pick($scope.groupedSections, datasetsAssociatedWithOrigins);
+                };
+
+
                 setCurrentGroupedSectionsForCurrentModule();
+                setCurrentGroupedSectionsForOrigins();
 
                 if ($scope.dataentryForm !== undefined)
                     $scope.dataentryForm.$setPristine();

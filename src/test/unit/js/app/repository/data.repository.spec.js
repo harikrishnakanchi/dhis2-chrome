@@ -6,7 +6,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
             scope = $rootScope;
-            dataRepository = new DataRepository(mockDB.db);
+            dataRepository = new DataRepository(q, mockDB.db);
 
             dataValuesFromClient = [{
                 "period": '2014W15',
@@ -74,7 +74,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
         it("should return true if events are present for the given orgunitids", function() {
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
-            dataRepository = new DataRepository(mockDB.db, q);
+            dataRepository = new DataRepository(q, mockDB.db);
 
             mockStore.exists.and.returnValue(utils.getPromise(q, true));
 
@@ -88,7 +88,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
         it("should return false if events are not present for the given orgunitids", function() {
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
-            dataRepository = new DataRepository(mockDB.db, q);
+            dataRepository = new DataRepository(q, mockDB.db);
 
             mockStore.exists.and.returnValue(utils.getPromise(q, false));
 
@@ -151,39 +151,56 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
 
         it("should get the data values", function() {
 
-            var dataValueFromClient = {
+            var dv1 = {
                 "period": '2014W15',
-                "orgUnit": 'company_0',
+                "orgUnit": 'mod1',
                 "dataElement": "DE1",
                 "categoryOptionCombo": "COC1",
-                "value": "1",
-                "clientLastUpdated": "2015-04-15T00:00:00.000"
+                "value": "1"
             };
 
-            var dataValueFromDhis = {
+            var dv2 = {
                 "period": '2014W15',
-                "orgUnit": 'company_0',
+                "orgUnit": 'mod1',
                 "dataElement": "DE2",
                 "categoryOptionCombo": "COC2",
-                "value": "2",
-                "lastUpdated": "2015-04-16T00:00:00.000"
+                "value": "2"
             };
 
-            mockStore.find.and.returnValue(utils.getPromise(q, {
-                "period": "2014W15",
-                "orgUnit": "company_0",
-                "dataValues": [dataValueFromClient, dataValueFromDhis]
-            }));
+            var dv3 = {
+                "period": '2014W15',
+                "orgUnit": 'origin1',
+                "dataElement": "NumPatients",
+                "categoryOptionCombo": "Number",
+                "value": "3"
+            };
+
+            mockStore.find.and.callFake(function(periodAndOrgUnit) {
+                var orgUnit = periodAndOrgUnit[1];
+                var result;
+                if (orgUnit === "mod1")
+                    result = {
+                        "period": "2014W15",
+                        "orgUnit": "mod1",
+                        "dataValues": [dv1, dv2]
+                    };
+                if (orgUnit === "origin1")
+                    result = {
+                        "period": "2014W15",
+                        "orgUnit": "mod1",
+                        "dataValues": [dv3]
+                    };
+                return utils.getPromise(q, result);
+            });
 
             var actualDataValues;
-            dataRepository.getDataValues('period', 'orgUnitId').then(function(data) {
+            dataRepository.getDataValues('period', ['mod1', 'origin1', 'origin2']).then(function(data) {
                 actualDataValues = data;
             });
 
             scope.$apply();
 
-            expect(mockStore.find).toHaveBeenCalledWith(['period', 'orgUnitId']);
-            expect(actualDataValues).toEqual([dataValueFromClient, dataValueFromDhis]);
+            expect(actualDataValues).toEqual([dv1, dv2, dv3]);
         });
 
         it("should get data values by periods and orgunits", function() {

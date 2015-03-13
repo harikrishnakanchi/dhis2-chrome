@@ -5,38 +5,45 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
         beforeEach(mocks.inject(function($injector, $q) {
             q = $q;
             viewModel = {
-                "DE_Oedema": {
-                    "32": {
-                        "value": "3",
-                        "formula": "1+2",
-                        "orgUnit": "company_0"
+                "mod1": {
+                    "DE_Oedema": {
+                        "32": {
+                            "value": "3",
+                            "formula": "1+2"
+                        },
+                        "33": {
+                            "value": "12",
+                            "formula": "12"
+                        },
                     },
-                    "33": {
-                        "value": "12",
-                        "formula": "12",
-                        "orgUnit": "company_0"
-                    },
+                    "DE_MLT115": {
+                        "32": {
+                            "value": "49",
+                            "formula": "49"
+                        },
+                        "37": {
+                            "value": "67",
+                            "formula": "67"
+                        }
+                    }
                 },
-                "DE_MLT115": {
-                    "32": {
-                        "value": "49",
-                        "formula": "49",
-                        "orgUnit": "company_0"
-                    },
-                    "37": {
-                        "value": "67",
-                        "formula": "67",
-                        "orgUnit": "company_0"
+                "origin1": {
+                    "NumPatients": {
+                        "Number": {
+                            "value": "10",
+                            "formula": "10"
+                        }
                     }
                 }
             };
+
 
             period = "2014W4";
             domain = [{
                 "dataElement": "DE_Oedema",
                 "categoryOptionCombo": "32",
                 "period": "2014W04",
-                "orgUnit": "company_0",
+                "orgUnit": "mod1",
                 "storedBy": "user",
                 "formula": "1+2",
                 "value": "3"
@@ -44,7 +51,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                 "dataElement": "DE_Oedema",
                 "categoryOptionCombo": "33",
                 "period": "2014W04",
-                "orgUnit": "company_0",
+                "orgUnit": "mod1",
                 "storedBy": "user",
                 "formula": "12",
                 "value": "12"
@@ -52,7 +59,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                 "dataElement": "DE_MLT115",
                 "categoryOptionCombo": "32",
                 "period": "2014W04",
-                "orgUnit": "company_0",
+                "orgUnit": "mod1",
                 "storedBy": "user",
                 "formula": "49",
                 "value": "49"
@@ -60,10 +67,18 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                 "dataElement": "DE_MLT115",
                 "categoryOptionCombo": "37",
                 "period": "2014W04",
-                "orgUnit": "company_0",
+                "orgUnit": "mod1",
                 "storedBy": "user",
                 "formula": "67",
                 "value": "67"
+            }, {
+                "dataElement": "NumPatients",
+                "categoryOptionCombo": "Number",
+                "period": "2014W04",
+                "orgUnit": "origin1",
+                "storedBy": "user",
+                "formula": "10",
+                "value": "10"
             }];
         }));
 
@@ -79,11 +94,12 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
 
         it("should filter out empty values when converting view to domain", function() {
             _.merge(viewModel, {
-                "DE_Podimas": {
-                    "33": {
-                        "formula": "",
-                        "value": "",
-                        "orgUnit": "company_0"
+                "mod1": {
+                    "DE_Podimas": {
+                        "33": {
+                            "formula": "",
+                            "value": "",
+                        }
                     }
                 }
             });

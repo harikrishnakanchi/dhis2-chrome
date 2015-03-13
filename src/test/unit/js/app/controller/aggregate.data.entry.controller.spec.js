@@ -264,16 +264,17 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
             it("should evaluate expression on blur and store as string", function() {
                 scope.dataValues = {
-                    "blah": {
-                        "some": {
-                            "value": "1+9"
+                    "mod1": {
+                        "blah": {
+                            "some": {
+                                "value": "1+9"
+                            }
                         }
                     }
                 };
+                scope.evaluateExpression("mod1", "blah", "some");
 
-                scope.evaluateExpression("blah", "some");
-
-                expect(scope.dataValues.blah.some.value).toEqual("10");
+                expect(scope.dataValues.mod1.blah.some.value).toEqual("10");
             });
 
             it("should group sections based on datasets", function() {
@@ -411,37 +412,41 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 var result = scope.safeGet(dataValues, "blah", "someOption", "mod2");
 
                 expect(dataValues).toEqual({
-                    blah: {
-                        someOption: {
-                            formula: '',
-                            value: '',
-                            orgUnit: 'mod2'
+                    "mod2": {
+                        "blah": {
+                            "someOption": {
+                                "formula": '',
+                                "value": ''
+                            }
                         }
                     }
                 });
                 expect(result).toEqual({
-                    formula: '',
-                    value: '',
-                    orgUnit: 'mod2'
+                    "formula": '',
+                    "value": ''
                 });
             });
 
             it("safe get dataValues should return if already present", function() {
                 scope.$apply();
                 var dataValues = {
-                    "blah": {
-                        "someOption": "test"
+                    "mod2": {
+                        "blah": {
+                            "someOption": "test"
+                        }
                     }
                 };
 
-                var result = scope.safeGet(dataValues, "blah", "someOption", "mod1");
+                var result = scope.safeGet(dataValues, "blah", "someOption", "mod2");
 
                 expect(dataValues).toEqual({
-                    blah: {
-                        someOption: 'test'
+                    "mod2": {
+                        "blah": {
+                            "someOption": "test"
+                        }
                     }
                 });
-                expect(result).toEqual(dataValues.blah.someOption);
+                expect(result).toEqual(dataValues.mod2.blah.someOption);
             });
 
             it("should fetch empty data if no data exists for the given period", function() {
@@ -458,7 +463,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 };
                 scope.$apply();
 
-                expect(dataRepository.getDataValues).toHaveBeenCalledWith('2014W14', 'Mod1');
+                expect(dataRepository.getDataValues).toHaveBeenCalledWith('2014W14', ['Mod1', 'origin1', 'origin2']);
                 expect(scope.dataValues).toEqual({});
             });
 
@@ -490,18 +495,18 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 scope.$apply();
 
-                expect(dataRepository.getDataValues).toHaveBeenCalledWith("2014W14", "mod2");
+                expect(dataRepository.getDataValues).toHaveBeenCalledWith("2014W14", ["mod2", "origin1", "origin2"]);
                 expect(scope.dataValues).toEqual({
-                    DE_Oedema: {
-                        32: {
-                            formula: '3',
-                            value: '3',
-                            orgUnit: 'mod2'
-                        },
-                        33: {
-                            formula: '12',
-                            value: '12',
-                            orgUnit: 'mod2'
+                    "mod2": {
+                        "DE_Oedema": {
+                            "32": {
+                                "formula": '3',
+                                "value": '3'
+                            },
+                            "33": {
+                                "formula": '12',
+                                "value": '12'
+                            }
                         }
                     }
                 });
@@ -524,6 +529,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(_.keys(scope.currentGroupedSections)).toEqual(['DS_OPD']);
+                expect(_.keys(scope.currentGroupedSectionsForOrigins)).toEqual(['Geographic Origin']);
                 expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
             });
 

@@ -41,7 +41,7 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                 section.orgUnitIds = [];
                 _.each(dataSets, function(ds) {
                     if (ds.id === section.dataSet.id) {
-                        section.orgUnitIds = _.pluck(ds.organisationUnits, "id");
+                        section.orgUnits = ds.organisationUnits;
                     }
                 });
                 section.headers = result.headers;
