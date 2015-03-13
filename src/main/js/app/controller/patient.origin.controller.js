@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhisId, orgUnitMapper) {
-    return function($scope, $hustle, patientOriginRepository, orgUnitRepository) {
+    return function($scope, $hustle, $q, patientOriginRepository, orgUnitRepository, datasetRepository) {
         var patientOrigins = [];
 
         $scope.save = function() {
@@ -24,10 +24,42 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
             };
 
             var createOrgUnits = function() {
+                var patientOriginPayload;
                 return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
-                    var patientOriginPayload = orgUnitMapper.createPatientOriginPayload($scope.patientOrigin, modules);
+                    patientOriginPayload = orgUnitMapper.createPatientOriginPayload($scope.patientOrigin, modules);
                     return orgUnitRepository.upsert(patientOriginPayload).then(_.partial(publishMessage, patientOriginPayload, "upsertOrgUnit"));
+                }).then(function() {
+                    return patientOriginPayload;
                 });
+            };
+
+            var associateDatasets = function(getDatasetsToAssociate, orgUnits) {
+                var addOrgUnits = function(orgUnits, datasets) {
+                    var ouPayloadToAssociate = _.map(orgUnits, function(orgUnit) {
+                        return {
+                            "id": orgUnit.id,
+                            "name": orgUnit.name
+                        };
+                    });
+
+                    return _.map(datasets, function(ds) {
+                        ds.organisationUnits = ds.organisationUnits || [];
+                        ds.organisationUnits = ds.organisationUnits.concat(ouPayloadToAssociate);
+                        return ds;
+                    });
+                };
+
+                var updateDatasets = function(datasets) {
+                    return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]);
+                };
+
+                return getDatasetsToAssociate()
+                    .then(_.partial(addOrgUnits, orgUnits))
+                    .then(updateDatasets);
+            };
+
+            var getOriginDatasets = function() {
+                return datasetRepository.getOriginDatasets();
             };
 
             $scope.patientOrigin.id = dhisId.get($scope.patientOrigin.name);
@@ -42,6 +74,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
             return patientOriginRepository.upsert(payload)
                 .then(_.partial(publishMessage, payload, "uploadPatientOriginDetails"))
                 .then(createOrgUnits)
+                .then(_.partial(associateDatasets, getOriginDatasets))
                 .then(onSuccess, onFailure);
         };
 

@@ -32,6 +32,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 get: function() {},
                 getEnriched: function() {},
                 upsert: function() {},
+                findAll: function() {},
+                getOriginDatasets: function() {},
                 getAllAggregateDatasets: jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, datasetsdata))
             };
 
@@ -110,6 +112,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
+            spyOn(dataSetRepo, "findAll").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dataSetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, {}));
 
             scope.$apply();
 
@@ -171,6 +175,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     id: 'someid'
                 }
             };
+
             scope.save();
             scope.$apply();
             expect(scope.saveFailure).toBe(false);
@@ -244,7 +249,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             }];
             spyOn(dataSetRepo, "upsert");
-            spyOn(dataSetRepo, "get").and.returnValue(utils.getPromise(q, datasetsdata[0]));
+            spyOn(dataSetRepo, "findAll").and.returnValue(utils.getPromise(q, [datasetsdata[0]]));
+            spyOn(dataSetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, {}));
 
             scope.associatedDatasets = enrichedAssociatedDatasets;
             scope.save();
@@ -274,7 +280,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 data: ['DS_OPD'],
                 type: "associateOrgUnitToDataset"
             }, "dataValues");
-
         });
 
         it("should save excluded data elements for the module", function() {
@@ -338,7 +343,8 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             }];
 
             spyOn(dataSetRepo, "upsert");
-            spyOn(dataSetRepo, "get").and.returnValue(utils.getPromise(q, datasetsdata[0]));
+            spyOn(dataSetRepo, "findAll").and.returnValue(utils.getPromise(q, datasetsdata));
+            spyOn(dataSetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, {}));
 
             scope.associatedDatasets = enrichedAssociatedDatasets;
             scope.save();
@@ -852,6 +858,120 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             expect(scope.getCollapsed("sectionId")).toEqual(true);
+        });
+
+        it("should create patient origin orgunits and associate datasets", function() {
+            var parent = {
+                "name": "Project1",
+                "id": "someid",
+                "children": []
+            };
+
+            var origins = {
+                "orgUnit": "someid",
+                "origins": [{
+                    "name": "or1",
+                    "latitude": 66.6,
+                    "longitude": 70.2
+                }]
+            };
+
+            var originDatasets = [{
+                "id": "origin",
+                "name": "origin",
+                "organisationUnits": []
+            }];
+
+            var expectedUpserts = [{
+                "id": "origin",
+                "name": "origin",
+                "organisationUnits": [{
+                    "id": "or1Module1someid",
+                    "name": "or1"
+                }]
+            }];
+
+            orgUnitRepo.getParentProject.and.returnValue(utils.getPromise(q, parent));
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
+
+            spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dhisId, "get").and.callFake(function(name) {
+                return name;
+            });
+            spyOn(dataSetRepo, "findAll").and.returnValue(utils.getPromise(q, {}));
+            spyOn(dataSetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, originDatasets));
+            spyOn(dataSetRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+
+            scope.$apply();
+
+
+            scope.orgUnit = parent;
+            scope.module = {
+                'name': "Module1",
+                'serviceType': "Aggregate",
+                'openingDate': new Date(),
+                'parent': parent
+            };
+
+            var originOrgunits = [{
+                "name": 'or1',
+                "shortName": 'or1',
+                "displayName": 'or1',
+                "id": 'or1Module1someid',
+                "level": 7,
+                "openingDate": moment(new Date()).toDate(),
+                "coordinates": '[70.2,66.6]',
+                "attributeValues": [{
+                    "attribute": {
+                        "code": 'Type',
+                        "name": 'Type'
+                    },
+                    "value": 'Patient Origin'
+                }],
+                "parent": {
+                    "id": 'Module1someid'
+                }
+            }];
+
+            var enrichedAggregateModule = {
+                name: 'Module1',
+                shortName: 'Module1',
+                displayName: 'Project1 - Module1',
+                id: 'Module1someid',
+                level: NaN,
+                openingDate: moment(new Date()).toDate(),
+                attributeValues: [{
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
+                    attribute: {
+                        code: "Type",
+                        name: "Type",
+                    },
+                    value: 'Module'
+                }, {
+                    created: moment().toISOString(),
+                    lastUpdated: moment().toISOString(),
+                    attribute: {
+                        code: "isLineListService",
+                        name: "Is Linelist Service"
+                    },
+                    value: 'false'
+                }],
+                parent: {
+                    name: 'Project1',
+                    id: 'someid'
+                }
+            };
+
+            scope.save();
+            scope.$apply();
+            expect(scope.saveFailure).toBe(false);
+
+            expect(orgUnitRepo.getParentProject).toHaveBeenCalledWith(enrichedAggregateModule.parent.id);
+            expect(patientOriginRepository.get).toHaveBeenCalledWith("someid");
+            expect(orgUnitRepo.upsert.calls.argsFor(1)[0]).toEqual(originOrgunits);
+            expect(dataSetRepo.getOriginDatasets).toHaveBeenCalled();
+            expect(dataSetRepo.upsert).toHaveBeenCalledWith(expectedUpserts);
         });
     });
 });

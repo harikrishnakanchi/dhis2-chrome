@@ -112,6 +112,15 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
+        var getOriginDatasets = function() {
+            var store = db.objectStore("dataSets");
+            return store.getAll().then(function(allDatasets) {
+                return _.filter(allDatasets, function(ds) {
+                    return getBooleanAttributeValue(ds.attributeValues, "isOriginDataset");
+                });
+            });
+        };
+
         return {
             "get": get,
             "findAll": findAll,
@@ -122,7 +131,8 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             "getAllForOrgUnit": getAllForOrgUnit,
             "getEnriched": getEnriched,
             "getAllLinelistDatasets": getAllLinelistDatasets,
-            "getAllAggregateDatasets": getAllAggregateDatasets
+            "getAllAggregateDatasets": getAllAggregateDatasets,
+            "getOriginDatasets": getOriginDatasets
         };
     };
 });

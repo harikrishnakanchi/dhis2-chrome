@@ -159,28 +159,41 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.save = function(module) {
             var enrichedModule = {};
 
-            var associateDatasets = function() {
-                var addOrgUnits = function() {
-                    return _.map($scope.associatedDatasets, function(ds) {
-                        return datasetRepository.get(ds.id).then(function(d) {
-                            d.organisationUnits = d.organisationUnits || [];
-                            d.organisationUnits = d.organisationUnits.concat({
-                                id: enrichedModule.id,
-                                name: enrichedModule.name
-                            });
-                            return d;
-                        });
+            var getAssociatedDatasets = function() {
+                var datasetIds = _.pluck($scope.associatedDatasets, "id");
+                return datasetRepository.findAll(datasetIds);
+            };
+
+            var associateDatasets = function(getDatasetsToAssociate, orgUnits) {
+                var addOrgUnits = function(orgUnits, datasets) {
+                    var ouPayloadToAssociate = _.map(orgUnits, function(orgUnit) {
+                        return {
+                            "id": orgUnit.id,
+                            "name": orgUnit.name
+                        };
+                    });
+
+                    return _.map(datasets, function(ds) {
+                        ds.organisationUnits = ds.organisationUnits || [];
+                        ds.organisationUnits = ds.organisationUnits.concat(ouPayloadToAssociate);
+                        return ds;
                     });
                 };
-                var updateDataSets = function(datasets) {
+
+                var updateDatasets = function(datasets) {
                     return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]);
                 };
-                return $q.all(addOrgUnits()).then(updateDataSets);
+
+                return getDatasetsToAssociate()
+                    .then(_.partial(addOrgUnits, orgUnits))
+                    .then(updateDatasets);
             };
+
             var getEnrichedModule = function(module) {
                 enrichedModule = orgUnitMapper.mapToModule(module);
                 return $q.when(enrichedModule);
             };
+
             var createModules = function() {
                 return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")]);
             };
@@ -190,17 +203,31 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             };
 
             var createOriginOrgUnits = function() {
-                return orgUnitRepository.getParentProject(enrichedModule.parent.id).then(function(parentProject) {
-                    return patientOriginRepository.get(parentProject.id).then(function(patientOrigins) {
-                        var patientOriginPayload = orgUnitMapper.createPatientOriginPayload(patientOrigins.origins, enrichedModule);
-                        return orgUnitRepository.upsert(patientOriginPayload).then(_.partial(publishMessage, patientOriginPayload, "upsertOrgUnit"));
+                var getOriginDatasets = function() {
+                    return datasetRepository.getOriginDatasets();
+                };
+
+                var getPatientOriginOUPayload = function() {
+                    return orgUnitRepository.getParentProject(enrichedModule.parent.id).then(function(parentProject) {
+                        return patientOriginRepository.get(parentProject.id).then(function(patientOrigins) {
+                            if (patientOrigins)
+                                return orgUnitMapper.createPatientOriginPayload(patientOrigins.origins, enrichedModule);
+                        });
                     });
+                };
+
+                return getPatientOriginOUPayload().then(function(patientOriginOUPayload) {
+                    if (!_.isEmpty(patientOriginOUPayload)) {
+                        return orgUnitRepository.upsert(patientOriginOUPayload)
+                            .then(_.partial(publishMessage, patientOriginOUPayload, "upsertOrgUnit"))
+                            .then(_.partial(associateDatasets, getOriginDatasets, patientOriginOUPayload));
+                    }
                 });
             };
 
             return getEnrichedModule($scope.module)
                 .then(createModules)
-                .then(associateDatasets)
+                .then(_.partial(associateDatasets, getAssociatedDatasets, [enrichedModule]))
                 .then(_.partial(saveExcludedDataElements, enrichedModule))
                 .then(createOrgUnitGroups)
                 .then(createOriginOrgUnits)

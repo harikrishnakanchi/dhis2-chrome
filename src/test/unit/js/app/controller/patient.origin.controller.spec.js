@@ -1,4 +1,4 @@
-define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop", "orgUnitRepository", "patientOriginRepository"], function(PatientOriginController, mocks, utils, dhisId, timecop, OrgUnitRepository, PatientOriginRepository) {
+define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop", "orgUnitRepository", "patientOriginRepository", "datasetRepository"], function(PatientOriginController, mocks, utils, dhisId, timecop, OrgUnitRepository, PatientOriginRepository, DatasetRepository) {
     describe("patientOriginController", function() {
         var scope, patientOriginController, q, patientOriginRepository, hustle, origins, orgUnitRepository;
 
@@ -31,6 +31,10 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
 
+            datasetRepository = new DatasetRepository();
+            spyOn(datasetRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+            spyOn(datasetRepository, "getOriginDatasets").and.returnValue(utils.getPromise(q, {}));
+
             origins = [{
                 "id": "origin1",
                 "name": "Origin1",
@@ -56,7 +60,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "orgUnit": "prj1",
                 "origins": origins
             }));
-            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository, orgUnitRepository);
+            patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository);
             scope.$apply();
 
             expect(patientOriginRepository.get).toHaveBeenCalledWith("prj1");
@@ -64,7 +68,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
         it("should add patient origin if no origins are present", function() {
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, {}));
-            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository, orgUnitRepository);
+            patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository);
             scope.patientOrigin = {
                 "name": "Origin1",
                 "longitude": 100,
@@ -98,7 +102,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "orgUnit": "prj1",
                 "origins": origins
             }));
-            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository, orgUnitRepository);
+            patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository);
             scope.patientOrigin = {
                 "name": "Origin2",
                 "longitude": 100,
@@ -142,7 +146,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, {}));
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
 
-            patientOriginController = new PatientOriginController(scope, hustle, patientOriginRepository, orgUnitRepository);
+            patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository);
 
             scope.patientOrigin = {
                 "name": "Origin1",
@@ -181,6 +185,53 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("prj1");
             expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedUpserts);
+        });
+
+        it("should associate origin orgunits with origin datsets", function() {
+            var modules = [{
+                "id": "p1",
+                "name": "p1",
+                "openingDate": "2014-02-02"
+            }];
+
+            var originDatasets = [{
+                "id": "origin",
+                "name": "origin",
+                "organisationUnits": []
+            }];
+
+            var expectedUpserts = [{
+                "id": "origin",
+                "name": "origin",
+                "organisationUnits": [{
+                    "id": "Origin1p1",
+                    "name": "Origin1"
+                }]
+            }];
+
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, {}));
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
+            datasetRepository.getOriginDatasets.and.returnValue(utils.getPromise(q, originDatasets));
+
+            patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository);
+
+            scope.patientOrigin = {
+                "name": "Origin1",
+                "longitude": 100,
+                "latitude": 80
+            };
+
+            scope.orgUnit = {
+                "id": "prj1"
+            };
+
+            scope.$apply();
+
+            scope.save();
+            scope.$apply();
+
+            expect(datasetRepository.getOriginDatasets).toHaveBeenCalled();
+            expect(datasetRepository.upsert).toHaveBeenCalledWith(expectedUpserts);
         });
     });
 });
