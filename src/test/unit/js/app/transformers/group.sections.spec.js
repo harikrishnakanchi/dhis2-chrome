@@ -17,7 +17,7 @@ define(["groupSections", "testData"], function(groupSections, testData) {
 
         it("should group sections based on datasets", function() {
             var dataSetKeys = _.keys(groupedSections);
-            expect(dataSetKeys.length).toBe(2);
+            expect(dataSetKeys.length).toBe(3);
             expect(dataSetKeys).toContain("DS_OPD");
             expect(dataSetKeys).toContain("Vacc");
             expect(groupedSections.DS_OPD[0].orgUnitIds).toEqual(["mod1"]);

@@ -221,7 +221,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 });
             };
 
-            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentModule.id, $scope.currentUser.userCredentials.username);
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentUser.userCredentials.username);
             if (asDraft) {
                 return dataRepository.saveAsDraft(payload);
             } else {
@@ -254,9 +254,12 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             }).name;
         };
 
-        $scope.safeGet = function(dataValues, id, option, allOrgUnitsAssociatedToDataSet) {
+        $scope.shouldDataBeEnteredForOrgUnit = function(orgUnitId) {
             var currentOrgUnitIdIncludingChildrenIds = _.flatten([$scope.currentModule.id, $scope.moduleChildren]);
-            var orgUnitForWhichDataIsEntered = _.intersection(allOrgUnitsAssociatedToDataSet, currentOrgUnitIdIncludingChildrenIds);
+            return _.contains(currentOrgUnitIdIncludingChildrenIds, orgUnitId);
+        };
+
+        $scope.safeGet = function(dataValues, id, option, orgUnitId) {
             if (dataValues === undefined)
                 return;
 
@@ -265,7 +268,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             dataValues[id][option] = dataValues[id][option] || {
                 'formula': '',
                 'value': '',
-                'orgUnitIds': orgUnitForWhichDataIsEntered
+                'orgUnit': orgUnitId
             };
             return dataValues[id][option];
         };
@@ -302,7 +305,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         var setData = function(data) {
             $scope.dataSets = data[0];
-            $scope.moduleChildren = _.pluck(data[8], "id");
+            $scope.moduleChildren = _.pluck(data[7], "id");
             $scope.excludedDataElements = data[6] && data[6].value ? data[6].value.dataElements : undefined;
             return data;
         };
@@ -320,10 +323,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var categoriesPromise = getAll("categories");
             var categoryOptionCombosPromise = getAll("categoryOptionCombos");
             var excludedDataElementPromise = systemSettingRepository.get($scope.currentModule.id);
-            var organisationUnitPromise = getAll("organisationUnits");
             var getChildrenPromise = orgUnitRepository.findAllByParent([$scope.currentModule.id]);
 
-            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, excludedDataElementPromise, organisationUnitPromise, getChildrenPromise]);
+            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, excludedDataElementPromise, getChildrenPromise]);
 
             $scope.loading = true;
             getAllData.then(setData).then(transformDataSet).then(function() {
@@ -351,13 +353,17 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     $scope.isSubmitted = (!_.isEmpty(dataValues) && isDraft);
                 });
 
-                var datasetsAssociatedWithModule = _.pluck(datasetTransformer.getAssociatedDatasets($scope.currentModule.id, $scope.dataSets), 'id');
+                var setCurrentGroupedSectionsForCurrentModule = function() {
+                    var datasetsAssociatedWithModule = _.pluck(datasetTransformer.getAssociatedDatasets($scope.currentModule.id, $scope.dataSets), 'id');
 
-                $scope.currentGroupedSections = _.pick($scope.groupedSections, datasetsAssociatedWithModule);
-                var selectedDatasets = _.keys($scope.currentGroupedSections);
-                _.each(selectedDatasets, function(selectedDataset) {
-                    $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.excludedDataElements);
-                });
+                    $scope.currentGroupedSections = _.pick($scope.groupedSections, datasetsAssociatedWithModule);
+                    var selectedDatasets = _.keys($scope.currentGroupedSections);
+                    _.each(selectedDatasets, function(selectedDataset) {
+                        $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.excludedDataElements);
+                    });
+                };
+
+                setCurrentGroupedSectionsForCurrentModule();
 
                 if ($scope.dataentryForm !== undefined)
                     $scope.dataentryForm.$setPristine();

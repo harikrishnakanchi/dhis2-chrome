@@ -28,6 +28,22 @@ define(["lodash"], function(_) {
             },
             "value": "true"
         }]
+    }, {
+        "name": "Geographic Origin",
+        "id": "Geographic Origin",
+        "organisationUnits": [{
+            "id": "origin1",
+        }, {
+            "id": "origin2",
+        }],
+        "orgUnitIds": ["origin1", "origin2"],
+        "attributeValues": [{
+            "attribute": {
+                "id": "wFC6joy3I8Q",
+                "code": "isNewDataModel",
+            },
+            "value": "true"
+        }]
     }];
 
     var categoryOptions = [{
@@ -186,6 +202,13 @@ define(["lodash"], function(_) {
         "dataElements": [{
             "id": "DE3",
             "name": "DE3 - ITFC"
+        }]
+    }, {
+        "id": "Origin",
+        "dataSet": _.pick(dataSets[2], ['name', 'id']),
+        "dataElements": [{
+            "id": "DE4",
+            "name": "Number Of Patients - Geographic Origin"
         }]
     }];
 

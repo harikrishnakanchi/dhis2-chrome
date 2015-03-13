@@ -387,7 +387,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             expect(scope.isDisabled).toBeFalsy();
             expect(scope.associatedDatasets.length).toEqual(1);
-            expect(scope.nonAssociatedDataSets).toEqual([datasetsdata[0]]);
+            expect(scope.nonAssociatedDataSets).toEqual([datasetsdata[0], datasetsdata[2]]);
             expect(scope.selectedDataset).toEqual(scope.associatedDatasets[0]);
             expect(scope.getEnriched);
         });

@@ -280,7 +280,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 var dataSetKeys = _.keys(scope.groupedSections);
-                expect(dataSetKeys.length).toBe(2);
+                expect(dataSetKeys.length).toBe(3);
                 expect(dataSetKeys).toContain("DS_OPD");
                 expect(dataSetKeys).toContain("Vacc");
 
@@ -408,21 +408,21 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("safe get dataValues should initialize data value and option if not present", function() {
                 scope.$apply();
                 var dataValues = {};
-                var result = scope.safeGet(dataValues, "blah", "someOption", ["mod1", "mod2", "mod3"]);
+                var result = scope.safeGet(dataValues, "blah", "someOption", "mod2");
 
                 expect(dataValues).toEqual({
                     blah: {
                         someOption: {
                             formula: '',
                             value: '',
-                            orgUnitIds: ['mod2']
+                            orgUnit: 'mod2'
                         }
                     }
                 });
                 expect(result).toEqual({
                     formula: '',
                     value: '',
-                    orgUnitIds: ['mod2']
+                    orgUnit: 'mod2'
                 });
             });
 
@@ -434,7 +434,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     }
                 };
 
-                var result = scope.safeGet(dataValues, "blah", "someOption", ["mod1", "mod2", "mod3"]);
+                var result = scope.safeGet(dataValues, "blah", "someOption", "mod1");
 
                 expect(dataValues).toEqual({
                     blah: {
@@ -478,12 +478,14 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "dataElement": "DE_Oedema",
                     "categoryOptionCombo": "32",
                     "value": "3",
-                    "dataset": "abbc"
+                    "dataset": "abbc",
+                    "orgUnit": "mod2"
                 }, {
                     "dataElement": "DE_Oedema",
                     "categoryOptionCombo": "33",
                     "value": "12",
-                    "dataset": "abbc"
+                    "dataset": "abbc",
+                    "orgUnit": "mod2"
                 }]));
 
                 scope.$apply();
@@ -493,11 +495,13 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     DE_Oedema: {
                         32: {
                             formula: '3',
-                            value: '3'
+                            value: '3',
+                            orgUnit: 'mod2'
                         },
                         33: {
                             formula: '12',
-                            value: '12'
+                            value: '12',
+                            orgUnit: 'mod2'
                         }
                     }
                 });
@@ -938,6 +942,18 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 expect(scope.isDataEntryAllowed()).toBeFalsy();
                 scope.$apply();
+            });
+
+            it("should return true if data can be entered for orgUnit", function() {
+                scope.$apply();
+                expect(scope.shouldDataBeEnteredForOrgUnit("origin2")).toEqual(true);
+                expect(scope.shouldDataBeEnteredForOrgUnit("mod2")).toEqual(true);
+            });
+
+            it("should return false if data can not be entered for orgUnit", function() {
+                scope.$apply();
+                expect(scope.shouldDataBeEnteredForOrgUnit("mod3")).toEqual(false);
+
             });
         });
     });

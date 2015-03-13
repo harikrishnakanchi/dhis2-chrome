@@ -6,9 +6,6 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
         var categoryCombos = data[3];
         var categories = data[4];
         var categoryOptionCombos = data[5];
-        var orgUnits = data[7];
-        var moduleId = 'moduleId';
-
 
         var groupedSections = _.groupBy(sections, function(section) {
             return section.dataSet.id;

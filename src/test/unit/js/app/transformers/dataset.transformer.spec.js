@@ -3,7 +3,8 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
         it("should enrich datasets", function() {
 
             var datasets, sections, dataelements;
-            datasets = testData.get("dataSets");
+            var allDataSetsFromTestData = testData.get("dataSets");
+            datasets = [allDataSetsFromTestData[0], allDataSetsFromTestData[1]];
             sections = testData.get("sections");
             dataelements = testData.get("dataElements");
 

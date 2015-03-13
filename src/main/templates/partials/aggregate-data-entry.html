@@ -39,33 +39,39 @@
                                 </accordion-heading>
 
                                 <table class="table table-bordered" ng-if="isDatasetOpen[dataSetId] || printingTallySheet">
-                                    <tr ng-repeat="category in section.headers">
-                                        <th></th>
+                                    <thead>
+                                        <tr ng-repeat="category in section.headers">
+                                            <th></th>
 
-                                        <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
-                                            <span ng-if="!resourceBundle[option.id]">{{option.name}}</span>
-                                            <span ng-if="resourceBundle[option.id]">{{resourceBundle[option.id]}}</span>
-                                        </th>
-                                        <th ng-hide="$last" class="last-column">
-                                        </th>
-                                        <th ng-show="$last" class="last-column">
-                                            {{ resourceBundle.totalLabel }}
-                                        </th>
-                                    </tr>
-                                    <tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm">
-                                        <td>
-                                            <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
-                                            <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}</span>
-                                        </td>
-                                        <td ng-repeat="option in section.categoryOptionComboIds">
-                                            <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
-                                                <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, section.orgUnitIds)['value']" ng-focus="restoreExpression(dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed()" />
-                                                <br/>
-                                            </ng-form>
-                                        </td>
-                                        <td class="last-column">{{sum(dataValues[dataElement.id])}}</td>
-                                    </tr>
+                                            <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
+                                                <span ng-if="!resourceBundle[option.id]">{{option.name}}</span>
+                                                <span ng-if="resourceBundle[option.id]">{{resourceBundle[option.id]}}</span>
+                                            </th>
+                                            <th ng-hide="$last" class="last-column">
+                                            </th>
+                                            <th ng-show="$last" class="last-column">
+                                                {{ resourceBundle.totalLabel }}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="orgUnit in section.orgUnitIds">
+                                        <tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm" ng-if="shouldDataBeEnteredForOrgUnit(orgUnit)">
+                                            <td>
+                                                <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
+                                                <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}</span>
+                                            </td>
+                                            <td ng-repeat="option in section.categoryOptionComboIds">
+                                                <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
+                                                    <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit)['value']" ng-focus="restoreExpression(dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed()" />
+                                                    <br/>
+                                                </ng-form>
+                                            </td>
+                                            <td class="last-column">{{sum(dataValues[dataElement.id])}}</td>
+                                        </tr>
+                                    </tbody>
+                                    
                                 </table>
+
                             </accordion-group>
                         </accordion>
                     </div>

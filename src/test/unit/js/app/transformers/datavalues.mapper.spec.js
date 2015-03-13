@@ -8,21 +8,25 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                 "DE_Oedema": {
                     "32": {
                         "value": "3",
-                        "formula": "1+2"
+                        "formula": "1+2",
+                        "orgUnit": "company_0"
                     },
                     "33": {
                         "value": "12",
-                        "formula": "12"
+                        "formula": "12",
+                        "orgUnit": "company_0"
                     },
                 },
                 "DE_MLT115": {
                     "32": {
                         "value": "49",
-                        "formula": "49"
+                        "formula": "49",
+                        "orgUnit": "company_0"
                     },
                     "37": {
                         "value": "67",
-                        "formula": "67"
+                        "formula": "67",
+                        "orgUnit": "company_0"
                     }
                 }
             };
@@ -64,7 +68,7 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
         }));
 
         it("should construct a valid json filtering out empty values given the data values", function() {
-            var payload = dataValuesMapper.mapToDomain(viewModel, period, "company_0", "user");
+            var payload = dataValuesMapper.mapToDomain(viewModel, period, "user");
             expect(payload).toEqual(domain);
         });
 
@@ -78,12 +82,12 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                 "DE_Podimas": {
                     "33": {
                         "formula": "",
-                        "value": ""
+                        "value": "",
+                        "orgUnit": "company_0"
                     }
                 }
             });
-
-            var payload = dataValuesMapper.mapToDomain(viewModel, period, "company_0", "user");
+            var payload = dataValuesMapper.mapToDomain(viewModel, period, "user");
 
             expect(payload).toEqual(domain);
         });
