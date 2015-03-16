@@ -61,7 +61,7 @@
                                                     </div>
                                                 </div>
                                             </li>
-                                        </div>    
+                                        </div>
                                     </ul>
                                 </accordion-group>
                             </accordion>
@@ -75,8 +75,8 @@
                                 </li>
                             </ul>
                         </div>
-                        <div ng-if="allEvents.length === 0 &amp;&amp; isDataEntryAllowed()" ng-show="showView">
-                            <div class="alert alert-success">There are no cases. <a ng-click="openNewForm()">Add new case</a>
+                        <div ng-if="allEvents.length === 0" ng-show="showView">
+                            <div class="alert alert-success">There are no cases. <a ng-click="openNewForm()" ng-if="isDataEntryAllowed()">Add new case</a>
                             </div>
                         </div>
                         <div ng-if="allEvents.length &gt; 0" ng-show="showView">
