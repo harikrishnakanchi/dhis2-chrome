@@ -24,7 +24,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                 });
             };
 
-            return $q.all([userPreferenceRepository.getUserProjectIds(), datasetRepository.getAllDatasetIds()])
+            return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAllDatasetIds()])
                 .then(getAllDataValues);
         };
 

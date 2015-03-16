@@ -13,7 +13,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 Timecop.freeze(thisMoment.toDate());
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, "getUserProjectIds").and.returnValue(utils.getPromise(q, ["org_0"]));
+                spyOn(userPreferenceRepository, "getUserModuleIds").and.returnValue(utils.getPromise(q, ["org_0"]));
 
                 datasetRepository = {
                     "getAllDatasetIds": jasmine.createSpy("getAllDatasetIds").and.returnValue(utils.getPromise(q, ["DS_OPD"]))
@@ -52,7 +52,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
             });
 
             it("should download data values from dhis based on user preferences and dataset", function() {
-                userPreferenceRepository.getUserProjectIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
+                userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
 
                 datasetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, ["ds1"]));
 
@@ -65,7 +65,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 downloadDataConsumer.run(message);
                 scope.$apply();
 
-                expect(userPreferenceRepository.getUserProjectIds).toHaveBeenCalled();
+                expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
                 expect(datasetRepository.getAllDatasetIds).toHaveBeenCalled();
                 expect(dataService.downloadAllData.calls.argsFor(0)).toEqual([
                     ["mod1"],
@@ -82,7 +82,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
             });
 
             it("should not download data values if org units is not present", function() {
-                userPreferenceRepository.getUserProjectIds.and.returnValue(utils.getPromise(q, []));
+                userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, []));
                 message = {
                     "data": {
                         "type": "downloadData"
