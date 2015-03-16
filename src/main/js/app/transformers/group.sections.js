@@ -7,9 +7,18 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
         var categories = data[4];
         var categoryOptionCombos = data[5];
 
-        var groupedSections = _.groupBy(sections, function(section) {
-            return section.dataSet.id;
-        });
+        var getGroupedSections = function() {
+            var sectionsById = _.indexBy(sections, "id");
+            var groupedSections = {};
+
+            _.forEach(dataSets, function(ds) {
+                sections = _.map(ds.sections, function(section) {
+                    return sectionsById[section.id];
+                });
+                groupedSections[ds.id] = sections;
+            });
+            return groupedSections;
+        };
 
         var getDetailedCategory = function(category) {
             return _.find(categories, function(c) {
@@ -32,8 +41,7 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
             return dataElement;
         };
 
-
-
+        var groupedSections = getGroupedSections();
         var returnVal = _.mapValues(groupedSections, function(sections) {
             return _.map(sections, function(section) {
                 section.dataElements = _.map(section.dataElements, enrichDataElement);
@@ -49,6 +57,7 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
                 return section;
             });
         });
+
         return returnVal;
     };
 
