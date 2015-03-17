@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "programTransformer", "md5"], function(_, orgUnitMapper, moment, systemSettingsTransformer, programTransformer, md5) {
-    return function($scope, $hustle, orgUnitRepository, systemSettingRepository, db, $location, $q, $modal, programRepository, orgUnitGroupRepository, orgUnitGroupHelper, datasetRepository) {
+    return function($scope, $hustle, orgUnitRepository, systemSettingRepository, db, $location, $q, $modal, programRepository, orgUnitGroupRepository, orgUnitGroupHelper, datasetRepository, patientOriginRepository) {
         $scope.module = {};
         $scope.isExpanded = {};
         $scope.isDisabled = false;
@@ -185,7 +185,37 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                 });
             };
 
-            var associateDataSets = function() {
+            var addOrgUnits = function(orgUnits, datasets) {
+                datasets = _.isArray(datasets) ? datasets : [datasets];
+                var ouPayloadToAssociate = _.map(orgUnits, function(orgUnit) {
+                    return {
+                        "id": orgUnit.id,
+                        "name": orgUnit.name
+                    };
+                });
+
+                return _.map(datasets, function(ds) {
+                    ds.organisationUnits = ds.organisationUnits || [];
+                    ds.organisationUnits = ds.organisationUnits.concat(ouPayloadToAssociate);
+                    return ds;
+                });
+            };
+
+            var updateDatasets = function(datasets) {
+                return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]);
+            };
+
+            var associateDatasetsToOrigins = function(orgUnits) {
+                var getOriginDatasets = function() {
+                    return datasetRepository.getOriginDatasets();
+                };
+
+                return getOriginDatasets()
+                    .then(_.partial(addOrgUnits, orgUnits))
+                    .then(updateDatasets);
+            };
+
+            var associateDataSetsToModule = function(enrichedModules) {
                 var getAllDatasets = function() {
                     return datasetRepository.getAllLinelistDatasets();
                 };
@@ -202,18 +232,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                     });
                 };
 
-                var addOrgUnitToAssociatedDataSet = function(dataset) {
-                    dataset.organisationUnits = dataset.organisationUnits || [];
-                    dataset.organisationUnits = dataset.organisationUnits.concat({
-                        id: enrichedModule.id,
-                        name: enrichedModule.name
-                    });
-                    return datasetRepository.upsert(dataset).then(function() {
-                        publishMessage([dataset.id], "associateOrgUnitToDataset");
-                    });
-                };
-
-                return getAllDatasets().then(getDataSetAssociatedWithProgram).then(addOrgUnitToAssociatedDataSet);
+                return getAllDatasets().then(getDataSetAssociatedWithProgram)
+                    .then(_.partial(addOrgUnits, enrichedModules))
+                    .then(updateDatasets);
             };
 
             var getEnrichedModule = function(module) {
@@ -229,12 +250,33 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                 return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false);
             };
 
+            var createOriginOrgUnits = function() {
+
+                var getPatientOriginOUPayload = function() {
+                    return orgUnitRepository.getParentProject(enrichedModule.parent.id).then(function(parentProject) {
+                        return patientOriginRepository.get(parentProject.id).then(function(patientOrigins) {
+                            if (!_.isEmpty(patientOrigins))
+                                return orgUnitMapper.createPatientOriginPayload(patientOrigins.origins, enrichedModule);
+                        });
+                    });
+                };
+
+                return getPatientOriginOUPayload().then(function(patientOriginOUPayload) {
+                    if (!_.isEmpty(patientOriginOUPayload)) {
+                        return orgUnitRepository.upsert(patientOriginOUPayload)
+                            .then(_.partial(publishMessage, patientOriginOUPayload, "upsertOrgUnit"))
+                            .then(_.partial(associateDatasetsToOrigins, patientOriginOUPayload));
+                    }
+                });
+            };
+
             return getEnrichedModule($scope.module)
                 .then(createModule)
                 .then(_.partial(associatePrograms, $scope.program))
                 .then(_.partial(saveExcludedDataElements, enrichedModule))
                 .then(createOrgUnitGroups)
-                .then(associateDataSets)
+                .then(_.partial(associateDataSetsToModule, [enrichedModule]))
+                .then(createOriginOrgUnits)
                 .then(_.partial(onSuccess, enrichedModule), onError);
         };
 

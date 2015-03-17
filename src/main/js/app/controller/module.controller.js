@@ -210,7 +210,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 var getPatientOriginOUPayload = function() {
                     return orgUnitRepository.getParentProject(enrichedModule.parent.id).then(function(parentProject) {
                         return patientOriginRepository.get(parentProject.id).then(function(patientOrigins) {
-                            if (patientOrigins)
+                            if (!_.isEmpty(patientOrigins))
                                 return orgUnitMapper.createPatientOriginPayload(patientOrigins.origins, enrichedModule);
                         });
                     });
