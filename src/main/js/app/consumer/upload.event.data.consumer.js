@@ -10,11 +10,11 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
             });
         };
 
-        var uploadEventData = function(projectIds) {
+        var uploadEventData = function(moduleIds) {
             var getEvents = function() {
                 var m = moment();
                 var startPeriod = dateUtils.toDhisFormat(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
-                return programEventRepository.getEventsFromPeriod(startPeriod, projectIds).then(function(events) {
+                return programEventRepository.getEventsFromPeriod(startPeriod, moduleIds).then(function(events) {
                     return _.filter(events, function(e) {
                         return e.localStatus === "NEW";
                     });
@@ -29,8 +29,8 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
         };
 
         this.run = function(message) {
-            return userPreferenceRepository.getUserProjectIds().then(function(projectIds) {
-                return uploadEventData(projectIds);
+            return userPreferenceRepository.getUserModuleIds().then(function(moduleIds) {
+                return uploadEventData(moduleIds);
             });
         };
     };

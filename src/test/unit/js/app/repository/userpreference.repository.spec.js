@@ -90,37 +90,5 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
             expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1', 'proj2']);
             expect(actualUserModules).toEqual(["mod1", "mod2", "mod3"]);
         });
-
-        it("should get all project id", function() {
-            var userPrefs = [{
-                "username": "msfadmin",
-                "locale": "en",
-                "orgUnits": [{
-                    "id": "proj0"
-                }]
-            }, {
-                "username": "new_user",
-                "locale": "en",
-                "orgUnits": [{
-                    "id": "proj1"
-                }]
-            }, {
-                "username": "new2_user",
-                "locale": "en",
-                "orgUnits": [{
-                    "id": "proj2"
-                }]
-            }];
-
-            mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
-
-            var actualUserProjects;
-            userPreferenceRepository.getUserProjectIds().then(function(data) {
-                actualUserProjects = data;
-            });
-
-            scope.$apply();
-            expect(actualUserProjects).toEqual(["proj0", "proj1", "proj2"]);
-        });
     });
 });

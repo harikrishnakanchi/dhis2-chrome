@@ -9,7 +9,7 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                 scope = $rootScope.$new();
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, "getUserProjectIds").and.returnValue(utils.getPromise(q, ["prj1"]));
+                spyOn(userPreferenceRepository, "getUserModuleIds").and.returnValue(utils.getPromise(q, ["prj1"]));
                 eventService = new EventService();
                 programEventRepository = new ProgramEventRepository();
                 uploadEventDataConsumer = new UploadEventDataConsumer(eventService, programEventRepository, userPreferenceRepository, q);
