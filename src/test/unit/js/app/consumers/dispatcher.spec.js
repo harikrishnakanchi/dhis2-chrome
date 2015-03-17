@@ -3,7 +3,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, log, scope,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
-            downloadSystemSettingConsumer, uploadSystemSettingConsumer;
+            downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -72,6 +72,12 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             uploadSystemSettingConsumer = {
                 'run': jasmine.createSpy("uploadSystemSettingConsumer")
             };
+            downloadPatientOriginConsumer = {
+                'run': jasmine.createSpy("downloadPatientOriginConsumer")
+            };
+            uploadPatientOriginConsumer = {
+                'run': jasmine.createSpy("uploadPatientOriginConsumer")
+            };
 
             message = {};
             q = $q;
@@ -86,11 +92,12 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadProgramConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadDatasetConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadSystemSettingConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadPatientOriginConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer,
-                uploadSystemSettingConsumer);
+                uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -328,6 +335,30 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
             expect(downloadSystemSettingConsumer.run).toHaveBeenCalledWith(message);
             expect(uploadSystemSettingConsumer.run).toHaveBeenCalledWith(message, {});
+        });
+
+        it("should download  patient origin consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "downloadPatientOriginDetails"
+            };
+
+            dispatcher.run(message);
+
+            expect(downloadPatientOriginConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should upload patient origin consumer", function() {
+            message.data = {
+                "data": {},
+                "type": "uploadPatientOriginDetails"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(downloadPatientOriginConsumer.run).toHaveBeenCalledWith(message);
+            expect(uploadPatientOriginConsumer.run).toHaveBeenCalledWith(message, {});
         });
     });
 });

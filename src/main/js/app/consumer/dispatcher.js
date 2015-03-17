@@ -81,6 +81,10 @@ define(["lodash"], function(_) {
                 case "uploadSystemSetting":
                     return downloadSystemSettingConsumer.run(message)
                         .then(_.partial(uploadSystemSettingConsumer.run, message));
+
+                case "downloadPatientOriginDetails":
+                    return downloadPatientOriginConsumer.run(message);
+
                 case "uploadPatientOriginDetails":
                     return downloadPatientOriginConsumer.run(message)
                         .then(_.partial(uploadPatientOriginConsumer.run, message));
