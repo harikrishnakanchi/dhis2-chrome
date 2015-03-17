@@ -92,7 +92,7 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
 
             var parseArgsForMessages = function(args) {
                 var messages = _.map(args, function(arg) {
-                    if (arg.stack)
+                    if (arg && arg.stack)
                         return arg.stack;
                     return arg;
                 });
