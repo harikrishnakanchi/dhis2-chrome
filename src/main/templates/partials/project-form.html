@@ -137,7 +137,7 @@
                     <tr>
                         <th>Username</th>
                         <th>Role</th>
-                        <th></th>
+                        <th>Enable/Disable</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -145,10 +145,11 @@
                         <td> {{user.userCredentials.username}}</td>
                         <td> {{user.roles}}</td>
                         <td>
-
-                            <a href="" title="Delete" class="delete" ng-if="user.roles != 'Superuser'" ng-click="toggleUserDisabledState(user)">
-                                <span class="glyphicon glyphicon-remove" ng-show="!user.userCredentials.disabled"></span>
-                                <span class="glyphicon glyphicon-ok" ng-show="user.userCredentials.disabled"></span>
+                            <a ng-if="!user.userCredentials.disabled" href="" title="Disable" class="delete" ng-if="user.roles != 'Superuser'" ng-click="toggleUserDisabledState(user)">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                            <a ng-if="user.userCredentials.disabled" href="" title="Enable" class="delete" ng-if="user.roles != 'Superuser'" ng-click="toggleUserDisabledState(user)">
+                                <span class="glyphicon glyphicon-ok"></span>
                             </a>
                         </td>
                     </tr>
