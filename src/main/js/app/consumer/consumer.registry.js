@@ -6,7 +6,7 @@ define([], function() {
             $log.info("Registering allconsumers");
             return $q.all([$hustle.registerConsumer(dispatcher.run, "dataValues")]).then(function(data) {
                 allConsumers = data;
-                $log.info("registered allconsumers", allConsumers);
+                $log.info("registered allconsumers");
             });
         };
 
@@ -14,14 +14,14 @@ define([], function() {
             for (var index in allConsumers) {
                 allConsumers[index].start();
             }
-            $log.info("started allconsumers", allConsumers);
+            $log.info("started allconsumers");
         };
 
         this.stopAllConsumers = function() {
             for (var index in allConsumers) {
                 allConsumers[index].stop();
             }
-            $log.info("stopped allconsumers", allConsumers);
+            $log.info("stopped allconsumers");
         };
     };
 });

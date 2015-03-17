@@ -71,36 +71,49 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
 
         var wireupLogging = function(logDb) {
 
-            var putLog = function(logLevel, args) {
+            var putLog = function(logLevel, messages) {
                 try {
                     var transaction = logDb.transaction(logStoreName, "readwrite");
                     var store = transaction.objectStore(logStoreName);
                     var logObject = {
                         'method': logLevel,
                         'datetime': moment().toISOString(),
-                        'arguments': args
+                        'messages': messages
                     };
-                    store.put(logObject);
+                    var req = store.put(logObject);
+                    req.onerror = function(e){
+                        console.error("Could not save log entry to indexedDB", e, logObject);
+                    };
                 } catch (e) {
+                    console.error("Could not save log entry to indexedDB", e, messages);
                     //burp
                 }
             };
 
+            var parseArgsForMessages = function(args) {
+                var messages = _.map(args, function(arg) {
+                    if (arg.stack)
+                        return arg.stack;
+                    return arg;
+                });
+                return messages;
+            };
+
             var originalInfoLogger = loggerDelegate.info;
             loggerDelegate.info = function() {
-                putLog('info', arguments);
+                putLog('info', parseArgsForMessages(arguments));
                 originalInfoLogger.apply(null, arguments);
             };
 
             var originalWarningLogger = loggerDelegate.warn;
             loggerDelegate.warn = function() {
-                putLog('warning', arguments);
+                putLog('warning', parseArgsForMessages(arguments));
                 originalWarningLogger.apply(null, arguments);
             };
 
             var originalErrorLogger = loggerDelegate.error;
             loggerDelegate.error = function() {
-                putLog('error', arguments);
+                putLog('error', parseArgsForMessages(arguments));
                 originalErrorLogger.apply(null, arguments);
             };
 
