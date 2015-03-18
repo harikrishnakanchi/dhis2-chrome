@@ -158,7 +158,7 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                     'orgUnit': $scope.currentModule.id,
                     'eventDate': moment($scope.eventDates[program.id][programStage.id]).format("YYYY-MM-DD"),
                     'dataValues': [],
-                    'localStatus': "DRAFT"
+                    'localStatus': "NEW_DRAFT"
                 };
                 _.each(programStage.programStageDataElements, function(psde) {
                     newEvent.dataValues.push({
@@ -211,7 +211,7 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                     'orgUnit': $scope.eventToBeEdited.orgUnit,
                     'eventDate': moment($scope.eventToBeEdited.eventDate).format("YYYY-MM-DD"),
                     'dataValues': [],
-                    'localStatus': "DRAFT"
+                    'localStatus': "UPDATED_DRAFT"
                 };
                 _.each(programStage.programStageDataElements, function(psde) {
                     newEvent.dataValues.push({
@@ -336,7 +336,7 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                     });
                 };
 
-                var deleteFunction = event.localStatus === "DRAFT" ? hardDelete : softDelete;
+                var deleteFunction = event.localStatus === "NEW_DRAFT" ? hardDelete : softDelete;
 
                 return deleteFunction.apply().then(function() {
                     $scope.allEvents.splice(_.indexOf($scope.allEvents, event), 1);

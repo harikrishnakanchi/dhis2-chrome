@@ -410,7 +410,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(moment(scope.maxDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-16");
             });
 
-            it("should save event details as draft and show view", function() {
+            it("should save event details as newDraft and show view", function() {
                 var program = {
                     'id': 'Prg1',
                 };
@@ -452,7 +452,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
                 expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("currentModuleId");
                 expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2014-11-18");
-                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("DRAFT");
+                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW_DRAFT");
                 expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([]);
 
                 expect(scope.resultMessageType).toEqual("success");
@@ -467,7 +467,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(scope.showForm).toEqual(false);
             });
 
-            it("should save event details as draft and show form again", function() {
+            it("should save event details as newDraft and show form again", function() {
                 var program = {
                     'id': 'Prg1',
                 };
@@ -673,7 +673,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should hard delete a local event", function() {
-                event1.localStatus = "DRAFT";
+                event1.localStatus = "NEW_DRAFT";
                 scope.programsInCurrentModule = "p1";
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, []));
                 spyOn(hustle, "publish");
@@ -691,6 +691,35 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(programEventRepository.delete).toHaveBeenCalledWith('event1');
                 expect(scope.allEvents).toEqual([event2]);
                 expect(hustle.publish).not.toHaveBeenCalled();
+            });
+
+            it("should soft delete a locally updated event which is already submitted to DHIS", function() {
+                event1.localStatus = "UPDATED_DRAFT";
+                scope.programsInCurrentModule = "p1";
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, []));
+                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
+                spyOn(fakeModal, "open").and.returnValue({
+                    result: utils.getPromise(q, {})
+                });
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalHelper, approvalDataRepository, datasetRepository);
+
+                var eventToDelete = event1;
+                scope.deleteEvent(eventToDelete);
+                scope.$apply();
+
+                var softDeletedEventPayload = {
+                    "events": [eventToDelete]
+                };
+
+                expect(fakeModal.open).toHaveBeenCalled();
+                expect(scope.allEvents).toEqual([event2]);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    data: 'event1',
+                    type: 'deleteEvent'
+                }, 'dataValues');
+                expect(programEventRepository.upsert).toHaveBeenCalledWith(softDeletedEventPayload);
+                expect(eventToDelete.localStatus).toEqual("DELETED");
             });
 
             it("should get data value", function() {
@@ -860,7 +889,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "dataElementValues": {
                         "de1": "12"
                     }
-                }
+                };
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, []));
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalHelper, approvalDataRepository, datasetRepository);
@@ -880,7 +909,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                             "dataElement": "de1",
                             "value": "12"
                         }],
-                        'localStatus': "DRAFT"
+                        'localStatus': "UPDATED_DRAFT"
                     }]
                 };
 

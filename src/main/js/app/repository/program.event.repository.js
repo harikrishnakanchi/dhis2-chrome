@@ -62,7 +62,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
 
             var updateEvents = function(events) {
                 var eventsToBeSubmitted = _.filter(events, function(e) {
-                    return e.localStatus === "DRAFT";
+                    return e.localStatus === "NEW_DRAFT" || e.localStatus === "UPDATED_DRAFT";
                 });
 
                 return _.map(eventsToBeSubmitted, function(e) {

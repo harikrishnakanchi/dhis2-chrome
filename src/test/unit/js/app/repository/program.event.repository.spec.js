@@ -239,7 +239,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             var events = [{
                 'event': 'event1',
                 'eventDate': '2014-11-26T00:00:00',
-                'localStatus': 'DRAFT',
+                'localStatus': 'NEW_DRAFT',
                 'dataValues': [{
                     'dataElement': 'de1',
                     'value': '20'
@@ -259,6 +259,14 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                     'dataElement': 'de1',
                     'value': '20'
                 }]
+            }, {
+                'event': 'event4',
+                'eventDate': '2014-11-26T00:00:00',
+                'localStatus': 'UPDATED_DRAFT',
+                'dataValues': [{
+                    'dataElement': 'de1',
+                    'value': '20'
+                }]
             }];
             mockStore.each.and.returnValue(utils.getPromise(q, events));
 
@@ -269,6 +277,14 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             var expectedPayload = [{
                 event: 'event1',
+                eventDate: '2014-11-26T00:00:00',
+                localStatus: 'NEW',
+                dataValues: [{
+                    dataElement: 'de1',
+                    value: '20'
+                }]
+            }, {
+                event: 'event4',
                 eventDate: '2014-11-26T00:00:00',
                 localStatus: 'NEW',
                 dataValues: [{
