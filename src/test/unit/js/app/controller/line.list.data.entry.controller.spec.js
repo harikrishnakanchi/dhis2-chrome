@@ -827,5 +827,69 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(scope.isDataEntryAllowed()).toBeFalsy();
                 scope.$apply();
             });
+
+            it("should update event details", function() {
+                var program = {
+                    'id': 'Prg1',
+                };
+
+                var programStage = {
+                    'id': 'PrgStage1',
+                    'programStageDataElements': [{
+                        "dataElement": {
+                            "id": "de1",
+                            "name": "Patient ID - V1 - Surgery",
+                            "type": "string",
+                            "isExcluded": true
+                        }
+                    }]
+                };
+
+                spyOn(location, "hash");
+
+                scope.resourceBundle = {
+                    'eventSaveSuccess': 'Event updated successfully'
+                };
+
+                scope.eventToBeEdited = {
+                    "event": "event1",
+                    "program": program,
+                    "programStage": programStage,
+                    "orgUnit": "Mod1",
+                    "eventDate": "2014-12-29T05:06:30.950+0000",
+                    "dataElementValues": {
+                        "de1": "12"
+                    }
+                }
+
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, []));
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalHelper, approvalDataRepository, datasetRepository);
+                scope.$apply();
+
+                scope.update(programStage);
+                scope.$apply();
+
+                var eventPayload = {
+                    "events": [{
+                        'event': "event1",
+                        'program': "Prg1",
+                        'programStage': programStage,
+                        'orgUnit': "Mod1",
+                        'eventDate': "2014-12-29",
+                        'dataValues': [{
+                            "dataElement": "de1",
+                            "value": "12"
+                        }],
+                        'localStatus': "DRAFT"
+                    }]
+                };
+
+                expect(programEventRepository.upsert).toHaveBeenCalledWith(eventPayload);
+                expect(scope.resultMessageType).toEqual("success");
+                expect(scope.resultMessage).toEqual("Event updated successfully");
+                expect(scope.showView).toEqual(true);
+                expect(scope.includeEditForm).toEqual(false);
+
+            });
         });
     });
