@@ -200,7 +200,12 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     scope: $scope
                 });
 
-                return modalInstance.result.then(okCallback);
+                return modalInstance.result
+                    .then(function() {
+                        return okCallback();
+                    }, function() {
+                        //burp on cancel
+                    });
             }
         };
 
