@@ -38,7 +38,7 @@ define(["dhisId"], function(dhisId) {
                     "userRoles": [{
                         "name": projectUser.userRole.name
                     }],
-                    "password": "msfuser",
+                    "password": "msfuser"
                 },
                 "organisationUnits": [{
                     "id": $scope.orgUnit.id,

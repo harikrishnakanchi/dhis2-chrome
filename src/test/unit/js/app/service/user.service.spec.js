@@ -36,7 +36,13 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
             userService.create(user);
 
             var expectedPayload = {
-                "users": [user]
+                "users": [{
+                    "firstName": "test1",
+                    "lastName": "test1last",
+                    "userCredentials": {
+                        "username": "someone@example.com"
+                    }
+                }]
             };
 
             httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
@@ -59,7 +65,10 @@ define(["userService", "angularMocks", "properties", "utils"], function(UserServ
             var expectedPayload = {
                 "firstName": "test1",
                 "surname": "test1last",
-                "userCredentials": user.userCredentials,
+                "userCredentials": {
+                    "username": "someone@example.com",
+                    "disabled": true
+                },
                 "organisationUnits": user.organisationUnits,
             };
 
