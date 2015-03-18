@@ -714,23 +714,24 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 });
 
                 var data = {
-                    "dataSets": ['Vacc'],
+                    "dataSets": ['DS_OPD'],
                     "period": '2014W14',
-                    "orgUnit": 'mod2',
+                    "orgUnit": 'mod1',
                     "storedBy": 'dataentryuser'
                 };
                 scope.currentModule = {
-                    id: 'mod2',
+                    id: 'mod1',
                     parent: {
                         id: 'parent'
                     }
                 };
+
                 scope.$apply();
 
                 scope.firstLevelApproval();
                 scope.$apply();
 
-                expect(approvalHelper.markDataAsComplete).toHaveBeenCalledWith(data);
+                expect(approvalHelper.markDataAsComplete.calls.argsFor(0)[0]).toEqual(data);
                 expect(scope.firstLevelApproveSuccess).toBe(true);
                 expect(scope.secondLevelApproveSuccess).toBe(false);
                 expect(scope.approveError).toBe(false);
@@ -757,9 +758,9 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
 
                 var l1ApprovalPayload = {
-                    "dataSets": ['Vacc'],
+                    "dataSets": ['DS_OPD'],
                     "period": '2014W14',
-                    "orgUnit": 'mod2',
+                    "orgUnit": 'mod1',
                     "storedBy": 'dataentryuser'
                 };
 
@@ -801,7 +802,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 }));
 
                 scope.currentModule = {
-                    id: 'mod2',
+                    id: 'mod1',
                     parent: {
                         id: 'parent'
                     }
@@ -811,18 +812,23 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.submitAndApprove();
                 scope.$apply();
 
-                expect(approvalHelper.markDataAsComplete).toHaveBeenCalledWith(l1ApprovalPayload);
+                expect(approvalHelper.markDataAsComplete.calls.argsFor(0)[0]).toEqual({
+                    "dataSets": ['DS_OPD'],
+                    "period": '2014W14',
+                    "orgUnit": 'mod1',
+                    "storedBy": 'dataentryuser'
+                });
 
 
                 var l2ApprovalPayload = {
-                    "dataSets": ['Vacc'],
+                    "dataSets": ['DS_OPD', 'Geographic Origin'],
                     "period": '2014W14',
-                    "orgUnit": 'mod2',
+                    "orgUnit": 'mod1',
                     "storedBy": 'dataentryuser'
                 };
 
                 expect(approvalHelper.markDataAsApproved).not.toHaveBeenCalled();
-                expect(approvalHelper.markDataAsAccepted).toHaveBeenCalledWith(l2ApprovalPayload);
+                expect(approvalHelper.markDataAsAccepted.calls.argsFor(0)[0]).toEqual(l2ApprovalPayload);
 
                 expect(scope.submitAndApprovalSuccess).toBe(true);
             });
@@ -960,6 +966,48 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
                 expect(scope.shouldDataBeEnteredForOrgUnit("mod3")).toEqual(false);
 
+            });
+
+            it("should submit data for second level approval", function() {
+                var levelTwoApprovalDataSaved = false;
+                getLevelTwoApprovalDataSpy.and.callFake(function() {
+                    if (levelTwoApprovalDataSaved)
+                        return utils.getPromise(q, {
+                            "blah": "moreBlah"
+                        });
+                    return utils.getPromise(q, undefined);
+                });
+
+                spyOn(fakeModal, "open").and.returnValue({
+                    result: utils.getPromise(q, {})
+                });
+
+                spyOn(approvalHelper, "markDataAsApproved").and.callFake(function() {
+                    levelTwoApprovalDataSaved = true;
+                    return utils.getPromise(q, {});
+                });
+
+                var data = {
+                    "dataSets": ['DS_OPD', 'Geographic Origin'],
+                    "period": '2014W14',
+                    "orgUnit": 'mod1',
+                    "storedBy": 'dataentryuser'
+                };
+                scope.currentModule = {
+                    id: 'mod1',
+                    parent: {
+                        id: 'parent'
+                    }
+                };
+
+                scope.$apply();
+
+                scope.secondLevelApproval();
+                scope.$apply();
+
+                expect(approvalHelper.markDataAsApproved.calls.argsFor(0)[0]).toEqual(data);
+                expect(scope.secondLevelApproveSuccess).toBe(true);
+                expect(scope.approveError).toBe(false);
             });
         });
     });

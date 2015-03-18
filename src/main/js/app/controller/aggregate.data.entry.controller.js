@@ -92,13 +92,30 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 scrollToTop();
             };
 
-            if ($scope.isCompleted || $scope.isApproved) {
-                showModal(function() {
-                    save(false).then(successPromise, errorPromise);
-                }, $scope.resourceBundle.reapprovalConfirmationMessage);
-            } else {
-                save(false).then(successPromise, errorPromise);
-            }
+            confirmAndProceed(_.partial(save, false), $scope.resourceBundle.reapprovalConfirmationMessage, !($scope.isCompleted || $scope.isApproved))
+                .then(successPromise, errorPromise);
+        };
+
+        var getPayloadForFirstLevelApproval = function() {
+            return {
+                "dataSets": _.keys($scope.currentGroupedSections),
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id,
+                "storedBy": $scope.currentUser.userCredentials.username
+            };
+        };
+
+        var getPayloadForSecondOrThirdLevelApproval = function() {
+            var datasets = _.keys($scope.currentGroupedSections);
+            if (!_.isEmpty($scope.currentGroupedSectionsForOrigins))
+                datasets = datasets.concat(_.keys($scope.currentGroupedSectionsForOrigins));
+
+            return {
+                "dataSets": datasets,
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id,
+                "storedBy": $scope.currentUser.userCredentials.username
+            };
         };
 
         $scope.submitAndApprove = function() {
@@ -116,19 +133,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 scrollToTop();
             };
 
-            if ($scope.isCompleted || $scope.isApproved) {
-                showModal(function() {
-                    save(false)
-                        .then(approvalHelper.markDataAsComplete)
-                        .then(approvalHelper.markDataAsAccepted)
-                        .then(successPromise, errorPromise);
-                }, $scope.resourceBundle.reapprovalConfirmationMessage);
-            } else {
+            var upsertAndPushToDhis = function() {
                 save(false)
-                    .then(approvalHelper.markDataAsComplete)
-                    .then(approvalHelper.markDataAsAccepted)
-                    .then(successPromise, errorPromise);
-            }
+                    .then(_.partial(approvalHelper.markDataAsComplete, getPayloadForFirstLevelApproval()))
+                    .then(_.partial(approvalHelper.markDataAsAccepted, getPayloadForSecondOrThirdLevelApproval()));
+            };
+
+            confirmAndProceed(upsertAndPushToDhis, $scope.resourceBundle.reapprovalConfirmationMessage, !($scope.isCompleted || $scope.isApproved))
+                .then(successPromise, errorPromise);
         };
 
         $scope.firstLevelApproval = function() {
@@ -143,16 +155,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.approveError = true;
             };
 
-            showModal(function() {
-                var data = {
-                    "dataSets": _.keys($scope.currentGroupedSections),
-                    "period": getPeriod(),
-                    "orgUnit": $scope.currentModule.id,
-                    "storedBy": $scope.currentUser.userCredentials.username
-                };
-
-                approvalHelper.markDataAsComplete(data).then(onSuccess, onError).finally(scrollToTop);
-            }, $scope.resourceBundle.dataApprovalConfirmationMessage);
+            confirmAndProceed(_.partial(approvalHelper.markDataAsComplete, getPayloadForFirstLevelApproval()), $scope.resourceBundle.dataApprovalConfirmationMessage)
+                .then(onSuccess, onError)
+                .finally(scrollToTop);
         };
 
         $scope.secondLevelApproval = function() {
@@ -167,16 +172,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.approveError = true;
             };
 
-            showModal(function() {
-                var data = {
-                    "dataSets": _.keys($scope.currentGroupedSections),
-                    "period": getPeriod(),
-                    "orgUnit": $scope.currentModule.id,
-                    "storedBy": $scope.currentUser.userCredentials.username
-                };
+            confirmAndProceed(_.partial(approvalHelper.markDataAsApproved, getPayloadForSecondOrThirdLevelApproval()), $scope.resourceBundle.dataApprovalConfirmationMessage, false)
+                .then(onSuccess, onError)
+                .finally(scrollToTop);
 
-                approvalHelper.markDataAsApproved(data).then(onSuccess, onError).finally(scrollToTop);
-            }, $scope.resourceBundle.dataApprovalConfirmationMessage);
         };
 
         var showModal = function(okCallback, message) {
@@ -188,6 +187,21 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             });
 
             modalInstance.result.then(okCallback);
+        };
+
+        var confirmAndProceed = function(okCallback, message, doNotConfirm) {
+            if (doNotConfirm) {
+                return $q.when(okCallback());
+            } else {
+                $scope.modalMessage = message;
+                var modalInstance = $modal.open({
+                    templateUrl: 'templates/confirm.dialog.html',
+                    controller: 'confirmDialogController',
+                    scope: $scope
+                });
+
+                return modalInstance.result.then(okCallback);
+            }
         };
 
         $scope.isCurrentWeekSelected = function(week) {
@@ -227,25 +241,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             } else {
                 return dataRepository.save(payload)
                     .then(unapproveData)
-                    .then(saveToDhis).then(function() {
-                        return {
-                            "dataSets": _.keys($scope.currentGroupedSections),
-                            "period": getPeriod(),
-                            "orgUnit": $scope.currentModule.id,
-                            "storedBy": $scope.currentUser.userCredentials.username
-                        };
-                    });
+                    .then(saveToDhis);
             }
-        };
-
-        var confirmAndMove = function(okCallback) {
-            var modalInstance = $modal.open({
-                templateUrl: 'templates/save.dialog.html',
-                controller: 'confirmDialogController',
-                scope: $scope
-            });
-
-            modalInstance.result.then(okCallback);
         };
 
         $scope.getDataSetName = function(id) {
