@@ -16,7 +16,7 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
                 var startPeriod = dateUtils.toDhisFormat(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
                 return programEventRepository.getEventsFromPeriod(startPeriod, moduleIds).then(function(events) {
                     return _.filter(events, function(e) {
-                        return e.localStatus === "NEW";
+                        return e.localStatus === "READY_FOR_DHIS";
                     });
                 });
             };

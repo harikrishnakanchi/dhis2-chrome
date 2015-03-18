@@ -278,7 +278,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             var expectedPayload = [{
                 event: 'event1',
                 eventDate: '2014-11-26T00:00:00',
-                localStatus: 'NEW',
+                localStatus: 'READY_FOR_DHIS',
                 dataValues: [{
                     dataElement: 'de1',
                     value: '20'
@@ -286,7 +286,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             }, {
                 event: 'event4',
                 eventDate: '2014-11-26T00:00:00',
-                localStatus: 'NEW',
+                localStatus: 'READY_FOR_DHIS',
                 dataValues: [{
                     dataElement: 'de1',
                     value: '20'

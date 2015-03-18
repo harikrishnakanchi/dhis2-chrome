@@ -19,7 +19,7 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                 var events = [{
                     'event': 'e1',
                     'eventDate': '2014-09-28',
-                    'localStatus': "NEW"
+                    'localStatus': "READY_FOR_DHIS"
                 }, {
                     'event': 'e2',
                     'eventDate': '2014-09-29'
@@ -32,7 +32,7 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                     'events': [{
                         'event': 'e1',
                         'eventDate': '2014-09-28',
-                        'localStatus': "NEW"
+                        'localStatus': "READY_FOR_DHIS"
                     }]
                 };
                 spyOn(eventService, "upsertEvents").and.returnValue(utils.getPromise(q, dhisEventPayload));

@@ -66,7 +66,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
                 });
 
                 return _.map(eventsToBeSubmitted, function(e) {
-                    e.localStatus = "NEW";
+                    e.localStatus = "READY_FOR_DHIS";
                     return e;
                 });
             };
