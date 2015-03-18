@@ -651,6 +651,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
+                spyOn(approvalHelper, "unapproveData");
 
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalHelper, approvalDataRepository, datasetRepository);
 
@@ -670,6 +671,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 }, 'dataValues');
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(softDeletedEventPayload);
                 expect(eventToDelete.localStatus).toEqual("DELETED");
+                expect(approvalHelper.unapproveData).toHaveBeenCalled();
             });
 
             it("should hard delete a local event", function() {
@@ -701,6 +703,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
+                spyOn(approvalHelper, "unapproveData");
 
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalHelper, approvalDataRepository, datasetRepository);
 
@@ -720,6 +723,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 }, 'dataValues');
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(softDeletedEventPayload);
                 expect(eventToDelete.localStatus).toEqual("DELETED");
+                expect(approvalHelper.unapproveData).toHaveBeenCalled();
             });
 
             it("should get data value", function() {

@@ -236,6 +236,11 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                 });
         };
 
+        var unapproveData = function(data) {
+            return approvalHelper.unapproveData($scope.currentModule.id, $scope.dataSetIds, getPeriod());
+        };
+
+
         var save = function(programId) {
             var period = getPeriod();
             var currentModule = $scope.currentModule.id;
@@ -244,10 +249,6 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                 return $hustle.publish({
                     "type": "uploadProgramEvents"
                 }, "dataValues");
-            };
-
-            var unapproveData = function(data) {
-                return approvalHelper.unapproveData($scope.currentModule.id, $scope.dataSetIds, period);
             };
 
             return programEventRepository.markEventsAsSubmitted(programId, period, currentModule)
@@ -332,7 +333,7 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                         'events': [event]
                     };
                     return programEventRepository.upsert(eventsPayload).then(function() {
-                        return saveToDhis(eventId);
+                        return saveToDhis(eventId).then(unapproveData);
                     });
                 };
 
