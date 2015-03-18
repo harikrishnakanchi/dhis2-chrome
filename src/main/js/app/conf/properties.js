@@ -3,7 +3,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
     var properties = {
         "metadata": {
             "sync": {
-                "intervalInMinutes": 1,
+                "intervalInMinutes": 720,
             },
             "types": ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "sections", "organisationUnitLevels", "users", "programStages", "optionSets", "indicators", "translations"]
         },
@@ -11,7 +11,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "timeout": 60000
         },
         "projectDataSync": {
-            "intervalInMinutes": 1,
+            "intervalInMinutes": 720,
             "numWeeksToSync": 12,
             "numWeeksToSyncOnFirstLogIn": 52
         },
