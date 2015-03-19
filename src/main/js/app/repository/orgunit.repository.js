@@ -146,29 +146,30 @@ define(["moment", "lodashUtils"], function(moment, _) {
             return store.each(query);
         };
 
-        var getAllModulesInOrgUnitsExceptCurrentModules = function(orgUnitIds, rejectDisabled) {
-            var getChildModules = function(orgUnitIds) {
-                return findAllByParent(orgUnitIds).then(function(children) {
-                    var moduleOrgUnits = [];
-                    var nonModuleOrgUnits = [];
+        var getChildModules = function(orgUnitIds) {
+            return findAllByParent(orgUnitIds).then(function(children) {
+                var moduleOrgUnits = [];
+                var nonModuleOrgUnits = [];
 
-                    _.forEach(children, function(ou) {
-                        if (isOfType(ou, 'Module')) {
-                            moduleOrgUnits.push(ou);
-                        } else {
-                            nonModuleOrgUnits.push(ou);
-                        }
-                    });
-
-                    if (_.isEmpty(nonModuleOrgUnits)) {
-                        return moduleOrgUnits;
+                _.forEach(children, function(ou) {
+                    if (isOfType(ou, 'Module')) {
+                        moduleOrgUnits.push(ou);
+                    } else {
+                        nonModuleOrgUnits.push(ou);
                     }
-
-                    return getChildModules(_.pluck(nonModuleOrgUnits, "id")).then(function(data) {
-                        return moduleOrgUnits.concat(data);
-                    });
                 });
-            };
+
+                if (_.isEmpty(nonModuleOrgUnits)) {
+                    return moduleOrgUnits;
+                }
+
+                return getChildModules(_.pluck(nonModuleOrgUnits, "id")).then(function(data) {
+                    return moduleOrgUnits.concat(data);
+                });
+            });
+        };
+
+        var getAllModulesInOrgUnitsExceptCurrentModules = function(orgUnitIds, rejectDisabled) {
 
             var rejectDisabledOrgUnits = function(allOrgUnits) {
 
@@ -189,6 +190,11 @@ define(["moment", "lodashUtils"], function(moment, _) {
             return getChildModules(orgUnitIds)
                 .then(rejectOrgUnitsWithCurrentDatasets)
                 .then(rejectDisabledOrgUnits);
+        };
+
+        var getAllModulesInOrgUnits = function(orgUnitIds) {
+            orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
+            return getChildModules(orgUnitIds);
         };
 
         var getProjectAndOpUnitAttributes = function(module) {
@@ -264,7 +270,8 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getAllModulesInOrgUnitsExceptCurrentModules": getAllModulesInOrgUnitsExceptCurrentModules,
             "getProjectAndOpUnitAttributes": getProjectAndOpUnitAttributes,
             "getAllProjects": getAllProjects,
-            "getParentProject": getParentProject
+            "getParentProject": getParentProject,
+            "getAllModulesInOrgUnits": getAllModulesInOrgUnits
         };
     };
 });

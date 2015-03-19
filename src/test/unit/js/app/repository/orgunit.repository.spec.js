@@ -235,6 +235,157 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             scope.$apply();
         });
 
+        it("should get all modules for given org units", function() {
+            var modules = [];
+            var project1 = {
+                "name": "prj1",
+                "displayName": "prj1",
+                "id": "prj1",
+                "parent": {
+                    "id": "cnt1"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Project"
+                }],
+                "children": [{
+                    "id": "opunit1",
+                    "name": "opunit1"
+                }]
+            };
+
+            var project2 = {
+                "name": "prj2",
+                "displayName": "prj2",
+                "id": "prj2",
+                "parent": {
+                    "id": "cnt1"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Project"
+                }],
+                "children": [{
+                    "id": "mod3",
+                    "name": "mod3"
+                }]
+            };
+
+            var opunit1 = {
+                "name": "opunit1",
+                "displayName": "opunit1",
+                "id": "opunit1",
+                "parent": {
+                    "id": "prj1"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Operation Unit"
+                }],
+                "children": [{
+                    "id": "mod1",
+                    "name": "mod1"
+                }, {
+                    "id": "mod2",
+                    "name": "mod2"
+                }]
+            };
+
+            var module1 = {
+                "name": "mod1",
+                "displayName": "mod1",
+                "id": "mod1",
+                "parent": {
+                    "id": "opunit1"
+                },
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Module"
+                }],
+                "children": []
+            };
+
+            var module2 = {
+                "name": "mod2",
+                "displayName": "mod2",
+                "id": "mod2",
+                "parent": {
+                    "id": "opunit1"
+                },
+                "dataSets": [{
+                    "id": "currentDs",
+                    "name": "OBGY_OPD - V1"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Module"
+                }],
+                "children": []
+            };
+
+            var module3 = {
+                "name": "mod3",
+                "displayName": "mod3",
+                "id": "mod3",
+                "parent": {
+                    "id": "prj2"
+                },
+                "dataSets": [{
+                    "id": "newDs",
+                    "name": "NeoNat"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Module"
+                }],
+                "children": []
+            };
+
+            var orgUnitsByParent = {
+                "prj1": [opunit1],
+                "prj2": [module3],
+                "opunit1": [module1, module2],
+                "mod1": [],
+                "mod2": [],
+                "mod3": []
+            };
+
+            var allOrgUnits = [project1, project2, module1, module2, module3, opunit1];
+            mockDb = utils.getMockDB(q, {}, allOrgUnits);
+            mockDb.objectStore.each.and.callFake(function(query) {
+                var children = _.transform(query.inList, function(acc, pid) {
+                    acc = acc.push(orgUnitsByParent[pid]);
+                }, []);
+                return utils.getPromise(q, _.flatten(children));
+            });
+
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, programRepository, q);
+            scope.$apply();
+            orgUnitRepository.getAllModulesInOrgUnits(["prj1"]).then(function(userModules) {
+                modules = userModules;
+            });
+
+            scope.$apply();
+
+            expect(modules).toEqual([module1, module2]);
+        });
+
         it("should get all modules except current modules for given org units if disabled flag is not given", function() {
             var modules = [];
             var project1 = {
