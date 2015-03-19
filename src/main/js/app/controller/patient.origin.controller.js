@@ -25,7 +25,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
 
             var createOrgUnits = function() {
                 var patientOriginPayload;
-                return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
+                return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules($scope.orgUnit.id).then(function(modules) {
                     patientOriginPayload = orgUnitMapper.createPatientOriginPayload($scope.patientOrigin, modules);
                     return orgUnitRepository.upsert(patientOriginPayload).then(_.partial(publishMessage, patientOriginPayload, "upsertOrgUnit"));
                 }).then(function() {

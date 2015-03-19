@@ -70,7 +70,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
                 }));
             };
 
-            return orgUnitRepository.getAllModulesInOrgUnits([orgUnitId], false).then(function(modules) {
+            return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules([orgUnitId], false).then(function(modules) {
                 return $q.all([getSubmittedPeriodsForModules(modules, properties.weeksForAutoApprove), datasetRepository.getAll()])
                     .then(autoApprove)
                     .then(function(data) {
@@ -147,7 +147,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
                 });
             };
 
-            return orgUnitRepository.getAllModulesInOrgUnits([orgUnitId], true).then(function(modules) {
+            return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules([orgUnitId], true).then(function(modules) {
                 return $q.all([
                     getSubmittedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard),
                     getLevelOneApprovedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard),

@@ -67,7 +67,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 getOrgUnitSpy = spyOn(orgUnitRepository, "getParentProject");
                 getOrgUnitSpy.and.returnValue(utils.getPromise(q, parentProject));
-                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, "getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, []));
                 spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
                 var queryBuilder = function() {

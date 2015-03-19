@@ -19,7 +19,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             datasetsdata = testData.get("dataSets");
 
             spyOn(orgUnitRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
-            spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitRepo, "getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepo, "getParentProject").and.returnValue(utils.getPromise(q, {}));
 

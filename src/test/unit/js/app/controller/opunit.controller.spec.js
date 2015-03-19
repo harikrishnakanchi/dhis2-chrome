@@ -304,7 +304,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": expectedOrgUnits,
                 "type": "upsertOrgUnit"
             };
-            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
+            orgUnitRepo.getAllModulesInOrgUnitsExceptCurrentModules = jasmine.createSpy("getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             spyOn(hustle, "publish");
             spyOn(fakeModal, "open").and.returnValue({
                 result: utils.getPromise(q, {})

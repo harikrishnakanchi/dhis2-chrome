@@ -29,7 +29,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-            spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
+            spyOn(orgUnitRepository, "getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, modules));
 
             datasetRepository = new DatasetRepository();
             spyOn(datasetRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
@@ -144,7 +144,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             }];
 
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, {}));
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
+            orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules.and.returnValue(utils.getPromise(q, modules));
 
             patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository);
 
@@ -183,7 +183,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 }
             }];
 
-            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("prj1");
+            expect(orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules).toHaveBeenCalledWith("prj1");
             expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedUpserts);
         });
 
@@ -210,7 +210,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             }];
 
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, {}));
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
+            orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules.and.returnValue(utils.getPromise(q, modules));
             datasetRepository.getOriginDatasets.and.returnValue(utils.getPromise(q, originDatasets));
 
             patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository);

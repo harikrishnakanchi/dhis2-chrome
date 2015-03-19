@@ -36,7 +36,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             };
 
             var getAllModules = function() {
-                return orgUnitRepository.getAllModulesInOrgUnits([$scope.module.parent.id]).then(function(modules) {
+                return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules([$scope.module.parent.id]).then(function(modules) {
                     $scope.allModules = _.pluck(modules, "name");
                 });
             };

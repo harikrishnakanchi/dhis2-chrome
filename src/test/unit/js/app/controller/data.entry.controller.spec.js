@@ -59,7 +59,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 }];
 
                 orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, allModules));
+                spyOn(orgUnitRepository, "getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, allModules));
 
                 programRepository = new ProgramRepository();
                 spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
@@ -73,7 +73,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 }];
 
                 orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
+                spyOn(orgUnitRepository, "getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, modules));
 
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();

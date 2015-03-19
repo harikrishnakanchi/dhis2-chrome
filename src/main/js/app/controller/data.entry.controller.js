@@ -34,7 +34,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             });
 
             var setAvailableModules = function() {
-                return orgUnitRepository.getAllModulesInOrgUnits(_.pluck($rootScope.currentUser.organisationUnits, "id"), true).then(function(modules) {
+                return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules(_.pluck($rootScope.currentUser.organisationUnits, "id"), true).then(function(modules) {
                     $scope.modules = modules;
                 });
             };

@@ -24,9 +24,6 @@ define(["moment", "lodashUtils"], function(moment, _) {
                 return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
             };
 
-            var isNewDataModel = function(ds) {
-                return getBooleanAttributeValue(ds.attributeValues, "isNewDataModel");
-            };
             var segragateOrgUnits = function(orgUnits) {
                 var partitionedOrgUnits = _.partition(orgUnits, function(ou) {
                     return !isOfType(ou, "Module");
@@ -149,7 +146,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
             return store.each(query);
         };
 
-        var getAllModulesInOrgUnits = function(orgUnitIds, rejectDisabled) {
+        var getAllModulesInOrgUnitsExceptCurrentModules = function(orgUnitIds, rejectDisabled) {
             var getChildModules = function(orgUnitIds) {
                 return findAllByParent(orgUnitIds).then(function(children) {
                     var moduleOrgUnits = [];
@@ -264,7 +261,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "get": get,
             "findAll": findAll,
             "findAllByParent": findAllByParent,
-            "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
+            "getAllModulesInOrgUnitsExceptCurrentModules": getAllModulesInOrgUnitsExceptCurrentModules,
             "getProjectAndOpUnitAttributes": getProjectAndOpUnitAttributes,
             "getAllProjects": getAllProjects,
             "getParentProject": getParentProject

@@ -458,7 +458,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
 
             orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, programRepository, q);
             scope.$apply();
-            orgUnitRepository.getAllModulesInOrgUnits(["prj1", "prj2"]).then(function(userModules) {
+            orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules(["prj1", "prj2"]).then(function(userModules) {
                 modules = userModules;
             });
 
@@ -649,7 +649,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, programRepository, q);
 
             scope.$apply();
-            orgUnitRepository.getAllModulesInOrgUnits(["prj1", "prj2"], true).then(function(userModules) {
+            orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules(["prj1", "prj2"], true).then(function(userModules) {
                 modules = userModules;
             });
 

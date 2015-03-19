@@ -9,7 +9,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
             q = $q;
 
             orgUnitRepository = new OrgUnitRepository();
-            spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, ["mod1"]));
+            spyOn(orgUnitRepository, "getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, ["mod1"]));
 
             userPreferenceRepository = new UserPreferenceRepository(mockDB.db, orgUnitRepository);
         }));
@@ -71,7 +71,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
                 }]
             }];
 
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [{
+            orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules.and.returnValue(utils.getPromise(q, [{
                 "id": "mod1"
             }, {
                 "id": "mod2"
@@ -87,7 +87,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
             });
 
             scope.$apply();
-            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1', 'proj2']);
+            expect(orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules).toHaveBeenCalledWith(['proj1', 'proj2']);
             expect(actualUserModules).toEqual(["mod1", "mod2", "mod3"]);
         });
     });
