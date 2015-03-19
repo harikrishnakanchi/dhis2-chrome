@@ -113,6 +113,11 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                         "code": "isNewDataModel"
                     },
                     "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isOriginDataset"
+                    },
+                    "value": "false"
                 }]
             }, {
                 "id": "dataSet2",
@@ -137,6 +142,25 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                     },
                     "value": "true"
                 }]
+            }, {
+                "id": "geographicOrigin",
+                "name": "Geographic Origin",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    },
+                    "value": "false"
+                }, {
+                    "attribute": {
+                        "code": "isOriginDataset"
+                    },
+                    "value": "true"
+                }]
             }];
 
             var expected = [{
@@ -147,6 +171,11 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                         "code": "isNewDataModel"
                     },
                     "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isOriginDataset"
+                    },
+                    "value": "false"
                 }]
             }];
             mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));

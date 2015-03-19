@@ -54,7 +54,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             return store.getAll().then(function(all) {
                 var filtered = filterNewDatasets(all);
                 return _.reject(filtered, function(ds) {
-                    return getBooleanAttributeValue(ds.attributeValues, "isLineListService");
+                    return getBooleanAttributeValue(ds.attributeValues, "isLineListService") || getBooleanAttributeValue(ds.attributeValues, "isOriginDataset");
                 });
             });
         };
