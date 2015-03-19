@@ -1,17 +1,26 @@
-define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalDataRepository, mocks, utils) {
+define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"], function(ApprovalDataRepository, mocks, utils, timecop, moment) {
     describe("approval data repo", function() {
         var approvalDataRepository, q, scope;
 
         beforeEach(mocks.inject(function($injector) {
             q = $injector.get('$q');
             scope = $injector.get("$rootScope");
+            thisMoment = moment("2014-01-03T00:00:00.000+0000");
 
             var mockDB = utils.getMockDB(q);
             db = mockDB.db;
             mockStore = mockDB.objectStore;
 
+            Timecop.install();
+            Timecop.freeze(thisMoment.toDate());
+
             approvalDataRepository = new ApprovalDataRepository(db);
         }));
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
 
         it("should save complete datasets", function() {
             var completeDataSetRegistrationList = [{
@@ -287,6 +296,216 @@ define(["approvalDataRepository", "angularMocks", "utils", ], function(ApprovalD
                 "isApproved": true
             }]);
         });
+
+        it("should mark as complete", function() {
+            var periodsAndOrgUnits = [{
+                "period": "2014W1",
+                "orgUnit": "Mod1"
+            }, {
+                "period": "2014W1",
+                "orgUnit": "Mod2"
+            }, {
+                "period": "2014W2",
+                "orgUnit": "Mod1"
+            }];
+
+            approvalDataRepository.markAsComplete(periodsAndOrgUnits, "user");
+
+            var expectedUpserts = [{
+                "period": "2014W01",
+                "orgUnit": "Mod1",
+                "storedBy": "user",
+                "date": "2014-01-03T00:00:00.000Z",
+                "status": "NEW"
+            }, {
+                "period": "2014W01",
+                "orgUnit": "Mod2",
+                "storedBy": "user",
+                "date": "2014-01-03T00:00:00.000Z",
+                "status": "NEW"
+            }, {
+                "period": "2014W02",
+                "orgUnit": "Mod1",
+                "storedBy": "user",
+                "date": "2014-01-03T00:00:00.000Z",
+                "status": "NEW"
+            }];
+
+            expect(db.objectStore).toHaveBeenCalledWith("completedDataSets");
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpserts);
+        });
+
+        it("should mark as approved", function() {
+            var periodsAndOrgUnits = [{
+                "period": "2014W1",
+                "orgUnit": "Mod1"
+            }, {
+                "period": "2014W1",
+                "orgUnit": "Mod2"
+            }, {
+                "period": "2014W2",
+                "orgUnit": "Mod1"
+            }];
+
+            approvalDataRepository.markAsApproved(periodsAndOrgUnits, "user");
+
+            var expectedUpserts = [{
+                "period": "2014W01",
+                "orgUnit": "Mod1",
+                "createdByUsername": "user",
+                "createdDate": "2014-01-03T00:00:00.000Z",
+                "isAccepted": false,
+                "isApproved": true,
+                "status": "NEW"
+            }, {
+                "period": "2014W01",
+                "orgUnit": "Mod2",
+                "createdByUsername": "user",
+                "createdDate": "2014-01-03T00:00:00.000Z",
+                "isAccepted": false,
+                "isApproved": true,
+                "status": "NEW"
+            }, {
+                "period": "2014W02",
+                "orgUnit": "Mod1",
+                "createdByUsername": "user",
+                "createdDate": "2014-01-03T00:00:00.000Z",
+                "isAccepted": false,
+                "isApproved": true,
+                "status": "NEW"
+            }];
+
+            expect(db.objectStore).toHaveBeenCalledWith("approvedDataSets");
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpserts);
+        });
+
+        it("should mark as accepted", function() {
+            var periodsAndOrgUnits = [{
+                "period": "2014W1",
+                "orgUnit": "Mod1"
+            }, {
+                "period": "2014W1",
+                "orgUnit": "Mod2"
+            }, {
+                "period": "2014W2",
+                "orgUnit": "Mod1"
+            }];
+
+            approvalDataRepository.markAsAccepted(periodsAndOrgUnits, "user");
+
+            var expectedUpserts = [{
+                "period": "2014W01",
+                "orgUnit": "Mod1",
+                "createdByUsername": "user",
+                "createdDate": "2014-01-03T00:00:00.000Z",
+                "isAccepted": true,
+                "isApproved": true,
+                "status": "NEW"
+            }, {
+                "period": "2014W01",
+                "orgUnit": "Mod2",
+                "createdByUsername": "user",
+                "createdDate": "2014-01-03T00:00:00.000Z",
+                "isAccepted": true,
+                "isApproved": true,
+                "status": "NEW"
+            }, {
+                "period": "2014W02",
+                "orgUnit": "Mod1",
+                "createdByUsername": "user",
+                "createdDate": "2014-01-03T00:00:00.000Z",
+                "isAccepted": true,
+                "isApproved": true,
+                "status": "NEW"
+            }];
+
+            expect(db.objectStore).toHaveBeenCalledWith("approvedDataSets");
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpserts);
+        });
+
+        it("should mark as not complete", function() {
+            var periodsAndOrgUnits = [{
+                "period": "2014W1",
+                "orgUnit": "Mod1"
+            }, {
+                "period": "2014W1",
+                "orgUnit": "Mod2"
+            }, {
+                "period": "2014W2",
+                "orgUnit": "Mod1"
+            }];
+
+            approvalDataRepository.markAsNotComplete(periodsAndOrgUnits, "user");
+
+            var expectedUpserts = [{
+                "period": "2014W01",
+                "orgUnit": "Mod1",
+                "storedBy": "user",
+                "date": "2014-01-03T00:00:00.000Z",
+                "status": "DELETED"
+            }, {
+                "period": "2014W01",
+                "orgUnit": "Mod2",
+                "storedBy": "user",
+                "date": "2014-01-03T00:00:00.000Z",
+                "status": "DELETED"
+            }, {
+                "period": "2014W02",
+                "orgUnit": "Mod1",
+                "storedBy": "user",
+                "date": "2014-01-03T00:00:00.000Z",
+                "status": "DELETED"
+            }];
+
+            expect(db.objectStore).toHaveBeenCalledWith("completedDataSets");
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpserts);
+
+        });
+
+        it("should mark as not approved", function() {
+            var periodsAndOrgUnits = [{
+                "period": "2014W1",
+                "orgUnit": "Mod1"
+            }, {
+                "period": "2014W1",
+                "orgUnit": "Mod2"
+            }, {
+                "period": "2014W2",
+                "orgUnit": "Mod1"
+            }];
+
+            approvalDataRepository.markAsNotApproved(periodsAndOrgUnits, "user");
+
+            var expectedUpserts = [{
+                "period": "2014W01",
+                "orgUnit": "Mod1",
+                "createdByUsername": "user",
+                "createdDate": "2014-01-03T00:00:00.000Z",
+                "isAccepted": false,
+                "isApproved": false,
+                "status": "DELETED"
+            }, {
+                "period": "2014W01",
+                "orgUnit": "Mod2",
+                "createdByUsername": "user",
+                "createdDate": "2014-01-03T00:00:00.000Z",
+                "isAccepted": false,
+                "isApproved": false,
+                "status": "DELETED"
+            }, {
+                "period": "2014W02",
+                "orgUnit": "Mod1",
+                "createdByUsername": "user",
+                "createdDate": "2014-01-03T00:00:00.000Z",
+                "isAccepted": false,
+                "isApproved": false,
+                "status": "DELETED"
+            }];
+
+            expect(db.objectStore).toHaveBeenCalledWith("approvedDataSets");
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpserts);
+        });
+
 
     });
 });

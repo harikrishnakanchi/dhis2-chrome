@@ -92,5 +92,86 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 });
             });
         };
+
+        this.markAsComplete = function(periodsAndOrgUnits, storedBy) {
+            var payload = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
+                return {
+                    "period": moment(periodAndOrgUnit.period, "GGGG[W]W").format("GGGG[W]WW"),
+                    "orgUnit": periodAndOrgUnit.orgUnit,
+                    "storedBy": storedBy,
+                    "date": moment().toISOString(),
+                    "status": "NEW"
+                };
+            });
+
+            var store = db.objectStore("completedDataSets");
+            return store.upsert(payload);
+        };
+
+        this.markAsApproved = function(periodsAndOrgUnits, storedBy) {
+            var payload = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
+                return {
+                    "period": moment(periodAndOrgUnit.period, "GGGG[W]W").format("GGGG[W]WW"),
+                    "orgUnit": periodAndOrgUnit.orgUnit,
+                    "createdByUsername": storedBy,
+                    "createdDate": moment().toISOString(),
+                    "isAccepted": false,
+                    "isApproved": true,
+                    "status": "NEW"
+                };
+            });
+
+            var store = db.objectStore("approvedDataSets");
+            return store.upsert(payload);
+        };
+
+        this.markAsAccepted = function(periodsAndOrgUnits, storedBy) {
+            var payload = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
+                return {
+                    "period": moment(periodAndOrgUnit.period, "GGGG[W]W").format("GGGG[W]WW"),
+                    "orgUnit": periodAndOrgUnit.orgUnit,
+                    "createdByUsername": storedBy,
+                    "createdDate": moment().toISOString(),
+                    "isAccepted": true,
+                    "isApproved": true,
+                    "status": "NEW"
+                };
+            });
+
+            var store = db.objectStore("approvedDataSets");
+            return store.upsert(payload);
+        };
+
+        this.markAsNotComplete = function(periodsAndOrgUnits, storedBy) {
+            var payload = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
+                return {
+                    "period": moment(periodAndOrgUnit.period, "GGGG[W]W").format("GGGG[W]WW"),
+                    "orgUnit": periodAndOrgUnit.orgUnit,
+                    "storedBy": storedBy,
+                    "date": moment().toISOString(),
+                    "status": "DELETED"
+                };
+            });
+
+            var store = db.objectStore("completedDataSets");
+            return store.upsert(payload);
+        };
+
+        this.markAsNotApproved = function(periodsAndOrgUnits, storedBy) {
+            var payload = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
+                return {
+                    "period": moment(periodAndOrgUnit.period, "GGGG[W]W").format("GGGG[W]WW"),
+                    "orgUnit": periodAndOrgUnit.orgUnit,
+                    "createdByUsername": storedBy,
+                    "createdDate": moment().toISOString(),
+                    "isAccepted": false,
+                    "isApproved": false,
+                    "status": "DELETED"
+                };
+            });
+
+            var store = db.objectStore("approvedDataSets");
+            return store.upsert(payload);
+        };
     };
 });
