@@ -10,7 +10,6 @@ require.config({
         "moment": "lib/moment/moment",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
         "angular": "lib/angular/angular",
-        "logger": "lib/loglevel/dist/loglevel",
         "md5": "lib/js-md5/js/md5",
 
         //services

@@ -14,7 +14,6 @@ require.config({
         "timecop": "lib/timecop/timecop-0.1.1",
         "hustle": "lib/hustle/hustle",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
-        "logger": "lib/loglevel/dist/loglevel",
         "indexedDBLogger": "app/utils/indexeddb.logger",
 
 
