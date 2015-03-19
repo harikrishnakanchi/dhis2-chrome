@@ -61,7 +61,12 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
                 "created": today
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/metadata?lastUpdated=" + lastUpdated).respond(200, metadata);
+            var filterString = "attributes=false&dataApprovalLevels=false&userRoles=false&userGroups=false&options=false" +
+                "&dashboardItems=false&dashboards=false&dataElementGroups=false&dataElementGroupSets=false&indicatorTypes=false" +
+                "&organisationUnits=false&organisationUnitGroups=false&organisationUnitGroupSets=false&sqlViews=false&charts=false" +
+                "&reportTables=false&dataSets=false&eventReports=false&eventCharts=false&programs=false&programStageSections=false" +
+                "&trackedEntities=false";
+            httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString + "&lastUpdated=" + lastUpdated).respond(200, metadata);
 
             var actualMetadata;
             metadataService.getMetadata(lastUpdated).then(function(data) {
@@ -80,7 +85,12 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
                 "created": today
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/metadata").respond(200, metadata);
+            var filterString = "attributes=false&dataApprovalLevels=false&userRoles=false&userGroups=false&options=false" +
+                "&dashboardItems=false&dashboards=false&dataElementGroups=false&dataElementGroupSets=false&indicatorTypes=false" +
+                "&organisationUnits=false&organisationUnitGroups=false&organisationUnitGroupSets=false&sqlViews=false&charts=false" +
+                "&reportTables=false&dataSets=false&eventReports=false&eventCharts=false&programs=false&programStageSections=false" +
+                "&trackedEntities=false";
+            httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString).respond(200, metadata);
 
             var actualMetadata;
             metadataService.getMetadata().then(function(data) {

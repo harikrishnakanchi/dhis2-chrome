@@ -1,7 +1,7 @@
 define(["dhisUrl", "moment"], function(dhisUrl, moment) {
     return function($http) {
         this.getMetadata = function(lastUpdatedTime) {
-            var url = dhisUrl.metadata + (lastUpdatedTime ? "?lastUpdated=" + lastUpdatedTime : "");
+            var url = dhisUrl.filteredMetadata + (lastUpdatedTime ? "&lastUpdated=" + lastUpdatedTime : "");
             return $http.get(url).then(function(response) {
                 return response.data;
             });

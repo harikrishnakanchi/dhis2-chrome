@@ -3,6 +3,23 @@ define(["properties"], function(properties) {
         return properties.dhis.url + relative_path;
     };
 
+    var filter_fields = function(url) {
+        var allMetadataFields = ["attributes", "dataApprovalLevels", "users", "userRoles", "userGroups", "options", "optionSets", "categories", "categoryOptions",
+            "categoryCombos", "categoryOptionCombos", "dashboardItems", "dashboards", "dataElementGroups", "dataElementGroupSets", "indicators", "indicatorTypes",
+            "organisationUnits", "organisationUnitGroups", "organisationUnitGroupSets", "organisationUnitLevels", "sqlViews", "charts", "reportTables",
+            "sections", "dataSets", "eventReports", "eventCharts", "programs", "programStages", "programStageSections", "trackedEntities", "translations"
+        ];
+
+        var requiredMetadataFields = properties.metadata.types;
+        var fieldsToFilter = _.difference(allMetadataFields, requiredMetadataFields);
+
+        var filterParams = _.reduce(fieldsToFilter, function(result, field, i) {
+            return i < fieldsToFilter.length - 1 ? result + field + "=false&" : result + field + "=false";
+        }, "?");
+
+        return url + filterParams;
+    };
+
     return {
         "approvalMultipleL1": with_host("/api/completeDataSetRegistrations/multiple"),
         "approvalMultipleL2": with_host("/api/dataApprovals/multiple"),
@@ -12,6 +29,7 @@ define(["properties"], function(properties) {
         "approvalStatus": with_host("/api/dataApprovals/status"),
         "dataValueSets": with_host("/api/dataValueSets"),
         "metadata": with_host("/api/metadata"),
+        "filteredMetadata": filter_fields(with_host("/api/metadata.json")),
         "events": with_host("/api/events"),
         "systemSettings": with_host("/api/systemSettings"),
         "translations": with_host("/api/translations"),
