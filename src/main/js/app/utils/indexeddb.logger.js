@@ -81,7 +81,7 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
                         'messages': messages
                     };
                     var req = store.put(logObject);
-                    req.onerror = function(e){
+                    req.onerror = function(e) {
                         console.error("Could not save log entry to indexedDB", e, logObject);
                     };
                 } catch (e) {
@@ -139,9 +139,11 @@ define(["lodash", "Q", "moment", "properties"], function(_, Q, moment, propertie
                     cursor.
                     continue();
                 } else {
-                    d.resolve({
-                        "msfLogs": results
+                    results = _.map(results, function(r) {
+                        r.date = r.datetime.substr(0, 10);
+                        return r;
                     });
+                    d.resolve(_.groupBy(results, "date"));
                 }
             };
             req.onerror = function(e) {

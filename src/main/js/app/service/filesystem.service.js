@@ -1,6 +1,6 @@
 define([], function() {
     return function($q) {
-        var writeFile = function(fileName, contents, blobType) {
+        var writeFile = function(fileName, contents) {
             var deferred = $q.defer();
             var errorHandler = function(err) {
                 deferred.reject(err);
@@ -27,9 +27,7 @@ define([], function() {
                                 writer.onwriteend = function() {
                                     deferred.resolve(entry);
                                 };
-                                writer.write(new Blob([contents], {
-                                    type: blobType
-                                }));
+                                writer.write(contents);
                             }, errorHandler);
                         }, errorHandler);
                     });

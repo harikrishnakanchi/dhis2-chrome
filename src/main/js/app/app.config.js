@@ -15,6 +15,7 @@ require.config({
         "hustle": "lib/hustle/hustle",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
         "indexedDBLogger": "app/utils/indexeddb.logger",
+        "JSZip": "lib/jszip/dist/jszip",
 
 
         //3rd party angular modules
@@ -114,6 +115,7 @@ require.config({
         "lodashUtils": "app/utils/lodash.utils",
         "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
+        "zipUtils": "app/utils/zip.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",

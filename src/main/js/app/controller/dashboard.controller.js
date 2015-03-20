@@ -1,4 +1,4 @@
-define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBLogger"], function(moment, approvalDataTransformer, properties, _, indexedDBLogger) {
+define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBLogger", "zipUtils"], function(moment, approvalDataTransformer, properties, _, indexedDBLogger, zipUtils) {
     return function($scope, $hustle, $q, $rootScope, approvalHelper, datasetRepository, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location) {
 
         $scope.approveSuccessForLevelOne = false;
@@ -194,6 +194,17 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
         };
 
         $scope.dumpLogs = function() {
+            var createZip = function(fileNamePrefix, fileNameExtn, backupCallback) {
+                $scope.cloning = true;
+                return backupCallback().then(function(data) {
+                    $scope.cloning = false;
+                    var zippedData = zipUtils.zipData("logs", "log_", ".log", data);
+                    return filesystemService.writeFile("logs.zip", zippedData);
+                }).finally(function() {
+                    $scope.cloning = false;
+                });
+            };
+
             var errorCallback = function(error) {
                 displayMessage($scope.resourceBundle.dumpLogsErrorMessage + error.name, true);
             };
@@ -202,7 +213,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                 displayMessage($scope.resourceBundle.dumpLogsSuccessMessage + directory.name, false);
             };
 
-            saveIdbBackup("logs_dump_", ".logs", _.partial(indexedDBLogger.exportLogs, "msfLogs"))
+            createZip("logs_dump_", ".logs", _.partial(indexedDBLogger.exportLogs, "msfLogs"))
                 .then(successCallback, errorCallback);
         };
 
@@ -245,7 +256,9 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                 var cloneFileName = fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + fileNameExtn;
                 var cloneFileContents = JSON.stringify(data);
                 $scope.cloning = false;
-                return filesystemService.writeFile(cloneFileName, cloneFileContents, "application/json");
+                return filesystemService.writeFile(cloneFileName, new Blob([cloneFileContents], {
+                    "type": "application/json"
+                }));
             }).finally(function() {
                 $scope.cloning = false;
             });

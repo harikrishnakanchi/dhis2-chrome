@@ -414,7 +414,9 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         });
 
         it("should clone the entire indexed db successfully and save it to a file", function() {
-            var expectedFileContents = JSON.stringify(idbDump);
+            var expectedFileContents = new Blob([JSON.stringify(idbDump)], {
+                "type": "application/json"
+            });
             spyOn(filesystemService, "writeFile").and.returnValue(utils.getPromise(q, {
                 "name": "Desktop"
             }));
@@ -427,15 +429,16 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             scope.$apply();
 
             expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
-            expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', expectedFileContents,
-                'application/json');
+            expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', jasmine.any(Blob));
 
             expect(scope.showMessage).toBeTruthy();
             expect(scope.message).toEqual("Clone created successfully at Desktop");
         });
 
         it("should fail if cloning entire indexedDb fails", function() {
-            var expectedFileContents = JSON.stringify(idbDump);
+            var expectedFileContents = new Blob([JSON.stringify(idbDump)], {
+                "type": "application/json"
+            });
             spyOn(filesystemService, "writeFile").and.returnValue(utils.getRejectedPromise(q, {
                 "name": "InvalidFile"
             }));
@@ -448,8 +451,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             scope.$apply();
 
             expect(indexeddbUtils.backupEntireDB).toHaveBeenCalled();
-            expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', expectedFileContents,
-                'application/json');
+            expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.clone', jasmine.any(Blob));
 
             expect(scope.showMessage).toBeTruthy();
             expect(scope.message).toEqual("Error creating clone: InvalidFile");
@@ -477,7 +479,10 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             };
 
             spyOn(indexedDBLogger, "exportLogs").and.returnValue(utils.getPromise(q, logsContent));
-            var expectedFileContents = JSON.stringify(logsContent);
+            var expectedFileContents = new Blob([JSON.stringify(logsContent)], {
+                "type": "application/json"
+            });
+
             spyOn(filesystemService, "writeFile").and.returnValue(utils.getPromise(q, {
                 "name": "Desktop"
             }));
@@ -491,8 +496,8 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             scope.$apply();
 
             expect(indexedDBLogger.exportLogs).toHaveBeenCalled();
-            expect(filesystemService.writeFile).toHaveBeenCalledWith('logs_dump_20140530-124354.logs', expectedFileContents,
-                'application/json');
+            expect(new Blob()).toEqual(jasmine.any(Blob));
+            expect(filesystemService.writeFile).toHaveBeenCalledWith('logs.zip', jasmine.any(Blob));
 
             expect(scope.showMessage).toBeTruthy();
         });
