@@ -14,10 +14,9 @@
     <div id="dhis2" name="dhis2" ng-csp ng-controller="mainController" ng-cloak>
         <header>
             <div class="container">
-                <a class="navbar-brand" href="#/dashboard"><img src="img/logo.png" alt="" title="DHIS" id="logoImg">
-                </a>
+                <img src="img/logo.png" alt="" title="DHIS" id="logoImg" class="navbar-brand">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#/dashboard" ng-if="currentUser">Home</a>
+                    <li><a href="#/dashboard" ng-if="currentUser">Dashboard</a>
                     </li>
                     <li>
                         <p class="navbar-text" ng-show="isDhisOnline" id="loggedInUser"> <span class="online">{{currentUser.userCredentials.username}}</span> </p>
