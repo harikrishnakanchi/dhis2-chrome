@@ -1,7 +1,7 @@
-define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "approvalHelper", "timecop", "orgUnitGroupHelper"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, ApprovalHelper, timecop, OrgUnitGroupHelper) {
+define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository) {
     describe("project controller tests", function() {
         var scope, timeout, q, location, anchorScroll, userRepository, parent,
-            fakeModal, orgUnitRepo, hustle, rootScope, approvalHelper, patientOriginRepository;
+            fakeModal, orgUnitRepo, hustle, rootScope, patientOriginRepository, approvalDataRepository;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
@@ -11,10 +11,11 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             q = $q;
             timeout = $timeout;
             location = $location;
-            approvalHelper = new ApprovalHelper();
             orgUnitGroupHelper = new OrgUnitGroupHelper();
 
             orgUnitRepo = utils.getMockRepo(q);
+
+            approvalDataRepository = new ApprovalDataRepository();
 
             userRepository = {
                 "upsert": function() {
@@ -57,7 +58,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, approvalHelper, orgUnitGroupHelper, patientOriginRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, patientOriginRepository, approvalDataRepository);
         }));
 
         afterEach(function() {
@@ -126,21 +127,102 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "autoApprove": true
             };
 
+            var modules = [{
+                "id": "mod1",
+                "name": "mod1"
+            }, {
+                "id": "mod2",
+                "name": "mod2"
+            }, {
+                "id": "mod3",
+                "name": "mod3"
+            }];
+
+            var expectedPeriodAndOrgUnits = [{
+                "period": '2014W22',
+                "orgUnit": 'mod1'
+            }, {
+                "period": '2014W21',
+                "orgUnit": 'mod1'
+            }, {
+                "period": '2014W20',
+                "orgUnit": 'mod1'
+            }, {
+                "period": '2014W19',
+                "orgUnit": 'mod1'
+            }, {
+                "period": '2014W18',
+                "orgUnit": 'mod1'
+            }, {
+                "period": '2014W17',
+                "orgUnit": 'mod1'
+            }, {
+                "period": '2014W16',
+                "orgUnit": 'mod1'
+            }, {
+                "period": '2014W15',
+                "orgUnit": 'mod1'
+            }, {
+                "period": '2014W22',
+                "orgUnit": 'mod2'
+            }, {
+                "period": '2014W21',
+                "orgUnit": 'mod2'
+            }, {
+                "period": '2014W20',
+                "orgUnit": 'mod2'
+            }, {
+                "period": '2014W19',
+                "orgUnit": 'mod2'
+            }, {
+                "period": '2014W18',
+                "orgUnit": 'mod2'
+            }, {
+                "period": '2014W17',
+                "orgUnit": 'mod2'
+            }, {
+                "period": '2014W16',
+                "orgUnit": 'mod2'
+            }, {
+                "period": '2014W15',
+                "orgUnit": 'mod2'
+            }, {
+                "period": '2014W22',
+                "orgUnit": 'mod3'
+            }, {
+                "period": '2014W21',
+                "orgUnit": 'mod3'
+            }, {
+                "period": '2014W20',
+                "orgUnit": 'mod3'
+            }, {
+                "period": '2014W19',
+                "orgUnit": 'mod3'
+            }, {
+                "period": '2014W18',
+                "orgUnit": 'mod3'
+            }, {
+                "period": '2014W17',
+                "orgUnit": 'mod3'
+            }, {
+                "period": '2014W16',
+                "orgUnit": 'mod3'
+            }, {
+                "period": '2014W15',
+                "orgUnit": 'mod3'
+            }];
+
+            spyOn(approvalDataRepository, "markAsAccepted").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(newOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-            spyOn(approvalHelper, "autoApproveExistingData").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
+            orgUnitRepo.getAllModulesInOrgUnitsExceptCurrentModules = jasmine.createSpy("getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, modules));
 
             scope.update(newOrgUnit, orgUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(newOrgUnit);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                data: newOrgUnit,
-                type: "upsertOrgUnit"
-            }, "dataValues");
-            expect(approvalHelper.autoApproveExistingData).toHaveBeenCalled();
+            expect(approvalDataRepository.markAsAccepted).toHaveBeenCalledWith(expectedPeriodAndOrgUnits,"service.account");
         });
 
         it("should display error if updating organization unit fails", function() {
@@ -290,7 +372,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             scope.isNewMode = false;
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, approvalHelper, orgUnitGroupHelper, patientOriginRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, patientOriginRepository);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });
@@ -364,7 +446,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             spyOn(userRepository, "getAllProjectUsers").and.returnValue(utils.getPromise(q, users));
             spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, patientOrigins));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, approvalHelper, orgUnitGroupHelper, patientOriginRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, patientOriginRepository);
             scope.$apply();
 
             expect(scope.projectUsers).toEqual(expectedUsers);
@@ -469,7 +551,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             var allOrgUnits = [country1, project1, module1];
             orgUnitRepo = utils.getMockRepo(q, allOrgUnits);
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, approvalHelper, orgUnitGroupHelper, patientOriginRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, patientOriginRepository);
             scope.$apply();
 
             expect(scope.existingProjectCodes).toEqual(["AF101"]);

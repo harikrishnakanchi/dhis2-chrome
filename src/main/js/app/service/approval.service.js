@@ -1,4 +1,4 @@
-define(["properties", "moment", "dhisUrl", "lodash"], function(properties, moment, dhisUrl, _) {
+define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(properties, moment, dhisUrl, _, dateUtils) {
     return function($http, db, $q) {
         this.markAsComplete = function(dataSets, period, orgUnit, storedBy, completionDate) {
             var payload = _.transform(dataSets, function(result, ds) {
@@ -60,7 +60,7 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
 
                 return _.map(registrationsGroupedByPeriodAndOu, function(item) {
                     return {
-                        'period': _.pluck(item, 'period')[0].id,
+                        'period': dateUtils.getFormattedPeriod(_.pluck(item, 'period')[0].id),
                         'orgUnit': _.pluck(item, 'organisationUnit')[0].id,
                         'storedBy': _.pluck(item, 'storedBy')[0],
                         'date': _.pluck(item, 'date')[0],
@@ -126,7 +126,7 @@ define(["properties", "moment", "dhisUrl", "lodash"], function(properties, momen
 
                     if (isApproved || isAccepted)
                         acc.push({
-                            'period': _.pluck(groupedItems, 'period')[0].id,
+                            'period': dateUtils.getFormattedPeriod(_.pluck(groupedItems, 'period')[0].id),
                             'orgUnit': _.pluck(groupedItems, 'organisationUnit')[0].id,
                             "isApproved": isApproved,
                             "isAccepted": isAccepted

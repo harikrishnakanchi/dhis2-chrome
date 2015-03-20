@@ -35,15 +35,15 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedEventData);
         });
 
-        it("should get all events", function() {
+        it("should get event by id", function() {
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
 
-            programEventRepository.getAll();
+            programEventRepository.getEvent("ev1");
             scope.$apply();
 
-            expect(mockStore.getAll).toHaveBeenCalled();
+            expect(mockStore.find).toHaveBeenCalledWith("ev1");
         });
 
         it("should delete events given ids", function() {

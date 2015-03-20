@@ -1,6 +1,5 @@
 define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBLogger", "zipUtils"], function(moment, approvalDataTransformer, properties, _, indexedDBLogger, zipUtils) {
-    return function($scope, $hustle, $q, $rootScope, approvalHelper, datasetRepository, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location) {
-
+    return function($scope, $hustle, $q, $rootScope, approvalHelper, datasetRepository, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location, approvalDataRepository) {
         $scope.approveSuccessForLevelOne = false;
         $scope.approveSuccessForLevelTwo = false;
         $scope.approveSuccessForLevelThree = false;
@@ -121,21 +120,6 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                 });
             };
 
-            var getPeriodsToBeApproved = function() {
-                return _.map(itemsToBeApproved, function(item) {
-                    return {
-                        "orgUnitId": item.moduleId,
-                        "period": _.pluck(item.status, "period")
-                    };
-                });
-            };
-
-            var getApprovalFunction = function() {
-                if ($scope.userApprovalLevel == 1)
-                    return approvalHelper.markDataAsComplete;
-                if ($scope.userApprovalLevel == 2)
-                    return approvalHelper.markDataAsApproved;
-            };
 
             var successPromise = function(data) {
                 $scope.itemsAwaitingApprovalAtUserLevel = filterItems($scope.itemsAwaitingApprovalAtUserLevel, false);
@@ -174,17 +158,25 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
             };
 
             var approve = function() {
-                return datasetRepository.getAll().then(function(dataSets) {
-                    var bulkApprovalData = approvalDataTransformer.generateBulkApprovalData(getPeriodsToBeApproved(), dataSets, $rootScope.currentUser.userCredentials.username);
-                    var approvalFunction = getApprovalFunction();
+                var getPeriodsAndOrgUnits = function() {
+                    var getPeriodsAndOrgUnits = _.map(itemsToBeApproved, function(item) {
+                        return _.map(item.status, function(status) {
+                            return {
+                                "period": status.period,
+                                "orgUnit": item.moduleId
+                            };
+                        });
+                    });
+                    return _.flatten(getPeriodsAndOrgUnits);
+                };
 
-                    return $q.all(_.map(bulkApprovalData, function(datum) {
-                        return approvalFunction(datum);
-                    })).then(successPromise, errorPromise);
-                });
+                if ($scope.userApprovalLevel === 1)
+                    return approvalDataRepository.markAsComplete(getPeriodsAndOrgUnits(), $rootScope.currentUser.userCredentials.username);
+                if ($scope.userApprovalLevel === 2)
+                    return approvalDataRepository.markAsApproved(getPeriodsAndOrgUnits(), $rootScope.currentUser.userCredentials.username);
             };
 
-            showModal(approve, $scope.resourceBundle.dataApprovalConfirmationMessage);
+            showModal(approve, $scope.resourceBundle.dataApprovalConfirmationMessage).then(successPromise, errorPromise);
         };
 
         $scope.getApprovalLevelName = function(level) {
@@ -285,7 +277,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                 scope: $scope
             });
 
-            modalInstance.result.then(okCallback);
+            return modalInstance.result.then(okCallback);
         };
 
         var filterItems = function(items, withSelectedItems) {

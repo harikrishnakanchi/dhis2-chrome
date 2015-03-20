@@ -1,84 +1,5 @@
 define(["properties", "datasetTransformer", "moment", "approvalDataTransformer", "dateUtils"], function(properties, datasetTransformer, moment, approvalDataTransformer, dateUtils) {
     return function($hustle, $q, $rootScope, orgUnitRepository, datasetRepository, approvalDataRepository, dataRepository) {
-        var approveData = function(approvalData, approvalFn, approvalType) {
-            var saveToDhis = function() {
-                return $hustle.publish({
-                    "data": approvalData,
-                    "type": approvalType
-                }, "dataValues");
-            };
-
-            return approvalFn(approvalData).then(saveToDhis);
-        };
-
-        var markDataAsComplete = function(data) {
-            var dataForApproval = {
-                "dataSets": data.dataSets,
-                "period": data.period,
-                "orgUnit": data.orgUnit,
-                "storedBy": data.storedBy,
-                "date": moment().toISOString(),
-                "status": "NEW"
-            };
-
-            return approveData(dataForApproval, approvalDataRepository.saveLevelOneApproval, "uploadCompletionData").then(function() {
-                return data;
-            });
-        };
-
-        var markDataAsApproved = function(data) {
-            var dataForApproval = {
-                "dataSets": data.dataSets,
-                "period": data.period,
-                "orgUnit": data.orgUnit,
-                "createdByUsername": data.storedBy,
-                "createdDate": moment().toISOString(),
-                "isAccepted": false,
-                "isApproved": true,
-                "status": "NEW"
-            };
-
-            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData").then(function() {
-                return data;
-            });
-        };
-
-        var markDataAsAccepted = function(data) {
-            var dataForApproval = {
-                "dataSets": data.dataSets,
-                "period": data.period,
-                "orgUnit": data.orgUnit,
-                "createdByUsername": data.storedBy,
-                "createdDate": moment().toISOString(),
-                "isApproved": true,
-                "isAccepted": true,
-                "status": "NEW"
-            };
-
-            return approveData(dataForApproval, approvalDataRepository.saveLevelTwoApproval, "uploadApprovalData").then(function() {
-                return data;
-            });
-        };
-
-        var autoApproveExistingData = function(orgUnit) {
-            var orgUnitId = orgUnit.id;
-
-            var autoApprove = function(data) {
-                var approvalData = approvalDataTransformer.generateBulkApprovalData(data[0], data[1], "service.account");
-                return $q.all(_.map(approvalData, function(datum) {
-                    return markDataAsComplete(datum).then(markDataAsAccepted);
-                }));
-            };
-
-            return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules([orgUnitId], false).then(function(modules) {
-                return $q.all([getSubmittedPeriodsForModules(modules, properties.weeksForAutoApprove), datasetRepository.getAll()])
-                    .then(autoApprove)
-                    .then(function(data) {
-                        return data;
-                    });
-            });
-        };
-
         var getApprovalStatus = function(orgUnitId) {
             var getStatus = function(modules, submittedPeriods, dataSetCompletePeriods, approvalData) {
 
@@ -215,34 +136,8 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
             });
         };
 
-        var unapproveData = function(currentModuleId, dataSetIds, period) {
-            var unapproveOnDHIS = function() {
-                return $hustle.publish({
-                    "data": {
-                        "ds": dataSetIds,
-                        "pe": period,
-                        "ou": currentModuleId
-                    },
-                    "type": "deleteApproval"
-                }, "dataValues");
-            };
-
-            var unapproveLocally = function() {
-                return $q.all([approvalDataRepository.unapproveLevelTwoData(period, currentModuleId),
-                    approvalDataRepository.unapproveLevelOneData(period, currentModuleId)
-                ]);
-            };
-
-            return unapproveLocally().then(unapproveOnDHIS);
-        };
-
         return {
-            "markDataAsComplete": markDataAsComplete,
-            "markDataAsApproved": markDataAsApproved,
-            "markDataAsAccepted": markDataAsAccepted,
-            "autoApproveExistingData": autoApproveExistingData,
-            "getApprovalStatus": getApprovalStatus,
-            "unapproveData": unapproveData
+            "getApprovalStatus": getApprovalStatus
         };
     };
 });

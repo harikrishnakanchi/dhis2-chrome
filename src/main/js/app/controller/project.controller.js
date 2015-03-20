@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper, properties) {
 
-    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal, approvalHelper, orgUnitGroupHelper, patientOriginRepository) {
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal, orgUnitGroupHelper, patientOriginRepository, approvalDataRepository) {
 
         $scope.allContexts = ['Internal instability', 'Stable', 'Post-conflict', 'Cross-border instability'].sort();
         $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
@@ -59,13 +59,32 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
                 .then(onSuccess, onError);
         };
 
+        var getPeriodsAndOrgUnitsForAutoApprove = function(orgUnits) {
+            var periods = _.times(properties.weeksForAutoApprove, function(n) {
+                return moment().subtract(n, 'week').format("GGGG[W]WW");
+            });
+            var orgUnitIds = _.pluck(orgUnits, 'id');
+
+            var periodAndOrgUnits = _.map(orgUnitIds, function(orgUnitId) {
+                return _.map(periods, function(period) {
+                    return {
+                        "period": period,
+                        "orgUnit": orgUnitId
+                    };
+                });
+            });
+
+            return _.flatten(periodAndOrgUnits);
+        };
+
         $scope.update = function(newOrgUnit, orgUnit) {
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
             saveToDbAndPublishMessage(dhisProject).then(function(data) {
                 orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules([dhisProject.id], true).then(function(modules) {
                     orgUnitGroupHelper.createOrgUnitGroups(modules, true);
                     if (newOrgUnit.autoApprove) {
-                        return approvalHelper.autoApproveExistingData(data);
+                        var periodAndOrgUnits = getPeriodsAndOrgUnitsForAutoApprove(modules);
+                        return approvalDataRepository.markAsAccepted(periodAndOrgUnits, "service.account");
                     } else {
                         return data;
                     }

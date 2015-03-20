@@ -3,7 +3,7 @@
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
     <section class="panel tab-panel">
-        <div ng-if="!includeEditForm">
+        <div ng-if="!showEditForm">
             <div ng-show="resultMessageType === 'success'" class="alert alert-success">{{resultMessage}}</div>
             <div ng-show="resultMessageType === 'failure'" class="alert alert-danger">{{resultMessage}}</div>
             <form name="form.eventDataEntryForm" id="form.eventDataEntryForm" class="form-horizontal">
@@ -80,7 +80,6 @@
                             </div>
                         </div>
                         <div ng-if="allEvents.length &gt; 0" ng-show="showView">
-                            <div ng-show="deleteSuccess" class="alert alert-success">{{resourceBundle.eventDeleteSuccess}}</div>
                             <ul ng-if="isDataEntryAllowed()">
                                 <li>
                                     <div class="text-right">
@@ -134,8 +133,8 @@
                                 <ul>
                                     <li>
                                         <div class="text-center">
-                                            <input type="button" ng-disabled="isCurrentWeekSelected(week) || !isDataEntryAllowed()" class="btn btn-main" value="Submit" ng-click="submit(program.id)" ng-if="!projectIsAutoApproved" />
-                                            <input type="button" ng-disabled="isCurrentWeekSelected(week) || !isDataEntryAllowed()" class="btn btn-main" value="Submit" ng-click="submitAndApprove(program.id)" ng-if="projectIsAutoApproved" />
+                                            <input type="button" ng-disabled="isCurrentWeekSelected(week) || !isDataEntryAllowed()" class="btn btn-main" value="Submit" ng-click="submit()" ng-if="!projectIsAutoApproved" />
+                                            <input type="button" ng-disabled="isCurrentWeekSelected(week) || !isDataEntryAllowed()" class="btn btn-main" value="Submit" ng-click="submitAndApprove()" ng-if="projectIsAutoApproved" />
                                         </div>
                                     </li>
                                 </ul>
@@ -145,7 +144,7 @@
                 </accordion>
             </form>
         </div>
-        <div ng-if="includeEditForm">
+        <div ng-if="showEditForm">
             <div ng-include="formTemplateUrl"></div>
         </div>
     </section>

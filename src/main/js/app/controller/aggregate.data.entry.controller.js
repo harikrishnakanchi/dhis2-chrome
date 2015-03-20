@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer, properties) {
     return function($scope, $routeParams, $q, $hustle, db, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
-        $timeout, orgUnitRepository, approvalHelper) {
+        $timeout, orgUnitRepository) {
 
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
@@ -133,10 +133,16 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 scrollToTop();
             };
 
+            var periodAndOrgUnit = {
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
+            };
+
+            var completedAndApprovedBy = $scope.currentUser.userCredentials.username;
+
             var upsertAndPushToDhis = function() {
                 save(false)
-                    .then(_.partial(approvalHelper.markDataAsComplete, getPayloadForFirstLevelApproval()))
-                    .then(_.partial(approvalHelper.markDataAsAccepted, getPayloadForSecondOrThirdLevelApproval()));
+                    .then(_.partial(approvalDataRepository.markAsAccepted, periodAndOrgUnit, completedAndApprovedBy));
             };
 
             confirmAndProceed(upsertAndPushToDhis, $scope.resourceBundle.reapprovalConfirmationMessage, !($scope.isCompleted || $scope.isApproved))
@@ -155,7 +161,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.approveError = true;
             };
 
-            confirmAndProceed(_.partial(approvalHelper.markDataAsComplete, getPayloadForFirstLevelApproval()), $scope.resourceBundle.dataApprovalConfirmationMessage)
+            var periodAndOrgUnit = {
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
+            };
+
+            var completedBy = $scope.currentUser.userCredentials.username;
+
+            approvalDataRepository.markAsComplete(periodAndOrgUnit, completedBy)
                 .then(onSuccess, onError)
                 .finally(scrollToTop);
         };
@@ -172,13 +185,23 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.approveError = true;
             };
 
-            confirmAndProceed(_.partial(approvalHelper.markDataAsApproved, getPayloadForSecondOrThirdLevelApproval()), $scope.resourceBundle.dataApprovalConfirmationMessage, false)
+            var periodAndOrgUnit = {
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
+            };
+
+            var approvedBy = $scope.currentUser.userCredentials.username;
+
+            approvalDataRepository.markAsApproved(periodAndOrgUnit, approvedBy)
                 .then(onSuccess, onError)
                 .finally(scrollToTop);
 
         };
 
-        var showModal = function(okCallback, message) {
+        var confirmAndProceed = function(okCallback, message, doNotConfirm) {
+            if (doNotConfirm)
+                return $q.when(okCallback());
+
             $scope.modalMessage = message;
             var modalInstance = $modal.open({
                 templateUrl: 'templates/confirm.dialog.html',
@@ -186,27 +209,13 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 scope: $scope
             });
 
-            modalInstance.result.then(okCallback);
-        };
-
-        var confirmAndProceed = function(okCallback, message, doNotConfirm) {
-            if (doNotConfirm) {
-                return $q.when(okCallback());
-            } else {
-                $scope.modalMessage = message;
-                var modalInstance = $modal.open({
-                    templateUrl: 'templates/confirm.dialog.html',
-                    controller: 'confirmDialogController',
-                    scope: $scope
+            return modalInstance.result
+                .then(function() {
+                    return okCallback();
+                }, function() {
+                    //burp on cancel
                 });
 
-                return modalInstance.result
-                    .then(function() {
-                        return okCallback();
-                    }, function() {
-                        //burp on cancel
-                    });
-            }
         };
 
         $scope.isCurrentWeekSelected = function(week) {
@@ -227,26 +236,26 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         var save = function(asDraft) {
             var period = getPeriod();
 
-            var saveToDhis = function(data) {
+            var publishToDhis = function(data) {
                 return $hustle.publish({
                     "data": data,
                     "type": "uploadDataValues"
                 }, "dataValues");
             };
 
-            var unapproveData = function(data) {
-                return approvalHelper.unapproveData($scope.currentModule.id, _.keys($scope.currentGroupedSections), getPeriod()).then(function() {
-                    return data;
-                });
+            var periodAndOrgUnit = {
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
             };
+
 
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentUser.userCredentials.username);
             if (asDraft) {
                 return dataRepository.saveAsDraft(payload);
             } else {
                 return dataRepository.save(payload)
-                    .then(unapproveData)
-                    .then(saveToDhis);
+                    .then(_.partial(approvalDataRepository.clearApprovals, periodAndOrgUnit))
+                    .then(_.partial(publishToDhis, payload));
             }
         };
 

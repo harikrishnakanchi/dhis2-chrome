@@ -85,7 +85,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d1"
                     },
                     "period": {
-                        "id": "2014W01"
+                        "id": "2014W1"
                     },
                     "organisationUnit": {
                         "id": "ou1"
@@ -98,7 +98,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d2"
                     },
                     "period": {
-                        "id": "2014W01"
+                        "id": "2014W1"
                     },
                     "organisationUnit": {
                         "id": "ou1"
@@ -111,7 +111,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d1"
                     },
                     "period": {
-                        "id": "2014W02"
+                        "id": "2014W2"
                     },
                     "organisationUnit": {
                         "id": "ou1"
@@ -124,7 +124,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d2"
                     },
                     "period": {
-                        "id": "2014W02"
+                        "id": "2014W2"
                     },
                     "organisationUnit": {
                         "id": "ou1"
@@ -172,7 +172,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d1"
                     },
                     "period": {
-                        "id": "2014W01"
+                        "id": "2014W1"
                     },
                     "organisationUnit": {
                         "id": "ou1"
@@ -189,7 +189,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d2"
                     },
                     "period": {
-                        "id": "2014W01"
+                        "id": "2014W1"
                     },
                     "organisationUnit": {
                         "id": "ou1"
@@ -206,7 +206,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d1"
                     },
                     "period": {
-                        "id": "2014W02"
+                        "id": "2014W2"
                     },
                     "organisationUnit": {
                         "id": "ou1"
@@ -223,7 +223,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d1"
                     },
                     "period": {
-                        "id": "2014W03"
+                        "id": "2014W3"
                     },
                     "organisationUnit": {
                         "id": "ou1"
@@ -240,7 +240,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d1"
                     },
                     "period": {
-                        "id": "2014W04"
+                        "id": "2014W4"
                     },
                     "organisationUnit": {
                         "id": "ou1"
@@ -257,7 +257,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d1"
                     },
                     "period": {
-                        "id": "2014W05"
+                        "id": "2014W5"
                     },
                     "organisationUnit": {
                         "id": "ou1"
@@ -272,7 +272,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                         "id": "d2"
                     },
                     "period": {
-                        "id": "2014W05"
+                        "id": "2014W5"
                     },
                     "organisationUnit": {
                         "id": "ou1"

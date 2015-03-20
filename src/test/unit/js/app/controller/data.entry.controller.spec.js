@@ -128,7 +128,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.$apply();
 
                 expect(scope.formTemplateUrl.indexOf("templates/partials/aggregate-data-entry.html?")).toEqual(0);
-                expect(scope.programsInCurrentModule).toBe(undefined);
+                expect(scope.programId).toBe(undefined);
             });
 
             it("should load the list-list entry template if current module contains line list porgrams", function() {
@@ -152,7 +152,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.$apply();
 
                 expect(scope.formTemplateUrl.indexOf("templates/partials/line-list-data-entry.html?")).toEqual(0);
-                expect(scope.programsInCurrentModule).toEqual('p1');
+                expect(scope.programId).toEqual('p1');
             });
 
             it("should load the data entry template if user is an approver and current module contains line list porgrams", function() {
@@ -176,7 +176,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.$apply();
 
                 expect(scope.formTemplateUrl.indexOf("templates/partials/aggregate-data-entry.html?")).toEqual(0);
-                expect(scope.programsInCurrentModule).toBe(undefined);
+                expect(scope.programId).toBe(undefined);
             });
 
             it("should not load the template only if module is undefined", function() {

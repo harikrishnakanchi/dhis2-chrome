@@ -67,10 +67,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                 for (var ouAndPeriod in originalDataGroupedByOuAndPeriod) {
                     if (mergedDataGroupedByOuAndPeriod[ouAndPeriod] && !areEqual(originalDataGroupedByOuAndPeriod[ouAndPeriod], mergedDataGroupedByOuAndPeriod[ouAndPeriod])) {
                         var firstDataValue = originalDataGroupedByOuAndPeriod[ouAndPeriod][0];
-                        var deleteFirstLevelApproval = approvalDataRepository.deleteLevelOneApproval(firstDataValue.period, firstDataValue.orgUnit);
-                        var deleteSecondLevelApproval = approvalDataRepository.deleteLevelTwoApproval(firstDataValue.period, firstDataValue.orgUnit);
-                        deleteApprovals.push(deleteFirstLevelApproval);
-                        deleteApprovals.push(deleteSecondLevelApproval);
+                        deleteApprovals.push(approvalDataRepository.invalidateApproval(firstDataValue.period, firstDataValue.orgUnit));
                     }
                 }
 

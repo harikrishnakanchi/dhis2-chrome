@@ -8,7 +8,7 @@ define(["dataRepository", "datasetRepository", "userPreferenceRepository", "appr
             app.service('datasetRepository', ['$indexedDB', '$q', datasetRepository]);
             app.service('orgUnitRepository', ['$indexedDB', 'datasetRepository', 'programRepository', '$q', orgUnitRepository]);
             app.service('userPreferenceRepository', ['$indexedDB', 'orgUnitRepository', userPreferenceRepository]);
-            app.service('approvalDataRepository', ['$indexedDB', approvalDataRepository]);
+            app.service('approvalDataRepository', ['$indexedDB', '$q', approvalDataRepository]);
             app.service('programEventRepository', ['$indexedDB', '$q', programEventRepository]);
             app.service('orgUnitGroupRepository', ['$indexedDB', orgUnitGroupRepository]);
             app.service('changeLogRepository', ['$indexedDB', changeLogRepository]);

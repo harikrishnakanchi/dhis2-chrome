@@ -1,73 +1,65 @@
 define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSections", "datasetTransformer"], function(_, moment, dhisId, properties, orgUnitMapper, groupSections, datasetTransformer) {
     return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepository,
-        orgUnitRepository, approvalHelper, approvalDataRepository, datasetRepository) {
+        orgUnitRepository, approvalDataRepository, datasetRepository) {
 
         var resetForm = function() {
             $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.showForm = false;
             $scope.showView = false;
+            $scope.showEditForm = false;
             $scope.dataValues = {};
             $scope.eventDates = {};
             $scope.minDateInCurrentPeriod = $scope.week.startOfWeek;
             $scope.maxDateInCurrentPeriod = $scope.week.endOfWeek;
-            if ($scope.form.eventDataEntryForm !== undefined)
+            if ($scope.form && $scope.form.eventDataEntryForm)
                 $scope.form.eventDataEntryForm.$setPristine();
         };
 
-        var loadPrograms = function(excludedDataElements) {
-            return programRepository.get($scope.programsInCurrentModule, excludedDataElements).then(function(program) {
-                $scope.program = program;
-                return $scope.program;
-            });
-
-        };
-        var getExcludedDataElements = function() {
-            return systemSettingRepository.get($scope.currentModule.id).then(function(data) {
-                return data && data.value ? data.value.dataElements : [];
-            });
-        };
-
-        var loadOptionSets = function() {
-            var store = db.objectStore("optionSets");
-            return store.getAll().then(function(opSets) {
-                $scope.optionSets = opSets;
-                return;
-            });
-        };
-
-        var setExcludedPropertyForDataElements = function(program) {
-            var loadSystemSettings = function() {
-                return systemSettingRepository.get($scope.currentModule.id).then(function(data) {
-                    return data && data.value ? data.value.dataElements : [];
-                });
-            };
-
-            var setDataElements = function(excludedDataElements) {
-                return programRepository.get(program.id, excludedDataElements);
-            };
-
-            return loadSystemSettings().then(setDataElements);
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
         };
 
         var getPeriod = function() {
             return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
         };
 
-        var reloadEventsView = function() {
-            $scope.allEvents = [];
-            programEventRepository.getEventsFor($scope.programsInCurrentModule, getPeriod(), $scope.currentModule.id).then(function(events) {
-                $scope.allEvents = $scope.allEvents.concat(events);
-            });
+        var showResultMessage = function(messageType, message) {
+            var hideMessage = function() {
+                $scope.resultMessageType = "";
+                $scope.resultMessage = "";
+            };
+
+            $scope.resultMessageType = messageType;
+            $scope.resultMessage = message;
+            $timeout(hideMessage, properties.messageTimeout);
+            scrollToTop();
         };
 
-        var showModal = function(okCallback, message) {
+        var confirmAndProceed = function(okCallback, message, showModal) {
+            if (showModal === false)
+                return $q.when(okCallback());
+
             $scope.modalMessage = message;
             var modalInstance = $modal.open({
                 templateUrl: 'templates/confirm.dialog.html',
                 controller: 'confirmDialogController',
                 scope: $scope
             });
-            modalInstance.result.then(okCallback);
+
+            return modalInstance.result
+                .then(function() {
+                    return okCallback();
+                }, function() {
+                    //burp on cancel
+                });
+        };
+
+        var reloadEventsView = function() {
+            $scope.allEvents = [];
+            return programEventRepository.getEventsFor($scope.programId, getPeriod(), $scope.currentModule.id).then(function(events) {
+                $scope.allEvents = $scope.allEvents.concat(events);
+            });
         };
 
         $scope.getEventDateNgModel = function(eventDates, programId, programStageId) {
@@ -105,11 +97,6 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             return options;
         };
 
-        var scrollToTop = function() {
-            $location.hash();
-            $anchorScroll();
-        };
-
         $scope.openNewForm = function() {
             resetForm();
             $scope.showForm = true;
@@ -118,6 +105,11 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
         $scope.closeNewForm = function() {
             resetForm();
             $scope.showView = true;
+        };
+
+        $scope.closeEditForm = function() {
+            $scope.showView = true;
+            $scope.showEditForm = false;
         };
 
         $scope.isDataEntryAllowed = function() {
@@ -131,20 +123,7 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             return false;
         };
 
-        var hideMessage = function() {
-            $scope.resultMessageType = "";
-            $scope.resultMessage = "";
-        };
-
         $scope.save = function(program, programStage, addAnother) {
-
-            var showResultMessage = function() {
-                $scope.resultMessageType = "success";
-                $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;
-                scrollToTop();
-
-                $timeout(hideMessage, properties.messageTimeout);
-            };
 
             var buildPayloadFromView = function() {
                 var formatValue = function(value) {
@@ -174,15 +153,14 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
 
             var newEventsPayload = buildPayloadFromView();
 
-            return programEventRepository.upsert(newEventsPayload)
-                .then(function() {
-                    showResultMessage();
-                    reloadEventsView();
-                    if (addAnother)
-                        $scope.openNewForm();
-                    else
-                        $scope.closeNewForm();
-                });
+            programEventRepository.upsert(newEventsPayload).then(function() {
+                showResultMessage("success", $scope.resourceBundle.eventSaveSuccess);
+                reloadEventsView();
+                if (addAnother)
+                    $scope.openNewForm();
+                else
+                    $scope.closeNewForm();
+            });
         };
 
         $scope.getFormattedDate = function(date) {
@@ -190,14 +168,6 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
         };
 
         $scope.update = function(programStage) {
-
-            var showResultMessage = function() {
-                $scope.resultMessageType = "success";
-                $scope.resultMessage = $scope.resourceBundle.eventSaveSuccess;
-                scrollToTop();
-
-                $timeout(hideMessage, properties.messageTimeout);
-            };
 
             var buildPayloadFromView = function() {
                 var formatValue = function(value) {
@@ -227,189 +197,159 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
 
             var newEventsPayload = buildPayloadFromView();
 
-            return programEventRepository.upsert(newEventsPayload)
-                .then(function() {
-                    showResultMessage();
-                    reloadEventsView();
-                    $scope.showView = true;
-                    $scope.includeEditForm = false;
-                });
+            programEventRepository.upsert(newEventsPayload).then(function() {
+                showResultMessage("success", $scope.resourceBundle.eventSaveSuccess);
+                reloadEventsView();
+                $scope.closeEditForm();
+            });
         };
 
-        var unapproveData = function(data) {
-            return approvalHelper.unapproveData($scope.currentModule.id, $scope.dataSetIds, getPeriod());
-        };
+        $scope.submit = function() {
+            var periodAndOrgUnit = {
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
+            };
 
+            var markEventsAsSubmitted = function() {
+                return programEventRepository.markEventsAsSubmitted($scope.programId, getPeriod(), $scope.currentModule.id);
+            };
 
-        var save = function(programId) {
-            var period = getPeriod();
-            var currentModule = $scope.currentModule.id;
+            var clearAnyExisingApprovals = function() {
+                return approvalDataRepository.clearApprovals(periodAndOrgUnit);
+            };
 
-            var saveToDhis = function() {
+            var publishToDhis = function() {
                 return $hustle.publish({
                     "type": "uploadProgramEvents"
                 }, "dataValues");
             };
 
-            return programEventRepository.markEventsAsSubmitted(programId, period, currentModule)
-                .then(unapproveData).then(saveToDhis).then(function(data) {
-                    return {
-                        "dataSets": $scope.dataSetIds,
-                        "period": period,
-                        "orgUnit": $scope.currentModule.id,
-                        "storedBy": $scope.currentUser.userCredentials.username
-                    };
-                });
-        };
+            var submit = function() {
+                return markEventsAsSubmitted()
+                    .then(clearAnyExisingApprovals)
+                    .then(publishToDhis);
+            };
 
-        var showResultMessage = function(messageType, message) {
-            $scope.resultMessageType = messageType;
-            $scope.resultMessage = message;
-            scrollToTop();
-            reloadEventsView();
-
-            $timeout(hideMessage, properties.messageTimeout);
-        };
-
-        var setUpIsApprovedFlag = function() {
-            approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
-                $scope.isCompleted = !_.isEmpty(data);
-            });
-
-            return approvalDataRepository.getLevelTwoApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
-                $scope.isApproved = !_.isEmpty(data) && data.isApproved;
+            var confirmationQuestion = $scope.resourceBundle.reapprovalConfirmationMessage;
+            var confirmIf = ($scope.isCompleted || $scope.isApproved);
+            confirmAndProceed(submit, confirmationQuestion, confirmIf).then(function() {
+                showResultMessage("success", $scope.resourceBundle.eventSubmitSuccess);
+                reloadEventsView();
             });
         };
 
-        $scope.submit = function(programId) {
-            setUpIsApprovedFlag().then(function() {
-                if ($scope.isCompleted || $scope.isApproved) {
-                    showModal(function() {
-                        save(programId).then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitSuccess));
-                    }, $scope.resourceBundle.reapprovalConfirmationMessage);
-                } else {
-                    save(programId).then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitSuccess));
-                }
-            });
-        };
+        $scope.submitAndApprove = function() {
+            var periodAndOrgUnit = {
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
+            };
 
-        $scope.submitAndApprove = function(programId) {
-            setUpIsApprovedFlag().then(function() {
-                if ($scope.isCompleted || $scope.isApproved) {
-                    showModal(function() {
-                        save(programId)
-                            .then(approvalHelper.markDataAsComplete)
-                            .then(approvalHelper.markDataAsAccepted)
-                            .then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitAndApproveSuccess));
-                    }, $scope.resourceBundle.reapprovalConfirmationMessage);
-                } else {
-                    save(programId)
-                        .then(approvalHelper.markDataAsComplete)
-                        .then(approvalHelper.markDataAsAccepted)
-                        .then(_.bind(showResultMessage, {}, "success", $scope.resourceBundle.eventSubmitAndApproveSuccess));
-                }
+            var markEventsAsSubmitted = function() {
+                return programEventRepository.markEventsAsSubmitted($scope.programId, getPeriod(), $scope.currentModule.id);
+            };
+
+            var markAsAccepted = function() {
+                var completedAndApprovedBy = $scope.currentUser.userCredentials.username;
+                return approvalDataRepository.markAsAccepted(periodAndOrgUnit, completedAndApprovedBy);
+            };
+
+            var publishToDhis = function() {
+                return $hustle.publish({
+                    "type": "uploadProgramEvents"
+                }, "dataValues");
+            };
+
+            var submitAndApprove = function() {
+                return markEventsAsSubmitted()
+                    .then(markAsAccepted)
+                    .then(publishToDhis);
+            };
+
+            var confirmationQuestion = $scope.resourceBundle.reapprovalConfirmationMessage;
+            var confirmIf = ($scope.isCompleted || $scope.isApproved);
+            confirmAndProceed(submitAndApprove, confirmationQuestion, confirmIf).then(function() {
+                showResultMessage("success", $scope.resourceBundle.eventSubmitAndApproveSuccess);
+                reloadEventsView();
             });
         };
 
         $scope.deleteEvent = function(event) {
+            var eventId = event.event;
 
-            var saveToDhis = function(data) {
+            var saveToDhis = function() {
                 return $hustle.publish({
-                    "data": data,
+                    "data": eventId,
                     "type": "deleteEvent"
                 }, "dataValues");
             };
 
+            var hardDelete = function() {
+                return programEventRepository.delete(eventId);
+            };
+
+            var softDelete = function() {
+                event.localStatus = "DELETED";
+                var eventsPayload = {
+                    'events': [event]
+                };
+
+                return programEventRepository.upsert(eventsPayload)
+                    .then(saveToDhis);
+            };
+
             var deleteOnConfirm = function() {
-                var eventId = event.event;
-
-                var hardDelete = function() {
-                    return programEventRepository.delete(eventId);
-                };
-
-                var softDelete = function() {
-                    event.localStatus = "DELETED";
-                    var eventsPayload = {
-                        'events': [event]
-                    };
-                    return programEventRepository.upsert(eventsPayload).then(function() {
-                        return saveToDhis(eventId).then(unapproveData);
-                    });
-                };
-
                 var deleteFunction = event.localStatus === "NEW_DRAFT" ? hardDelete : softDelete;
-
                 return deleteFunction.apply().then(function() {
-                    $scope.allEvents.splice(_.indexOf($scope.allEvents, event), 1);
-                    $scope.deleteSuccess = true;
-                    $timeout(function() {
-                        $scope.deleteSuccess = false;
-                    }, properties.messageTimeout);
+                    showResultMessage("success", $scope.resourceBundle.eventDeleteSuccess);
+                    reloadEventsView();
                 });
             };
 
-            showModal(deleteOnConfirm, $scope.resourceBundle.deleteEventConfirmation);
+            confirmAndProceed(deleteOnConfirm, $scope.resourceBundle.deleteEventConfirmation);
         };
 
         $scope.setUpViewOrEditForm = function(eventId) {
-            var getAllEvents = function() {
-                return programEventRepository.getAll();
+            var getEvent = function() {
+                return programEventRepository.getEvent(eventId);
             };
 
-            var setUpEvent = function(eventData) {
-                var getProgramInfoNgModel = function(programId) {
-                    return programRepository.get(programId);
-                };
+            var getDataElementValues = function(eventToBeEdited) {
+                var dataValueHash = {};
 
-                var eventToBeEdited = _.find(eventData, {
-                    'event': eventId
-                });
-
-                return getProgramInfoNgModel(eventToBeEdited.program).then(function(program) {
-                    eventToBeEdited.eventDate = new Date(eventToBeEdited.eventDate);
-                    setExcludedPropertyForDataElements(program).then(function(modifiedProgram) {
-                        eventToBeEdited.program = modifiedProgram;
-                        eventToBeEdited.dataElementValues = getDataElementValues(eventToBeEdited);
-                        $scope.eventToBeEdited = _.cloneDeep(eventToBeEdited);
-                        return;
-                    });
-
-                });
-            };
-            $scope.showView = false;
-            $scope.includeEditForm = true;
-            $scope.formTemplateUrl = "templates/partials/edit-event.html" + '?' + moment().format("X");
-            return loadOptionSets().then(getAllEvents).then(setUpEvent);
-        };
-
-        $scope.closeEditForm = function() {
-            $scope.showView = true;
-            $scope.includeEditForm = false;
-        };
-
-        var getDataElementValues = function(eventToBeEdited) {
-            var dataValueHash = {};
-
-            _.forEach(eventToBeEdited.program.programStages, function(programStage) {
-                _.forEach(programStage.programStageSections, function(programStageSection) {
-                    _.forEach(programStageSection.programStageDataElements, function(de) {
-                        var dataElementId = de.dataElement.id;
-                        var dataElementAttribute = _.find(eventToBeEdited.dataValues, {
-                            "dataElement": dataElementId
-                        });
-                        if (!_.isEmpty(dataElementAttribute)) {
-                            if (de.dataElement.type === "date") {
-                                dataValueHash[dataElementId] = new Date(dataElementAttribute.value);
-                            } else if (de.dataElement.type === "int") {
-                                dataValueHash[dataElementId] = parseInt(dataElementAttribute.value);
-                            } else {
-                                dataValueHash[dataElementId] = dataElementAttribute.value;
+                _.forEach(eventToBeEdited.program.programStages, function(programStage) {
+                    _.forEach(programStage.programStageSections, function(programStageSection) {
+                        _.forEach(programStageSection.programStageDataElements, function(de) {
+                            var dataElementId = de.dataElement.id;
+                            var dataElementAttribute = _.find(eventToBeEdited.dataValues, {
+                                "dataElement": dataElementId
+                            });
+                            if (!_.isEmpty(dataElementAttribute)) {
+                                if (de.dataElement.type === "date") {
+                                    dataValueHash[dataElementId] = new Date(dataElementAttribute.value);
+                                } else if (de.dataElement.type === "int") {
+                                    dataValueHash[dataElementId] = parseInt(dataElementAttribute.value);
+                                } else {
+                                    dataValueHash[dataElementId] = dataElementAttribute.value;
+                                }
                             }
-                        }
+                        });
                     });
                 });
-            });
-            return dataValueHash;
+                return dataValueHash;
+            };
+
+            var setUpEventInScope = function(event) {
+                event.eventDate = new Date(event.eventDate);
+                event.program = $scope.program;
+                event.dataElementValues = getDataElementValues(event);
+                $scope.eventToBeEdited = _.cloneDeep(event);
+            };
+
+            $scope.showView = false;
+            $scope.showEditForm = true;
+            $scope.formTemplateUrl = "templates/partials/edit-event.html" + '?' + moment().format("X");
+
+            getEvent().then(setUpEventInScope);
         };
 
         $scope.$watch('eventDataEntryForm', function(eventDataEntryForm) {
@@ -418,23 +358,30 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             }
         });
 
-        var getAll = function(storeName) {
-            var store = db.objectStore(storeName);
-            return store.getAll();
-        };
-
         var init = function() {
-            var setUpNewForm = function() {
-                $scope.form = {};
-                $scope.loading = true;
-                resetForm();
-                $scope.showView = true;
-                reloadEventsView();
-                getExcludedDataElements().then(loadPrograms)
-                    .then(setExcludedPropertyForDataElements)
-                    .then(loadOptionSets);
-                $scope.loading = false;
-                $scope.includeEditForm = false;
+
+            var loadPrograms = function() {
+                var getExcludedDataElementsForModule = function() {
+                    return systemSettingRepository.get($scope.currentModule.id).then(function(data) {
+                        return data && data.value ? data.value.dataElements : [];
+                    });
+                };
+
+                var getProgram = function(excludedDataElements) {
+                    return programRepository.get($scope.programId, excludedDataElements);
+                };
+
+                return getExcludedDataElementsForModule().then(getProgram).then(function(program) {
+                    $scope.program = program;
+                    return program;
+                });
+            };
+
+            var loadOptionSets = function() {
+                var store = db.objectStore("optionSets");
+                return store.getAll().then(function(opSets) {
+                    $scope.optionSets = opSets;
+                });
             };
 
             var setUpProjectAutoApprovedFlag = function() {
@@ -444,18 +391,32 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                 });
             };
 
-            var getAllAssociatedDataSets = function() {
-                return datasetRepository.getAllForOrgUnit($scope.currentModule.id);
+            var setUpIsApprovedFlag = function() {
+                var l1Promise = approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                    $scope.isCompleted = !_.isEmpty(data);
+                });
+
+                var l2Promise = approvalDataRepository.getLevelTwoApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                    $scope.isApproved = !_.isEmpty(data) && data.isApproved;
+                });
+
+                return $q.all([l1Promise, l2Promise]);
             };
 
-            setUpNewForm();
-            $scope.loading = true;
+            var loadAssociatedDataSets = function() {
+                return datasetRepository.getAllForOrgUnit($scope.currentModule.id).then(function(dataSets) {
+                    $scope.dataSetIds = _.pluck(dataSets, "id");
+                });
+            };
 
-            setUpProjectAutoApprovedFlag().then(setUpIsApprovedFlag).then(getAllAssociatedDataSets).then(function(dataSets) {
-                $scope.dataSetIds = _.pluck(dataSets, "id");
-            }).finally(function() {
-                $scope.loading = false;
-            });
+            resetForm();
+            $scope.form = {};
+            $scope.loading = true;
+            $q.all([reloadEventsView(), loadPrograms(), loadOptionSets(), setUpProjectAutoApprovedFlag(), setUpIsApprovedFlag(), loadAssociatedDataSets()])
+                .finally(function() {
+                    $scope.loading = false;
+                    $scope.showView = true;
+                });
         };
 
         init();

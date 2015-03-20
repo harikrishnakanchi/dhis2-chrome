@@ -12,10 +12,10 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 if ($scope.week && $scope.currentModule) {
                     programRepository.getProgramForOrgUnit($scope.currentModule.id).then(function(program) {
                         if (_.isEmpty(program) || !isDataEntryUser($rootScope.currentUser)) {
-                            $scope.programsInCurrentModule = undefined;
+                            $scope.programId = undefined;
                             $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
                         } else {
-                            $scope.programsInCurrentModule = program.id;
+                            $scope.programId = program.id;
                             $scope.formTemplateUrl = "templates/partials/line-list-data-entry.html" + '?' + moment().format("X");
                         }
                     });

@@ -32,8 +32,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "getLevelTwoApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getLevelTwoApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
                     "saveLevelOneApproval": jasmine.createSpy("saveLevelOneApproval"),
                     "saveLevelTwoApproval": jasmine.createSpy("saveLevelTwoApproval"),
-                    "deleteLevelOneApproval": jasmine.createSpy("deleteLevelOneApproval"),
-                    "deleteLevelTwoApproval": jasmine.createSpy("deleteLevelTwoApproval")
+                    "invalidateApproval": jasmine.createSpy("invalidateApproval")
                 };
 
                 dataService = {
@@ -247,7 +246,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "value": "4"
                 }];
 
-                expect(approvalDataRepository.deleteLevelTwoApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
+                expect(approvalDataRepository.invalidateApproval).toHaveBeenCalledWith('2014W12', 'MSF_0');
                 expect(dataRepository.saveDhisData).toHaveBeenCalledWith(expectedDataConsumer);
             });
 
@@ -299,8 +298,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 downloadDataConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.deleteLevelOneApproval).not.toHaveBeenCalled();
-                expect(approvalDataRepository.deleteLevelTwoApproval).not.toHaveBeenCalled();
+                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalled();
                 expect(dataRepository.saveDhisData).toHaveBeenCalledWith(dhisDataValues);
             });
         });

@@ -1,4 +1,4 @@
-define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datasetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5", "moment", "indexedDBLogger"], function(DashboardController, mocks, utils, ApprovalHelper, DatasetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5, moment, indexedDBLogger) {
+define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datasetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5", "moment", "indexedDBLogger", "approvalDataRepository"], function(DashboardController, mocks, utils, ApprovalHelper, DatasetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5, moment, indexedDBLogger, ApprovalDataRepository) {
     describe("dashboard controller", function() {
         var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, datasetRepository, filesystemService, indexeddbUtils, idbDump, sessionHelper, location;
 
@@ -11,6 +11,8 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             rootScope = $rootScope;
             timeout = $timeout;
             location = $location;
+
+            approvalDataRepository = new ApprovalDataRepository();
 
             var allDatasets = [{
                 "id": "DS1",
@@ -69,7 +71,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30 12:43:54"));
 
-            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, datasetRepository, fakeModal, timeout, indexeddbUtils, filesystemService, sessionHelper, location);
+            dashboardController = new DashboardController(scope, hustle, q, rootScope, approvalHelper, datasetRepository, fakeModal, timeout, indexeddbUtils, filesystemService, sessionHelper, location, approvalDataRepository);
         }));
 
         afterEach(function() {
@@ -250,7 +252,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         });
 
         it("should approve selected items", function() {
-            spyOn(approvalHelper, "markDataAsComplete");
+            spyOn(approvalDataRepository, "markAsComplete").and.returnValue(utils.getPromise(q, {}));
             scope.resourceBundle = {
                 "dataApprovalConfirmationMessage": "mssg"
             };
@@ -326,6 +328,17 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
                 }
             };
 
+            var expectedUpserts = [{
+                "period": "2014W18",
+                "orgUnit": "123"
+            }, {
+                "period": "2014W17",
+                "orgUnit": "456"
+            }, {
+                "period": "2014W18",
+                "orgUnit": "456"
+            }];
+
             scope.userApprovalLevel = 1;
             scope.itemsAwaitingApprovalAtOtherLevels = [];
 
@@ -334,7 +347,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             scope.$apply();
             timeout.flush();
 
-            expect(approvalHelper.markDataAsComplete).toHaveBeenCalled();
+            expect(approvalDataRepository.markAsComplete).toHaveBeenCalledWith(expectedUpserts, "prj_approver_l1");
             expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
             expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual(expectedItemsAwaitingApprovalAtOtherLevels);
         });

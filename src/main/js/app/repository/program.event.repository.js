@@ -16,11 +16,9 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             });
         };
 
-        this.getAll = function() {
+        this.getEvent = function(eventId) {
             var store = db.objectStore("programEvents");
-            return store.getAll().then(function(allEvents) {
-                return allEvents;
-            });
+            return store.find(eventId);
         };
 
         this.getEventsFromPeriod = function(startPeriod, orgUnitIds) {

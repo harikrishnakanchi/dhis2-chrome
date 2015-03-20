@@ -11,8 +11,8 @@ define(["lodash"], function(_) {
                     return downloadMetadataConsumer.run(message);
 
                 case "downloadData":
-                    return downloadDataConsumer.run(message)
-                        .then(_.partial(downloadApprovalConsumer.run, message));
+                    return downloadDataConsumer.run(message);
+                        // .then(_.partial(downloadApprovalConsumer.run, message));
 
                 case "uploadDataValues":
                     return downloadDataConsumer.run(message)
