@@ -69,7 +69,20 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
             it("should initialize modules", function() {
                 var modules = [{
-                    'id': 'mod1'
+                    'id': 'mod1',
+                    'name': 'mod1',
+                    'parent': {
+                        'name': 'op1'
+                    }
+                }];
+
+                var expectedModules = [{
+                    'id': 'mod1',
+                    'name': 'mod1',
+                    'displayName': 'op1 - mod1',
+                    'parent': {
+                        'name': 'op1'
+                    }
                 }];
 
                 orgUnitRepository = new OrgUnitRepository();
@@ -78,7 +91,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
 
-                expect(scope.modules).toEqual(modules);
+                expect(scope.modules).toEqual(expectedModules);
             });
 
             it("should set initial values for modules and week from route params", function() {
