@@ -497,7 +497,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
 
             expect(indexedDBLogger.exportLogs).toHaveBeenCalled();
             expect(new Blob()).toEqual(jasmine.any(Blob));
-            expect(filesystemService.writeFile).toHaveBeenCalledWith('logs.zip', jasmine.any(Blob));
+            expect(filesystemService.writeFile).toHaveBeenCalledWith('logs_20140530-124354.zip', jasmine.any(Blob));
 
             expect(scope.showMessage).toBeTruthy();
         });

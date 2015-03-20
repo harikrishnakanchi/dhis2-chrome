@@ -199,7 +199,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                 return backupCallback().then(function(data) {
                     $scope.cloning = false;
                     var zippedData = zipUtils.zipData("logs", "log_", ".log", data);
-                    return filesystemService.writeFile("logs.zip", zippedData);
+                    return filesystemService.writeFile("logs_" + moment().format("YYYYMMDD-HHmmss") + ".zip", zippedData);
                 }).finally(function() {
                     $scope.cloning = false;
                 });
