@@ -286,6 +286,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
             });
             module.selectedDataset = undefined;
+            $scope.selectedDataset = undefined;
         };
 
         $scope.isAfterMaxDate = function() {
