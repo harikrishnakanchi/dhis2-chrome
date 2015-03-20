@@ -69,8 +69,12 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle',
-                function(dhisMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle) {
+            app.run(['dhisMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document',
+                function(dhisMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document) {
+
+                    $document.on('keydown', function(e) {
+                        disableBackspaceKey(e);
+                    });
 
                     $hustle.registerInterceptor(queuePostProcessInterceptor);
 
@@ -104,6 +108,23 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                 }
             ]);
             return app;
+        };
+
+        var disableBackspaceKey = function(event) {
+            var shouldPrevent = false;
+
+            if (event.keyCode === 8) {
+                var srcElement = event.srcElement || event.target;
+                if (srcElement.tagName.toUpperCase() === "INPUT" || srcElement.tagName.toUpperCase() === "TEXTAREA" || srcElement.tagName.toUpperCase() === "SELECT") {
+                    shouldPrevent = srcElement.readOnly || srcElement.disabled;
+                } else {
+                    shouldPrevent = true;
+                }
+            }
+
+            if (shouldPrevent) {
+                event.preventDefault();
+            }
         };
 
         var bootstrap = function(app) {
