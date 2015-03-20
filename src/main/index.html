@@ -19,7 +19,6 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#/dashboard" ng-if="currentUser">Home</a>
                     </li>
-
                     <li>
                         <p class="navbar-text" ng-show="isDhisOnline" id="loggedInUser"> <span class="online">{{currentUser.userCredentials.username}}</span> </p>
                     </li>
@@ -33,12 +32,11 @@
                             <option dir="rtl" lang="ar" value="ar">العربية</option>
                         </select>
                     </li>
-
                     <li ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a>
                     </li>
                 </ul>
             </div>
-            <div class="container">
+            <div class="container" ng-hide="true">
                 <ul class="nav navbar-nav navbar-right">
                     <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Superuser']))">
                         <select name="project" class="select_project input-sm" ng-model="currentUserProject" ng-options="getFormattedOption(p) for p in projects | orderBy:getFormattedOption" ng-change="saveUser()">
@@ -55,7 +53,6 @@
             </div>
         </div>
     </div>
-
 </body>
 
 </html>

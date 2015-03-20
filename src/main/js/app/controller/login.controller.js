@@ -51,11 +51,7 @@ define(["md5", "lodash"], function(md5, _) {
                     .then(saveUserPreferences)
                     .then(downloadDataValues)
                     .then(function() {
-                        if (_.isEmpty($rootScope.currentUser.organisationUnits)) {
-                            $location.path("/selectproject");
-                        } else {
-                            $location.path("/dashboard");
-                        }
+                        $location.path("/dashboard");
                     });
             }
         };

@@ -97,34 +97,6 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             }, "dataValues");
         });
 
-
-        it("should login admin user with valid credentials and redirect to select project page if no project present", function() {
-            scope.username = "MSFAdmin";
-            scope.password = "password";
-            fakeUserStoreSpy.and.callFake(function(username) {
-                return utils.getPromise(q, {
-                    "id": "xYRvx4y7Gm9",
-                    "userCredentials": {
-                        "username": username
-                    }
-                });
-            });
-
-            scope.login();
-            scope.$apply();
-
-            expect(rootScope.isLoggedIn).toEqual(true);
-            expect(location.path).toHaveBeenCalledWith("/selectproject");
-            expect(userPreferenceRepository.save).toHaveBeenCalledWith({
-                username: "msfadmin",
-                locale: undefined,
-                orgUnits: []
-            });
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "downloadData"
-            }, "dataValues");
-        });
-
         it("should not login msfadmin user with invalid password", function() {
             scope.username = "msfadmin";
             scope.password = "password1234";
