@@ -5,7 +5,6 @@
         <a id="linkToDataApproval" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])" href="#/data-entry" class="btn btn-default">{{ resourceBundle.approveDataLabel }}</a>
         <a id="linkToProjects" ng-if="hasRoles(['Superuser'])" href="#/projects" class="btn btn-default">{{ resourceBundle.projectsLabel }}</a>
         <a id="linkToDownloadData" ng-if="hasRoles(['Superuser', 'Data entry user', 'Project Level Approver', 'Coordination Level Approver'])" href="" ng-click="syncNow()" class="btn btn-default">{{ resourceBundle.downloadDataLabel }}</a>
-
         <div class="btn-group" dropdown is-open="status.isopen">
             <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle ng-disabled="disabled">
                 {{resourceBundle.importExportMenuLabel}} <span class="caret"></span>
@@ -21,11 +20,9 @@
                 </li>
             </ul>
         </div>
-
         <div class="loading" ng-show="cloning">
             <img src="img/ajax-loader.gif" class="spinner" />
         </div>
-
         <span ng-show="showMessage" class="{{messageClass}} download-msg-alert">{{message}}</span>
     </div>
     <div>
@@ -49,7 +46,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="item in itemsAwaitingApprovalAtUserLevel">
+                        <tr ng-repeat="item in itemsAwaitingApprovalAtUserLevel | orderBy:'moduleName'">
                             <td>{{item.moduleName}}</td>
                             <td>
                                 <ul>
@@ -79,7 +76,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="item in itemsAwaitingSubmission">
+                        <tr ng-repeat="item in itemsAwaitingSubmission | orderBy:'moduleName'">
                             <td>{{item.moduleName}}</td>
                             <td>
                                 <ul>
@@ -92,7 +89,6 @@
                         </tr>
                     </tbody>
                 </table>
-
                 <table class="table table-bordered msf-table" ng-if="itemsAwaitingApprovalAtOtherLevels.length > 0">
                     <caption class="msf-table-caption" ng-if="userApprovalLevel">{{resourceBundle.itemsAwaitingApprovalAtOtherLevelLabel}}</caption>
                     <caption class="msf-table-caption" ng-if="!userApprovalLevel">{{resourceBundle.itemsAwaitingApproval}}</caption>
@@ -104,7 +100,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="item in itemsAwaitingApprovalAtOtherLevels">
+                        <tr ng-repeat="item in itemsAwaitingApprovalAtOtherLevels | orderBy:'moduleName'">
                             <td>{{item.moduleName}}</td>
                             <td>
                                 <ul>
@@ -124,7 +120,6 @@
                         </tr>
                     </tbody>
                 </table>
-
             </form>
         </div>
     </div>
