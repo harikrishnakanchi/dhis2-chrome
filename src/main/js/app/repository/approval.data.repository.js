@@ -85,6 +85,16 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 .then(filterApprovals);
         };
 
+        this.getApprovalData = function(period, orgUnitId, shouldFilterSoftDeletes) {
+            var filterSoftDeletedApprovals = function(d) {
+                return shouldFilterSoftDeletes && d && d.status === "DELETED" ? undefined : d;
+            };
+
+            var store = db.objectStore('approvals');
+            return store.find([dateUtils.getFormattedPeriod(period), orgUnitId])
+                .then(filterSoftDeletedApprovals);
+        };
+
         this.getLevelOneApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
             var store = db.objectStore('approvals');
             var query = db.queryBuilder().$between(dateUtils.getFormattedPeriod(startPeriod), dateUtils.getFormattedPeriod(endPeriod)).$index("by_period").compile();
@@ -126,11 +136,11 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
 
         this.markAsApproved = function(periodsAndOrgUnits, approvedBy) {
             periodsAndOrgUnits = _.isArray(periodsAndOrgUnits) ? periodsAndOrgUnits : [periodsAndOrgUnits];
-            var store = db.objectStore("approvals");
 
             var getExistingApprovals = function() {
                 var periods = _.uniq(_.pluck(periodsAndOrgUnits, "period"));
-                var query = db.queryBuilder().$in(periods).compile();
+                var query = db.queryBuilder().$index("by_period").$in(periods).compile();
+                var store = db.objectStore("approvals");
                 return store.each(query).then(function(allApprovalsForPeriods) {
                     return _.transform(periodsAndOrgUnits, function(acc, periodAndOrgUnit) {
                         var matchingApprovals = _.filter(allApprovalsForPeriods, {
@@ -155,9 +165,14 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 });
             };
 
+            var saveToIdb = function(approvals){
+                var store = db.objectStore("approvals");
+                store.upsert(approvals);
+            };
+
             return getExistingApprovals()
                 .then(updateThemAsApproved)
-                .then(store.upsert);
+                .then(saveToIdb);
         };
 
         this.markAsAccepted = function(periodsAndOrgUnits, acceptedBy) {
@@ -167,7 +182,7 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
 
             var getExistingApprovals = function() {
                 var periods = _.uniq(_.pluck(periodsAndOrgUnits, "period"));
-                var query = db.queryBuilder().$in(periods).compile();
+                var query = db.queryBuilder().$index("by_period").$in(periods).compile();
                 return store.each(query).then(function(allApprovalsForPeriods) {
                     return _.transform(periodsAndOrgUnits, function(acc, periodAndOrgUnit) {
                         var matchingApprovals = _.filter(allApprovalsForPeriods, {

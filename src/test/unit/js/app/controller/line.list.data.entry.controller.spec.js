@@ -180,8 +180,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, project));
-                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {}));
-                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {}));
                 spyOn(datasetRepository, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, [{
                     "id": "Vacc"
                 }]));
@@ -205,10 +204,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
                 approvalDataRepository = new ApprovalDataRepository();
-                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {
-                    "key": "value"
-                }));
-                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {
+
+                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {
+                    'isComplete': true,
                     'isApproved': true
                 }));
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
@@ -526,10 +524,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             it("should warn the user when data will have to be reapproved", function() {
                 scope.programId = "Prg1";
                 approvalDataRepository = new ApprovalDataRepository();
-                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {
-                    "key": "value"
-                }));
-                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {
+                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {
+                    'isComplete': true,
                     'isApproved': true
                 }));
                 spyOn(fakeModal, "open").and.returnValue({
@@ -597,10 +593,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
             it("should warn the user if data is to be re-approved automatically", function() {
                 approvalDataRepository = new ApprovalDataRepository();
-                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {
-                    "key": "value"
-                }));
-                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {
+                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {
+                    'isComplete': true,
                     'isApproved': true
                 }));
                 spyOn(fakeModal, "open").and.returnValue({

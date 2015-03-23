@@ -346,11 +346,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     $scope.projectIsAutoApproved = (project.autoApprove === "true");
                 });
 
-                approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
-                    $scope.isCompleted = !_.isEmpty(data);
-                });
-
-                approvalDataRepository.getLevelTwoApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                approvalDataRepository.getApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                    $scope.isCompleted = !_.isEmpty(data) && data.isComplete;
                     $scope.isApproved = !_.isEmpty(data) && data.isApproved;
                     $scope.isAccepted = !_.isEmpty(data) && data.isAccepted;
                 });

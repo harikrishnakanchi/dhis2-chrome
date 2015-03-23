@@ -392,15 +392,11 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             };
 
             var setUpIsApprovedFlag = function() {
-                var l1Promise = approvalDataRepository.getLevelOneApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
-                    $scope.isCompleted = !_.isEmpty(data);
-                });
-
-                var l2Promise = approvalDataRepository.getLevelTwoApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                return approvalDataRepository.getApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                    $scope.isCompleted = !_.isEmpty(data) && data.isComplete;
                     $scope.isApproved = !_.isEmpty(data) && data.isApproved;
+                    $scope.isAccepted = !_.isEmpty(data) && data.isAccepted;
                 });
-
-                return $q.all([l1Promise, l2Promise]);
             };
 
             var loadAssociatedDataSets = function() {

@@ -107,7 +107,7 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 status: 'DELETED'
             }));
 
-            approvalDataRepository.getLevelOneApprovalData('period', 'orgUnitId', true).then(function(data) {
+            approvalDataRepository.getApprovalData('period', 'orgUnitId', true).then(function(data) {
                 expect(data).toBeUndefined();
             });
 
@@ -119,7 +119,7 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 period: '2014W05'
             }));
 
-            approvalDataRepository.getLevelOneApprovalData('2014W5', 'orgUnitId');
+            approvalDataRepository.getApprovalData('2014W5', 'orgUnitId');
 
             expect(db.objectStore).toHaveBeenCalledWith("approvals");
             expect(mockStore.find).toHaveBeenCalledWith(['2014W05', 'orgUnitId']);
