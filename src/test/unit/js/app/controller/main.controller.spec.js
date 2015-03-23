@@ -14,6 +14,15 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 metadataImporter = new MetadataImporter();
                 sessionHelper = new SessionHelper();
 
+                chrome.storage = {
+                    "local": {
+                        "set": function() {
+                        }
+                    }
+                };
+
+                spyOn(chrome.storage.local,"set").and.returnValue(utils.getPromise(q,{}));
+
                 i18nResourceBundle = {
                     get: function() {}
                 };
@@ -203,6 +212,11 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 location.path("/somethingelse");
 
                 expect(scope.canChangeProject(false, true)).toBeFalsy();
+            });
+
+            it("should set auth header on local storage", function(){
+
+                expect(chrome.storage.local.set).toHaveBeenCalled();
             });
         });
     });

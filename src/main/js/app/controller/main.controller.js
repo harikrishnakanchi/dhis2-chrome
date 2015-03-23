@@ -84,6 +84,12 @@ define(["lodash"], function(_) {
             }).then(assignCurrentProject);
         };
 
+        var setAuthHeader = function() {
+            chrome.storage.local.set({
+                "auth_header": "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA=="
+            });
+        };
+
         $rootScope.$watch("currentUser.organisationUnits", function() {
             resetProjects();
         }, true);
@@ -99,6 +105,7 @@ define(["lodash"], function(_) {
         $rootScope.$on('resetProjects', resetProjects);
 
         var init = function() {
+            setAuthHeader();
             metadataImporter.run().then(resetProjects);
         };
 

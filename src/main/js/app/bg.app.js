@@ -7,7 +7,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             repositories.init(app);
             monitors.init(app);
 
-            app.factory('configureRequestInterceptor', [configureRequestInterceptor]);
+            app.factory('configureRequestInterceptor', ['$q', configureRequestInterceptor]);
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', handleTimeoutInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);

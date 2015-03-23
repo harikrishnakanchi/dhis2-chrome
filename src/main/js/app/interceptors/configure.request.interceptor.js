@@ -1,13 +1,21 @@
 define(["properties"], function(properties) {
-    return function() {
+    return function($q) {
+        var checkAndProceed = function(config) {
+            var deferred = $q.defer();
+            if (config.url.indexOf(properties.dhis.url) === 0) {
+                chrome.storage.local.get("auth_header", function(result) {
+                    deferred.resolve(result.auth_header);
+                });
+                return deferred.promise;
+            }
+        };
         return {
             'request': function(config) {
                 config.timeout = properties.http.timeout;
-                if (config.url.indexOf(properties.dhis.url) === 0) {
-                    config.headers.Authorization = properties.dhis.auth_header;
-                }
-
-                return config;
+                return checkAndProceed(config).then(function(data) {
+                    config.headers.Authorization = data;
+                    return config;
+                });
             }
         };
     };
