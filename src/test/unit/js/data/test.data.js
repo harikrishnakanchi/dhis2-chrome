@@ -13,11 +13,6 @@ define(["lodash"], function(_) {
                 "code": "isNewDataModel",
             },
             "value": "false"
-        }],
-        "sections": [{
-            "id": "Sec1"
-        }, {
-            "id": "Sec2"
         }]
     }, {
         "name": "Vaccination",
@@ -32,9 +27,6 @@ define(["lodash"], function(_) {
                 "code": "isNewDataModel",
             },
             "value": "true"
-        }],
-        "sections": [{
-            "id": "Sec3"
         }]
     }, {
         "name": "Geographic Origin",
@@ -51,9 +43,6 @@ define(["lodash"], function(_) {
                 "code": "isNewDataModel",
             },
             "value": "true"
-        }],
-        "sections": [{
-            "id": "Origin"
         }]
     }];
 

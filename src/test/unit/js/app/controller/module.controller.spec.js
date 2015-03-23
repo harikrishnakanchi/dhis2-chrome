@@ -271,11 +271,6 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                         code: 'isNewDataModel'
                     },
                     value: 'false'
-                }],
-                sections: [{
-                    "id": "Sec1"
-                }, {
-                    "id": "Sec2"
                 }]
             }];
 
