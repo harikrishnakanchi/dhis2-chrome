@@ -65,5 +65,18 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeRunt
                 "requestId": "1"
             });
         });
+
+        it('should return false for retry if job type is blacklisted for retrial', function() {
+            var actualResult = queuePostProcessInterceptor.shouldRetry({
+                "id": 1,
+                "data": {
+                    "type": "downloadMetadata",
+                    "requestId": "1"
+                },
+                "releases": properties.queue.maxretries - 2
+            }, {});
+
+            expect(actualResult).toBeFalsy();
+        });
     });
 });

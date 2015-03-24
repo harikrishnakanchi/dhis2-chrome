@@ -5,7 +5,9 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "sync": {
                 "intervalInMinutes": 720,
             },
-            "types": ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements", "sections", "organisationUnitLevels", "users", "programStages", "optionSets", "indicators", "translations"]
+            "types": ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements",
+                "sections", "organisationUnitLevels", "users", "programStages", "optionSets", "indicators", "translations"
+            ]
         },
         "http": {
             "timeout": 60000
@@ -26,6 +28,9 @@ define(['lodash', 'overrides'], function(_, overrides) {
         "queue": {
             "maxretries": 5,
             "delay": 100,
+            "skipRetryMessages": ["downloadMetadata", "downloadData", "downloadOrgUnit", "downloadOrgUnitGroups", "downloadDatasets",
+                "downloadProgram", "downloadEventData", "downloadSystemSetting", "downloadPatientOriginDetails"
+            ],
             "retryDelayConfig": {
                 0: 15000,
                 1: 15000,
