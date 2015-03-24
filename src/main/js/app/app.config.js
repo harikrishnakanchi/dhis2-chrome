@@ -52,6 +52,7 @@ require.config({
         "selectProjectController": "app/controller/select.project.controller",
         "indicatorController": "app/controller/indicator.controller",
         "patientOriginController": "app/controller/patient.origin.controller",
+        "productKeyController": "app/controller/product.key.controller",
 
         //Services
         "services": "app/service/services",

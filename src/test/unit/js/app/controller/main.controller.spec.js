@@ -16,12 +16,13 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
 
                 chrome.storage = {
                     "local": {
-                        "set": function() {
+                        "get": function(key, callBack) {
+                            callBack({
+                                "auth_header": "Basic Auth"
+                            });
                         }
                     }
                 };
-
-                spyOn(chrome.storage.local,"set").and.returnValue(utils.getPromise(q,{}));
 
                 i18nResourceBundle = {
                     get: function() {}
@@ -74,7 +75,7 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 getAllProjectsSpy = spyOn(orgUnitRepository, "getAllProjects");
                 getAllProjectsSpy.and.returnValue(utils.getPromise(q, []));
 
-                mainController = new MainController(scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
+                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
                     userRepository, metadataImporter, sessionHelper);
             }));
 
@@ -84,7 +85,7 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 }];
 
                 getAllProjectsSpy.and.returnValue(utils.getPromise(q, projectList));
-                mainController = new MainController(scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
+                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
                     userRepository, metadataImporter, sessionHelper);
                 scope.$apply();
 
@@ -214,9 +215,27 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 expect(scope.canChangeProject(false, true)).toBeFalsy();
             });
 
-            it("should set auth header on local storage", function(){
+            it("should redirect to product key page", function() {
+                spyOn(location, "path");
 
-                expect(chrome.storage.local.set).toHaveBeenCalled();
+                chrome.storage.local.get = function(key, callBack) {
+                    callBack({});
+                };
+                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
+                    userRepository, metadataImporter, sessionHelper);
+
+                scope.$apply();
+
+                expect(location.path).toHaveBeenCalledWith("/productKeyPage");
+            });
+
+            it("should set auth header on local storage", function() {
+                spyOn(location, "path");
+
+                scope.$apply();
+
+                expect(rootScope.auth_header).toEqual("Basic Auth");
+                expect(location.path).toHaveBeenCalledWith("/login");
             });
         });
     });

@@ -7,7 +7,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             repositories.init(app);
             monitors.init(app);
 
-            app.factory('configureRequestInterceptor', ['$q', configureRequestInterceptor]);
+            app.factory('configureRequestInterceptor', ['$rootScope', configureRequestInterceptor]);
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', handleTimeoutInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
@@ -31,8 +31,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 }
             ]);
 
-            app.run(['consumerRegistry', 'dhisMonitor', 'queuePostProcessInterceptor', '$hustle', '$log',
-                function(consumerRegistry, dhisMonitor, queuePostProcessInterceptor, $hustle, $log) {
+            app.run(['consumerRegistry', 'dhisMonitor', 'queuePostProcessInterceptor', '$hustle', '$log', '$rootScope',
+                function(consumerRegistry, dhisMonitor, queuePostProcessInterceptor, $hustle, $log, $rootScope) {
 
                     $hustle.registerInterceptor(queuePostProcessInterceptor);
 
@@ -93,18 +93,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         }, "dataValues");
                     };
 
-                    chrome.alarms.create('metadataSyncAlarm', {
-                        periodInMinutes: properties.metadata.sync.intervalInMinutes
-                    });
-                    chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataSync));
-
-                    chrome.alarms.create('projectDataSyncAlarm', {
-                        periodInMinutes: properties.projectDataSync.intervalInMinutes
-                    });
-                    chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
-
-                    consumerRegistry.register().then(function() {
-
+                    var checkOnlineStatusAndSync = function() {
                         dhisMonitor.online(function() {
                             $log.info("Starting all hustle consumers");
                             consumerRegistry.startAllConsumers();
@@ -118,12 +107,46 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         dhisMonitor.start()
                             .then(metadataSync)
                             .then(projectDataSync);
+                    };
+
+                    chrome.alarms.create('metadataSyncAlarm', {
+                        periodInMinutes: properties.metadata.sync.intervalInMinutes
+                    });
+                    chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataSync));
+
+                    chrome.alarms.create('projectDataSyncAlarm', {
+                        periodInMinutes: properties.projectDataSync.intervalInMinutes
+                    });
+                    chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
+
+                    chrome.runtime.onMessage.addListener(
+                        function(request, sender, sendResponse) {
+                            if (request.auth_header === true) {
+                                chrome.storage.local.get("auth_header", function(result) {
+                                    $rootScope.auth_header = result.auth_header;
+                                    checkOnlineStatusAndSync();
+                                });
+                            }
+                        });
+
+                    consumerRegistry.register().then(function() {
+
+                        chrome.storage.local.get("auth_header", function(result) {
+                            if (Object.keys(result).length === 0)
+                                return;
+
+                            $rootScope.auth_header = result.auth_header;
+                            checkOnlineStatusAndSync();
+                        });
+
                     });
                 }
             ]);
 
             return app;
         };
+
+
 
         var bootstrap = function(appInit) {
             var deferred = Q.defer();

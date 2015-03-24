@@ -41,6 +41,10 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/select.project.html',
                         controller: 'selectProjectController'
                     }).
+                    when('/productKeyPage', {
+                        templateUrl: 'templates/product.key.html',
+                        controller: 'productKeyController'
+                    }).
                     otherwise({
                         redirectTo: '/dashboard'
                     });
@@ -79,7 +83,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                     $hustle.registerInterceptor(queuePostProcessInterceptor);
 
                     $rootScope.$on('$locationChangeStart', function(e, newUrl, oldUrl) {
-                        if (!$rootScope.isLoggedIn) {
+                        if (!$rootScope.isLoggedIn && $rootScope.auth_header) {
                             $location.path("/login");
                         }
                     });

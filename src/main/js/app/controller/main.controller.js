@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $location, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository, metadataImporter, sessionHelper) {
+    return function($q, $scope, $location, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository, metadataImporter, sessionHelper) {
         var oldUserProject;
         $scope.projects = [];
 
@@ -84,10 +84,12 @@ define(["lodash"], function(_) {
             }).then(assignCurrentProject);
         };
 
-        var setAuthHeader = function() {
-            chrome.storage.local.set({
-                "auth_header": "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA=="
+        var getAuthHeader = function() {
+            var deferred = $q.defer();
+            chrome.storage.local.get("auth_header", function(result) {
+                deferred.resolve(result.auth_header);
             });
+            return deferred.promise;
         };
 
         $rootScope.$watch("currentUser.organisationUnits", function() {
@@ -104,9 +106,24 @@ define(["lodash"], function(_) {
 
         $rootScope.$on('resetProjects', resetProjects);
 
-        var init = function() {
-            setAuthHeader();
+        var showProductKeyPage = function() {
+            $location.path("/productKeyPage");
+        };
+
+        var setAuthHeaderOnRootscope = function(result) {
+            $rootScope.auth_header = result;
+            $location.path("/login");
             metadataImporter.run().then(resetProjects);
+        };
+
+        var init = function() {
+            getAuthHeader().then(function(result) {
+                if (_.isEmpty(result)) {
+                    return showProductKeyPage();
+                }
+
+                setAuthHeaderOnRootscope(result);
+            });
         };
 
         init();
