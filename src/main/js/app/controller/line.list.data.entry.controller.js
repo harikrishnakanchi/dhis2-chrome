@@ -1,6 +1,6 @@
 define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSections", "datasetTransformer"], function(_, moment, dhisId, properties, orgUnitMapper, groupSections, datasetTransformer) {
     return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepository,
-        orgUnitRepository, approvalDataRepository, datasetRepository) {
+        orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository) {
 
         var resetForm = function() {
             $scope.numberPattern = "^[1-9][0-9]*$";
@@ -359,7 +359,6 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
         });
 
         var init = function() {
-
             var loadPrograms = function() {
                 var getExcludedDataElementsForModule = function() {
                     return systemSettingRepository.get($scope.currentModule.id).then(function(data) {
@@ -405,10 +404,18 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                 });
             };
 
+            var loadPatientOrigins = function() {
+                return patientOriginRepository.get($scope.currentUserProject.id).then(function(data) {
+                    $scope.patientOrigins = data.origins;
+                });
+            };
+
             resetForm();
             $scope.form = {};
             $scope.loading = true;
-            $q.all([reloadEventsView(), loadPrograms(), loadOptionSets(), setUpProjectAutoApprovedFlag(), setUpIsApprovedFlag(), loadAssociatedDataSets()])
+            $q.all([reloadEventsView(), loadPrograms(), loadOptionSets(), setUpProjectAutoApprovedFlag(), setUpIsApprovedFlag(),
+                    loadAssociatedDataSets(), loadPatientOrigins()
+                ])
                 .finally(function() {
                     $scope.loading = false;
                     $scope.showView = true;

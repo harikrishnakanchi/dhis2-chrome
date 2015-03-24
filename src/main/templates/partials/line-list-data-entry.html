@@ -17,9 +17,17 @@
                             <accordion close-others="false">
                                 <ul>
                                     <li class="form-group">
-                                        <label for="eventDate" class="col-sm-4 col-md-4 control-label">{{ resourceBundle["lineListEventDate"] }}</label>
+                                        <label for="eventDate" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.lineListEventDate }}</label>
                                         <div class="col-sm-6 col-md-6">
                                             <input name="eventDate" type="date" class="form-control" ng-model="getEventDateNgModel(eventDates, program.id, programStage.id)[programStage.id]" required min="{{minDateInCurrentPeriod}}" max="{{maxDateInCurrentPeriod}}" />
+                                        </div>
+                                    </li>
+                                    <li class="form-group">
+                                        <label for="patientOrigin" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.patientOrigin }}</label>
+                                        <div class="col-sm-6 col-md-6">
+                                            <select ng-options="p.name for p in patientOrigins | orderBy: 'name'" ng-model="selectedPatientOrigin" name="patientOrigin">
+                                                <option value=""></option>
+                                            </select>
                                         </div>
                                     </li>
                                 </ul>

@@ -1,13 +1,13 @@
 define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programRepository", "programEventRepository", "dataElementRepository", "systemSettingRepository",
-        "orgUnitRepository", "testData", "approvalDataRepository", "datasetRepository"
+        "orgUnitRepository", "testData", "approvalDataRepository", "datasetRepository", "patientOriginRepository"
     ],
     function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramRepository, ProgramEventRepository, DataElementRepository, SystemSettingRepo,
-        OrgUnitRepository, testData, ApprovalDataRepository, DatasetRepository) {
+        OrgUnitRepository, testData, ApprovalDataRepository, DatasetRepository, PatientOriginRepository) {
         describe("lineListDataEntryController ", function() {
 
             var scope, q, hustle, programRepository, db, mockStore, dataElementRepository, allEvents, timeout,
                 fakeModal, anchorScroll, location, event1, event2, event3, event4, systemSettingRepo, systemSettings,
-                orgUnitRepository, optionSets, dataSets, approvalDataRepository, datasetRepository;
+                orgUnitRepository, optionSets, dataSets, approvalDataRepository, datasetRepository, patientOriginRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
@@ -102,6 +102,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         }]
                     }
                 };
+                scope.currentUserProject = {
+                    "id": "prj1"
+                };
 
                 event1 = {
                     event: 'event1',
@@ -132,6 +135,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 orgUnitRepository = new OrgUnitRepository();
                 approvalDataRepository = new ApprovalDataRepository();
                 datasetRepository = new DatasetRepository();
+                patientOriginRepository = new PatientOriginRepository();
 
                 programEventRepository = {
                     "getEvent": jasmine.createSpy("getAll"),
@@ -179,11 +183,20 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     }]
                 };
 
+                var patientOrigins = {
+                    "origins": [{
+                        "name": "Origin1"
+                    }, {
+                        "name": "Origin2"
+                    }]
+                };
+
                 spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, project));
                 spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {}));
                 spyOn(datasetRepository, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, [{
                     "id": "Vacc"
                 }]));
+                spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, patientOrigins));
             }));
 
             afterEach(function() {
@@ -194,7 +207,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             it("should set projectIsAutoApproved on scope on init", function() {
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 expect(scope.projectIsAutoApproved).toEqual(true);
@@ -209,12 +222,11 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     'isComplete': true,
                     'isApproved': true
                 }));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
                 expect(scope.isCompleted).toEqual(true);
                 expect(scope.isApproved).toEqual(true);
             });
-
 
             it("should load programs into scope on init", function() {
                 var programAndStageData = {
@@ -223,7 +235,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, programAndStageData));
 
                 scope.programId = 'p1';
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 expect(programRepository.get).toHaveBeenCalledWith('p1', ['de1', 'de3']);
@@ -232,7 +244,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
             it("should load all optionSets to scope on init", function() {
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 expect(scope.optionSets).toBe(optionSets);
@@ -240,10 +252,22 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
             it("should load associatedDatasetIds to scope on init", function() {
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 expect(scope.dataSetIds).toEqual(['Vacc']);
+            });
+
+            it("should load patient origins to scope on init", function() {
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
+                scope.$apply();
+
+                expect(scope.patientOrigins).toEqual([{
+                    "name": "Origin1"
+                }, {
+                    "name": "Origin2"
+                }]);
             });
 
             it("should load all system settings on init", function() {
@@ -307,7 +331,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     }]
                 };
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, program));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 expect(scope.program).toEqual(expectedProgram);
@@ -315,7 +339,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
             it("should find optionSets for id", function() {
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 expect(scope.getOptionsFor('os2')).toEqual([{
@@ -331,7 +355,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 expect(scope.getOptionsFor('os2')).toEqual([{
@@ -345,7 +369,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 var dataValues = {};
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 scope.getDataValueNgModel(dataValues, 'p1', 'ps1');
@@ -365,7 +389,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 scope.getDataValueNgModel(dataValues, 'p1', 'ps2');
@@ -382,7 +406,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 var eventDates = {};
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 scope.getEventDateNgModel(eventDates, 'p1', 'ps1');
@@ -400,7 +424,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 expect(moment(scope.minDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-10");
@@ -425,7 +449,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.programId = "p2";
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, []));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 scope.eventDates = {
@@ -474,7 +498,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 scope.eventDates = {
@@ -501,7 +525,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
                 scope.year = "2014";
 
@@ -541,7 +565,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
                 scope.year = "2014";
 
@@ -571,7 +595,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 spyOn(approvalDataRepository, "markAsAccepted").and.returnValue(utils.getPromise(q, {}));
 
                 scope.programId = "Prg1";
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 scope.year = "2014";
@@ -612,7 +636,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 spyOn(approvalDataRepository, "markAsAccepted").and.returnValue(utils.getPromise(q, {}));
 
                 scope.programId = "Prg1";
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
                 scope.year = "2014";
 
@@ -639,7 +663,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 });
 
                 scope.programId = "p1";
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
 
                 var eventToDelete = event1;
                 scope.deleteEvent(eventToDelete);
@@ -668,7 +692,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     result: utils.getPromise(q, {})
                 });
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
 
                 var eventToDelete = event1;
                 scope.deleteEvent(eventToDelete);
@@ -689,7 +713,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     result: utils.getPromise(q, {})
                 });
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
 
                 var eventToDelete = event1;
                 scope.deleteEvent(eventToDelete);
@@ -715,7 +739,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "value": "Case123"
                 };
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 var actualValue = scope.getDisplayValue(dataValue);
                 scope.$apply();
 
@@ -740,7 +764,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 var actualValue = scope.getDisplayValue(dataValue);
                 scope.$apply();
 
@@ -821,7 +845,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, program));
                 programEventRepository.getEvent.and.returnValue(utils.getPromise(q, event1));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 scope.setUpViewOrEditForm('event1');
@@ -840,7 +864,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
 
                 expect(scope.isDataEntryAllowed()).toBeFalsy();
                 scope.$apply();
@@ -881,7 +905,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, []));
-                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
                 scope.$apply();
 
                 scope.update(programStage);
