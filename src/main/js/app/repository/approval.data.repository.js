@@ -1,5 +1,7 @@
 define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
     return function(db, $q) {
+        var self = this;
+
         var modifiedPayload = function(payload) {
             payload = _.isArray(payload) ? payload : [payload];
             return _.map(payload, function(datum) {
@@ -100,7 +102,7 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             var query = db.queryBuilder().$between(dateUtils.getFormattedPeriod(startPeriod), dateUtils.getFormattedPeriod(endPeriod)).$index("by_period").compile();
             return store.each(query).then(function(approvalData) {
                 return _.filter(approvalData, function(ad) {
-                    return ad.isComplete && _.contains(orgUnits, ad.orgUnit);
+                    return ad.isComplete && !ad.isApproved && _.contains(orgUnits, ad.orgUnit);
                 });
             });
         };
@@ -111,6 +113,16 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             return store.each(query).then(function(approvalData) {
                 return _.filter(approvalData, function(ad) {
                     return ad.isApproved && _.contains(orgUnits, ad.orgUnit);
+                });
+            });
+        };
+
+        this.getApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
+            var store = db.objectStore('approvals');
+            var query = db.queryBuilder().$between(dateUtils.getFormattedPeriod(startPeriod), dateUtils.getFormattedPeriod(endPeriod)).$index("by_period").compile();
+            return store.each(query).then(function(approvalData) {
+                return _.filter(approvalData, function(ad) {
+                    return _.contains(orgUnits, ad.orgUnit);
                 });
             });
         };
@@ -165,7 +177,7 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 });
             };
 
-            var saveToIdb = function(approvals){
+            var saveToIdb = function(approvals) {
                 var store = db.objectStore("approvals");
                 store.upsert(approvals);
             };
@@ -246,6 +258,16 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
         this.invalidateApproval = function(period, orgUnit) {
             var store = db.objectStore("approvals");
             return store.delete([dateUtils.getFormattedPeriod(period), orgUnit]);
+        };
+
+        this.saveApprovalsFromDhis = function(approvalsFromDhis) {
+            approvalsFromDhis = _.isArray(approvalsFromDhis) ? approvalsFromDhis : [approvalsFromDhis];
+            var store = db.objectStore("approvals");
+            _.each(approvalsFromDhis, function(approvalFromDhis) {
+                return self.getApprovalData(approvalFromDhis.period, approvalFromDhis.orgUnit).then(function(approvalFromDb) {
+                    return store.upsert(_.merge(approvalFromDb, approvalFromDhis));
+                });
+            });
         };
     };
 });

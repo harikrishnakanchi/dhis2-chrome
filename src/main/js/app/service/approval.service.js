@@ -62,9 +62,9 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     return {
                         'period': dateUtils.getFormattedPeriod(_.pluck(item, 'period')[0].id),
                         'orgUnit': _.pluck(item, 'organisationUnit')[0].id,
-                        'storedBy': _.pluck(item, 'storedBy')[0],
-                        'date': _.pluck(item, 'date')[0],
-                        'dataSets': _.pluck(_.pluck(item, 'dataSet'), 'id')
+                        'completedBy': _.pluck(item, 'storedBy')[0],
+                        'completedOn': _.pluck(item, 'date')[0],
+                        "isComplete": true
                     };
                 });
             };
@@ -129,7 +129,9 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                             'period': dateUtils.getFormattedPeriod(_.pluck(groupedItems, 'period')[0].id),
                             'orgUnit': _.pluck(groupedItems, 'organisationUnit')[0].id,
                             "isApproved": isApproved,
-                            "isAccepted": isAccepted
+                            "isAccepted": isAccepted,
+                            "approvedBy": _.pluck(groupedItems, 'createdByUsername')[0],
+                            "approvedOn": _.pluck(groupedItems, 'createdDate')[0],
                         });
                 }, []);
             };

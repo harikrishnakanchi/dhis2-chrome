@@ -148,15 +148,15 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             var expectedApprovalData = [{
                 "period": "2014W01",
                 "orgUnit": "ou1",
-                "storedBy": "testproj_approver_l1",
-                "date": "2014-01-03T00:00:00.000+0000",
-                "dataSets": ["d1", "d2"]
+                "completedBy": "testproj_approver_l1",
+                "completedOn": "2014-01-03T00:00:00.000+0000",
+                "isComplete": true
             }, {
                 "period": "2014W02",
                 "orgUnit": "ou1",
-                "storedBy": "testproj_approver_l1",
-                "date": "2014-01-10T00:00:00.000+0000",
-                "dataSets": ["d1", "d2"]
+                "completedBy": "testproj_approver_l1",
+                "completedOn": "2014-01-10T00:00:00.000+0000",
+                "isComplete": true
             }];
 
             expect(actualApprovalData).toEqual(expectedApprovalData);
@@ -300,21 +300,29 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             var expectedApprovalData = [{
                 "period": "2014W01",
                 "orgUnit": "ou1",
+                "approvedBy": "msfadmin",
+                "approvedOn": "2014-07-21T12:08:05.311+0000",
                 "isApproved": true,
                 "isAccepted": false
             }, {
                 "period": "2014W02",
                 "orgUnit": "ou1",
+                "approvedBy": "msfadmin",
+                "approvedOn": "2014-07-21T12:08:05.311+0000",
                 "isApproved": true,
                 "isAccepted": false
             }, {
                 "period": "2014W03",
                 "orgUnit": "ou1",
+                "approvedBy": "msfadmin",
+                "approvedOn": "2014-07-21T12:08:05.311+0000",
                 "isApproved": true,
                 "isAccepted": true
             }, {
                 "period": "2014W04",
                 "orgUnit": "ou1",
+                "approvedBy": "msfadmin",
+                "approvedOn": "2014-07-21T12:08:05.311+0000",
                 "isApproved": true,
                 "isAccepted": true
             }];
