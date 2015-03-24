@@ -1,4 +1,4 @@
-define(["consumerRegistry", "angularMocks", "hustleModule", "utils"], function(ConsumerRegistry, mocks, hustleModule, utils) {
+define(["consumerRegistry", "angularMocks", "hustleModule", "utils", "properties"], function(ConsumerRegistry, mocks, hustleModule, utils, properties) {
     describe("register consumers", function() {
         var hustle, consumerRegistry, dataValueConsumer, consumer, q, scope;
         beforeEach(module('hustle'));
@@ -21,7 +21,7 @@ define(["consumerRegistry", "angularMocks", "hustleModule", "utils"], function(C
 
             consumerRegistry.register();
 
-            expect(hustle.registerConsumer).toHaveBeenCalledWith(dataValueConsumer.run, "dataValues");
+            expect(hustle.registerConsumer).toHaveBeenCalledWith(dataValueConsumer.run, "dataValues", properties.queue.delay, properties.queue.retryDelayConfig);
         });
 
         it("should stop all consumers", function() {

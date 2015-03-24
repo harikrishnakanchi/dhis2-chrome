@@ -24,7 +24,15 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "url": url
         },
         "queue": {
-            "maxretries": 5
+            "maxretries": 5,
+            "delay": 100,
+            "retryDelayConfig": {
+                0: 15000,
+                1: 15000,
+                2: 15000,
+                3: 15000,
+                4: 15000
+            }
         },
         "logging": {
             "maxAgeinHours": 720
