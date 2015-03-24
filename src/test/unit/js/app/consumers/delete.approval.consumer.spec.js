@@ -1,71 +1,83 @@
-define(["deleteApprovalConsumer", "angularMocks", "utils", "approvalService", "approvalDataRepository"], function(DeleteApprovalConsumer, mocks, utils, ApprovalService, ApprovalDataRepository) {
+define(["deleteApprovalConsumer", "angularMocks", "utils", "approvalService", "approvalDataRepository", "datasetRepository"], function(DeleteApprovalConsumer, mocks, utils, ApprovalService, ApprovalDataRepository, DatasetRepository) {
     describe("deleteApprovalConsumer", function() {
-        var deleteApprovalConsumer, message, approvalService, scope, q, completeDataSets, approvedDataSets;
+        var deleteApprovalConsumer, message, approvalService, scope, q, completeDataSets, approvedDataSets, allDatasetIds;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             scope = $rootScope.$new();
             q = $q;
+            allDatasetIds = ["ds1", "ds2"];
 
             approvalService = new ApprovalService();
             approvalDataRepository = new ApprovalDataRepository();
-            deleteApprovalConsumer = new DeleteApprovalConsumer(approvalService, approvalDataRepository, q);
+            datasetRepository = new DatasetRepository();
+            deleteApprovalConsumer = new DeleteApprovalConsumer(approvalService, approvalDataRepository, datasetRepository, q);
 
             message = {
                 "data": {
                     "data": {
-                        "ds": ["ds1", "ds2"],
                         "pe": "2014W12",
                         "ou": "org1"
                     },
-                    "type": "upsertOrgUnit"
+                    "type": "deleteApprovals"
                 }
             };
 
             spyOn(approvalService, "markAsIncomplete").and.returnValue(utils.getPromise(q, {}));
             spyOn(approvalService, "markAsUnapproved").and.returnValue(utils.getPromise(q, {}));
+            spyOn(datasetRepository, "getAllDatasetIds").and.returnValue(utils.getPromise(q, allDatasetIds));
 
-            completeDataSets = {
-                "orgUnit": "org1",
-                "period": "2014W12",
-                "status": "DELETED",
-                "createdByUsername": "foobar",
-                "createdDate": "2014-01-01",
-                "dataSets": ["ds1", "ds2"]
-            };
-            spyOn(approvalDataRepository, "getLevelOneApprovalData").and.returnValue(utils.getPromise(q, completeDataSets));
-
-            approvedDataSets = {
-                "isApproved": true,
-                "isAccepted": true,
-                "orgUnit": "org1",
-                "period": "2014W12",
-                "status": "DELETED",
-            };
-            spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, approvedDataSets));
-            spyOn(approvalDataRepository, "saveLevelOneApproval");
-            spyOn(approvalDataRepository, "saveLevelTwoApproval");
-
+            spyOn(approvalDataRepository, "invalidateApproval").and.returnValue(utils.getPromise(q, undefined));
         }));
 
-        it("should delete all approvals from dhis", function() {
+        it("should delete approval for all datasets from dhis", function() {
+
+            completeDataSets = {
+                "period": "2014W12",
+                "orgUnit": "org1",
+                "completedBy": "user1",
+                "completedOn": "2014-01-01T00:00:00.000Z",
+                "approvedBy": "user2",
+                "approvedOn": "2014-02-04T00:00:00.000Z",
+                "isComplete": true,
+                "isApproved": true,
+                "isAccepted": false,
+                "status": "DELETED"
+            };
+
+            spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, completeDataSets));
+
             deleteApprovalConsumer.run(message);
             scope.$apply();
 
             var data = message.data.data;
 
-            expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(data.ds, data.pe, data.ou);
-            expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(data.ds, data.pe, data.ou);
+            expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(allDatasetIds, data.pe, data.ou);
+            expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(allDatasetIds, data.pe, data.ou);
 
-            var expectedPayload = {
-                "orgUnit": "org1",
+            expect(approvalDataRepository.invalidateApproval).toHaveBeenCalledWith(data.pe, data.ou);
+        });
+
+        it("should delete approval from dhis but not delete from the approval repo if module has been reapproved in the field app", function() {
+            completeDataSets = {
                 "period": "2014W12",
-                "createdByUsername": "foobar",
-                "createdDate": "2014-01-01",
-                "dataSets": ["ds1", "ds2"]
+                "orgUnit": "org1",
+                "completedBy": "user1",
+                "completedOn": "2014-01-02T00:00:00.000Z",
+                "isComplete": true,
+                "status": "NEW"
             };
 
-            expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(_.omit(completeDataSets, 'status'));
-            expect(approvalDataRepository.saveLevelTwoApproval).toHaveBeenCalledWith(_.omit(approvedDataSets, 'status'));
+            spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, completeDataSets));
+
+            deleteApprovalConsumer.run(message);
+            scope.$apply();
+
+            var data = message.data.data;
+
+            expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(allDatasetIds, data.pe, data.ou);
+            expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(allDatasetIds, data.pe, data.ou);
+
+            expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalled();
         });
     });
 });

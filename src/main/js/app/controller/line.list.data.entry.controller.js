@@ -219,9 +219,16 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             };
 
             var publishToDhis = function() {
-                return $hustle.publish({
+                var uploadDataValuesPromise = $hustle.publish({
                     "type": "uploadProgramEvents"
                 }, "dataValues");
+
+                var deleteApprovalsPromise = $hustle.publish({
+                    "data": periodAndOrgUnit,
+                    "type": "deleteApprovals"
+                }, "dataValues");
+
+                return $q.all([uploadDataValuesPromise, deleteApprovalsPromise]);
             };
 
             var submit = function() {

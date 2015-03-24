@@ -23,7 +23,7 @@ define(["lodash"], function(_) {
                         .then(_.partial(downloadApprovalConsumer.run, message))
                         .then(_.partial(uploadCompletionDataConsumer.run, message));
 
-                case "deleteApproval":
+                case "deleteApprovals":
                     return deleteApprovalConsumer.run(message);
 
                 case "uploadApprovalData":

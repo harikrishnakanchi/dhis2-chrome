@@ -1,23 +1,21 @@
 define([], function() {
-    return function(approvalService, approvalDataRepository, $q) {
+    return function(approvalService, approvalDataRepository, datasetRepository, $q) {
         this.run = function(message) {
             var data = message.data.data;
 
-            var modifyCompleteDataSets = function() {
-                return approvalDataRepository.getLevelOneApprovalData(data.pe, data.ou).then(function(data) {
-                    return approvalDataRepository.saveLevelOneApproval(_.omit(data, 'status'));
+            var invalidateApproval = function() {
+                return approvalDataRepository.getApprovalData(data.pe, data.ou).then(function(approvalData) {
+                    if (approvalData.status === "DELETED")
+                        return approvalDataRepository.invalidateApproval(approvalData.period, approvalData.orgUnit);
                 });
             };
 
-            var modifyApprovedDataSets = function() {
-                return approvalDataRepository.getLevelTwoApprovalData(data.pe, data.ou).then(function(data) {
-                    return approvalDataRepository.saveLevelTwoApproval(_.omit(data, 'status'));
-                });
-            };
-
-            return $q.all([approvalService.markAsUnapproved(data.ds, data.pe, data.ou),
-                approvalService.markAsIncomplete(data.ds, data.pe, data.ou)
-            ]).then(modifyCompleteDataSets).then(modifyApprovedDataSets);
+            return datasetRepository.getAllDatasetIds().then(function(allDatasets) {
+                var markAsIncompletePromise = approvalService.markAsIncomplete(allDatasets, data.pe, data.ou);
+                var markAsUnapprovedPromise = approvalService.markAsUnapproved(allDatasets, data.pe, data.ou);
+                return $q.all([markAsIncompletePromise, markAsUnapprovedPromise])
+                    .then(invalidateApproval);
+            });
         };
     };
 });

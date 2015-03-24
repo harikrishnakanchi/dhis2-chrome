@@ -540,6 +540,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(hustle.publish).toHaveBeenCalledWith({
                     type: 'uploadProgramEvents'
                 }, 'dataValues');
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": {
+                        "period": "2014W44",
+                        "orgUnit": "currentModuleId"
+                    },
+                    "type": "deleteApprovals"
+                }, "dataValues");
                 expect(scope.resultMessageType).toEqual("success");
                 expect(scope.resultMessage).toEqual("Event submitted succesfully");
                 expect(location.hash).toHaveBeenCalled();
@@ -573,14 +580,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.$apply();
 
                 expect(fakeModal.open).toHaveBeenCalled();
-                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("Prg1", "2014W44", "currentModuleId");
-                expect(approvalDataRepository.clearApprovals).toHaveBeenCalledWith({
-                    'orgUnit': 'currentModuleId',
-                    'period': '2014W44'
-                });
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    type: 'uploadProgramEvents'
-                }, 'dataValues');
             });
 
             it("should submit and auto approve event details", function() {
@@ -653,7 +652,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     type: 'uploadProgramEvents'
                 }, 'dataValues');
             });
-
 
             it("should soft-delete event which is POSTed to DHIS", function() {
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, []));

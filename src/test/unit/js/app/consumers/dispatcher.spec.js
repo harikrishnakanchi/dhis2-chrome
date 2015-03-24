@@ -305,7 +305,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should call delete approval consumer", function() {
             message.data = {
                 "data": {},
-                "type": "deleteApproval"
+                "type": "deleteApprovals"
             };
 
             dispatcher.run(message);

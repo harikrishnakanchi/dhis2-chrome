@@ -156,8 +156,12 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 getApprovalDataSpy = spyOn(approvalDataRepository, "getApprovalData");
                 getApprovalDataSpy.and.returnValue(utils.getPromise(q, {}));
 
+                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
+
                 getDataValuesSpy = spyOn(dataRepository, "getDataValues");
                 getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
+
+                spyOn(hustle, "publish");
 
                 fakeModal = {
                     close: function() {
@@ -287,9 +291,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.getDataSetName(datasetId)).toEqual("OPD");
             });
 
-            xit("should submit data values to indexeddb and dhis", function() {
+            it("should submit data values to indexeddb and dhis", function() {
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                spyOn(hustle, "publish");
                 spyOn(scope.dataentryForm, '$setPristine');
 
                 var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository);
@@ -299,9 +302,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 expect(dataRepository.save).toHaveBeenCalled();
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    data: {
-                        ok: 'ok'
-                    },
+                    data: [],
                     type: 'uploadDataValues'
                 }, 'dataValues');
 
@@ -315,7 +316,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should save data values as draft to indexeddb", function() {
 
                 spyOn(dataRepository, "saveAsDraft").and.returnValue(saveSuccessPromise);
-                spyOn(hustle, "publish");
                 spyOn(scope.dataentryForm, '$setPristine');
 
                 var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository);
@@ -354,8 +354,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should let the user know of failures when saving the data to indexedDB ", function() {
 
                 spyOn(dataRepository, "save").and.returnValue(saveErrorPromise);
-                spyOn(hustle, "publish");
-
 
                 var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository);
 
@@ -364,23 +362,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 expect(dataRepository.save).toHaveBeenCalled();
                 expect(hustle.publish).not.toHaveBeenCalled();
-                expect(scope.submitSuccess).toBe(false);
-                expect(scope.saveSuccess).toBe(false);
-                expect(scope.submitError).toBe(true);
-                expect(scope.saveError).toBe(false);
-            });
-
-            xit("should let the user know of failures when saving to queue ", function() {
-                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                spyOn(hustle, "publish").and.returnValue(saveErrorPromise);
-
-                var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository);
-
-                scope.submit();
-                scope.$apply();
-
-                expect(dataRepository.save).toHaveBeenCalled();
-                expect(hustle.publish).toHaveBeenCalled();
                 expect(scope.submitSuccess).toBe(false);
                 expect(scope.saveSuccess).toBe(false);
                 expect(scope.submitError).toBe(true);
@@ -731,8 +712,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     return utils.getPromise(q, undefined);
                 });
 
-                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, undefined));
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
@@ -879,7 +858,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             it("should delete approvals if data is edited", function() {
 
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
-                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
 
                 var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db,
                     dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository);
@@ -894,6 +872,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 expect(dataRepository.save).toHaveBeenCalled();
                 expect(approvalDataRepository.clearApprovals.calls.argsFor(0)[0]).toEqual(periodAndOrgUnit);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": periodAndOrgUnit,
+                    "type": "deleteApprovals"
+                }, "dataValues");
             });
 
             it("should not allow data entry if selected week is beyond configured week", function() {
@@ -928,8 +910,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                             "isApproved": true
                         });
                     return utils.getPromise(q, {
-                            "isComplete": true
-                        });
+                        "isComplete": true
+                    });
                 });
 
                 spyOn(fakeModal, "open").and.returnValue({

@@ -235,27 +235,32 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         var save = function(asDraft) {
             var period = getPeriod();
-
-            var publishToDhis = function(data) {
-                return $hustle.publish({
-                    "data": data,
-                    "type": "uploadDataValues"
-                }, "dataValues");
-            };
-
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentUser.userCredentials.username);
             var periodAndOrgUnit = {
                 "period": getPeriod(),
                 "orgUnit": $scope.currentModule.id
             };
 
+            var publishToDhis = function() {
+                var uploadDataValuesPromise = $hustle.publish({
+                    "data": payload,
+                    "type": "uploadDataValues"
+                }, "dataValues");
 
-            var payload = dataValuesMapper.mapToDomain($scope.dataValues, period, $scope.currentUser.userCredentials.username);
+                var deleteApprovalsPromise = $hustle.publish({
+                    "data": periodAndOrgUnit,
+                    "type": "deleteApprovals"
+                }, "dataValues");
+
+                return $q.all([uploadDataValuesPromise, deleteApprovalsPromise]);
+            };
+
             if (asDraft) {
                 return dataRepository.saveAsDraft(payload);
             } else {
                 return dataRepository.save(payload)
                     .then(_.partial(approvalDataRepository.clearApprovals, periodAndOrgUnit))
-                    .then(_.partial(publishToDhis, payload));
+                    .then(publishToDhis);
             }
         };
 
