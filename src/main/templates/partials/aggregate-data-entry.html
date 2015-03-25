@@ -97,9 +97,6 @@
                                             </th>
                                             <th ng-hide="$last" class="last-column">
                                             </th>
-                                            <th ng-show="$last" class="last-column">
-                                                {{ resourceBundle.totalLabel }}
-                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody ng-repeat="orgUnit in section.orgUnits | orderBy: 'name'">
@@ -114,7 +111,6 @@
                                                     <br/>
                                                 </ng-form>
                                             </td>
-                                            <td class="last-column">{{sum(dataValues[dataElement.id])}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
