@@ -1,11 +1,12 @@
 define(["productKeyController", "angularMocks", "metadataImporter", "utils", "chromeRuntime"], function(ProductKeyController, mocks, MetadataImporter, utils, chromeRuntime) {
     describe("productKeyController", function() {
-        var scope, location, productKeyController, metadataImporter, rootscope;
+        var scope, location, productKeyController, metadataImporter, rootscope, q;
 
-        beforeEach(mocks.inject(function($rootScope, $location) {
+        beforeEach(mocks.inject(function($rootScope, $location, $q) {
             scope = $rootScope.$new();
             location = $location;
             rootscope = $rootScope;
+            q= $q;
 
             chrome.storage = {
                 "local": {
