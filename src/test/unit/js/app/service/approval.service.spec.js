@@ -31,13 +31,41 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "sb": "testproj_approver_l1",
                 "cd": "2014-05-30T12:43:54.972Z",
                 "multiOu": true
+            }, {
+                "ds": "wqeb8cd5e53",
+                "pe": "2014W01",
+                "ou": "17yugc",
+                "sb": "testproj_approver_l1",
+                "cd": "2014-05-30T12:43:54.972Z",
+                "multiOu": true
+            }, {
+                "ds": "170b8cd5e53",
+                "pe": "2014W02",
+                "ou": "17yugc",
+                "sb": "testproj_approver_l1",
+                "cd": "2014-05-30T12:43:54.972Z",
+                "multiOu": true
+            }, {
+                "ds": "wqeb8cd5e53",
+                "pe": "2014W02",
+                "ou": "17yugc",
+                "sb": "testproj_approver_l1",
+                "cd": "2014-05-30T12:43:54.972Z",
+                "multiOu": true
             }];
 
             httpBackend.expectPOST(properties.dhis.url + "/api/completeDataSetRegistrations/multiple", expectedPayload).respond(200, "ok");
 
-            var approvalService = new ApprovalService(http, db, q);
-            approvalService.markAsComplete(["170b8cd5e53"], "2014W01", "17yugc", "testproj_approver_l1", moment().toISOString());
+            var periodsAndOrgUnits = [{
+                "period": "2014W01",
+                "orgUnit": "17yugc"
+            }, {
+                "period": "2014W02",
+                "orgUnit": "17yugc"
+            }];
 
+            var approvalService = new ApprovalService(http, db, q);
+            approvalService.markAsComplete(["170b8cd5e53", "wqeb8cd5e53"], periodsAndOrgUnits, "testproj_approver_l1", moment().toISOString());
             httpBackend.flush();
         });
 
@@ -49,28 +77,38 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "ou": "17yugc",
                 "ab": "currentUserName",
                 "ad": "2014-01-01"
-            }];
-
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals/multiple", expectedPayload).respond(200, "ok");
-            var approvalService = new ApprovalService(http, db, q);
-            approvalService.markAsApproved(["170b8cd5e53"], "2014W01", "17yugc", "currentUserName", "2014-01-01");
-
-            httpBackend.flush();
-        });
-
-        it("should mark data as accepted in dhis", function() {
-
-            var expectedPayload = [{
-                "ds": "170b8cd5e53",
+            }, {
+                "ds": "wqeb8cd5e53",
                 "pe": "2014W01",
+                "ou": "17yugc",
+                "ab": "currentUserName",
+                "ad": "2014-01-01"
+            }, {
+                "ds": "170b8cd5e53",
+                "pe": "2014W02",
+                "ou": "17yugc",
+                "ab": "currentUserName",
+                "ad": "2014-01-01"
+            }, {
+                "ds": "wqeb8cd5e53",
+                "pe": "2014W02",
                 "ou": "17yugc",
                 "ab": "currentUserName",
                 "ad": "2014-01-01"
             }];
 
-            httpBackend.expectPOST(properties.dhis.url + "/api/dataAcceptances/multiple", expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(properties.dhis.url + "/api/dataApprovals/multiple", expectedPayload).respond(200, "ok");
+
+            var periodsAndOrgUnits = [{
+                "period": "2014W01",
+                "orgUnit": "17yugc"
+            }, {
+                "period": "2014W02",
+                "orgUnit": "17yugc"
+            }];
+
             var approvalService = new ApprovalService(http, db, q);
-            approvalService.markAsAccepted(["170b8cd5e53"], "2014W01", "17yugc", "currentUserName", "2014-01-01");
+            approvalService.markAsApproved(["170b8cd5e53", "wqeb8cd5e53"], periodsAndOrgUnits, "currentUserName", "2014-01-01");
 
             httpBackend.flush();
         });
@@ -302,29 +340,25 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "orgUnit": "ou1",
                 "approvedBy": "msfadmin",
                 "approvedOn": "2014-07-21T12:08:05.311+0000",
-                "isApproved": true,
-                "isAccepted": false
+                "isApproved": true
             }, {
                 "period": "2014W02",
                 "orgUnit": "ou1",
                 "approvedBy": "msfadmin",
                 "approvedOn": "2014-07-21T12:08:05.311+0000",
-                "isApproved": true,
-                "isAccepted": false
+                "isApproved": true
             }, {
                 "period": "2014W03",
                 "orgUnit": "ou1",
                 "approvedBy": "msfadmin",
                 "approvedOn": "2014-07-21T12:08:05.311+0000",
-                "isApproved": true,
-                "isAccepted": true
+                "isApproved": true
             }, {
                 "period": "2014W04",
                 "orgUnit": "ou1",
                 "approvedBy": "msfadmin",
                 "approvedOn": "2014-07-21T12:08:05.311+0000",
-                "isApproved": true,
-                "isAccepted": true
+                "isApproved": true
             }];
 
             expect(actualApprovalData).toEqual(expectedApprovalData);

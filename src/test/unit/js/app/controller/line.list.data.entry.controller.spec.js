@@ -591,7 +591,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                spyOn(approvalDataRepository, "markAsAccepted").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
 
                 scope.programId = "Prg1";
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
@@ -602,13 +602,28 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.$apply();
 
                 expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("Prg1", "2014W44", "currentModuleId");
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    type: 'uploadProgramEvents'
-                }, 'dataValues');
-                expect(approvalDataRepository.markAsAccepted).toHaveBeenCalledWith({
+                expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith({
                     'orgUnit': 'currentModuleId',
                     'period': '2014W44'
                 }, 'dataentryuser');
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    type: 'uploadProgramEvents'
+                }, 'dataValues');
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [{
+                        'orgUnit': 'currentModuleId',
+                        'period': '2014W44'
+                    }],
+                    "type": "uploadCompletionData"
+                }, "dataValues");
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [{
+                        'orgUnit': 'currentModuleId',
+                        'period': '2014W44'
+                    }],
+                    "type": "uploadApprovalData"
+                }, "dataValues");
+
                 expect(scope.resultMessageType).toEqual("success");
                 expect(scope.resultMessage).toEqual("Event(s) submitted and auto-approved successfully.");
                 expect(location.hash).toHaveBeenCalled();
@@ -632,7 +647,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                spyOn(approvalDataRepository, "markAsAccepted").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
 
                 scope.programId = "Prg1";
                 var lineListDataEntryController = new LineListDataEntryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, db, programRepository, programEventRepository, dataElementRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository, datasetRepository, patientOriginRepository);
@@ -643,14 +658,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.$apply();
 
                 expect(fakeModal.open).toHaveBeenCalled();
-                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("Prg1", "2014W44", "currentModuleId");
-                expect(approvalDataRepository.markAsAccepted).toHaveBeenCalledWith({
-                    'orgUnit': 'currentModuleId',
-                    'period': '2014W44'
-                }, 'dataentryuser');
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    type: 'uploadProgramEvents'
-                }, 'dataValues');
             });
 
             it("should soft-delete event which is POSTed to DHIS", function() {

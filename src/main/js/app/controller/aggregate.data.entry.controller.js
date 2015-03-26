@@ -119,6 +119,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.submitAndApprove = function() {
+
+            var periodAndOrgUnit = {
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
+            };
+
+            var completedAndApprovedBy = $scope.currentUser.userCredentials.username;
+
             var successPromise = function() {
                 $scope.saveSuccess = false;
                 $scope.submitAndApprovalSuccess = true;
@@ -133,16 +141,24 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 scrollToTop();
             };
 
-            var periodAndOrgUnit = {
-                "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id
-            };
+            var publishToDhis = function() {
+                var uploadCompletionPromise = $hustle.publish({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadCompletionData"
+                }, "dataValues");
 
-            var completedAndApprovedBy = $scope.currentUser.userCredentials.username;
+                var uploadApprovalPromise = $hustle.publish({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadApprovalData"
+                }, "dataValues");
+
+                return $q.all([uploadCompletionPromise, uploadApprovalPromise]);
+            };
 
             var upsertAndPushToDhis = function() {
                 save(false)
-                    .then(_.partial(approvalDataRepository.markAsAccepted, periodAndOrgUnit, completedAndApprovedBy));
+                    .then(_.partial(approvalDataRepository.markAsApproved, periodAndOrgUnit, completedAndApprovedBy))
+                    .then(publishToDhis);
             };
 
             confirmAndProceed(upsertAndPushToDhis, $scope.resourceBundle.reapprovalConfirmationMessage, !($scope.isCompleted || $scope.isApproved))
@@ -150,6 +166,21 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
         };
 
         $scope.firstLevelApproval = function() {
+
+            var periodAndOrgUnit = {
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
+            };
+
+            var completedBy = $scope.currentUser.userCredentials.username;
+
+            var publishToDhis = function() {
+                return $hustle.publish({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadCompletionData"
+                }, "dataValues");
+            };
+
             var onSuccess = function() {
                 $scope.firstLevelApproveSuccess = true;
                 $scope.approveError = false;
@@ -161,14 +192,8 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.approveError = true;
             };
 
-            var periodAndOrgUnit = {
-                "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id
-            };
-
-            var completedBy = $scope.currentUser.userCredentials.username;
-
             approvalDataRepository.markAsComplete(periodAndOrgUnit, completedBy)
+                .then(publishToDhis)
                 .then(onSuccess, onError)
                 .finally(scrollToTop);
         };
@@ -190,9 +215,17 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 "orgUnit": $scope.currentModule.id
             };
 
+            var publishToDhis = function() {
+                return $hustle.publish({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadApprovalData"
+                }, "dataValues");
+            };
+
             var approvedBy = $scope.currentUser.userCredentials.username;
 
             approvalDataRepository.markAsApproved(periodAndOrgUnit, approvedBy)
+                .then(publishToDhis)
                 .then(onSuccess, onError)
                 .finally(scrollToTop);
 
@@ -345,16 +378,19 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
             $scope.loading = true;
             getAllData.then(setData).then(transformDataSet).then(function() {
+                var periodAndOrgUnit = {
+                    "period": getPeriod(),
+                    "orgUnit": $scope.currentModule.id
+                };
 
                 orgUnitRepository.getParentProject($scope.currentModule.id).then(function(orgUnit) {
                     var project = orgUnitMapper.mapToProject(orgUnit);
                     $scope.projectIsAutoApproved = (project.autoApprove === "true");
                 });
 
-                approvalDataRepository.getApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                approvalDataRepository.getApprovalData(periodAndOrgUnit).then(function(data) {
                     $scope.isCompleted = !_.isEmpty(data) && data.isComplete;
                     $scope.isApproved = !_.isEmpty(data) && data.isApproved;
-                    $scope.isAccepted = !_.isEmpty(data) && data.isAccepted;
                 });
 
                 dataRepository.getDataValues(getPeriod(), $scope.currentOrgUnitIdIncludingChildrenIds).then(function(dataValues) {

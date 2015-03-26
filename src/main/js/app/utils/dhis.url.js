@@ -23,7 +23,6 @@ define(["properties"], function(properties) {
     return {
         "approvalMultipleL1": with_host("/api/completeDataSetRegistrations/multiple"),
         "approvalMultipleL2": with_host("/api/dataApprovals/multiple"),
-        "approvalMultipleL3": with_host("/api/dataAcceptances/multiple"),
         "approvalL1": with_host("/api/completeDataSetRegistrations"),
         "approvalL2": with_host("/api/dataApprovals"),
         "approvalStatus": with_host("/api/dataApprovals/status"),

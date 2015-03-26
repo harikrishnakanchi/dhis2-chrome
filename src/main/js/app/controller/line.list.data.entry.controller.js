@@ -255,20 +255,32 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
                 return programEventRepository.markEventsAsSubmitted($scope.programId, getPeriod(), $scope.currentModule.id);
             };
 
-            var markAsAccepted = function() {
+            var markAsApproved = function() {
                 var completedAndApprovedBy = $scope.currentUser.userCredentials.username;
-                return approvalDataRepository.markAsAccepted(periodAndOrgUnit, completedAndApprovedBy);
+                return approvalDataRepository.markAsApproved(periodAndOrgUnit, completedAndApprovedBy);
             };
 
             var publishToDhis = function() {
-                return $hustle.publish({
+                var uploadProgramPromise = $hustle.publish({
                     "type": "uploadProgramEvents"
                 }, "dataValues");
+
+                var uploadCompletionPromise = $hustle.publish({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadCompletionData"
+                }, "dataValues");
+
+                var uploadApprovalPromise = $hustle.publish({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadApprovalData"
+                }, "dataValues");
+
+                return $q.all([uploadProgramPromise, uploadCompletionPromise, uploadApprovalPromise]);
             };
 
             var submitAndApprove = function() {
                 return markEventsAsSubmitted()
-                    .then(markAsAccepted)
+                    .then(markAsApproved)
                     .then(publishToDhis);
             };
 
@@ -366,6 +378,11 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
         });
 
         var init = function() {
+            var periodAndOrgUnit = {
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
+            };
+
             var loadPrograms = function() {
                 var getExcludedDataElementsForModule = function() {
                     return systemSettingRepository.get($scope.currentModule.id).then(function(data) {
@@ -398,10 +415,9 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
             };
 
             var setUpIsApprovedFlag = function() {
-                return approvalDataRepository.getApprovalData(getPeriod(), $scope.currentModule.id, true).then(function(data) {
+                return approvalDataRepository.getApprovalData(periodAndOrgUnit).then(function(data) {
                     $scope.isCompleted = !_.isEmpty(data) && data.isComplete;
                     $scope.isApproved = !_.isEmpty(data) && data.isApproved;
-                    $scope.isAccepted = !_.isEmpty(data) && data.isAccepted;
                 });
             };
 

@@ -158,22 +158,30 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
             };
 
             var approve = function() {
-                var getPeriodsAndOrgUnits = function() {
-                    var getPeriodsAndOrgUnits = _.map(itemsToBeApproved, function(item) {
-                        return _.map(item.status, function(status) {
-                            return {
-                                "period": status.period,
-                                "orgUnit": item.moduleId
-                            };
-                        });
+                var periodsAndOrgUnits = _.flatten(_.map(itemsToBeApproved, function(item) {
+                    return _.map(item.status, function(status) {
+                        return {
+                            "period": status.period,
+                            "orgUnit": item.moduleId
+                        };
                     });
-                    return _.flatten(getPeriodsAndOrgUnits);
+                }));
+
+                var publishToDhis = function(messageType) {
+                    var promises = [];
+                    promises.push($hustle.publish({
+                        "data": periodsAndOrgUnits,
+                        "type": messageType
+                    }, "dataValues"));
+                    return $q.all(promises);
                 };
 
                 if ($scope.userApprovalLevel === 1)
-                    return approvalDataRepository.markAsComplete(getPeriodsAndOrgUnits(), $rootScope.currentUser.userCredentials.username);
+                    return approvalDataRepository.markAsComplete(periodsAndOrgUnits, $rootScope.currentUser.userCredentials.username)
+                        .then(_.partial(publishToDhis, "uploadCompletionData"));
                 if ($scope.userApprovalLevel === 2)
-                    return approvalDataRepository.markAsApproved(getPeriodsAndOrgUnits(), $rootScope.currentUser.userCredentials.username);
+                    return approvalDataRepository.markAsApproved(periodsAndOrgUnits, $rootScope.currentUser.userCredentials.username)
+                        .then(_.partial(publishToDhis, "uploadApprovalData"));
             };
 
             showModal(approve, $scope.resourceBundle.dataApprovalConfirmationMessage).then(successPromise, errorPromise);

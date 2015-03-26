@@ -212,7 +212,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "orgUnit": 'mod3'
             }];
 
-            spyOn(approvalDataRepository, "markAsAccepted").and.returnValue(utils.getPromise(q, {}));
+            spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(newOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
@@ -222,7 +222,15 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             scope.update(newOrgUnit, orgUnit);
             scope.$apply();
 
-            expect(approvalDataRepository.markAsAccepted).toHaveBeenCalledWith(expectedPeriodAndOrgUnits,"service.account");
+            expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(expectedPeriodAndOrgUnits, "admin");
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "data": expectedPeriodAndOrgUnits,
+                "type": "uploadCompletionData"
+            }, "dataValues");
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "data": expectedPeriodAndOrgUnits,
+                "type": "uploadApprovalData"
+            }, "dataValues");
         });
 
         it("should display error if updating organization unit fails", function() {

@@ -118,15 +118,13 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "approvedBy": "approver1",
                     "approvedOn": "2014-01-10T00:00:00.000+0000",
                     "dataSets": ["d1", "d2"],
-                    "isApproved": true,
-                    "isAccepted": false,
+                    "isApproved": true
                 }, {
                     "period": "2014W02",
                     "orgUnit": "ou1",
                     "approvedBy": "approver1",
                     "approvedOn": "2014-01-10T00:00:00.000+0000",
-                    "isApproved": true,
-                    "isAccepted": true
+                    "isApproved": true
                 }];
 
                 approvalService.getAllLevelTwoApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
@@ -194,8 +192,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "approvedBy": "approver2",
                     "approvedOn": "2014-01-11T12:00:00.000+0000",
                     "isComplete": true,
-                    "isApproved": true,
-                    "isAccepted": false
+                    "isApproved": true
                 };
 
                 var dhisCompletionWithDifferentData = {
@@ -240,8 +237,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "period": "2014W07",
                     "approvedBy": "approver1",
                     "approvedOn": "2014-01-10T00:00:00.000+0000",
-                    "isApproved": true,
-                    "isAccepted": false
+                    "isApproved": true
                 };
 
                 var dataFromIdb = [dbCompletionWhichIsDeletedInDhis, dbUnchangedCompletion, dbNewCompletion, dbDeletedCompletion, dbStaleCompletionData, dbApprovedData];
@@ -283,8 +279,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "approvedBy": "approver2",
                     "approvedOn": "2014-01-11T12:00:00.000+0000",
                     "isComplete": true,
-                    "isApproved": true,
-                    "isAccepted": false
+                    "isApproved": true
                 };
 
                 var dbUnchangedApproval = {
@@ -295,8 +290,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "approvedBy": "approver1",
                     "approvedOn": "2014-01-10T00:00:00.000+0000",
                     "isComplete": true,
-                    "isApproved": true,
-                    "isAccepted": false
+                    "isApproved": true
                 };
 
                 var dbNewApproval = {
@@ -308,7 +302,6 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "approvedOn": "2014-01-11T12:00:00.000+0000",
                     "isComplete": true,
                     "isApproved": true,
-                    "isAccepted": false,
                     "status": "NEW"
                 };
 
@@ -317,7 +310,6 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "period": "2014W04",
                     "isComplete": false,
                     "isApproved": false,
-                    "isAccepted": false,
                     "status": "DELETED"
                 };
 
@@ -329,8 +321,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "approvedBy": "approver2",
                     "approvedOn": "2014-01-11T12:00:00.000+0000",
                     "isComplete": true,
-                    "isApproved": true,
-                    "isAccepted": false
+                    "isApproved": true
                 };
 
                 var dbApprovalWhichIsNotApprovedYet = {
@@ -346,7 +337,6 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "orgUnit": dbStaleApprovalData.orgUnit,
                     "period": dbStaleApprovalData.period,
                     "isApproved": true,
-                    "isAccepted": true,
                     "approvedBy": "newApprover2",
                     "approvedOn": "2014-01-11T14:00:00.000+0000"
                 };
@@ -355,7 +345,6 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "period": "2014W05",
                     "orgUnit": "ou1",
                     "isApproved": true,
-                    "isAccepted": false,
                     "approvedBy": "approver1",
                     "approvedOn": "2014-01-10T00:00:00.000+0000",
                 };
@@ -365,8 +354,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "orgUnit": dbDeletedApproval.orgUnit,
                     "approvedBy": "approver1",
                     "approvedOn": "2014-01-10T00:00:00.000+0000",
-                    "isApproved": true,
-                    "isAccepted": false
+                    "isApproved": true
                 };
 
                 var dhisUnchangedApproval = {
@@ -374,8 +362,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "orgUnit": "ou1",
                     "approvedBy": "approver1",
                     "approvedOn": "2014-01-10T00:00:00.000+0000",
-                    "isApproved": true,
-                    "isAccepted": false
+                    "isApproved": true
                 };
 
                 var dbApprovalData = [dbApprovalWhichIsDeletedInDhis, dbUnchangedApproval, dbNewApproval, dbDeletedApproval, dbStaleApprovalData, dbApprovalWhichIsNotApprovedYet];

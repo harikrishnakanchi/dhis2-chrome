@@ -701,6 +701,12 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(approvalDataRepository.markAsComplete).toHaveBeenCalledWith(periodAndOrgUnit, storedBy);
+
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadCompletionData"
+                }, "dataValues");
+
                 expect(scope.firstLevelApproveSuccess).toBe(true);
                 expect(scope.secondLevelApproveSuccess).toBe(false);
                 expect(scope.approveError).toBe(false);
@@ -725,8 +731,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 var approvedAndCompletedBy = "dataentryuser";
 
-                spyOn(approvalDataRepository, "markAsAccepted").and.callFake(function() {
-                    acceptDataSaved = true;
+                spyOn(approvalDataRepository, "markAsApproved").and.callFake(function() {
                     return utils.getPromise(q, {
                         "blah": "moreBlah"
                     });
@@ -761,8 +766,15 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.submitAndApprove();
                 scope.$apply();
 
-                expect(approvalDataRepository.markAsAccepted.calls.argsFor(0)[0]).toEqual(periodAndOrgUnit);
-
+                expect(approvalDataRepository.markAsApproved.calls.argsFor(0)[0]).toEqual(periodAndOrgUnit);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadCompletionData"
+                }, "dataValues");
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadApprovalData"
+                }, "dataValues");
                 expect(scope.submitAndApprovalSuccess).toBe(true);
             });
 
@@ -941,6 +953,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(periodAndOrgUnit, approvedBy);
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [periodAndOrgUnit],
+                    "type": "uploadApprovalData"
+                }, "dataValues");
                 expect(scope.secondLevelApproveSuccess).toBe(true);
                 expect(scope.approveError).toBe(false);
             });

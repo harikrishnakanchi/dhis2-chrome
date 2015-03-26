@@ -61,6 +61,8 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
                 result: utils.getPromise(q, {})
             });
 
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+
             rootScope.hasRoles = function(args) {
                 if (args[0] === "Superuser")
                     return false;
@@ -80,7 +82,6 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         });
 
         it("should fetch and display all organisation units", function() {
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
             scope.syncNow();
 
@@ -251,7 +252,7 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual(itemsAwaitingApprovalAtOtherLevels);
         });
 
-        it("should approve selected items", function() {
+        it("should complete selected items", function() {
             spyOn(approvalDataRepository, "markAsComplete").and.returnValue(utils.getPromise(q, {}));
             scope.resourceBundle = {
                 "dataApprovalConfirmationMessage": "mssg"
@@ -348,6 +349,117 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             timeout.flush();
 
             expect(approvalDataRepository.markAsComplete).toHaveBeenCalledWith(expectedUpserts, "prj_approver_l1");
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "data": expectedUpserts,
+                "type": "uploadCompletionData"
+            }, "dataValues");
+
+            expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
+            expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual(expectedItemsAwaitingApprovalAtOtherLevels);
+        });
+
+
+        it("should approve selected items", function() {
+            spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
+            scope.resourceBundle = {
+                "dataApprovalConfirmationMessage": "mssg"
+            };
+
+            scope.itemsAwaitingApprovalAtUserLevel = [{
+                "moduleId": "123",
+                "moduleName": "mod1",
+                "status": [{
+                    "period": "2014W17",
+                    "submitted": true,
+                    "nextApprovalLevel": 1
+                }, {
+                    "period": "2014W18",
+                    "submitted": true,
+                    "nextApprovalLevel": 1,
+                    "shouldBeApproved": true
+                }]
+            }, {
+                "moduleId": "456",
+                "moduleName": "mod2",
+                "status": [{
+                    "period": "2014W17",
+                    "submitted": true,
+                    "nextApprovalLevel": 1,
+                    "shouldBeApproved": true
+                }, {
+                    "period": "2014W18",
+                    "submitted": true,
+                    "nextApprovalLevel": 1,
+                    "shouldBeApproved": true
+                }]
+            }];
+
+            var expectedItemsAwaitingApprovalAtUserLevel = [{
+                "moduleId": "123",
+                "moduleName": "mod1",
+                "status": [{
+                    "period": "2014W17",
+                    "submitted": true,
+                    "nextApprovalLevel": 1,
+                    "shouldBeApproved": false
+                }]
+            }];
+
+            var expectedItemsAwaitingApprovalAtOtherLevels = [{
+                "moduleId": "123",
+                "moduleName": "mod1",
+                "status": [{
+                    "period": "2014W18",
+                    "submitted": true,
+                    "nextApprovalLevel": 2,
+                    "shouldBeApproved": true
+                }]
+            }, {
+                "moduleId": "456",
+                "moduleName": "mod2",
+                "status": [{
+                    "period": "2014W17",
+                    "submitted": true,
+                    "nextApprovalLevel": 2,
+                    "shouldBeApproved": true
+                }, {
+                    "period": "2014W18",
+                    "submitted": true,
+                    "nextApprovalLevel": 2,
+                    "shouldBeApproved": true
+                }]
+            }];
+
+            rootScope.currentUser = {
+                "userCredentials": {
+                    "username": "prj_approver_l1"
+                }
+            };
+
+            var expectedUpserts = [{
+                "period": "2014W18",
+                "orgUnit": "123"
+            }, {
+                "period": "2014W17",
+                "orgUnit": "456"
+            }, {
+                "period": "2014W18",
+                "orgUnit": "456"
+            }];
+
+            scope.userApprovalLevel = 2;
+            scope.itemsAwaitingApprovalAtOtherLevels = [];
+
+            scope.bulkApprove();
+
+            scope.$apply();
+            timeout.flush();
+
+            expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(expectedUpserts, "prj_approver_l1");
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "data": expectedUpserts,
+                "type": "uploadApprovalData"
+            }, "dataValues");
             expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
             expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual(expectedItemsAwaitingApprovalAtOtherLevels);
         });

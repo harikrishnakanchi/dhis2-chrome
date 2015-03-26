@@ -87,14 +87,19 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 .then(filterApprovals);
         };
 
-        this.getApprovalData = function(period, orgUnitId, shouldFilterSoftDeletes) {
-            var filterSoftDeletedApprovals = function(d) {
-                return shouldFilterSoftDeletes && d && d.status === "DELETED" ? undefined : d;
-            };
-
+        this.getApprovalData = function(periodsAndOrgUnits) {
             var store = db.objectStore('approvals');
-            return store.find([dateUtils.getFormattedPeriod(period), orgUnitId])
-                .then(filterSoftDeletedApprovals);
+
+            if (!_.isArray(periodsAndOrgUnits))
+                return store.find([dateUtils.getFormattedPeriod(periodsAndOrgUnits.period), periodsAndOrgUnits.orgUnit]);
+
+            var getApprovalDataPromises = [];
+            _.each(periodsAndOrgUnits, function(periodAndOrgUnit) {
+                getApprovalDataPromises.push(store.find([dateUtils.getFormattedPeriod(periodAndOrgUnit.period), periodAndOrgUnit.orgUnit]));
+            });
+            return $q.all(getApprovalDataPromises).then(function(allApprovalData) {
+                return _.compact(allApprovalData);
+            });
         };
 
         this.getLevelOneApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
@@ -137,7 +142,6 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                     "completedOn": moment().toISOString(),
                     "isComplete": true,
                     "isApproved": false,
-                    "isAccepted": false,
                     "status": "NEW"
                 };
             });
@@ -187,57 +191,6 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 .then(saveToIdb);
         };
 
-        this.markAsAccepted = function(periodsAndOrgUnits, acceptedBy) {
-            periodsAndOrgUnits = _.isArray(periodsAndOrgUnits) ? periodsAndOrgUnits : [periodsAndOrgUnits];
-
-            var store = db.objectStore("approvals");
-
-            var getExistingApprovals = function() {
-                var periods = _.uniq(_.pluck(periodsAndOrgUnits, "period"));
-                var query = db.queryBuilder().$index("by_period").$in(periods).compile();
-                return store.each(query).then(function(allApprovalsForPeriods) {
-                    return _.transform(periodsAndOrgUnits, function(acc, periodAndOrgUnit) {
-                        var matchingApprovals = _.filter(allApprovalsForPeriods, {
-                            "period": periodAndOrgUnit.period,
-                            "orgUnit": periodAndOrgUnit.orgUnit
-                        });
-                        _.each(matchingApprovals, function(approval) {
-                            acc.push(approval);
-                        });
-                    }, []);
-                });
-            };
-
-            var updateThemAsAccepted = function(approvalsInDb) {
-                var approvalsGroupedByPeriodOrgUnit = _.groupBy(approvalsInDb, function(approval) {
-                    return approval.period + approval.orgUnit;
-                });
-
-                return _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
-                    var period = moment(periodAndOrgUnit.period, "GGGG[W]W").format("GGGG[W]WW");
-                    var orgUnit = periodAndOrgUnit.orgUnit;
-                    var completedBy = _.isUndefined(approvalsGroupedByPeriodOrgUnit[period + orgUnit]) ? acceptedBy : approvalsGroupedByPeriodOrgUnit[period + orgUnit][0].completedBy;
-                    var completedOn = _.isUndefined(approvalsGroupedByPeriodOrgUnit[period + orgUnit]) ? moment().toISOString() : approvalsGroupedByPeriodOrgUnit[period + orgUnit][0].completedOn;
-                    return {
-                        "period": period,
-                        "orgUnit": orgUnit,
-                        "completedBy": completedBy,
-                        "completedOn": completedOn,
-                        "approvedBy": acceptedBy,
-                        "approvedOn": moment().toISOString(),
-                        "isComplete": true,
-                        "isApproved": true,
-                        "isAccepted": true,
-                        "status": "NEW"
-                    };
-                });
-            };
-
-            return getExistingApprovals()
-                .then(updateThemAsAccepted)
-                .then(store.upsert);
-        };
-
         this.clearApprovals = function(periodsAndOrgUnits) {
             periodsAndOrgUnits = _.isArray(periodsAndOrgUnits) ? periodsAndOrgUnits : [periodsAndOrgUnits];
             var payload = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
@@ -246,7 +199,6 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                     "orgUnit": periodAndOrgUnit.orgUnit,
                     "isComplete": false,
                     "isApproved": false,
-                    "isAccepted": false,
                     "status": "DELETED"
                 };
             });
@@ -264,9 +216,24 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             approvalsFromDhis = _.isArray(approvalsFromDhis) ? approvalsFromDhis : [approvalsFromDhis];
             var store = db.objectStore("approvals");
             _.each(approvalsFromDhis, function(approvalFromDhis) {
-                return self.getApprovalData(approvalFromDhis.period, approvalFromDhis.orgUnit).then(function(approvalFromDb) {
-                    return store.upsert(_.merge(approvalFromDb, approvalFromDhis));
+                var periodAndOrgUnit = {
+                    "period": approvalFromDhis.period,
+                    "orgUnit": approvalFromDhis.orgUnit
+                };
+                return self.getApprovalData(periodAndOrgUnit).then(function(approvalFromDb) {
+                    return store.upsert(_.merge(approvalFromDhis, approvalFromDb));
                 });
+            });
+        };
+
+        this.clearStatusFlag = function(period, orgUnit) {
+            var periodAndOrgUnit = {
+                "period": period,
+                "orgUnit": orgUnit
+            };
+            var store = db.objectStore("approvals");
+            return self.getApprovalData(periodAndOrgUnit).then(function(approvalFromDb) {
+                return store.upsert(_.omit(approvalFromDb, "status"));
             });
         };
     };

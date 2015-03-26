@@ -1,45 +1,37 @@
 define(["moment", "properties", "lodash"], function(moment, properties, _) {
-    return function(approvalService, approvalDataRepository) {
-
-        var preparePayload = function(data) {
-            return approvalDataRepository.getLevelTwoApprovalData(data.period, data.orgUnit);
-        };
-
-        var upload = function(payload) {
-            if (!payload) return;
-
-            var createApproval = function() {
-                var clearStatusFlag = function() {
-                    return approvalDataRepository.saveLevelTwoApproval(_.omit(payload, "status"));
-                };
-                if (payload.isApproved === true && payload.isAccepted === true)
-                    return approvalService.markAsApproved(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate)
-                        .then(function() {
-                            approvalService.markAsAccepted(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate);
-                        })
-                        .then(clearStatusFlag);
-                else if (payload.isApproved === true)
-                    return approvalService.markAsApproved(payload.dataSets, payload.period, payload.orgUnit, payload.createdByUsername, payload.createdDate).then(clearStatusFlag);
-            };
-
-            var deleteApproval = function() {
-                var deleteLocally = function() {
-                    return approvalDataRepository.deleteLevelTwoApproval(payload.period, payload.orgUnit);
-                };
-                return approvalService.markAsUnapproved(payload.dataSets, payload.period, payload.orgUnit).then(deleteLocally);
-            };
-
-            var commands = {
-                "NEW": createApproval,
-                "DELETED": deleteApproval
-            };
-
-            var command = commands[payload.status] || function() {};
-            return command.apply(this);
-        };
-
+    return function(approvalService, approvalDataRepository, datasetRepository, $q) {
         this.run = function(message) {
-            return preparePayload(message.data.data).then(upload);
+            var periodsAndOrgUnits = _.isArray(message.data.data) ? message.data.data : [message.data.data];
+            var getDatasetIdsPromise = datasetRepository.getAllDatasetIds();
+            var getApprovalDataPromise = approvalDataRepository.getApprovalData(periodsAndOrgUnits);
+
+            return $q.all([getDatasetIdsPromise, getApprovalDataPromise]).then(function(data) {
+                var allDatasets = data[0];
+                var allApprovalData = data[1];
+
+                if (_.isEmpty(allApprovalData))
+                    return;
+
+                var clearStatusFlag = function() {
+                    var promises = [];
+                    _.each(allApprovalData, function(approvalData) {
+                        promises.push(approvalDataRepository.clearStatusFlag(approvalData.period, approvalData.orgUnit));
+                    });
+                    return $q.all(promises);
+                };
+
+                var approvedBy = allApprovalData[0].approvedBy;
+                var approvedOn = allApprovalData[0].approvedOn;
+                var periodsAndOrgUnitsForDhis = _.transform(allApprovalData, function(results, approvalData) {
+                    results.push({
+                        "period": approvalData.period,
+                        "orgUnit": approvalData.orgUnit
+                    });
+                });
+
+                return approvalService.markAsApproved(allDatasets, periodsAndOrgUnitsForDhis, approvedBy, approvedOn)
+                    .then(clearStatusFlag);
+            });
         };
     };
 });

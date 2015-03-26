@@ -32,7 +32,6 @@
         <div ng-if="hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver'])">
             <div ng-show="approveSuccessForLevelOne" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
             <div ng-show="approveSuccessForLevelTwo" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
-            <div ng-show="approveSuccessForLevelThree" class="alert alert-success">{{resourceBundle.thirdLevelApproveSuccess}}</div>
             <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
             <form name="approvalForm">
                 <table class="table table-bordered msf-table" ng-if="itemsAwaitingApprovalAtUserLevel.length > 0">

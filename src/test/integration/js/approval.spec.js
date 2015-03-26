@@ -153,7 +153,6 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 "createdDate": "2015-01-08T11:42:41.108Z",
                 "orgUnit": orgUnitId,
                 "period": period,
-                "isAccepted": false,
                 "isApproved": true,
                 "createdByUsername": "prj_approver_l2"
             };
@@ -223,7 +222,6 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 "orgUnit": orgUnitId,
                 "period": period,
                 "status": "NEW",
-                "isAccepted": false,
                 "isApproved": true,
                 "createdByUsername": "prj_approver_l2"
             };
@@ -410,7 +408,6 @@ define(["idbUtils", "httpTestUtils", "dataValueBuilder", "moment", "lodash"], fu
                 "createdDate": "2015-01-08T11:42:41.108Z",
                 "orgUnit": orgUnitId,
                 "period": period,
-                "isAccepted": false,
                 "isApproved": true,
                 "createdByUsername": "prj_approver_l2"
             };

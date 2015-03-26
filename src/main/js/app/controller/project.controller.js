@@ -82,13 +82,30 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
         };
 
         $scope.update = function(newOrgUnit, orgUnit) {
+
+            var publishApprovalsToDhis = function(periodAndOrgUnits) {
+
+                var uploadCompletionPromise = $hustle.publish({
+                    "data": periodAndOrgUnits,
+                    "type": "uploadCompletionData"
+                }, "dataValues");
+
+                var uploadApprovalPromise = $hustle.publish({
+                    "data": periodAndOrgUnits,
+                    "type": "uploadApprovalData"
+                }, "dataValues");
+
+                return $q.all([uploadCompletionPromise, uploadApprovalPromise]);
+            };
+
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
             saveToDbAndPublishMessage(dhisProject).then(function(data) {
                 orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules([dhisProject.id], true).then(function(modules) {
                     orgUnitGroupHelper.createOrgUnitGroups(modules, true);
                     if (newOrgUnit.autoApprove) {
                         var periodAndOrgUnits = getPeriodsAndOrgUnitsForAutoApprove(modules);
-                        return approvalDataRepository.markAsAccepted(periodAndOrgUnits, "service.account");
+                        return approvalDataRepository.markAsApproved(periodAndOrgUnits, "admin")
+                            .then(_.partial(publishApprovalsToDhis, periodAndOrgUnits));
                     } else {
                         return data;
                     }

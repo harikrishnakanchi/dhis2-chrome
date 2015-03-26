@@ -1,28 +1,33 @@
 define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(properties, moment, dhisUrl, _, dateUtils) {
     return function($http, db, $q) {
-        this.markAsComplete = function(dataSets, period, orgUnit, storedBy, completionDate) {
-            var payload = _.transform(dataSets, function(result, ds) {
-                result.push({
-                    "ds": ds,
-                    "pe": period,
-                    "ou": orgUnit,
-                    "sb": storedBy,
-                    "cd": completionDate,
-                    "multiOu": true
+        this.markAsComplete = function(dataSets, periodsAndOrgUnits, completedBy, completedOn) {
+            var payload = [];
+            _.each(periodsAndOrgUnits, function(periodAndOrgUnit) {
+                _.each(dataSets, function(ds) {
+                    payload.push({
+                        "ds": ds,
+                        "pe": periodAndOrgUnit.period,
+                        "ou": periodAndOrgUnit.orgUnit,
+                        "sb": completedBy,
+                        "cd": completedOn,
+                        "multiOu": true
+                    });
                 });
             });
-
             return $http.post(dhisUrl.approvalMultipleL1, payload);
         };
 
-        this.markAsApproved = function(dataSets, period, orgUnit, approvedBy, approvalDate) {
-            var payload = _.transform(dataSets, function(result, ds) {
-                result.push({
-                    "ds": ds,
-                    "pe": period,
-                    "ou": orgUnit,
-                    "ab": approvedBy,
-                    "ad": approvalDate
+        this.markAsApproved = function(dataSets, periodsAndOrgUnits, approvedBy, approvalDate) {
+            var payload = [];
+            _.each(periodsAndOrgUnits, function(periodAndOrgUnit) {
+                _.each(dataSets, function(ds) {
+                    payload.push({
+                        "ds": ds,
+                        "pe": periodAndOrgUnit.period,
+                        "ou": periodAndOrgUnit.orgUnit,
+                        "ab": approvedBy,
+                        "ad": approvalDate
+                    });
                 });
             });
 
@@ -37,19 +42,6 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     "ou": orgUnit
                 }
             });
-        };
-
-        this.markAsAccepted = function(dataSets, period, orgUnit, approvedBy, approvalDate) {
-            var payload = _.transform(dataSets, function(result, ds) {
-                result.push({
-                    "ds": ds,
-                    "pe": period,
-                    "ou": orgUnit,
-                    "ab": approvedBy,
-                    "ad": approvalDate
-                });
-            });
-            return $http.post(dhisUrl.approvalMultipleL3, payload);
         };
 
         this.getAllLevelOneApprovalData = function(orgUnits, dataSets) {
@@ -109,27 +101,22 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
 
                 return _.transform(approvalDataGroupedByPeriodAndOu, function(acc, groupedItems) {
                     var isApproved = false;
-                    var isAccepted = false;
 
                     var itemAtLowestApprovalLevel = _.minWhile(groupedItems, "state", approvalStatusOrder);
 
                     switch (itemAtLowestApprovalLevel.state) {
                         case "APPROVED_ABOVE":
                         case "APPROVED_HERE":
-                            isApproved = true;
-                            break;
                         case "ACCEPTED_HERE":
                             isApproved = true;
-                            isAccepted = true;
                             break;
                     }
 
-                    if (isApproved || isAccepted)
+                    if (isApproved)
                         acc.push({
                             'period': dateUtils.getFormattedPeriod(_.pluck(groupedItems, 'period')[0].id),
                             'orgUnit': _.pluck(groupedItems, 'organisationUnit')[0].id,
                             "isApproved": isApproved,
-                            "isAccepted": isAccepted,
                             "approvedBy": _.pluck(groupedItems, 'createdByUsername')[0],
                             "approvedOn": _.pluck(groupedItems, 'createdDate')[0],
                         });

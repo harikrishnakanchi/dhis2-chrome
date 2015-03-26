@@ -101,25 +101,15 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
             expect(result).toEqual(data);
         });
 
-        it("should get the filtered approval data", function() {
-            mockStore.find.and.returnValue(utils.getPromise(q, {
-                period: '2014W15',
-                status: 'DELETED'
-            }));
-
-            approvalDataRepository.getApprovalData('period', 'orgUnitId', true).then(function(data) {
-                expect(data).toBeUndefined();
-            });
-
-            scope.$apply();
-        });
-
         it("should get the approval data", function() {
             mockStore.find.and.returnValue(utils.getPromise(q, {
                 period: '2014W05'
             }));
 
-            approvalDataRepository.getApprovalData('2014W5', 'orgUnitId');
+            approvalDataRepository.getApprovalData({
+                'period': '2014W5',
+                'orgUnit': 'orgUnitId'
+            });
 
             expect(db.objectStore).toHaveBeenCalledWith("approvals");
             expect(mockStore.find).toHaveBeenCalledWith(['2014W05', 'orgUnitId']);
@@ -208,7 +198,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "createdByUsername": "testproj_approver_l1",
                 "createdDate": "2014-01-03T00:00:00.000+0000",
                 "dataSets": ["d1", "d2", "d3"],
-                "isAccepted": true,
                 "isApproved": true
             }, {
                 "orgUnit": "ou1",
@@ -216,7 +205,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "createdByUsername": "testproj_approver_l1",
                 "createdDate": "2014-01-03T00:00:00.000+0000",
                 "dataSets": ["d1", "d2", "d3"],
-                "isAccepted": false,
                 "isApproved": true
             }, {
                 "orgUnit": "ou2",
@@ -224,7 +212,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "createdByUsername": "testproj_approver_l1",
                 "createdDate": "2014-01-03T00:00:00.000+0000",
                 "dataSets": ["d1", "d2", "d3"],
-                "isAccepted": false,
                 "isApproved": true
             }, {
                 "orgUnit": "ou3",
@@ -232,7 +219,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "createdByUsername": "testproj_approver_l1",
                 "createdDate": "2014-01-03T00:00:00.000+0000",
                 "dataSets": ["d1", "d2", "d3"],
-                "isAccepted": false,
                 "isApproved": true
             }]));
 
@@ -249,7 +235,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "createdByUsername": "testproj_approver_l1",
                 "createdDate": "2014-01-03T00:00:00.000+0000",
                 "dataSets": ["d1", "d2", "d3"],
-                "isAccepted": true,
                 "isApproved": true
             }, {
                 "orgUnit": "ou1",
@@ -257,7 +242,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "createdByUsername": "testproj_approver_l1",
                 "createdDate": "2014-01-03T00:00:00.000+0000",
                 "dataSets": ["d1", "d2", "d3"],
-                "isAccepted": false,
                 "isApproved": true
             }, {
                 "orgUnit": "ou2",
@@ -265,7 +249,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "createdByUsername": "testproj_approver_l1",
                 "createdDate": "2014-01-03T00:00:00.000+0000",
                 "dataSets": ["d1", "d2", "d3"],
-                "isAccepted": false,
                 "isApproved": true
             }]);
         });
@@ -291,7 +274,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-03T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "isAccepted": false,
                 "status": "NEW"
             }, {
                 "period": "2014W01",
@@ -300,7 +282,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-03T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "isAccepted": false,
                 "status": "NEW"
             }, {
                 "period": "2014W02",
@@ -309,7 +290,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-03T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "isAccepted": false,
                 "status": "NEW"
             }];
 
@@ -339,7 +319,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-01T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "isAccepted": false
             }, {
                 "period": "2014W01",
                 "orgUnit": "Mod2",
@@ -347,7 +326,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-01T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "isAccepted": false
             }, {
                 "period": "2014W01",
                 "orgUnit": "Mod3",
@@ -355,7 +333,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-01T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "isAccepted": false
             }, {
                 "period": "2014W02",
                 "orgUnit": "Mod1",
@@ -363,7 +340,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-01T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "isAccepted": false,
                 "status": "NEW"
             }, {
                 "period": "2014W02",
@@ -372,7 +348,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "completedOn": "2014-01-01T00:00:00.000Z",
                 "isComplete": true,
                 "isApproved": false,
-                "isAccepted": false,
                 "status": "NEW"
             }];
 
@@ -385,7 +360,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedOn": thisMoment.toISOString(),
                 "isComplete": true,
                 "isApproved": true,
-                "isAccepted": false,
                 "status": "NEW"
             }, {
                 "period": "2014W01",
@@ -396,7 +370,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedOn": thisMoment.toISOString(),
                 "isComplete": true,
                 "isApproved": true,
-                "isAccepted": false,
                 "status": "NEW"
             }, {
                 "period": "2014W02",
@@ -407,157 +380,12 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedOn": thisMoment.toISOString(),
                 "isComplete": true,
                 "isApproved": true,
-                "isAccepted": false,
                 "status": "NEW"
             }];
 
             mockStore.each.and.returnValue(utils.getPromise(q, approvalsInIdb));
 
             approvalDataRepository.markAsApproved(periodsAndOrgUnits, "user3");
-            scope.$apply();
-
-            expect(db.objectStore).toHaveBeenCalledWith("approvals");
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpserts);
-        });
-
-        it("should mark all period and orgunit combinations as accepted while retaining existing completion info", function() {
-            var periodsAndOrgUnits = [{
-                "period": "2014W01",
-                "orgUnit": "Mod1"
-            }, {
-                "period": "2014W01",
-                "orgUnit": "Mod2"
-            }, {
-                "period": "2014W02",
-                "orgUnit": "Mod4"
-            }];
-
-            var approvalsInIdb = [{
-                "period": "2014W01",
-                "orgUnit": "Mod1",
-                "completedBy": "user1",
-                "completedOn": "2014-01-01T00:00:00.000Z",
-                "approvedBy": "user2",
-                "approvedOn": "2014-02-04T00:00:00.000Z",
-                "isComplete": true,
-                "isApproved": true,
-                "isAccepted": false,
-                "status": "NEW"
-            }, {
-                "period": "2014W01",
-                "orgUnit": "Mod2",
-                "completedBy": "user1",
-                "completedOn": "2014-01-01T00:00:00.000Z",
-                "isComplete": true,
-                "isApproved": true,
-                "isAccepted": false
-            }, {
-                "period": "2014W01",
-                "orgUnit": "Mod3",
-                "completedBy": "user1",
-                "completedOn": "2014-01-01T00:00:00.000Z",
-                "isComplete": true,
-                "isApproved": true,
-                "isAccepted": false
-            }];
-
-            var expectedUpserts = [{
-                "period": "2014W01",
-                "orgUnit": "Mod1",
-                "completedBy": "user1",
-                "completedOn": "2014-01-01T00:00:00.000Z",
-                "approvedBy": "user3",
-                "approvedOn": thisMoment.toISOString(),
-                "isComplete": true,
-                "isApproved": true,
-                "isAccepted": true,
-                "status": "NEW"
-            }, {
-                "period": "2014W01",
-                "orgUnit": "Mod2",
-                "completedBy": "user1",
-                "completedOn": "2014-01-01T00:00:00.000Z",
-                "approvedBy": "user3",
-                "approvedOn": thisMoment.toISOString(),
-                "isComplete": true,
-                "isApproved": true,
-                "isAccepted": true,
-                "status": "NEW"
-            }, {
-                "period": "2014W02",
-                "orgUnit": "Mod4",
-                "completedBy": "user3",
-                "completedOn": thisMoment.toISOString(),
-                "approvedBy": "user3",
-                "approvedOn": thisMoment.toISOString(),
-                "isComplete": true,
-                "isApproved": true,
-                "isAccepted": true,
-                "status": "NEW"
-            }];
-
-            mockStore.each.and.returnValue(utils.getPromise(q, approvalsInIdb));
-
-            approvalDataRepository.markAsAccepted(periodsAndOrgUnits, "user3");
-            scope.$apply();
-
-            expect(db.objectStore).toHaveBeenCalledWith("approvals");
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpserts);
-        });
-
-        it("should mark as accepted during auto approve", function() {
-            var periodsAndOrgUnits = [{
-                "period": "2014W1",
-                "orgUnit": "Mod1"
-            }, {
-                "period": "2014W1",
-                "orgUnit": "Mod2"
-            }, {
-                "period": "2014W2",
-                "orgUnit": "Mod1"
-            }];
-
-            var approvalsInIdb = [];
-
-
-            var expectedUpserts = [{
-                "period": "2014W01",
-                "orgUnit": "Mod1",
-                "completedBy": "user3",
-                "completedOn": thisMoment.toISOString(),
-                "approvedBy": "user3",
-                "approvedOn": thisMoment.toISOString(),
-                "isComplete": true,
-                "isApproved": true,
-                "isAccepted": true,
-                "status": "NEW"
-            }, {
-                "period": "2014W01",
-                "orgUnit": "Mod2",
-                "completedBy": "user3",
-                "completedOn": thisMoment.toISOString(),
-                "approvedBy": "user3",
-                "approvedOn": thisMoment.toISOString(),
-                "isComplete": true,
-                "isApproved": true,
-                "isAccepted": true,
-                "status": "NEW"
-            }, {
-                "period": "2014W02",
-                "orgUnit": "Mod1",
-                "completedBy": "user3",
-                "completedOn": thisMoment.toISOString(),
-                "approvedBy": "user3",
-                "approvedOn": thisMoment.toISOString(),
-                "isComplete": true,
-                "isApproved": true,
-                "isAccepted": true,
-                "status": "NEW"
-            }];
-
-            mockStore.each.and.returnValue(utils.getPromise(q, approvalsInIdb));
-
-            approvalDataRepository.markAsAccepted(periodsAndOrgUnits, "user3");
             scope.$apply();
 
             expect(db.objectStore).toHaveBeenCalledWith("approvals");
@@ -583,21 +411,18 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "orgUnit": "Mod1",
                 "isComplete": false,
                 "isApproved": false,
-                "isAccepted": false,
                 "status": "DELETED"
             }, {
                 "period": "2014W01",
                 "orgUnit": "Mod2",
                 "isComplete": false,
                 "isApproved": false,
-                "isAccepted": false,
                 "status": "DELETED"
             }, {
                 "period": "2014W02",
                 "orgUnit": "Mod1",
                 "isComplete": false,
                 "isApproved": false,
-                "isAccepted": false,
                 "status": "DELETED"
             }];
 
@@ -622,7 +447,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedOn": thisMoment.toISOString(),
                 "isComplete": true,
                 "isApproved": true,
-                "isAccepted": true
             };
 
             var dataFromDhis = {
@@ -642,7 +466,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedOn": thisMoment.toISOString(),
                 "isComplete": true,
                 "isApproved": true,
-                "isAccepted": true
             };
 
             mockStore.find.and.callFake(function(data) {
@@ -674,7 +497,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedBy": "approver1",
                 "approvedOn": "2014-01-10T00:00:00.000+0000",
                 "isApproved": true,
-                "isAccepted": false
             };
 
             var expectedUpsert = {
@@ -686,7 +508,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "approvedOn": "2014-01-10T00:00:00.000+0000",
                 "isComplete": true,
                 "isApproved": true,
-                "isAccepted": false
             };
 
             mockStore.find.and.callFake(function(data) {
