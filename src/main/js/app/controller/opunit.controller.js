@@ -24,6 +24,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         };
 
         var getAttributeValues = function(opUnitType, hospitalUnitCode) {
+            hospitalUnitCode = opUnitType === "Hospital" ? hospitalUnitCode : "";
             return [{
                 "created": moment().toISOString(),
                 "lastUpdated": moment().toISOString(),

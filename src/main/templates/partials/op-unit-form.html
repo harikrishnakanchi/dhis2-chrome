@@ -38,7 +38,7 @@
                             </div>
                         </div>
                     </li>
-                    <li class="form-group">
+                    <li class="form-group" ng-if="opUnit.type==='Hospital'">
                         <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label">Hospital Unit Code</label>
                         <div class="col-sm-6 col-md-6">
                             <select type="text" class="form-control" name="hospitalUnitCode" id="hospitalUnitCode" ng-model="opUnit.hospitalUnitCode" title="{{newOrgUnit.hospitalUnitCode}}" ng-options="h as h for h in hospitalUnitCodes" ng-disabled="isDisabled">

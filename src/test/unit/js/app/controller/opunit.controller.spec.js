@@ -110,6 +110,75 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }, "dataValues");
         });
 
+        it("should not hospital unit code while saving operation unit if it is not hospital", function() {
+            var opUnit = {
+                "name": "OpUnit1",
+                "type": "Health Center",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "hospitalUnitCode": "Unit Code - A"
+            };
+
+            scope.orgUnit = {
+                "level": "4",
+                "name": "Parent",
+                "id": "ParentId",
+                "children": []
+            };
+
+            var expectedOpUnit = {
+                "name": "OpUnit1",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "id": "OpUnit1ParentId",
+                "shortName": "OpUnit1",
+                "level": 5,
+                "parent": {
+                    "name": "Parent",
+                    "id": "ParentId"
+                },
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "opUnitType"
+                    },
+                    "value": "Health Center"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Operation Unit"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "hospitalUnitCode"
+                    },
+                    "value": ""
+                }]
+            };
+
+            spyOn(location, "hash");
+            spyOn(dhisId, "get").and.callFake(function(name) {
+                return name;
+            });
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
+                "data": {
+                    "data": []
+                }
+            }));
+
+            scope.save(opUnit);
+            scope.$apply();
+
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnit);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "data": expectedOpUnit,
+                "type": "upsertOrgUnit"
+            }, "dataValues");
+        });
+
         it("should set operation unit for view", function() {
             scope.orgUnit = {
                 "name": "opUnit1",
