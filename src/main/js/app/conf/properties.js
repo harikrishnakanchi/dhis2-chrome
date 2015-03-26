@@ -42,6 +42,9 @@ define(['lodash', 'overrides'], function(_, overrides) {
         "logging": {
             "maxAgeinHours": 720
         },
+        "encryption": {
+            "passphrase": "My Product Key"
+        },
         "messageTimeout": 5000,
         "devMode": true,
         "weeksForAutoApprove": 8,

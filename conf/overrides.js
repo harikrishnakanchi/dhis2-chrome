@@ -8,8 +8,7 @@ define([], function() {
             "url": url + "/favicon.ico"
         },
         "dhis": {
-            "url": url,
-            "auth_header": auth_header
+            "url": url
         },
         "metadata": {
             "sync": {

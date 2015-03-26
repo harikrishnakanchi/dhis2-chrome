@@ -20,7 +20,8 @@
         "hustle": "https://github.com/orthecreedence/hustle.git",
         "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git",
         "timecop": null,
-        "jszip": null
+        "jszip": null,
+        "sjcl": null
     },
     "devDependencies": {
         "angular-mocks": null

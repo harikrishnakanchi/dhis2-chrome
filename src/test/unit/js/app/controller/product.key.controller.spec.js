@@ -6,7 +6,7 @@ define(["productKeyController", "angularMocks", "metadataImporter", "utils", "ch
             scope = $rootScope.$new();
             location = $location;
             rootscope = $rootScope;
-            q= $q;
+            q = $q;
 
             chrome.storage = {
                 "local": {
@@ -24,13 +24,13 @@ define(["productKeyController", "angularMocks", "metadataImporter", "utils", "ch
         }));
 
         it("should set the product key on rootscope and trigger sync", function() {
-            scope.productKey = "Auth";
+            scope.productKey = "eyJpdiI6IldrbWRjaERvR0RhYmRWVmozbFVHeXc9PSIsInNhbHQiOiJGYU90RkVlM1E1dz0iLCJjdCI6ImpUQVJ0UWxXOE96TlltTFNsWCtCNzlDY2l1ST0ifQ==";
 
             scope.$apply();
             scope.setAuthHeaderAndProceed();
             scope.$apply();
 
-            expect(rootscope.auth_header).toEqual("Auth");
+            expect(rootscope.auth_header).toEqual("Test Message");
         });
     });
 });

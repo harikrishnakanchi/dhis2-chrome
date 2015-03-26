@@ -16,7 +16,7 @@ require.config({
         "hustleModule": "lib/angularjs-hustle/hustle.module",
         "indexedDBLogger": "app/utils/indexeddb.logger",
         "JSZip": "lib/jszip/dist/jszip",
-
+        "sjcl": "lib/sjcl/sjcl",
 
         //3rd party angular modules
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
