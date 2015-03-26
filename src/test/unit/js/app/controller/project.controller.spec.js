@@ -556,6 +556,27 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             expect(scope.existingProjectCodes).toEqual(["AF101"]);
         });
+
+        it("should take the user to the view page of the parent country on clicking cancel", function(){
+            var parentOrgUnit = {
+                'id' : 'parent',
+                'name': 'parent'
+            };
+
+            scope.$parent = {
+                "closeNewForm" : function() {}
+            };
+
+            spyOn(scope.$parent,"closeNewForm").and.callFake(function(parentOrgUnit){
+                return;
+            });
+
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, patientOriginRepository);
+
+            scope.closeForm(parentOrgUnit);
+
+            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(parentOrgUnit);
+        });
     });
 
 });

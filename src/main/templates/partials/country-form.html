@@ -39,7 +39,8 @@
                     <li ng-if="isNewMode">
                         <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
                             <input type="submit" class="btn btn-main" ng-disabled="createForm.$invalid || isAfterMaxDate()" value="Save" />
-                            <input type="button" class="btn btn-default" ng-click="reset()" value="Reset">
+                            <input type="button" class="btn" ng-click="reset()" value="Reset">
+                            <input type="button" class="btn" ng-click="closeForm(orgUnit)" value="Back">
                         </div>
                     </li>
                 </ul>

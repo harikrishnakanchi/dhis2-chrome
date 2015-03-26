@@ -23,6 +23,10 @@ define(["dhisId"], function(dhisId) {
             });
         };
 
+        $scope.closeForm = function() {
+            $scope.$parent.closeNewForm($scope.orgUnit);
+        };
+
         $scope.reset = function() {
             $scope.projectUser = {};
         };

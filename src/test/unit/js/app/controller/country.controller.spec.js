@@ -1,8 +1,8 @@
-define(["countryController", "angularMocks", "utils", "moment", "timecop","dhisId"], function(CountryController, mocks, utils, moment, timecop,dhisId) {
+define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhisId"], function(CountryController, mocks, utils, moment, timecop, dhisId) {
 
     describe("contry controller", function() {
 
-        var scope, timeout, q, location, anchorScroll, hustle, orgUnitRepo,DhisId;
+        var scope, timeout, q, location, anchorScroll, hustle, orgUnitRepo, DhisId;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $hustle, $q, $timeout, $location) {
@@ -89,7 +89,7 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop","dhisI
             };
 
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-            spyOn(dhisId, "get").and.callFake(function(name){
+            spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
 
@@ -136,6 +136,27 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop","dhisI
             countryController = new CountryController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
+        });
+
+        it("should take the user to the view page of OCP on clicking cancel", function(){
+            var parentOrgUnit = {
+                'id': 'parent',
+                'name': 'parent'
+            };
+
+            scope.$parent = {
+                "closeNewForm": function() {}
+            };
+
+            spyOn(scope.$parent, "closeNewForm").and.callFake(function(parentOrgUnit) {
+                return;
+            });
+
+            countryController = new CountryController(scope, hustle, orgUnitRepo, q, location, timeout, anchorScroll);
+
+            scope.closeForm(parentOrgUnit);
+
+            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(parentOrgUnit);
         });
 
     });

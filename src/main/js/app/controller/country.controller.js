@@ -62,6 +62,10 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             return moment($scope.newOrgUnit.openingDate).isAfter(moment($scope.thisDate));
         };
 
+        $scope.closeForm = function(parentOrgUnit) {
+            $scope.$parent.closeNewForm(parentOrgUnit);
+        };
+
         var scrollToTop = function() {
             $location.hash();
             $anchorScroll();

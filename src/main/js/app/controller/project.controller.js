@@ -31,6 +31,10 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             };
         };
 
+        $scope.closeForm = function(parentOrgUnit) {
+            $scope.$parent.closeNewForm(parentOrgUnit);
+        };
+
         var publishMessage = function(data, action) {
             return $hustle.publish({
                 "data": data,

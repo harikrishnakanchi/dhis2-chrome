@@ -714,5 +714,25 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             expect(datasetRepo.upsert).toHaveBeenCalledWith(expectedUpserts);
 
         });
+
+        it("should take the user to the view page of the parent opUnit on clicking cancel", function() {
+            scope.orgUnit = {
+                "id": "parent",
+                "name": "parent"
+            };
+
+            scope.$parent = {
+                "closeNewForm": function() {}
+            };
+
+            spyOn(scope.$parent, "closeNewForm").and.callFake(function(parentOrgUnit) {
+                return;
+            });
+
+            scope.closeForm();
+
+            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
+        });
+        
     });
 });

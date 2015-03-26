@@ -395,5 +395,24 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }, "dataValues");
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
         });
+
+        it("should take the user to the view page of the parent project on clicking cancel", function(){
+            scope.orgUnit = {
+                "id" : "parent",
+                "name": "parent"
+            };
+
+            scope.$parent = {
+                "closeNewForm": function() {}
+            };
+
+            spyOn(scope.$parent, "closeNewForm").and.callFake(function(parentOrgUnit) {
+                return;
+            });
+
+            scope.closeForm();
+
+            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
+        });
     });
 });

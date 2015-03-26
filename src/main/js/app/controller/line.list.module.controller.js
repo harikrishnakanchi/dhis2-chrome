@@ -103,6 +103,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             return $scope.collapseSection[sectionId];
         };
 
+        $scope.closeForm = function() {
+            $scope.$parent.closeNewForm($scope.orgUnit);
+        };
+
         var publishMessage = function(data, action) {
             return $hustle.publish({
                 "data": data,

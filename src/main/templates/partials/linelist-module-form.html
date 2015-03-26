@@ -66,6 +66,7 @@
 
                 </ul>
             </div>
+            <input type="button" class="btn pull-right" ng-if="isNewMode" ng-click="closeForm()" value="Back" />
             <input type="button" class="btn btn-main pull-right" ng-click="save(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton()" value="Save" ng-if="isNewMode" />
             <input type="button" class="btn btn-main pull-right" ng-click="update(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton() || isDisabled==true || !form.$dirty" value="Update" ng-if="!isNewMode &amp;&amp; !(isDisabled==true)" />
             <input type="button" class="btn btn-main pull-right" ng-click="disable(module)" value="Disable" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !(isDisabled==true)" />

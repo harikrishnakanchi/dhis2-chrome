@@ -119,6 +119,7 @@
                             <input type="button" class="btn btn-main" ng-if="isNewMode" ng-click="save(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Save" />
                             <input type="button" class="btn btn-main" ng-if="!isNewMode" ng-click="update(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate() || !createForm.$dirty" value="Update" />
                             <input type="button" class="btn" ng-click="reset()" ng-if="isNewMode" value="Reset" />
+                            <input type="button" class="btn" ng-if="isNewMode" ng-click="closeForm(orgUnit)" value="Back" />
                         </div>
                     </li>
                 </ul>

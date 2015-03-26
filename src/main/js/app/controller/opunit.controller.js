@@ -121,6 +121,10 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             $scope.opUnits.splice(index, 1);
         };
 
+        $scope.closeForm = function() {
+            $scope.$parent.closeNewForm($scope.orgUnit);
+        };
+
         var disableOpunit = function(orgUnit) {
             return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules([orgUnit.id]).then(function(orgUnitsToDisable) {
                 orgUnitsToDisable.push(orgUnit);
@@ -148,6 +152,12 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             showModal(function() {
                 disableOpunit(orgUnit);
             }, $scope.resourceBundle.disableOrgUnitConfirmationMessage);
+        };
+
+        $scope.reset = function() {
+            $scope.opUnits = [{
+            'openingDate': moment().format("YYYY-MM-DD")
+        }];
         };
 
         var init = function() {

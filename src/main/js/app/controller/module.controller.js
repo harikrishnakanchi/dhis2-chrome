@@ -100,6 +100,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
         };
 
+        $scope.closeForm = function() {
+            $scope.$parent.closeNewForm($scope.orgUnit);
+        };
+
         var publishMessage = function(data, action) {
             return $hustle.publish({
                 "data": data,
