@@ -113,7 +113,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             httpBackend.flush();
         });
 
-        it("should get complete datasets", function() {
+        it("should get completion data", function() {
             var startDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
             var endDate = moment().format("YYYY-MM-DD");
 
@@ -177,7 +177,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
             var actualApprovalData;
             approvalService = new ApprovalService(http, db, q);
-            approvalService.getAllLevelOneApprovalData(orgUnits, dataSets).then(function(data) {
+            approvalService.getCompletionData(orgUnits, dataSets).then(function(data) {
                 actualApprovalData = data;
             });
 
@@ -200,7 +200,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             expect(actualApprovalData).toEqual(expectedApprovalData);
         });
 
-        it("should get level two approval data by considering the lowest approval level of associated datasets", function() {
+        it("should get approval data by considering the lowest approval level of associated datasets", function() {
             var startDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
             var endDate = moment().format("YYYY-MM-DD");
 
@@ -329,7 +329,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
             var actualApprovalData;
             approvalService = new ApprovalService(http, db, q);
-            approvalService.getAllLevelTwoApprovalData(orgUnits, dataSets).then(function(data) {
+            approvalService.getApprovalData(orgUnits, dataSets).then(function(data) {
                 actualApprovalData = data;
             });
 
@@ -364,12 +364,12 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             expect(actualApprovalData).toEqual(expectedApprovalData);
         });
 
-        it("should return a failure http promise if download approval level two data fails", function() {
+        it("should return a failure http promise if download approval data fails", function() {
             httpBackend.expectGET().respond(500, {});
             approvalService = new ApprovalService(http, db, q);
 
             var status;
-            approvalService.getAllLevelTwoApprovalData(orgUnits, dataSets).then(undefined, function(data) {
+            approvalService.getApprovalData(orgUnits, dataSets).then(undefined, function(data) {
                 status = data.status;
             });
 
@@ -378,12 +378,12 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             expect(status).toBe(500);
         });
 
-        it("should return a failure http promise if download all data fails", function() {
+        it("should return a failure http promise if download completion data fails", function() {
             httpBackend.expectGET().respond(500, {});
             approvalService = new ApprovalService(http, db, q);
 
             var status;
-            approvalService.getAllLevelOneApprovalData(orgUnits, dataSets).then(undefined, function(data) {
+            approvalService.getCompletionData(orgUnits, dataSets).then(undefined, function(data) {
                 status = data.status;
             });
 

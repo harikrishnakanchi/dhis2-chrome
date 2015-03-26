@@ -10,53 +10,6 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             });
         };
 
-        this.saveLevelOneApproval = function(payload) {
-            var store = db.objectStore("completedData");
-            return store.upsert(modifiedPayload(payload));
-        };
-
-        this.saveLevelTwoApproval = function(payload) {
-            var store = db.objectStore("approvedData");
-            return store.upsert(modifiedPayload(payload));
-        };
-
-        this.deleteLevelOneApproval = function(period, orgUnitId) {
-            var store = db.objectStore("completedData");
-            return store.delete([dateUtils.getFormattedPeriod(period), orgUnitId]);
-        };
-
-        this.deleteLevelTwoApproval = function(period, orgUnitId) {
-            var store = db.objectStore("approvedData");
-            return store.delete([dateUtils.getFormattedPeriod(period), orgUnitId]);
-        };
-
-        this.unapproveLevelOneData = function(period, orgUnit) {
-            var unapprove = function(data) {
-                if (!data) return;
-                data.status = "DELETED";
-                var store = db.objectStore('completedData');
-                return store.upsert(data).then(function() {
-                    return data;
-                });
-            };
-
-            return this.getLevelOneApprovalData(period, orgUnit, true).then(unapprove);
-        };
-
-        this.unapproveLevelTwoData = function(period, orgUnit) {
-            var unapprove = function(data) {
-                if (!data) return;
-                data.isApproved = false;
-                data.status = "DELETED";
-                var store = db.objectStore('approvedData');
-                return store.upsert(data).then(function() {
-                    return data;
-                });
-            };
-
-            return this.getLevelTwoApprovalData(period, orgUnit, true).then(unapprove);
-        };
-
         this.getLevelOneApprovalData = function(period, orgUnitId, shouldFilterSoftDeletes) {
             var filterSoftDeletedApprovals = function(d) {
                 return shouldFilterSoftDeletes && d && d.status === "DELETED" ? undefined : d;
@@ -221,7 +174,9 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                     "orgUnit": approvalFromDhis.orgUnit
                 };
                 return self.getApprovalData(periodAndOrgUnit).then(function(approvalFromDb) {
-                    return store.upsert(_.merge(approvalFromDhis, approvalFromDb));
+                    if (!approvalFromDb)
+                        return store.upsert(approvalFromDhis);
+                    return store.upsert(_.merge(approvalFromDb, approvalFromDhis));
                 });
             });
         };

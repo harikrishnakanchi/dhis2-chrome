@@ -30,8 +30,6 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "getLevelTwoApprovalData": jasmine.createSpy("getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {})),
                     "getLevelOneApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getLevelOneApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
                     "getLevelTwoApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getLevelTwoApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
-                    "saveLevelOneApproval": jasmine.createSpy("saveLevelOneApproval"),
-                    "saveLevelTwoApproval": jasmine.createSpy("saveLevelTwoApproval"),
                     "invalidateApproval": jasmine.createSpy("invalidateApproval")
                 };
 

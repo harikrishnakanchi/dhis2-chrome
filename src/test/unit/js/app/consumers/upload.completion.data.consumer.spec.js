@@ -36,7 +36,6 @@ define(["uploadCompletionDataConsumer", "angularMocks", "approvalService", "appr
 
                 spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, approvalData));
 
-                spyOn(approvalDataRepository, "saveLevelOneApproval");
                 spyOn(approvalService, "markAsComplete").and.returnValue(utils.getPromise(q, {}));
 
                 message = {
@@ -59,44 +58,6 @@ define(["uploadCompletionDataConsumer", "angularMocks", "approvalService", "appr
                 scope.$apply();
 
                 expect(approvalService.markAsComplete).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1', 'testproj_approver_l1', '2014-05-24T09:00:00.120Z');
-                expect(approvalDataRepository.saveLevelOneApproval).toHaveBeenCalledWith(_.omit(completeData, "status"));
-            });
-
-            it("should unapprove data if it has changed", function() {
-                spyOn(approvalDataRepository, "getLevelOneApprovalData").and.callFake(function(period, orgUnit) {
-                    if (period === "2014W12" && orgUnit === "ou1")
-                        return utils.getPromise(q, {
-                            "orgUnit": "ou1",
-                            "period": "2014W12",
-                            "storedBy": "testproj_approver_l1",
-                            "date": "2014-05-24T09:00:00.120Z",
-                            "status": "DELETED",
-                            "dataSets": ["d1", "d2"]
-                        });
-
-                    return utils.getPromise(q, undefined);
-                });
-
-                spyOn(approvalDataRepository, "deleteLevelOneApproval");
-                spyOn(approvalService, "markAsIncomplete").and.returnValue(utils.getPromise(q, {}));
-
-                message = {
-                    "data": {
-                        "data": {
-                            "dataSets": ["d1", "d2"],
-                            "period": '2014W12',
-                            "orgUnit": 'ou1',
-                            "status": "DELETED"
-                        },
-                        "type": "uploadCompletionData"
-                    }
-                };
-
-                uploadCompletionDataConsumer.run(message);
-                scope.$apply();
-
-                expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1');
-                expect(approvalDataRepository.deleteLevelOneApproval).toHaveBeenCalledWith('2014W12', 'ou1');
             });
         });
     });

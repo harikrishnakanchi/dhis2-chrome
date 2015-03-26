@@ -34,6 +34,17 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             return $http.post(dhisUrl.approvalMultipleL2, payload);
         };
 
+        this.markAsIncomplete = function(dataSets, period, orgUnit) {
+            return $http.delete(dhisUrl.approvalL1, {
+                params: {
+                    "ds": dataSets,
+                    "pe": period,
+                    "ou": orgUnit,
+                    "multiOu": true
+                }
+            });
+        };
+
         this.markAsUnapproved = function(dataSets, period, orgUnit) {
             return $http.delete(dhisUrl.approvalL2, {
                 params: {
@@ -44,7 +55,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             });
         };
 
-        this.getAllLevelOneApprovalData = function(orgUnits, dataSets) {
+        this.getCompletionData = function(orgUnits, dataSets) {
             var transform = function(completeDataSetRegistrations) {
                 var registrationsGroupedByPeriodAndOu = _.groupBy(completeDataSetRegistrations, function(registration) {
                     return [registration.period.id, registration.organisationUnit.id];
@@ -84,7 +95,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             }).then(onSuccess);
         };
 
-        this.getAllLevelTwoApprovalData = function(orgUnits, dataSets) {
+        this.getApprovalData = function(orgUnits, dataSets) {
             var transform = function(dataApprovalStateResponses) {
                 var approvalStatusOrder = {
                     "UNAPPROVABLE": -1,
@@ -145,17 +156,6 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     "children": true
                 }
             }).then(onSuccess);
-        };
-
-        this.markAsIncomplete = function(dataSets, period, orgUnit) {
-            return $http.delete(dhisUrl.approvalL1, {
-                params: {
-                    "ds": dataSets,
-                    "pe": period,
-                    "ou": orgUnit,
-                    "multiOu": true
-                }
-            });
         };
     };
 });

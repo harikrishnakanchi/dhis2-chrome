@@ -22,64 +22,6 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
             Timecop.uninstall();
         });
 
-        it("should save complete datasets", function() {
-            var completeDataSetRegistrationList = [{
-                "orgUnit": "ou1",
-                "period": "2014W1",
-                "storedBy": "testproj_approver_l1",
-                "date": "2014-01-03T00:00:00.000+0000",
-                "dataSets": ["d1", "d2", "d3"]
-            }, {
-                "orgUnit": "ou1",
-                "period": "2014W02",
-                "storedBy": "testproj_approver_l1",
-                "date": "2014-01-03T00:00:00.000+0000",
-                "dataSets": ["d1", "d2", "d3"]
-            }];
-
-            approvalDataRepository.saveLevelOneApproval(completeDataSetRegistrationList);
-
-            expect(db.objectStore).toHaveBeenCalledWith("completedData");
-
-            expect(mockStore.upsert).toHaveBeenCalledWith(completeDataSetRegistrationList);
-            expect(mockStore.upsert.calls.argsFor(0)[0][0].period).toEqual("2014W01");
-            expect(mockStore.upsert.calls.argsFor(0)[0][1].period).toEqual("2014W02");
-        });
-
-        it("should delete complete registrations", function() {
-            approvalDataRepository.deleteLevelOneApproval("2014W1", "ou1");
-
-            expect(db.objectStore).toHaveBeenCalledWith("completedData");
-            expect(mockStore.delete).toHaveBeenCalledWith(["2014W01", "ou1"]);
-        });
-
-        it("should delete approval", function() {
-            approvalDataRepository.deleteLevelTwoApproval("2014W1", "ou1");
-
-            expect(db.objectStore).toHaveBeenCalledWith("approvedData");
-            expect(mockStore.delete).toHaveBeenCalledWith(["2014W01", "ou1"]);
-        });
-
-        it("should save approvals", function() {
-            var approvedDataSets = [{
-                "orgUnit": "ou1",
-                "period": "2014W1",
-                "dataSets": ["d1", "d2", "d3"]
-            }, {
-                "orgUnit": "ou1",
-                "period": "2014W02",
-                "dataSets": ["d1", "d2", "d3"]
-            }];
-
-            approvalDataRepository.saveLevelTwoApproval(approvedDataSets);
-
-            expect(db.objectStore).toHaveBeenCalledWith("approvedData");
-
-            expect(mockStore.upsert).toHaveBeenCalledWith(approvedDataSets);
-            expect(mockStore.upsert.calls.argsFor(0)[0][0].period).toEqual("2014W01");
-            expect(mockStore.upsert.calls.argsFor(0)[0][1].period).toEqual("2014W02");
-        });
-
         it("should get level two approval data", function() {
             var data = {
                 "period": "2014W05",

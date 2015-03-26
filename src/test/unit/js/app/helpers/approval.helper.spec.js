@@ -10,8 +10,6 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 scope = $rootScope.$new();
 
                 approvalDataRepository = new ApprovalDataRepository();
-                spyOn(approvalDataRepository, "saveLevelOneApproval").and.returnValue(utils.getPromise(q, {}));
-                spyOn(approvalDataRepository, "saveLevelTwoApproval").and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitRepository = new OrgUnitRepository();
                 datasetRepository = new DatasetRepository();
