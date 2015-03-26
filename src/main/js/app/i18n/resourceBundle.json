@@ -129,6 +129,6 @@
     "errorAddingPatientOriginDetails": "Error adding patient origin details",
     "savedOriginDetails": "Patient origin details added successfully",
     "patientOrigin": "Patient Origin",
-    "invalidKey": "Invlid Key",
+    "invalidKey": "Invalid Key",
     "enterProductKeyLabel": "Enter Product Key"
 }
