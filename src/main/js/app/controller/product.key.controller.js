@@ -21,12 +21,17 @@ define(["chromeUtils", "sjcl", "properties"], function(chromeUtils, sjcl, proper
         };
 
         $scope.setAuthHeaderAndProceed = function() {
-            var decryptedProductKey = sjcl.decrypt(properties.encryption.passphrase, createCipherText($scope.productKey));
-            chromeUtils.setAuthHeader(decryptedProductKey);
-            $rootScope.auth_header = decryptedProductKey;
+            try {
+                var decryptedProductKey = sjcl.decrypt(properties.encryption.passphrase, createCipherText($scope.productKey));
 
-            triggerImportAndSync();
-            $location.path("/login");
+                chromeUtils.setAuthHeader(decryptedProductKey);
+                $rootScope.auth_header = decryptedProductKey;
+
+                triggerImportAndSync();
+                $location.path("/login");
+            } catch (err) {
+                $scope.isKeyInvalid = true;
+            }
         };
     };
 });

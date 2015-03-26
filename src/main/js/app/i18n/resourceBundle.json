@@ -128,5 +128,7 @@
     "latitudeRangeValidation": "Latitude should be a number between -90 and 90",
     "errorAddingPatientOriginDetails": "Error adding patient origin details",
     "savedOriginDetails": "Patient origin details added successfully",
-    "patientOrigin": "Patient Origin"
+    "patientOrigin": "Patient Origin",
+    "invalidKey": "Invlid Key",
+    "enterProductKeyLabel": "Enter Product Key"
 }
