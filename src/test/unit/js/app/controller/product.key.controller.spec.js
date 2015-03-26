@@ -8,14 +8,8 @@ define(["productKeyController", "angularMocks", "metadataImporter", "utils", "ch
             rootscope = $rootScope;
             q = $q;
 
-            chrome.storage = {
-                "local": {
-                    "set": function(key) {}
-                }
-            };
-
             spyOn(chromeUtils, "sendMessage");
-            spyOn(chrome.storage.local, "set").and.returnValue(utils.getPromise(q, {}));
+            spyOn(chromeUtils, "setAuthHeader").and.returnValue(utils.getPromise(q, {}));
 
             metadataImporter = new MetadataImporter();
             spyOn(metadataImporter, "run").and.returnValue(utils.getPromise(q, {}));

@@ -1,5 +1,5 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "angular-indexedDB"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "chromeUtils", "angular-indexedDB"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, chromeUtils) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
             services.init(app);
@@ -109,6 +109,12 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             .then(projectDataSync);
                     };
 
+                    var setAuthHeader = function(result) {
+                        if (!result || !result.auth_header) return;
+                        $rootScope.auth_header = result.auth_header;
+                        checkOnlineStatusAndSync();
+                    };
+
                     chrome.alarms.create('metadataSyncAlarm', {
                         periodInMinutes: properties.metadata.sync.intervalInMinutes
                     });
@@ -119,34 +125,18 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     });
                     chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
 
-                    chrome.runtime.onMessage.addListener(
-                        function(request, sender, sendResponse) {
-                            if (request.auth_header === true) {
-                                chrome.storage.local.get("auth_header", function(result) {
-                                    $rootScope.auth_header = result.auth_header;
-                                    checkOnlineStatusAndSync();
-                                });
-                            }
-                        });
+                    chromeUtils.addListener("productKeyDecrypted", function() {
+                        chromeUtils.getAuthHeader(setAuthHeader);
+                    });
 
                     consumerRegistry.register().then(function() {
-
-                        chrome.storage.local.get("auth_header", function(result) {
-                            if (Object.keys(result).length === 0)
-                                return;
-
-                            $rootScope.auth_header = result.auth_header;
-                            checkOnlineStatusAndSync();
-                        });
-
+                        chromeUtils.getAuthHeader(setAuthHeader);
                     });
                 }
             ]);
 
             return app;
         };
-
-
 
         var bootstrap = function(appInit) {
             var deferred = Q.defer();

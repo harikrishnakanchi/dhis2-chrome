@@ -1,5 +1,5 @@
-define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "userRepository", "metadataImporter", "sessionHelper"],
-    function(MainController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, UserRepository, MetadataImporter, SessionHelper) {
+define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "userRepository", "metadataImporter", "sessionHelper", "chromeUtils"],
+    function(MainController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, UserRepository, MetadataImporter, SessionHelper, chromeUtils) {
         describe("main controller", function() {
             var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, getAllProjectsSpy, db,
                 translationStore, userPreferenceRepository, location, orgUnitRepository, userRepository, metadataImporter, sessionHelper;
@@ -14,15 +14,11 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 metadataImporter = new MetadataImporter();
                 sessionHelper = new SessionHelper();
 
-                chrome.storage = {
-                    "local": {
-                        "get": function(key, callBack) {
-                            callBack({
-                                "auth_header": "Basic Auth"
-                            });
-                        }
-                    }
-                };
+                spyOn(chromeUtils, "getAuthHeader").and.callFake(function(callBack) {
+                    callBack({
+                        "auth_header": "Basic Auth"
+                    });
+                });
 
                 i18nResourceBundle = {
                     get: function() {}
@@ -218,9 +214,10 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
             it("should redirect to product key page", function() {
                 spyOn(location, "path");
 
-                chrome.storage.local.get = function(key, callBack) {
+                chromeUtils.getAuthHeader.and.callFake(function(callBack) {
                     callBack({});
-                };
+                });
+
                 mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
                     userRepository, metadataImporter, sessionHelper);
 

@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define(["chromeUtils", "lodash"], function(chromeUtils, _) {
     return function($q, $scope, $location, $rootScope, ngI18nResourceBundle, db, userPreferenceRepository, orgUnitRepository, userRepository, metadataImporter, sessionHelper) {
         var oldUserProject;
         $scope.projects = [];
@@ -86,7 +86,7 @@ define(["lodash"], function(_) {
 
         var getAuthHeader = function() {
             var deferred = $q.defer();
-            chrome.storage.local.get("auth_header", function(result) {
+            chromeUtils.getAuthHeader(function(result) {
                 deferred.resolve(result.auth_header);
             });
             return deferred.promise;

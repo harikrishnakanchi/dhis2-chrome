@@ -2,9 +2,7 @@ define(["chromeUtils", "sjcl", "properties"], function(chromeUtils, sjcl, proper
     return function($scope, $location, $rootScope, metadataImporter) {
         var triggerImportAndSync = function() {
             metadataImporter.run();
-            chromeUtils.sendMessage({
-                auth_header: true
-            });
+            chromeUtils.sendMessage("productKeyDecrypted");
         };
 
         var createCipherText = function(productKey) {
@@ -24,10 +22,7 @@ define(["chromeUtils", "sjcl", "properties"], function(chromeUtils, sjcl, proper
 
         $scope.setAuthHeaderAndProceed = function() {
             var decryptedProductKey = sjcl.decrypt(properties.encryption.passphrase, createCipherText($scope.productKey));
-            chrome.storage.local.set({
-                "auth_header": decryptedProductKey
-            });
-
+            chromeUtils.setAuthHeader(decryptedProductKey);
             $rootScope.auth_header = decryptedProductKey;
 
             triggerImportAndSync();
