@@ -1,7 +1,7 @@
-define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRuntime, _) {
+define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils, _) {
     return function($log) {
         var sendChromeMessage = function(job, messageType) {
-            chromeRuntime.sendMessage({
+            chromeUtils.sendMessage({
                 "message": job.data.type + messageType,
                 "requestId": job.data.requestId
             });

@@ -1,4 +1,4 @@
-define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRuntime, _) {
+define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils, _) {
     return function($http, $log) {
         var onlineEventHandlers = [];
         var offlineEventHandlers = [];
@@ -21,12 +21,12 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
             }).then(function(response) {
                 $log.info("DHIS is accessible");
                 isDhisOnline = true;
-                chromeRuntime.sendMessage("dhisOnline");
+                chromeUtils.sendMessage("dhisOnline");
             }).
             catch(function(response) {
                 $log.info("DHIS is not accessible");
                 isDhisOnline = false;
-                chromeRuntime.sendMessage("dhisOffline");
+                chromeUtils.sendMessage("dhisOffline");
             });
         };
 
@@ -81,9 +81,9 @@ define(["properties", "chromeRuntime", "lodash"], function(properties, chromeRun
             return dhisConnectivityCheck();
         };
 
-        chromeRuntime.addListener("dhisOffline", onDhisOffline);
-        chromeRuntime.addListener("dhisOnline", onDhisOnline);
-        chromeRuntime.addListener("checkNow", checkNow);
+        chromeUtils.addListener("dhisOffline", onDhisOffline);
+        chromeUtils.addListener("dhisOnline", onDhisOnline);
+        chromeUtils.addListener("checkNow", checkNow);
 
         return {
             "start": start,

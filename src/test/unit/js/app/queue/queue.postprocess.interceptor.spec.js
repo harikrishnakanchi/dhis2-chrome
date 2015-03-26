@@ -1,4 +1,4 @@
-define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeRuntime"], function(QueuePostProcessInterceptor, mocks, properties, chromeRuntime) {
+define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils"], function(QueuePostProcessInterceptor, mocks, properties, chromeUtils) {
     describe('queuePostProcessInterceptor', function() {
 
         var hustle, queuePostProcessInterceptor, q, rootScope;
@@ -6,7 +6,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeRunt
             queuePostProcessInterceptor = new QueuePostProcessInterceptor($log);
             q = $q;
             rootScope = $rootScope;
-            spyOn(chromeRuntime, "sendMessage");
+            spyOn(chromeUtils, "sendMessage");
         }));
 
         it('should return true for retry if number of releases is less than max retries', function() {
@@ -44,7 +44,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeRunt
                 "releases": 1
             }, {});
 
-            expect(chromeRuntime.sendMessage).toHaveBeenCalledWith({
+            expect(chromeUtils.sendMessage).toHaveBeenCalledWith({
                 "message": "aFailed",
                 "requestId": "1"
             });
@@ -60,7 +60,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeRunt
                 "releases": 1
             }, {});
 
-            expect(chromeRuntime.sendMessage).toHaveBeenCalledWith({
+            expect(chromeUtils.sendMessage).toHaveBeenCalledWith({
                 "message": "aDone",
                 "requestId": "1"
             });

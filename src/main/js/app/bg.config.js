@@ -95,7 +95,7 @@ require.config({
         "queuePostProcessInterceptor": "app/queue/queue.postprocess.interceptor",
 
         //Utils
-        "chromeRuntime": "app/utils/chrome.runtime",
+        "chromeUtils": "app/utils/chrome.utils",
         "dhisId": "app/utils/dhis.id",
         "dateUtils": "app/utils/date.utils",
         "lodashUtils": "app/utils/lodash.utils",

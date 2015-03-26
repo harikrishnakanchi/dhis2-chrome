@@ -1,4 +1,4 @@
-define(["dhisMonitor", "utils", "angularMocks", "chromeRuntime", "mockChrome"], function(DhisMonitor, utils, mocks, chromeRuntime, MockChrome) {
+define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome"], function(DhisMonitor, utils, mocks, chromeUtils, MockChrome) {
     describe("dhis.monitor", function() {
         var q, log, http, httpBackend;
         var callbacks = {};
@@ -9,8 +9,8 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeRuntime", "mockChrome"], 
             http = $injector.get('$http');
             httpBackend = $injector.get('$httpBackend');
             mockChrome = new MockChrome();
-            spyOn(chromeRuntime, "sendMessage").and.callFake(mockChrome.sendMessage);
-            spyOn(chromeRuntime, "addListener").and.callFake(mockChrome.addListener);
+            spyOn(chromeUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
+            spyOn(chromeUtils, "addListener").and.callFake(mockChrome.addListener);
         }));
 
         afterEach(function() {

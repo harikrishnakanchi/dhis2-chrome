@@ -1,4 +1,4 @@
-define(["productKeyController", "angularMocks", "metadataImporter", "utils", "chromeRuntime"], function(ProductKeyController, mocks, MetadataImporter, utils, chromeRuntime) {
+define(["productKeyController", "angularMocks", "metadataImporter", "utils", "chromeUtils"], function(ProductKeyController, mocks, MetadataImporter, utils, chromeUtils) {
     describe("productKeyController", function() {
         var scope, location, productKeyController, metadataImporter, rootscope, q;
 
@@ -14,7 +14,7 @@ define(["productKeyController", "angularMocks", "metadataImporter", "utils", "ch
                 }
             };
 
-            spyOn(chromeRuntime, "sendMessage");
+            spyOn(chromeUtils, "sendMessage");
             spyOn(chrome.storage.local, "set").and.returnValue(utils.getPromise(q, {}));
 
             metadataImporter = new MetadataImporter();

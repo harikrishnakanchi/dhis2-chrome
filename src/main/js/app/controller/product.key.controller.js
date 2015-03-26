@@ -1,8 +1,8 @@
-define(["chromeRuntime", "sjcl", "properties"], function(chromeRuntime, sjcl, properties) {
+define(["chromeUtils", "sjcl", "properties"], function(chromeUtils, sjcl, properties) {
     return function($scope, $location, $rootScope, metadataImporter) {
         var triggerImportAndSync = function() {
             metadataImporter.run();
-            chromeRuntime.sendMessage({
+            chromeUtils.sendMessage({
                 auth_header: true
             });
         };

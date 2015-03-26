@@ -1,4 +1,4 @@
-define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeRuntime"], function(HandleTimeoutInterceptor, mocks, properties, chromeRuntime) {
+define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeUtils"], function(HandleTimeoutInterceptor, mocks, properties, chromeUtils) {
     describe("httpInterceptor", function() {
         var q, handleTimeoutInterceptor;
 
@@ -17,9 +17,9 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeRuntime
                 "status": 0
             };
 
-            spyOn(chromeRuntime, "sendMessage");
+            spyOn(chromeUtils, "sendMessage");
             handleTimeoutInterceptor.responseError(rejection);
-            expect(chromeRuntime.sendMessage).toHaveBeenCalledWith("checkNow");
+            expect(chromeUtils.sendMessage).toHaveBeenCalledWith("checkNow");
             expect(q.reject).toHaveBeenCalledWith(rejection);
         });
 
@@ -33,9 +33,9 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeRuntime
                 "status": 0
             };
 
-            spyOn(chromeRuntime, "sendMessage");
+            spyOn(chromeUtils, "sendMessage");
             handleTimeoutInterceptor.responseError(rejection);
-            expect(chromeRuntime.sendMessage).not.toHaveBeenCalled();
+            expect(chromeUtils.sendMessage).not.toHaveBeenCalled();
             expect(q.reject).toHaveBeenCalledWith(rejection);
         });
     });
