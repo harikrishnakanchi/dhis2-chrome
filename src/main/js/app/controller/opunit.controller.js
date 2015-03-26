@@ -6,12 +6,6 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             'openingDate': moment().format("YYYY-MM-DD")
         }];
 
-        $scope.addOpUnits = function() {
-            $scope.opUnits.push({
-                'openingDate': moment().format("YYYY-MM-DD")
-            });
-        };
-
         var saveToDhis = function(data) {
             return $hustle.publish({
                 "data": data,
@@ -156,8 +150,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
 
         $scope.reset = function() {
             $scope.opUnits = [{
-            'openingDate': moment().format("YYYY-MM-DD")
-        }];
+                'openingDate': moment().format("YYYY-MM-DD")
+            }];
         };
 
         var init = function() {

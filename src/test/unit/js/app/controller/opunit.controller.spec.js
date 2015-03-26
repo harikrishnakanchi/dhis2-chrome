@@ -41,17 +41,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             Timecop.uninstall();
         });
 
-        it("should add new op units", function() {
-            scope.isNewMode = false;
-
-            scope.$apply();
-            var orginalOpUnitLen = scope.opUnits.length;
-            scope.addOpUnits();
-
-            expect(scope.opUnits.length).toBe(orginalOpUnitLen + 1);
-            expect(scope.isDisabled).toBeFalsy();
-        });
-
         it("should delete operation unit", function() {
             scope.opUnits = [{
                 "name": "opUnit1"
@@ -396,9 +385,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
         });
 
-        it("should take the user to the view page of the parent project on clicking cancel", function(){
+        it("should take the user to the view page of the parent project on clicking cancel", function() {
             scope.orgUnit = {
-                "id" : "parent",
+                "id": "parent",
                 "name": "parent"
             };
 
