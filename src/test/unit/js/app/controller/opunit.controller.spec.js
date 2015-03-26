@@ -41,46 +41,13 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             Timecop.uninstall();
         });
 
-        it("should delete operation unit", function() {
-            scope.opUnits = [{
-                "name": "opUnit1"
-            }, {
-                "name": "opUnit2"
-            }, {
-                "name": "opUnit1"
-            }, {
-                "name": "opUnit4"
-            }];
-
-            scope.isNewMode = false;
-            scope.$apply();
-
-            scope.delete(2);
-            expect(scope.opUnits).toEqual([{
-                "name": "opUnit1"
-            }, {
-                "name": "opUnit2"
-            }, {
-                "name": "opUnit4"
-            }]);
-        });
-
-        it("should save operation units", function() {
-            var opUnit1Id = "a823e522c15";
-            var opUnit2Id = "a764a0f84af";
-            var opUnit1 = {
+        it("should save operation unit", function() {
+            var opUnit = {
                 "name": "OpUnit1",
                 "type": "Hospital",
                 "openingDate": moment().format("YYYY-MM-DD"),
                 "hospitalUnitCode": "Unit Code - A"
             };
-            var opUnit2 = {
-                "name": "OpUnit2",
-                "type": "Community",
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": "Unit Code - A"
-            };
-            var opUnits = [opUnit1, opUnit2];
 
             scope.orgUnit = {
                 "level": "4",
@@ -89,7 +56,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "children": []
             };
 
-            var expectedOpUnits = [{
+            var expectedOpUnit = {
                 "name": "OpUnit1",
                 "openingDate": moment().format("YYYY-MM-DD"),
                 "id": "OpUnit1ParentId",
@@ -121,39 +88,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     },
                     "value": "Unit Code - A"
                 }]
-            }, {
-                "name": "OpUnit2",
-                "openingDate": moment().format("YYYY-MM-DD"),
-                "id": "OpUnit2ParentId",
-                "shortName": "OpUnit2",
-                "level": 5,
-                "parent": {
-                    "name": "Parent",
-                    "id": "ParentId"
-                },
-                "attributeValues": [{
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "opUnitType"
-                    },
-                    "value": "Community"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Operation Unit"
-                }, {
-                    "created": "2014-10-29T12:43:54.972Z",
-                    "lastUpdated": "2014-10-29T12:43:54.972Z",
-                    "attribute": {
-                        "code": "hospitalUnitCode"
-                    },
-                    "value": "Unit Code - A"
-                }]
-            }];
+            };
 
             spyOn(location, "hash");
             spyOn(dhisId, "get").and.callFake(function(name) {
@@ -165,12 +100,12 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }
             }));
 
-            scope.save(opUnits);
+            scope.save(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnits);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "data": expectedOpUnits,
+                "data": expectedOpUnit,
                 "type": "upsertOrgUnit"
             }, "dataValues");
         });
@@ -203,8 +138,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, db, location, fakeModal);
 
             scope.$apply();
-            expect(scope.opUnits[0].name).toEqual("opUnit1");
-            expect(scope.opUnits[0].type).toEqual("Health Center");
+            expect(scope.opUnit.name).toEqual("opUnit1");
+            expect(scope.opUnit.type).toEqual("Health Center");
             expect(scope.isDisabled).toBeFalsy();
         });
 
@@ -308,14 +243,13 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             expect(scope.isDisabled).toEqual(true);
         });
 
-        it("should update operation units", function() {
-            var opUnit1 = {
+        it("should update operation unit", function() {
+            var opUnit = {
                 "name": "OpUnit1",
                 "type": "Hospital",
                 "openingDate": moment().format("YYYY-MM-DD"),
                 "hospitalUnitCode": "Unit Code - A"
             };
-            var opUnits = [opUnit1];
 
             scope.orgUnit = {
                 "id": "opUnit1Id",
@@ -330,7 +264,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "children": []
             };
 
-            var expectedOpUnits = [{
+            var expectedOpUnit = {
                 "name": "OpUnit1",
                 "id": "opUnit1Id",
                 "openingDate": moment().format("YYYY-MM-DD"),
@@ -363,7 +297,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     },
                     "value": "Unit Code - A"
                 }]
-            }];
+            };
 
             spyOn(location, "hash");
 
@@ -374,12 +308,12 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }));
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
 
-            scope.update(opUnits);
+            scope.update(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnits);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "data": expectedOpUnits,
+                "data": expectedOpUnit,
                 "type": "upsertOrgUnit"
             }, "dataValues");
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
