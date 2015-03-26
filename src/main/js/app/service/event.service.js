@@ -11,7 +11,7 @@ define(["moment", "dhisUrl"], function(moment, dhisUrl) {
                     "endDate": moment().format("YYYY-MM-DD"),
                     "paging": false,
                     "orgUnit": orgUnitId,
-                    "children": true
+                    "ouMode": "DESCENDANTS"
                 }
             }).then(onSuccess);
 
