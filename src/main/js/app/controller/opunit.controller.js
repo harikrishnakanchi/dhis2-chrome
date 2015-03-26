@@ -23,40 +23,42 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             $scope.saveFailure = true;
         };
 
+        var getAttributeValues = function(opUnitType, hospitalUnitCode) {
+            return [{
+                "created": moment().toISOString(),
+                "lastUpdated": moment().toISOString(),
+                "attribute": {
+                    "code": "opUnitType"
+                },
+                "value": opUnitType
+            }, {
+                "created": moment().toISOString(),
+                "lastUpdated": moment().toISOString(),
+                "attribute": {
+                    "code": "Type"
+                },
+                "value": "Operation Unit"
+            }, {
+                "created": moment().toISOString(),
+                "lastUpdated": moment().toISOString(),
+                "attribute": {
+                    "code": "hospitalUnitCode"
+                },
+                "value": hospitalUnitCode
+            }];
+        };
+
         $scope.save = function(opUnit) {
             var parent = $scope.orgUnit;
-            var opUnitType = opUnit.type;
-            var hospitalUnitCode = opUnit.hospitalUnitCode;
-            opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode']);
 
-            opunit = _.merge(opUnit, {
+            opUnit = _.merge(opUnit, {
                 'id': dhisId.get(opUnit.name + parent.id),
                 'shortName': opUnit.name,
                 'level': parseInt(parent.level) + 1,
                 'parent': _.pick(parent, "name", "id"),
-                "attributeValues": [{
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "opUnitType"
-                    },
-                    "value": opUnitType
-                }, {
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Operation Unit"
-                }, {
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "hospitalUnitCode"
-                    },
-                    "value": hospitalUnitCode
-                }]
+                "attributeValues": getAttributeValues(opUnit.type, opUnit.hospitalUnitCode)
             });
+            opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode']);
 
             return orgUnitRepository.upsert(opUnit)
                 .then(saveToDhis)
@@ -64,38 +66,15 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         };
 
         $scope.update = function(opUnit) {
-            var opUnitType = opUnit.type;
-            var hospitalUnitCode = opUnit.hospitalUnitCode;
-            opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode']);
             opUnit = _.merge(opUnit, {
                 'id': $scope.orgUnit.id,
                 'shortName': opUnit.name,
                 'level': $scope.orgUnit.level,
                 'parent': _.pick($scope.orgUnit.parent, "name", "id"),
                 'children': $scope.orgUnit.children,
-                "attributeValues": [{
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "opUnitType"
-                    },
-                    "value": opUnitType
-                }, {
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "Type"
-                    },
-                    "value": "Operation Unit"
-                }, {
-                    "created": moment().toISOString(),
-                    "lastUpdated": moment().toISOString(),
-                    "attribute": {
-                        "code": "hospitalUnitCode"
-                    },
-                    "value": hospitalUnitCode
-                }]
+                "attributeValues": getAttributeValues(opUnit.type, opUnit.hospitalUnitCode)
             });
+            opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode']);
 
             var updateOrgUnitGroupsForModules = function() {
                 return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules($scope.orgUnit.id).then(function(modules) {
