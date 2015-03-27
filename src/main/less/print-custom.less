@@ -1,102 +1,139 @@
 @media print {
-	header{
-			display:none;
-	}
-	.alert{
-			display:none;
-	}
-	.dataentrypage{
-		.panel-default{
-			border:none !important;
-			.panel-heading {
-				background: #transparent !important;
-				.glyphicon{
-					display:none !important;
-				}
-			}
-		}
-		.exp-coll-group .panel-default > .panel-heading {
-			background-color: transparent!important;
-		}
-		.panel-collapse{ 
-			display:block!important; 
-			height:auto !important;
-		}
-
-		.panel-title{
-		    text-transform:uppercase;
-		  }
-		 .exp-coll-group {
-		 	.panel-heading{
-		 		border:none!important;
-		 		padding:0;
-		    .panel-title {
-		    text-transform: none!important;
-		  }
-		}
-		.panel-body{
-			border:none!important;
-			padding:0;
-		}
-  		}
-.panel-group {
-margin-bottom: 0px;
-}
-		table tr td:first-child {
-			width:22%;
-			span { display:inline; white-space:normal;}
-			}
-		table tr {
-			.last-column{
-				display:none;
-			}
-			td{
-				padding:3px;
-			}
-			th{ text-align:center;}
-			td:first-child {
-				width:22%;
-			}
-			td, th{
-				white-space:normal;
-				// white-space: nowrap;
-
-			}
-		}
-		table{
-			table-layout: fixed;
-		}
-
-		.module-select {
-			 	margin: 20px 0px 20px!important;
-			    border-radius: 0px!important;
-			    border: 0px solid #ccc!important;
-			    border-bottom: 2px solid #ccc!important;
-			    padding: 14px 15px 0 15px;
-			.form-group{ margin-bottom:0;}
-
-			input[type="button"]{
-				display:none;
-			}
-			select{
-				visibility:hidden;
-				width:90px!important;
-			}
-			select#module{
-				visibility: visible;
-				width: auto!important;
-				-webkit-appearance: none;
-				border: 0;
-				height:auto!important;
-				line-height: 20px !important;
-			}
-		}
-
-		input[type="submit"]{
-			display:none;
-		}
-		input[type="text"]{
-			display:none;
-		}
-	}
+    body {
+        font-size: 9px;
+    }
+    header {
+        display: none;
+    }
+    .alert {
+        display: none;
+    }
+    .panel-body {
+        padding: 0;
+    }
+    .container {
+        padding: 0;
+        margin: 0;
+    }
+    .dataentrypage {
+        .printTallySheetBtn {
+            display: none;
+        }
+        .panel-default {
+            border: none !important;
+            .panel-heading {
+                background: #transparent !important;
+                padding-left: 0px;
+                padding-bottom: 0;
+                .glyphicon {
+                    display: none !important;
+                }
+            }
+        }
+        .exp-coll-group .panel-default > .panel-heading {
+            background-color: transparent!important;
+        }
+        .panel-collapse {
+            display: block!important;
+            height: auto !important;
+            .panel-body {
+                border-top: none !important;
+            }
+        }
+        .panel-title {
+            text-transform: uppercase;
+            font-size: 13px;
+            padding-bottom: 5px;
+        }
+        .exp-coll-group {
+            .panel-heading {
+                border: none!important;
+                padding: 0;
+                .panel-title {
+                    text-transform: none!important;
+                    visibility: hidden;
+                    height: 0;
+                }
+            }
+            .panel-body {
+                border: none!important;
+                padding: 0;
+            }
+        }
+        .panel-group {
+            margin-bottom: 0px;
+            .dataset-acc-wrapper {
+                page-break-after: always;
+            }
+        }
+        table tr td:first-child {
+            width: 22%;
+            span {
+                display: inline;
+                white-space: normal;
+            }
+        }
+        table tr {
+            .last-column {
+                display: none;
+            }
+            td {
+                padding: 3px;
+            }
+            th {
+                text-align: center;
+            }
+            td:first-child {
+                width: 22%;
+            }
+            td,
+            th {
+                white-space: normal;
+                // white-space: nowrap;
+            }
+        }
+        table {
+            table-layout: fixed;
+            margin-bottom: 5px;
+        }
+        .module-select {
+            margin: 20px 0px 0px 0!important;
+            border-radius: 0px!important;
+            border: 0px solid #ccc!important;
+            border-bottom: 2px solid #ccc!important;
+            padding: 14px 15px 0 15px;
+            .form-group {
+                margin-bottom: 0;
+            }
+            input[type="button"] {
+                display: none;
+            }
+            select {
+                visibility: hidden;
+                width: 90px!important;
+            }
+            select.input-sm {
+                box-shadow: none;
+            }
+            select#module {
+                visibility: visible;
+                width: auto!important;
+                -webkit-appearance: none;
+                border: 1px white solid;
+                height: auto!important;
+                line-height: 12px !important;
+                border-radius: 0px;
+                font-size: 11px;
+            }
+        }
+        input[type="submit"] {
+            display: none;
+        }
+        input[type="text"] {
+            display: none;
+        }
+        .display-print {
+            text-indent: 0px;
+        }
+    }
 }
