@@ -190,7 +190,6 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
         $scope.getApprovalLevelName = function(level) {
             if (level === 1) return "Project Level";
             if (level === 2) return "Coordination Level";
-            if (level === 3) return "Desk Level";
         };
 
         $scope.dumpLogs = function() {

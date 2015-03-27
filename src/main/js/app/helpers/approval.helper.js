@@ -25,9 +25,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
                             "period": period
                         }) || {};
 
-                        if (data.isAccepted) {
-                            return 3;
-                        } else if (data.isApproved) {
+                        if (data.isApproved) {
                             return 2;
                         }
                     }
@@ -35,7 +33,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
 
                 var getNextApprovalLevel = function(currentApprovalLevel, submitted) {
                     if (!currentApprovalLevel && submitted) return 1;
-                    return currentApprovalLevel < 3 ? currentApprovalLevel + 1 : undefined;
+                    return currentApprovalLevel < 2 ? currentApprovalLevel + 1 : undefined;
                 };
 
                 var getWeeksToDisplayStatus = function(openingDate) {

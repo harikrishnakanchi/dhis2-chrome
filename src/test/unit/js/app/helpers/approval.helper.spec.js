@@ -157,19 +157,16 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 var approvalData = [{
                     "orgUnit": "123",
                     "period": "2014W19",
-                    "isAccepted": false,
                     "isApproved": true,
                     "dataSets": ["ds123", "ds345"]
                 }, {
                     "orgUnit": "123",
                     "period": "2014W20",
-                    "isAccepted": true,
                     "isApproved": true,
                     "dataSets": ["ds123", "ds345"]
                 }, {
                     "orgUnit": "123",
                     "period": "2014W21",
-                    "isAccepted": true,
                     "isApproved": true,
                     "dataSets": ["ds123", "ds345"],
                     "status": "DELETED"
@@ -213,7 +210,7 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     }, {
                         "period": "2014W19",
                         "submitted": true,
-                        "nextApprovalLevel": 3
+                        "nextApprovalLevel": undefined
                     }, {
                         "period": "2014W20",
                         "submitted": true,
