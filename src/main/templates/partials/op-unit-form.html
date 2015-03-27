@@ -2,6 +2,7 @@
     <div class="top-actions" ng-if="!isNewMode">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Aggregate Module" ng-if="!(isDisabled)" ng-click="openInNewMode('Module')" />
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Linelist Module" ng-if="!(isDisabled)" ng-click="openInNewMode('LineListModule')" />
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="Add Patient Origin" ng-click="openInNewMode('Patient Origin')" />
     </div>
     <div class="panel panel-default">
         <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorOpUnit }}</div>
@@ -53,6 +54,29 @@
                 <input type="button" class="btn btn-main pull-right" ng-disabled="form.$invalid || !form.$dirty" ng-if="!isNewMode &amp;&amp; !(isDisabled)" ng-click="update(opUnit) " value="Update " />
                 <input type="button " class="btn btn-main pull-right " ng-click="disable(orgUnit) " value="Disable " ng-if="!isNewMode &amp;&amp; !(isDisabled) " />
             </form>
+        </div>
+    </div>
+    <div class="panel panel-default" ng-if="!isNewMode &amp;&amp; originDetails &amp;&amp; originDetails.length !== 0">
+        <div class="panel-heading">
+            <h3 class="panel-title">Patient Origins</h3>
+        </div>
+        <div class="panel-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Origin</th>
+                        <th>latitude</th>
+                        <th>longitude</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="origin in originDetails | orderBy: 'name'">
+                        <td> {{origin.name}}</td>
+                        <td> {{origin.latitude}}</td>
+                        <td> {{origin.longitude}}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

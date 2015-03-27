@@ -1,5 +1,5 @@
 define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
-    return function($scope, $q, $hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, $modal) {
+    return function($scope, $q, $hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, $modal, patientOriginRepository) {
         $scope.isDisabled = false;
         $scope.hospitalUnitCodes = ['A', 'B1', 'C1', 'C2', 'C3', 'X'];
         $scope.opUnit = {
@@ -49,6 +49,13 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }];
         };
 
+        var publishMessage = function(data, action) {
+            return $hustle.publish({
+                "data": data,
+                "type": action
+            }, "dataValues");
+        };
+
         $scope.save = function(opUnit) {
             var parent = $scope.orgUnit;
 
@@ -61,7 +68,16 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             });
             opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode']);
 
-            return orgUnitRepository.upsert(opUnit)
+            var patientOriginPayload = {
+                "orgUnit": opUnit.id,
+                "origins": [{
+                    "name": "Unknown",
+                    "clientLastUpdated": moment().toISOString()
+                }]
+            };
+            return patientOriginRepository.upsert(patientOriginPayload)
+                .then(_.partial(publishMessage, patientOriginPayload, "uploadPatientOriginDetails"))
+                .then(_.partial(orgUnitRepository.upsert, opUnit))
                 .then(saveToDhis)
                 .then(onSuccess, onError);
         };
@@ -127,6 +143,14 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             };
         };
 
+        var setOriginDetails = function(originDetails) {
+            if (!_.isEmpty(originDetails)) {
+                $scope.originDetails = _.reject(originDetails.origins, function(origin) {
+                    return _.isUndefined(origin.longitude) && _.isUndefined(origin.latitude);
+                });
+            }
+        };
+
         var init = function() {
             if (!$scope.isNewMode) {
                 $scope.opUnit = {
@@ -150,6 +174,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     }
                 });
                 $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
+                patientOriginRepository.get($scope.orgUnit.id).then(setOriginDetails);
             }
             orgUnitRepository.getAll().then(function(allOrgUnits) {
                 var parentId = $scope.isNewMode ? $scope.orgUnit.id : $scope.orgUnit.parent.id;

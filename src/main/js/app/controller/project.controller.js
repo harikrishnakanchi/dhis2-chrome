@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper, properties) {
 
-    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal, orgUnitGroupHelper, patientOriginRepository, approvalDataRepository) {
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal, orgUnitGroupHelper, approvalDataRepository) {
 
         $scope.allContexts = ['Internal instability', 'Stable', 'Post-conflict', 'Cross-border instability'].sort();
         $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
@@ -177,12 +177,6 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             });
         };
 
-        var setOriginDetails = function(originDetails) {
-            if (!_.isEmpty(originDetails)) {
-                $scope.originDetails = originDetails.origins;
-            }
-        };
-
         var prepareNewForm = function() {
             $scope.reset();
             orgUnitRepository.getAll().then(function(allOrgUnits) {
@@ -206,7 +200,6 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             orgUnitRepository.getAllProjects().then(function(allProjects) {
                 $scope.peerProjects = _.without(orgUnitMapper.getChildOrgUnitNames(allProjects, $scope.orgUnit.parent.id), $scope.orgUnit.name);
                 userRepository.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForEdit);
-                patientOriginRepository.get($scope.orgUnit.id).then(setOriginDetails);
             });
         };
 

@@ -676,12 +676,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
 
             var patientOrigins = [{
                 "name": "Origin1",
-                "latitude": "23.21",
-                "longitude": "32.12"
+                "latitude": 23.21,
+                "longitude": 32.12
             }, {
                 "name": "Origin2",
-                "latitude": "43.96",
-                "longitude": "84.142"
+                "latitude": 43.96,
+                "longitude": 84.142
+            }, {
+                "name": "Unknown"
             }];
 
             var expectedPayload = [{
@@ -691,7 +693,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "id": dhisId.get(patientOrigins[0].name + "p1"),
                 "level": 7,
                 "openingDate": "2014-02-02",
-                "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type",
@@ -701,7 +702,8 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 }],
                 "parent": {
                     "id": "p1"
-                }
+                },
+                "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]"
             }, {
                 "name": patientOrigins[0].name,
                 "shortName": patientOrigins[0].name,
@@ -709,7 +711,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "id": dhisId.get(patientOrigins[0].name + "p2"),
                 "level": 7,
                 "openingDate": "2015-02-02",
-                "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type",
@@ -719,7 +720,8 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 }],
                 "parent": {
                     "id": "p2"
-                }
+                },
+                "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]"
             }, {
                 "name": patientOrigins[1].name,
                 "shortName": patientOrigins[1].name,
@@ -727,7 +729,42 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "id": dhisId.get(patientOrigins[1].name + "p1"),
                 "level": 7,
                 "openingDate": "2014-02-02",
-                "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
+                    },
+                    "value": "Patient Origin"
+                }],
+                "parent": {
+                    "id": "p1"
+                },
+                "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]"
+            }, {
+                "name": patientOrigins[1].name,
+                "shortName": patientOrigins[1].name,
+                "displayName": patientOrigins[1].name,
+                "id": dhisId.get(patientOrigins[1].name + "p2"),
+                "level": 7,
+                "openingDate": "2015-02-02",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type",
+                        "name": "Type"
+                    },
+                    "value": "Patient Origin"
+                }],
+                "parent": {
+                    "id": "p2"
+                },
+                "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]"
+            }, {
+                "name": patientOrigins[2].name,
+                "shortName": patientOrigins[2].name,
+                "displayName": patientOrigins[2].name,
+                "id": dhisId.get(patientOrigins[2].name + "p1"),
+                "level": 7,
+                "openingDate": "2014-02-02",
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type",
@@ -739,13 +776,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "id": "p1"
                 }
             }, {
-                "name": patientOrigins[1].name,
-                "shortName": patientOrigins[1].name,
-                "displayName": patientOrigins[1].name,
-                "id": dhisId.get(patientOrigins[1].name + "p2"),
+                "name": patientOrigins[2].name,
+                "shortName": patientOrigins[2].name,
+                "displayName": patientOrigins[2].name,
+                "id": dhisId.get(patientOrigins[2].name + "p2"),
                 "level": 7,
                 "openingDate": "2015-02-02",
-                "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type",

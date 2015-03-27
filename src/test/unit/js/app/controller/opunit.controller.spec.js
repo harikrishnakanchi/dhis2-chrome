@@ -2,7 +2,7 @@
 define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId) {
     describe("op unit controller", function() {
 
-        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper;
+        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper, patientOriginRepository;
 
         beforeEach(module("hustle"));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -21,6 +21,16 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }
             };
 
+            patientOriginRepository = {
+                "get": function() {
+                    return utils.getPromise(q, [{}]);
+                },
+                "upsert": function() {
+                    return utils.getPromise(q,{});
+                }
+            };
+
+
             Timecop.install();
             Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
 
@@ -33,7 +43,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 },
                 open: function(object) {}
             };
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, orgUnitGroupHelper, db, location, fakeModal);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
         }));
 
         afterEach(function() {
@@ -103,14 +113,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.save(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnit);
+            expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);            
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedOpUnit,
                 "type": "upsertOrgUnit"
             }, "dataValues");
         });
 
-        it("should not hospital unit code while saving operation unit if it is not hospital", function() {
+        it("should not ask for hospital unit code while saving operation unit if it is not hospital", function() {
             var opUnit = {
                 "name": "OpUnit1",
                 "type": "Health Center",
@@ -172,14 +182,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.save(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnit);
+            expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedOpUnit,
                 "type": "upsertOrgUnit"
             }, "dataValues");
         });
 
-        it("should set operation unit for view", function() {
+        it("should set operation unit for view and show patientOrigins", function() {
             scope.orgUnit = {
                 "name": "opUnit1",
                 "parent": {
@@ -202,14 +212,38 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "value": "Unit Code - B1"
                 }]
             };
+
+            var patientOrigins = {
+                "orgUnit": "opunitid",
+                "origins": [{
+                    "originName": "test",
+                    "latitude": 78,
+                    "longitude": 80
+                }, {
+                    "originName": "Unknown"
+                }]
+            };
+
+            var expectedPatientOrigins = {
+                "orgUnit": "opunitid",
+                "origins": [{
+                    "originName": "test",
+                    "latitude": 78,
+                    "longitude": 80
+                }]
+            };
+
             scope.isNewMode = false;
 
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, db, location, fakeModal);
+            spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, patientOrigins));
+
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
 
             scope.$apply();
             expect(scope.opUnit.name).toEqual("opUnit1");
             expect(scope.opUnit.type).toEqual("Health Center");
             expect(scope.isDisabled).toBeFalsy();
+            expect(scope.originDetails).toEqual(expectedPatientOrigins.origins);
         });
 
         it("should disable disable button for opunit", function() {
@@ -237,7 +271,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
             scope.isNewMode = false;
 
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, db, location, fakeModal);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
 
             scope.$apply();
             expect(scope.isDisabled).toBeTruthy();
@@ -405,6 +439,54 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.closeForm();
 
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
+        });
+
+        it("should create unknown origin orgunit while creating an operational unit", function() {
+            var opUnit = {
+                "id": "OpUnit1",
+                "name": "OpUnit1",
+                "type": "Hospital",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "hospitalUnitCode": "Unit Code - A"
+            };
+
+            var payload = {
+                "orgUnit" : "OpUnit1ParentId",
+                "origins" : [{
+                    "name" : "Unknown",
+                    "clientLastUpdated": "2014-10-29T12:43:54.972Z"
+                }]
+            };
+
+            scope.orgUnit = {
+                "level": "4",
+                "name": "Parent",
+                "id": "ParentId",
+                "children": []
+            };
+
+            spyOn(location, "hash");
+            spyOn(dhisId, "get").and.callFake(function(name) {
+                return name;
+            });
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
+                "data": {
+                    "data": []
+                }
+            }));
+
+            spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+
+
+            scope.save(opUnit);
+            scope.$apply();
+
+            expect(patientOriginRepository.upsert).toHaveBeenCalledWith(payload);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "data": payload,
+                "type": "uploadPatientOriginDetails"
+            }, "dataValues");
+
         });
     });
 });

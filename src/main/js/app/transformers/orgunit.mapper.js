@@ -234,14 +234,14 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
 
         var payload = _.map(patientOrigins, function(patientOrigin) {
             return _.map(parentOrgUnits, function(parent) {
-                return {
+                
+                var patientOriginPayload = {
                     "name": patientOrigin.name,
                     "shortName": patientOrigin.name,
                     "displayName": patientOrigin.name,
                     "id": dhisId.get(patientOrigin.name + parent.id),
                     "level": 7,
                     "openingDate": parent.openingDate,
-                    "coordinates": "[" + patientOrigin.longitude + "," + patientOrigin.latitude + "]",
                     "attributeValues": [{
                         "attribute": {
                             "code": "Type",
@@ -253,6 +253,10 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                         "id": parent.id
                     }
                 };
+                
+                if (!_.isUndefined(patientOrigin.longitude) && !_.isUndefined(patientOrigin.latitude)) 
+                    patientOriginPayload.coordinates = "[" + patientOrigin.longitude + "," + patientOrigin.latitude + "]";   
+                return patientOriginPayload;
             });
         });
         return _.flatten(payload);

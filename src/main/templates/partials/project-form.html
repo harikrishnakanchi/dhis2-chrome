@@ -1,8 +1,7 @@
 <div ng-controller="projectController">
     <div class="top-actions" ng-if="!isNewMode">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Operation Unit" ng-click="openInNewMode('Operation Unit')" />
-        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />
-        <input type="button" class="btn btn-sub btn-sm pull-right" value="Add Patient Origin" ng-click="openInNewMode('Patient Origin')" />
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />        
     </div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
     <form name="createForm" class="form-horizontal" role="form" novalidate>
@@ -155,28 +154,5 @@
                 </tbody>
             </table>
         </div>
-    </div>
-    <div class="panel panel-default" ng-if="!isNewMode &amp;&amp; originDetails &amp;&amp; originDetails.length !== 0">
-        <div class="panel-heading">
-            <h3 class="panel-title">Patient Origins</h3>
-        </div>
-        <div class="panel-body">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Origin</th>
-                        <th>latitude</th>
-                        <th>longitude</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="origin in originDetails | orderBy: 'name'">
-                        <td> {{origin.name}}</td>
-                        <td> {{origin.latitude}}</td>
-                        <td> {{origin.longitude}}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    </div>    
 </div>

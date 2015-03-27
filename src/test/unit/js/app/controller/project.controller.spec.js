@@ -1,7 +1,7 @@
 define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository) {
     describe("project controller tests", function() {
         var scope, timeout, q, location, anchorScroll, userRepository, parent,
-            fakeModal, orgUnitRepo, hustle, rootScope, patientOriginRepository, approvalDataRepository;
+            fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
@@ -22,12 +22,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                     return utils.getPromise(q, [{}]);
                 },
                 "getAllProjectUsers": function() {
-                    return utils.getPromise(q, [{}]);
-                }
-            };
-
-            patientOriginRepository = {
-                "get": function() {
                     return utils.getPromise(q, [{}]);
                 }
             };
@@ -58,7 +52,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, patientOriginRepository, approvalDataRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, approvalDataRepository);
         }));
 
         afterEach(function() {
@@ -380,12 +374,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             scope.isNewMode = false;
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, patientOriginRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });
 
-        it('should set project users and origin details in view mode', function() {
+        it('should set project users in view mode', function() {
             scope.orgUnit = {
                 "name": "anyname",
                 "parent": {
@@ -417,15 +411,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }
             }];
 
-            var patientOrigins = {
-                "orgUnit": "projid",
-                "origins": [{
-                    "originName": "test",
-                    "latitude": 78,
-                    "longitude": 80
-                }]
-            };
-
             var expectedUsers = [{
                 'roles': 'Data Entry User, Project Level Approver',
                 'userCredentials': {
@@ -452,13 +437,11 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }
             }];
             spyOn(userRepository, "getAllProjectUsers").and.returnValue(utils.getPromise(q, users));
-            spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, patientOrigins));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, patientOriginRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
             scope.$apply();
 
             expect(scope.projectUsers).toEqual(expectedUsers);
-            expect(scope.originDetails).toEqual(patientOrigins.origins);
         });
 
         it("should set user project as currently selected project", function() {
@@ -559,7 +542,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             var allOrgUnits = [country1, project1, module1];
             orgUnitRepo = utils.getMockRepo(q, allOrgUnits);
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, patientOriginRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
             scope.$apply();
 
             expect(scope.existingProjectCodes).toEqual(["AF101"]);
@@ -579,7 +562,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 return;
             });
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, patientOriginRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
 
             scope.closeForm(parentOrgUnit);
 

@@ -43,7 +43,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             spyOn(orgUnitRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
-            spyOn(orgUnitRepo, "getParentProject").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
             patientOriginRepository = new PatientOriginRepository();
 
@@ -673,13 +673,13 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             }];
 
             spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, originDatasets));
-            orgUnitRepo.getParentProject.and.returnValue(utils.getPromise(q, scope.orgUnit));
+            orgUnitRepo.get.and.returnValue(utils.getPromise(q, scope.orgUnit));
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
 
             scope.save();
             scope.$apply();
 
-            expect(orgUnitRepo.getParentProject).toHaveBeenCalledWith("someid");
+            expect(orgUnitRepo.get).toHaveBeenCalledWith("someid");
             expect(patientOriginRepository.get).toHaveBeenCalledWith("someid");
             var originOrgunits = [{
                 "name": 'or1',

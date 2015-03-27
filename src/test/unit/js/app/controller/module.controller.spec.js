@@ -21,7 +21,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             spyOn(orgUnitRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
-            spyOn(orgUnitRepo, "getParentProject").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
             patientOriginRepository = new PatientOriginRepository();
             spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
@@ -105,7 +105,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     "longitude": 70.2
                 }]
             };
-            orgUnitRepo.getParentProject.and.returnValue(utils.getPromise(q, parent));
+            orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
 
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
@@ -185,7 +185,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 data: enrichedAggregateModule,
                 type: "upsertOrgUnit"
             }, "dataValues");
-            expect(orgUnitRepo.getParentProject).toHaveBeenCalledWith(enrichedAggregateModule.parent.id);
+            expect(orgUnitRepo.get).toHaveBeenCalledWith(enrichedAggregateModule.parent.id);
             expect(patientOriginRepository.get).toHaveBeenCalledWith("someid");
             expect(orgUnitRepo.upsert.calls.argsFor(1)[0]).toEqual(originOrgunits);
         });
@@ -205,7 +205,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     "longitude": 70.2
                 }]
             };
-            orgUnitRepo.getParentProject.and.returnValue(utils.getPromise(q, parent));
+            orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
 
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
@@ -297,7 +297,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     "longitude": 70.2
                 }]
             };
-            orgUnitRepo.getParentProject.and.returnValue(utils.getPromise(q, parent));
+            orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
 
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
@@ -862,7 +862,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
         it("should create patient origin orgunits and associate datasets", function() {
             var parent = {
-                "name": "Project1",
+                "name": "OpUnit1",
                 "id": "someid",
                 "children": []
             };
@@ -891,7 +891,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                 }]
             }];
 
-            orgUnitRepo.getParentProject.and.returnValue(utils.getPromise(q, parent));
+            orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
 
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
@@ -936,7 +936,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             var enrichedAggregateModule = {
                 name: 'Module1',
                 shortName: 'Module1',
-                displayName: 'Project1 - Module1',
+                displayName: 'OpUnit1 - Module1',
                 id: 'Module1someid',
                 level: NaN,
                 openingDate: moment(new Date()).toDate(),
@@ -958,7 +958,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
                     value: 'false'
                 }],
                 parent: {
-                    name: 'Project1',
+                    name: 'OpUnit1',
                     id: 'someid'
                 }
             };
@@ -967,7 +967,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             scope.$apply();
             expect(scope.saveFailure).toBe(false);
 
-            expect(orgUnitRepo.getParentProject).toHaveBeenCalledWith(enrichedAggregateModule.parent.id);
+            expect(orgUnitRepo.get).toHaveBeenCalledWith(enrichedAggregateModule.parent.id);
             expect(patientOriginRepository.get).toHaveBeenCalledWith("someid");
             expect(orgUnitRepo.upsert.calls.argsFor(1)[0]).toEqual(originOrgunits);
             expect(dataSetRepo.getOriginDatasets).toHaveBeenCalled();

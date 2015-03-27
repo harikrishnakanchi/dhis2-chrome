@@ -209,8 +209,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 };
 
                 var getPatientOriginOUPayload = function() {
-                    return orgUnitRepository.getParentProject(enrichedModule.parent.id).then(function(parentProject) {
-                        return patientOriginRepository.get(parentProject.id).then(function(patientOrigins) {
+                    return orgUnitRepository.get(enrichedModule.parent.id).then(function(parentOpUnit) {
+                        return patientOriginRepository.get(parentOpUnit.id).then(function(patientOrigins) {
                             if (!_.isEmpty(patientOrigins))
                                 return orgUnitMapper.createPatientOriginPayload(patientOrigins.origins, enrichedModule);
                         });
