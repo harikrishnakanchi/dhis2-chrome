@@ -8,7 +8,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
             var scope, q, hustle, programRepository, mockStore, timeout, fakeModal, anchorScroll, location,
                 event1, event2, event3, event4, systemSettingRepo, systemSettings,
-                orgUnitRepository, optionSets, approvalDataRepository;
+                orgUnitRepository, optionSets, approvalDataRepository, originOrgUnits;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
@@ -143,7 +143,16 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     }]
                 };
 
+                originOrgUnits = [{
+                    "id": "o1",
+                    "name": "o1"
+                }, {
+                    "id": "o2",
+                    "name": "o2"
+                }];
+
                 spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, project));
+                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
                 spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {}));
                 spyOn(datasetRepository, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, [{
                     "id": "Vacc"
@@ -191,6 +200,19 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 expect(programRepository.get).toHaveBeenCalledWith('p1', ['de1', 'de3']);
                 expect(scope.program).toEqual(programAndStageData);
+            });
+
+            it("should load patient origin org units on init", function() {
+                var programAndStageData = {
+                    'id': 'p1'
+                };
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, programAndStageData));
+
+                scope.programId = 'p1';
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepo, orgUnitRepository, approvalDataRepository);
+                scope.$apply();
+
+                expect(scope.originOrgUnits).toEqual(originOrgUnits);
             });
 
             it("should load all system settings on init", function() {

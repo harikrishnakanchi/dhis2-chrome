@@ -111,7 +111,6 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
         });
 
         it("should get events for particular period and orgUnit", function() {
-
             var program = {
                 'id': 'p1',
                 'programStages': [{
@@ -217,6 +216,138 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             }, {
                 event: 'event2',
                 eventDate: '2014-11-24T00:00:00',
+                dataValues: [{
+                    shortName: 'Age',
+                    showInEventSummary: true,
+                    dataElement: 'de1'
+                }, {
+                    shortName: 'PatientId',
+                    showInEventSummary: false,
+                    dataElement: 'de2',
+                    value: 'ABC1',
+                }]
+            }];
+
+            expect(enrichedEvents).toEqual(expectedEvents);
+        });
+
+        it("should get events for particular period and multiple orgUnits", function() {
+            var program = {
+                'id': 'p1',
+                'programStages': [{
+                    'id': 'p1s1'
+                }]
+            };
+
+            var programStage = {
+                'id': 'p1s1',
+                'programStageSections': [{
+                    'id': 'st1',
+                    'programStageDataElements': [{
+                        'dataElement': {
+                            'id': 'de1'
+                        }
+                    }, {
+                        'dataElement': {
+                            'id': 'de2'
+                        }
+                    }]
+                }]
+            };
+
+            var dataElements = [{
+                'id': 'de1',
+                'shortName': 'Age',
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "showInEventSummary",
+                    },
+                    "value": "true"
+                }]
+            }, {
+                'id': 'de2',
+                'shortName': 'PatientId',
+            }, {
+                'id': 'de3',
+                'shortName': 'SomeNonProgramDataElement',
+            }];
+
+            var events = [{
+                'event': 'event1',
+                'eventDate': '2014-11-26T00:00:00',
+                'orgUnit': "ou1",
+                'dataValues': [{
+                    'dataElement': 'de1',
+                    'value': '20'
+                }]
+            }, {
+                'event': 'event2',
+                'eventDate': '2014-11-24T00:00:00',
+                'orgUnit': "ou2",
+                'dataValues': [{
+                    'dataElement': 'de2',
+                    'value': 'ABC1'
+                }]
+            }, {
+                'event': 'event3',
+                'eventDate': '2014-11-23T00:00:00',
+                'orgUnit': "ou2",
+                'localStatus': 'DELETED',
+                'dataValues': [{
+                    'dataElement': 'de1',
+                    'value': '20'
+                }]
+            }];
+
+            mockDB = utils.getMockDB(q, "", dataElements);
+            mockStore = mockDB.objectStore;
+
+            mockStore.find.and.callFake(function(id) {
+                if (id === "p1")
+                    return utils.getPromise(q, program);
+                if (id === "p1s1")
+                    return utils.getPromise(q, programStage);
+                if (id === "de1")
+                    return utils.getPromise(q, dataElements[0]);
+                if (id === "de2")
+                    return utils.getPromise(q, dataElements[1]);
+                return utils.getPromise(q, undefined);
+            });
+
+            mockStore.each.and.callFake(function(args) {
+                if (args.eq[2] === 'ou1') {
+                    return utils.getPromise(q, [events[0]]);
+                } else if (args.eq[2] === 'ou2') {
+                    return utils.getPromise(q, [events[1], events[2]]);
+                }
+            });
+
+            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+
+            var enrichedEvents;
+            programEventRepository.getEventsFor("p1", "2014W1", ["ou1", "ou2"]).then(function(data) {
+                enrichedEvents = data;
+            });
+            scope.$apply();
+
+            var expectedEvents = [{
+                event: 'event1',
+                eventDate: '2014-11-26T00:00:00',
+                orgUnit: "ou1",
+                dataValues: [{
+                    shortName: 'Age',
+                    showInEventSummary: true,
+                    dataElement: 'de1',
+                    value: '20',
+                }, {
+                    shortName: 'PatientId',
+                    showInEventSummary: false,
+                    dataElement: 'de2'
+                }]
+            }, {
+                event: 'event2',
+                eventDate: '2014-11-24T00:00:00',
+                orgUnit: "ou2",
                 dataValues: [{
                     shortName: 'Age',
                     showInEventSummary: true,

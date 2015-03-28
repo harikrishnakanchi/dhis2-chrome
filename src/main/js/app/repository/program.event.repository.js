@@ -75,13 +75,11 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             });
         };
 
-        this.getEventsFor = function(programId, period, orgUnit) {
-
+        this.getEventsFor = function(programId, period, orgUnitIds) {
             var getProgram = function() {
                 var store = db.objectStore('programs');
                 return store.find(programId);
             };
-
 
             var getProgramStages = function(program) {
                 var store = db.objectStore('programStages');
@@ -124,16 +122,22 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             };
 
             var getEvents = function() {
-
                 var excludeSoftDeletedEvents = function(events) {
+                    events = _.flatten(events);
                     return _.reject(events, function(e) {
                         return e.localStatus === "DELETED";
                     });
                 };
 
+                orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
                 var store = db.objectStore('programEvents');
-                var query = db.queryBuilder().$eq([programId, dateUtils.getFormattedPeriod(period), orgUnit]).$index("by_program_period_orgunit").compile();
-                return store.each(query).then(excludeSoftDeletedEvents);
+
+                var queryPromises = _.map(orgUnitIds, function(orgUnitId) {
+                    var query = db.queryBuilder().$eq([programId, dateUtils.getFormattedPeriod(period), orgUnitId]).$index("by_program_period_orgunit").compile();
+                    return store.each(query);
+                });
+
+                return $q.all(queryPromises).then(excludeSoftDeletedEvents);
             };
 
             return $q.all([getDataElements(), getEvents()]).then(function(data) {

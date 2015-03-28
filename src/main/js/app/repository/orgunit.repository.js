@@ -141,6 +141,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
         };
 
         var findAllByParent = function(parentIds) {
+            parentIds = _.isArray(parentIds) ? parentIds : [parentIds];
             var store = db.objectStore("organisationUnits");
             var query = db.queryBuilder().$in(parentIds).$index("by_parent").compile();
             return store.each(query);

@@ -47,7 +47,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 allEvents: []
             };
             $scope.eventForm.showEventForm = false;
-            return programEventRepository.getEventsFor($scope.programId, getPeriod(), $scope.currentModule.id).then(function(events) {
+            return programEventRepository.getEventsFor($scope.programId, getPeriod(), _.pluck($scope.originOrgUnits, "id")).then(function(events) {
                 $scope.eventForm.allEvents = $scope.eventForm.allEvents.concat(events);
             });
         };
@@ -243,12 +243,22 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 });
             };
 
+            var loadOriginsOrgUnits = function() {
+                return orgUnitRepository.findAllByParent($scope.currentModule.id).then(function(data) {
+                    $scope.originOrgUnits = data;
+                    $scope.originOrgUnitsById = _.indexBy(data, "id");
+                });
+            };
+
             $scope.minDateInCurrentPeriod = $scope.week.startOfWeek;
             $scope.maxDateInCurrentPeriod = $scope.week.endOfWeek;
             $scope.loading = true;
             $scope.formTemplateUrl = undefined;
-            return $q.all([$scope.loadEventsView(), loadPrograms(), setUpProjectAutoApprovedFlag(), setUpIsApprovedFlag()]).finally(function() {
-                $scope.loading = false;
+
+            return loadOriginsOrgUnits().then(function() {
+                return $q.all([$scope.loadEventsView(), loadPrograms(), setUpProjectAutoApprovedFlag(), setUpIsApprovedFlag()]).finally(function() {
+                    $scope.loading = false;
+                });
             });
         };
 
