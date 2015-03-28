@@ -128,5 +128,8 @@
     "savedOriginDetails": "Patient origin details added successfully",
     "patientOrigin": "Patient Origin",
     "invalidKey": "Invalid Key",
-    "enterProductKeyLabel": "Enter Product Key"
+    "enterProductKeyLabel": "Enter Product Key",
+    "noCasesLabel": "There are no cases. ",
+    "addNewCaseLabel": "Add new case",
+    "eventDataLabel": "Event Date"
 }

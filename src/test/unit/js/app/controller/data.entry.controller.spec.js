@@ -151,7 +151,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.currentModule = {};
                 scope.$apply();
 
-                expect(scope.formTemplateUrl.indexOf("templates/partials/line-list-data-entry.html?")).toEqual(0);
+                expect(scope.formTemplateUrl.indexOf("templates/partials/line-list-summary.html?")).toEqual(0);
                 expect(scope.programId).toEqual('p1');
             });
 

@@ -16,7 +16,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                             $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
                         } else {
                             $scope.programId = program.id;
-                            $scope.formTemplateUrl = "templates/partials/line-list-data-entry.html" + '?' + moment().format("X");
+                            $scope.formTemplateUrl = "templates/partials/line-list-summary.html" + '?' + moment().format("X");
                         }
                     });
                 }

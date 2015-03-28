@@ -39,6 +39,7 @@ require.config({
         "dataEntryController": "app/controller/data.entry.controller",
         "aggregateDataEntryController": "app/controller/aggregate.data.entry.controller",
         "lineListDataEntryController": "app/controller/line.list.data.entry.controller",
+        "lineListSummaryController": "app/controller/line.list.summary.controller",
         "orgUnitContoller": "app/controller/orgunit.controller",
         "opUnitController": "app/controller/opunit.controller",
         "moduleController": "app/controller/module.controller",

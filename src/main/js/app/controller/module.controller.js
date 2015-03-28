@@ -111,7 +111,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             }, "dataValues");
         };
 
-
         var showModal = function(okCallback, message) {
             $scope.modalMessage = message;
             var modalInstance = $modal.open({
