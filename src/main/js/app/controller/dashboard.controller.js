@@ -279,7 +279,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
         var showModal = function(okCallback, message) {
             $scope.modalMessage = message;
             var modalInstance = $modal.open({
-                templateUrl: 'templates/confirm.dialog.html',
+                templateUrl: 'templates/confirm-dialog.html',
                 controller: 'confirmDialogController',
                 scope: $scope
             });

@@ -42,7 +42,7 @@ define(["lodash", "moment", "dhisId", "properties", "orgUnitMapper", "groupSecti
 
             $scope.modalMessage = message;
             var modalInstance = $modal.open({
-                templateUrl: 'templates/confirm.dialog.html',
+                templateUrl: 'templates/confirm-dialog.html',
                 controller: 'confirmDialogController',
                 scope: $scope
             });

@@ -237,7 +237,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
             $scope.modalMessage = message;
             var modalInstance = $modal.open({
-                templateUrl: 'templates/confirm.dialog.html',
+                templateUrl: 'templates/confirm-dialog.html',
                 controller: 'confirmDialogController',
                 scope: $scope
             });

@@ -107,7 +107,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         var showModal = function(okCallback, message) {
             $scope.modalMessage = message;
             var modalInstance = $modal.open({
-                templateUrl: 'templates/confirm.dialog.html',
+                templateUrl: 'templates/confirm-dialog.html',
                 controller: 'confirmDialogController',
                 scope: $scope
             });
