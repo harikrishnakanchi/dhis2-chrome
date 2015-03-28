@@ -42,6 +42,10 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 });
         };
 
+        var markEventsAsSubmitted = function() {
+            return programEventRepository.markEventsAsSubmitted($scope.programId, getPeriod(), _.pluck($scope.originOrgUnits, "id"));
+        };
+
         $scope.loadEventsView = function() {
             $scope.eventForm = {
                 allEvents: []
@@ -83,10 +87,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 "orgUnit": $scope.currentModule.id
             };
 
-            var markEventsAsSubmitted = function() {
-                return programEventRepository.markEventsAsSubmitted($scope.programId, getPeriod(), $scope.currentModule.id);
-            };
-
             var clearAnyExisingApprovals = function() {
                 return approvalDataRepository.clearApprovals(periodAndOrgUnit);
             };
@@ -122,10 +122,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             var periodAndOrgUnit = {
                 "period": getPeriod(),
                 "orgUnit": $scope.currentModule.id
-            };
-
-            var markEventsAsSubmitted = function() {
-                return programEventRepository.markEventsAsSubmitted($scope.programId, getPeriod(), $scope.currentModule.id);
             };
 
             var markAsApproved = function() {

@@ -7,7 +7,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 scope = $rootScope.$new();
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, "getUserModuleIds").and.returnValue(utils.getPromise(q, ["mod1"]));
+                spyOn(userPreferenceRepository, "getOriginOrgUnitIds").and.returnValue(utils.getPromise(q, ["mod1"]));
                 eventService = new EventService();
                 programEventRepository = new ProgramEventRepository();
                 downloadEventDataConsumer = new DownloadEventDataConsumer(eventService, programEventRepository, userPreferenceRepository, q);

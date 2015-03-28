@@ -2,7 +2,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
     function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, q, programRepository, db, mockStore, allEvents, timeout, anchorScroll, location, optionSets;
+            var scope, q, programRepository, db, mockStore, allEvents, timeout, anchorScroll, location, optionSets, originOrgUnits;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
@@ -39,6 +39,20 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     'parent': {
                         'id': 'par1'
                     }
+                };
+
+                originOrgUnits = [{
+                    "id": "o1",
+                    "name": "o1"
+                }, {
+                    "id": "o2",
+                    "name": "o2"
+                }];
+
+                scope.originOrgUnits = originOrgUnits;
+                scope.originOrgUnitsById = {
+                    "o1": originOrgUnits[0],
+                    "o2": originOrgUnits[1]
                 };
 
                 programEventRepository = new ProgramEventRepository();
@@ -136,6 +150,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 scope.dataValues = {};
 
+                scope.patientOrigin = {
+                    "selected": originOrgUnits[0]
+                };
                 scope.save(programStage);
                 scope.$apply();
 
@@ -143,7 +160,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
                 expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
-                expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("currentModuleId");
+                expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("o1");
                 expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2014-11-18");
                 expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW_DRAFT");
                 expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([]);
@@ -169,6 +186,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 var lineListDataEntryController = new LineListDataEntryController(scope, timeout, location, anchorScroll, db, programEventRepository);
                 scope.$apply();
 
+                scope.patientOrigin = {
+                    "selected": originOrgUnits[0]
+                };
                 scope.eventDates = {
                     "Prg1": {
                         "PrgStage1": "2014-11-18T10:34:14.067Z"
@@ -215,6 +235,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 var lineListDataEntryController = new LineListDataEntryController(scope, timeout, location, anchorScroll, db, programEventRepository);
                 scope.$apply();
 
+                scope.patientOrigin = {
+                    "selected": originOrgUnits[0]
+                };
                 scope.update(programStage);
                 scope.$apply();
 
@@ -223,7 +246,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         'event': "event1",
                         'program': "Prg1",
                         'programStage': "PrgStage1",
-                        'orgUnit': "Mod1",
+                        'orgUnit': "o1",
                         'eventDate': "2014-12-29",
                         'dataValues': [{
                             "dataElement": "de1",

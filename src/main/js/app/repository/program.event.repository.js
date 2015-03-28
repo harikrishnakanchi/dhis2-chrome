@@ -51,11 +51,17 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             }));
         };
 
-        this.markEventsAsSubmitted = function(programId, period, orgUnit) {
+        this.markEventsAsSubmitted = function(programId, period, orgUnitIds) {
             var getEvents = function() {
                 var store = db.objectStore('programEvents');
-                var query = db.queryBuilder().$eq([programId, dateUtils.getFormattedPeriod(period), orgUnit]).$index("by_program_period_orgunit").compile();
-                return store.each(query);
+                var queryPromises = _.map(orgUnitIds, function(orgUnitId) {
+                    var query = db.queryBuilder().$eq([programId, dateUtils.getFormattedPeriod(period), orgUnitId]).$index("by_program_period_orgunit").compile();
+                    return store.each(query);
+                });
+
+                return $q.all(queryPromises).then(function(events) {
+                    return _.flatten(events);
+                });
             };
 
             var updateEvents = function(events) {
@@ -69,6 +75,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
                 });
             };
 
+            orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
             return getEvents().then(updateEvents).then(function(newEvents) {
                 var store = db.objectStore('programEvents');
                 return store.upsert(newEvents);

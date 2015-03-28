@@ -10,11 +10,11 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
             });
         };
 
-        var uploadEventData = function(moduleIds) {
+        var uploadEventData = function(orgUnitIds) {
             var getEvents = function() {
                 var m = moment();
                 var startPeriod = dateUtils.toDhisFormat(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
-                return programEventRepository.getEventsFromPeriod(startPeriod, moduleIds).then(function(events) {
+                return programEventRepository.getEventsFromPeriod(startPeriod, orgUnitIds).then(function(events) {
                     return _.filter(events, function(e) {
                         return e.localStatus === "READY_FOR_DHIS";
                     });
@@ -29,8 +29,8 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
         };
 
         this.run = function(message) {
-            return userPreferenceRepository.getUserModuleIds().then(function(moduleIds) {
-                return uploadEventData(moduleIds);
+            return userPreferenceRepository.getOriginOrgUnitIds().then(function(originOrgUnitIds) {
+                return uploadEventData(originOrgUnitIds);
             });
         };
     };

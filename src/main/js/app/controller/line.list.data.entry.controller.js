@@ -5,9 +5,10 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.dataValues = {};
             $scope.eventDates = {};
-            $scope.isNewMode = true;
+            $scope.patientOrigin = {};
             $scope.minDateInCurrentPeriod = $scope.week.startOfWeek;
             $scope.maxDateInCurrentPeriod = $scope.week.endOfWeek;
+            $scope.isNewMode = true;
             if ($scope.form && $scope.form.eventDataEntryForm) {
                 $scope.form.eventDataEntryForm.$setPristine();
             }
@@ -77,6 +78,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
         $scope.update = function(programStage) {
             var buildPayloadFromView = function() {
+                $scope.event.orgUnit = $scope.patientOrigin.selected.id;
                 $scope.event.eventDate = moment($scope.eventDates[$scope.event.program][$scope.event.programStage]).format("YYYY-MM-DD");
                 $scope.event.localStatus = "UPDATED_DRAFT";
                 $scope.event.dataValues = getDataValues(programStage);
@@ -92,7 +94,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                     "event": dhisId.get($scope.program.id + programStage.id + $scope.currentModule.id + moment().format()),
                     "program": $scope.program.id,
                     "programStage": programStage.id,
-                    "orgUnit": $scope.currentModule.id,
+                    "orgUnit": $scope.patientOrigin.selected.id,
                     "eventDate": moment($scope.eventDates[$scope.program.id][programStage.id]).format("YYYY-MM-DD"),
                     "localStatus": "NEW_DRAFT",
                     "dataValues": getDataValues(programStage)
@@ -119,6 +121,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             var loadEvent = function() {
                 if ($scope.event) {
                     $scope.isNewMode = false;
+                    $scope.patientOrigin.selected = $scope.originOrgUnitsById[$scope.event.orgUnit];
                     $scope.eventDates[$scope.event.program] = $scope.eventDates[$scope.event.program] ? $scope.eventDates[$scope.event.program] : {};
                     $scope.eventDates[$scope.event.program][$scope.event.programStage] = new Date($scope.event.eventDate);
                     _.forEach($scope.event.dataValues, function(dv) {

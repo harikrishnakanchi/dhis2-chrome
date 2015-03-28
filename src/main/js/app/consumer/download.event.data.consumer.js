@@ -67,8 +67,8 @@ define(["moment", "properties", "dateUtils", "lodash"], function(moment, propert
         };
 
         this.run = function() {
-            return userPreferenceRepository.getUserModuleIds().then(function(moduleIds) {
-                return $q.all([downloadEventsData(moduleIds), getLocalData(moduleIds)]).then(mergeAndSave);
+            return userPreferenceRepository.getOriginOrgUnitIds().then(function(originOrgUnitIds) {
+                return $q.all([downloadEventsData(originOrgUnitIds), getLocalData(originOrgUnitIds)]).then(mergeAndSave);
             });
         };
     };

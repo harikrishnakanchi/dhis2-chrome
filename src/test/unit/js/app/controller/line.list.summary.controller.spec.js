@@ -300,7 +300,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 scope.submit();
                 scope.$apply();
 
-                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("Prg1", "2014W44", "currentModuleId");
+                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("Prg1", "2014W44", ["o1", "o2"]);
                 expect(approvalDataRepository.clearApprovals).toHaveBeenCalledWith({
                     "period": "2014W44",
                     "orgUnit": "currentModuleId"
@@ -369,7 +369,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 scope.submitAndApprove();
                 scope.$apply();
 
-                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("Prg1", "2014W44", "currentModuleId");
+                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("Prg1", "2014W44", ["o1", "o2"]);
                 expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith({
                     'orgUnit': 'currentModuleId',
                     'period': '2014W44'

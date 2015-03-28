@@ -22,6 +22,14 @@
                                             <input name="eventDate" type="date" class="form-control" ng-model="getEventDateNgModel(eventDates, program.id, programStage.id)[programStage.id]" required min="{{ minDateInCurrentPeriod }}" max="{{ maxDateInCurrentPeriod }}" />
                                         </div>
                                     </li>
+                                    <li class="form-group">
+                                        <label for="patientOrigin" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.patientOriginLabel }}</label>
+                                        <div class="col-sm-6 col-md-6">
+                                            <select ng-options="o.name for o in originOrgUnits" ng-model="patientOrigin.selected" name="patientOrigin" required>
+                                                <option value=""></option>
+                                            </select>
+                                        </div>
+                                    </li>
                                 </ul>
                                 <accordion-group ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'" is-open="true">
                                     <accordion-heading>

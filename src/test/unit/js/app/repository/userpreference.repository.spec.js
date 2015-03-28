@@ -90,5 +90,28 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
             expect(orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules).toHaveBeenCalledWith(['proj1', 'proj2']);
             expect(actualUserModules).toEqual(["mod1", "mod2", "mod3"]);
         });
+
+        it("should get all patient origin org units for user's modules", function() {
+            var originOrgUnits = [{
+                "id": "o1",
+                "name": "o1"
+            }, {
+                "id": "o2",
+                "name": "o2"
+            }];
+
+            spyOn(userPreferenceRepository, "getUserModuleIds").and.returnValue(utils.getPromise(q, []));
+            orgUnitRepository.findAllByParent = jasmine.createSpy("findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
+
+            var expectedResults = ["o1", "o2"];
+            var actualResult;
+
+            userPreferenceRepository.getOriginOrgUnitIds().then(function(data) {
+                actualResult = data;
+            });
+
+            scope.$apply();
+            expect(actualResult).toEqual(expectedResults);
+        });
     });
 });

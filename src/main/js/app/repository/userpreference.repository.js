@@ -29,11 +29,20 @@ define(["lodash"], function(_) {
             });
         };
 
+        var getOriginOrgUnitIds = function() {
+            return getUserModuleIds().then(function(moduleIds) {
+                return orgUnitRepository.findAllByParent(moduleIds).then(function(originOrgUnits) {
+                    return _.pluck(originOrgUnits, "id");
+                });
+            });
+        };
+
         return {
             "get": get,
             "getAll": getAll,
             "save": save,
-            "getUserModuleIds": getUserModuleIds
+            "getUserModuleIds": getUserModuleIds,
+            "getOriginOrgUnitIds": getOriginOrgUnitIds
         };
     };
 });
