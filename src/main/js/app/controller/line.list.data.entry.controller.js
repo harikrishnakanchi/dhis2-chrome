@@ -1,15 +1,16 @@
 define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
     return function($scope, $timeout, $location, $anchorScroll, db, programEventRepository) {
         var resetForm = function() {
-            $scope.form = {};
+            $scope.form = $scope.form || {};
             $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.dataValues = {};
             $scope.eventDates = {};
             $scope.isNewMode = true;
             $scope.minDateInCurrentPeriod = $scope.week.startOfWeek;
             $scope.maxDateInCurrentPeriod = $scope.week.endOfWeek;
-            if ($scope.form && $scope.form.eventDataEntryForm)
+            if ($scope.form && $scope.form.eventDataEntryForm) {
                 $scope.form.eventDataEntryForm.$setPristine();
+            }
         };
 
         var scrollToTop = function() {
@@ -106,12 +107,6 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                     $scope.loadEventsView();
             });
         };
-
-        $scope.$watch('eventDataEntryForm', function(eventDataEntryForm) {
-            if (eventDataEntryForm) {
-                $scope.eventDataEntryForm.$setPristine();
-            }
-        });
 
         var init = function() {
             var loadOptionSets = function() {
