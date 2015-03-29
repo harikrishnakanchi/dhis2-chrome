@@ -11,18 +11,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
         };
 
-        var showResultMessage = function(messageType, message) {
-            var hideMessage = function() {
-                $scope.resultMessageType = "";
-                $scope.resultMessage = "";
-            };
-
-            $scope.resultMessageType = messageType;
-            $scope.resultMessage = message;
-            $timeout(hideMessage, properties.messageTimeout);
-            scrollToTop();
-        };
-
         var confirmAndProceed = function(okCallback, message, showModal) {
             if (showModal === false)
                 return $q.when(okCallback());
@@ -44,6 +32,18 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
         var markEventsAsSubmitted = function() {
             return programEventRepository.markEventsAsSubmitted($scope.programId, getPeriod(), _.pluck($scope.originOrgUnits, "id"));
+        };
+
+        $scope.showResultMessage = function(messageType, message) {
+            var hideMessage = function() {
+                $scope.resultMessageType = "";
+                $scope.resultMessage = "";
+            };
+
+            $scope.resultMessageType = messageType;
+            $scope.resultMessage = message;
+            $timeout(hideMessage, properties.messageTimeout);
+            scrollToTop();
         };
 
         $scope.loadEventsView = function() {
@@ -113,7 +113,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             var confirmationQuestion = $scope.resourceBundle.reapprovalConfirmationMessage;
             var confirmIf = ($scope.isCompleted || $scope.isApproved);
             confirmAndProceed(submit, confirmationQuestion, confirmIf).then(function() {
-                showResultMessage("success", $scope.resourceBundle.eventSubmitSuccess);
+                $scope.showResultMessage("success", $scope.resourceBundle.eventSubmitSuccess);
                 $scope.loadEventsView();
             });
         };
@@ -156,7 +156,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             var confirmationQuestion = $scope.resourceBundle.reapprovalConfirmationMessage;
             var confirmIf = ($scope.isCompleted || $scope.isApproved);
             confirmAndProceed(submitAndApprove, confirmationQuestion, confirmIf).then(function() {
-                showResultMessage("success", $scope.resourceBundle.eventSubmitAndApproveSuccess);
+                $scope.showResultMessage("success", $scope.resourceBundle.eventSubmitAndApproveSuccess);
                 $scope.loadEventsView();
             });
         };
@@ -188,7 +188,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             var deleteOnConfirm = function() {
                 var deleteFunction = event.localStatus === "NEW_DRAFT" ? hardDelete : softDelete;
                 return deleteFunction.apply().then(function() {
-                    showResultMessage("success", $scope.resourceBundle.eventDeleteSuccess);
+                    $scope.showResultMessage("success", $scope.resourceBundle.eventDeleteSuccess);
                     $scope.loadEventsView();
                 });
             };

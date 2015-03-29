@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
-    return function($scope, $timeout, $location, $anchorScroll, db, programEventRepository) {
+    return function($scope, db, programEventRepository) {
         var resetForm = function() {
             $scope.form = $scope.form || {};
             $scope.numberPattern = "^[1-9][0-9]*$";
@@ -14,25 +14,8 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             }
         };
 
-        var scrollToTop = function() {
-            $location.hash();
-            $anchorScroll();
-        };
-
         var getPeriod = function() {
             return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
-        };
-
-        var showResultMessage = function(messageType, message) {
-            var hideMessage = function() {
-                $scope.resultMessageType = "";
-                $scope.resultMessage = "";
-            };
-
-            $scope.resultMessageType = messageType;
-            $scope.resultMessage = message;
-            $timeout(hideMessage, properties.messageTimeout);
-            scrollToTop();
         };
 
         var getDataValues = function(programStage) {
@@ -53,7 +36,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 "events": [$scope.event]
             };
             return programEventRepository.upsert(payload).then(function() {
-                return showResultMessage("success", $scope.resourceBundle.eventSaveSuccess);
+                return $scope.showResultMessage("success", $scope.resourceBundle.eventSaveSuccess);
             });
         };
 
@@ -119,13 +102,24 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             };
 
             var loadEvent = function() {
+                var formatValue = function(dv) {
+                    if (dv.type === "date") {
+                        return new Date(dv.value);
+                    }
+
+                    if (dv.type === "int") {
+                        return parseInt(dv.value);
+                    }
+
+                    return dv.value;
+                };
                 if ($scope.event) {
                     $scope.isNewMode = false;
                     $scope.patientOrigin.selected = $scope.originOrgUnitsById[$scope.event.orgUnit];
                     $scope.eventDates[$scope.event.program] = $scope.eventDates[$scope.event.program] ? $scope.eventDates[$scope.event.program] : {};
                     $scope.eventDates[$scope.event.program][$scope.event.programStage] = new Date($scope.event.eventDate);
                     _.forEach($scope.event.dataValues, function(dv) {
-                        $scope.dataValues[dv.dataElement] = dv.type === 'date' ? new Date(dv.value) : dv.value;
+                        $scope.dataValues[dv.dataElement] = formatValue(dv);
                     });
                 }
             };

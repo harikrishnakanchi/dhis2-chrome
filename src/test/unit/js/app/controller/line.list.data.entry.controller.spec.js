@@ -2,15 +2,12 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
     function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, q, programRepository, db, mockStore, allEvents, timeout, anchorScroll, location, optionSets, originOrgUnits;
+            var scope, q, programRepository, db, mockStore, allEvents, optionSets, originOrgUnits;
 
             beforeEach(module('hustle'));
-            beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
+            beforeEach(mocks.inject(function($rootScope, $q) {
                 scope = $rootScope.$new();
                 q = $q;
-                timeout = $timeout;
-                location = $location;
-                anchorScroll = jasmine.createSpy();
 
                 optionSets = [{
                     'id': 'os2',
@@ -50,6 +47,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 }];
 
                 scope.originOrgUnits = originOrgUnits;
+                scope.showResultMessage = jasmine.createSpy("showResultMessage");
                 scope.originOrgUnitsById = {
                     "o1": originOrgUnits[0],
                     "o2": originOrgUnits[1]
@@ -68,7 +66,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should find optionSets for id", function() {
-                var lineListDataEntryController = new LineListDataEntryController(scope, timeout, location, anchorScroll, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
                 scope.$apply();
 
                 expect(scope.getOptionsFor('os2')).toEqual([{
@@ -83,7 +81,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     'os2o1': 'os2o1 translated name'
                 };
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, timeout, location, anchorScroll, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
                 scope.$apply();
 
                 expect(scope.getOptionsFor('os2')).toEqual([{
@@ -96,7 +94,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             it("should get eventDates with default set to today", function() {
                 var eventDates = {};
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, timeout, location, anchorScroll, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
                 scope.$apply();
 
                 scope.getEventDateNgModel(eventDates, 'p1', 'ps1');
@@ -113,7 +111,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "endOfWeek": "2014-11-16"
                 };
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, timeout, location, anchorScroll, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
                 scope.$apply();
 
                 expect(moment(scope.minDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-10");
@@ -139,7 +137,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
                 scope.programId = "p2";
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, timeout, location, anchorScroll, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
                 scope.$apply();
 
                 scope.eventDates = {
@@ -165,10 +163,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW_DRAFT");
                 expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([]);
 
-                expect(scope.resultMessageType).toEqual("success");
-                expect(scope.resultMessage).toEqual("Event saved successfully");
-                expect(location.hash).toHaveBeenCalled();
-
                 expect(scope.loadEventsView).toHaveBeenCalled();
             });
 
@@ -183,7 +177,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     'id': 'PrgStage1',
                 };
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, timeout, location, anchorScroll, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
                 scope.$apply();
 
                 scope.patientOrigin = {
@@ -228,11 +222,12 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "eventDate": "2014-12-29T05:06:30.950+0000",
                     "dataValues": [{
                         "dataElement": "de1",
-                        "value": "12"
+                        "value": "12",
+                        "type": "int"
                     }]
                 };
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, timeout, location, anchorScroll, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
                 scope.$apply();
 
                 scope.patientOrigin = {
@@ -250,15 +245,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         'eventDate': "2014-12-29",
                         'dataValues': [{
                             "dataElement": "de1",
-                            "value": "12"
+                            "value": 12
                         }],
                         'localStatus': "UPDATED_DRAFT"
                     }]
                 };
 
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(eventPayload);
-                expect(scope.resultMessageType).toEqual("success");
-                expect(scope.resultMessage).toEqual("Event updated successfully");
             });
         });
     });

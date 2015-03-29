@@ -3,6 +3,8 @@
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
     <section class="panel tab-panel">
+        <div ng-show="resultMessageType === 'success'" class="alert alert-success">{{ resultMessage }}</div>
+        <div ng-show="resultMessageType === 'failure'" class="alert alert-danger">{{ resultMessage }}</div>
         <div ng-if="!eventForm.showEventForm">
             <form name="eventSummaryForm" id="eventSummaryForm" class="form-horizontal">
                 <accordion close-others="false">
