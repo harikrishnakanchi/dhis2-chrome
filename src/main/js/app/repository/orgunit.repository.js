@@ -198,7 +198,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
             return getChildModules(orgUnitIds);
         };
 
-        var getProjectAndOpUnitAttributes = function(module) {
+        var getProjectAndOpUnitAttributes = function(moduleOrOrigin) {
             var attributes_arr = [];
 
             var pushAttributeValues = function(attributes) {
@@ -208,6 +208,14 @@ define(["moment", "lodashUtils"], function(moment, _) {
             };
 
             var getAttributes = function(orgUnits) {
+                var isOrigin = _.any(moduleOrOrigin.attributeValues, {
+                    "value": "Patient Origin"
+                });
+                
+                var module = isOrigin === true ? _.find(orgUnits, {
+                    'id': moduleOrOrigin.parent.id
+                }) : moduleOrOrigin;
+
                 var opUnit = _.find(orgUnits, {
                     'id': module.parent.id
                 });

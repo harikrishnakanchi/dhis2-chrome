@@ -209,7 +209,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             var updateDatasets = function(datasets) {
                 return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]);
             };
-            
+
             var associateDatasetsToOrigins = function(originOrgUnits) {
                 var getOriginDatasetsPromise = datasetRepository.getOriginDatasets();
                 var getSummaryDatasetsPromise = datasetRepository.getDataSetAssociatedWithProgram($scope.program.attributeValues);
@@ -233,11 +233,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                 return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")]);
             };
 
-            var createOrgUnitGroups = function() {
-                return orgUnitGroupHelper.createOrgUnitGroups([enrichedModule], false);
-            };
 
-            var createOriginOrgUnits = function() {
+            var createOriginOrgUnitsAndGroups = function() {
+                var createOrgUnitGroups = function(originsPayload) {
+                    return orgUnitGroupHelper.createOrgUnitGroups(originsPayload, false);
+                };
 
                 var getPatientOriginOUPayload = function() {
                     return orgUnitRepository.get(enrichedModule.parent.id).then(function(parentOpUnit) {
@@ -253,16 +253,16 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                         return orgUnitRepository.upsert(patientOriginOUPayload)
                             .then(_.partial(publishMessage, patientOriginOUPayload, "upsertOrgUnit"))
                             .then(_.partial(associatePrograms, $scope.program, patientOriginOUPayload))
-                            .then(_.partial(associateDatasetsToOrigins, patientOriginOUPayload));
+                            .then(_.partial(associateDatasetsToOrigins, patientOriginOUPayload))
+                            .then(_.partial(createOrgUnitGroups, patientOriginOUPayload));
                     }
                 });
             };
 
             return getEnrichedModule($scope.module)
                 .then(createModule)
-                .then(createOrgUnitGroups)
                 .then(_.partial(saveExcludedDataElements, enrichedModule))
-                .then(createOriginOrgUnits)
+                .then(createOriginOrgUnitsAndGroups)
                 .then(_.partial(onSuccess, enrichedModule), onError);
         };
 

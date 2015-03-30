@@ -58,6 +58,8 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             spyOn(datasetRepo, "getAllLinelistDatasets").and.returnValue(utils.getPromise(q, allDatasets));
             orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
 
+            spyOn(orgUnitGroupHelper,"createOrgUnitGroups").and.returnValue(utils.getPromise(q,{}));
+
             mockOrgStore = {
                 upsert: function() {},
                 getAll: function() {}
@@ -583,7 +585,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             expect(scope.getCollapsed("sectionId")).toEqual(true);
         });
 
-        it("should create origin orgunits, associate geaographic origin dataset , associate programs and summary datasets", function() {
+        it("should create origin orgunits, orgunit groups, associate geaographic origin dataset , associate programs and summary datasets", function() {
 
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, undefined));
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
@@ -701,7 +703,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }]
             }];
             expect(datasetRepo.upsert).toHaveBeenCalledWith(expectedUpserts);
-
+            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(originOrgunits,false);
         });
 
         it("should take the user to the view page of the parent opUnit on clicking cancel", function() {

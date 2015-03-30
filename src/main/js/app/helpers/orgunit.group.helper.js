@@ -1,6 +1,6 @@
 define([], function() {
     return function($hustle, $q, $scope, orgUnitRepository, orgUnitGroupRepository) {
-        this.createOrgUnitGroups = function(modules, isUpdateProject) {
+        this.createOrgUnitGroups = function(orgunits, isUpdateProject) {
             var getOrgUnitGroups = function() {
                 return orgUnitGroupRepository.getAll()
                     .then(function(result) {
@@ -8,19 +8,19 @@ define([], function() {
                     });
             };
 
-            var getAttributes = function(module_t) {
-                return orgUnitRepository.getProjectAndOpUnitAttributes(module_t).then(function(result) {
-                    return [result, module_t];
+            var getAttributes = function(orgunit) {
+                return orgUnitRepository.getProjectAndOpUnitAttributes(orgunit).then(function(result) {
+                    return [result, orgunit];
                 });
             };
 
-            var addModulesToOrgUnitGroups = function(orgUnitGroups) {
+            var addOrgunitsToOrgUnitGroups = function(orgUnitGroups) {
                 var addToGroup = function(data) {
                     var attributes = data[0];
-                    var module_t = data[1];
-                    var moduleToAdd = {
-                        'id': module_t.id,
-                        'name': module_t.name
+                    var orgunit = data[1];
+                    var orgunitToAdd = {
+                        'id': orgunit.id,
+                        'name': orgunit.name
                     };
                     var modifiedOrgUnitGroups = [];
                     _.forEach(orgUnitGroups, function(orgUnitGroup) {
@@ -37,12 +37,12 @@ define([], function() {
                         }
 
                         if (isUpdateProject) {
-                            orgUnitGroup.organisationUnits = _.reject(orgUnitGroup.organisationUnits, moduleToAdd);
+                            orgUnitGroup.organisationUnits = _.reject(orgUnitGroup.organisationUnits, orgunitToAdd);
                         }
-                        var isOrgUnitAbsent = !_.find(orgUnitGroup.organisationUnits, moduleToAdd);
+                        var isOrgUnitAbsent = !_.find(orgUnitGroup.organisationUnits, orgunitToAdd);
 
                         if (res !== undefined && isOrgUnitAbsent) {
-                            orgUnitGroup.organisationUnits.push(moduleToAdd);
+                            orgUnitGroup.organisationUnits.push(orgunitToAdd);
                             modifiedOrgUnitGroups.push(orgUnitGroup);
                         }
                     });
@@ -58,12 +58,12 @@ define([], function() {
                     });
                 };
 
-                _.forEach(modules, function(module_t) {
-                    getAttributes(module_t).then(addToGroup).then(upsertOrgUnitGroup);
+                _.forEach(orgunits, function(orgunit) {
+                    getAttributes(orgunit).then(addToGroup).then(upsertOrgUnitGroup);
                 });
             };
 
-            return getOrgUnitGroups().then(addModulesToOrgUnitGroups);
+            return getOrgUnitGroups().then(addOrgunitsToOrgUnitGroups);
         };
     };
 });
