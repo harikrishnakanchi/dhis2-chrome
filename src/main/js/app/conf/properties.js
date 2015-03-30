@@ -34,9 +34,9 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "retryDelayConfig": {
                 0: 15000,
                 1: 15000,
-                2: 15000,
-                3: 15000,
-                4: 15000
+                2: 30000,
+                3: 720000,
+                4: 720000
             }
         },
         "logging": {
