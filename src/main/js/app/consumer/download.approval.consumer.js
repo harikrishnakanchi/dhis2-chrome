@@ -52,7 +52,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                 return approvalDataRepository.getApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(mergeAndSaveCompletion);
             };
 
-            return approvalService.getAllLevelTwoApprovalData(userModuleIds, allDataSetIds).then(saveAllLevelTwoApprovalData);
+            return approvalService.getApprovalData(userModuleIds, allDataSetIds).then(saveAllLevelTwoApprovalData);
         };
 
         var downloadCompletionData = function(metadata) {
@@ -107,7 +107,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                 return approvalDataRepository.getApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(mergeAndSaveCompletion);
             };
 
-            return approvalService.getAllLevelOneApprovalData(userModuleIds, allDataSetIds).then(saveAllLevelOneApprovalData);
+            return approvalService.getCompletionData(userModuleIds, allDataSetIds).then(saveAllLevelOneApprovalData);
         };
 
         this.run = function() {

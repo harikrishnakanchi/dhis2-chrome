@@ -26,8 +26,8 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 };
 
                 approvalService = {
-                    "getAllLevelOneApprovalData": jasmine.createSpy("getAllLevelOneApprovalData").and.returnValue(utils.getPromise(q, [])),
-                    "getAllLevelTwoApprovalData": jasmine.createSpy("getAllLevelTwoApprovalData").and.returnValue(utils.getPromise(q, [])),
+                    "getCompletionData": jasmine.createSpy("getCompletionData").and.returnValue(utils.getPromise(q, [])),
+                    "getApprovalData": jasmine.createSpy("getApprovalData").and.returnValue(utils.getPromise(q, [])),
                     "saveApprovalsFromDhis": jasmine.createSpy("saveApprovalsFromDhis"),
                     "markAsComplete": jasmine.createSpy("markAsComplete"),
                     "markAsApproved": jasmine.createSpy("markAsApproved"),
@@ -54,13 +54,13 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
                 expect(datasetRepository.getAllDatasetIds).toHaveBeenCalled();
 
-                expect(approvalService.getAllLevelOneApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
-                expect(approvalService.getAllLevelTwoApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
+                expect(approvalService.getCompletionData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
+                expect(approvalService.getApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
             });
 
             it("should not save to indexeddb if no level one or level two approval data is available in dhis", function() {
-                approvalService.getAllLevelOneApprovalData.and.returnValue(utils.getPromise(q, []));
-                approvalService.getAllLevelTwoApprovalData.and.returnValue(utils.getPromise(q, []));
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, []));
+                approvalService.getApprovalData.and.returnValue(utils.getPromise(q, []));
 
                 var dbData = {
                     "orgUnit": "ou1",
@@ -97,7 +97,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "completedOn": "2014-01-05T00:00:00.000+0000"
                 }];
 
-                approvalService.getAllLevelOneApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, dhisApprovalData));
 
                 message = {
                     "data": {
@@ -127,7 +127,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "isApproved": true
                 }];
 
-                approvalService.getAllLevelTwoApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
+                approvalService.getApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
 
                 message = {
                     "data": {
@@ -243,8 +243,8 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 var dataFromIdb = [dbCompletionWhichIsDeletedInDhis, dbUnchangedCompletion, dbNewCompletion, dbDeletedCompletion, dbStaleCompletionData, dbApprovedData];
                 var dataFromDhis = [dhisUnchangedCompletion, dhisCompletionWhichIsDeletedLocally, dhisNewCompletion, dhisCompletionWithDifferentData, dhisCompletionDataForPeriodThatIsApproved];
 
-                approvalService.getAllLevelOneApprovalData.and.returnValue(utils.getPromise(q, dataFromDhis));
-                approvalService.getAllLevelTwoApprovalData.and.returnValue(utils.getPromise(q, [dhisApprovalDataForPeriodThatIsApproved]));
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, dataFromDhis));
+                approvalService.getApprovalData.and.returnValue(utils.getPromise(q, [dhisApprovalDataForPeriodThatIsApproved]));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataFromIdb));
 
                 message = {
@@ -368,7 +368,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 var dbApprovalData = [dbApprovalWhichIsDeletedInDhis, dbUnchangedApproval, dbNewApproval, dbDeletedApproval, dbStaleApprovalData, dbApprovalWhichIsNotApprovedYet];
                 var dhisApprovalData = [dhisUnchangedApproval, dhisApprovalWhichIsDeletedLocally, dhisApprovalWithDifferentData, dhisNewApproval];
 
-                approvalService.getAllLevelTwoApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
+                approvalService.getApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbApprovalData));
 
                 message = {
