@@ -4,7 +4,6 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
         $scope.allContexts = ['Internal instability', 'Stable', 'Post-conflict', 'Cross-border instability'].sort();
         $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
-        $scope.thisDate = moment().toDate();
         $scope.reasonForIntervention = ['Armed Conflict', 'Access to health care', 'Natural Disaster', 'Epidemic'].sort();
         $scope.modeOfOperation = ['Direct operation', 'Remote operation'].sort();
         $scope.modelOfManagement = ['Collaboration', 'MSF management'].sort();
@@ -148,10 +147,6 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
                 $scope.userStateSuccessfullyToggled = false;
                 $timeout(onTimeOut, properties.messageTimeout);
             });
-        };
-
-        $scope.isAfterMaxDate = function() {
-            return moment($scope.newOrgUnit.openingDate).isAfter(moment($scope.thisDate));
         };
 
         $scope.setUserProject = function() {

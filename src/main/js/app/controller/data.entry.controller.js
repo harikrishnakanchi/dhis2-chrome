@@ -1,7 +1,6 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer"],
     function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
         return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository, programRepository) {
-
             var isDataEntryUser = function(user) {
                 return _.any(user.userCredentials.userRoles, function(userAuth) {
                     return userAuth.name === 'Data entry user';
@@ -10,17 +9,30 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
             $scope.$watchCollection('[week, currentModule]', function() {
                 if ($scope.week && $scope.currentModule) {
-                    programRepository.getProgramForOrgUnit($scope.currentModule.id).then(function(program) {
-                        if (_.isEmpty(program) || !isDataEntryUser($rootScope.currentUser)) {
-                            $scope.programId = undefined;
-                            $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
-                        } else {
-                            $scope.programId = program.id;
-                            $scope.formTemplateUrl = "templates/partials/line-list-summary.html" + '?' + moment().format("X");
-                        }
-                    });
+                    if (isOpeningDateInFuture()) {
+                        $scope.errorMessage = $scope.resourceBundle.openingDateInFutureError + moment($scope.currentModule.openingDate).isoWeek();
+                        return;
+                    } else {
+                        return loadDataEntryForm();
+                    }
                 }
             });
+
+            var loadDataEntryForm = function() {
+                return programRepository.getProgramForOrgUnit($scope.currentModule.id).then(function(program) {
+                    if (_.isEmpty(program) || !isDataEntryUser($rootScope.currentUser)) {
+                        $scope.programId = undefined;
+                        $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
+                    } else {
+                        $scope.programId = program.id;
+                        $scope.formTemplateUrl = "templates/partials/line-list-summary.html" + '?' + moment().format("X");
+                    }
+                });
+            };
+
+            var isOpeningDateInFuture = function() {
+                return moment($scope.currentModule.openingDate).isAfter(moment($scope.week.endOfWeek));
+            };
 
             var deregisterSelf = $scope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
                 var okCallback = function() {

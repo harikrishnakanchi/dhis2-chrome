@@ -20,8 +20,8 @@
                     <li class="form-group">
                         <label for="moduleOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="date" max={{thisDate}} name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" required>
-                            <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; (form.moduleOpeningDate.$invalid || isAfterMaxDate(module))">
+                            <input type="date" name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" required>
+                            <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; form.moduleOpeningDate.$error">
                                 <span ng-show="form.moduleOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
                                 <span ng-show="form.moduleOpeningDate.$invalid" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
                             </div>
@@ -35,7 +35,6 @@
                             </select>
                         </div>
                         <div>
-
                         </div>
                     </li>
                     <li class="form-group" ng-if="program.name !== ''">
@@ -63,7 +62,6 @@
                             </section>
                         </div>
                     </li>
-
                 </ul>
             </div>
             <input type="button" class="btn pull-right" ng-if="isNewMode" ng-click="closeForm()" value="Back" />

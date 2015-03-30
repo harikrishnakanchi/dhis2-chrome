@@ -1,8 +1,5 @@
 define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
     return function($scope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll) {
-
-        $scope.thisDate = moment().toDate();
-
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
@@ -56,10 +53,6 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             $scope.newOrgUnit = {
                 'openingDate': moment().toDate(),
             };
-        };
-
-        $scope.isAfterMaxDate = function() {
-            return moment($scope.newOrgUnit.openingDate).isAfter(moment($scope.thisDate));
         };
 
         $scope.closeForm = function(parentOrgUnit) {

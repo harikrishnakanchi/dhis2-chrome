@@ -85,14 +85,12 @@
                             </div>
                         </div>
                     </li>
-
                     <li class="form-group">
                         <label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="date" class="msf-date-input" max={{thisDate}} name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required>
-                            <div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid || isAfterMaxDate()">
+                            <input type="date" class="msf-date-input" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required>
+                            <div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid">
                                 <span ng-show="createForm.newOrgUnitOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
-                                <span ng-show="createForm.newOrgUnitOpeningDate.$invalid" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
                             </div>
                         </div>
                     </li>
@@ -116,8 +114,8 @@
                     </li>
                     <li>
                         <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
-                            <input type="button" class="btn btn-main" ng-if="isNewMode" ng-click="save(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate()" value="Save" />
-                            <input type="button" class="btn btn-main" ng-if="!isNewMode" ng-click="update(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid  || isAfterMaxDate() || !createForm.$dirty" value="Update" />
+                            <input type="button" class="btn btn-main" ng-if="isNewMode" ng-click="save(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid" value="Save" />
+                            <input type="button" class="btn btn-main" ng-if="!isNewMode" ng-click="update(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid || !createForm.$dirty" value="Update" />
                             <input type="button" class="btn" ng-click="reset()" ng-if="isNewMode" value="Reset" />
                             <input type="button" class="btn" ng-if="isNewMode" ng-click="closeForm(orgUnit)" value="Back" />
                         </div>

@@ -131,5 +131,6 @@
     "enterProductKeyLabel": "Enter Product Key",
     "noCasesLabel": "There are no cases. ",
     "addNewCaseLabel": "Add new case",
-    "eventDateLabel": "Event Date"
+    "eventDateLabel": "Event Date",
+    "openingDateInFutureError": "Data entry form will open from Week "
 }

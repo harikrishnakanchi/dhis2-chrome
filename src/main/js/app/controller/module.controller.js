@@ -3,7 +3,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.originalDatasets = [];
         $scope.isExpanded = {};
         $scope.isDisabled = false;
-        $scope.thisDate = (moment().add(1, 'day')).toDate();
         $scope.module = {};
         $scope.allModules = [];
 
@@ -11,7 +10,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.associatedDatasets = [];
         $scope.selectedDataset = {};
         $scope.excludedDataElements = [];
-        $scope.thisDate = moment().toDate();
 
         var init = function() {
             var initModule = function() {
@@ -290,10 +288,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             });
             module.selectedDataset = undefined;
             $scope.selectedDataset = undefined;
-        };
-
-        $scope.isAfterMaxDate = function() {
-            return moment($scope.module.openingDate).isAfter(moment($scope.thisDate));
         };
 
         init();

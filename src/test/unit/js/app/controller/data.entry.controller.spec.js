@@ -1,5 +1,5 @@
-define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "orgUnitRepository", "programRepository"],
-    function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, OrgUnitRepository, ProgramRepository) {
+define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "orgUnitRepository", "programRepository", "timecop"],
+    function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, OrgUnitRepository, ProgramRepository, timecop) {
         describe("dataEntryController ", function() {
 
             var scope, rootScope, q, anchorScroll, location, window, timeout, orgUnitRepository, allModules, routeParams;
@@ -65,7 +65,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
 
                 routeParams = {};
+
+                Timecop.install();
+                Timecop.freeze("2014-05-05");
             }));
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
 
             it("should initialize modules", function() {
                 var modules = [{
@@ -100,6 +108,9 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     "week": "2014W31"
                 };
 
+                scope.resourceBundle = {
+                    "openingDateInFutureError": "openingDateInFutureError"
+                };
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
 
@@ -201,5 +212,32 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.formTemplateUrl).toEqual(undefined);
             });
 
+            it("should not load the template if module's opening date is in future", function() {
+                rootScope.currentUser.userCredentials = {
+                    "username": "dataentryuser",
+                    "userRoles": [{
+                        "name": 'Data entry user'
+                    }]
+                };
+
+                programRepository = new ProgramRepository();
+
+                scope.resourceBundle = {
+                    "openingDateInFutureError": "Data entry form will open from Week "
+                };
+
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
+                scope.$apply();
+
+                scope.week = {};
+                scope.currentModule = {
+                    "openingDate": "2015-03-03"
+                };
+                scope.$apply();
+
+                expect(scope.formTemplateUrl).toBeUndefined();
+                expect(scope.programId).toBeUndefined();
+                expect(scope.errorMessage).toEqual("Data entry form will open from Week 10");
+            });
         });
     });

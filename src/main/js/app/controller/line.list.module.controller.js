@@ -3,14 +3,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
         $scope.module = {};
         $scope.isExpanded = {};
         $scope.isDisabled = false;
-        $scope.thisDate = (moment().add(1, 'day')).toDate();
         $scope.allModules = [];
         $scope.collapseSection = {};
         $scope.excludedDataElements = [];
         $scope.allPrograms = [];
         $scope.program = {};
         $scope.enrichedProgram = {};
-        $scope.thisDate = moment().toDate();
 
         var init = function() {
             var initModule = function() {
@@ -293,10 +291,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
 
         $scope.shouldDisableSaveOrUpdateButton = function() {
             return _.isEmpty($scope.program.name);
-        };
-
-        $scope.isAfterMaxDate = function() {
-            return moment($scope.module.openingDate).isAfter(moment($scope.thisDate));
         };
 
         init();
