@@ -10,36 +10,6 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             });
         };
 
-        this.getLevelOneApprovalData = function(period, orgUnitId, shouldFilterSoftDeletes) {
-            var filterSoftDeletedApprovals = function(d) {
-                return shouldFilterSoftDeletes && d && d.status === "DELETED" ? undefined : d;
-            };
-
-            var filterCompleted = function(d) {
-                return d && d.isComplete && !d.isApproved ? d : undefined;
-            };
-
-            var store = db.objectStore('approvals');
-            return store.find([dateUtils.getFormattedPeriod(period), orgUnitId])
-                .then(filterSoftDeletedApprovals)
-                .then(filterCompleted);
-        };
-
-        this.getLevelTwoApprovalData = function(period, orgUnitId, shouldFilterSoftDeletes) {
-            var filterSoftDeletedApprovals = function(d) {
-                return shouldFilterSoftDeletes && d && d.status === "DELETED" ? undefined : d;
-            };
-
-            var filterApprovals = function(d) {
-                return d && d.isApproved ? d : undefined;
-            };
-
-            var store = db.objectStore('approvals');
-            return store.find([dateUtils.getFormattedPeriod(period), orgUnitId])
-                .then(filterSoftDeletedApprovals)
-                .then(filterApprovals);
-        };
-
         this.getApprovalData = function(periodsAndOrgUnits) {
             var store = db.objectStore('approvals');
 
@@ -52,26 +22,6 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             });
             return $q.all(getApprovalDataPromises).then(function(allApprovalData) {
                 return _.compact(allApprovalData);
-            });
-        };
-
-        this.getLevelOneApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
-            var store = db.objectStore('approvals');
-            var query = db.queryBuilder().$between(dateUtils.getFormattedPeriod(startPeriod), dateUtils.getFormattedPeriod(endPeriod)).$index("by_period").compile();
-            return store.each(query).then(function(approvalData) {
-                return _.filter(approvalData, function(ad) {
-                    return ad.isComplete && !ad.isApproved && _.contains(orgUnits, ad.orgUnit);
-                });
-            });
-        };
-
-        this.getLevelTwoApprovalDataForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
-            var store = db.objectStore('approvals');
-            var query = db.queryBuilder().$between(dateUtils.getFormattedPeriod(startPeriod), dateUtils.getFormattedPeriod(endPeriod)).$index("by_period").compile();
-            return store.each(query).then(function(approvalData) {
-                return _.filter(approvalData, function(ad) {
-                    return ad.isApproved && _.contains(orgUnits, ad.orgUnit);
-                });
             });
         };
 

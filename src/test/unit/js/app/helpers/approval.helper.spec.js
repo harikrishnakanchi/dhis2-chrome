@@ -53,11 +53,6 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 }];
 
                 var dataValues = [];
-
-                var completedDatasets = [];
-
-                var approvalData = [];
-
                 var expectedStatus = [{
                     "moduleId": "123",
                     "moduleName": "parent - mod1",
@@ -80,8 +75,7 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
 
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, modules));
                 spyOn(dataRepository, "getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, dataValues));
-                spyOn(approvalDataRepository, "getLevelOneApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, completedDatasets));
-                spyOn(approvalDataRepository, "getLevelTwoApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, approvalData));
+                spyOn(approvalDataRepository, "getApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, []));
 
                 approvalHelper.getApprovalStatus(orgUnitId).then(function(actualStatus) {
                     expect(actualStatus).toEqual(expectedStatus);
@@ -135,40 +129,26 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                     "value": "9"
                 }];
 
-                var completedDatasets = [{
+                var approvalPeriodData = [{
                     "orgUnit": "123",
                     "period": "2014W18",
-                    "dataSets": ["ds213", "ds345"]
+                    "isComplete": true
                 }, {
                     "orgUnit": "123",
                     "period": "2014W19",
-                    "dataSets": ["ds213", "ds345"]
+                    "isComplete": true,
+                    "isApproved": true,
                 }, {
                     "orgUnit": "123",
                     "period": "2014W20",
-                    "dataSets": ["ds213", "ds345"]
-                }, {
-                    "orgUnit": "123",
-                    "period": "2014W20",
-                    "dataSets": ["ds213", "ds345"],
+                    "isComplete": true,
+                    "isApproved": true,
                     "status": "DELETED"
-                }];
-
-                var approvalData = [{
-                    "orgUnit": "123",
-                    "period": "2014W19",
-                    "isApproved": true,
-                    "dataSets": ["ds123", "ds345"]
-                }, {
-                    "orgUnit": "123",
-                    "period": "2014W20",
-                    "isApproved": true,
-                    "dataSets": ["ds123", "ds345"]
                 }, {
                     "orgUnit": "123",
                     "period": "2014W21",
+                    "isComplete": true,
                     "isApproved": true,
-                    "dataSets": ["ds123", "ds345"],
                     "status": "DELETED"
                 }];
 
@@ -282,8 +262,7 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
 
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, modules));
                 spyOn(dataRepository, "getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, dataValues));
-                spyOn(approvalDataRepository, "getLevelOneApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, completedDatasets));
-                spyOn(approvalDataRepository, "getLevelTwoApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, approvalData));
+                spyOn(approvalDataRepository, "getApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, approvalPeriodData));
 
                 approvalHelper.getApprovalStatus(orgUnitId).then(function(actualStatus) {
                     expect(actualStatus).toEqual(expectedStatus);
