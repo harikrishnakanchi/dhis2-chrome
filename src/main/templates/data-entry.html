@@ -12,7 +12,7 @@
         </ul>
     </div>
     <div ng-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-    <div ng-include="formTemplateUrl"></div>
+    <div ng-if="!errorMessage" ng-include="formTemplateUrl"></div>
     <div class="loading" ng-show="loading">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>

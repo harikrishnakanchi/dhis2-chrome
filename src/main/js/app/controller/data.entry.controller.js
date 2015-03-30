@@ -8,6 +8,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             };
 
             $scope.$watchCollection('[week, currentModule]', function() {
+                $scope.errorMessage = undefined;
                 if ($scope.week && $scope.currentModule) {
                     if (isOpeningDateInFuture()) {
                         $scope.errorMessage = $scope.resourceBundle.openingDateInFutureError + moment($scope.currentModule.openingDate).isoWeek();
