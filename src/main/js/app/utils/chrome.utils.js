@@ -1,4 +1,4 @@
-define([], function() {
+define(["lodash"], function(_) {
     var registerMessageCallback = function(messageName, callback) {
         return function(request, sender, sendResponse) {
             if (request === messageName)
@@ -24,10 +24,23 @@ define([], function() {
         chrome.storage.local.get("auth_header", callback);
     };
 
+    var createNotification = function(title, message) {
+        var options = {
+            "type": "basic",
+            "iconUrl": "/img/logo.png",
+            "title": title,
+            "message": message
+        };
+        chrome.notifications.create(_.random(1000000).toString(), options, function(notificationId) {
+            return notificationId;
+        });
+    };
+
     return {
         "addListener": addListener,
         "sendMessage": sendMessage,
         "setAuthHeader": setAuthHeader,
-        "getAuthHeader": getAuthHeader
+        "getAuthHeader": getAuthHeader,
+        "createNotification": createNotification
     };
 });
