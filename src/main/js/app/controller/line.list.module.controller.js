@@ -175,19 +175,22 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
         $scope.save = function(module) {
             var enrichedModule = {};
 
-            var associatePrograms = function(program) {
-                var orgUnit = {
-                    id: enrichedModule.id,
-                    name: enrichedModule.name
-                };
-                program.organisationUnits = program.organisationUnits || [];
-                program.organisationUnits = program.organisationUnits.concat(orgUnit);
+            var associatePrograms = function(program, originOrgUnits) {
+                _.forEach(originOrgUnits, function(originOrgUnit) {
+                    var orgUnit = {
+                        id: originOrgUnit.id,
+                        name: originOrgUnit.name
+                    };
+                    program.organisationUnits = program.organisationUnits || [];
+                    program.organisationUnits = program.organisationUnits.concat(orgUnit);
+                });
+
                 return programRepository.upsert(program).then(function() {
                     publishMessage(program, "uploadProgram");
                 });
             };
 
-            var addOrgUnits = function(orgUnits, datasets) {
+            var addOrgUnitsToDatasets = function(orgUnits, datasets) {
                 datasets = _.isArray(datasets) ? datasets : [datasets];
                 var ouPayloadToAssociate = _.map(orgUnits, function(orgUnit) {
                     return {
@@ -206,37 +209,19 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             var updateDatasets = function(datasets) {
                 return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]);
             };
+            
+            var associateDatasetsToOrigins = function(originOrgUnits) {
+                var getOriginDatasetsPromise = datasetRepository.getOriginDatasets();
+                var getSummaryDatasetsPromise = datasetRepository.getDataSetAssociatedWithProgram($scope.program.attributeValues);
 
-            var associateDatasetsToOrigins = function(orgUnits) {
-                var getOriginDatasets = function() {
-                    return datasetRepository.getOriginDatasets();
-                };
+                var datasets = $q.all([getOriginDatasetsPromise, getSummaryDatasetsPromise]);
 
-                return getOriginDatasets()
-                    .then(_.partial(addOrgUnits, orgUnits))
-                    .then(updateDatasets);
-            };
+                datasets.then(function(datasetsToAssociate) {
+                    datasetsToAssociate = _.flatten(datasetsToAssociate);
+                    var datasets = addOrgUnitsToDatasets(originOrgUnits, datasetsToAssociate);
+                    return updateDatasets(datasets);
+                });
 
-            var associateDataSetsToModule = function(enrichedModules) {
-                var getAllDatasets = function() {
-                    return datasetRepository.getAllLinelistDatasets();
-                };
-
-                var getDataSetAssociatedWithProgram = function(allDataSets) {
-                    var datasetCode = _.find($scope.program.attributeValues, {
-                        "attribute": {
-                            "code": "associatedDataSet"
-                        }
-                    });
-
-                    return _.find(allDataSets, {
-                        "code": datasetCode.value
-                    });
-                };
-
-                return getAllDatasets().then(getDataSetAssociatedWithProgram)
-                    .then(_.partial(addOrgUnits, enrichedModules))
-                    .then(updateDatasets);
             };
 
             var getEnrichedModule = function(module) {
@@ -267,6 +252,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                     if (!_.isEmpty(patientOriginOUPayload)) {
                         return orgUnitRepository.upsert(patientOriginOUPayload)
                             .then(_.partial(publishMessage, patientOriginOUPayload, "upsertOrgUnit"))
+                            .then(_.partial(associatePrograms, $scope.program, patientOriginOUPayload))
                             .then(_.partial(associateDatasetsToOrigins, patientOriginOUPayload));
                     }
                 });
@@ -274,10 +260,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
 
             return getEnrichedModule($scope.module)
                 .then(createModule)
-                .then(_.partial(associatePrograms, $scope.program))
-                .then(_.partial(saveExcludedDataElements, enrichedModule))
                 .then(createOrgUnitGroups)
-                .then(_.partial(associateDataSetsToModule, [enrichedModule]))
+                .then(_.partial(saveExcludedDataElements, enrichedModule))
                 .then(createOriginOrgUnits)
                 .then(_.partial(onSuccess, enrichedModule), onError);
         };

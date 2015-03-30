@@ -121,6 +121,24 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
+        var getDataSetAssociatedWithProgram = function(programAttrValues) {
+
+            var getDataSetAssociatedWithProgram = function(allDataSets) {
+                var datasetCode = _.find(programAttrValues, {
+                    "attribute": {
+                        "code": "associatedDataSet"
+                    }
+                });
+
+                return _.find(allDataSets, {
+                    "code": datasetCode.value
+                });
+            };
+
+            var store = db.objectStore("dataSets");
+            return store.getAll().then(getDataSetAssociatedWithProgram);
+        };
+
         return {
             "get": get,
             "findAll": findAll,
@@ -132,7 +150,8 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             "getEnriched": getEnriched,
             "getAllLinelistDatasets": getAllLinelistDatasets,
             "getAllAggregateDatasets": getAllAggregateDatasets,
-            "getOriginDatasets": getOriginDatasets
+            "getOriginDatasets": getOriginDatasets,
+            "getDataSetAssociatedWithProgram": getDataSetAssociatedWithProgram
         };
     };
 });

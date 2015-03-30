@@ -54,6 +54,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             datasetRepo = utils.getMockRepo(q);
             datasetRepo.getAllLinelistDatasets = function() {};
             datasetRepo.getOriginDatasets = function() {};
+            datasetRepo.getDataSetAssociatedWithProgram = function() {};
             spyOn(datasetRepo, "getAllLinelistDatasets").and.returnValue(utils.getPromise(q, allDatasets));
             orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
 
@@ -272,33 +273,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: newLineListModule,
                 type: "upsertOrgUnit"
-            }, "dataValues");
-
-            var programWithNewOrgUnit = {
-                'id': 'prog1',
-                'name': 'ER Linelist',
-                'attributeValues': [{
-                    "attribute": {
-                        "code": "associatedDataSet"
-                    },
-                    "value": "ds1Code"
-                }],
-                'organisationUnits': [{
-                    id: 'Module2someid',
-                    name: 'Module2'
-                }]
-            };
-
-            expect(programsRepo.upsert).toHaveBeenCalledWith(programWithNewOrgUnit);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                data: programWithNewOrgUnit,
-                type: "uploadProgram"
-            }, "dataValues");
-
-            expect(datasetRepo.upsert).toHaveBeenCalledWith([datasetWithNewModule]);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                data: ["ds1"],
-                type: "associateOrgUnitToDataset"
             }, "dataValues");
 
             expect(scope.saveFailure).toBe(false);
@@ -609,7 +583,8 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             expect(scope.getCollapsed("sectionId")).toEqual(true);
         });
 
-        it("should create origin orgunits and associate datasets", function() {
+        it("should create origin orgunits, associate geaographic origin dataset , associate programs and summary datasets", function() {
+
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, undefined));
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(dhisId, "get").and.callFake(function(name) {
@@ -637,6 +612,12 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     'serviceType': "Linelist",
                     'parent': scope.orgUnit
                 };
+            };
+
+            var dataSetAssociatedWithProgram = {
+                "id": "ER Linelist Summary",
+                "name": "ER Linelist Summary",
+                "organisationUnits": []
             };
 
             var selectProgram = function() {
@@ -673,6 +654,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             }];
 
             spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, originDatasets));
+            spyOn(datasetRepo, "getDataSetAssociatedWithProgram").and.returnValue(utils.getPromise(q, dataSetAssociatedWithProgram));
             orgUnitRepo.get.and.returnValue(utils.getPromise(q, scope.orgUnit));
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
 
@@ -710,6 +692,13 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "id": "or1Module2someid",
                     "name": "or1"
                 }]
+            }, {
+                "id": "ER Linelist Summary",
+                "name": "ER Linelist Summary",
+                "organisationUnits": [{
+                    "id": "or1Module2someid",
+                    "name": "or1"
+                }]
             }];
             expect(datasetRepo.upsert).toHaveBeenCalledWith(expectedUpserts);
 
@@ -733,6 +722,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
         });
-        
+
     });
 });
