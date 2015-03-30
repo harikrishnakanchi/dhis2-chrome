@@ -23,7 +23,6 @@
                             <input type="date" name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" required>
                             <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; form.moduleOpeningDate.$error">
                                 <span ng-show="form.moduleOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
-                                <span ng-show="form.moduleOpeningDate.$invalid" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
                             </div>
                         </div>
                     </li>

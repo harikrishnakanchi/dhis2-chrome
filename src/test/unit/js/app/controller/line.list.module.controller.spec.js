@@ -1,8 +1,9 @@
 /*global Date:true*/
-define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "md5", "timecop", "dhisId", "patientOriginRepository", "orgUnitRepository"], function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, md5, timecop, dhisId, PatientOriginRepository, OrgUnitRepository) {
+define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "md5", "timecop", "dhisId", "patientOriginRepository", "orgUnitRepository", "datasetRepository"], function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, md5, timecop, dhisId, PatientOriginRepository, OrgUnitRepository, DatasetRepository) {
     describe("line list module controller", function() {
-        var scope, lineListModuleController, mockOrgStore, db, q, location, _Date, datasets, sections,
-            dataElements, sectionsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, systemSettingRepo, fakeModal, allPrograms, programsRepo, datasetRepo, allDatasets;
+        var scope, lineListModuleController, mockOrgStore, db, q, location, datasets, sections,
+            dataElements, sectionsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, systemSettingRepo,
+            fakeModal, allPrograms, programsRepo, datasetRepo, allDatasets;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -51,14 +52,13 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
-            datasetRepo = utils.getMockRepo(q);
-            datasetRepo.getAllLinelistDatasets = function() {};
-            datasetRepo.getOriginDatasets = function() {};
-            datasetRepo.getDataSetAssociatedWithProgram = function() {};
+            datasetRepo = new DatasetRepository();
+            spyOn(datasetRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
+            spyOn(datasetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
             spyOn(datasetRepo, "getAllLinelistDatasets").and.returnValue(utils.getPromise(q, allDatasets));
             orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
 
-            spyOn(orgUnitGroupHelper,"createOrgUnitGroups").and.returnValue(utils.getPromise(q,{}));
+            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
 
             mockOrgStore = {
                 upsert: function() {},
@@ -586,7 +586,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         });
 
         it("should create origin orgunits, orgunit groups, associate geaographic origin dataset , associate programs and summary datasets", function() {
-
             spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, undefined));
             spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(dhisId, "get").and.callFake(function(name) {
@@ -656,7 +655,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             }];
 
             spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, originDatasets));
-            spyOn(datasetRepo, "getDataSetAssociatedWithProgram").and.returnValue(utils.getPromise(q, dataSetAssociatedWithProgram));
+            spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, dataSetAssociatedWithProgram));
             orgUnitRepo.get.and.returnValue(utils.getPromise(q, scope.orgUnit));
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
 
@@ -687,23 +686,18 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             expect(orgUnitRepo.upsert.calls.argsFor(1)[0]).toEqual(originOrgunits);
             expect(datasetRepo.getOriginDatasets).toHaveBeenCalled();
 
-            var expectedUpserts = [{
+            var datasets = [{
                 "id": "origin",
                 "name": "origin",
-                "organisationUnits": [{
-                    "id": "or1Module2someid",
-                    "name": "or1"
-                }]
+                "organisationUnits": []
             }, {
                 "id": "ER Linelist Summary",
                 "name": "ER Linelist Summary",
-                "organisationUnits": [{
-                    "id": "or1Module2someid",
-                    "name": "or1"
-                }]
+                "organisationUnits": []
             }];
-            expect(datasetRepo.upsert).toHaveBeenCalledWith(expectedUpserts);
-            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(originOrgunits,false);
+
+            expect(datasetRepo.associateOrgUnits).toHaveBeenCalledWith(datasets, originOrgunits);
+            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(originOrgunits, false);
         });
 
         it("should take the user to the view page of the parent opUnit on clicking cancel", function() {
@@ -724,6 +718,5 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
         });
-
     });
 });

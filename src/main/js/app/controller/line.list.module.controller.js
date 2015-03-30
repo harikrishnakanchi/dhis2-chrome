@@ -190,38 +190,26 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                 });
             };
 
-            var addOrgUnitsToDatasets = function(orgUnits, datasets) {
-                datasets = _.isArray(datasets) ? datasets : [datasets];
-                var ouPayloadToAssociate = _.map(orgUnits, function(orgUnit) {
-                    return {
-                        "id": orgUnit.id,
-                        "name": orgUnit.name
+            var associateToDatasets = function(originOrgUnits) {
+                var getDatasets = function() {
+                    var getSummaryDatasetId = function() {
+                        return _.find($scope.program.attributeValues, {
+                            "attribute": {
+                                "code": "associatedDataSet"
+                            }
+                        }).value;
                     };
+
+                    return $q.all([datasetRepository.getOriginDatasets(), datasetRepository.get(getSummaryDatasetId())]).then(function(datasets) {
+                        return datasets[0].concat(datasets[1]);
+                    });
+                };
+
+                return getDatasets().then(function(datasets) {
+                    return datasetRepository.associateOrgUnits(datasets, originOrgUnits).then(function() {
+                        return publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset");
+                    });
                 });
-
-                return _.map(datasets, function(ds) {
-                    ds.organisationUnits = ds.organisationUnits || [];
-                    ds.organisationUnits = ds.organisationUnits.concat(ouPayloadToAssociate);
-                    return ds;
-                });
-            };
-
-            var updateDatasets = function(datasets) {
-                return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]);
-            };
-
-            var associateDatasetsToOrigins = function(originOrgUnits) {
-                var getOriginDatasetsPromise = datasetRepository.getOriginDatasets();
-                var getSummaryDatasetsPromise = datasetRepository.getDataSetAssociatedWithProgram($scope.program.attributeValues);
-
-                var datasets = $q.all([getOriginDatasetsPromise, getSummaryDatasetsPromise]);
-
-                datasets.then(function(datasetsToAssociate) {
-                    datasetsToAssociate = _.flatten(datasetsToAssociate);
-                    var datasets = addOrgUnitsToDatasets(originOrgUnits, datasetsToAssociate);
-                    return updateDatasets(datasets);
-                });
-
             };
 
             var getEnrichedModule = function(module) {
@@ -232,7 +220,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             var createModule = function() {
                 return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")]);
             };
-
 
             var createOriginOrgUnitsAndGroups = function() {
                 var createOrgUnitGroups = function(originsPayload) {
@@ -253,7 +240,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                         return orgUnitRepository.upsert(patientOriginOUPayload)
                             .then(_.partial(publishMessage, patientOriginOUPayload, "upsertOrgUnit"))
                             .then(_.partial(associatePrograms, $scope.program, patientOriginOUPayload))
-                            .then(_.partial(associateDatasetsToOrigins, patientOriginOUPayload))
+                            .then(_.partial(associateToDatasets, patientOriginOUPayload))
                             .then(_.partial(createOrgUnitGroups, patientOriginOUPayload));
                     }
                 });

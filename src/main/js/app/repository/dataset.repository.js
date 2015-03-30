@@ -121,22 +121,23 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
-        var getDataSetAssociatedWithProgram = function(programAttrValues) {
-
-            var getDataSetAssociatedWithProgram = function(allDataSets) {
-                var datasetCode = _.find(programAttrValues, {
-                    "attribute": {
-                        "code": "associatedDataSet"
-                    }
+        var associateOrgUnits = function(datasets, orgUnits) {
+            var addOrgUnitsToDatasets = function() {
+                var ouPayload = _.map(orgUnits, function(orgUnit) {
+                    return {
+                        "id": orgUnit.id,
+                        "name": orgUnit.name
+                    };
                 });
-
-                return _.find(allDataSets, {
-                    "code": datasetCode.value
+                return _.map(datasets, function(ds) {
+                    ds.organisationUnits = ds.organisationUnits || [];
+                    ds.organisationUnits = ds.organisationUnits.concat(ouPayload);
+                    return ds;
                 });
             };
 
-            var store = db.objectStore("dataSets");
-            return store.getAll().then(getDataSetAssociatedWithProgram);
+            var updatedDatasets = addOrgUnitsToDatasets();
+            return upsert(updatedDatasets);
         };
 
         return {
@@ -151,7 +152,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             "getAllLinelistDatasets": getAllLinelistDatasets,
             "getAllAggregateDatasets": getAllAggregateDatasets,
             "getOriginDatasets": getOriginDatasets,
-            "getDataSetAssociatedWithProgram": getDataSetAssociatedWithProgram
+            "associateOrgUnits": associateOrgUnits
         };
     };
 });

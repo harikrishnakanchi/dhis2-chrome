@@ -75,7 +75,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 });
             };
 
-            initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModules).then(setDisabled);
+            var getOriginDatasets = function() {
+                return datasetRepository.getOriginDatasets().then(function(data) {
+                    $scope.originDatasets = data;
+                });
+            };
+
+            return initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModules).then(setDisabled).then(getOriginDatasets);
         };
 
         $scope.changeCollapsed = function(sectionId) {
@@ -160,34 +166,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
         $scope.save = function(module) {
             var enrichedModule = {};
 
-            var getAssociatedDatasets = function() {
-                var datasetIds = _.pluck($scope.associatedDatasets, "id");
-                return datasetRepository.findAll(datasetIds);
-            };
-
-            var associateDatasets = function(getDatasetsToAssociate, orgUnits) {
-                var addOrgUnits = function(orgUnits, datasets) {
-                    var ouPayloadToAssociate = _.map(orgUnits, function(orgUnit) {
-                        return {
-                            "id": orgUnit.id,
-                            "name": orgUnit.name
-                        };
-                    });
-
-                    return _.map(datasets, function(ds) {
-                        ds.organisationUnits = ds.organisationUnits || [];
-                        ds.organisationUnits = ds.organisationUnits.concat(ouPayloadToAssociate);
-                        return ds;
-                    });
-                };
-
-                var updateDatasets = function(datasets) {
-                    return $q.all([datasetRepository.upsert(datasets), publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset")]);
-                };
-
-                return getDatasetsToAssociate()
-                    .then(_.partial(addOrgUnits, orgUnits))
-                    .then(updateDatasets);
+            var associateToDatasets = function(datasets, orgUnits) {
+                return datasetRepository.associateOrgUnits(datasets, orgUnits).then(function() {
+                    return publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset");
+                });
             };
 
             var getEnrichedModule = function(module) {
@@ -204,10 +186,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
             };
 
             var createOriginOrgUnits = function() {
-                var getOriginDatasets = function() {
-                    return datasetRepository.getOriginDatasets();
-                };
-
                 var getPatientOriginOUPayload = function() {
                     return orgUnitRepository.get(enrichedModule.parent.id).then(function(parentOpUnit) {
                         return patientOriginRepository.get(parentOpUnit.id).then(function(patientOrigins) {
@@ -221,14 +199,14 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                     if (!_.isEmpty(patientOriginOUPayload)) {
                         return orgUnitRepository.upsert(patientOriginOUPayload)
                             .then(_.partial(publishMessage, patientOriginOUPayload, "upsertOrgUnit"))
-                            .then(_.partial(associateDatasets, getOriginDatasets, patientOriginOUPayload));
+                            .then(_.partial(associateToDatasets, $scope.originDatasets, patientOriginOUPayload));
                     }
                 });
             };
 
             return getEnrichedModule($scope.module)
                 .then(createModules)
-                .then(_.partial(associateDatasets, getAssociatedDatasets, [enrichedModule]))
+                .then(_.partial(associateToDatasets, $scope.associatedDatasets, [enrichedModule]))
                 .then(_.partial(saveExcludedDataElements, enrichedModule))
                 .then(createOrgUnitGroups)
                 .then(createOriginOrgUnits)

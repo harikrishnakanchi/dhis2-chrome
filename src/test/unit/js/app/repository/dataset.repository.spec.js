@@ -253,7 +253,6 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             expect(result).toEqual(expected);
         });
 
-
         it("should get datasets for OrgUnit", function() {
             var expectedDatasets = [{
                 "id": "ds1"
@@ -424,6 +423,70 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
 
             scope.$apply();
             expect(actualEnrichedDS).toEqual(expectedEnrichedDS);
+        });
+
+        it("should get all origin datasets", function() {
+            var allDataSets = [{
+                "id": "dataSet1",
+                "name": "NeoNat",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isOriginDataset"
+                    },
+                    "value": "true"
+                }]
+            }, {
+                "id": "dataSet2",
+                "name": "Obgyn",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isOriginDataset"
+                    },
+                    "value": "false"
+                }]
+            }];
+
+            var expectedResult = [{
+                "id": "dataSet1",
+                "name": "NeoNat",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isOriginDataset"
+                    },
+                    "value": "true"
+                }]
+            }];
+
+            mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
+            var actualResult;
+            datasetRepository.getOriginDatasets().then(function(r) {
+                actualResult = r;
+            });
+            scope.$apply();
+            expect(actualResult).toEqual(expectedResult);
+        });
+
+        it("should associate org units to datasets", function() {
+            var datasets = [{
+                "id": "dataSet1",
+                "name": "NeoNat"
+            }];
+
+            var orgUnits = [{
+                "id": "ou1",
+                "name": "ou1"
+            }];
+
+            var expectedDatasetUpsert = [{
+                "id": "dataSet1",
+                "name": "NeoNat",
+                "organisationUnits": orgUnits,
+                "clientLastUpdated": "2014-05-30T12:43:54.972Z",
+                "orgUnitIds": ["ou1"]
+            }];
+            datasetRepository.associateOrgUnits(datasets, orgUnits);
+
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
         });
     });
 });
