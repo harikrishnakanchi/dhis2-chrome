@@ -42,7 +42,7 @@ require.config({
         "lineListSummaryController": "app/controller/line.list.summary.controller",
         "orgUnitContoller": "app/controller/orgunit.controller",
         "opUnitController": "app/controller/opunit.controller",
-        "moduleController": "app/controller/module.controller",
+        "aggregateModuleController": "app/controller/aggregate.module.controller",
         "lineListModuleController": "app/controller/line.list.module.controller",
         "mainController": "app/controller/main.controller",
         "projectController": "app/controller/project.controller",

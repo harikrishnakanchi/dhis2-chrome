@@ -1,8 +1,8 @@
-define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'moduleController', 'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController',
+define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'aggregateModuleController', 'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController',
         'projectUserController', 'selectProjectController', 'aggregateDataEntryController', 'lineListDataEntryController', 'indicatorController', 'patientOriginController', 'productKeyController',
         'lineListSummaryController'
     ],
-    function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, moduleController, lineListModuleController, projectController, countryController, confirmDialogController,
+    function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, aggregateModuleController, lineListModuleController, projectController, countryController, confirmDialogController,
         projectUserController, selectProjectController, aggregateDataEntryController, lineListDataEntryController, indicatorController, patientOriginController, productKeyController,
         lineListSummaryController) {
         var init = function(app) {
@@ -13,7 +13,7 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('lineListSummaryController', ['$scope', '$q', '$hustle', '$modal', '$timeout', '$location', '$anchorScroll', 'programRepository', 'programEventRepository', 'systemSettingRepository', 'orgUnitRepository', 'approvalDataRepository', lineListSummaryController]);
             app.controller('orgUnitContoller', ['$scope', '$indexedDB', '$q', '$location', '$timeout', '$anchorScroll', 'orgUnitRepository', orgUnitContoller]);
             app.controller('opUnitController', ['$scope', '$q', '$hustle', 'orgUnitRepository', 'orgUnitGroupHelper', '$indexedDB', '$location', '$modal', 'patientOriginRepository', opUnitController]);
-            app.controller('moduleController', ['$scope', '$hustle', 'orgUnitRepository', 'datasetRepository', 'systemSettingRepository', '$indexedDB', '$location', '$q', '$modal', 'programRepository', 'orgUnitGroupRepository', 'orgUnitGroupHelper', 'patientOriginRepository', moduleController]);
+            app.controller('aggregateModuleController', ['$scope', '$hustle', 'orgUnitRepository', 'datasetRepository', 'systemSettingRepository', '$indexedDB', '$location', '$q', '$modal', 'programRepository', 'orgUnitGroupRepository', 'orgUnitGroupHelper', 'patientOriginRepository', aggregateModuleController]);
             app.controller('lineListModuleController', ['$scope', '$hustle', 'orgUnitRepository', 'systemSettingRepository', '$indexedDB', '$location', '$q', '$modal', 'programRepository', 'orgUnitGroupRepository', 'orgUnitGroupHelper', 'datasetRepository', 'patientOriginRepository', lineListModuleController]);
             app.controller('projectController', ['$scope', '$rootScope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', 'userRepository', '$modal', 'orgUnitGroupHelper', 'approvalDataRepository', projectController]);
             app.controller('mainController', ['$q', '$scope', '$location', '$rootScope', 'ngI18nResourceBundle', '$indexedDB', 'userPreferenceRepository', 'orgUnitRepository', 'userRepository', 'metadataImporter', 'sessionHelper', mainController]);

@@ -1,7 +1,7 @@
 /*global Date:true*/
-define(["moduleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop", "dhisId", "patientOriginRepository", "orgUnitRepository"], function(ModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop, dhisId, PatientOriginRepository, OrgUnitRepository) {
+define(["aggregateModuleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop", "dhisId", "patientOriginRepository", "orgUnitRepository"], function(AggregateModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop, dhisId, PatientOriginRepository, OrgUnitRepository) {
     describe("module controller", function() {
-        var scope, moduleController, mockOrgStore, db, q, location, _Date, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
+        var scope, aggregateModuleController, mockOrgStore, db, q, location, _Date, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
             dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo, patientOriginRepository;
 
         beforeEach(module('hustle'));
@@ -82,7 +82,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
             scope.isNewMode = true;
 
-            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper, patientOriginRepository);
+            aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper, patientOriginRepository);
         }));
 
         afterEach(function() {
@@ -382,7 +382,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             spyOn(dataSetRepo, "getEnriched").and.callFake(function(ds) {
                 return ds;
             });
-            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+            aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             scope.$apply();
 
             expect(scope.isDisabled).toBeFalsy();
@@ -419,7 +419,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
             scope.isNewMode = false;
 
-            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+            aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
 
             scope.$apply();
 
@@ -441,7 +441,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
 
             scope.isNewMode = false;
 
-            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+            aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             scope.$apply();
 
             scope.associatedDatasets = [{
@@ -510,7 +510,7 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             };
 
             scope.isNewMode = false;
-            moduleController = new ModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+            aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
             scope.$apply();
 
             scope.module = updatedModule;
@@ -974,9 +974,9 @@ define(["moduleController", "angularMocks", "utils", "testData", "datasetTransfo
             expect(dataSetRepo.upsert).toHaveBeenCalledWith(expectedUpserts);
         });
 
-        it("should take the user to the view page of the parent opUnit on clicking cancel", function(){
+        it("should take the user to the view page of the parent opUnit on clicking cancel", function() {
             scope.orgUnit = {
-                "id" : "parent",
+                "id": "parent",
                 "name": "parent"
             };
 
