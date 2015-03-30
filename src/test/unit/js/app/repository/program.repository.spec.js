@@ -431,5 +431,30 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
             scope.$apply();
             expect(actualPrograms).toEqual(expectedPrograms);
         });
+
+        it("should associate org units to programs", function() {
+            var program = {
+                "id": "Prg",
+                "name": "Program"
+            };
+
+            var orgUnits = [{
+                "id": "ou1",
+                "name": "ou1"
+            }];
+
+            var expectedProgramsUpsert = [{
+                "id": "Prg",
+                "name": "Program",
+                "organisationUnits": orgUnits,
+                "clientLastUpdated": "2014-05-30T12:43:54.972Z",
+                "orgUnitIds": ["ou1"]
+            }];
+
+            programRepository.associateOrgUnits(program, orgUnits);
+
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedProgramsUpsert);
+
+        });
     });
 });

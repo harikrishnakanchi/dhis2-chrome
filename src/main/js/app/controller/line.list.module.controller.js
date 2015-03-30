@@ -176,16 +176,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
             var enrichedModule = {};
 
             var associatePrograms = function(program, originOrgUnits) {
-                _.forEach(originOrgUnits, function(originOrgUnit) {
-                    var orgUnit = {
-                        id: originOrgUnit.id,
-                        name: originOrgUnit.name
-                    };
-                    program.organisationUnits = program.organisationUnits || [];
-                    program.organisationUnits = program.organisationUnits.concat(orgUnit);
-                });
-
-                return programRepository.upsert(program).then(function() {
+                return programRepository.associateOrgUnits(program, originOrgUnits).then(function() {
                     publishMessage(program, "uploadProgram");
                 });
             };

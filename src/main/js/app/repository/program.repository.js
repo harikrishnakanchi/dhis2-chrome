@@ -108,5 +108,22 @@ define(["lodash", "moment"], function(_, moment) {
                 .then(enrichDataElements);
         };
 
+        this.associateOrgUnits = function(program, orgUnits) {
+            var addOrgUnitsToProgram = function() {
+                var ouPayload = _.map(orgUnits, function(orgUnit) {
+                    return {
+                        "id": orgUnit.id,
+                        "name": orgUnit.name
+                    };
+                });
+
+                program.organisationUnits = program.organisationUnits || [];
+                program.organisationUnits = program.organisationUnits.concat(ouPayload);
+                return program;
+            };
+
+            var updatedProgram = addOrgUnitsToProgram();
+            return this.upsert(program);
+        };
     };
 });
