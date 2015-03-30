@@ -56,19 +56,29 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
         this.markAsApproved = function(periodsAndOrgUnits, approvedBy) {
             periodsAndOrgUnits = _.isArray(periodsAndOrgUnits) ? periodsAndOrgUnits : [periodsAndOrgUnits];
 
-            var getExistingApprovals = function() {
+            var getApprovals = function() {
                 var periods = _.uniq(_.pluck(periodsAndOrgUnits, "period"));
                 var query = db.queryBuilder().$index("by_period").$in(periods).compile();
                 var store = db.objectStore("approvals");
+                var newApprovals = [];
                 return store.each(query).then(function(allApprovalsForPeriods) {
                     return _.transform(periodsAndOrgUnits, function(acc, periodAndOrgUnit) {
-                        var matchingApprovals = _.filter(allApprovalsForPeriods, {
+                        var approval = _.find(allApprovalsForPeriods, {
                             "period": periodAndOrgUnit.period,
                             "orgUnit": periodAndOrgUnit.orgUnit
                         });
-                        _.each(matchingApprovals, function(approval) {
+
+                        if (_.isEmpty(approval)) {
+                            acc.push({
+                                "period": periodAndOrgUnit.period,
+                                "orgUnit": periodAndOrgUnit.orgUnit,
+                                "completedBy": approvedBy,
+                                "completedOn": moment().toISOString(),
+                                "isComplete": true
+                            });
+                        } else {
                             acc.push(approval);
-                        });
+                        }
                     }, []);
                 });
             };
@@ -89,7 +99,7 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                 store.upsert(approvals);
             };
 
-            return getExistingApprovals()
+            return getApprovals()
                 .then(updateThemAsApproved)
                 .then(saveToIdb);
         };

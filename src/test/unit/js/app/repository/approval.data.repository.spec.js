@@ -164,6 +164,16 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
                 "isComplete": true,
                 "isApproved": true,
                 "status": "NEW"
+            }, {
+                "period": "2014W02",
+                "orgUnit": "Mod5",
+                "completedBy": "user3",
+                "completedOn": thisMoment.toISOString(),
+                "approvedBy": "user3",
+                "approvedOn": thisMoment.toISOString(),
+                "isComplete": true,
+                "isApproved": true,
+                "status": "NEW"
             }];
 
             mockStore.each.and.returnValue(utils.getPromise(q, approvalsInIdb));
