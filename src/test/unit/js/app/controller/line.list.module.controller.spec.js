@@ -1,16 +1,17 @@
 /*global Date:true*/
-define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "md5", "timecop", "dhisId",
-        "patientOriginRepository", "orgUnitRepository", "datasetRepository"
+define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId",
+        "orgUnitRepository", "datasetRepository", "originOrgunitCreator"
     ],
-    function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, md5, timecop, dhisId,
-        PatientOriginRepository, OrgUnitRepository, DatasetRepository) {
+    function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId,
+        OrgUnitRepository, DatasetRepository, OriginOrgunitCreator) {
+
         describe("line list module controller", function() {
-            var scope, lineListModuleController, mockOrgStore, db, q, location, datasets, sections,
-                dataElements, sectionsdata, dataElementsdata, orgUnitRepo, orgunitGroupRepo, hustle, systemSettingRepo,
-                fakeModal, allPrograms, programsRepo, datasetRepo, allDatasets;
+            var scope, lineListModuleController, mockOrgStore, db, q, datasets, sections,
+                dataElements, sectionsdata, dataElementsdata, orgUnitRepo, hustle, systemSettingRepo,
+                fakeModal, allPrograms, programsRepo, datasetRepo, allDatasets, originOrgunitCreator;
 
             beforeEach(module('hustle'));
-            beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
+            beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
                 scope = $rootScope.$new();
                 q = $q;
                 hustle = $hustle;
@@ -27,9 +28,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }]
                 }];
 
-                location = $location;
                 orgUnitRepo = new OrgUnitRepository();
-                orgunitGroupRepo = utils.getMockRepo(q);
                 systemSettingRepo = utils.getMockRepo(q);
                 systemSettingRepo.get = function() {};
                 systemSettingRepo.upsert = function() {};
@@ -52,22 +51,19 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "name": "dataSet2"
                 }];
 
+                originOrgunitCreator = new OriginOrgunitCreator();
+                spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, {}));
+
                 spyOn(orgUnitRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
-                patientOriginRepository = new PatientOriginRepository();
-
-                patientOriginRepository = new PatientOriginRepository();
-                spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-
                 datasetRepo = new DatasetRepository();
                 spyOn(datasetRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(datasetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(datasetRepo, "getAllLinelistDatasets").and.returnValue(utils.getPromise(q, allDatasets));
-                orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
+                orgUnitGroupHelper = new OrgUnitGroupHelper();
                 spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
 
                 mockOrgStore = {
@@ -101,7 +97,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }
                 };
                 scope.isNewMode = true;
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper, datasetRepo, patientOriginRepository);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, q, fakeModal, programsRepo, orgUnitGroupHelper, datasetRepo, originOrgunitCreator);
             }));
 
             afterEach(function() {
@@ -161,6 +157,8 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }]
                 };
 
+                spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
                 spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
@@ -233,10 +231,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 fillNewModuleForm();
                 selectProgram();
 
-                spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, {}));
+                spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, {}));
+
                 scope.save();
                 scope.$apply();
-
 
                 var newLineListModule = {
                     "name": "Module2",
@@ -324,7 +323,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
 
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper, datasetRepo, patientOriginRepository);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, q, fakeModal, programsRepo, orgUnitGroupHelper, datasetRepo, originOrgunitCreator);
 
                 scope.$apply();
                 expect(scope.isDisabled).toBeTruthy();
@@ -336,7 +335,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.$apply();
 
                 scope.isNewMode = false;
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper, datasetRepo, patientOriginRepository);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, q, fakeModal, programsRepo, orgUnitGroupHelper, datasetRepo, originOrgunitCreator);
                 var parent = {
                     "id": "par1",
                     "name": "Par1"
@@ -442,7 +441,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper, datasetRepo, patientOriginRepository);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, q, fakeModal, programsRepo, orgUnitGroupHelper, datasetRepo, originOrgunitCreator);
                 scope.update(module);
                 scope.$apply();
 
@@ -526,7 +525,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 });
                 scope.isNewMode = false;
 
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper, datasetRepo, patientOriginRepository);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, q, fakeModal, programsRepo, orgUnitGroupHelper, datasetRepo, originOrgunitCreator);
                 scope.disable(module);
                 scope.$apply();
 
@@ -615,31 +614,35 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }]
                 };
 
-                var patientOrigins = {
-                    "origins": [{
-                        "id": "id",
-                        "name": "Unknown"
-                    }]
-                };
-
-                var originOrgUnit = [{
-                    "name": "Unknown",
-                    "shortName": "Unknown",
-                    "displayName": "Unknown",
-                    "id": "UnknownModule2someId",
-                    "level": 7,
+                var enrichedModule = {
+                    "name": "Module2",
+                    "shortName": "Module2",
+                    "displayName": "SomeName - Module2",
+                    "id": "Module2someId",
+                    "level": NaN,
                     "openingDate": moment().toDate(),
                     "attributeValues": [{
+                        "created": "2014-04-01T00:00:00.000Z",
+                        "lastUpdated": "2014-04-01T00:00:00.000Z",
                         "attribute": {
                             "code": "Type",
                             "name": "Type"
                         },
-                        "value": "Patient Origin"
+                        "value": "Module"
+                    }, {
+                        "created": "2014-04-01T00:00:00.000Z",
+                        "lastUpdated": "2014-04-01T00:00:00.000Z",
+                        "attribute": {
+                            "code": "isLineListService",
+                            "name": "Is Linelist Service"
+                        },
+                        "value": "true"
                     }],
                     "parent": {
-                        "id": "Module2someId"
+                        "name": "SomeName",
+                        "id": "someId"
                     }
-                }];
+                };
 
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
@@ -652,18 +655,12 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-                patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
 
+                scope.$apply();
                 scope.save();
                 scope.$apply();
 
-                expect(orgUnitRepo.upsert.calls.count()).toEqual(2);
-                expect(orgUnitRepo.upsert.calls.argsFor(1)).toEqual([originOrgUnit]);
-
-                expect(hustle.publish.calls.argsFor(2)).toEqual([{
-                    "data": originOrgUnit,
-                    "type": "upsertOrgUnit"
-                }, "dataValues"]);
+                expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedModule);
             });
 
             it("should associate origin org units to programs and datasets", function() {
@@ -734,8 +731,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, originDataset));
                 spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, summaryDataset));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-                patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
+                originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
 
+                scope.$apply();
                 scope.save();
                 scope.$apply();
 
@@ -749,7 +747,13 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     'name': "Module2",
                     'openingDate': today,
                     'serviceType': "Linelist",
-                    'parent': scope.orgUnit
+                    'parent': scope.orgUnit,
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "associatedDataSet"
+                        },
+                        "value": ""
+                    }],
                 };
 
                 var program = {
@@ -801,8 +805,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-                patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
+                originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
 
+                scope.$apply();
                 scope.save();
                 scope.$apply();
 

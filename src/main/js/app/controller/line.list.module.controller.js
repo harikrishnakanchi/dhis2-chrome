@@ -1,7 +1,8 @@
-define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "programTransformer", "md5"],
-    function(_, orgUnitMapper, moment, systemSettingsTransformer, programTransformer, md5) {
-        return function($scope, $hustle, orgUnitRepository, systemSettingRepository, db, $location, $q, $modal,
-            programRepository, orgUnitGroupRepository, orgUnitGroupHelper, datasetRepository, patientOriginRepository) {
+define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
+    function(_, orgUnitMapper, moment, systemSettingsTransformer) {
+        return function($scope, $hustle, orgUnitRepository, systemSettingRepository, $q, $modal,
+            programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator) {
+
             $scope.module = {};
             $scope.isExpanded = {};
             $scope.isDisabled = false;
@@ -222,23 +223,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                         return orgUnitGroupHelper.createOrgUnitGroups(originsPayload, false);
                     };
 
-                    var getPatientOriginOUPayload = function() {
-                        return orgUnitRepository.get(enrichedModule.parent.id).then(function(parentOpUnit) {
-                            return patientOriginRepository.get(parentOpUnit.id).then(function(patientOrigins) {
-                                if (!_.isEmpty(patientOrigins))
-                                    return orgUnitMapper.createPatientOriginPayload(patientOrigins.origins, enrichedModule);
-                            });
-                        });
-                    };
-
-                    return getPatientOriginOUPayload().then(function(patientOriginOUPayload) {
-                        if (!_.isEmpty(patientOriginOUPayload)) {
-                            return orgUnitRepository.upsert(patientOriginOUPayload)
-                                .then(_.partial(publishMessage, patientOriginOUPayload, "upsertOrgUnit"))
-                                .then(_.partial(associateToProgram, $scope.program, patientOriginOUPayload))
-                                .then(_.partial(associateToDatasets, patientOriginOUPayload))
-                                .then(_.partial(createOrgUnitGroups, patientOriginOUPayload));
-                        }
+                    return originOrgunitCreator.create(enrichedModule).then(function(patientOriginOUPayload) {
+                        return associateToProgram($scope.program, patientOriginOUPayload)
+                            .then(_.partial(associateToDatasets, patientOriginOUPayload))
+                            .then(_.partial(createOrgUnitGroups, patientOriginOUPayload));
                     });
                 };
 

@@ -1,13 +1,13 @@
 /*global Date:true*/
-define(["aggregateModuleController", "angularMocks", "utils", "testData", "datasetTransformer", "orgUnitGroupHelper", "moment", "md5", "timecop", "dhisId",
-        "patientOriginRepository", "orgUnitRepository", "datasetRepository"
+define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "datasetRepository",
+        "orgUnitRepository", "originOrgunitCreator"
     ],
-    function(AggregateModuleController, mocks, utils, testData, datasetTransformer, OrgUnitGroupHelper, moment, md5, timecop, dhisId,
-        PatientOriginRepository, OrgUnitRepository, DatasetRepository) {
+    function(AggregateModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, DatasetRepository,
+        OrgUnitRepository, OriginOrgunitCreator) {
 
         describe("module controller", function() {
             var scope, aggregateModuleController, mockOrgStore, db, q, location, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
-                dataSetRepo, systemSettingRepo, fakeModal, allPrograms, programsRepo, patientOriginRepository;
+                dataSetRepo, systemSettingRepo, fakeModal, allPrograms, originOrgunitCreator;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -28,9 +28,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
                 spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
-                patientOriginRepository = new PatientOriginRepository();
-                spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+                originOrgunitCreator = new OriginOrgunitCreator();
+                spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, {}));
 
                 dataSetRepo = new DatasetRepository();
                 spyOn(dataSetRepo, "getAllAggregateDatasets").and.returnValue(utils.getPromise(q, datasetsdata));
@@ -41,8 +40,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
                 systemSettingRepo = utils.getMockRepo(q);
                 systemSettingRepo.get = function() {};
 
-                programsRepo = utils.getMockRepo(q);
-                programsRepo.get = function() {};
                 orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
                 spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
 
@@ -83,7 +80,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
                 Timecop.install();
                 Timecop.freeze(new Date("2014-04-01T00:00:00.000Z"));
 
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, programsRepo, orgunitGroupRepo, orgUnitGroupHelper, patientOriginRepository);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator);
             }));
 
             afterEach(function() {
@@ -98,16 +95,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
                     "children": []
                 };
 
-                var origins = {
-                    "orgUnit": "someid",
-                    "origins": [{
-                        "name": "or1",
-                        "latitude": 66.6,
-                        "longitude": 70.2
-                    }]
-                };
                 orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
-                patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
 
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(dhisId, "get").and.callFake(function(name) {
@@ -117,7 +105,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
 
                 scope.$apply();
 
-
                 scope.orgUnit = parent;
                 scope.module = {
                     'name': "Module1",
@@ -125,26 +112,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
                     'openingDate': new Date(),
                     'parent': parent
                 };
-
-                var originOrgunits = [{
-                    "name": 'or1',
-                    "shortName": 'or1',
-                    "displayName": 'or1',
-                    "id": 'or1Module1someid',
-                    "level": 7,
-                    "openingDate": moment(new Date()).toDate(),
-                    "coordinates": '[70.2,66.6]',
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": 'Type',
-                            "name": 'Type'
-                        },
-                        "value": 'Patient Origin'
-                    }],
-                    "parent": {
-                        "id": 'Module1someid'
-                    }
-                }];
 
                 var enrichedAggregateModule = {
                     name: 'Module1',
@@ -185,9 +152,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
                     data: enrichedAggregateModule,
                     type: "upsertOrgUnit"
                 }, "dataValues");
-                expect(orgUnitRepo.get).toHaveBeenCalledWith(enrichedAggregateModule.parent.id);
-                expect(patientOriginRepository.get).toHaveBeenCalledWith("someid");
-                expect(orgUnitRepo.upsert.calls.argsFor(1)[0]).toEqual(originOrgunits);
+                expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedAggregateModule);
             });
 
             it("should associate aggregate datasets with module", function() {
@@ -256,16 +221,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
                     "children": []
                 };
 
-                var origins = {
-                    "orgUnit": "someid",
-                    "origins": [{
-                        "name": "or1",
-                        "latitude": 66.6,
-                        "longitude": 70.2
-                    }]
-                };
                 orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
-                patientOriginRepository.get.and.returnValue(utils.getPromise(q, origins));
 
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(dhisId, "get").and.callFake(function(name) {
@@ -897,43 +853,45 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
                     }
                 };
 
-                var patientOrigins = {
-                    "origins": [{
-                        "id": "id",
-                        "name": "Unknown"
-                    }]
-                };
-
-                var originOrgUnit = [{
-                    "name": "Unknown",
-                    "shortName": "Unknown",
-                    "displayName": "Unknown",
-                    "id": "Unknownmod1pid",
-                    "level": 7,
-                    "openingDate": moment("2014-04-01").toDate(),
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "Type",
-                            "name": "Type"
+                var enrichedAggregateModule = {
+                    name: 'mod1',
+                    shortName: 'mod1',
+                    displayName: 'parent - mod1',
+                    id: 'mod1pid',
+                    level: 6,
+                    openingDate: moment("2014-04-01").toDate(),
+                    attributeValues: [{
+                        created: moment().toISOString(),
+                        lastUpdated: moment().toISOString(),
+                        attribute: {
+                            code: "Type",
+                            name: "Type",
                         },
-                        "value": "Patient Origin"
+                        value: 'Module'
+                    }, {
+                        created: moment().toISOString(),
+                        lastUpdated: moment().toISOString(),
+                        attribute: {
+                            code: "isLineListService",
+                            name: "Is Linelist Service"
+                        },
+                        value: 'false'
                     }],
-                    "parent": {
-                        "id": "mod1pid"
+                    parent: {
+                        name: 'parent',
+                        id: 'pid'
                     }
-                }];
+                };
 
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
-                patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
 
                 scope.save();
                 scope.$apply();
 
-                expect(orgUnitRepo.upsert.calls.count()).toEqual(2);
-                expect(orgUnitRepo.upsert.calls.argsFor(1)).toEqual([originOrgUnit]);
+                expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedAggregateModule);
             });
 
             it("should associate geographic origin dataset to patient origin org unit", function() {
@@ -946,13 +904,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
                         "name": "parent",
                         "level": 5
                     }
-                };
-
-                var patientOrigins = {
-                    "origins": [{
-                        "id": "id",
-                        "name": "Unknown"
-                    }]
                 };
 
                 var originDatasets = [{
@@ -985,7 +936,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "datas
 
                 dataSetRepo.getOriginDatasets.and.returnValue(utils.getPromise(q, originDatasets));
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
-                patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
+                originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
 
                 scope.save();
                 scope.$apply();

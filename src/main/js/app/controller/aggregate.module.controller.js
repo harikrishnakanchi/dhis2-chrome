@@ -1,7 +1,8 @@
-define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datasetTransformer", "programTransformer", "md5"],
-    function(_, orgUnitMapper, moment, systemSettingsTransformer, datasetTransformer, programTransformer, md5) {
+define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
+    function(_, orgUnitMapper, moment, systemSettingsTransformer) {
         return function($scope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, db, $location, $q, $modal,
-            programRepository, orgUnitGroupRepository, orgUnitGroupHelper, patientOriginRepository) {
+            orgUnitGroupHelper, originOrgunitCreator) {
+
             $scope.originalDatasets = [];
             $scope.isExpanded = {};
             $scope.isDisabled = false;
@@ -191,22 +192,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 };
 
                 var createOriginOrgUnits = function() {
-                    var getPatientOriginOUPayload = function() {
-                        return orgUnitRepository.get(enrichedModule.parent.id).then(function(parentOpUnit) {
-                            return patientOriginRepository.get(parentOpUnit.id).then(function(patientOrigins) {
-                                if (!_.isEmpty(patientOrigins))
-                                    return orgUnitMapper.createPatientOriginPayload(patientOrigins.origins, enrichedModule);
-                            });
-                        });
-                    };
-
-                    return getPatientOriginOUPayload().then(function(patientOriginOUPayload) {
-                        if (!_.isEmpty(patientOriginOUPayload)) {
-                            return orgUnitRepository.upsert(patientOriginOUPayload)
-                                .then(_.partial(publishMessage, patientOriginOUPayload, "upsertOrgUnit"))
-                                .then(_.partial(associateToDatasets, $scope.originDatasets, patientOriginOUPayload));
-                        }
-                    });
+                    return originOrgunitCreator.create(enrichedModule)
+                        .then(_.partial(associateToDatasets, $scope.originDatasets));
                 };
 
                 return getEnrichedModule($scope.module)
