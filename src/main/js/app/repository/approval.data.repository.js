@@ -126,19 +126,8 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
         };
 
         this.saveApprovalsFromDhis = function(approvalsFromDhis) {
-            approvalsFromDhis = _.isArray(approvalsFromDhis) ? approvalsFromDhis : [approvalsFromDhis];
             var store = db.objectStore("approvals");
-            _.each(approvalsFromDhis, function(approvalFromDhis) {
-                var periodAndOrgUnit = {
-                    "period": approvalFromDhis.period,
-                    "orgUnit": approvalFromDhis.orgUnit
-                };
-                return self.getApprovalData(periodAndOrgUnit).then(function(approvalFromDb) {
-                    if (!approvalFromDb)
-                        return store.upsert(approvalFromDhis);
-                    return store.upsert(_.merge(approvalFromDb, approvalFromDhis));
-                });
-            });
+            return store.upsert(approvalsFromDhis);
         };
 
         this.clearStatusFlag = function(period, orgUnit) {

@@ -11,7 +11,6 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
 
                 if (_.isEmpty(allApprovalData))
                     return;
-
                 var clearStatusFlag = function() {
                     var promises = [];
                     _.each(allApprovalData, function(approvalData) {

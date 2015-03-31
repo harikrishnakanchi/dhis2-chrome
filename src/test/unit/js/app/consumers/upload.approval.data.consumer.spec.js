@@ -1,35 +1,47 @@
-define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approvalDataRepository", "utils"],
-    function(UploadApprovalDataConsumer, mocks, ApprovalService, ApprovalDataRepository, utils) {
-        xdescribe("upload data consumer", function() {
-            var approvalDataRepository, uploadApprovalDataConsumer, scope, q;
+define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approvalDataRepository", "datasetRepository", "utils"],
+    function(UploadApprovalDataConsumer, mocks, ApprovalService, ApprovalDataRepository, DatasetRepository, utils) {
+        describe("upload data consumer", function() {
+            var approvalDataRepository, uploadApprovalDataConsumer, datasetRepository, scope, q;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
-                approvalDataRepository = new ApprovalDataRepository();
-                approvalService = new ApprovalService();
-                uploadApprovalDataConsumer = new UploadApprovalDataConsumer(approvalService, approvalDataRepository);
                 scope = $rootScope.$new();
                 q = $q;
+
+                approvalDataRepository = new ApprovalDataRepository();
+                spyOn(approvalDataRepository, "clearStatusFlag").and.returnValue(utils.getPromise(q, {}));
+
+                approvalService = new ApprovalService();
+                spyOn(approvalService, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
+
+                datasetRepository = new DatasetRepository();
+
+                uploadApprovalDataConsumer = new UploadApprovalDataConsumer(approvalService, approvalDataRepository, datasetRepository, q);
             }));
 
 
             it("should upload approval data to DHIS", function() {
-                var approvalData = {
-                    "orgUnit": "ou1",
-                    "period": "2014W12",
-                    "dataSets": ["d1", "d2"],
-                    "isApproved": true,
-                    "status": "NEW",
-                    "createdByUsername": "foobar",
-                    "createdDate": "2014-01-01"
-                };
 
-                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, approvalData));
-                spyOn(approvalService, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
+                var allDatasetIds = ['d1', 'd2'];
+
+                var approvalData = [{
+                    "period": "2014W01",
+                    "orgUnit": "ou1",
+                    "completedBy": "user1",
+                    "completedOn": "2014-01-05T00:00:00.000+0000",
+                    "approvedBy": "approver1",
+                    "approvedOn": "2014-01-10T00:00:00.000+0000",
+                    "isComplete": true,
+                    "isApproved": true,
+                    "status": "NEW"
+                }];
+
+                spyOn(datasetRepository, "getAllDatasetIds").and.returnValue(utils.getPromise(q, allDatasetIds));
+                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, approvalData));
 
                 var message = {
                     "data": {
                         "data": {
-                            "period": "2014W12",
+                            "period": "2014W01",
                             "orgUnit": "ou1"
                         },
                         "type": "uploadApprovalData",
@@ -39,28 +51,34 @@ define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approv
                 uploadApprovalDataConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.getLevelTwoApprovalData).toHaveBeenCalledWith("2014W12", "ou1");
-                expect(approvalService.markAsApproved).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1', "foobar", "2014-01-01");
+                var expectedPeriodsAndOrgUnitsToUpsert = [{
+                    "period": "2014W01",
+                    "orgUnit": "ou1"
+                }];
+
+                expect(approvalService.markAsApproved).toHaveBeenCalledWith(allDatasetIds, expectedPeriodsAndOrgUnitsToUpsert, "approver1", "2014-01-10T00:00:00.000+0000");
             });
 
-            it("should upload accept data to DHIS", function() {
-                var approvalData = {
+            it("should clear the status flag upon successful approval", function() {
+                var approvalData = [{
+                    "period": "2014W01",
                     "orgUnit": "ou1",
-                    "period": "2014W12",
-                    "dataSets": ["d1", "d2"],
+                    "completedBy": "user1",
+                    "completedOn": "2014-01-05T00:00:00.000+0000",
+                    "approvedBy": "approver1",
+                    "approvedOn": "2014-01-10T00:00:00.000+0000",
+                    "isComplete": true,
                     "isApproved": true,
-                    "status": "NEW",
-                    "createdByUsername": "foobar",
-                    "createdDate": "2014-01-01"
-                };
+                    "status": "NEW"
+                }];
 
-                spyOn(approvalDataRepository, "getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, approvalData));
-                spyOn(approvalService, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
+                spyOn(datasetRepository, "getAllDatasetIds").and.returnValue(utils.getPromise(q, ['d1', 'd2']));
+                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, approvalData));
 
                 var message = {
                     "data": {
                         "data": {
-                            "period": "2014W12",
+                            "period": "2014W01",
                             "orgUnit": "ou1"
                         },
                         "type": "uploadApprovalData",
@@ -70,8 +88,7 @@ define(["uploadApprovalDataConsumer", "angularMocks", "approvalService", "approv
                 uploadApprovalDataConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.getLevelTwoApprovalData).toHaveBeenCalledWith("2014W12", "ou1");
-                expect(approvalService.markAsApproved).toHaveBeenCalledWith(['d1', 'd2'], '2014W12', 'ou1', "foobar", "2014-01-01");
+                expect(approvalDataRepository.clearStatusFlag).toHaveBeenCalledWith("2014W01", "ou1");
             });
         });
     });

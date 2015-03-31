@@ -17,9 +17,6 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 };
 
                 approvalDataRepository = {
-                    "getLevelOneApprovalData": jasmine.createSpy("getLevelOneApprovalData").and.returnValue(utils.getPromise(q, {})),
-                    "getLevelTwoApprovalData": jasmine.createSpy("getLevelTwoApprovalData").and.returnValue(utils.getPromise(q, {})),
-                    "getLevelOneApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getLevelOneApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
                     "getApprovalDataForPeriodsOrgUnits": jasmine.createSpy("getApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, [])),
                     "saveApprovalsFromDhis": jasmine.createSpy("saveApprovalsFromDhis"),
                     "invalidateApproval": jasmine.createSpy("invalidateApproval")
@@ -27,17 +24,13 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
 
                 approvalService = {
                     "getCompletionData": jasmine.createSpy("getCompletionData").and.returnValue(utils.getPromise(q, [])),
-                    "getApprovalData": jasmine.createSpy("getApprovalData").and.returnValue(utils.getPromise(q, [])),
-                    "saveApprovalsFromDhis": jasmine.createSpy("saveApprovalsFromDhis"),
-                    "markAsComplete": jasmine.createSpy("markAsComplete"),
-                    "markAsApproved": jasmine.createSpy("markAsApproved"),
-                    "markAsIncomplete": jasmine.createSpy("markAsIncomplete")
+                    "getApprovalData": jasmine.createSpy("getApprovalData").and.returnValue(utils.getPromise(q, []))
                 };
 
                 downloadApprovalConsumer = new DownloadApprovalConsumer(datasetRepository, userPreferenceRepository, q, approvalService, approvalDataRepository);
             }));
 
-            it("should download approval data from dhis based on user preferences and dataset", function() {
+            it("should download approval data from dhis based on user module ids and dataset", function() {
                 userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
 
                 datasetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, ["ds1"]));
@@ -58,46 +51,10 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 expect(approvalService.getApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
             });
 
-            it("should not save to indexeddb if no level one or level two approval data is available in dhis", function() {
-                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, []));
-                approvalService.getApprovalData.and.returnValue(utils.getPromise(q, []));
+            it("should not download approval data from dhis if the user does not have any preferred moduleids", function() {
+                userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, []));
 
-                var dbData = {
-                    "orgUnit": "ou1",
-                    "period": "2014W01",
-                    "storedBy": "testproj_approver_l1",
-                    "date": "2014-01-03T00:00:00.000+0000",
-                    "dataSets": ["d1", "d2", "d3"]
-                };
-
-                approvalDataRepository.getLevelOneApprovalData.and.returnValue(utils.getPromise(q, dbData));
-                message = {
-                    "data": {
-                        "type": "downloadData"
-                    }
-                };
-
-                downloadApprovalConsumer.run(message);
-                scope.$apply();
-
-                expect(approvalDataRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
-                expect(approvalDataRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
-            });
-
-            it("should save downloaded level one approval data to idb if approval data doesn't exist in idb", function() {
-                var dhisApprovalData = [{
-                    "period": "2014W01",
-                    "orgUnit": "ou1",
-                    "completedBy": "testproj_approver_l1",
-                    "completedOn": "2014-01-05T00:00:00.000+0000"
-                }, {
-                    "period": "2014W02",
-                    "orgUnit": "ou1",
-                    "completedBy": "testproj_approver_l1",
-                    "completedOn": "2014-01-05T00:00:00.000+0000"
-                }];
-
-                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, dhisApprovalData));
+                datasetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, ["ds1"]));
 
                 message = {
                     "data": {
@@ -108,16 +65,59 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 downloadApprovalConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisApprovalData);
+                expect(approvalService.getCompletionData).not.toHaveBeenCalled();
+                expect(approvalService.getApprovalData).not.toHaveBeenCalled();
             });
 
-            it("should save downloaded level two approval data to idb if approval data doesn't exist in idb", function() {
+            it("should save downloaded dhis completion data to idb if completion data doesn't exist in idb", function() {
+                var dhisCompletionData = [{
+                    "period": "2014W01",
+                    "orgUnit": "ou1",
+                    "completedBy": "testproj_approver_l1",
+                    "completedOn": "2014-01-05T00:00:00.000+0000",
+                    "isComplete": true
+                }, {
+                    "period": "2014W02",
+                    "orgUnit": "ou1",
+                    "completedBy": "testproj_approver_l1",
+                    "completedOn": "2014-01-05T00:00:00.000+0000",
+                    "isComplete": true
+                }];
+
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, dhisCompletionData));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
+
+                downloadApprovalConsumer.run(message);
+                scope.$apply();
+
+                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisCompletionData);
+            });
+
+            it("should save downloaded dhis approval data to idb if approval data doesn't exist in idb", function() {
+                var dhisCompletionData = [{
+                    "period": "2014W01",
+                    "orgUnit": "ou1",
+                    "completedBy": "testproj_approver_l1",
+                    "completedOn": "2014-01-05T00:00:00.000+0000",
+                    "isComplete": true
+                }, {
+                    "period": "2014W02",
+                    "orgUnit": "ou1",
+                    "completedBy": "testproj_approver_l1",
+                    "completedOn": "2014-01-05T00:00:00.000+0000",
+                    "isComplete": true
+                }];
+
                 var dhisApprovalData = [{
                     "period": "2014W01",
                     "orgUnit": "ou1",
                     "approvedBy": "approver1",
                     "approvedOn": "2014-01-10T00:00:00.000+0000",
-                    "dataSets": ["d1", "d2"],
                     "isApproved": true
                 }, {
                     "period": "2014W02",
@@ -127,6 +127,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "isApproved": true
                 }];
 
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, dhisCompletionData));
                 approvalService.getApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
 
                 message = {
@@ -138,11 +139,31 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 downloadApprovalConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisApprovalData);
+                var expectedApprovalData = [{
+                    "period": "2014W01",
+                    "orgUnit": "ou1",
+                    "completedBy": "testproj_approver_l1",
+                    "completedOn": "2014-01-05T00:00:00.000+0000",
+                    "approvedBy": "approver1",
+                    "approvedOn": "2014-01-10T00:00:00.000+0000",
+                    "isComplete": true,
+                    "isApproved": true
+                }, {
+                    "period": "2014W02",
+                    "orgUnit": "ou1",
+                    "completedBy": "testproj_approver_l1",
+                    "completedOn": "2014-01-05T00:00:00.000+0000",
+                    "approvedBy": "approver1",
+                    "approvedOn": "2014-01-10T00:00:00.000+0000",
+                    "isComplete": true,
+                    "isApproved": true
+                }];
+
+                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(expectedApprovalData);
             });
 
-            it("should merge level one approval data from dhis and idb based on status", function() {
-                var dbCompletionWhichIsDeletedInDhis = {
+            it("should overwrite completion data if it exists in both dhis and idb", function() {
+                var unchangedCompletion = {
                     "orgUnit": "ou1",
                     "period": "2014W01",
                     "completedBy": "testproj_approver2_l1",
@@ -150,102 +171,24 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "isComplete": true
                 };
 
-                var dbUnchangedCompletion = {
-                    "orgUnit": "ou1",
+                var oldCompletion = {
+                    "orgUnit": "ou2",
                     "period": "2014W02",
                     "completedBy": "testproj_approver2_l1",
                     "completedOn": "2014-01-10T00:00:00.000+0000",
                     "isComplete": true
                 };
 
-                var dbNewCompletion = {
-                    "orgUnit": "ou1",
-                    "period": "2014W03",
-                    "completedBy": "testproj_approver2_l1",
-                    "completedOn": "2014-01-10T00:00:00.000+0000",
-                    "isComplete": true,
-                    "status": "NEW"
-                };
-
-                var dbDeletedCompletion = {
-                    "orgUnit": "ou1",
-                    "period": "2014W04",
-                    "completedBy": "testproj_approver2_l1",
-                    "completedOn": "2014-01-10T00:00:00.000+0000",
-                    "isComplete": true,
-                    "status": "DELETED"
-                };
-
-                var dbStaleCompletionData = {
-                    "orgUnit": "ou1",
-                    "period": "2014W06",
-                    "completedBy": "testproj_approver2_l1",
-                    "completedOn": "2014-01-10T00:00:00.000+0000",
-                    "isComplete": true
-                };
-
-                var dbApprovedData = {
-                    "orgUnit": "ou1",
-                    "period": "2014W07",
-                    "completedBy": "testproj_approver2_l1",
-                    "completedOn": "2014-01-10T00:00:00.000+0000",
-                    "approvedBy": "approver2",
-                    "approvedOn": "2014-01-11T12:00:00.000+0000",
-                    "isComplete": true,
-                    "isApproved": true
-                };
-
-                var dhisCompletionWithDifferentData = {
-                    "orgUnit": dbStaleCompletionData.orgUnit,
-                    "period": dbStaleCompletionData.period,
-                    "completedBy": "testproj_approver3_l1",
-                    "completedOn": "2014-01-11T00:00:00.000+0000"
-                };
-
-                var dhisNewCompletion = {
-                    "period": "2014W05",
-                    "orgUnit": "ou1",
-                    "completedBy": "testproj_approver_l1",
-                    "completedOn": "2014-01-05T00:00:00.000+0000"
-                };
-
-                var dhisCompletionWhichIsDeletedLocally = {
-                    "period": dbDeletedCompletion.period,
-                    "orgUnit": dbDeletedCompletion.orgUnit,
-                    "completedBy": dbDeletedCompletion.completedBy,
-                    "completedOn": dbDeletedCompletion.completedOn
-                };
-
-                var dhisUnchangedCompletion = {
-                    "orgUnit": "ou1",
+                var updatedCompletion = {
+                    "orgUnit": "ou2",
                     "period": "2014W02",
-                    "completedBy": "testproj_approver2_l1",
-                    "completedOn": "2014-01-10T00:00:00.000+0000",
+                    "completedBy": "new_testproj_approver2_l1",
+                    "completedOn": "2014-02-10T00:00:00.000+0000",
                     "isComplete": true
                 };
 
-                var dhisCompletionDataForPeriodThatIsApproved = {
-                    "orgUnit": "ou1",
-                    "period": "2014W07",
-                    "completedBy": "testproj_approver2_l1",
-                    "completedOn": "2014-01-10T00:00:00.000+0000",
-                    "isComplete": true
-                };
-
-                var dhisApprovalDataForPeriodThatIsApproved = {
-                    "orgUnit": "ou1",
-                    "period": "2014W07",
-                    "approvedBy": "approver1",
-                    "approvedOn": "2014-01-10T00:00:00.000+0000",
-                    "isApproved": true
-                };
-
-                var dataFromIdb = [dbCompletionWhichIsDeletedInDhis, dbUnchangedCompletion, dbNewCompletion, dbDeletedCompletion, dbStaleCompletionData, dbApprovedData];
-                var dataFromDhis = [dhisUnchangedCompletion, dhisCompletionWhichIsDeletedLocally, dhisNewCompletion, dhisCompletionWithDifferentData, dhisCompletionDataForPeriodThatIsApproved];
-
-                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, dataFromDhis));
-                approvalService.getApprovalData.and.returnValue(utils.getPromise(q, [dhisApprovalDataForPeriodThatIsApproved]));
-                approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataFromIdb));
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, [unchangedCompletion, updatedCompletion]));
+                approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, [unchangedCompletion, oldCompletion]));
 
                 message = {
                     "data": {
@@ -256,24 +199,83 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 downloadApprovalConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.invalidateApproval).toHaveBeenCalledWith(dbCompletionWhichIsDeletedInDhis.period, dbCompletionWhichIsDeletedInDhis.orgUnit);
-                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalledWith(dbUnchangedCompletion.period, dbUnchangedCompletion.orgUnit);
-                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalledWith(dbNewCompletion.period, dbNewCompletion.orgUnit);
-                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalledWith(dbDeletedCompletion.period, dbDeletedCompletion.orgUnit);
-                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalledWith(dbStaleCompletionData.period, dbStaleCompletionData.orgUnit);
-                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalledWith(dbApprovedData.period, dbApprovedData.orgUnit);
-
-                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisUnchangedCompletion);
-                expect(approvalDataRepository.saveApprovalsFromDhis).not.toHaveBeenCalledWith(dhisCompletionWhichIsDeletedLocally);
-                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisCompletionWithDifferentData);
-                expect(approvalDataRepository.saveApprovalsFromDhis).not.toHaveBeenCalledWith(dhisCompletionDataForPeriodThatIsApproved);
-                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith([dhisNewCompletion]);
+                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalled();
+                expect(approvalDataRepository.saveApprovalsFromDhis.calls.count()).toEqual(2);
+                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(unchangedCompletion);
+                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(updatedCompletion);
             });
 
-            it("should merge level two approval data from dhis and idb based on status", function() {
-                var dbApprovalWhichIsDeletedInDhis = {
+            it("should overwrite approval data if it exists in both dhis and idb", function() {
+                var unchangedApproval = {
                     "orgUnit": "ou1",
                     "period": "2014W01",
+                    "completedBy": "testproj_approver1_l1",
+                    "completedOn": "2014-01-10T00:00:00.000+0000",
+                    "approvedBy": "testproj_approver1_l2",
+                    "approvedOn": "2014-01-11T00:00:00.000+0000",
+                    "isComplete": true,
+                    "isApproved": true
+                };
+
+                var dhisCompletionForUnchangedApproval = _.omit(unchangedApproval, ["approvedBy", "approvedOn", "isApproved"]);
+                var dhisApprovalForUnchangedApproval = _.omit(unchangedApproval, ["completedBy", "completedOn", "isComplete"]);
+
+                var oldApproval = {
+                    "orgUnit": "ou2",
+                    "period": "2014W02",
+                    "completedBy": "testproj_approver1_l1",
+                    "completedOn": "2014-01-10T00:00:00.000+0000",
+                    "approvedBy": "testproj_approver1_l2",
+                    "approvedOn": "2014-01-11T00:00:00.000+0000",
+                    "isComplete": true,
+                    "isApproved": true
+                };
+
+                var updatedApproval = {
+                    "orgUnit": "ou2",
+                    "period": "2014W02",
+                    "completedBy": "testproj_approver1_l1",
+                    "completedOn": "2014-01-10T00:00:00.000+0000",
+                    "approvedBy": "testproj_approver1_l2",
+                    "approvedOn": "2014-01-11T00:00:00.000+0000",
+                    "isComplete": true,
+                    "isApproved": true
+                };
+
+                var dhisCompletionForUpdatedApproval = _.omit(updatedApproval, ["approvedBy", "approvedOn", "isApproved"]);
+                var dhisApprovalForUpdatedApproval = _.omit(updatedApproval, ["completedBy", "completedOn", "isComplete"]);
+
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, [dhisCompletionForUnchangedApproval, dhisCompletionForUpdatedApproval]));
+                approvalService.getApprovalData.and.returnValue(utils.getPromise(q, [dhisApprovalForUnchangedApproval, dhisApprovalForUpdatedApproval]));
+                approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, [unchangedApproval, oldApproval]));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
+
+                downloadApprovalConsumer.run(message);
+                scope.$apply();
+
+                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalled();
+                expect(approvalDataRepository.saveApprovalsFromDhis.calls.count()).toEqual(2);
+                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(unchangedApproval);
+                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(updatedApproval);
+            });
+
+            it("should delete completion and approval data that is not present in dhis", function() {
+                var dbCompletionWhichIsDeletedInDhis = {
+                    "orgUnit": "ou1",
+                    "period": "2014W01",
+                    "completedBy": "testproj_approver2_l1",
+                    "completedOn": "2014-01-10T00:00:00.000+0000",
+                    "isComplete": true
+                };
+
+                var dbApprovalWhichIsDeletedInDhis = {
+                    "orgUnit": "ou2",
+                    "period": "2014W02",
                     "completedBy": "approver1",
                     "completedOn": "2014-01-11T00:00:00.000+0000",
                     "approvedBy": "approver2",
@@ -282,16 +284,62 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "isApproved": true
                 };
 
-                var dbUnchangedApproval = {
-                    "period": "2014W02",
-                    "orgUnit": "ou1",
-                    "completedBy": "approver1",
-                    "completedOn": "2014-01-11T00:00:00.000+0000",
-                    "approvedBy": "approver1",
-                    "approvedOn": "2014-01-10T00:00:00.000+0000",
-                    "isComplete": true,
-                    "isApproved": true
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, []));
+                approvalService.getApprovalData.and.returnValue(utils.getPromise(q, []));
+                approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, [dbCompletionWhichIsDeletedInDhis, dbApprovalWhichIsDeletedInDhis]));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
                 };
+
+                downloadApprovalConsumer.run(message);
+                scope.$apply();
+
+                expect(approvalDataRepository.invalidateApproval.calls.count()).toEqual(2);
+                expect(approvalDataRepository.invalidateApproval).toHaveBeenCalledWith(dbCompletionWhichIsDeletedInDhis.period, dbCompletionWhichIsDeletedInDhis.orgUnit);
+                expect(approvalDataRepository.invalidateApproval).toHaveBeenCalledWith(dbApprovalWhichIsDeletedInDhis.period, dbApprovalWhichIsDeletedInDhis.orgUnit);
+            });
+
+            it("should not change completion data that is new locally or deleted locally", function() {
+
+                var newCompletionInDb = {
+                    "orgUnit": "ou1",
+                    "period": "2014W03",
+                    "completedBy": "testproj_approver2_l1",
+                    "completedOn": "2014-01-10T00:00:00.000+0000",
+                    "isComplete": true,
+                    "status": "NEW"
+                };
+
+                var locallyDeletedCompletion = {
+                    "orgUnit": "ou1",
+                    "period": "2014W04",
+                    "completedBy": "testproj_approver2_l1",
+                    "completedOn": "2014-01-10T00:00:00.000+0000",
+                    "isComplete": true,
+                    "status": "DELETED"
+                };
+
+                var dhisCompletionWhichIsDeletedLocally = _.omit(locallyDeletedCompletion, "status");
+
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, [dhisCompletionWhichIsDeletedLocally]));
+                approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, [newCompletionInDb, locallyDeletedCompletion]));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
+
+                downloadApprovalConsumer.run(message);
+                scope.$apply();
+
+                expect(approvalDataRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
+            });
+
+            it("should merge level two approval data from dhis and idb based on status", function() {
 
                 var dbNewApproval = {
                     "orgUnit": "ou1",
@@ -313,61 +361,29 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "status": "DELETED"
                 };
 
-                var dbStaleApprovalData = {
-                    "orgUnit": "ou1",
-                    "period": "2014W06",
+                var dhisCompletionDataForNewApproval = _.omit(dbNewApproval, ["approvedOn", "approvedBy", "isApproved", "status"]);
+
+                var dhisCompletionDataForApprovalWhichIsDeletedLocally = {
+                    "period": dbDeletedApproval.period,
+                    "orgUnit": dbDeletedApproval.orgUnit,
                     "completedBy": "approver1",
-                    "completedOn": "2014-01-11T00:00:00.000+0000",
-                    "approvedBy": "approver2",
-                    "approvedOn": "2014-01-11T12:00:00.000+0000",
-                    "isComplete": true,
-                    "isApproved": true
-                };
-
-                var dbApprovalWhichIsNotApprovedYet = {
-                    "orgUnit": "ou1",
-                    "period": "2014W07",
-                    "isComplete": true,
-                    "completedBy": "approver1",
-                    "completedOn": "2014-01-11T00:00:00.000+0000",
-                    "status": "NEW"
-                };
-
-                var dhisApprovalWithDifferentData = {
-                    "orgUnit": dbStaleApprovalData.orgUnit,
-                    "period": dbStaleApprovalData.period,
-                    "isApproved": true,
-                    "approvedBy": "newApprover2",
-                    "approvedOn": "2014-01-11T14:00:00.000+0000"
-                };
-
-                var dhisNewApproval = {
-                    "period": "2014W05",
-                    "orgUnit": "ou1",
-                    "isApproved": true,
-                    "approvedBy": "approver1",
-                    "approvedOn": "2014-01-10T00:00:00.000+0000",
+                    "completedOn": "2014-01-10T00:00:00.000+0000",
+                    "isComplete": true
                 };
 
                 var dhisApprovalWhichIsDeletedLocally = {
                     "period": dbDeletedApproval.period,
                     "orgUnit": dbDeletedApproval.orgUnit,
-                    "approvedBy": "approver1",
-                    "approvedOn": "2014-01-10T00:00:00.000+0000",
+                    "approvedBy": "approver2",
+                    "approvedOn": "2014-01-11T00:00:00.000+0000",
                     "isApproved": true
                 };
 
-                var dhisUnchangedApproval = {
-                    "period": "2014W02",
-                    "orgUnit": "ou1",
-                    "approvedBy": "approver1",
-                    "approvedOn": "2014-01-10T00:00:00.000+0000",
-                    "isApproved": true
-                };
+                var dbApprovalData = [dbNewApproval, dbDeletedApproval];
+                var dhisCompletionData = [dhisCompletionDataForNewApproval, dhisCompletionDataForApprovalWhichIsDeletedLocally];
+                var dhisApprovalData = [dhisApprovalWhichIsDeletedLocally];
 
-                var dbApprovalData = [dbApprovalWhichIsDeletedInDhis, dbUnchangedApproval, dbNewApproval, dbDeletedApproval, dbStaleApprovalData, dbApprovalWhichIsNotApprovedYet];
-                var dhisApprovalData = [dhisUnchangedApproval, dhisApprovalWhichIsDeletedLocally, dhisApprovalWithDifferentData, dhisNewApproval];
-
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, dhisCompletionData));
                 approvalService.getApprovalData.and.returnValue(utils.getPromise(q, dhisApprovalData));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbApprovalData));
 
@@ -380,17 +396,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 downloadApprovalConsumer.run(message);
                 scope.$apply();
 
-                expect(approvalDataRepository.invalidateApproval).toHaveBeenCalledWith(dbApprovalWhichIsDeletedInDhis.period, dbApprovalWhichIsDeletedInDhis.orgUnit);
-                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalledWith(dbUnchangedApproval.period, dbUnchangedApproval.orgUnit);
-                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalledWith(dbNewApproval.period, dbNewApproval.orgUnit);
-                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalledWith(dbDeletedApproval.period, dbDeletedApproval.orgUnit);
-                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalledWith(dbStaleApprovalData.period, dbStaleApprovalData.orgUnit);
-                expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalledWith(dbApprovalWhichIsNotApprovedYet.period, dbApprovalWhichIsNotApprovedYet.orgUnit);
-
-                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisUnchangedApproval);
-                expect(approvalDataRepository.saveApprovalsFromDhis).not.toHaveBeenCalledWith(dhisApprovalWhichIsDeletedLocally);
-                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisApprovalWithDifferentData);
-                expect(approvalDataRepository.saveApprovalsFromDhis).toHaveBeenCalledWith([dhisNewApproval]);
+                expect(approvalDataRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
             });
         });
     });

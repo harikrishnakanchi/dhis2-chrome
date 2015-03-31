@@ -230,92 +230,23 @@ define(["approvalDataRepository", "angularMocks", "utils", "timecop", "moment"],
             expect(mockStore.delete).toHaveBeenCalledWith(["2014W01", "ou1"]);
         });
 
-        it("should save completion data from dhis", function() {
-            var approvalDataInDb = {
-                "period": "2014W01",
-                "orgUnit": "Mod1",
-                "completedBy": "user3",
-                "completedOn": thisMoment.toISOString(),
-                "approvedBy": "user3",
-                "approvedOn": thisMoment.toISOString(),
-                "isComplete": true,
-                "isApproved": true,
-            };
+        it("should save data from dhis", function() {
 
             var dataFromDhis = {
                 "period": "2014W01",
                 "orgUnit": "Mod1",
-                "completedBy": "newUser",
+                "completedBy": "user1",
                 "completedOn": "2014-01-10T00:00:00.000Z",
-                "isComplete": true
-            };
-
-            var expectedUpsert = {
-                "period": "2014W01",
-                "orgUnit": "Mod1",
-                "completedBy": "newUser",
-                "completedOn": "2014-01-10T00:00:00.000Z",
-                "approvedBy": "user3",
-                "approvedOn": thisMoment.toISOString(),
                 "isComplete": true,
-                "isApproved": true,
+                "approvedBy": "user2",
+                "approvedOn": "2014-01-10T00:00:00.000Z",
+                "isApproved": true
             };
 
-            mockStore.find.and.callFake(function(data) {
-                if (data[0] === "2014W01" && data[1] === "Mod1")
-                    return (utils.getPromise(q, approvalDataInDb));
-                return (utils.getPromise(q, undefined));
-            });
-
-            approvalDataRepository.saveApprovalsFromDhis([dataFromDhis]);
-            scope.$apply();
+            approvalDataRepository.saveApprovalsFromDhis(dataFromDhis);
 
             expect(db.objectStore).toHaveBeenCalledWith("approvals");
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpsert);
+            expect(mockStore.upsert).toHaveBeenCalledWith(dataFromDhis);
         });
-
-
-        it("should save approval data from dhis", function() {
-            var approvalDataInDb = {
-                "period": "2014W01",
-                "orgUnit": "Mod1",
-                "completedBy": "user3",
-                "completedOn": thisMoment.toISOString(),
-                "isComplete": true
-            };
-
-            var dataFromDhis = {
-                "period": "2014W01",
-                "orgUnit": "Mod1",
-                "approvedBy": "approver1",
-                "approvedOn": "2014-01-10T00:00:00.000+0000",
-                "isApproved": true,
-            };
-
-            var expectedUpsert = {
-                "period": "2014W01",
-                "orgUnit": "Mod1",
-                "completedBy": "user3",
-                "completedOn": thisMoment.toISOString(),
-                "approvedBy": "approver1",
-                "approvedOn": "2014-01-10T00:00:00.000+0000",
-                "isComplete": true,
-                "isApproved": true,
-            };
-
-            mockStore.find.and.callFake(function(data) {
-                if (data[0] === "2014W01" && data[1] === "Mod1")
-                    return (utils.getPromise(q, approvalDataInDb));
-                return (utils.getPromise(q, undefined));
-            });
-
-            approvalDataRepository.saveApprovalsFromDhis([dataFromDhis]);
-            scope.$apply();
-
-            expect(db.objectStore).toHaveBeenCalledWith("approvals");
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedUpsert);
-        });
-
-
     });
 });
