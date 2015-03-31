@@ -1,5 +1,5 @@
 define(["moment", "lodashUtils"], function(moment, _) {
-    return function(db, datasetRepository, programRepository, $q) {
+    return function(db, datasetRepository, $q) {
         var isOfType = function(orgUnit, type) {
             return _.any(orgUnit.attributeValues, {
                 attribute: {
@@ -60,29 +60,10 @@ define(["moment", "lodashUtils"], function(moment, _) {
                 return indexDatasetsByOrgUnits().then(filterModulesWithNewDatasets);
             };
 
-            var filterLineListModules = function(lineListModules) {
-                var indexProgramsByOrgUnits = function() {
-                    return programRepository.getAll().then(function(programs) {
-                        return _.groupByArray(programs, "orgUnitIds");
-                    });
-                };
-
-                var filterModulesWithNewPrograms = function(programsIndexedByOU) {
-                    return _.filter(lineListModules, function(mod) {
-                        var associatedPrograms = programsIndexedByOU[mod.id];
-                        return !_.isEmpty(associatedPrograms);
-                    });
-                };
-
-                return indexProgramsByOrgUnits().then(filterModulesWithNewPrograms);
-            };
-
             var segragatedOrgUnits = segragateOrgUnits(orgUnits);
-            return $q.all([filterAggregateModules(segragatedOrgUnits.aggregateModules),
-                    filterLineListModules(segragatedOrgUnits.lineListModules)
-                ])
+            return filterAggregateModules(segragatedOrgUnits.aggregateModules)
                 .then(function(filteredModules) {
-                    return segragatedOrgUnits.otherOrgUnits.concat(filteredModules[0]).concat(filteredModules[1]);
+                    return segragatedOrgUnits.otherOrgUnits.concat(filteredModules).concat(segragatedOrgUnits.lineListModules);
                 });
         };
 
@@ -211,7 +192,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
                 var isOrigin = _.any(moduleOrOrigin.attributeValues, {
                     "value": "Patient Origin"
                 });
-                
+
                 var module = isOrigin === true ? _.find(orgUnits, {
                     'id': moduleOrOrigin.parent.id
                 }) : moduleOrOrigin;

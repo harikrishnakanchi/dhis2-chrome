@@ -1,4 +1,4 @@
-define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetRepository", "programRepository", "lodash"], function(OrgUnitRepository, utils, mocks, timecop, DatasetRepository, ProgramRepository, _) {
+define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetRepository", "lodash"], function(OrgUnitRepository, utils, mocks, timecop, DatasetRepository, _) {
     describe("Org Unit Repository specs", function() {
         var mockOrgStore, mockDb, orgUnitRepository, q, orgUnits, scope, datasetRepository;
         var getAttr = function(key, value) {
@@ -94,9 +94,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
             scope = $rootScope.$new();
             datasetRepository = new DatasetRepository();
             spyOn(datasetRepository, "getAllAggregateDatasets").and.returnValue(utils.getPromise(q, datasets));
-
-            programRepository = new ProgramRepository();
-            spyOn(programRepository, "getAll").and.returnValue(utils.getPromise(q, []));
 
             var newDataSet = {
                 "id": "newDs",
@@ -1001,7 +998,6 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
 
             orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, programRepository, q);
             datasetRepository.getAllAggregateDatasets.and.returnValue(utils.getPromise(q, datasets));
-            programRepository.getAll.and.returnValue(utils.getPromise(q, programs));
 
             var actualOrgUnits = [];
             orgUnitRepository.getAll(false).then(function(data) {
@@ -1010,7 +1006,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "datasetReposit
 
             scope.$apply();
 
-            var expectedOrgUnits = [testCountry, testProject, opUnit1, newAggregateModule, newLineListModule];
+            var expectedOrgUnits = [testCountry, testProject, opUnit1, newAggregateModule, newLineListModule, currentLineListModule];
             expect(actualOrgUnits).toEqual(expectedOrgUnits);
         });
 
