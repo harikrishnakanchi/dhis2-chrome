@@ -170,14 +170,14 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                         dataElements: excludedDataElements
                     }
                 };
-                return systemSettingRepository.upsert(systemSetting).
-                then(_.partial(publishMessage, systemSetting, "uploadSystemSetting"));
+                return systemSettingRepository.upsert(systemSetting)
+                    .then(_.partial(publishMessage, systemSetting, "uploadSystemSetting"));
             };
 
             $scope.save = function(module) {
                 var enrichedModule = {};
 
-                var associatePrograms = function(program, originOrgUnits) {
+                var associateToProgram = function(program, originOrgUnits) {
                     return programRepository.associateOrgUnits(program, originOrgUnits).then(function() {
                         publishMessage(program, "uploadProgram");
                     });
@@ -232,7 +232,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "progr
                         if (!_.isEmpty(patientOriginOUPayload)) {
                             return orgUnitRepository.upsert(patientOriginOUPayload)
                                 .then(_.partial(publishMessage, patientOriginOUPayload, "upsertOrgUnit"))
-                                .then(_.partial(associatePrograms, $scope.program, patientOriginOUPayload))
+                                .then(_.partial(associateToProgram, $scope.program, patientOriginOUPayload))
                                 .then(_.partial(associateToDatasets, patientOriginOUPayload))
                                 .then(_.partial(createOrgUnitGroups, patientOriginOUPayload));
                         }

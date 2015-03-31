@@ -165,7 +165,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer", "datas
                 then(_.partial(publishMessage, systemSetting, "uploadSystemSetting"));
             };
 
-            $scope.save = function(module) {
+            $scope.save = function() {
                 var enrichedModule = {};
 
                 var associateToDatasets = function(datasets, orgUnits) {
