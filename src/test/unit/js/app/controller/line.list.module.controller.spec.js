@@ -644,10 +644,16 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }
                 };
 
+                var originOrgUnit = {
+                    "id": "ou1",
+                    "name": "origin org unit"
+                };
+
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
 
+                originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
                 spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
@@ -661,6 +667,11 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.$apply();
 
                 expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedModule);
+                expect(hustle.publish.calls.count()).toEqual(5);
+                expect(hustle.publish.calls.argsFor(2)).toEqual([{
+                    "data": originOrgUnit,
+                    "type": "upsertOrgUnit"
+                }, "dataValues"]);
             });
 
             it("should associate origin org units to programs and datasets", function() {

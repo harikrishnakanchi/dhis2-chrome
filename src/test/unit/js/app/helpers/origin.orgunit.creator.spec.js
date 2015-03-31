@@ -2,13 +2,12 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
     function(OriginOrgunitCreator, mocks, utils, OrgUnitRepository, PatientOriginRepository, dhisId) {
         describe("origin orgunit creator", function() {
 
-            var scope, q, hustle, originOrgunitCreator, orgUnitRepository, patientOriginRepository;
+            var scope, q, originOrgunitCreator, orgUnitRepository, patientOriginRepository;
 
             beforeEach(module('hustle'));
-            beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
+            beforeEach(mocks.inject(function($rootScope, $q) {
                 scope = $rootScope.$new();
                 q = $q;
-                hustle = $hustle;
 
                 orgUnitRepository = new OrgUnitRepository();
                 patientOriginRepository = new PatientOriginRepository();
@@ -18,7 +17,7 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
 
                 spyOn(patientOriginRepository, "get");
 
-                originOrgunitCreator = new OriginOrgunitCreator(hustle, orgUnitRepository, patientOriginRepository);
+                originOrgunitCreator = new OriginOrgunitCreator(orgUnitRepository, patientOriginRepository);
             }));
 
             it("should create origin org units", function() {

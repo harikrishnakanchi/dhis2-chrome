@@ -140,7 +140,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
             $scope.disable = function(module) {
                 var modalMessages = {
-                    "confirmationMessage" : $scope.resourceBundle.disableOrgUnitConfirmationMessage
+                    "confirmationMessage": $scope.resourceBundle.disableOrgUnitConfirmationMessage
                 };
                 showModal(_.bind(disableModule, {}, module), modalMessages);
             };
@@ -192,8 +192,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var createOriginOrgUnits = function() {
-                    return originOrgunitCreator.create(enrichedModule)
-                        .then(_.partial(associateToDatasets, $scope.originDatasets));
+                    return originOrgunitCreator.create(enrichedModule).then(function(originOrgUnits) {
+                        return publishMessage(originOrgUnits, "upsertOrgUnit")
+                            .then(_.partial(associateToDatasets, $scope.originDatasets, originOrgUnits));
+                    });
                 };
 
                 return getEnrichedModule($scope.module)

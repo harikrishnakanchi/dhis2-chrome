@@ -88,7 +88,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 Timecop.uninstall();
             });
 
-            it("should save aggregate module and create origin orgunits", function() {
+            it("should save aggregate module", function() {
                 var parent = {
                     "name": "Project1",
                     "id": "someid",
@@ -152,7 +152,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     data: enrichedAggregateModule,
                     type: "upsertOrgUnit"
                 }, "dataValues");
-                expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedAggregateModule);
             });
 
             it("should associate aggregate datasets with module", function() {
@@ -883,15 +882,27 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     }
                 };
 
+                var originOrgUnit = {
+                    "id": "ou1",
+                    "name": "origin org unit"
+                };
+
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
+
+                originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
                 scope.save();
                 scope.$apply();
 
                 expect(originOrgunitCreator.create).toHaveBeenCalledWith(enrichedAggregateModule);
+                expect(hustle.publish.calls.count()).toEqual(5);
+                expect(hustle.publish.calls.argsFor(3)).toEqual([{
+                    "data": originOrgUnit,
+                    "type": "upsertOrgUnit"
+                }, "dataValues"]);
             });
 
             it("should associate geographic origin dataset to patient origin org unit", function() {

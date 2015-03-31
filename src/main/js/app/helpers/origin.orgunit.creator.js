@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
-    return function($hustle, orgUnitRepository, patientOriginRepository) {
+    return function(orgUnitRepository, patientOriginRepository) {
 
         var create = function(module) {
             var getOriginOUPayload = function() {
@@ -11,19 +11,8 @@ define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
                 });
             };
 
-            var publishMessage = function(data, action) {
-                return $hustle.publish({
-                    "data": data,
-                    "type": action
-                }, "dataValues");
-            };
-
             return getOriginOUPayload().then(function(originOUPayload) {
-                return orgUnitRepository.upsert(originOUPayload)
-                    .then(_.partial(publishMessage, originOUPayload, "upsertOrgUnit"))
-                    .then(function() {
-                        return originOUPayload;
-                    });
+                return orgUnitRepository.upsert(originOUPayload);
             });
         };
 

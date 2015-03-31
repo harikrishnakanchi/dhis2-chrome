@@ -224,7 +224,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     };
 
                     return originOrgunitCreator.create(enrichedModule).then(function(patientOriginOUPayload) {
-                        return associateToProgram($scope.program, patientOriginOUPayload)
+                        return publishMessage(patientOriginOUPayload, "upsertOrgUnit")
+                            .then(_.partial(associateToProgram, $scope.program, patientOriginOUPayload))
                             .then(_.partial(associateToDatasets, patientOriginOUPayload))
                             .then(_.partial(createOrgUnitGroups, patientOriginOUPayload));
                     });
