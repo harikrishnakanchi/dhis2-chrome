@@ -184,7 +184,11 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                         .then(_.partial(publishToDhis, "uploadApprovalData"));
             };
 
-            showModal(approve, $scope.resourceBundle.dataApprovalConfirmationMessage).then(successPromise, errorPromise);
+            var modalMessages = {
+                "confirmationMessage": $scope.resourceBundle.dataApprovalConfirmationMessage
+            };
+
+            showModal(approve, modalMessages).then(successPromise, errorPromise);
         };
 
         $scope.getApprovalLevelName = function(level) {
@@ -225,8 +229,15 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                 displayMessage($scope.resourceBundle.createCloneSuccessMessage + directory.name, false);
             };
 
-            saveIdbBackup("dhis_idb_", ".clone", indexeddbUtils.backupEntireDB)
-                .then(successCallback, errorCallback);
+            var modalMessages = {
+                "ok": $scope.resourceBundle.confirmExport,
+                "title": $scope.resourceBundle.confirmExportTitle,
+                "confirmationMessage": $scope.resourceBundle.createCloneConfirmationMessage
+            };
+
+            showModal(function() {
+                saveIdbBackup("dhis_idb_", ".clone", indexeddbUtils.backupEntireDB).then(successCallback, errorCallback);
+            }, modalMessages);
         };
 
         $scope.loadClone = function() {
@@ -244,9 +255,15 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
 
             };
 
+            var modalMessages = {
+                "ok": $scope.resourceBundle.confirmExport,
+                "title": $scope.resourceBundle.confirmExportTitle,
+                "confirmationMessage": $scope.resourceBundle.loadCloneConfirmationMessage
+            };
+
             showModal(function() {
                 filesystemService.readFile(["clone"]).then(successCallback, errorCallback);
-            }, $scope.resourceBundle.loadCloneConfirmationMessage);
+            }, modalMessages);
         };
 
         var saveIdbBackup = function(fileNamePrefix, fileNameExtn, backupCallback) {
@@ -277,7 +294,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
         };
 
         var showModal = function(okCallback, message) {
-            $scope.modalMessage = message;
+            $scope.modalMessages = message;
             var modalInstance = $modal.open({
                 templateUrl: 'templates/confirm-dialog.html',
                 controller: 'confirmDialogController',

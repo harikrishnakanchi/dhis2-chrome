@@ -15,7 +15,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             if (showModal === false)
                 return $q.when(okCallback());
 
-            $scope.modalMessage = message;
+            $scope.modalMessages = message;
             var modalInstance = $modal.open({
                 templateUrl: 'templates/confirm-dialog.html',
                 controller: 'confirmDialogController',

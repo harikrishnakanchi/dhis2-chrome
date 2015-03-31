@@ -119,6 +119,7 @@
     "newLabel": "New",
     "currentLabel": "Current",
     "loadCloneConfirmationMessage": "WARNING: Importing application copy will delete all existing data not uploaded to DHIS2. You will be logged out of current session after import. THIS ACTION IS IRREVERSIBLE.",
+    "createCloneConfirmationMessage": "WARNING: Exporting application copy will create a copy of the current application on your computer. To be used for importing application ONLY",
     "projectCodeExists": "Project code already exists.",
     "dateInvalid": "Not a valid date.",
     "longitudeValidation": "Longitude is required",
@@ -133,5 +134,9 @@
     "noCasesLabel": "There are no cases. ",
     "addNewCaseLabel": "Add new case",
     "eventDateLabel": "Event Date",
-    "openingDateInFutureError": "Data entry form will open from Week "
+    "openingDateInFutureError": "Data entry form will open from Week ",
+    "confirmExport" : "YES, I want to export the application.",
+    "confirmExportTitle" : "Export Confirmation",
+    "confirmImport" : "YES, I want to import application copy.",
+    "confirmImportTitle" : "Import Confirmation"
 }

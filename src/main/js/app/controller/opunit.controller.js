@@ -121,7 +121,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         };
 
         var showModal = function(okCallback, message) {
-            $scope.modalMessage = message;
+            $scope.modalMessages = message;
             var modalInstance = $modal.open({
                 templateUrl: 'templates/confirm-dialog.html',
                 controller: 'confirmDialogController',
@@ -132,9 +132,12 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         };
 
         $scope.disable = function(orgUnit) {
+            var modalMessages = {
+                "confirmationMessage" : $scope.resourceBundle.disableOrgUnitConfirmationMessage
+            };
             showModal(function() {
                 disableOpunit(orgUnit);
-            }, $scope.resourceBundle.disableOrgUnitConfirmationMessage);
+            }, modalMessages);
         };
 
         $scope.reset = function() {

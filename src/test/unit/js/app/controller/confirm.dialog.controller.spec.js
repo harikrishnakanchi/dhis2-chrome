@@ -8,6 +8,12 @@ define(["confirmDialogController", "angularMocks"], function(ConfirmDialogContro
                 'close': function() {},
                 'dismiss': function() {}
             };
+            scope.modalMessages = {
+                "ok" : "ok",
+                "cancel" : "cancel",
+                "title" : "title",
+                "confirmationMessage" : "confirmationMessage"
+            };
             confirmDialogController = new ConfirmDialogController(scope, modalInstance);
 
         }));
