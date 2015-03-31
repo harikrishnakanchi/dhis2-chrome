@@ -26,6 +26,7 @@
     "invalidDateError": "Date is invalid.",
     "beyondMaxDate": "Date cannot exceed today's date.",
     "nameValidation": "Name is required.",
+    "hospitalUnitCodeValidation": "Hospital Unit Code is required.",
     "consultDaysValidation": "Consultation days is required.",
     "loginFailed": "Invalid Credentials.",
     "savedCountry": "Country saved successfully.",
