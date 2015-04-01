@@ -12,7 +12,6 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
                 orgUnitRepository = new OrgUnitRepository();
                 patientOriginRepository = new PatientOriginRepository();
 
-                spyOn(orgUnitRepository, "get");
                 spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
                 spyOn(patientOriginRepository, "get");
@@ -72,11 +71,6 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
                     }
                 };
 
-                var opunit = {
-                    "id": "opunit1",
-                    "name": "opunit1"
-                };
-
                 var patientOrigins = {
                     "origins": [{
                         "id": "o1",
@@ -106,8 +100,6 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
-
-                orgUnitRepository.get.and.returnValue(utils.getPromise(q, opunit));
                 patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
 
                 originOrgunitCreator.create(module);
