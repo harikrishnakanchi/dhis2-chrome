@@ -17,10 +17,53 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
 
                 spyOn(patientOriginRepository, "get");
 
-                originOrgunitCreator = new OriginOrgunitCreator(orgUnitRepository, patientOriginRepository);
+                originOrgunitCreator = new OriginOrgunitCreator(q, orgUnitRepository, patientOriginRepository);
             }));
 
-            it("should create origin org units", function() {
+            it("should create orgin orgunits for the given patient origin", function() {
+                var module = {
+                    "id": "mod1",
+                    "name": "mod1",
+                    "parent": {
+                        "id": "opunit1"
+                    }
+                };
+                var patientOrigin = {
+                    "id": "o1",
+                    "name": "o1"
+                };
+
+                var originOrgUnits = [{
+                    "name": 'o1',
+                    "shortName": 'o1',
+                    "displayName": 'o1',
+                    "id": 'o1mod1',
+                    "level": 7,
+                    "openingDate": undefined,
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": 'Type',
+                            "name": 'Type'
+                        },
+                        "value": 'Patient Origin'
+                    }],
+                    "parent": {
+                        "id": 'mod1'
+                    }
+                }];
+
+                spyOn(dhisId, "get").and.callFake(function(name) {
+                    return name;
+                });
+
+                originOrgunitCreator.create(module, patientOrigin);
+                scope.$apply();
+
+                expect(orgUnitRepository.upsert).toHaveBeenCalledWith(originOrgUnits);
+            });
+
+
+            it("should get patient origin info from repository and create origin org units if no patient origin is passed", function() {
                 var module = {
                     "id": "mod1",
                     "name": "mod1",
