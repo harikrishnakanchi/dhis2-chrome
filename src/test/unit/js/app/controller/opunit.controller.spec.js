@@ -13,6 +13,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             location = $location;
 
             orgUnitRepo = utils.getMockRepo(q);
+            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
+            orgUnitRepo.getChildOrgUnitNames = jasmine.createSpy("getChildOrgUnitNames").and.returnValue(utils.getPromise(q, []));
+
             orgUnitGroupHelper = new OrgUnitGroupHelper();
             scope.orgUnit = {
                 "id": "blah",
@@ -345,7 +348,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": expectedOrgUnits,
                 "type": "upsertOrgUnit"
             };
-            orgUnitRepo.getAllModulesInOrgUnitsExceptCurrentModules = jasmine.createSpy("getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
+            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             spyOn(hustle, "publish");
             spyOn(fakeModal, "open").and.returnValue({
                 result: utils.getPromise(q, {})

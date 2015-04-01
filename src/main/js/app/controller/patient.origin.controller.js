@@ -58,7 +58,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                         publishMessage(associatedPrograms, "uploadProgram");
                 };
 
-                return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules($scope.orgUnit.id).then(function(modules) {
+                return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
                     var promises = _.map(modules, function(module) {
                         return orgUnitRepository.findAllByParent(module.id).then(function(siblingOriginOrgUnits) {
                             return originOrgunitCreator.create(module, $scope.patientOrigin).then(function(originOrgUnits) {

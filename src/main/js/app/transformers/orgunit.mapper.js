@@ -142,14 +142,6 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return projectOrgUnit;
     };
 
-    this.getChildOrgUnitNames = function(allOrgUnits, parentId) {
-        return _.pluck(_.filter(allOrgUnits, {
-            'parent': {
-                'id': parentId,
-            }
-        }), 'name');
-    };
-
     this.getAttributeValue = function(dhisProject, code) {
         var attribute = _.find(dhisProject.attributeValues, {
             'attribute': {

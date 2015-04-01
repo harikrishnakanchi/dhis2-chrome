@@ -47,7 +47,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             });
 
             var setAvailableModules = function() {
-                return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules(_.pluck($rootScope.currentUser.organisationUnits, "id"), true).then(function(modules) {
+                return orgUnitRepository.getAllModulesInOrgUnits(_.pluck($rootScope.currentUser.organisationUnits, "id")).then(function(modules) {
                     modules = _.map(modules, function(module) {
                         module.displayName = module.parent.name + ' - ' + module.name;
                         return module;

@@ -101,7 +101,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode']);
 
             var updateOrgUnitGroupsForModules = function() {
-                return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules($scope.orgUnit.id).then(function(modules) {
+                return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
                     return orgUnitGroupHelper.createOrgUnitGroups(modules, true);
                 });
             };
@@ -116,7 +116,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         };
 
         var disableOpunit = function(orgUnit) {
-            return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules([orgUnit.id]).then(function(orgUnitsToDisable) {
+            return orgUnitRepository.getAllModulesInOrgUnits([orgUnit.id]).then(function(orgUnitsToDisable) {
                 orgUnitsToDisable.push(orgUnit);
                 var payload = orgUnitMapper.disable(orgUnitsToDisable);
                 $scope.isDisabled = true;
@@ -186,9 +186,9 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
                 patientOriginRepository.get($scope.orgUnit.id).then(setOriginDetails);
             }
-            orgUnitRepository.getAll().then(function(allOrgUnits) {
-                var parentId = $scope.isNewMode ? $scope.orgUnit.id : $scope.orgUnit.parent.id;
-                $scope.allOpunitNames = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, parentId);
+            var parentId = $scope.isNewMode ? $scope.orgUnit.id : $scope.orgUnit.parent.id;
+            orgUnitRepository.getChildOrgUnitNames(parentId).then(function(data) {
+                $scope.allOpunitNames = data;
             });
         };
 

@@ -67,7 +67,7 @@ define(["properties", "datasetTransformer", "moment", "approvalDataTransformer",
                 });
             };
 
-            return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules([orgUnitId], true).then(function(modules) {
+            return orgUnitRepository.getAllModulesInOrgUnits([orgUnitId]).then(function(modules) {
                 return $q.all([
                     getSubmittedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard),
                     getApprovedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard)

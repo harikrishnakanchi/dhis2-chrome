@@ -74,8 +74,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
 
         var prepareNewForm = function() {
             $scope.reset();
-            orgUnitRepository.getAll().then(function(allOrgUnits) {
-                $scope.allCountries = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
+            return orgUnitRepository.getChildOrgUnitNames($scope.orgUnit.id).then(function(data) {
+                $scope.allCountries = data;
             });
         };
 

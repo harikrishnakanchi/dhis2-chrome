@@ -17,6 +17,8 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
             };
 
             orgUnitRepo = utils.getMockRepo(q);
+            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
+            orgUnitRepo.getChildOrgUnitNames = jasmine.createSpy("getChildOrgUnitNames").and.returnValue(utils.getPromise(q, []));
 
             scope.isNewMode = true;
             scope.orgUnit = {

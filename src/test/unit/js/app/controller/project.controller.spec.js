@@ -1,7 +1,6 @@
 define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository) {
     describe("project controller tests", function() {
-        var scope, timeout, q, location, anchorScroll, userRepository, parent,
-            fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository;
+        var scope, timeout, q, location, anchorScroll, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
@@ -14,6 +13,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             orgUnitGroupHelper = new OrgUnitGroupHelper();
 
             orgUnitRepo = utils.getMockRepo(q);
+            orgUnitRepo.getChildOrgUnitNames = jasmine.createSpy("getChildOrgUnitNames").and.returnValue(utils.getPromise(q, []));
+            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
 
             approvalDataRepository = new ApprovalDataRepository();
 
@@ -211,7 +212,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
-            orgUnitRepo.getAllModulesInOrgUnitsExceptCurrentModules = jasmine.createSpy("getAllModulesInOrgUnitsExceptCurrentModules").and.returnValue(utils.getPromise(q, modules));
+            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
 
             scope.update(newOrgUnit, orgUnit);
             scope.$apply();
@@ -512,17 +513,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
         });
 
         it("should get all existing project codes while preparing new form", function() {
-            var country1 = {
-                "id": "Af1",
-                "name": "Afghanistan",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "projCode"
-                    },
-                    "value": ""
-                }]
-            };
-
             var project1 = {
                 "id": "Kabul1",
                 "name": "Kabul-AF101",
@@ -534,13 +524,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }]
             };
 
-            var module1 = {
-                "id": "module1",
-                "name": "Mod1"
-            };
-
-            var allOrgUnits = [country1, project1, module1];
-            orgUnitRepo = utils.getMockRepo(q, allOrgUnits);
+            orgUnitRepo.getChildOrgUnitNames.and.returnValue(utils.getPromise(q, [project1]));
 
             projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
             scope.$apply();

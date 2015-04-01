@@ -36,7 +36,10 @@ define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
             return getOriginOUPayload().then(function(originOUPayload) {
                 if (isLinelistService(module)) {
                     return orgUnitRepository.upsert(originOUPayload)
-                        .then(_.partial(orgUnitGroupHelper.createOrgUnitGroups, originOUPayload, false));
+                        .then(_.partial(orgUnitGroupHelper.createOrgUnitGroups, originOUPayload, false))
+                        .then(function() {
+                            return originOUPayload;
+                        });
                 }
                 return orgUnitRepository.upsert(originOUPayload);
             });

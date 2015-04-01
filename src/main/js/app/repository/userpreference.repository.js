@@ -23,7 +23,7 @@ define(["lodash"], function(_) {
                 if (_.isEmpty(userProjectIds))
                     return [];
 
-                return orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules(userProjectIds).then(function(userModules) {
+                return orgUnitRepository.getAllModulesInOrgUnits(userProjectIds).then(function(userModules) {
                     return _.pluck(userModules, "id");
                 });
             });

@@ -99,7 +99,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
             saveToDbAndPublishMessage(dhisProject).then(function(data) {
-                orgUnitRepository.getAllModulesInOrgUnitsExceptCurrentModules([dhisProject.id], true).then(function(modules) {
+                orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id]).then(function(modules) {
                     orgUnitGroupHelper.createOrgUnitGroups(modules, true);
                     if (newOrgUnit.autoApprove) {
                         var periodAndOrgUnits = getPeriodsAndOrgUnitsForAutoApprove(modules);
@@ -179,8 +179,8 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
         var prepareNewForm = function() {
             $scope.reset();
-            orgUnitRepository.getAll().then(function(allOrgUnits) {
-                $scope.peerProjects = orgUnitMapper.getChildOrgUnitNames(allOrgUnits, $scope.orgUnit.id);
+            return orgUnitRepository.getChildOrgUnitNames($scope.orgUnit.id).then(function(allOrgUnits) {
+                $scope.peerProjects = allOrgUnits;
                 $scope.existingProjectCodes = _.transform(allOrgUnits, function(acc, orgUnit) {
                     var projCodeAttribute = _.find(orgUnit.attributeValues, {
                         'attribute': {
@@ -198,7 +198,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             $scope.reset();
             $scope.newOrgUnit = orgUnitMapper.mapToProject($scope.orgUnit);
             orgUnitRepository.getAllProjects().then(function(allProjects) {
-                $scope.peerProjects = _.without(orgUnitMapper.getChildOrgUnitNames(allProjects, $scope.orgUnit.parent.id), $scope.orgUnit.name);
+                $scope.peerProjects = _.without(orgUnitRepository.getChildOrgUnitNames($scope.orgUnit.parent.id), $scope.orgUnit.name);
                 userRepository.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForEdit);
             });
         };

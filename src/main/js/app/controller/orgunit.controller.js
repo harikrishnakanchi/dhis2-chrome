@@ -19,10 +19,6 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             return store.getAll();
         };
 
-        var getAllOrgUnitsExceptCurrentModules = function() {
-            return orgUnitRepository.getAll(false);
-        };
-
         var selectCurrentNode = function(transformedOrgUnits) {
             if (!transformedOrgUnits.selectedNode) return;
             $scope.state = {
@@ -53,7 +49,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         var init = function() {
             var selectedNodeId = $location.hash()[0];
             var message = $location.hash()[1];
-            $q.all([getAllOrgUnitsExceptCurrentModules(), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
+            $q.all([orgUnitRepository.getAll(), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
         };
 
         $scope.closeNewForm = function(selectedNode, message) {
@@ -64,7 +60,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
                     $scope.showMessage = false;
                 }, properties.messageTimeout);
             }
-            $q.all([getAllOrgUnitsExceptCurrentModules(), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNode.id));
+            $q.all([orgUnitRepository.getAll(), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNode.id));
         };
 
         var scrollToTop = function() {

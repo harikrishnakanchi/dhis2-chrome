@@ -397,39 +397,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
             });
         });
 
-        it("should return all the projects under a orgUnit", function() {
-            var allOrgUnit = [{
-                "id": 1,
-                "name": "blah1",
-                "parent": {},
-                "children": [{
-                    "id": "blah1",
-                    "name": "blah1",
-                }, {
-                    "id": "blah2",
-                    "name": "blah2",
-                }]
-            }, {
-                "id": "blah1",
-                "name": "blah1",
-                "parent": {
-                    "id": 1
-                }
-            }, {
-                "id": "blah2",
-                "name": "blah2",
-                "parent": {
-                    "id": 1
-                }
-            }];
-            var id = 1;
-            var expectedProjects = ["blah1", "blah2"];
-
-            var projects = orgUnitMapper.getChildOrgUnitNames(allOrgUnit, id);
-
-            expect(expectedProjects).toEqual(projects);
-        });
-
         it("should filter modules from org units", function() {
             var project = {
                 "name": "Project1",

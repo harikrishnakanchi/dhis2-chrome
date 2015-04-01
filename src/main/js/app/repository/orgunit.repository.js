@@ -1,5 +1,5 @@
 define(["moment", "lodashUtils"], function(moment, _) {
-    return function(db, datasetRepository, $q) {
+    return function(db, $q) {
         var isOfType = function(orgUnit, type) {
             return _.any(orgUnit.attributeValues, {
                 attribute: {
@@ -9,7 +9,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
             });
         };
 
-        var rejectOrgUnitsWithCurrentDatasets = function(orgUnits) {
+        var rejectCurrentAndDisabled = function(orgUnits) {
             var getBooleanAttributeValue = function(attributeValues, attributeCode) {
                 var attr = _.find(attributeValues, {
                     "attribute": {
@@ -19,52 +19,9 @@ define(["moment", "lodashUtils"], function(moment, _) {
 
                 return attr && attr.value === 'true';
             };
-
-            var isLinelistService = function(orgUnit) {
-                return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
-            };
-
-            var segragateOrgUnits = function(orgUnits) {
-                var partitionedOrgUnits = _.partition(orgUnits, function(ou) {
-                    return !isOfType(ou, "Module");
-                });
-
-                var nonModuleOrgUnits = partitionedOrgUnits[0];
-                var modules = partitionedOrgUnits[1];
-
-                var partitionedModules = _.partition(modules, function(mod) {
-                    return !isLinelistService(mod);
-                });
-
-                return {
-                    "aggregateModules": partitionedModules[0],
-                    "lineListModules": partitionedModules[1],
-                    "otherOrgUnits": nonModuleOrgUnits
-                };
-            };
-
-            var filterAggregateModules = function(aggregateModules) {
-                var indexDatasetsByOrgUnits = function() {
-                    return datasetRepository.getAllAggregateDatasets().then(function(datasets) {
-                        return _.groupByArray(datasets, "orgUnitIds");
-                    });
-                };
-
-                var filterModulesWithNewDatasets = function(datasetsIndexedByOU) {
-                    return _.filter(aggregateModules, function(mod) {
-                        var associatedDatasets = datasetsIndexedByOU[mod.id];
-                        return !_.isEmpty(associatedDatasets);
-                    });
-                };
-
-                return indexDatasetsByOrgUnits().then(filterModulesWithNewDatasets);
-            };
-
-            var segragatedOrgUnits = segragateOrgUnits(orgUnits);
-            return filterAggregateModules(segragatedOrgUnits.aggregateModules)
-                .then(function(filteredModules) {
-                    return segragatedOrgUnits.otherOrgUnits.concat(filteredModules).concat(segragatedOrgUnits.lineListModules);
-                });
+            return _.filter(orgUnits, function(ou) {
+                return getBooleanAttributeValue(ou.attributeValues, "isNewDataModel") && !getBooleanAttributeValue(ou.attributeValues, "isDisabled");
+            });
         };
 
         var addParentIdField = function(payload) {
@@ -100,14 +57,10 @@ define(["moment", "lodashUtils"], function(moment, _) {
             });
         };
 
-        var getAll = function(includeCurrent) {
-            includeCurrent = includeCurrent === undefined ? true : includeCurrent;
-
+        var getAll = function() {
             var store = db.objectStore("organisationUnits");
             var orgUnits = store.getAll();
-            if (!includeCurrent)
-                return orgUnits.then(rejectOrgUnitsWithCurrentDatasets);
-            return orgUnits;
+            return orgUnits.then(rejectCurrentAndDisabled);
         };
 
         var get = function(orgUnitId) {
@@ -125,69 +78,10 @@ define(["moment", "lodashUtils"], function(moment, _) {
             parentIds = _.isArray(parentIds) ? parentIds : [parentIds];
             var store = db.objectStore("organisationUnits");
             var query = db.queryBuilder().$in(parentIds).$index("by_parent").compile();
-            return store.each(query);
-        };
-
-        var getChildModules = function(orgUnitIds) {
-            return findAllByParent(orgUnitIds).then(function(children) {
-                var moduleOrgUnits = [];
-                var nonModuleOrgUnits = [];
-
-                _.forEach(children, function(ou) {
-                    if (isOfType(ou, 'Module')) {
-                        moduleOrgUnits.push(ou);
-                    } else {
-                        nonModuleOrgUnits.push(ou);
-                    }
-                });
-
-                if (_.isEmpty(nonModuleOrgUnits)) {
-                    return moduleOrgUnits;
-                }
-
-                return getChildModules(_.pluck(nonModuleOrgUnits, "id")).then(function(data) {
-                    return moduleOrgUnits.concat(data);
-                });
-            });
-        };
-
-        var getAllModulesInOrgUnitsExceptCurrentModules = function(orgUnitIds, rejectDisabled) {
-
-            var rejectDisabledOrgUnits = function(allOrgUnits) {
-
-                if (!rejectDisabled)
-                    return allOrgUnits;
-
-                return _.reject(allOrgUnits, function(module) {
-                    var isDisabledAttribute = _.find(module.attributeValues, {
-                        'attribute': {
-                            'code': 'isDisabled'
-                        }
-                    });
-                    return isDisabledAttribute && isDisabledAttribute.value === "true";
-                });
-            };
-
-            orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
-            return getChildModules(orgUnitIds)
-                .then(rejectOrgUnitsWithCurrentDatasets)
-                .then(rejectDisabledOrgUnits);
-        };
-
-        var getAllModulesInOrgUnits = function(orgUnitIds) {
-            orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
-            return getChildModules(orgUnitIds);
+            return store.each(query).then(rejectCurrentAndDisabled);
         };
 
         var getProjectAndOpUnitAttributes = function(moduleOrOrigin) {
-            var attributes_arr = [];
-
-            var pushAttributeValues = function(attributes) {
-                _.forEach(attributes, function(attribute) {
-                    attributes_arr.push(attribute);
-                });
-            };
-
             var getAttributes = function(orgUnits) {
                 var isOrigin = _.any(moduleOrOrigin.attributeValues, {
                     "value": "Patient Origin"
@@ -204,10 +98,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
                     'id': opUnit.parent.id
                 });
 
-                pushAttributeValues(opUnit.attributeValues);
-                pushAttributeValues(project.attributeValues);
-
-                return attributes_arr;
+                return opUnit.attributeValues.concat(project.attributeValues);
             };
 
             return getAll().then(getAttributes);
@@ -250,6 +141,43 @@ define(["moment", "lodashUtils"], function(moment, _) {
             });
         };
 
+        var getAllModulesInOrgUnits = function(orgUnitIds) {
+            var getChildModules = function(orgUnitIds) {
+                return findAllByParent(orgUnitIds).then(function(children) {
+                    var moduleOrgUnits = [];
+                    var nonModuleOrgUnits = [];
+
+                    _.forEach(children, function(ou) {
+                        if (isOfType(ou, 'Module')) {
+                            moduleOrgUnits.push(ou);
+                        } else {
+                            nonModuleOrgUnits.push(ou);
+                        }
+                    });
+
+                    if (_.isEmpty(nonModuleOrgUnits)) {
+                        return moduleOrgUnits;
+                    }
+
+                    return getChildModules(_.pluck(nonModuleOrgUnits, "id")).then(function(data) {
+                        return moduleOrgUnits.concat(data);
+                    });
+                });
+            };
+
+            orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
+            return getChildModules(orgUnitIds);
+        };
+
+        var getChildOrgUnitNames = function(parentIds) {
+            parentIds = _.isArray(parentIds) ? parentIds : [parentIds];
+            var store = db.objectStore("organisationUnits");
+            var query = db.queryBuilder().$in(parentIds).$index("by_parent").compile();
+            return store.each(query).then(function(children) {
+                return _.pluck(children, "name");
+            });
+        };
+
         return {
             "upsert": upsert,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
@@ -257,11 +185,11 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "get": get,
             "findAll": findAll,
             "findAllByParent": findAllByParent,
-            "getAllModulesInOrgUnitsExceptCurrentModules": getAllModulesInOrgUnitsExceptCurrentModules,
             "getProjectAndOpUnitAttributes": getProjectAndOpUnitAttributes,
             "getAllProjects": getAllProjects,
             "getParentProject": getParentProject,
-            "getAllModulesInOrgUnits": getAllModulesInOrgUnits
+            "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
+            "getChildOrgUnitNames": getChildOrgUnitNames
         };
     };
 });
