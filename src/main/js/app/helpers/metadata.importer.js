@@ -1,4 +1,4 @@
-define([], function() {
+define(["lodash"], function(_) {
     return function($q, metadataService, systemSettingService, systemSettingRepository, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository) {
         this.run = function() {
             return verifyIsNewInstall().then(importData);
@@ -18,12 +18,16 @@ define([], function() {
 
             return $q.all([importMetadata(), importSystemSettings()]).then(function(data) {
                 var metadata = data[0];
+                if (!_.isObject(metadata))
+                    return;
                 return changeLogRepository.upsert("metaData", metadata.created);
             });
         };
 
         var importMetadata = function() {
             return metadataService.loadMetadataFromFile().then(function(metadata) {
+                if (!_.isObject(metadata))
+                    return;
                 var promises = [];
                 promises.push(metadataRepository.upsertMetadata(metadata));
                 promises.push(orgUnitRepository.upsertDhisDownloadedData(metadata.organisationUnits));
@@ -37,7 +41,11 @@ define([], function() {
         };
 
         var importSystemSettings = function(isNewInstall) {
-            return systemSettingService.loadFromFile().then(systemSettingRepository.upsert);
+            return systemSettingService.loadFromFile().then(function(systemSettings) {
+                if (!_.isObject(systemSettings))
+                    return;
+                systemSettingRepository.upsert(systemSettings);
+            });
         };
     };
 });

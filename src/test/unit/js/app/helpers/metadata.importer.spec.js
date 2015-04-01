@@ -21,6 +21,13 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 systemSettingService = new SystemSettingService();
                 systemSettingRepository = new SystemSettingRepository();
 
+                spyOn(metadataRepository, "upsertMetadata");
+                spyOn(orgUnitRepository, "upsertDhisDownloadedData");
+                spyOn(orgUnitGroupRepository, "upsertDhisDownloadedData");
+                spyOn(datasetRepository, "upsertDhisDownloadedData");
+                spyOn(programRepository, "upsertDhisDownloadedData");
+                spyOn(systemSettingRepository, "upsert");
+
                 metadataImporter = new MetadataImporter(q, metadataService, systemSettingService, systemSettingRepository, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository);
             }));
 
@@ -59,13 +66,6 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, dhisMetadata));
                 spyOn(systemSettingService, "loadFromFile").and.returnValue(utils.getPromise(q, systemSettings));
 
-                spyOn(metadataRepository, "upsertMetadata");
-                spyOn(orgUnitRepository, "upsertDhisDownloadedData");
-                spyOn(orgUnitGroupRepository, "upsertDhisDownloadedData");
-                spyOn(datasetRepository, "upsertDhisDownloadedData");
-                spyOn(programRepository, "upsertDhisDownloadedData");
-                spyOn(systemSettingRepository, "upsert");
-
                 metadataImporter.run();
                 scope.$apply();
 
@@ -82,17 +82,26 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
             it("should not run import if run once before", function() {
                 changeLogRepository.get.and.returnValue(utils.getPromise(q, moment().toISOString()));
                 spyOn(metadataService, "loadMetadataFromFile");
-                spyOn(metadataRepository, "upsertMetadata");
-                spyOn(orgUnitRepository, "upsertDhisDownloadedData");
-                spyOn(orgUnitGroupRepository, "upsertDhisDownloadedData");
-                spyOn(datasetRepository, "upsertDhisDownloadedData");
-                spyOn(programRepository, "upsertDhisDownloadedData");
-                spyOn(systemSettingRepository, "upsert");
-
                 metadataImporter.run();
                 scope.$apply();
 
                 expect(metadataService.loadMetadataFromFile).not.toHaveBeenCalled();
+                expect(metadataRepository.upsertMetadata).not.toHaveBeenCalled();
+                expect(orgUnitRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
+                expect(orgUnitGroupRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
+                expect(datasetRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
+                expect(programRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
+                expect(systemSettingRepository.upsert).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
+            });
+
+            it("should not do anything if metadata and system settings are not valid", function() {
+                spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, "<html><body>Error!</body></html>"));
+                spyOn(systemSettingService, "loadFromFile").and.returnValue(utils.getPromise(q, "<html><body>Error!</body></html>"));
+
+                metadataImporter.run();
+                scope.$apply();
+
                 expect(metadataRepository.upsertMetadata).not.toHaveBeenCalled();
                 expect(orgUnitRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(orgUnitGroupRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
