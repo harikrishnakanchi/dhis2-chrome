@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
-    return function($q, orgUnitRepository, patientOriginRepository) {
+    return function($q, orgUnitRepository, patientOriginRepository, orgUnitGroupHelper) {
 
         var create = function(module, patientOrigins) {
             var getPatientOrigins = function() {
@@ -19,7 +19,25 @@ define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
                 });
             };
 
+            var getBooleanAttributeValue = function(attributeValues, attributeCode) {
+                var attr = _.find(attributeValues, {
+                    "attribute": {
+                        "code": attributeCode
+                    }
+                });
+
+                return attr && attr.value === 'true';
+            };
+
+            var isLinelistService = function(orgUnit) {
+                return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
+            };
+
             return getOriginOUPayload().then(function(originOUPayload) {
+                if (isLinelistService(module)) {
+                    return orgUnitRepository.upsert(originOUPayload)
+                        .then(_.partial(orgUnitGroupHelper.createOrgUnitGroups, originOUPayload, false));
+                }
                 return orgUnitRepository.upsert(originOUPayload);
             });
         };
