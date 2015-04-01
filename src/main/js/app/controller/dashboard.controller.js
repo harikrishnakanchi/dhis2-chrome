@@ -188,7 +188,9 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                 "confirmationMessage": $scope.resourceBundle.dataApprovalConfirmationMessage
             };
 
-            showModal(approve, modalMessages).then(successPromise, errorPromise);
+            showModal(function() {
+                approve().then(successPromise, errorPromise);
+            }, modalMessages);
         };
 
         $scope.getApprovalLevelName = function(level) {

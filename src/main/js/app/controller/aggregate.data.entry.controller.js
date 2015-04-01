@@ -92,7 +92,11 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 scrollToTop();
             };
 
-            confirmAndProceed(_.partial(save, false), $scope.resourceBundle.reapprovalConfirmationMessage, !($scope.isCompleted || $scope.isApproved))
+            var modalMessages = {
+                "confirmationMessage": $scope.resourceBundle.reapprovalConfirmationMessage
+            };
+
+            confirmAndProceed(_.partial(save, false), modalMessages, !($scope.isCompleted || $scope.isApproved))
                 .then(successPromise, errorPromise);
         };
 
@@ -161,7 +165,11 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     .then(publishToDhis);
             };
 
-            confirmAndProceed(upsertAndPushToDhis, $scope.resourceBundle.reapprovalConfirmationMessage, !($scope.isCompleted || $scope.isApproved))
+            var modalMessages = {
+                "confirmationMessage": $scope.resourceBundle.reapprovalConfirmationMessage
+            };
+
+            confirmAndProceed(upsertAndPushToDhis, modalMessages, !($scope.isCompleted || $scope.isApproved))
                 .then(successPromise, errorPromise);
         };
 
@@ -235,7 +243,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             if (doNotConfirm)
                 return $q.when(okCallback());
 
-            $scope.modalMessage = message;
+            $scope.modalMessages = message;
             var modalInstance = $modal.open({
                 templateUrl: 'templates/confirm-dialog.html',
                 controller: 'confirmDialogController',

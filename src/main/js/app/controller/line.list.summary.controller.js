@@ -110,9 +110,11 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     .then(publishToDhis);
             };
 
-            var confirmationQuestion = $scope.resourceBundle.reapprovalConfirmationMessage;
+            var modalMessages = {
+                "confirmationMessage": $scope.resourceBundle.reapprovalConfirmationMessage
+            };
             var confirmIf = ($scope.isCompleted || $scope.isApproved);
-            confirmAndProceed(submit, confirmationQuestion, confirmIf).then(function() {
+            confirmAndProceed(submit, modalMessages, confirmIf).then(function() {
                 $scope.showResultMessage("success", $scope.resourceBundle.eventSubmitSuccess);
                 $scope.loadEventsView();
             });
@@ -153,9 +155,11 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     .then(publishToDhis);
             };
 
-            var confirmationQuestion = $scope.resourceBundle.reapprovalConfirmationMessage;
+            var modalMessages = {
+                "confirmationMessage": $scope.resourceBundle.reapprovalConfirmationMessage
+            };
             var confirmIf = ($scope.isCompleted || $scope.isApproved);
-            confirmAndProceed(submitAndApprove, confirmationQuestion, confirmIf).then(function() {
+            confirmAndProceed(submitAndApprove, modalMessages, confirmIf).then(function() {
                 $scope.showResultMessage("success", $scope.resourceBundle.eventSubmitAndApproveSuccess);
                 $scope.loadEventsView();
             });
@@ -193,7 +197,11 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 });
             };
 
-            confirmAndProceed(deleteOnConfirm, $scope.resourceBundle.deleteEventConfirmation);
+            var modalMessages = {
+                "confirmationMessage": $scope.resourceBundle.deleteEventConfirmation
+            };
+
+            confirmAndProceed(deleteOnConfirm, modalMessages);
         };
 
         $scope.loadEventDataEntryForm = function(event) {
