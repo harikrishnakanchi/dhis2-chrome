@@ -52,7 +52,6 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             indexeddbUtils = new IndexeddbUtils();
             sessionHelper = new SessionHelper();
 
-            spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
             spyOn(indexeddbUtils, "backupEntireDB").and.returnValue(utils.getPromise(q, idbDump));
             spyOn(indexeddbUtils, "restore").and.returnValue(utils.getPromise(q, {}));
             spyOn(sessionHelper, "logout");

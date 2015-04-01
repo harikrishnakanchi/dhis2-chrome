@@ -42,13 +42,6 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             return attr && attr.value === "true";
         };
 
-        var getAll = function() {
-            var store = db.objectStore("dataSets");
-            return store.getAll().then(function(all) {
-                return filterNewDatasets(all);
-            });
-        };
-
         var getAllAggregateDatasets = function() {
             var store = db.objectStore("dataSets");
             return store.getAll().then(function(all) {
@@ -70,7 +63,8 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
         };
 
         var getAllDatasetIds = function() {
-            return getAll().then(function(data) {
+            var store = db.objectStore("dataSets");
+            return store.getAll().then(function(data) {
                 return _.pluck(data, "id");
             });
         };
@@ -144,7 +138,6 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             "get": get,
             "findAll": findAll,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
-            "getAll": getAll,
             "getAllDatasetIds": getAllDatasetIds,
             "upsert": upsert,
             "getAllForOrgUnit": getAllForOrgUnit,
