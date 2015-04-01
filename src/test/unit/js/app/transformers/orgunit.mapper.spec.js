@@ -250,6 +250,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
                         "code": "prjEndDate",
                         "name": "End date"
                     },
@@ -310,6 +318,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Is Linelist Service"
                     },
                     "value": "false"
+                }, {
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
                 }],
                 "parent": {
                     "name": "Parent",
@@ -344,8 +360,8 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
 
             expect(actualModule).toEqual({
                 "name": "Module1",
-                "displayName": "Parent - Module1",
                 "shortName": "Module1",
+                "displayName": "Parent - Module1",
                 "id": "someId",
                 "level": "someLevel",
                 "openingDate": moment(new Date()).toDate(),
@@ -365,6 +381,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Is Linelist Service"
                     },
                     "value": "false"
+                }, {
+                    "created": moment().toISOString(),
+                    "lastUpdated": moment().toISOString(),
+                    "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
                 }],
                 "parent": {
                     "name": "Parent",
@@ -647,6 +671,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
                         "code": "prjEndDate",
                         "name": "End date"
                     },
@@ -699,6 +731,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Type"
                     },
                     "value": "Patient Origin"
+                }, {
+                    "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
                 }],
                 "parent": {
                     "id": "p1"
@@ -717,6 +755,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Type"
                     },
                     "value": "Patient Origin"
+                }, {
+                    "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
                 }],
                 "parent": {
                     "id": "p2"
@@ -735,6 +779,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Type"
                     },
                     "value": "Patient Origin"
+                }, {
+                    "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
                 }],
                 "parent": {
                     "id": "p1"
@@ -753,6 +803,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Type"
                     },
                     "value": "Patient Origin"
+                }, {
+                    "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
                 }],
                 "parent": {
                     "id": "p2"
@@ -771,6 +827,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Type"
                     },
                     "value": "Patient Origin"
+                }, {
+                    "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
                 }],
                 "parent": {
                     "id": "p1"
@@ -788,6 +850,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Type"
                     },
                     "value": "Patient Origin"
+                }, {
+                    "attribute": {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    "value": "true"
                 }],
                 "parent": {
                     "id": "p2"

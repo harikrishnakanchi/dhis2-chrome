@@ -26,7 +26,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     return utils.getPromise(q, [{}]);
                 },
                 "upsert": function() {
-                    return utils.getPromise(q,{});
+                    return utils.getPromise(q, {});
                 }
             };
 
@@ -97,6 +97,13 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                         "code": "hospitalUnitCode"
                     },
                     "value": "Unit Code - A"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": 'true'
                 }]
             };
 
@@ -113,7 +120,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.save(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);            
+            expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedOpUnit,
                 "type": "upsertOrgUnit"
@@ -166,6 +173,13 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                         "code": "hospitalUnitCode"
                     },
                     "value": ""
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": 'true'
                 }]
             };
 
@@ -399,6 +413,13 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                         "code": "hospitalUnitCode"
                     },
                     "value": "Unit Code - A"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": 'true'
                 }]
             };
 
@@ -451,9 +472,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
 
             var payload = {
-                "orgUnit" : "OpUnit1ParentId",
-                "origins" : [{
-                    "name" : "Unknown",
+                "orgUnit": "OpUnit1ParentId",
+                "origins": [{
+                    "name": "Unknown",
                     "clientLastUpdated": "2014-10-29T12:43:54.972Z"
                 }]
             };

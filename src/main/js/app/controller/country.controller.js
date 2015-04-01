@@ -22,6 +22,14 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                         "name": "Type"
                     },
                     'value': "Country"
+                }, {
+                    'created': moment().toISOString(),
+                    'lastUpdated': moment().toISOString(),
+                    'attribute': {
+                        "code": "isNewDataModel",
+                        "name": "Is New Data Model"
+                    },
+                    'value': "true"
                 }]
             };
 

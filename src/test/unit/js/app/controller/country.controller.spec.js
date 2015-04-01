@@ -85,6 +85,14 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
                         'name': 'Type'
                     },
                     'value': "Country"
+                }, {
+                    'created': '2014-10-29T12:43:54.972Z',
+                    'lastUpdated': '2014-10-29T12:43:54.972Z',
+                    'attribute': {
+                        'code': 'isNewDataModel',
+                        'name': 'Is New Data Model'
+                    },
+                    'value': 'true'
                 }]
             };
 
@@ -138,7 +146,7 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });
 
-        it("should take the user to the view page of OCP on clicking cancel", function(){
+        it("should take the user to the view page of OCP on clicking cancel", function() {
             var parentOrgUnit = {
                 'id': 'parent',
                 'name': 'parent'

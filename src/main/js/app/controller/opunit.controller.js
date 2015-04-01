@@ -46,6 +46,13 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     "code": "hospitalUnitCode"
                 },
                 "value": hospitalUnitCode
+            }, {
+                "created": moment().toISOString(),
+                "lastUpdated": moment().toISOString(),
+                "attribute": {
+                    "code": "isNewDataModel"
+                },
+                "value": "true"
             }];
         };
 
@@ -133,7 +140,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
 
         $scope.disable = function(orgUnit) {
             var modalMessages = {
-                "confirmationMessage" : $scope.resourceBundle.disableOrgUnitConfirmationMessage
+                "confirmationMessage": $scope.resourceBundle.disableOrgUnitConfirmationMessage
             };
             showModal(function() {
                 disableOpunit(orgUnit);

@@ -73,6 +73,14 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "name": "Auto Approve"
             },
             "value": orgUnit.autoApprove
+        }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
+            "attribute": {
+                "code": "isNewDataModel",
+                "name": "Is New Data Model"
+            },
+            "value": "true"
         });
 
         if (orgUnit.endDate)
@@ -194,6 +202,14 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                     "name": "Is Linelist Service"
                 },
                 value: module.serviceType === "Linelist" ? "true" : "false"
+            }, {
+                created: moment().toISOString(),
+                lastUpdated: moment().toISOString(),
+                attribute: {
+                    "code": "isNewDataModel",
+                    "name": "Is New Data Model"
+                },
+                value: "true"
             }],
             parent: {
                 name: module.parent.name,
@@ -234,7 +250,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
 
         var payload = _.map(patientOrigins, function(patientOrigin) {
             return _.map(parentOrgUnits, function(parent) {
-                
+
                 var patientOriginPayload = {
                     "name": patientOrigin.name,
                     "shortName": patientOrigin.name,
@@ -248,14 +264,20 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                             "name": "Type"
                         },
                         "value": "Patient Origin"
+                    }, {
+                        "attribute": {
+                            "code": "isNewDataModel",
+                            "name": "Is New Data Model"
+                        },
+                        "value": "true"
                     }],
                     "parent": {
                         "id": parent.id
                     }
                 };
-                
-                if (!_.isUndefined(patientOrigin.longitude) && !_.isUndefined(patientOrigin.latitude)) 
-                    patientOriginPayload.coordinates = "[" + patientOrigin.longitude + "," + patientOrigin.latitude + "]";   
+
+                if (!_.isUndefined(patientOrigin.longitude) && !_.isUndefined(patientOrigin.latitude))
+                    patientOriginPayload.coordinates = "[" + patientOrigin.longitude + "," + patientOrigin.latitude + "]";
                 return patientOriginPayload;
             });
         });

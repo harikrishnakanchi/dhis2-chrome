@@ -48,6 +48,12 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
                             "name": 'Type'
                         },
                         "value": 'Patient Origin'
+                    }, {
+                        "attribute": {
+                            "code": 'isNewDataModel',
+                            "name": 'Is New Data Model'
+                        },
+                        "value": 'true'
                     }],
                     "parent": {
                         "id": 'mod1'
@@ -94,6 +100,12 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
                             "name": 'Type'
                         },
                         "value": 'Patient Origin'
+                    }, {
+                        "attribute": {
+                            "code": 'isNewDataModel',
+                            "name": 'Is New Data Model'
+                        },
+                        "value": 'true'
                     }],
                     "parent": {
                         "id": 'mod1'
@@ -144,6 +156,12 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
                             "name": 'Type'
                         },
                         "value": 'Patient Origin'
+                    }, {
+                        "attribute": {
+                            "code": 'isNewDataModel',
+                            "name": 'Is New Data Model'
+                        },
+                        "value": 'true'
                     }],
                     "parent": {
                         "id": 'mod1'

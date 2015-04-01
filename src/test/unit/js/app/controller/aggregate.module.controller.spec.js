@@ -136,6 +136,14 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                             name: "Is Linelist Service"
                         },
                         value: 'false'
+                    }, {
+                        created: moment().toISOString(),
+                        lastUpdated: moment().toISOString(),
+                        attribute: {
+                            code: "isNewDataModel",
+                            name: "Is New Data Model"
+                        },
+                        value: 'true'
                     }],
                     parent: {
                         name: 'Project1',
@@ -189,6 +197,14 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                             "name": 'Is Linelist Service'
                         },
                         "value": 'false'
+                    }, {
+                        "created": '2014-04-01T00:00:00.000Z',
+                        "lastUpdated": '2014-04-01T00:00:00.000Z',
+                        "attribute": {
+                            "code": "isNewDataModel",
+                            "name": "Is New Data Model"
+                        },
+                        "value": 'true'
                     }],
                     "parent": {
                         "name": 'parent',
@@ -327,6 +343,14 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                             "name": 'Is Linelist Service'
                         },
                         "value": 'false'
+                    }, {
+                        "created": '2014-04-01T00:00:00.000Z',
+                        "lastUpdated": '2014-04-01T00:00:00.000Z',
+                        "attribute": {
+                            "code": "isNewDataModel",
+                            "name": "Is New Data Model"
+                        },
+                        "value": 'true'
                     }],
                     "parent": {
                         "name": 'parent',
@@ -520,6 +544,14 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                             name: 'Is Linelist Service'
                         },
                         value: 'false'
+                    }, {
+                        created: moment().toISOString(),
+                        lastUpdated: moment().toISOString(),
+                        attribute: {
+                            code: "isNewDataModel",
+                            name: "Is New Data Model"
+                        },
+                        value: 'true'
                     }],
                     parent: {
                         name: "Par1",
@@ -792,6 +824,14 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         created: '2014-04-01T00:00:00.000Z',
                         lastUpdated: '2014-04-01T00:00:00.000Z',
                         attribute: {
+                            code: "isNewDataModel",
+                            name: "Is New Data Model"
+                        },
+                        value: 'true'
+                    }, {
+                        created: '2014-04-01T00:00:00.000Z',
+                        lastUpdated: '2014-04-01T00:00:00.000Z',
+                        attribute: {
                             code: 'isDisabled',
                             name: 'Is Disabled'
                         },
@@ -875,6 +915,14 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                             name: "Is Linelist Service"
                         },
                         value: 'false'
+                    }, {
+                        created: moment().toISOString(),
+                        lastUpdated: moment().toISOString(),
+                        attribute: {
+                            code: "isNewDataModel",
+                            name: "Is New Data Model"
+                        },
+                        value: 'true'
                     }],
                     parent: {
                         name: 'parent',

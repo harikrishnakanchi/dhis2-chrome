@@ -260,6 +260,14 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                             "name": "Is Linelist Service"
                         },
                         "value": "true"
+                    }, {
+                        "created": moment().toISOString(),
+                        "lastUpdated": moment().toISOString(),
+                        "attribute": {
+                            "code": 'isNewDataModel',
+                            "name": "Is New Data Model"
+                        },
+                        "value": 'true'
                     }],
                     "parent": {
                         "name": "Project1",
@@ -433,6 +441,14 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                             "name": "Is Linelist Service"
                         },
                         "value": "true"
+                    }, {
+                        "created": moment().toISOString(),
+                        "lastUpdated": moment().toISOString(),
+                        "attribute": {
+                            "code": 'isNewDataModel',
+                            "name": "Is New Data Model"
+                        },
+                        "value": 'true'
                     }],
                     "parent": parent
                 };
@@ -637,6 +653,14 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                             "name": "Is Linelist Service"
                         },
                         "value": "true"
+                    }, {
+                        "created": "2014-04-01T00:00:00.000Z",
+                        "lastUpdated": "2014-04-01T00:00:00.000Z",
+                        "attribute": {
+                            "code": 'isNewDataModel',
+                            "name": "Is New Data Model"
+                        },
+                        "value": 'true'
                     }],
                     "parent": {
                         "name": "SomeName",
