@@ -64,7 +64,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
         var getPeriodsAndOrgUnitsForAutoApprove = function(orgUnits) {
             var periods = _.times(properties.weeksForAutoApprove, function(n) {
-                return moment().subtract(n, 'week').format("GGGG[W]WW");
+                return moment().subtract(n + 1, 'week').format("GGGG[W]WW");
             });
             var orgUnitIds = _.pluck(orgUnits, 'id');
 

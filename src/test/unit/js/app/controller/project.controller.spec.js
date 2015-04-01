@@ -133,9 +133,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             }];
 
             var expectedPeriodAndOrgUnits = [{
-                "period": '2014W22',
-                "orgUnit": 'mod1'
-            }, {
                 "period": '2014W21',
                 "orgUnit": 'mod1'
             }, {
@@ -157,8 +154,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "period": '2014W15',
                 "orgUnit": 'mod1'
             }, {
-                "period": '2014W22',
-                "orgUnit": 'mod2'
+                "period": '2014W14',
+                "orgUnit": 'mod1'
             }, {
                 "period": '2014W21',
                 "orgUnit": 'mod2'
@@ -181,8 +178,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "period": '2014W15',
                 "orgUnit": 'mod2'
             }, {
-                "period": '2014W22',
-                "orgUnit": 'mod3'
+                "period": '2014W14',
+                "orgUnit": 'mod2'
             }, {
                 "period": '2014W21',
                 "orgUnit": 'mod3'
@@ -203,6 +200,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "orgUnit": 'mod3'
             }, {
                 "period": '2014W15',
+                "orgUnit": 'mod3'
+            }, {
+                "period": '2014W14',
                 "orgUnit": 'mod3'
             }];
 
@@ -548,17 +548,17 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             expect(scope.existingProjectCodes).toEqual(["AF101"]);
         });
 
-        it("should take the user to the view page of the parent country on clicking cancel", function(){
+        it("should take the user to the view page of the parent country on clicking cancel", function() {
             var parentOrgUnit = {
-                'id' : 'parent',
+                'id': 'parent',
                 'name': 'parent'
             };
 
             scope.$parent = {
-                "closeNewForm" : function() {}
+                "closeNewForm": function() {}
             };
 
-            spyOn(scope.$parent,"closeNewForm").and.callFake(function(parentOrgUnit){
+            spyOn(scope.$parent, "closeNewForm").and.callFake(function(parentOrgUnit) {
                 return;
             });
 
