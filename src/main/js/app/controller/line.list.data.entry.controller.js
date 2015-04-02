@@ -22,13 +22,14 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             var formatValue = function(value) {
                 return _.isDate(value) ? moment(value).format("YYYY-MM-DD") : value;
             };
-
-            return _.map(programStage.programStageDataElements, function(psde) {
-                return ({
-                    "dataElement": psde.dataElement.id,
-                    "value": formatValue($scope.dataValues[psde.dataElement.id])
+            return _.flatten(_.map(programStage.programStageSections, function(sections) {
+                return _.map(sections.programStageDataElements, function(psde) {
+                    return ({
+                        "dataElement": psde.dataElement.id,
+                        "value": formatValue($scope.dataValues[psde.dataElement.id])
+                    });
                 });
-            });
+            }));
         };
 
         var upsertEvent = function() {

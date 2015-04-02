@@ -198,13 +198,24 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             it("should update event details", function() {
                 var programStage = {
                     'id': 'PrgStage1',
-                    'programStageDataElements': [{
-                        "dataElement": {
-                            "id": "de1",
-                            "name": "Patient ID - V1 - Surgery",
-                            "type": "string",
-                            "isExcluded": true
-                        }
+                    'programStageSections': [{
+                        'id': 'section1',
+                        'programStageDataElements': [{
+                            "dataElement": {
+                                "id": "de1"
+                            }
+                        }, {
+                            "dataElement": {
+                                "id": "de2"
+                            }
+                        }]
+                    }, {
+                        'id': 'section2',
+                        'programStageDataElements': [{
+                            "dataElement": {
+                                "id": "de3"
+                            }
+                        }]
                     }]
                 };
 
@@ -223,6 +234,14 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "dataValues": [{
                         "dataElement": "de1",
                         "value": "12",
+                        "type": "int"
+                    }, {
+                        "dataElement": "de2",
+                        "value": "13",
+                        "type": "int"
+                    }, {
+                        "dataElement": "de3",
+                        "value": "14",
                         "type": "int"
                     }]
                 };
@@ -246,6 +265,12 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         'dataValues': [{
                             "dataElement": "de1",
                             "value": 12
+                        }, {
+                            "dataElement": "de2",
+                            "value": 13
+                        }, {
+                            "dataElement": "de3",
+                            "value": 14
                         }],
                         'localStatus': "UPDATED_DRAFT"
                     }]
