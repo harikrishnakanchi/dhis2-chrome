@@ -21,7 +21,6 @@
     "syncComplete": "Data sync scheduled successfully.",
     "openingDateValidation": "Date d'ouverture est nécessaire.",
     "endDateValidation": "Date de fin est nécessaire",
-    "beyondMaxDate": "La date ne peut pas dépasser la date d'aujourd'hui.",
     "nameValidation": "Le nom est obligatoire.",
     "consultDaysValidation": "Jours de consultation est nécessaire.",
     "loginFailed": "Pouvoirs invalides.",

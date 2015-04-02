@@ -24,7 +24,6 @@
     "openingDateValidation": "Opening Date is required.",
     "endDateValidation": "End Date is required.",
     "invalidDateError": "Date is invalid.",
-    "beyondMaxDate": "Date cannot exceed today's date.",
     "nameValidation": "Name is required.",
     "hospitalUnitCodeValidation": "Hospital Unit Code is required.",
     "consultDaysValidation": "Consultation days is required.",
@@ -135,8 +134,8 @@
     "addNewCaseLabel": "Add new case",
     "eventDateLabel": "Event Date",
     "openingDateInFutureError": "Data entry form will open from Week ",
-    "confirmExport" : "YES, I want to export the application.",
-    "confirmExportTitle" : "Export Confirmation",
-    "confirmImport" : "YES, I want to import application copy.",
-    "confirmImportTitle" : "Import Confirmation"
+    "confirmExport": "YES, I want to export the application.",
+    "confirmExportTitle": "Export Confirmation",
+    "confirmImport": "YES, I want to import application copy.",
+    "confirmImportTitle": "Import Confirmation"
 }

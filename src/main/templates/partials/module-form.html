@@ -21,8 +21,9 @@
                         <label for="moduleOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="date" name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" required>
-                            <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; form.moduleOpeningDate.$error">
+                            <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; form.moduleOpeningDate.$invalid">
                                 <span ng-show="form.moduleOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
+                                <span ng-show="form.moduleOpeningDate.$invalid" class="errortxt">{{resourceBundle.invalidDateError}}</span>
                             </div>
                         </div>
                     </li>

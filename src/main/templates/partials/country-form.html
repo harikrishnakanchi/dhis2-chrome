@@ -30,7 +30,7 @@
                                 </div>
                                 <div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid">
                                     <span ng-show="createForm.newOrgUnitOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
-                                    <span ng-show="createForm.newOrgUnitOpeningDate.$invalid" class="errortxt">{{resourceBundle.beyondMaxDate}}</span>
+                                    <span ng-show="createForm.newOrgUnitOpeningDate.$invalid" class="errortxt">{{resourceBundle.invalidDateError}}</span>
                                 </div>
                             </p>
                         </div>

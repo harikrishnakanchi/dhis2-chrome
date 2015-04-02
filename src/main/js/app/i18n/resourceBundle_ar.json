@@ -23,7 +23,6 @@
     "syncComplete": "Data sync scheduled successfully.d",
     "openingDateValidation": "مطلوب افتتاح التسجيل.",
     "endDateValidation": "مطلوب تاريخ نهاية",
-    "beyondMaxDate": "تاريخ لا يمكن أن يتجاوز تاريخ اليوم.",
     "nameValidation": "مطلوب الاسم.",
     "consultDaysValidation": "مطلوب أيام التشاور.",
     "loginFailed": "وثائق التفويض غير صالحة.",

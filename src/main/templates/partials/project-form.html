@@ -1,7 +1,7 @@
 <div ng-controller="projectController">
     <div class="top-actions" ng-if="!isNewMode">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Operation Unit" ng-click="openInNewMode('Operation Unit')" />
-        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />        
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />
     </div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
     <form name="createForm" class="form-horizontal" role="form" novalidate>
@@ -90,6 +90,7 @@
                             <input type="date" class="msf-date-input" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required>
                             <div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid">
                                 <span ng-show="createForm.newOrgUnitOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
+                                <span ng-show="createForm.newOrgUnitOpeningDate.$invalid" class="errortxt">{{resourceBundle.invalidDateError}}</span>
                             </div>
                         </div>
                     </li>
@@ -98,7 +99,7 @@
                         <div class="col-sm-6 col-md-6">
                             <input type="date" class="msf-date-input" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate">
                             <div ng-show="createForm.newOrgUnitEndDate.$dirty &amp;&amp; createForm.newOrgUnitEndDate.$invalid">
-                                <span ng-show="createForm.newOrgUnitEndDate.$error" class="errortxt">{{resourceBundle.invalidDateError}}</span>
+                                <span ng-show="createForm.newOrgUnitEndDate.$invalid" class="errortxt">{{resourceBundle.invalidDateError}}</span>
                             </div>
                         </div>
                     </li>
@@ -154,5 +155,5 @@
                 </tbody>
             </table>
         </div>
-    </div>    
+    </div>
 </div>
