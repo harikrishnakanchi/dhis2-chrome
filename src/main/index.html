@@ -14,26 +14,26 @@
     <div id="dhis2" name="dhis2" ng-csp ng-controller="mainController" ng-cloak>
         <header>
             <div class="container">
-                <img src="img/logo.png" alt="" title="DHIS" id="logoImg" class="navbar-brand">
+                <img src="img/logo.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#/productKeyPage" ng-if="currentUser">Update Product Key</a>
+                    <li><a href="#/productKeyPage" ng-if="currentUser" tabindex="-1">Update Product Key</a>
                     </li>
-                    <li><a href="#/dashboard" ng-if="currentUser">Dashboard</a>
-                    </li>
-                    <li>
-                        <p class="navbar-text" ng-show="isDhisOnline" id="loggedInUser"> <span class="online">{{currentUser.userCredentials.username}}</span> </p>
+                    <li><a href="#/dashboard" ng-if="currentUser" tabindex="-1">Dashboard</a>
                     </li>
                     <li>
-                        <p class="navbar-text" ng-show="!isDhisOnline" id="userOffline"> <span class="offline">{{currentUser.userCredentials.username}}</span> </p>
+                        <p class="navbar-text" ng-show="isDhisOnline" id="loggedInUser" tabindex="-1"> <span class="online">{{currentUser.userCredentials.username}}</span> </p>
                     </li>
                     <li>
-                        <select id="languageSelectButton" ng-model="currentUser.locale" ng-if="currentUser" class="input-sm">
+                        <p class="navbar-text" ng-show="!isDhisOnline" id="userOffline" tabindex="-1"> <span class="offline">{{currentUser.userCredentials.username}}</span> </p>
+                    </li>
+                    <li>
+                        <select id="languageSelectButton" ng-model="currentUser.locale" ng-if="currentUser" class="input-sm" tabindex="-1">
                             <option value="en">English</option>
                             <option dir="rtl" lang="fr" value="fr">Français</option>
                             <option dir="rtl" lang="ar" value="ar">العربية</option>
                         </select>
                     </li>
-                    <li ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout">{{ resourceBundle.logoutLabel }}</a>
+                    <li ng-show="isLoggedIn"><a ng-click="logout()" href="#/login" id="linkToLogout" tabindex="-1">{{ resourceBundle.logoutLabel }}</a>
                     </li>
                 </ul>
             </div>
