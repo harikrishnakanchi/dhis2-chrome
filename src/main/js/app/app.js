@@ -119,7 +119,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
 
             if (event.keyCode === 8) {
                 var srcElement = event.srcElement || event.target;
-                if (srcElement.tagName.toUpperCase() === "INPUT" || srcElement.tagName.toUpperCase() === "TEXTAREA" || srcElement.tagName.toUpperCase() === "SELECT") {
+                if (srcElement.tagName.toUpperCase() === "INPUT" || srcElement.tagName.toUpperCase() === "TEXTAREA") {
                     shouldPrevent = srcElement.readOnly || srcElement.disabled;
                 } else {
                     shouldPrevent = true;
