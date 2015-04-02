@@ -301,7 +301,10 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "opunit1",
                 "id": "opunit1",
                 "datasets": [],
-                "attributeValues": []
+                "attributeValues": [],
+                "parent": {
+                    "id": "parent"
+                }
             };
 
             var module = {
@@ -342,7 +345,10 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                         "name": "Is Disabled"
                     },
                     "value": "true"
-                }]
+                }],
+                "parent": {
+                    "id": "parent"
+                }
             }];
             var expectedHustleMessage = {
                 "data": expectedOrgUnits,
@@ -359,7 +365,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnits);
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, "dataValues");
-            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(opunit, "disabledOpUnit");
+            expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(opunit.parent, "disabledOpUnit");
             expect(scope.isDisabled).toEqual(true);
         });
 
