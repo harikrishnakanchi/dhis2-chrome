@@ -83,22 +83,24 @@ define(["moment", "lodashUtils"], function(moment, _) {
 
         var getProjectAndOpUnitAttributes = function(moduleOrOrigin) {
             var getAttributes = function(orgUnits) {
-                var isOrigin = _.any(moduleOrOrigin.attributeValues, {
-                    "value": "Patient Origin"
-                });
+                return get(moduleOrOrigin.id).then(function(enrichedModuleOrOrigin) {
+                    var isOrigin = _.any(enrichedModuleOrOrigin.attributeValues, {
+                        "value": "Patient Origin"
+                    });
 
-                var module = isOrigin === true ? _.find(orgUnits, {
-                    'id': moduleOrOrigin.parent.id
-                }) : moduleOrOrigin;
+                    var module = isOrigin === true ? _.find(orgUnits, {
+                        'id': enrichedModuleOrOrigin.parent.id
+                    }) : enrichedModuleOrOrigin;
 
-                var opUnit = _.find(orgUnits, {
-                    'id': module.parent.id
-                });
-                var project = _.find(orgUnits, {
-                    'id': opUnit.parent.id
-                });
+                    var opUnit = _.find(orgUnits, {
+                        'id': module.parent.id
+                    });
+                    var project = _.find(orgUnits, {
+                        'id': opUnit.parent.id
+                    });
 
-                return opUnit.attributeValues.concat(project.attributeValues);
+                    return opUnit.attributeValues.concat(project.attributeValues);
+                });
             };
 
             return getAll().then(getAttributes);

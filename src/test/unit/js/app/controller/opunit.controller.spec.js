@@ -518,5 +518,49 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }, "dataValues");
 
         });
+
+        it("should update org unit groups when op unit is updated", function() {
+            var opUnit = {
+                "name": "OpUnit1",
+                "type": "Hospital",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "hospitalUnitCode": "Unit Code - A"
+            };
+
+            scope.orgUnit = {
+                "id": "opUnit1Id",
+                "name": "OpUnit1",
+                "type": "Health Center",
+                "level": 5,
+                "hospitalUnitCode": "Unit Code - B1",
+                "parent": {
+                    "name": "Parent",
+                    "id": "ParentId"
+                },
+                "children": []
+            };
+
+            var orgunitsToAssociate = [{
+                "id": "child1",
+                "name": "child1"
+            }, {
+                "id": "child2",
+                "name": "child2"
+            }];
+
+            spyOn(orgUnitGroupHelper, "getOrgUnitsToAssociateForUpdate").and.returnValue(orgunitsToAssociate);
+            spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
+                "data": {
+                    "data": []
+                }
+            }));
+
+            scope.update(opUnit);
+            scope.$apply();
+
+
+            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(orgunitsToAssociate, true);
+        });
     });
 });

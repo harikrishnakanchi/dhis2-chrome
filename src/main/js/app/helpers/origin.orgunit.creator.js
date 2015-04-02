@@ -40,8 +40,8 @@ define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
                         .then(function() {
                             return originOUPayload;
                         });
-                }
-                return orgUnitRepository.upsert(originOUPayload);
+                } else
+                    return orgUnitRepository.upsert(originOUPayload);
             });
         };
 

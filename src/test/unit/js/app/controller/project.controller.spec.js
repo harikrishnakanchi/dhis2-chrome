@@ -552,6 +552,68 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(parentOrgUnit);
         });
+
+        it("should update org unit groups on updating project", function() {
+            var modules = [{
+                "name": "OBGYN",
+                "parent": {
+                    "id": "a5dc7e2aa0e"
+                },
+                "active": true,
+                "shortName": "OBGYN",
+                "id": "a72ec34b863",
+                "children": [{
+                    "id": "child1",
+                    "name": "child1"
+                }, {
+                    "id": "child2",
+                    "name": "child2"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type",
+                    },
+                    "value": "Module"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService",
+                    },
+                    "value": "true"
+                }]
+            }];
+
+            var orgunitsToAssociate = [{
+                "id": "child1",
+                "name": "child1"
+            }, {
+                "id": "child2",
+                "name": "child2"
+            }];
+
+            var orgUnit = {
+                "id": "blah"
+            };
+            var newOrgUnit = {
+                "id": "blah",
+                "autoApprove": true
+            };
+
+            spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(newOrgUnit);
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
+            spyOn(location, 'hash');
+            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
+            spyOn(orgUnitGroupHelper, "getOrgUnitsToAssociateForUpdate").and.returnValue(orgunitsToAssociate);
+            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
+
+
+            scope.update(newOrgUnit, orgUnit);
+            scope.$apply();
+
+            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(orgunitsToAssociate, true);
+
+
+        });
     });
 
 });

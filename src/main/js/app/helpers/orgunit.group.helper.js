@@ -58,12 +58,49 @@ define([], function() {
                     });
                 };
 
-                _.forEach(orgunits, function(orgunit) {
-                    getAttributes(orgunit).then(addToGroup).then(upsertOrgUnitGroup);
+                var promises = _.map(orgunits, function(orgunit) {
+                    return getAttributes(orgunit);
+                });
+                
+                $q.all(promises).then(function(attrsList) {
+                    _.forEach(attrsList, function(attrs) {
+                        var orgunitGroups = addToGroup(attrs);
+                        $q.when(orgUnitGroups).then(function(orgUnitGroups) {
+                            upsertOrgUnitGroup(orgUnitGroups);
+                        });
+                    });
                 });
             };
 
             return getOrgUnitGroups().then(addOrgunitsToOrgUnitGroups);
+        };
+
+        this.getOrgUnitsToAssociateForUpdate = function(orgunits) {
+            var getBooleanAttributeValue = function(attributeValues, attributeCode) {
+                var attr = _.find(attributeValues, {
+                    "attribute": {
+                        "code": attributeCode
+                    }
+                });
+
+                return attr && attr.value === 'true';
+            };
+
+            var isLinelistService = function(orgUnit) {
+                return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
+            };
+
+            var orgUnitsToAssociate = [];
+
+            _.forEach(orgunits, function(orgunit) {
+                if (isLinelistService(orgunit))
+                    orgUnitsToAssociate.push(orgunit.children);
+                else
+                    orgUnitsToAssociate.push(orgunit);
+
+            });
+            return _.flatten(orgUnitsToAssociate);
+
         };
     };
 });
