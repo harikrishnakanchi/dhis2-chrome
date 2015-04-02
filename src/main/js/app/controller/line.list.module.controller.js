@@ -51,6 +51,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var getAssociatedProgram = function() {
+                    if (!$scope.module.id) {
+                        $scope.program = {
+                            "name": ""
+                        };
+                        return;
+                    }
+
                     return orgUnitRepository.findAllByParent($scope.module.id).then(function(originOrgUnits) {
                         return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(prg) {
                             if (_.isEmpty(prg)) {

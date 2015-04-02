@@ -616,6 +616,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             it("should create origin org units", function() {
                 var today = new Date();
                 scope.module = {
+                    'id': "Module2",
                     'name': "Module2",
                     'openingDate': today,
                     'serviceType': "Linelist",
@@ -704,6 +705,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             it("should associate origin org units to programs and datasets", function() {
                 var today = new Date();
                 scope.module = {
+                    'id': "Module2",
                     'name': "Module2",
                     'openingDate': today,
                     'serviceType': "Linelist",
@@ -782,6 +784,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             it("should create org unit groups", function() {
                 var today = new Date();
                 scope.module = {
+                    'id': "Module2",
                     'name': "Module2",
                     'openingDate': today,
                     'serviceType': "Linelist",
