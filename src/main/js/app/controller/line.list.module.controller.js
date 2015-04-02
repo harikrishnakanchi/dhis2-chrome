@@ -51,17 +51,19 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var getAssociatedProgram = function() {
-                    return programRepository.getProgramForOrgUnit($scope.module.id).then(function(prg) {
-                        if (_.isEmpty(prg)) {
-                            $scope.program = {
-                                "name": ""
-                            };
-                        } else {
-                            $scope.program = _.find($scope.allPrograms, function(p) {
-                                return p.id == prg.id;
-                            });
-                            $scope.getEnrichedProgram(prg.id);
-                        }
+                    return orgUnitRepository.findAllByParent($scope.module.id).then(function(originOrgUnits) {
+                        return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(prg) {
+                            if (_.isEmpty(prg)) {
+                                $scope.program = {
+                                    "name": ""
+                                };
+                            } else {
+                                $scope.program = _.find($scope.allPrograms, function(p) {
+                                    return p.id == prg.id;
+                                });
+                                $scope.getEnrichedProgram(prg.id);
+                            }
+                        });
                     });
                 };
 

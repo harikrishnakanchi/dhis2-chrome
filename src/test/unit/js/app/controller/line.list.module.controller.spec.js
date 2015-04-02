@@ -58,6 +58,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "get").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepo, "findAllByParent").and.returnValue(utils.getPromise(q, [{
+                    "id": "originOrgUnit"
+                }]));
 
                 datasetRepo = new DatasetRepository();
                 spyOn(datasetRepo, "upsert").and.returnValue(utils.getPromise(q, {}));

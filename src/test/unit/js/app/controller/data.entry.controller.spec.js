@@ -155,11 +155,25 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     'id': 'p1'
                 }));
 
+                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [{
+                    "id": "originOrgUnit",
+                    "name": "orignOrgUnit"
+                }]));
+
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
 
                 scope.week = {};
-                scope.currentModule = {};
+                scope.currentModule = {
+                    "id": "mod1",
+                    "name": "mod1",
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "true"
+                    }]
+                };
                 scope.$apply();
 
                 expect(scope.formTemplateUrl.indexOf("templates/partials/line-list-summary.html?")).toEqual(0);

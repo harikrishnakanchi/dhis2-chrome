@@ -7,6 +7,15 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 });
             };
 
+            var isLineListService = function(orgUnit) {
+                var attr = _.find(orgUnit.attributeValues, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    }
+                });
+                return attr && attr.value == "true";
+            };
+
             $scope.$watchCollection('[week, currentModule]', function() {
                 $scope.errorMessage = undefined;
                 if ($scope.week && $scope.currentModule) {
@@ -20,15 +29,17 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             });
 
             var loadDataEntryForm = function() {
-                return programRepository.getProgramForOrgUnit($scope.currentModule.id).then(function(program) {
-                    if (_.isEmpty(program) || !isDataEntryUser($rootScope.currentUser)) {
-                        $scope.programId = undefined;
-                        $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
-                    } else {
-                        $scope.programId = program.id;
-                        $scope.formTemplateUrl = "templates/partials/line-list-summary.html" + '?' + moment().format("X");
-                    }
-                });
+                if (isLineListService($scope.currentModule)) {
+                    return orgUnitRepository.findAllByParent($scope.currentModule.id).then(function(originOrgUnits) {
+                        return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
+                            $scope.programId = program.id;
+                            $scope.formTemplateUrl = "templates/partials/line-list-summary.html" + '?' + moment().format("X");
+                        });
+                    });
+                } else {
+                    $scope.programId = undefined;
+                    $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
+                }
             };
 
             var isOpeningDateInFuture = function() {
