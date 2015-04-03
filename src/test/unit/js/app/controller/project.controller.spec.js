@@ -595,8 +595,12 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             };
             var newOrgUnit = {
                 "id": "blah",
-                "autoApprove": true
+                "autoApprove": true,
+                "children": [{
+                    "id": "op1"
+                }]
             };
+
 
             spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(newOrgUnit);

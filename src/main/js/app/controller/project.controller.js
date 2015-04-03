@@ -97,17 +97,21 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
                 return $q.all([uploadCompletionPromise, uploadApprovalPromise]);
             };
 
-            var createOrgUnitGroups = function(modules) {
-                var orgUnitsToAssociate = orgUnitGroupHelper.getOrgUnitsToAssociateForUpdate(modules);
-                $q.when(orgUnitsToAssociate).then(function(orgUnitsToAssociate) {
-                    orgUnitGroupHelper.createOrgUnitGroups(orgUnitsToAssociate, true);
+            var createOrgUnitGroups = function() {
+                _.forEach(dhisProject.children, function(opunit) {
+                    orgUnitRepository.getAllModulesInOrgUnits([opunit.id]).then(function(modules) {
+                        var orgUnitsToAssociate = orgUnitGroupHelper.getOrgUnitsToAssociateForUpdate(modules);
+                        $q.when(orgUnitsToAssociate).then(function(orgUnitsToAssociate) {
+                            orgUnitGroupHelper.createOrgUnitGroups(orgUnitsToAssociate, true);
+                        });
+                    });
                 });
             };
 
-            var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
+            var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);            
             saveToDbAndPublishMessage(dhisProject).then(function(data) {
+                createOrgUnitGroups();
                 orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id]).then(function(modules) {
-                    createOrgUnitGroups(modules);
                     if (newOrgUnit.autoApprove) {
                         var periodAndOrgUnits = getPeriodsAndOrgUnitsForAutoApprove(modules);
                         return approvalDataRepository.markAsApproved(periodAndOrgUnits, "admin")

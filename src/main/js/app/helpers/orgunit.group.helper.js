@@ -10,18 +10,19 @@ define([], function() {
 
             var getAttributes = function(orgunit) {
                 return orgUnitRepository.getProjectAndOpUnitAttributes(orgunit).then(function(result) {
-                    return [result, orgunit];
+                    return result;
                 });
             };
 
             var addOrgunitsToOrgUnitGroups = function(orgUnitGroups) {
-                var addToGroup = function(data) {
-                    var attributes = data[0];
-                    var orgunit = data[1];
-                    var orgunitToAdd = {
-                        'id': orgunit.id,
-                        'name': orgunit.name
-                    };
+                var addToGroup = function(attributes) {
+                    var orgunitsToAdd = _.map(orgunits, function(orgunit) {
+                        return {
+                            'id': orgunit.id,
+                            'name': orgunit.name
+                        };
+                    });
+
                     var modifiedOrgUnitGroups = [];
                     _.forEach(orgUnitGroups, function(orgUnitGroup) {
                         var res;
@@ -37,14 +38,22 @@ define([], function() {
                         }
 
                         if (isUpdateProject) {
-                            orgUnitGroup.organisationUnits = _.reject(orgUnitGroup.organisationUnits, orgunitToAdd);
+                            orgUnitGroup.organisationUnits = _.filter(orgUnitGroup.organisationUnits, function(obj) {
+                                return !_.findWhere(orgunitsToAdd, {
+                                    id: obj.id
+                                });
+                            });
+                            orgUnitGroup.organisationUnits = _.reject(orgUnitGroup.organisationUnits, orgunitsToAdd);
                         }
-                        var isOrgUnitAbsent = !_.find(orgUnitGroup.organisationUnits, orgunitToAdd);
+
+                        var isOrgUnitAbsent = !_.find(orgUnitGroup.organisationUnits, orgunitsToAdd);
 
                         if (res !== undefined && isOrgUnitAbsent) {
-                            orgUnitGroup.organisationUnits.push(orgunitToAdd);
-                            modifiedOrgUnitGroups.push(orgUnitGroup);
+                            _.forEach(orgunitsToAdd, function(orgunitToAdd) {
+                                orgUnitGroup.organisationUnits.push(orgunitToAdd);
+                            });
                         }
+                        modifiedOrgUnitGroups.push(orgUnitGroup);
                     });
                     return modifiedOrgUnitGroups;
                 };
@@ -58,18 +67,7 @@ define([], function() {
                     });
                 };
 
-                var promises = _.map(orgunits, function(orgunit) {
-                    return getAttributes(orgunit);
-                });
-                
-                $q.all(promises).then(function(attrsList) {
-                    _.forEach(attrsList, function(attrs) {
-                        var orgunitGroups = addToGroup(attrs);
-                        $q.when(orgUnitGroups).then(function(orgUnitGroups) {
-                            upsertOrgUnitGroup(orgUnitGroups);
-                        });
-                    });
-                });
+                return getAttributes(orgunits[0]).then(addToGroup).then(upsertOrgUnitGroup);
             };
 
             return getOrgUnitGroups().then(addOrgunitsToOrgUnitGroups);
