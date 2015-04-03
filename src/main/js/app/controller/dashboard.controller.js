@@ -98,7 +98,7 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
             var moveApprovedItemsToNextLevel = function() {
                 var incrementApprovalLevel = function(status) {
                     status = _.map(status, function(s) {
-                        s.nextApprovalLevel = s.nextApprovalLevel < 3 ? s.nextApprovalLevel + 1 : undefined;
+                        s.nextApprovalLevel = s.nextApprovalLevel < 2 ? s.nextApprovalLevel + 1 : undefined;
                         return s;
                     });
 
@@ -112,10 +112,12 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                         return approvedItem.moduleId === otherLevelItem.moduleId;
                     });
 
-                    if (!existingOtherLevelItem) {
-                        $scope.itemsAwaitingApprovalAtOtherLevels.push(approvedItem);
-                    } else {
-                        existingOtherLevelItem.status = existingOtherLevelItem.status.concat(approvedItem.status);
+                    if (!_.isEmpty(approvedItem.status)) {
+                        if (!existingOtherLevelItem) {
+                            $scope.itemsAwaitingApprovalAtOtherLevels.push(approvedItem);
+                        } else {
+                            existingOtherLevelItem.status = existingOtherLevelItem.status.concat(approvedItem.status);
+                        }
                     }
                 });
             };
