@@ -112,7 +112,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             saveToDbAndPublishMessage(dhisProject).then(function(data) {
                 createOrgUnitGroups();
                 orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id]).then(function(modules) {
-                    if (newOrgUnit.autoApprove) {
+                    if (newOrgUnit.autoApprove === "true") {
                         var periodAndOrgUnits = getPeriodsAndOrgUnitsForAutoApprove(modules);
                         return approvalDataRepository.markAsApproved(periodAndOrgUnits, "admin")
                             .then(_.partial(publishApprovalsToDhis, periodAndOrgUnits));

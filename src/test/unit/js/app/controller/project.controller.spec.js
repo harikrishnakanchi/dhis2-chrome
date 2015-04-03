@@ -119,7 +119,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             };
             var newOrgUnit = {
                 "id": "blah",
-                "autoApprove": true
+                "autoApprove": "true"
             };
 
             var modules = [{
