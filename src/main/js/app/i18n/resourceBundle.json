@@ -133,7 +133,7 @@
     "noCasesLabel": "There are no cases. ",
     "addNewCaseLabel": "Add new case",
     "eventDateLabel": "Event Date",
-    "openingDateInFutureError": "Data entry form will open from Week ",
+    "openingDateInFutureError": "The data collection for this module will begin from week ",
     "confirmExport": "YES, I want to export the application.",
     "confirmExportTitle": "Export Confirmation",
     "confirmImport": "YES, I want to import application copy.",
