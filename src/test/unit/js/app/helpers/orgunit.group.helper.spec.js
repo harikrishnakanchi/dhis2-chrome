@@ -15,6 +15,13 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                     "upsert": function() {}
                 };
 
+                scope.currentUser = {
+                    "locale": "en"
+                };
+                scope.resourceBundle = {
+                    "upsertOrgUnitGroupsDesc": "upsertOrgUnitGroupsDesc"
+                };
+
                 spyOn(hustle, "publish");
             }));
 
@@ -124,7 +131,9 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 expect(orgUnitRepository.getProjectAndOpUnitAttributes).toHaveBeenCalled();
                 expect(hustle.publish.calls.argsFor(0)).toEqual([{
                     "data": expectedOutput,
-                    "type": "upsertOrgUnitGroups"
+                    "type": "upsertOrgUnitGroups",
+                    "locale": "en",
+                    "desc": "upsertOrgUnitGroupsDesc"
                 }, "dataValues"]);
             });
 

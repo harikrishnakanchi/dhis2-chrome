@@ -117,10 +117,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 $scope.$parent.closeNewForm($scope.orgUnit);
             };
 
-            var publishMessage = function(data, action) {
+            var publishMessage = function(data, action, desc) {
                 return $hustle.publish({
                     "data": data,
-                    "type": action
+                    "type": action,
+                    "locale": $scope.currentUser.locale,
+                    "desc": desc
                 }, "dataValues");
             };
 
@@ -138,11 +140,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
                 var payload = orgUnitMapper.disable(enrichedModule);
                 $scope.isDisabled = true;
-                $q.all([orgUnitRepository.upsert(payload), publishMessage(payload, "upsertOrgUnit")]).then(function() {
-                    if ($scope.$parent.closeNewForm) {
-                        $scope.$parent.closeNewForm(module, "disabledModule");
-                    }
-                });
+                $q.all([orgUnitRepository.upsert(payload), publishMessage(payload, "upsertOrgUnit", $scope.resourceBundle.disableOrgUnitDesc + payload.name)])
+                    .then(function() {
+                        if ($scope.$parent.closeNewForm) {
+                            $scope.$parent.closeNewForm(module, "disabledModule");
+                        }
+                    });
             };
 
             var showModal = function(okCallback, message) {
@@ -184,7 +187,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     }
                 };
                 return systemSettingRepository.upsert(systemSetting)
-                    .then(_.partial(publishMessage, systemSetting, "uploadSystemSetting"));
+                    .then(_.partial(publishMessage, systemSetting, "uploadSystemSetting", undefined));
             };
 
             $scope.save = function(module) {
@@ -224,7 +227,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var createModule = function() {
-                    return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")]);
+                    return $q.all([orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)]);
                 };
 
                 var createOriginOrgUnitsAndGroups = function() {
@@ -233,7 +236,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     };
 
                     return originOrgunitCreator.create(enrichedModule).then(function(patientOriginOUPayload) {
-                        return publishMessage(patientOriginOUPayload, "upsertOrgUnit")
+                        return publishMessage(patientOriginOUPayload, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.pluck(patientOriginOUPayload, "name"))
                             .then(_.partial(associateToProgram, $scope.program, patientOriginOUPayload))
                             .then(_.partial(associateToDatasets, patientOriginOUPayload))
                             .then(_.partial(createOrgUnitGroups, patientOriginOUPayload));
@@ -250,7 +253,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.update = function(module) {
                 var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
 
-                return $q.all([saveExcludedDataElements(enrichedModule), orgUnitRepository.upsert(enrichedModule), publishMessage(enrichedModule, "upsertOrgUnit")])
+                return $q.all([saveExcludedDataElements(enrichedModule),
+                        orgUnitRepository.upsert(enrichedModule),
+                        publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.updateOrgUnitDesc + enrichedModule.name)
+                    ])
                     .then(_.partial(onSuccess, enrichedModule), onError);
             };
 

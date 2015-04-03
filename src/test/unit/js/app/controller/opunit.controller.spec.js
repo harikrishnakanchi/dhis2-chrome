@@ -33,6 +33,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }
             };
 
+            scope.currentUser = {
+                "locale": "en"
+            };
+
+            scope.resourceBundle = {
+                "uploadPatientOriginDetailsDesc": "create patient origin ",
+                "upsertOrgUnitDesc": "upsert org unit "
+            };
 
             Timecop.install();
             Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
@@ -126,7 +134,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedOpUnit,
-                "type": "upsertOrgUnit"
+                "type": "upsertOrgUnit",
+                "locale": "en",
+                "desc": "upsert org unit OpUnit1"
             }, "dataValues");
         });
 
@@ -202,7 +212,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedOpUnit,
-                "type": "upsertOrgUnit"
+                "type": "upsertOrgUnit",
+                "locale": "en",
+                "desc": "upsert org unit OpUnit1"
             }, "dataValues");
         });
 
@@ -352,7 +364,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }];
             var expectedHustleMessage = {
                 "data": expectedOrgUnits,
-                "type": "upsertOrgUnit"
+                "type": "upsertOrgUnit",
+                "locale": "en",
+                "desc": NaN
             };
             orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             spyOn(hustle, "publish");
@@ -447,7 +461,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedOpUnit,
-                "type": "upsertOrgUnit"
+                "type": "upsertOrgUnit",
+                "locale": "en",
+                "desc": "upsert org unit OpUnit1"
             }, "dataValues");
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
         });
@@ -514,7 +530,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(payload);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": payload,
-                "type": "uploadPatientOriginDetails"
+                "type": "uploadPatientOriginDetails",
+                "locale": "en",
+                "desc": "create patient origin Unknown"
             }, "dataValues");
 
         });

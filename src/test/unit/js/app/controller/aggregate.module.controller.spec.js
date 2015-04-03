@@ -5,7 +5,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
     function(AggregateModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, DatasetRepository,
         OrgUnitRepository, OriginOrgunitCreator) {
 
-        describe("module controller", function() {
+        describe("aggregate module controller", function() {
             var scope, aggregateModuleController, mockOrgStore, db, q, location, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
                 dataSetRepo, systemSettingRepo, fakeModal, allPrograms, originOrgunitCreator;
 
@@ -75,6 +75,17 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         "id": "blah1"
                     }
                 };
+
+                scope.currentUser = {
+                    "locale": "en"
+                };
+
+                scope.resourceBundle = {
+                    "disableOrgUnitDesc": "disable organisation unit: ",
+                    "upsertOrgUnitDesc": "create organisation unit: ",
+                    "updateOrgUnitDesc": "update organisation unit: "
+                };
+
                 scope.isNewMode = true;
 
                 Timecop.install();
@@ -158,7 +169,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedAggregateModule);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: enrichedAggregateModule,
-                    type: "upsertOrgUnit"
+                    type: "upsertOrgUnit",
+                    locale: "en",
+                    desc: "create organisation unit: Module1"
                 }, "dataValues");
             });
 
@@ -297,6 +310,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 var expectedHustleMessage = {
                     data: expectedSystemSetting,
                     type: "uploadSystemSetting",
+                    locale: "en",
+                    desc: undefined
                 };
 
                 expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSetting);
@@ -487,7 +502,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSetting);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: expectedSystemSetting,
-                    type: "uploadSystemSetting"
+                    type: "uploadSystemSetting",
+                    locale: "en",
+                    desc: undefined
                 }, "dataValues");
             });
 
@@ -562,7 +579,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedModule);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: expectedModule,
-                    type: "upsertOrgUnit"
+                    type: "upsertOrgUnit",
+                    locale: "en",
+                    desc: "update organisation unit: module NEW name"
                 }, "dataValues");
             });
 
@@ -786,7 +805,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "name": "Par1"
                 };
                 scope.$parent.closeNewForm = jasmine.createSpy();
-                scope.resourceBundle = {};
                 scope.$apply();
                 var module = {
                     name: "test1",
@@ -844,7 +862,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 };
                 var expectedHustleMessage = {
                     data: expectedModule,
-                    type: "upsertOrgUnit"
+                    type: "upsertOrgUnit",
+                    locale: "en",
+                    desc: "disable organisation unit: test1"
                 };
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
@@ -930,10 +950,10 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     }
                 };
 
-                var originOrgUnit = {
+                var originOrgUnit = [{
                     "id": "ou1",
                     "name": "origin org unit"
-                };
+                }];
 
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
@@ -949,7 +969,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(hustle.publish.calls.count()).toEqual(5);
                 expect(hustle.publish.calls.argsFor(3)).toEqual([{
                     "data": originOrgUnit,
-                    "type": "upsertOrgUnit"
+                    "type": "upsertOrgUnit",
+                    "locale": "en",
+                    "desc": "create organisation unit: origin org unit"
                 }, "dataValues"]);
             });
 

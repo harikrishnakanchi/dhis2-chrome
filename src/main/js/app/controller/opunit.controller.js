@@ -6,10 +6,12 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             'openingDate': moment().format("YYYY-MM-DD")
         };
 
-        var saveToDhis = function(data) {
+        var saveToDhis = function(data, desc) {
             return $hustle.publish({
                 "data": data,
-                "type": "upsertOrgUnit"
+                "type": "upsertOrgUnit",
+                "locale": $scope.currentUser.locale,
+                "desc": $scope.resourceBundle.upsertOrgUnitDesc + data.name
             }, "dataValues");
         };
 
@@ -56,10 +58,12 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }];
         };
 
-        var publishMessage = function(data, action) {
+        var publishMessage = function(data, action, desc) {
             return $hustle.publish({
                 "data": data,
-                "type": action
+                "type": action,
+                "locale": $scope.currentUser.locale,
+                "desc": desc
             }, "dataValues");
         };
 
@@ -83,7 +87,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 }]
             };
             return patientOriginRepository.upsert(patientOriginPayload)
-                .then(_.partial(publishMessage, patientOriginPayload, "uploadPatientOriginDetails"))
+                .then(_.partial(publishMessage, patientOriginPayload, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(patientOriginPayload.origins, "name")))
                 .then(_.partial(orgUnitRepository.upsert, opUnit))
                 .then(saveToDhis)
                 .then(onSuccess, onError);

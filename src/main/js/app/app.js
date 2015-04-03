@@ -15,7 +15,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
             dbutils.init(app);
             controllers.init(app);
 
-            app.factory('queuePostProcessInterceptor', ['$log', queuePostProcessInterceptor]);
+            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', queuePostProcessInterceptor]);
 
             app.config(['$routeProvider', '$indexedDBProvider', '$httpProvider', '$hustleProvider', '$compileProvider', '$provide',
                 function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide) {

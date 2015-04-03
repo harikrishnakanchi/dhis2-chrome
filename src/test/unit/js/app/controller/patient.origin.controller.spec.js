@@ -28,6 +28,15 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "name": "Unknown"
             }];
 
+            scope.currentUser = {
+                "locale": "en"
+            };
+
+            scope.resourceBundle = {
+                "uploadPatientOriginDetailsDesc": "create patient origin ",
+                "upsertOrgUnitDesc": "upsert "
+            };
+
             patientOriginRepository = new PatientOriginRepository();
             spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
@@ -106,7 +115,9 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: expectedPayload,
-                type: "uploadPatientOriginDetails"
+                type: "uploadPatientOriginDetails",
+                locale: "en",
+                desc: "create patient origin Origin1"
             }, "dataValues");
             expect(scope.saveFailure).toEqual(false);
         });
@@ -144,10 +155,12 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 }]
             };
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
-            expect(hustle.publish).toHaveBeenCalledWith({
+            expect(hustle.publish.calls.argsFor(0)).toEqual([{
                 data: expectedPayload,
-                type: "uploadPatientOriginDetails"
-            }, "dataValues");
+                type: "uploadPatientOriginDetails",
+                locale: "en",
+                desc: "create patient origin Origin1,Origin2"
+            }, "dataValues"]);
         });
 
         it("should create new orgunits under child modules on adding new patient origins", function() {
@@ -222,17 +235,23 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             expect(hustle.publish.calls.argsFor(1)).toEqual([{
                 "data": originOrgUnits,
-                "type": "upsertOrgUnit"
+                "type": "upsertOrgUnit",
+                "locale": "en",
+                "desc": "upsert origin org unit"
             }, "dataValues"]);
 
             expect(hustle.publish.calls.argsFor(2)).toEqual([{
                 "data": ["ds1"],
-                "type": "associateOrgUnitToDataset"
+                "type": "associateOrgUnitToDataset",
+                "locale": "en",
+                "desc": undefined
             }, "dataValues"]);
 
             expect(hustle.publish.calls.argsFor(3)).toEqual([{
                 "data": [program],
-                "type": "uploadProgram"
+                "type": "uploadProgram",
+                "locale": "en",
+                "desc": undefined
             }, "dataValues"]);
         });
 

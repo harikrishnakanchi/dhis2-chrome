@@ -118,6 +118,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 rootScope.currentUser = {
                     "firstName": "test1",
                     "lastName": "test1last",
+                    "locale": "en",
                     "userCredentials": {
                         "username": "dataentryuser",
                         "userRoles": [{
@@ -138,6 +139,13 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         id: "test2",
                         "name": "MISSIONS EXPLOS345"
                     }]
+                };
+
+                scope.resourceBundle = {
+                    "uploadDataValuesDesc": "upload data for ",
+                    "uploadApprovalDataDesc": "approve data at coordination level for ",
+                    "uploadCompletionDataDesc": "approve data at project level for ",
+                    "deleteApprovalsDesc": "restart approval process for "
                 };
 
                 spyOn(location, "hash");
@@ -303,7 +311,9 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(dataRepository.save).toHaveBeenCalled();
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: [],
-                    type: 'uploadDataValues'
+                    type: 'uploadDataValues',
+                    locale: 'en',
+                    desc: 'upload data for 2014W14'
                 }, 'dataValues');
 
                 expect(scope.submitSuccess).toBe(true);
@@ -769,11 +779,15 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(approvalDataRepository.markAsApproved.calls.argsFor(0)[0]).toEqual(periodAndOrgUnit);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": [periodAndOrgUnit],
-                    "type": "uploadCompletionData"
+                    "type": "uploadCompletionData",
+                    "locale": "en",
+                    "desc": "approve data at project level for 2014W14"
                 }, "dataValues");
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": [periodAndOrgUnit],
-                    "type": "uploadApprovalData"
+                    "type": "uploadApprovalData",
+                    "locale": "en",
+                    "desc": "approve data at coordination level for 2014W14"
                 }, "dataValues");
                 expect(scope.submitAndApprovalSuccess).toBe(true);
             });
@@ -886,7 +900,9 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(approvalDataRepository.clearApprovals.calls.argsFor(0)[0]).toEqual(periodAndOrgUnit);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": periodAndOrgUnit,
-                    "type": "deleteApprovals"
+                    "type": "deleteApprovals",
+                    "locale": "en",
+                    "desc": "restart approval process for 2014W14"
                 }, "dataValues");
             });
 
@@ -955,7 +971,9 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(periodAndOrgUnit, approvedBy);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": [periodAndOrgUnit],
-                    "type": "uploadApprovalData"
+                    "type": "uploadApprovalData",
+                    "locale": "en",
+                    "desc": "approve data at coordination level for 2014W14"
                 }, "dataValues");
                 expect(scope.secondLevelApproveSuccess).toBe(true);
                 expect(scope.approveError).toBe(false);

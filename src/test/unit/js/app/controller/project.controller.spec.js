@@ -38,6 +38,17 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 id: "blah"
             };
 
+            scope.resourceBundle = {
+                "upsertOrgUnitDesc": "upsert org unit ",
+                "updateUserDesc": "update user ",
+                "uploadApprovalDataDesc": "approve data at coordination level for ",
+                "uploadCompletionDataDesc": "approve data at project level for "
+            };
+
+            scope.currentUser = {
+                "locale": "en"
+            };
+
             fakeModal = {
                 close: function() {
                     this.result.confirmCallBack();
@@ -64,7 +75,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
         it("should save project in dhis", function(done) {
             var newOrgUnit = {};
             var expectedNewOrgUnit = {
-                "id": "blah"
+                "id": "blah",
+                "name": "blah"
             };
             spyOn(orgUnitMapper, "mapToProjectForDhis").and.returnValue(expectedNewOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
@@ -74,7 +86,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: expectedNewOrgUnit,
-                    type: "upsertOrgUnit"
+                    type: "upsertOrgUnit",
+                    locale: "en",
+                    desc: "upsert org unit blah"
                 }, "dataValues");
 
                 done();
@@ -95,7 +109,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
         it("should update project", function() {
             var expectedNewOrgUnit = {
-                "id": "blah"
+                "id": "blah",
+                "name": "blah"
             };
 
             spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(expectedNewOrgUnit);
@@ -109,7 +124,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 data: expectedNewOrgUnit,
-                type: "upsertOrgUnit"
+                type: "upsertOrgUnit",
+                locale: "en",
+                desc: "upsert org unit blah"
             }, "dataValues");
         });
 
@@ -220,11 +237,15 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(expectedPeriodAndOrgUnits, "admin");
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedPeriodAndOrgUnits,
-                "type": "uploadCompletionData"
+                "type": "uploadCompletionData",
+                "locale": "en",
+                "desc": "approve data at project level for 2014W21,2014W20,2014W19,2014W18,2014W17,2014W16,2014W15,2014W14"
             }, "dataValues");
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedPeriodAndOrgUnits,
-                "type": "uploadApprovalData"
+                "type": "uploadApprovalData",
+                "locale": "en",
+                "desc": "approve data at coordination level for 2014W21,2014W20,2014W19,2014W18,2014W17,2014W16,2014W15,2014W14"
             }, "dataValues");
         });
 
@@ -500,7 +521,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             var expectedMessage = {
                 data: user,
-                type: 'updateUser'
+                type: 'updateUser',
+                locale: 'en',
+                desc: 'update user blah blah'
             };
             spyOn(userRepository, "upsert").and.returnValue(utils.getPromise(q, user));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));

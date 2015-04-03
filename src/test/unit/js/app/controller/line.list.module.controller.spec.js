@@ -99,6 +99,17 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "id": "blah1"
                     }
                 };
+
+                scope.currentUser = {
+                    "locale": "en"
+                };
+
+                scope.resourceBundle = {
+                    "disableOrgUnitDesc": "disable organisation unit: ",
+                    "upsertOrgUnitDesc": "create organisation unit: ",
+                    "updateOrgUnitDesc": "update organisation unit: "
+                };
+
                 scope.isNewMode = true;
                 lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepo, systemSettingRepo, q, fakeModal, programsRepo, orgUnitGroupHelper, datasetRepo, originOrgunitCreator);
             }));
@@ -182,7 +193,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: expectedSystemSettings,
-                    type: "uploadSystemSetting"
+                    type: "uploadSystemSetting",
+                    locale: "en",
+                    desc: undefined
                 }, "dataValues");
             });
 
@@ -294,7 +307,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(newLineListModule);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: newLineListModule,
-                    type: "upsertOrgUnit"
+                    type: "upsertOrgUnit",
+                    locale: "en",
+                    desc: "create organisation unit: Module2"
                 }, "dataValues");
 
                 expect(scope.saveFailure).toBe(false);
@@ -398,7 +413,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSettings);
                 expect(hustle.publish.calls.argsFor(1)).toEqual([{
                     data: expectedSystemSettings,
-                    type: "uploadSystemSetting"
+                    type: "uploadSystemSetting",
+                    locale: "en",
+                    desc: undefined
                 }, "dataValues"]);
             });
 
@@ -467,7 +484,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedLineListModule);
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: enrichedLineListModule,
-                    type: "upsertOrgUnit"
+                    type: "upsertOrgUnit",
+                    locale: "en",
+                    desc: "update organisation unit: new name"
                 }, "dataValues");
             });
 
@@ -672,10 +691,10 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }
                 };
 
-                var originOrgUnit = {
+                var originOrgUnit = [{
                     "id": "ou1",
                     "name": "origin org unit"
-                };
+                }];
 
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
@@ -698,7 +717,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 expect(hustle.publish.calls.count()).toEqual(5);
                 expect(hustle.publish.calls.argsFor(2)).toEqual([{
                     "data": originOrgUnit,
-                    "type": "upsertOrgUnit"
+                    "type": "upsertOrgUnit",
+                    "locale": "en",
+                    "desc": "create organisation unit: origin org unit"
                 }, "dataValues"]);
             });
 

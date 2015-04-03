@@ -254,7 +254,8 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         it("should complete selected items", function() {
             spyOn(approvalDataRepository, "markAsComplete").and.returnValue(utils.getPromise(q, {}));
             scope.resourceBundle = {
-                "dataApprovalConfirmationMessage": "mssg"
+                "dataApprovalConfirmationMessage": "mssg",
+                "uploadCompletionDataDesc": "upload approval for "
             };
 
             scope.itemsAwaitingApprovalAtUserLevel = [{
@@ -325,7 +326,8 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             rootScope.currentUser = {
                 "userCredentials": {
                     "username": "prj_approver_l1"
-                }
+                },
+                "locale": "en"
             };
 
             var expectedUpserts = [{
@@ -350,7 +352,9 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             expect(approvalDataRepository.markAsComplete).toHaveBeenCalledWith(expectedUpserts, "prj_approver_l1");
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedUpserts,
-                "type": "uploadCompletionData"
+                "type": "uploadCompletionData",
+                "locale": "en",
+                "desc": "upload approval for 2014W18,2014W17,2014W18"
             }, "dataValues");
 
             expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
@@ -361,7 +365,8 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         it("should approve selected items", function() {
             spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
             scope.resourceBundle = {
-                "dataApprovalConfirmationMessage": "mssg"
+                "dataApprovalConfirmationMessage": "mssg",
+                "uploadApprovalDataDesc": "approve data for "
             };
 
             scope.itemsAwaitingApprovalAtUserLevel = [{
@@ -432,7 +437,8 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             rootScope.currentUser = {
                 "userCredentials": {
                     "username": "prj_approver_l1"
-                }
+                },
+                "locale": "en"
             };
 
             var expectedUpserts = [{
@@ -457,7 +463,9 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(expectedUpserts, "prj_approver_l1");
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedUpserts,
-                "type": "uploadApprovalData"
+                "type": "uploadApprovalData",
+                "locale": "en",
+                "desc": "approve data for 2014W18,2014W17,2014W18"
             }, "dataValues");
             expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
             expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual(expectedItemsAwaitingApprovalAtOtherLevels);

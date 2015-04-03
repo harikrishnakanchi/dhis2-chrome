@@ -34,10 +34,12 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             $scope.$parent.closeNewForm(parentOrgUnit);
         };
 
-        var publishMessage = function(data, action) {
+        var publishMessage = function(data, action, desc) {
             return $hustle.publish({
                 "data": data,
-                "type": action
+                "type": action,
+                "locale": $scope.currentUser.locale,
+                "desc": desc
             }, "dataValues").then(function() {
                 return data;
             });
@@ -57,7 +59,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
             return orgUnitRepository.upsert(dhisProject)
                 .then(function(data) {
-                    return publishMessage(data, "upsertOrgUnit");
+                    return publishMessage(data, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + data.name);
                 })
                 .then(onSuccess, onError);
         };
@@ -86,12 +88,16 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
                 var uploadCompletionPromise = $hustle.publish({
                     "data": periodAndOrgUnits,
-                    "type": "uploadCompletionData"
+                    "type": "uploadCompletionData",
+                    "locale": $scope.currentUser.locale,
+                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
                 }, "dataValues");
 
                 var uploadApprovalPromise = $hustle.publish({
                     "data": periodAndOrgUnits,
-                    "type": "uploadApprovalData"
+                    "type": "uploadApprovalData",
+                    "locale": $scope.currentUser.locale,
+                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
                 }, "dataValues");
 
                 return $q.all([uploadCompletionPromise, uploadApprovalPromise]);
@@ -108,7 +114,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
                 });
             };
 
-            var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);            
+            var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
             saveToDbAndPublishMessage(dhisProject).then(function(data) {
                 createOrgUnitGroups();
                 orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id]).then(function(modules) {
@@ -147,7 +153,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
                 user.userCredentials.disabled = $scope.isUserToBeDisabled;
                 return userRepository.upsert(user)
                     .then(function(data) {
-                        return publishMessage(data, "updateUser");
+                        return publishMessage(data, "updateUser", $scope.resourceBundle.updateUserDesc + user.name);
                     });
             };
 

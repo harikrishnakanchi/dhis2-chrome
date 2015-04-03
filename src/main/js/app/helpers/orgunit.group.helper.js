@@ -62,7 +62,9 @@ define([], function() {
                     orgUnitGroupRepository.upsert(orgUnitGroups).then(function() {
                         return $hustle.publish({
                             "data": orgUnitGroups,
-                            "type": "upsertOrgUnitGroups"
+                            "type": "upsertOrgUnitGroups",
+                            "locale": $scope.currentUser.locale,
+                            "desc": $scope.resourceBundle.upsertOrgUnitGroupsDesc
                         }, "dataValues");
                     });
                 };

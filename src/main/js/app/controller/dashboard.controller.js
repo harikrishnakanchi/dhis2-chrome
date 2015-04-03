@@ -169,21 +169,23 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                     });
                 }));
 
-                var publishToDhis = function(messageType) {
+                var publishToDhis = function(messageType, desc) {
                     var promises = [];
                     promises.push($hustle.publish({
                         "data": periodsAndOrgUnits,
-                        "type": messageType
+                        "type": messageType,
+                        "locale": $scope.currentUser.locale,
+                        "desc": desc
                     }, "dataValues"));
                     return $q.all(promises);
                 };
 
                 if ($scope.userApprovalLevel === 1)
                     return approvalDataRepository.markAsComplete(periodsAndOrgUnits, $rootScope.currentUser.userCredentials.username)
-                        .then(_.partial(publishToDhis, "uploadCompletionData"));
+                        .then(_.partial(publishToDhis, "uploadCompletionData", $scope.resourceBundle.uploadCompletionDataDesc + _.pluck(periodsAndOrgUnits, "period")));
                 if ($scope.userApprovalLevel === 2)
                     return approvalDataRepository.markAsApproved(periodsAndOrgUnits, $rootScope.currentUser.userCredentials.username)
-                        .then(_.partial(publishToDhis, "uploadApprovalData"));
+                        .then(_.partial(publishToDhis, "uploadApprovalData", $scope.resourceBundle.uploadApprovalDataDesc + _.pluck(periodsAndOrgUnits, "period")));
             };
 
             var modalMessages = {

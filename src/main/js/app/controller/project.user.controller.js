@@ -54,10 +54,12 @@ define(["dhisId"], function(dhisId) {
                 }]
             };
 
-            var publishMessage = function(data, action) {
+            var publishMessage = function(data, action, desc) {
                 return $hustle.publish({
                     "data": data,
-                    "type": action
+                    "type": action,
+                    "locale": $scope.currentUser.locale,
+                    "desc": desc
                 }, "dataValues");
             };
 
@@ -74,7 +76,7 @@ define(["dhisId"], function(dhisId) {
                 return error;
             };
             userRepository.upsert(userPayload).then(function() {
-                return publishMessage(userPayload, "createUser");
+                return publishMessage(userPayload, "createUser", $scope.resourceBundle.createUserDesc + userPayload.username);
             }).then(onSuccess, onFailure);
         };
 

@@ -25,6 +25,14 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
                 id: "blah"
             };
 
+            scope.currentUser = {
+                "locale": "en"
+            };
+
+            scope.resourceBundle = {
+                "upsertOrgUnitDesc": "create organisation unit: ",
+            };
+
             Timecop.install();
             Timecop.freeze(new Date('2014-10-29T12:43:54.972Z'));
 
@@ -109,7 +117,9 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": expectedNewOrgUnit,
-                "type": "upsertOrgUnit"
+                "type": "upsertOrgUnit",
+                "locale": "en",
+                "desc": "create organisation unit: Org1"
             }, 'dataValues');
         });
 

@@ -3,10 +3,12 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
         var patientOrigins = [];
 
         $scope.save = function() {
-            var publishMessage = function(data, action) {
+            var publishMessage = function(data, action, desc) {
                 return $hustle.publish({
                     "data": data,
-                    "type": action
+                    "type": action,
+                    "locale": $scope.currentUser.locale,
+                    "desc": desc
                 }, "dataValues");
             };
 
@@ -49,7 +51,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 };
 
                 var publishMessages = function() {
-                    publishMessage(allOriginOrgUnits, "upsertOrgUnit");
+                    publishMessage(allOriginOrgUnits, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.pluck(allOriginOrgUnits, "name"));
 
                     associatedDatasetIds = _.flatten(associatedDatasetIds);
                     publishMessage(associatedDatasetIds, "associateOrgUnitToDataset");
@@ -81,7 +83,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
             };
 
             return patientOriginRepository.upsert(payload)
-                .then(_.partial(publishMessage, payload, "uploadPatientOriginDetails"))
+                .then(_.partial(publishMessage, payload, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(payload.origins, "name")))
                 .then(createOrgUnits)
                 .then(onSuccess, onFailure);
         };

@@ -40,7 +40,15 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
 
-                scope.resourceBundle = {};
+                scope.resourceBundle = {
+                    "uploadProgramEventsDesc": "submit cases",
+                    "deleteEventDesc": "delete cases",
+                    "uploadApprovalDataDesc": "approve data at coordination level for ",
+                    "uploadCompletionDataDesc": "approve data at project level for ",
+                    "deleteApprovalsDesc": "restart approval process for ",
+                    "eventSubmitAndApproveSuccess": "Event(s) submitted and auto-approved successfully.",
+                    'eventSubmitSuccess': 'Event submitted succesfully'
+                };
                 scope.week = {
                     "weekNumber": 44,
                     "weekYear": 2014,
@@ -56,6 +64,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 scope.currentUser = {
                     "firstName": "foo",
                     "lastName": "bar",
+                    "locale": "en",
                     "userCredentials": {
                         "username": "dataentryuser",
                         "userRoles": [{
@@ -287,9 +296,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
                 spyOn(location, "hash");
 
-                scope.resourceBundle = {
-                    'eventSubmitSuccess': 'Event submitted succesfully'
-                };
 
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
@@ -306,14 +312,18 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "orgUnit": "currentModuleId"
                 });
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    type: 'uploadProgramEvents'
+                    type: 'uploadProgramEvents',
+                    locale: 'en',
+                    desc: 'submit cases'
                 }, 'dataValues');
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": {
                         "period": "2014W44",
                         "orgUnit": "currentModuleId"
                     },
-                    "type": "deleteApprovals"
+                    "type": "deleteApprovals",
+                    "locale": "en",
+                    "desc": "restart approval process for 2014W44"
                 }, "dataValues");
                 expect(scope.resultMessageType).toEqual("success");
                 expect(scope.resultMessage).toEqual("Event submitted succesfully");
@@ -354,10 +364,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
                 spyOn(location, "hash");
 
-                scope.resourceBundle = {
-                    "eventSubmitAndApproveSuccess": "Event(s) submitted and auto-approved successfully."
-                };
-
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
 
@@ -375,13 +381,17 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     'period': '2014W44'
                 }, 'dataentryuser');
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    type: 'uploadProgramEvents'
+                    type: 'uploadProgramEvents',
+                    locale: 'en',
+                    desc: 'submit cases'
                 }, 'dataValues');
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": [{
                         'orgUnit': 'currentModuleId',
                         'period': '2014W44'
                     }],
+                    'locale': 'en',
+                    'desc': 'approve data at project level for 2014W44',
                     "type": "uploadCompletionData"
                 }, "dataValues");
                 expect(hustle.publish).toHaveBeenCalledWith({
@@ -389,6 +399,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                         'orgUnit': 'currentModuleId',
                         'period': '2014W44'
                     }],
+                    'locale': 'en',
+                    'desc': 'approve data at coordination level for 2014W44',
                     "type": "uploadApprovalData"
                 }, "dataValues");
 
@@ -449,7 +461,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 expect(fakeModal.open).toHaveBeenCalled();
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: 'event1',
-                    type: 'deleteEvent'
+                    type: 'deleteEvent',
+                    locale: 'en',
+                    desc: 'delete cases'
                 }, 'dataValues');
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(softDeletedEventPayload);
                 expect(eventToDelete.localStatus).toEqual("DELETED");
@@ -499,7 +513,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 expect(fakeModal.open).toHaveBeenCalled();
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: 'event1',
-                    type: 'deleteEvent'
+                    type: 'deleteEvent',
+                    locale: 'en',
+                    desc: 'delete cases'
                 }, 'dataValues');
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(softDeletedEventPayload);
                 expect(eventToDelete.localStatus).toEqual("DELETED");

@@ -1,5 +1,4 @@
-define(["projectUserController", "angularMocks", "utils","dhisId"], function(ProjectUserController, mocks, utils,dhisId) {
-
+define(["projectUserController", "angularMocks", "utils", "dhisId"], function(ProjectUserController, mocks, utils, dhisId) {
     describe("projectUserControllerspec", function() {
         var scope, projectUserController, q, userRepository, hustle;
 
@@ -21,6 +20,15 @@ define(["projectUserController", "angularMocks", "utils","dhisId"], function(Pro
                     "value": "PRJ"
                 }]
             };
+
+            scope.currentUser = {
+                "locale": "en"
+            };
+
+            scope.resourceBundle = {
+                "createUserDesc": "create user "
+            };
+
             userRepository = utils.getMockRepo(q);
             userRepository.getAllUsernames = function() {};
 
@@ -61,10 +69,12 @@ define(["projectUserController", "angularMocks", "utils","dhisId"], function(Pro
 
             var payload = {
                 data: expectedUserPayload,
-                type: "createUser"
+                type: "createUser",
+                locale: "en",
+                desc: "create user proj_1_blah"
             };
 
-            spyOn(dhisId, "get").and.callFake(function(name){
+            spyOn(dhisId, "get").and.callFake(function(name) {
                 return name;
             });
 

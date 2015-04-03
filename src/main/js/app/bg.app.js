@@ -1,7 +1,7 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "chromeUtils", "angular-indexedDB"],
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "chromeUtils", "angular-indexedDB", "ng-i18n"],
     function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, chromeUtils) {
         var init = function() {
-            var app = angular.module('DHIS2', ["xc.indexedDB", "hustle"]);
+            var app = angular.module('DHIS2', ["xc.indexedDB", "hustle", "ngI18n"]);
             services.init(app);
             consumers.init(app);
             repositories.init(app);
@@ -11,7 +11,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', handleTimeoutInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
-            app.factory('queuePostProcessInterceptor', ['$log', queuePostProcessInterceptor]);
+            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', queuePostProcessInterceptor]);
 
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider', '$provide',
                 function($indexedDBProvider, $httpProvider, $hustleProvider, $provide) {
@@ -30,6 +30,12 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     $hustleProvider.init("hustle", 1, ["dataValues"]);
                 }
             ]);
+
+            app.value('ngI18nConfig', {
+                defaultLocale: 'en',
+                supportedLocales: ['en', 'fr', 'ar'],
+                basePath: "/js/app/i18n"
+            });
 
             app.run(['consumerRegistry', 'dhisMonitor', 'queuePostProcessInterceptor', '$hustle', '$log', '$rootScope',
                 function(consumerRegistry, dhisMonitor, queuePostProcessInterceptor, $hustle, $log, $rootScope) {

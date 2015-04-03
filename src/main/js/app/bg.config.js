@@ -2,6 +2,7 @@ require.config({
     paths: {
         "Q": "lib/q/q",
         "lodash": "lib/lodash/lodash",
+        "ng-i18n": "lib/ng-i18n/src/js/ng-i18n",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
         "indexedDBLogger": "app/utils/indexeddb.logger",
@@ -111,7 +112,11 @@ require.config({
         },
         'hustleModule': {
             deps: ["angular", "hustle"]
-        }
+        },
+        "ng-i18n": {
+            deps: ["angular"],
+            exports: "i18n"
+        },
     }
 });
 console.log("Config is complete");

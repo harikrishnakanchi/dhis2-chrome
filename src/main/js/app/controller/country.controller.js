@@ -45,7 +45,9 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             var saveToDhis = function(data) {
                 return $hustle.publish({
                     "data": data,
-                    "type": "upsertOrgUnit"
+                    "type": "upsertOrgUnit",
+                    "locale": $scope.currentUser.locale,
+                    "desc": $scope.resourceBundle.upsertOrgUnitDesc + data.name
                 }, "dataValues").then(function() {
                     return data;
                 });

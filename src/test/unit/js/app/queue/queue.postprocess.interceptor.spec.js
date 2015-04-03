@@ -1,12 +1,23 @@
-define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils"], function(QueuePostProcessInterceptor, mocks, properties, chromeUtils) {
+define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils"], function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils) {
     describe('queuePostProcessInterceptor', function() {
 
-        var hustle, queuePostProcessInterceptor, q, rootScope;
+        var hustle, queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope;
+
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
-            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log);
             q = $q;
             rootScope = $rootScope;
+            scope = $rootScope.$new();
+
             spyOn(chromeUtils, "sendMessage");
+            spyOn(chromeUtils, "createNotification");
+
+            ngI18nResourceBundle = {
+                "get": jasmine.createSpy("ngI18nResourceBundle").and.returnValue(utils.getPromise(q, {
+                    "data": {}
+                }))
+            };
+
+            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle);
         }));
 
         it('should return true for retry if number of releases is less than max retries', function() {
@@ -77,6 +88,36 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             }, {});
 
             expect(actualResult).toBeFalsy();
+        });
+
+        it('should notify user after 3 retries', function() {
+            var actualResult = queuePostProcessInterceptor.shouldRetry({
+                "id": 1,
+                "data": {
+                    "type": "a",
+                    "requestId": "1"
+                },
+                "releases": 2
+            }, {});
+
+            scope.$apply();
+
+            expect(chromeUtils.createNotification).toHaveBeenCalled();
+        });
+
+        it('should notify user after max retries has exceeded', function() {
+            var actualResult = queuePostProcessInterceptor.shouldRetry({
+                "id": 1,
+                "data": {
+                    "type": "a",
+                    "requestId": "1"
+                },
+                "releases": properties.queue.maxretries
+            }, {});
+
+            scope.$apply();
+
+            expect(chromeUtils.createNotification).toHaveBeenCalled();
         });
     });
 });
