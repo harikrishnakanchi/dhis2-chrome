@@ -32,11 +32,11 @@ define(['lodash', 'overrides'], function(_, overrides) {
                 "downloadProgram", "downloadEventData", "downloadSystemSetting", "downloadPatientOriginDetails"
             ],
             "retryDelayConfig": {
-                0: 15000,
-                1: 15000,
-                2: 30000,
-                3: 720000,
-                4: 720000
+                0: 10000,
+                1: 10000,
+                2: 10000,
+                3: 10000,
+                4: 10000
             }
         },
         "logging": {

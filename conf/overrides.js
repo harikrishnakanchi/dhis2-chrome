@@ -15,6 +15,15 @@ define([], function() {
                 "intervalInMinutes": parseInt(metdataSyncInterval)
             }
         },
+        "queue": {
+            "retryDelayConfig": {
+                0: 900000,
+                1: 900000,
+                2: 1800000,
+                3: 43200000,
+                4: 43200000
+            }
+        },
         "devMode": false
     };
 });
