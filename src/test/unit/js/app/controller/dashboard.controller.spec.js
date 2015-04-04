@@ -1,4 +1,4 @@
-define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datasetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5", "moment", "indexedDBLogger", "approvalDataRepository"], function(DashboardController, mocks, utils, ApprovalHelper, DatasetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5, moment, indexedDBLogger, ApprovalDataRepository) {
+define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datasetRepository", "filesystemService", "indexeddbUtils", "timecop", "sessionHelper", "md5", "moment", "indexedDBLogger", "approvalDataRepository", "lodash"], function(DashboardController, mocks, utils, ApprovalHelper, DatasetRepository, FilesystemService, IndexeddbUtils, timecop, SessionHelper, md5, moment, indexedDBLogger, ApprovalDataRepository, _) {
     describe("dashboard controller", function() {
         var q, rootScope, db, hustle, dashboardController, approvalHelper, fakeModal, timeout, datasetRepository, filesystemService, indexeddbUtils, idbDump, sessionHelper, location;
 
@@ -81,18 +81,26 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
         });
 
         it("should fetch and display all organisation units", function() {
-
             scope.syncNow();
 
             scope.$apply();
             timeout.flush();
 
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "downloadData"
-            }, "dataValues");
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "downloadEventData"
-            }, "dataValues");
+            var syncableTypes = ["downloadMetadata", "downloadSystemSetting", "downloadPatientOriginDetails", "downloadOrgUnit", "downloadOrgUnitGroups",
+                "downloadProgram", "downloadData", "downloadEventData", "downloadDatasets"
+            ];
+
+            var expectedHustleArgs = _.map(syncableTypes, function(type) {
+                return [{
+                    "type": type,
+                    "data": []
+                }, "dataValues"];
+            });
+
+            expect(hustle.publish.calls.count()).toEqual(syncableTypes.length);
+            _.forEach(syncableTypes, function(type, i) {
+                expect(hustle.publish.calls.argsFor(i)).toEqual(expectedHustleArgs[i]);
+            });
         });
 
         it("should format periods to be shown on dashboard", function() {
@@ -360,7 +368,6 @@ define(["dashboardController", "angularMocks", "utils", "approvalHelper", "datas
             expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual(expectedItemsAwaitingApprovalAtUserLevel);
             expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual(expectedItemsAwaitingApprovalAtOtherLevels);
         });
-
 
         it("should approve selected items", function() {
             spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));

@@ -26,7 +26,18 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
             };
 
             var downloadMetadata = $hustle.publish({
-                "type": "downloadMetadata"
+                "type": "downloadMetadata",
+                "data": []
+            }, "dataValues");
+
+            var downloadSystemSetting = $hustle.publish({
+                "type": "downloadSystemSetting",
+                "data": []
+            }, "dataValues");
+
+            var downloadPatientOriginDetails = $hustle.publish({
+                "type": "downloadPatientOriginDetails",
+                "data": []
             }, "dataValues");
 
             var downloadOrgUnit = $hustle.publish({
@@ -45,11 +56,13 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
             }, "dataValues");
 
             var downloadData = $hustle.publish({
-                "type": "downloadData"
+                "type": "downloadData",
+                "data": []
             }, "dataValues");
 
             var downloadEvents = $hustle.publish({
-                "type": "downloadEventData"
+                "type": "downloadEventData",
+                "data": []
             }, "dataValues");
 
             var downloadDatasets = $hustle.publish({
@@ -57,7 +70,10 @@ define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBL
                 "data": []
             }, "dataValues");
 
-            return $q.all([downloadMetadata, downloadOrgUnit, downloadOrgUnitGroups, downloadProgram, downloadData, downloadEvents, downloadDatasets]).then(onSuccess);
+            return $q.all([downloadMetadata, downloadSystemSetting, downloadPatientOriginDetails, downloadOrgUnit, downloadOrgUnitGroups,
+                    downloadProgram, downloadData, downloadEvents, downloadDatasets
+                ])
+                .then(onSuccess);
         };
 
         $scope.formatPeriods = function(period) {
