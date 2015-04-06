@@ -13,6 +13,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
                 spyOn(location, "hash");
 
+                rootScope.hasRoles = jasmine.createSpy("hasRoles").and.returnValue(false);
+
                 rootScope.currentUser = {
                     "firstName": "test1",
                     "lastName": "test1last",
@@ -123,14 +125,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.currentModule).toEqual(allModules[0]);
             });
 
-            it("should load the aggregate data entry template if current module does not contain line list porgrams", function() {
-                rootScope.currentUser.userCredentials = {
-                    "username": "dataentryuser",
-                    "userRoles": [{
-                        "name": 'Data entry user'
-                    }]
-                };
-
+            it("should load the aggregate data entry template by default", function() {
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
 
@@ -142,23 +137,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.programId).toBe(undefined);
             });
 
-            it("should load the list-list entry template if current module contains line list porgrams", function() {
-                rootScope.currentUser.userCredentials = {
-                    "username": "dataentryuser",
-                    "userRoles": [{
-                        "name": 'Data entry user'
-                    }]
-                };
-
-                programRepository = new ProgramRepository();
-                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {
-                    'id': 'p1'
-                }));
-
-                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [{
-                    "id": "originOrgUnit",
-                    "name": "orignOrgUnit"
-                }]));
+            it("should load the list-list entry template for a data entry user if current module contains line list porgrams", function() {
+                rootScope.hasRoles.and.callFake(function(roles) {
+                    if (_.includes(roles, "Data entry user"))
+                        return true;
+                });
 
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
                 scope.$apply();
@@ -177,16 +160,13 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.$apply();
 
                 expect(scope.formTemplateUrl.indexOf("templates/partials/line-list-summary.html?")).toEqual(0);
-                expect(scope.programId).toEqual('p1');
             });
 
-            it("should load the data entry template if user is an approver and current module contains line list porgrams", function() {
-                rootScope.currentUser.userCredentials = {
-                    "username": "dataentryuser",
-                    "userRoles": [{
-                        "name": 'Not a Data entry user'
-                    }]
-                };
+            it("should load the approval template if user is a project level approver", function() {
+                rootScope.hasRoles.and.callFake(function(roles) {
+                    if (_.includes(roles, "Project Level Approver"))
+                        return true;
+                });
 
                 programRepository = new ProgramRepository();
                 spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {
@@ -200,7 +180,29 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.currentModule = {};
                 scope.$apply();
 
-                expect(scope.formTemplateUrl.indexOf("templates/partials/aggregate-data-entry.html?")).toEqual(0);
+                expect(scope.formTemplateUrl.indexOf("templates/partials/data-approval.html?")).toEqual(0);
+                expect(scope.programId).toBe(undefined);
+            });
+
+            it("should load the approval template if user is an Coordination Level approver", function() {
+                rootScope.hasRoles.and.callFake(function(roles) {
+                    if (_.includes(roles, "Coordination Level Approver"))
+                        return true;
+                });
+
+                programRepository = new ProgramRepository();
+                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {
+                    'id': 'p1'
+                }));
+
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
+                scope.$apply();
+
+                scope.week = {};
+                scope.currentModule = {};
+                scope.$apply();
+
+                expect(scope.formTemplateUrl.indexOf("templates/partials/data-approval.html?")).toEqual(0);
                 expect(scope.programId).toBe(undefined);
             });
 

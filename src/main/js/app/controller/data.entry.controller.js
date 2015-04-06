@@ -1,11 +1,6 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer"],
     function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
         return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository, programRepository) {
-            var isDataEntryUser = function(user) {
-                return _.any(user.userCredentials.userRoles, function(userAuth) {
-                    return userAuth.name === 'Data entry user';
-                });
-            };
 
             var isLineListService = function(orgUnit) {
                 var attr = _.find(orgUnit.attributeValues, {
@@ -23,23 +18,23 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                         $scope.errorMessage = $scope.resourceBundle.openingDateInFutureError + moment($scope.currentModule.openingDate).isoWeek();
                         return;
                     } else {
-                        return loadDataEntryForm();
+                        return loadTemplate();
                     }
                 }
             });
 
-            var loadDataEntryForm = function() {
-                if (isLineListService($scope.currentModule)) {
-                    return orgUnitRepository.findAllByParent($scope.currentModule.id).then(function(originOrgUnits) {
-                        return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
-                            $scope.programId = program.id;
-                            $scope.formTemplateUrl = "templates/partials/line-list-summary.html" + '?' + moment().format("X");
-                        });
-                    });
-                } else {
-                    $scope.programId = undefined;
-                    $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
+            var loadTemplate = function() {
+                if (isLineListService($scope.currentModule) && $scope.hasRoles(['Data entry user'])) {
+                    $scope.formTemplateUrl = "templates/partials/line-list-summary.html" + '?' + moment().format("X");
+                    return;
                 }
+
+                if ($scope.hasRoles(['Project Level Approver', 'Coordination Level Approver'])) {
+                    $scope.formTemplateUrl = "templates/partials/data-approval.html" + '?' + moment().format("X");
+                    return;
+                }
+
+                $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
             };
 
             var isOpeningDateInFuture = function() {
@@ -67,33 +62,33 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 });
             };
 
-            var setInitialModuleAndWeek = function() {
-                var setSelectedModule = function(moduleId) {
-                    $scope.currentModule = _.find($scope.modules, function(module) {
-                        return module.id === moduleId;
-                    });
-                };
-
-                var setSelectedWeek = function(period) {
-                    var m = moment(period, "GGGG[W]W");
-
-                    $scope.year = m.year();
-                    $scope.month = m.month();
-                    $scope.week = {
-                        "weekNumber": m.isoWeek(),
-                        "weekYear": m.isoWeekYear(),
-                        "startOfWeek": m.startOf("isoWeek").format("YYYY-MM-DD"),
-                        "endOfWeek": m.endOf("isoWeek").format("YYYY-MM-DD")
-                    };
-                };
-
-                if ($routeParams.module && $routeParams.week) {
-                    setSelectedModule($routeParams.module);
-                    setSelectedWeek($routeParams.week);
-                }
-            };
-
             var init = function() {
+                var setInitialModuleAndWeek = function() {
+                    var setSelectedModule = function(moduleId) {
+                        $scope.currentModule = _.find($scope.modules, function(module) {
+                            return module.id === moduleId;
+                        });
+                    };
+
+                    var setSelectedWeek = function(period) {
+                        var m = moment(period, "GGGG[W]W");
+
+                        $scope.year = m.year();
+                        $scope.month = m.month();
+                        $scope.week = {
+                            "weekNumber": m.isoWeek(),
+                            "weekYear": m.isoWeekYear(),
+                            "startOfWeek": m.startOf("isoWeek").format("YYYY-MM-DD"),
+                            "endOfWeek": m.endOf("isoWeek").format("YYYY-MM-DD")
+                        };
+                    };
+
+                    if ($routeParams.module && $routeParams.week) {
+                        setSelectedModule($routeParams.module);
+                        setSelectedWeek($routeParams.week);
+                    }
+                };
+
                 $location.hash('top');
                 $scope.loading = true;
                 setAvailableModules()

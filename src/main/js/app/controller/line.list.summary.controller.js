@@ -31,7 +31,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         var markEventsAsSubmitted = function() {
-            return programEventRepository.markEventsAsSubmitted($scope.programId, getPeriod(), _.pluck($scope.originOrgUnits, "id"));
+            return programEventRepository.markEventsAsSubmitted($scope.program.id, getPeriod(), _.pluck($scope.originOrgUnits, "id"));
         };
 
         $scope.showResultMessage = function(messageType, message) {
@@ -51,7 +51,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 allEvents: []
             };
             $scope.eventForm.showEventForm = false;
-            return programEventRepository.getEventsFor($scope.programId, getPeriod(), _.pluck($scope.originOrgUnits, "id")).then(function(events) {
+            return programEventRepository.getEventsFor($scope.program.id, getPeriod(), _.pluck($scope.originOrgUnits, "id")).then(function(events) {
                 $scope.eventForm.allEvents = $scope.eventForm.allEvents.concat(events);
             });
         };
@@ -236,7 +236,11 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 };
 
                 var getProgram = function(excludedDataElements) {
-                    return programRepository.get($scope.programId, excludedDataElements);
+                    return orgUnitRepository.findAllByParent($scope.currentModule.id).then(function(originOrgUnits) {
+                        return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
+                            return programRepository.get(program.id, excludedDataElements);
+                        });
+                    });
                 };
 
                 return getExcludedDataElementsForModule().then(getProgram).then(function(program) {
@@ -271,10 +275,10 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             $scope.loading = true;
             $scope.formTemplateUrl = undefined;
 
-            return loadOriginsOrgUnits().then(function() {
-                return $q.all([$scope.loadEventsView(), loadPrograms(), setUpProjectAutoApprovedFlag(), setUpIsApprovedFlag()]).finally(function() {
-                    $scope.loading = false;
-                });
+            return $q.all([loadOriginsOrgUnits(), loadPrograms()]).then(function() {
+                return $q.all([$scope.loadEventsView(), setUpProjectAutoApprovedFlag(), setUpIsApprovedFlag()]);
+            }).finally(function() {
+                $scope.loading = false;
             });
         };
 

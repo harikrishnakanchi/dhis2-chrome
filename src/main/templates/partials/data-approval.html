@@ -1,16 +1,13 @@
-<div ng-controller="aggregateDataEntryController">
+<div ng-controller="dataApprovalController">
     <div class="loading" ng-show="loading">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
     <section class="panel tab-panel" ng-if="week &amp;&amp; currentModule">
-        <div ng-show="saveSuccess" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
-        <div ng-show="isSubmitted &amp;&amp; !isCompleted &amp;&amp; !isApproved" class="alert alert-success">{{resourceBundle.dataSubmittedForApproval}}</div>
-        <div ng-show="isCompleted &amp;&amp; !isApproved" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
+        <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
         <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
-        <div ng-show="submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.dataSubmitAndApproved}}</div>
-        <div ng-show="saveError" class="alert alert-danger">{{resourceBundle.dataSaveFailure}}</div>
-        <div ng-show="submitError" class="alert alert-danger">{{resourceBundle.dataSubmitFailure}}</div>
-        <form name="dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user'])">
+        <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
+        <div class="alert alert-danger" ng-if="dataValues !== undefined &amp;&amp; (!isSubmitted || hasRoles(['Coordination Level Approver']) &amp;&amp;!isCompleted) &amp;&amp; hasRoles(['Project Level Approver', 'Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
+        <form name="dataentryForm" id="dataentry" ng-if="(isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) || (isCompleted &amp;&amp; hasRoles(['Coordination Level Approver']))">
             <div class="text-right">
                 <input type="button" class="printTallySheetBtn" ng-click="printWindow()" value="{{resourceBundle.printTallySheetBtnValue}}" ng-show="currentModule"></input>
             </div>
@@ -61,7 +58,7 @@
                                                 </td>
                                                 <td ng-repeat="option in section.categoryOptionComboIds">
                                                     <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
-                                                        <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit.id)['value']" ng-focus="restoreExpression(orgUnit.id, dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(orgUnit.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed()" />
+                                                        <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit.id)['value']" class="form-control" ng-disabled="true" />
                                                         <br/>
                                                     </ng-form>
                                                 </td>
@@ -114,7 +111,7 @@
                                             </td>
                                             <td ng-repeat="option in section.categoryOptionComboIds">
                                                 <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
-                                                    <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit.id)['value']" ng-focus="restoreExpression(orgUnit.id, dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(orgUnit.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed()" />
+                                                    <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit.id)['value']" ng-focus="restoreExpression(orgUnit.id, dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(orgUnit.id, dataElement.id, option)" ng-disabled="true" />
                                                     <br/>
                                                 </ng-form>
                                             </td>
@@ -128,9 +125,8 @@
                 </accordion-group>
             </accordion>
             <div>
-                <input type="button" class="btn btn-main" id="dataEntrySave" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}" />
-                <input type="button" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || !isDataEntryAllowed()" ng-if="hasRoles(['Data entry user']) &amp;&amp; !projectIsAutoApproved" value="{{resourceBundle.submitBtnValue}}" />
-                <input type="button" class="btn btn-main" id="dataEntrySubmitAndApprove" ng-click="submitAndApprove()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || !isDataEntryAllowed()" ng-if="hasRoles(['Data entry user']) &amp;&amp; projectIsAutoApproved" value="{{resourceBundle.submitBtnValue}}" />
+                <input type="button" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="dataentryForm.$invalid || isCompleted || !isDataEntryAllowed()" ng-if="hasRoles(['Project Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
+                <input type="button" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="dataentryForm.$invalid || isApproved || !isDataEntryAllowed()" ng-if="hasRoles(['Coordination Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
             </div>
         </form>
     </section>

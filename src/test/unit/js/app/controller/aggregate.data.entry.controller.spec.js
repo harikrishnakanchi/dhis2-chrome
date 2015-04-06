@@ -674,55 +674,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.isSubmitted).toBe(true);
             });
 
-            it("should submit data for first level approval", function() {
-                var levelOneApprovalDataSaved = false;
-                getApprovalDataSpy.and.callFake(function() {
-                    if (levelOneApprovalDataSaved)
-                        return utils.getPromise(q, {
-                            "isComplete": true
-                        });
-                    return utils.getPromise(q, undefined);
-                });
-
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
-
-                spyOn(approvalDataRepository, "markAsComplete").and.callFake(function() {
-                    levelOneApprovalDataSaved = true;
-                    return utils.getPromise(q, {});
-                });
-
-                var periodAndOrgUnit = {
-                    "period": '2014W14',
-                    "orgUnit": 'mod1'
-                };
-                var storedBy = "dataentryuser";
-                scope.currentModule = {
-                    id: 'mod1',
-                    parent: {
-                        id: 'parent'
-                    }
-                };
-
-                scope.$apply();
-
-                scope.firstLevelApproval();
-                scope.$apply();
-
-                expect(approvalDataRepository.markAsComplete).toHaveBeenCalledWith(periodAndOrgUnit, storedBy);
-
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": [periodAndOrgUnit],
-                    "type": "uploadCompletionData"
-                }, "dataValues");
-
-                expect(scope.firstLevelApproveSuccess).toBe(true);
-                expect(scope.secondLevelApproveSuccess).toBe(false);
-                expect(scope.approveError).toBe(false);
-                expect(scope.isCompleted).toEqual(true);
-            });
-
             it("should submit data for auto approval", function() {
                 getApprovalDataSpy.and.callFake(function() {
                     return utils.getPromise(q, undefined);
@@ -792,38 +743,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.submitAndApprovalSuccess).toBe(true);
             });
 
-            it("should not submit data for approval", function() {
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
-
-                spyOn(approvalDataRepository, "markAsComplete").and.returnValue(utils.getRejectedPromise(q, {}));
-
-                scope.firstLevelApproval();
-                scope.$apply();
-
-                expect(scope.firstLevelApproveSuccess).toBe(false);
-                expect(scope.secondLevelApproveSuccess).toBe(false);
-                expect(scope.approveError).toBe(true);
-                expect(scope.isCompleted).toEqual(false);
-            });
-
-            it("should mark data as complete if proccessed", function() {
-                scope.$apply();
-
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
-                spyOn(approvalDataRepository, "markAsComplete").and.returnValue(utils.getPromise(q, {}));
-
-                scope.firstLevelApproval();
-                scope.$apply();
-
-                expect(scope.firstLevelApproveSuccess).toBe(true);
-                expect(scope.secondLevelApproveSuccess).toBe(false);
-                expect(scope.approveError).toBe(false);
-            });
-
             it("should show a message if data is already complete", function() {
                 getApprovalDataSpy.and.returnValue(utils.getPromise(q, {
                     "isComplete": true
@@ -832,42 +751,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(scope.isCompleted).toBeTruthy();
-            });
-
-            it("should mark data as approved if proccessed", function() {
-                var levelTwoApprovalDataSaved = false;
-                getApprovalDataSpy.and.callFake(function() {
-                    if (levelTwoApprovalDataSaved)
-                        return utils.getPromise(q, {
-                            "isComplete": true,
-                            "isApproved": true
-                        });
-                    return utils.getPromise(q, {
-                        "isComplete": true
-                    });
-                });
-
-                scope.$apply();
-
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
-
-                spyOn(approvalDataRepository, "markAsApproved").and.callFake(function() {
-                    levelTwoApprovalDataSaved = true;
-                    return utils.getPromise(q, {
-                        "blah": "moreBlah"
-                    });
-                });
-
-                scope.secondLevelApproval();
-                scope.$apply();
-
-                expect(scope.firstLevelApproveSuccess).toBe(false);
-                expect(scope.secondLevelApproveSuccess).toBe(true);
-                expect(scope.approveError).toBe(false);
-                expect(scope.isCompleted).toEqual(true);
-                expect(scope.isApproved).toEqual(true);
             });
 
             it("should show a message if data is already approved", function() {
@@ -927,56 +810,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
                 expect(scope.shouldDataBeEnteredForOrgUnit("mod3")).toEqual(false);
 
-            });
-
-            it("should submit data for second level approval", function() {
-                var levelTwoApprovalDataSaved = false;
-                getApprovalDataSpy.and.callFake(function() {
-                    if (levelTwoApprovalDataSaved)
-                        return utils.getPromise(q, {
-                            "isComplete": true,
-                            "isApproved": true
-                        });
-                    return utils.getPromise(q, {
-                        "isComplete": true
-                    });
-                });
-
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
-
-                spyOn(approvalDataRepository, "markAsApproved").and.callFake(function() {
-                    levelTwoApprovalDataSaved = true;
-                    return utils.getPromise(q, {});
-                });
-
-                var periodAndOrgUnit = {
-                    "period": '2014W14',
-                    "orgUnit": 'mod1',
-                };
-                var approvedBy = "dataentryuser";
-                scope.currentModule = {
-                    id: 'mod1',
-                    parent: {
-                        id: 'parent'
-                    }
-                };
-
-                scope.$apply();
-
-                scope.secondLevelApproval();
-                scope.$apply();
-
-                expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith(periodAndOrgUnit, approvedBy);
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": [periodAndOrgUnit],
-                    "type": "uploadApprovalData",
-                    "locale": "en",
-                    "desc": "approve data at coordination level for 2014W14"
-                }, "dataValues");
-                expect(scope.secondLevelApproveSuccess).toBe(true);
-                expect(scope.approveError).toBe(false);
             });
         });
     });
