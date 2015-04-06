@@ -155,5 +155,6 @@
     "upsertOrgUnitGroupsDesc": "assign organisation unit to appropriate groups",
     "uploadProgramEventsDesc": "submit cases",
     "deleteEventDesc": "delete cases",
-    "uploadPatientOriginDetailsDesc": "create patient origin "
+    "uploadPatientOriginDetailsDesc": "create patient origin ",
+    "patientOriginValidation": "Patient origin is required"
 }

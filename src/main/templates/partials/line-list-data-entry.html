@@ -26,6 +26,7 @@
                                             <select ng-options="o.name for o in originOrgUnits" ng-model="patientOrigin.selected" name="patientOrigin" required>
                                                 <option value=""></option>
                                             </select>
+                                            <span class="errortxt" ng-show="form.eventDataEntryForm.patientOrigin.$error.required &amp;&amp; form.eventDataEntryForm.patientOrigin.$dirty">{{ resourceBundle.patientOriginValidation}}</span>
                                         </div>
                                     </li>
                                 </ul>
