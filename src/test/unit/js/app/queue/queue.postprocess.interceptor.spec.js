@@ -106,7 +106,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
         });
 
         it('should notify user after max retries has exceeded', function() {
-            var actualResult = queuePostProcessInterceptor.shouldRetry({
+            queuePostProcessInterceptor.shouldRetry({
                 "id": 1,
                 "data": {
                     "type": "a",
@@ -118,6 +118,30 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             scope.$apply();
 
             expect(chromeUtils.createNotification).toHaveBeenCalled();
+        });
+
+        it("should notify user if product key has expired", function() {
+            var job = {
+                "id": 1,
+                "data": {
+                    "type": "a",
+                    "requestId": "1"
+                },
+                "releases": 0
+            };
+
+            var data = {
+                "status": 401
+            };
+
+            queuePostProcessInterceptor.shouldRetry(job, data);
+
+            scope.$apply();
+
+            expect(chromeUtils.createNotification).toHaveBeenCalled();
+            expect(chromeUtils.sendMessage.calls.count()).toEqual(3);
+            expect(chromeUtils.sendMessage.calls.argsFor(1)).toEqual(["dhisOffline"]);
+            expect(chromeUtils.sendMessage.calls.argsFor(2)).toEqual(["productKeyExpired"]);
         });
     });
 });

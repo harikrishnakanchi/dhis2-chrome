@@ -135,6 +135,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         chromeUtils.getAuthHeader(setAuthHeader);
                     });
 
+                    chromeUtils.addListener("productKeyExpired", function() {
+                        dhisMonitor.stop();
+                    });
+
                     consumerRegistry.register().then(function() {
                         chromeUtils.getAuthHeader(setAuthHeader);
                     });

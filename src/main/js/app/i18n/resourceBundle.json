@@ -157,5 +157,6 @@
     "deleteEventDesc": "delete cases",
     "uploadPatientOriginDetailsDesc": "create patient origin ",
     "patientOriginValidation": "Patient origin is required",
-    "invalidDateRangeMessage": "Date should be in selected week"
+    "invalidDateRangeMessage": "Date should be in selected week",
+    "productKeyExpiredMessage": "Your product key has expired. Please contact admin."
 }

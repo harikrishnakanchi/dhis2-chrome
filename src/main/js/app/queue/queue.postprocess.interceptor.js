@@ -14,8 +14,15 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
             return delayinHrs.toString();
         };
 
-        var notifyUser = function(job) {
-            if (job.releases === 2) {
+        var notifyUser = function(job, data) {
+            if (data && data.status === 401) {
+                getResourceBundle(job.data.locale).then(function(data) {
+                    var resourceBundle = data;
+                    chromeUtils.createNotification(resourceBundle.notificationTitle, resourceBundle.productKeyExpiredMessage);
+                    chromeUtils.sendMessage("dhisOffline");
+                    chromeUtils.sendMessage("productKeyExpired");
+                });
+            } else if (job.releases === 2) {
                 getResourceBundle(job.data.locale).then(function(data) {
                     var resourceBundle = data;
                     var notificationMessage = resourceBundle.failedToLabel + job.data.desc + resourceBundle.notificationRetryMessagePrefix + getRetryDelayInHours(3) + resourceBundle.notificationRetryMessageSuffix;
@@ -43,11 +50,12 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
             },
             "shouldRetry": function(job, data) {
                 sendChromeMessage(job, "Failed");
+
+                notifyUser(job, data);
+
                 if (_.contains(properties.queue.skipRetryMessages, job.data.type)) {
                     return false;
                 }
-
-                notifyUser(job);
 
                 if (job.releases < properties.queue.maxretries) {
                     $log.warn("Retry " + job.releases + " for job", job);
