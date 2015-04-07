@@ -18,18 +18,27 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]W");
         };
 
-        var getDataValues = function(programStage) {
+        var getDataValuesAndEventDate = function(programStage) {
+            var eventDate = null;
             var formatValue = function(value) {
                 return _.isDate(value) ? moment(value).format("YYYY-MM-DD") : value;
             };
-            return _.flatten(_.map(programStage.programStageSections, function(sections) {
+            var dataValuesList = _.flatten(_.map(programStage.programStageSections, function(sections) {
                 return _.map(sections.programStageDataElements, function(psde) {
+                    if ($scope.isEventDateSubstitute(psde.dataElement)) {
+                        eventDate = formatValue($scope.dataValues[psde.dataElement.id]);
+                    }
+
                     return ({
                         "dataElement": psde.dataElement.id,
                         "value": formatValue($scope.dataValues[psde.dataElement.id])
                     });
                 });
             }));
+            return {
+                eventDate: eventDate,
+                dataValues: dataValuesList
+            };
         };
 
         var upsertEvent = function() {
@@ -39,6 +48,13 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             return programEventRepository.upsert(payload).then(function() {
                 return $scope.showResultMessage("success", $scope.resourceBundle.eventSaveSuccess);
             });
+        };
+
+        $scope.isEventDateSubstitute = function(dataElement) {
+            var attr = _.find(dataElement.attributeValues, function(attributeValue) {
+                return attributeValue.attribute.code === "useAsEventDate";
+            });
+            return attr && attr.value === "true";
         };
 
         $scope.getEventDateNgModel = function(eventDates, programId, programStageId) {
@@ -62,10 +78,11 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
         $scope.update = function(programStage) {
             var buildPayloadFromView = function() {
+                var dataValuesAndEventDate = getDataValuesAndEventDate(programStage);
                 $scope.event.orgUnit = $scope.patientOrigin.selected.id;
-                $scope.event.eventDate = moment($scope.eventDates[$scope.event.program][$scope.event.programStage]).format("YYYY-MM-DD");
+                $scope.event.eventDate = dataValuesAndEventDate.eventDate;
                 $scope.event.localStatus = "UPDATED_DRAFT";
-                $scope.event.dataValues = getDataValues(programStage);
+                $scope.event.dataValues = dataValuesAndEventDate.dataValues;
             };
 
             buildPayloadFromView();
@@ -74,14 +91,16 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
         $scope.save = function(programStage, addAnother) {
             var buildPayloadFromView = function() {
+                var dataValuesAndEventDate = getDataValuesAndEventDate(programStage);
+
                 $scope.event = {
                     "event": dhisId.get($scope.program.id + programStage.id + $scope.currentModule.id + moment().format()),
                     "program": $scope.program.id,
                     "programStage": programStage.id,
                     "orgUnit": $scope.patientOrigin.selected.id,
-                    "eventDate": moment($scope.eventDates[$scope.program.id][programStage.id]).format("YYYY-MM-DD"),
+                    "eventDate": dataValuesAndEventDate.eventDate,
                     "localStatus": "NEW_DRAFT",
-                    "dataValues": getDataValues(programStage)
+                    "dataValues": dataValuesAndEventDate.dataValues
                 };
             };
 

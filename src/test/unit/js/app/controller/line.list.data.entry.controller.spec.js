@@ -125,8 +125,33 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 var programStage = {
                     'id': 'PrgStage1',
-                    'programStageDataElements': []
+                    'programStageSections': [{
+                        'id': 'section1',
+                        'programStageDataElements': [{
+                            "dataElement": {
+                                "id": "de1",
+                                'attributeValues': [{
+                                    'attribute': {
+                                        'code': 'useAsEventDate'
+                                    },
+                                    'value': 'true'
+                                }]
+                            }
+                        }, {
+                            "dataElement": {
+                                "id": "de2"
+                            }
+                        }]
+                    }, {
+                        'id': 'section2',
+                        'programStageDataElements': [{
+                            "dataElement": {
+                                "id": "de3"
+                            }
+                        }]
+                    }]
                 };
+
 
                 spyOn(location, "hash");
 
@@ -140,13 +165,11 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
                 scope.$apply();
 
-                scope.eventDates = {
-                    "Prg1": {
-                        "PrgStage1": "2014-11-18T10:34:14.067Z"
-                    }
+                scope.dataValues = {
+                    'de1': "2015-02-03",
+                    'de2': "someValue",
+                    'de3': "blah"
                 };
-
-                scope.dataValues = {};
 
                 scope.patientOrigin = {
                     "selected": originOrgUnits[0]
@@ -159,9 +182,18 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
                 expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
                 expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("o1");
-                expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2014-11-18");
+                expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2015-02-03");
                 expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW_DRAFT");
-                expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([]);
+                expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([{
+                    "dataElement": 'de1',
+                    "value": '2015-02-03'
+                }, {
+                    "dataElement": 'de2',
+                    "value": 'someValue'
+                }, {
+                    "dataElement": 'de3',
+                    "value": 'blah'
+                }]);
 
                 expect(scope.loadEventsView).toHaveBeenCalled();
             });
@@ -202,7 +234,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         'id': 'section1',
                         'programStageDataElements': [{
                             "dataElement": {
-                                "id": "de1"
+                                "id": "de1",
+                                'attributeValues': [{
+                                    'attribute': {
+                                        'code': 'useAsEventDate'
+                                    },
+                                    'value': 'true'
+                                }]
                             }
                         }, {
                             "dataElement": {
@@ -230,11 +268,11 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "program": "Prg1",
                     "programStage": "PrgStage1",
                     "orgUnit": "Mod1",
-                    "eventDate": "2014-12-29T05:06:30.950+0000",
+                    "eventDate": "2014-12-29",
                     "dataValues": [{
                         "dataElement": "de1",
-                        "value": "12",
-                        "type": "int"
+                        "value": "2014-12-31",
+                        "type": "date"
                     }, {
                         "dataElement": "de2",
                         "value": "13",
@@ -261,10 +299,10 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         'program': "Prg1",
                         'programStage': "PrgStage1",
                         'orgUnit': "o1",
-                        'eventDate': "2014-12-29",
+                        'eventDate': new Date("2014-12-31"),
                         'dataValues': [{
                             "dataElement": "de1",
-                            "value": 12
+                            "value": new Date("2014-12-31")
                         }, {
                             "dataElement": "de2",
                             "value": 13
