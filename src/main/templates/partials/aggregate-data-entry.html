@@ -109,8 +109,8 @@
                                     <tbody ng-repeat="orgUnit in section.orgUnits | orderBy: 'name'">
                                         <tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm" ng-if="shouldDataBeEnteredForOrgUnit(orgUnit.id)">
                                             <td>
-                                                <span ng-if="resourceBundle[dataElement.id]"> {{ orgUnit.name }}</span>
-                                                <span ng-if="!resourceBundle[dataElement.id]"> {{ orgUnit.name }}</span>
+                                                <span ng-if="resourceBundle[orgUnit.id]"> {{resourceBundle[orgUnit.id]}}</span>
+                                                <span ng-if="!resourceBundle[orgUnit.id]"> {{ orgUnit.name }}</span>
                                             </td>
                                             <td ng-repeat="option in section.categoryOptionComboIds">
                                                 <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">

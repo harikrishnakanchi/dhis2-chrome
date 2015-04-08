@@ -1,10 +1,10 @@
 /*global Date:true*/
-define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository"],
-    function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository) {
+define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository", "datasetRepository"],
+    function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository, DatasetRepository) {
         describe("dataApprovalController ", function() {
             var scope, routeParams, db, q, location, anchorScroll, dataApprovalController, rootScope, approvalStore,
                 saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getApprovalDataSpy, getDataValuesSpy,
-                orgUnits, window, approvalStoreSpy, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, systemSettingRepository, origin1, origin2;
+                orgUnits, window, approvalStoreSpy, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, systemSettingRepository, origin1, origin2, geographicOrigins;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -23,6 +23,12 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 scope = $rootScope.$new();
                 dataRepository = new DataRepository();
                 approvalDataRepository = new ApprovalDataRepository();
+                datasetRepository = new DatasetRepository();
+
+                geographicOrigins = [{
+                    id: 'origin1',
+                    name: "Geographic Origin"
+                }];
 
                 scope.currentModule = {
                     id: 'mod2',
@@ -65,6 +71,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 getOrgUnitSpy.and.returnValue(utils.getPromise(q, parentProject));
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, {}));
+                spyOn(datasetRepository, "getOriginDatasets").and.returnValue(utils.getPromise(q, geographicOrigins));
 
                 var queryBuilder = function() {
                     this.$index = function() {
@@ -182,7 +189,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 };
 
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [origin1, origin2]));
-                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository);
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository);
             }));
 
             afterEach(function() {
@@ -358,5 +365,60 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 expect(scope.approveError).toBe(false);
             });
 
+            it("should return the sum of the list ", function() {
+                var dataValues = {
+                    "ou1": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c2": {
+                                "value": "2"
+                            }
+                        }
+                    },
+                    "ou2": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c2": {
+                                "value": "2"
+                            }
+                        },
+                        "de2": {
+                            "c2": {
+                                "value": "10"
+                            }
+                        }
+                    },
+                    "ou3": undefined
+                };
+
+                var orgUnits = [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }, {
+                    "id": "ou2",
+                    "name": "ou2"
+                }, {
+                    "id": "ou3",
+                    "name": "ou3"
+                }];
+
+                expect(scope.sum(dataValues, orgUnits, "de1")).toBe(6);
+            });
+
+            it("should group sections based on datasets", function() {
+                scope.$apply();
+
+                var dataSetKeys = _.keys(scope.groupedSections);
+                expect(dataSetKeys.length).toBe(3);
+                expect(dataSetKeys).toContain("DS_OPD");
+                expect(dataSetKeys).toContain("Vacc");
+
+                expect(scope.groupedSections.DS_OPD.length).toBe(2);
+                expect(scope.groupedSections.Vacc.length).toBe(1);
+            });
         });
     });

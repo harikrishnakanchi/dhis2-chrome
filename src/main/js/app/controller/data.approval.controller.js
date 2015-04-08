@@ -1,19 +1,14 @@
 define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer, properties) {
     return function($scope, $routeParams, $q, $hustle, db, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
-        $timeout, orgUnitRepository) {
+        $timeout, orgUnitRepository, datasetRepository) {
 
-        $scope.printWindow = function() {
-            $scope.printingTallySheet = true;
-            $timeout(function() {
-                $window.print();
-            }, 0);
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
         };
 
-        $scope.getDatasetState = function(id, isFirst) {
-            if (isFirst && !(id in $scope.isDatasetOpen)) {
-                $scope.isDatasetOpen[id] = true;
-            }
-            return $scope.isDatasetOpen;
+        var getPeriod = function() {
+            return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
         };
 
         var resetForm = function() {
@@ -26,15 +21,70 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $scope.excludedDataElements = {};
         };
 
-        $scope.sum = function(iterable) {
-            return _.reduce(iterable, function(sum, currentOption) {
-                exp = currentOption.value || "0";
-                return sum + calculateSum(exp);
-            }, 0);
+        $scope.getDatasetState = function(id, isFirst) {
+            if (isFirst && !(id in $scope.isDatasetOpen)) {
+                $scope.isDatasetOpen[id] = true;
+            }
+            return $scope.isDatasetOpen;
         };
 
         $scope.maxcolumns = function(headers) {
             return _.last(headers).length;
+        };
+
+        $scope.getDataSetName = function(id) {
+            return _.find($scope.dataSets, function(dataSet) {
+                return id === dataSet.id;
+            }).name;
+        };
+
+        $scope.shouldDataBeEnteredForOrgUnit = function(orgUnitId) {
+            return _.contains($scope.currentOrgUnitIdIncludingChildrenIds, orgUnitId);
+        };
+
+        $scope.getValue = function(dataValues, dataElementId, option, orgUnits) {
+            if (dataValues === undefined)
+                return;
+
+            orgUnits = _.isArray(orgUnits) ? orgUnits : [orgUnits];
+
+            var result = 0;
+
+            var orgUnitIds = _.pluck(orgUnits, "id");
+            _.forEach(orgUnitIds, function(orgUnitId) {
+                dataValues[orgUnitId] = dataValues[orgUnitId] || {};
+                dataValues[orgUnitId][dataElementId] = dataValues[orgUnitId][dataElementId] || {};
+                dataValues[orgUnitId][dataElementId][option] = dataValues[orgUnitId][dataElementId][option] || {};
+
+                if (!_.isEmpty(dataValues[orgUnitId][dataElementId][option].value))
+                    result += parseInt(dataValues[orgUnitId][dataElementId][option].value);
+            });
+
+            return result;
+        };
+
+        $scope.sum = function(dataValues, orgUnits, dataElementId) {
+            orgUnits = _.isArray(orgUnits) ? orgUnits : [orgUnits];
+
+            var allValues = [];
+            _.forEach(orgUnits, function(orgUnit) {
+                dataValues[orgUnit.id] = dataValues[orgUnit.id] || {};
+                dataValues[orgUnit.id][dataElementId] = dataValues[orgUnit.id][dataElementId] || {};
+
+                var allOptions = _.keys(dataValues[orgUnit.id][dataElementId]);
+                _.forEach(allOptions, function(option) {
+                    dataValues[orgUnit.id][dataElementId][option] = dataValues[orgUnit.id][dataElementId][option] || {};
+                    allValues.push(dataValues[orgUnit.id][dataElementId][option].value);
+                });
+            });
+            return _.sum(allValues);
+        };
+
+        $scope.printWindow = function() {
+            $scope.printingTallySheet = true;
+            $timeout(function() {
+                $window.print();
+            }, 0);
         };
 
         $scope.firstLevelApproval = function() {
@@ -104,99 +154,38 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 .finally(scrollToTop);
         };
 
-        $scope.isCurrentWeekSelected = function(week) {
-            var today = moment().format("YYYY-MM-DD");
-            if (week && today >= week.startOfWeek && today <= week.endOfWeek)
-                return true;
-            return false;
-        };
-
-        $scope.$watch('dataentryForm.$dirty', function(dirty) {
-            if (dirty) {
-                $scope.preventNavigation = true;
-            } else {
-                $scope.preventNavigation = false;
-            }
-        });
-
-        $scope.getDataSetName = function(id) {
-            return _.find($scope.dataSets, function(dataSet) {
-                return id === dataSet.id;
-            }).name;
-        };
-
-        $scope.shouldDataBeEnteredForOrgUnit = function(orgUnitId) {
-            return _.contains($scope.currentOrgUnitIdIncludingChildrenIds, orgUnitId);
-        };
-
-        $scope.safeGet = function(dataValues, id, option, orgUnitId) {
-            if (dataValues === undefined)
-                return;
-
-            dataValues[orgUnitId] = dataValues[orgUnitId] || {};
-            dataValues[orgUnitId][id] = dataValues[orgUnitId][id] || {};
-
-            dataValues[orgUnitId][id][option] = dataValues[orgUnitId][id][option] || {
-                'formula': '',
-                'value': ''
-            };
-            return dataValues[orgUnitId][id][option];
-        };
-
-        $scope.isDataEntryAllowed = function() {
-            return moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
-        };
-
-        var scrollToTop = function() {
-            $location.hash();
-            $anchorScroll();
-        };
-
-        var calculateSum = function(cellValue) {
-            if (!cellValue)
-                return 0;
-
-            cellValue = cellValue.toString().split("+").filter(function(e) {
-                return e;
-            });
-            return _.reduce(cellValue, function(sum, exp) {
-                return sum + parseInt(exp);
-            }, 0);
-        };
-
-        var getPeriod = function() {
-            return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
-        };
-
-        var getAll = function(storeName) {
-            var store = db.objectStore(storeName);
-            return store.getAll();
-        };
-
-        var setData = function(data) {
-            $scope.dataSets = data[0];
-            $scope.moduleChildren = _.pluck(data[7], "id");
-            $scope.currentOrgUnitIdIncludingChildrenIds = _.flatten([$scope.currentModule.id, $scope.moduleChildren]);
-            $scope.excludedDataElements = data[6] && data[6].value ? data[6].value.dataElements : undefined;
-            return data;
-        };
-
-        var transformDataSet = function(data) {
-            $scope.groupedSections = groupSections.enrichGroupedSections(data);
-            return data;
-        };
-
         var init = function() {
+
+            var getAll = function(storeName) {
+                var store = db.objectStore(storeName);
+                return store.getAll();
+            };
+
+            var setData = function(data) {
+                $scope.geographicOrigin = data[8];
+                $scope.dataSets = data[0];
+                $scope.moduleChildren = _.pluck(data[7], "id");
+                $scope.currentOrgUnitIdIncludingChildrenIds = _.flatten([$scope.currentModule.id, $scope.moduleChildren]);
+                $scope.excludedDataElements = data[6] && data[6].value ? data[6].value.dataElements : undefined;
+                return data;
+            };
+
+            var transformDataSet = function(data) {
+                $scope.groupedSections = groupSections.enrichGroupedSections(data);
+                return data;
+            };
+
             var dataSetPromise = getAll('dataSets');
             var sectionPromise = getAll("sections");
             var dataElementsPromise = getAll("dataElements");
             var comboPromise = getAll("categoryCombos");
             var categoriesPromise = getAll("categories");
             var categoryOptionCombosPromise = getAll("categoryOptionCombos");
+            var geographicOriginDatasetPromise = datasetRepository.getOriginDatasets();
             var excludedDataElementPromise = systemSettingRepository.get($scope.currentModule.id);
             var getChildrenPromise = orgUnitRepository.findAllByParent([$scope.currentModule.id]);
 
-            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, excludedDataElementPromise, getChildrenPromise]);
+            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, excludedDataElementPromise, getChildrenPromise, geographicOriginDatasetPromise]);
 
             $scope.loading = true;
             getAllData.then(setData).then(transformDataSet).then(function() {
@@ -219,27 +208,25 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     $scope.isSubmitted = (!_.isEmpty(dataValues) && isDraft);
                 });
 
-                var setCurrentGroupedSectionsForCurrentModule = function() {
+                var setCurrentGroupedSections = function() {
                     var datasetsAssociatedWithModule = _.pluck(datasetTransformer.getAssociatedDatasets($scope.currentModule.id, $scope.dataSets), 'id');
 
-                    $scope.currentGroupedSections = _.pick($scope.groupedSections, datasetsAssociatedWithModule);
+                    var allDatasetsAssociatedWithOrigins = _.uniq(_.flatten(_.map($scope.moduleChildren, function(origin) {
+                        return _.pluck(datasetTransformer.getAssociatedDatasets(origin, $scope.dataSets), 'id');
+                    })));
+
+                    var allRelevantDatasetIds = _.uniq(allDatasetsAssociatedWithOrigins.concat(datasetsAssociatedWithModule));
+
+                    $scope.currentGroupedSections = _.pick($scope.groupedSections, _.without(allRelevantDatasetIds, $scope.geographicOrigin[0].id));
                     var selectedDatasets = _.keys($scope.currentGroupedSections);
                     _.each(selectedDatasets, function(selectedDataset) {
                         $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.excludedDataElements);
                     });
+
+                    $scope.currentGroupedSectionsForOrigins = _.pick($scope.groupedSections, $scope.geographicOrigin[0].id);
                 };
 
-                var setCurrentGroupedSectionsForOrigins = function() {
-                    var datasetsAssociatedWithOrigins = _.uniq(_.flatten(_.map($scope.moduleChildren, function(origin) {
-                        return _.pluck(datasetTransformer.getAssociatedDatasets(origin, $scope.dataSets), 'id');
-                    })));
-
-                    $scope.currentGroupedSectionsForOrigins = _.pick($scope.groupedSections, datasetsAssociatedWithOrigins);
-                };
-
-
-                setCurrentGroupedSectionsForCurrentModule();
-                setCurrentGroupedSectionsForOrigins();
+                setCurrentGroupedSections();
 
                 if ($scope.dataentryForm !== undefined)
                     $scope.dataentryForm.$setPristine();

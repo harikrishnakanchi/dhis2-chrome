@@ -32,8 +32,6 @@ define(["lodash", "extractHeaders"], function(_, extractHeaders) {
             return dataElement;
         };
 
-
-
         var returnVal = _.mapValues(groupedSections, function(sections) {
             return _.map(sections, function(section) {
                 section.dataElements = _.map(section.dataElements, enrichDataElement);
