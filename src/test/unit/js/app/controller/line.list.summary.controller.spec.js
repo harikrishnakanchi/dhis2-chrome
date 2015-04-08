@@ -172,9 +172,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, project));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
                 spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {}));
-                spyOn(datasetRepository, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, [{
-                    "id": "Vacc"
-                }]));
             }));
 
             afterEach(function() {
