@@ -243,21 +243,29 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
+                $scope.loading = true;
                 return getEnrichedModule($scope.module)
                     .then(createModule)
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
                     .then(createOriginOrgUnitsAndGroups)
-                    .then(_.partial(onSuccess, enrichedModule), onError);
+                    .then(_.partial(onSuccess, enrichedModule), onError)
+                    .finally(function() {
+                        $scope.loading = false;
+                    });
             };
 
             $scope.update = function(module) {
                 var enrichedModule = orgUnitMapper.mapToModule(module, module.id, 6);
 
+                $scope.loading = true;
                 return $q.all([saveExcludedDataElements(enrichedModule),
                         orgUnitRepository.upsert(enrichedModule),
                         publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.updateOrgUnitDesc + enrichedModule.name)
                     ])
-                    .then(_.partial(onSuccess, enrichedModule), onError);
+                    .then(_.partial(onSuccess, enrichedModule), onError)
+                    .finally(function() {
+                        $scope.loading = false;
+                    });
             };
 
             $scope.shouldDisableSaveOrUpdateButton = function() {

@@ -1,4 +1,7 @@
 <div ng-controller="patientOriginController">
+    <div class="loading" ng-show="loading">
+        <img src="img/ajax-loader.gif" class="spinner" />
+    </div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorAddingPatientOriginDetails }}</div>
     <form name="createForm" class="form-horizontal" role="form" novalidate ng-submit="save()">
         <div class="panel panel-default">

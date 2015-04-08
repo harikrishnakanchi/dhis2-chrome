@@ -115,7 +115,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             };
 
             var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
-            saveToDbAndPublishMessage(dhisProject).then(function(data) {
+            return saveToDbAndPublishMessage(dhisProject).then(function(data) {
                 createOrgUnitGroups();
                 orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id]).then(function(modules) {
                     if (newOrgUnit.autoApprove === "true") {
@@ -130,8 +130,11 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
+            $scope.loading = true;
             var dhisProject = orgUnitMapper.mapToProjectForDhis(newOrgUnit, parentOrgUnit);
-            saveToDbAndPublishMessage(dhisProject);
+            saveToDbAndPublishMessage(dhisProject).finally(function() {
+                $scope.loading = false;
+            });
         };
 
         $scope.toggleUserDisabledState = function(user) {

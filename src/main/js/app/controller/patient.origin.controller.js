@@ -82,10 +82,14 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 "origins": patientOrigins
             };
 
+            $scope.loading = true;
             return patientOriginRepository.upsert(payload)
                 .then(_.partial(publishMessage, payload, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(payload.origins, "name")))
                 .then(createOrgUnits)
-                .then(onSuccess, onFailure);
+                .then(onSuccess, onFailure)
+                .finally(function() {
+                    $scope.loading = false;
+                });
         };
 
         $scope.reset = function() {

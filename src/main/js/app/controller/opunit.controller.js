@@ -86,11 +86,16 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     "clientLastUpdated": moment().toISOString()
                 }]
             };
+
+            $scope.loading = true;
             return patientOriginRepository.upsert(patientOriginPayload)
                 .then(_.partial(publishMessage, patientOriginPayload, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(patientOriginPayload.origins, "name")))
                 .then(_.partial(orgUnitRepository.upsert, opUnit))
                 .then(saveToDhis)
-                .then(onSuccess, onError);
+                .then(onSuccess, onError)
+                .finally(function() {
+                    $scope.loading = false;
+                });
         };
 
         $scope.update = function(opUnit) {
@@ -114,9 +119,13 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 });
             };
 
+            $scope.loading = true;
             return orgUnitRepository.upsert(opUnit)
                 .then(saveToDhis).then(updateOrgUnitGroupsForModules)
-                .then(onSuccess, onError);
+                .then(onSuccess, onError)
+                .finally(function() {
+                    $scope.loading = false;
+                });
         };
 
         $scope.closeForm = function() {

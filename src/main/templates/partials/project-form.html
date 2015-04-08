@@ -1,4 +1,7 @@
 <div ng-controller="projectController">
+    <div class="loading" ng-show="loading">
+        <img src="img/ajax-loader.gif" class="spinner" />
+    </div>
     <div class="top-actions" ng-if="!isNewMode">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Operation Unit" ng-click="openInNewMode('Operation Unit')" />
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />

@@ -1,4 +1,7 @@
 <div ng-controller="opUnitController">
+    <div class="loading" ng-show="loading">
+        <img src="img/ajax-loader.gif" class="spinner" />
+    </div>
     <div class="top-actions" ng-if="!isNewMode">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Aggregate Module" ng-if="!(isDisabled)" ng-click="openInNewMode('Module')" />
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Linelist Module" ng-if="!(isDisabled)" ng-click="openInNewMode('LineListModule')" />
