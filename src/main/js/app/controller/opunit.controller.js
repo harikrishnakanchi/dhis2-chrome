@@ -82,7 +82,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             var patientOriginPayload = {
                 "orgUnit": opUnit.id,
                 "origins": [{
-                    "name": "Unknown",
+                    "name": "Not Specified",
                     "clientLastUpdated": moment().toISOString()
                 }]
             };

@@ -499,7 +499,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             var payload = {
                 "orgUnit": "OpUnit1ParentId",
                 "origins": [{
-                    "name": "Unknown",
+                    "name": "Not Specified",
                     "clientLastUpdated": "2014-10-29T12:43:54.972Z"
                 }]
             };
@@ -532,7 +532,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": payload,
                 "type": "uploadPatientOriginDetails",
                 "locale": "en",
-                "desc": "create patient origin Unknown"
+                "desc": "create patient origin Not Specified"
             }, "dataValues");
 
         });
