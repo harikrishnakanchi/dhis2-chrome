@@ -19,7 +19,7 @@ require(["app/bg.config"], function(config) {
             chrome.app.runtime.onLaunched.addListener(function(launchData) {
                 chrome.app.window.create('../../index.html', {
                     id: 'DHIS2',
-                    state: 'fullscreen'
+                    state: 'maximized'
                 });
             });
         });
