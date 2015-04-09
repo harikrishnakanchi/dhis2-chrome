@@ -57,12 +57,6 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             return attr && attr.value === "true";
         };
 
-        $scope.getEventDateNgModel = function(eventDates, programId, programStageId) {
-            eventDates[programId] = eventDates[programId] || {};
-            eventDates[programId][programStageId] = eventDates[programId][programStageId] || moment($scope.minDateInCurrentPeriod).toDate();
-            return eventDates[programId];
-        };
-
         $scope.getOptionsFor = function(optionSetId) {
             var optionSet = _.find($scope.optionSets, function(os) {
                 return optionSetId === os.id;

@@ -91,17 +91,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 }]);
             });
 
-            it("should get eventDates with default set to today", function() {
-                var eventDates = {};
-
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
-                scope.$apply();
-
-                scope.getEventDateNgModel(eventDates, 'p1', 'ps1');
-
-                expect(moment(eventDates.p1.ps1).isSame(scope.minDateInCurrentPeriod, 'days')).toBe(true);
-            });
-
             it("should set min and max date for selected period", function() {
 
                 scope.week = {
