@@ -143,6 +143,87 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }, "dataValues");
         });
 
+        it("should save operation unit with GIS coordinate information", function() {
+            var opUnit = {
+                "name": "OpUnit1",
+                "type": "Hospital",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "hospitalUnitCode": "Unit Code - A",
+                "latitude": 50,
+                "longitude": 25
+            };
+
+            scope.orgUnit = {
+                "level": "4",
+                "name": "Parent",
+                "id": "ParentId",
+                "children": []
+            };
+
+            var expectedOpUnit = {
+                "name": "OpUnit1",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "id": "OpUnit1ParentId",
+                "shortName": "OpUnit1",
+                "level": 5,
+                "parent": {
+                    "name": "Parent",
+                    "id": "ParentId"
+                },
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "opUnitType"
+                    },
+                    "value": "Hospital"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Operation Unit"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "hospitalUnitCode"
+                    },
+                    "value": "Unit Code - A"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": 'true'
+                }],
+                "coordinates": "[25,50]"
+            };
+
+            spyOn(location, "hash");
+            spyOn(dhisId, "get").and.callFake(function(name) {
+                return name;
+            });
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
+                "data": {
+                    "data": []
+                }
+            }));
+
+            scope.save(opUnit);
+            scope.$apply();
+
+            expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "data": [expectedOpUnit],
+                "type": "upsertOrgUnit",
+                "locale": "en",
+                "desc": "upsert org unit OpUnit1"
+            }, "dataValues");
+        });
+
         it("should not ask for hospital unit code while saving operation unit if it is not hospital", function() {
             var opUnit = {
                 "name": "OpUnit1",
@@ -227,6 +308,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "parent": {
                     "id": "parent"
                 },
+                "coordinates": "[29,-45]",
                 "attributeValues": [{
                     "attribute": {
                         "code": "opUnitType"
@@ -274,6 +356,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.$apply();
             expect(scope.opUnit.name).toEqual("opUnit1");
             expect(scope.opUnit.type).toEqual("Health Center");
+            expect(scope.opUnit.longitude).toEqual(29);
+            expect(scope.opUnit.latitude).toEqual(-45);
             expect(scope.isDisabled).toBeFalsy();
             expect(scope.originDetails).toEqual(expectedPatientOrigins.origins);
         });
@@ -471,6 +555,94 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
         });
 
+        it("should update operation unit with GIS coordinates", function() {
+            var opUnit = {
+                "name": "OpUnit1",
+                "type": "Hospital",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "hospitalUnitCode": "Unit Code - A",
+                "latitude": 50,
+                "longitude": 25
+            };
+
+            scope.orgUnit = {
+                "id": "opUnit1Id",
+                "name": "OpUnit1",
+                "type": "Health Center",
+                "level": 5,
+                "hospitalUnitCode": "Unit Code - B1",
+                "parent": {
+                    "name": "Parent",
+                    "id": "ParentId"
+                },
+                "children": []
+            };
+
+            var expectedOpUnit = {
+                "name": "OpUnit1",
+                "id": "opUnit1Id",
+                "openingDate": moment().format("YYYY-MM-DD"),
+                "shortName": "OpUnit1",
+                "level": 5,
+                "parent": {
+                    "name": "Parent",
+                    "id": "ParentId"
+                },
+                "children": [],
+                "attributeValues": [{
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "opUnitType"
+                    },
+                    "value": "Hospital"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Operation Unit"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "hospitalUnitCode"
+                    },
+                    "value": "Unit Code - A"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": 'isNewDataModel'
+                    },
+                    "value": 'true'
+                }],
+                "coordinates": "[25,50]"
+            };
+
+            spyOn(location, "hash");
+
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
+                "data": {
+                    "data": []
+                }
+            }));
+            spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+
+            scope.update(opUnit);
+            scope.$apply();
+
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnit);
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "data": [expectedOpUnit],
+                "type": "upsertOrgUnit",
+                "locale": "en",
+                "desc": "upsert org unit OpUnit1"
+            }, "dataValues");
+            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
+        });
+
         it("should take the user to the view page of the parent project on clicking cancel", function() {
             scope.orgUnit = {
                 "id": "parent",
@@ -537,7 +709,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "locale": "en",
                 "desc": "create patient origin Not Specified"
             }, "dataValues");
-
         });
 
         it("should update org unit groups when op unit is updated", function() {

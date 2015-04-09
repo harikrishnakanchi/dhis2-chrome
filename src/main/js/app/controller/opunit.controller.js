@@ -77,7 +77,11 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 'parent': _.pick(parent, "name", "id"),
                 "attributeValues": getAttributeValues(opUnit.type, opUnit.hospitalUnitCode)
             });
-            opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode']);
+
+            if (!_.isUndefined(opUnit.longitude) && !_.isUndefined(opUnit.latitude))
+                opUnit.coordinates = "[" + opUnit.longitude + "," + opUnit.latitude + "]";
+
+            opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode', 'latitude', 'longitude']);
 
             var patientOriginPayload = {
                 "orgUnit": opUnit.id,
@@ -107,7 +111,11 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 'children': $scope.orgUnit.children,
                 "attributeValues": getAttributeValues(opUnit.type, opUnit.hospitalUnitCode)
             });
-            opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode']);
+
+            if (!_.isUndefined(opUnit.longitude) && !_.isUndefined(opUnit.latitude))
+                opUnit.coordinates = "[" + opUnit.longitude + "," + opUnit.latitude + "]";
+
+            opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode', 'latitude', 'longitude']);
 
             var updateOrgUnitGroupsForModules = function() {
                 return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
@@ -180,6 +188,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
 
         var init = function() {
             if (!$scope.isNewMode) {
+                var coordinates = $scope.orgUnit.coordinates;
+                coordinates = coordinates ? coordinates.substr(1, coordinates.length - 2).split(",") : coordinates;
                 $scope.opUnit = {
                     'name': $scope.orgUnit.name,
                     'openingDate': $scope.orgUnit.openingDate,
@@ -192,17 +202,24 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                         "attribute": {
                             "code": "hospitalUnitCode"
                         }
-                    }).value,
+                    }).value
                 };
+
+                if (coordinates) {
+                    $scope.opUnit.longitude = parseInt(coordinates[0]);
+                    $scope.opUnit.latitude = parseInt(coordinates[1]);
+                }
 
                 var isDisabled = _.find($scope.orgUnit.attributeValues, {
                     "attribute": {
                         "code": "isDisabled"
                     }
                 });
+
                 $scope.isDisabled = isDisabled && isDisabled.value === "true" ? true : false;
                 patientOriginRepository.get($scope.orgUnit.id).then(setOriginDetails);
             }
+
             var parentId = $scope.isNewMode ? $scope.orgUnit.id : $scope.orgUnit.parent.id;
             orgUnitRepository.getChildOrgUnitNames(parentId).then(function(data) {
                 $scope.allOpunitNames = data;

@@ -53,6 +53,26 @@
                             </div>
                         </div>
                     </li>
+                    <li class="form-group">
+                        <label for="longitude" class="col-sm-4 col-md-4 control-label">Longitude</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="number" step="0.1" min="-180" max="180" class="form-control" name="longitude" id="longitude" ng-model="opUnit.longitude" ng-required="opUnit.latitude !== undefined &amp;&amp; opUnit.latitude !== null" />
+                            <div ng-show="form.longitude.$dirty &amp;&amp; form.longitude.$invalid">
+                                <span ng-show="form.longitude.$invalid &amp;&amp; !form.longitude.$error.required" class="errortxt">{{resourceBundle.longitudeRangeValidation}}</span>
+                                <span ng-show="form.longitude.$error.required" class="errortxt">{{resourceBundle.longitudeValidation}}</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="latitude" class="col-sm-4 col-md-4 control-label">Latitude</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="number" step="0.1" min="-90" max="90" class="form-control" name="latitude" id="latitude" ng-model="opUnit.latitude" ng-required="opUnit.longitude !== undefined &amp;&amp; opUnit.longitude !== null" />
+                            <div ng-show="form.latitude.$dirty &amp;&amp; form.latitude.$invalid">
+                                <span ng-show="form.latitude.$invalid &amp;&amp; !form.latitude.$error.required" class="errortxt">{{resourceBundle.latitudeRangeValidation}}</span>
+                                <span ng-show="form.latitude.$error.required" class="errortxt">{{resourceBundle.latitudeValidation}}</span>
+                            </div>
+                        </div>
+                    </li>
                 </ul>
                 <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6 button-group">
                     <input type="submit" class="btn btn-main" ng-disabled="form.$invalid" ng-if="isNewMode" value="Save" />
