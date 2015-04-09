@@ -15,6 +15,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             orgUnitRepo = utils.getMockRepo(q);
             orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
             orgUnitRepo.getChildOrgUnitNames = jasmine.createSpy("getChildOrgUnitNames").and.returnValue(utils.getPromise(q, []));
+            orgUnitRepo.upsert = jasmine.createSpy("upsert").and.callFake(function(orgUnits) {
+                return utils.getPromise(q, [orgUnits]);
+            });
 
             orgUnitGroupHelper = new OrgUnitGroupHelper();
             scope.orgUnit = {
@@ -133,7 +136,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "data": expectedOpUnit,
+                "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
                 "desc": "upsert org unit OpUnit1"
@@ -211,7 +214,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "data": expectedOpUnit,
+                "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
                 "desc": "upsert org unit OpUnit1"
@@ -366,7 +369,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "data": expectedOrgUnits,
                 "type": "upsertOrgUnit",
                 "locale": "en",
-                "desc": NaN
+                "desc": "undefinedmod1"
             };
             orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             spyOn(hustle, "publish");
@@ -460,7 +463,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "data": expectedOpUnit,
+                "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
                 "desc": "upsert org unit OpUnit1"
@@ -576,7 +579,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             scope.update(opUnit);
             scope.$apply();
-
 
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(orgunitsToAssociate, true);
         });
