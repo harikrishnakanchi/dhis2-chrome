@@ -156,6 +156,9 @@
     "uploadProgramEventsDesc": "submit cases",
     "deleteEventDesc": "delete cases",
     "uploadPatientOriginDetailsDesc": "create patient origin ",
+    "associateOrgUnitToDatasetDesc": "associate selected services to ",
+    "uploadProgramDesc": "associate selected program to ",
+    "uploadSystemSettingDesc": "sync excluded data elements for ",
     "patientOriginValidation": "Patient origin is required",
     "invalidDateRangeMessage": "Date should be in selected week",
     "productKeyExpiredMessage": "Your product key has expired. Please contact admin."

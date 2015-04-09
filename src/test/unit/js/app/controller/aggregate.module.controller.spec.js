@@ -83,7 +83,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.resourceBundle = {
                     "disableOrgUnitDesc": "disable organisation unit: ",
                     "upsertOrgUnitDesc": "create organisation unit: ",
-                    "updateOrgUnitDesc": "update organisation unit: "
+                    "updateOrgUnitDesc": "update organisation unit: ",
+                    "uploadSystemSettingDesc": "upload sys settings for "
                 };
 
                 scope.isNewMode = true;
@@ -311,7 +312,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     data: expectedSystemSetting,
                     type: "uploadSystemSetting",
                     locale: "en",
-                    desc: undefined
+                    desc: "upload sys settings for Module1"
                 };
 
                 expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSetting);
@@ -504,7 +505,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     data: expectedSystemSetting,
                     type: "uploadSystemSetting",
                     locale: "en",
-                    desc: undefined
+                    desc: "upload sys settings for module NEW name"
                 }, "dataValues");
             });
 

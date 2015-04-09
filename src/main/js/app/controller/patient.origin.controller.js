@@ -54,10 +54,12 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                     publishMessage(allOriginOrgUnits, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.pluck(allOriginOrgUnits, "name"));
 
                     associatedDatasetIds = _.flatten(associatedDatasetIds);
-                    publishMessage(associatedDatasetIds, "associateOrgUnitToDataset");
+                    publishMessage(associatedDatasetIds, "associateOrgUnitToDataset",
+                        $scope.resourceBundle.associateOrgUnitToDatasetDesc + _.pluck(allOriginOrgUnits, "name"));
 
                     if (!_.isEmpty(associatedPrograms))
-                        publishMessage(associatedPrograms, "uploadProgram");
+                        publishMessage(associatedPrograms, "uploadProgram",
+                            $scope.resourceBundle.uploadProgramDesc + _.pluck(allOriginOrgUnits, "name"));
                 };
 
                 return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {

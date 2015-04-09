@@ -187,7 +187,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     }
                 };
                 return systemSettingRepository.upsert(systemSetting)
-                    .then(_.partial(publishMessage, systemSetting, "uploadSystemSetting", undefined));
+                    .then(_.partial(publishMessage, systemSetting, "uploadSystemSetting",
+                        $scope.resourceBundle.uploadSystemSettingDesc + enrichedModule.name));
             };
 
             $scope.save = function(module) {
@@ -195,7 +196,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var associateToProgram = function(program, originOrgUnits) {
                     return programRepository.associateOrgUnits(program, originOrgUnits).then(function() {
-                        publishMessage(program, "uploadProgram");
+                        publishMessage(program, "uploadProgram", $scope.resourceBundle.uploadProgramDesc + _.pluck(originOrgUnits, "name"));
                     });
                 };
 
@@ -216,7 +217,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                     return getDatasets().then(function(datasets) {
                         return datasetRepository.associateOrgUnits(datasets, originOrgUnits).then(function() {
-                            return publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset");
+                            return publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset",
+                                $scope.resourceBundle.associateOrgUnitToDatasetDesc + _.pluck(originOrgUnits, "name"));
                         });
                     });
                 };

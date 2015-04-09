@@ -34,7 +34,9 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             scope.resourceBundle = {
                 "uploadPatientOriginDetailsDesc": "create patient origin ",
-                "upsertOrgUnitDesc": "upsert "
+                "upsertOrgUnitDesc": "upsert ",
+                "uploadProgramDesc": "upload program for ",
+                "associateOrgUnitToDatasetDesc": "associate datasets for "
             };
 
             patientOriginRepository = new PatientOriginRepository();
@@ -244,14 +246,14 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "data": ["ds1"],
                 "type": "associateOrgUnitToDataset",
                 "locale": "en",
-                "desc": undefined
+                "desc": "associate datasets for origin org unit"
             }, "dataValues"]);
 
             expect(hustle.publish.calls.argsFor(3)).toEqual([{
                 "data": [program],
                 "type": "uploadProgram",
                 "locale": "en",
-                "desc": undefined
+                "desc": "upload program for origin org unit"
             }, "dataValues"]);
         });
 
