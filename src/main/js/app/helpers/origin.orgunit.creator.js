@@ -1,5 +1,5 @@
 define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
-    return function($q, orgUnitRepository, patientOriginRepository, orgUnitGroupHelper) {
+    return function($q, orgUnitRepository, patientOriginRepository, orgUnitGroupHelper, datasetRepository) {
 
         var create = function(module, patientOrigins) {
             var getPatientOrigins = function() {
@@ -34,14 +34,22 @@ define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
             };
 
             return getOriginOUPayload().then(function(originOUPayload) {
-                if (isLinelistService(module)) {
-                    return orgUnitRepository.upsert(originOUPayload)
-                        .then(_.partial(orgUnitGroupHelper.createOrgUnitGroups, originOUPayload, false))
-                        .then(function() {
-                            return originOUPayload;
-                        });
-                } else
-                    return orgUnitRepository.upsert(originOUPayload);
+                return datasetRepository.getOriginDatasets().then(function(originDatasets) {
+                    if (isLinelistService(module)) {
+                        return orgUnitRepository.upsert(originOUPayload)
+                            .then(_.partial(orgUnitGroupHelper.createOrgUnitGroups, originOUPayload, false))
+                            .then(_.partial(datasetRepository.associateOrgUnits, originDatasets, originOUPayload))
+                            .then(function() {
+                                return originOUPayload;
+                            });
+                    } else {
+                        return orgUnitRepository.upsert(originOUPayload)
+                            .then(_.partial(datasetRepository.associateOrgUnits, originDatasets, originOUPayload))
+                            .then(function() {
+                                return originOUPayload;
+                            });
+                    }
+                });
             });
         };
 

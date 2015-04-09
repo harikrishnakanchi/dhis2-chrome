@@ -116,7 +116,8 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
         };
 
         var associateOrgUnits = function(datasets, orgUnits) {
-            var addOrgUnitsToDatasets = function() {
+
+            var addOrgUnitsToDatasets = function(datasets) {
                 var ouPayload = _.map(orgUnits, function(orgUnit) {
                     return {
                         "id": orgUnit.id,
@@ -125,13 +126,15 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
                 });
                 return _.map(datasets, function(ds) {
                     ds.organisationUnits = ds.organisationUnits || [];
-                    ds.organisationUnits = ds.organisationUnits.concat(ouPayload);
+                    if (!_.contains(ds.organisationUnits, ouPayload))
+                        ds.organisationUnits = ds.organisationUnits.concat(ouPayload);
                     return ds;
                 });
             };
 
-            var updatedDatasets = addOrgUnitsToDatasets();
+            var updatedDatasets = addOrgUnitsToDatasets(datasets);
             return upsert(updatedDatasets);
+
         };
 
         return {
