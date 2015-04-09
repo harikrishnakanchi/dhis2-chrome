@@ -1,4 +1,4 @@
-define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils, _) {
+define(["properties", "chromeUtils", "moment", "lodash"], function(properties, chromeUtils, moment, _) {
     return function($log, ngI18nResourceBundle) {
         var getResourceBundle = function(locale) {
             return ngI18nResourceBundle.get({
@@ -15,23 +15,28 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
         };
 
         var notifyUser = function(job, data) {
+            var getCurrentDateTime = function() {
+                return moment().format("MM-DD-YYYY HH:mm") + "\n";
+            };
+
             if (data && data.status === 401) {
                 getResourceBundle(job.data.locale).then(function(data) {
                     var resourceBundle = data;
-                    chromeUtils.createNotification(resourceBundle.notificationTitle, resourceBundle.productKeyExpiredMessage);
+                    chromeUtils.createNotification(resourceBundle.notificationTitle, getCurrentDateTime() + resourceBundle.productKeyExpiredMessage);
                     chromeUtils.sendMessage("dhisOffline");
                     chromeUtils.sendMessage("productKeyExpired");
                 });
             } else if (job.releases === 2) {
                 getResourceBundle(job.data.locale).then(function(data) {
                     var resourceBundle = data;
-                    var notificationMessage = resourceBundle.failedToLabel + job.data.desc + resourceBundle.notificationRetryMessagePrefix + getRetryDelayInHours(3) + resourceBundle.notificationRetryMessageSuffix;
+                    var notificationMessage = getCurrentDateTime();
+                    notificationMessage += resourceBundle.failedToLabel + job.data.desc + resourceBundle.notificationRetryMessagePrefix + getRetryDelayInHours(3) + resourceBundle.notificationRetryMessageSuffix;
                     chromeUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
                 });
             } else if (job.releases === properties.queue.maxretries) {
                 getResourceBundle(job.data.locale).then(function(data) {
                     var resourceBundle = data;
-                    var notificationMessage = resourceBundle.failedToLabel + job.data.desc + resourceBundle.notificationAbortRetryMessageSuffix;
+                    var notificationMessage = getCurrentDateTime() + resourceBundle.failedToLabel + job.data.desc + resourceBundle.notificationAbortRetryMessageSuffix;
                     chromeUtils.createNotification(resourceBundle.notificationTitle, notificationMessage);
                 });
             }
