@@ -199,8 +199,8 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
         var prepareNewForm = function() {
             $scope.reset();
-            return orgUnitRepository.getChildOrgUnitNames($scope.orgUnit.id).then(function(allOrgUnits) {
-                $scope.peerProjects = allOrgUnits;
+            return orgUnitRepository.findAllByParent($scope.orgUnit.id).then(function(allOrgUnits) {
+                $scope.peerProjects = _.pluck(allOrgUnits, "name");
                 $scope.existingProjectCodes = _.transform(allOrgUnits, function(acc, orgUnit) {
                     var projCodeAttribute = _.find(orgUnit.attributeValues, {
                         'attribute': {

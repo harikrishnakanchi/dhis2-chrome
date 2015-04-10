@@ -15,6 +15,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             orgUnitRepo = utils.getMockRepo(q);
             orgUnitRepo.getChildOrgUnitNames = jasmine.createSpy("getChildOrgUnitNames").and.returnValue(utils.getPromise(q, []));
             orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
+            orgUnitRepo.findAllByParent = jasmine.createSpy("findAllByParent").and.returnValue(utils.getPromise(q, []));
 
             approvalDataRepository = new ApprovalDataRepository();
 
@@ -547,7 +548,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }]
             };
 
-            orgUnitRepo.getChildOrgUnitNames.and.returnValue(utils.getPromise(q, [project1]));
+            orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, [project1]));
 
             projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
             scope.$apply();
