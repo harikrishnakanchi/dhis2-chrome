@@ -206,8 +206,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 };
 
                 if (coordinates) {
-                    $scope.opUnit.longitude = parseInt(coordinates[0]);
-                    $scope.opUnit.latitude = parseInt(coordinates[1]);
+                    $scope.opUnit.longitude = parseFloat(coordinates[0]);
+                    $scope.opUnit.latitude = parseFloat(coordinates[1]);
                 }
 
                 var isDisabled = _.find($scope.orgUnit.attributeValues, {
