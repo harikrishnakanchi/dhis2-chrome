@@ -121,7 +121,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
                     var orgUnitsToAssociate = orgUnitGroupHelper.getOrgUnitsToAssociateForUpdate(modules);
                     $q.when(orgUnitsToAssociate).then(function(orgUnitsToAssociate) {
-                        orgUnitGroupHelper.createOrgUnitGroups(orgUnitsToAssociate, true);
+                        if (!_.isEmpty(orgUnitsToAssociate))
+                            orgUnitGroupHelper.createOrgUnitGroups(orgUnitsToAssociate, true);
                     });
 
                 });

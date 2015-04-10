@@ -533,6 +533,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }]
             };
 
+            var orgunitsToAssociate = [{
+                "id": "child1",
+                "name": "child1"
+            }, {
+                "id": "child2",
+                "name": "child2"
+            }];
+
             spyOn(location, "hash");
 
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
@@ -541,6 +549,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }
             }));
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+            spyOn(orgUnitGroupHelper, "getOrgUnitsToAssociateForUpdate").and.returnValue(orgunitsToAssociate);
 
             scope.update(opUnit);
             scope.$apply();
@@ -621,6 +630,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "coordinates": "[25,50]"
             };
 
+            var orgunitsToAssociate = [{
+                "id": "child1",
+                "name": "child1"
+            }, {
+                "id": "child2",
+                "name": "child2"
+            }];
+
             spyOn(location, "hash");
 
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
@@ -629,6 +646,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }
             }));
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+            spyOn(orgUnitGroupHelper, "getOrgUnitsToAssociateForUpdate").and.returnValue(utils.getPromise(q, orgunitsToAssociate));
 
             scope.update(opUnit);
             scope.$apply();
