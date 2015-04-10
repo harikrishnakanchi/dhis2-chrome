@@ -57,6 +57,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         $scope.getDisplayValue = function(dataValue) {
+            if (!dataValue.value) return "";
             if (dataValue.optionSet && dataValue.optionSet.options.length > 0) {
                 return _.find(dataValue.optionSet.options, function(o) {
                     return o.code === dataValue.value;
@@ -78,7 +79,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         $scope.getFormattedDate = function(date) {
-            return moment(date).toDate().toLocaleDateString();
+            return date ? moment(date).toDate().toLocaleDateString() : "";
         };
 
         $scope.submit = function() {

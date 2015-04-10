@@ -55,6 +55,8 @@
                                             <td>
                                                 <a href="" id="" title="Submitted" class="submitted">
                                                     <span class="glyphicon glyphicon-ok" ng-if="!event.localStatus || event.localStatus === 'READY_FOR_DHIS'"></span>
+                                                    <span class="glyphicon glyphicon-adjust" ng-if="event.localStatus === 'INCOMPLETE_DRAFT'">
+                                                    </span>
                                                 </a>
                                             </td>
                                             <td ng-hide="!isDataEntryAllowed()">

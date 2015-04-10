@@ -19,24 +19,37 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
         var getDataValuesAndEventDate = function(programStage) {
             var eventDate = null;
+            var compulsoryFieldsPresent = true;
+
             var formatValue = function(value) {
                 return _.isDate(value) ? moment(value).format("YYYY-MM-DD") : value;
             };
+
             var dataValuesList = _.flatten(_.map(programStage.programStageSections, function(sections) {
                 return _.map(sections.programStageDataElements, function(psde) {
+                    var value = formatValue($scope.dataValues[psde.dataElement.id]);
+
                     if ($scope.isEventDateSubstitute(psde.dataElement)) {
-                        eventDate = formatValue($scope.dataValues[psde.dataElement.id]);
+                        eventDate = value;
+                    }
+
+                    if (psde.compulsory) {
+                        if (psde.dataElement.type === "int") {
+                            compulsoryFieldsPresent = isNaN(value) || value === null ? false : compulsoryFieldsPresent;
+                        } else if (_.isEmpty(value))
+                            compulsoryFieldsPresent = false;
                     }
 
                     return ({
                         "dataElement": psde.dataElement.id,
-                        "value": formatValue($scope.dataValues[psde.dataElement.id])
+                        "value": value
                     });
                 });
             }));
             return {
+                dataValues: dataValuesList,
                 eventDate: eventDate,
-                dataValues: dataValuesList
+                compulsoryFieldsPresent: compulsoryFieldsPresent
             };
         };
 
@@ -74,7 +87,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 var dataValuesAndEventDate = getDataValuesAndEventDate(programStage);
                 $scope.event.orgUnit = $scope.patientOrigin.selected.id;
                 $scope.event.eventDate = dataValuesAndEventDate.eventDate;
-                $scope.event.localStatus = "UPDATED_DRAFT";
+                $scope.event.localStatus = dataValuesAndEventDate.compulsoryFieldsPresent ? "UPDATED_DRAFT" : "INCOMPLETE_DRAFT";
                 $scope.event.dataValues = dataValuesAndEventDate.dataValues;
             };
 
@@ -92,7 +105,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                     "programStage": programStage.id,
                     "orgUnit": $scope.patientOrigin.selected.id,
                     "eventDate": dataValuesAndEventDate.eventDate,
-                    "localStatus": "NEW_DRAFT",
+                    "localStatus": dataValuesAndEventDate.compulsoryFieldsPresent ? "NEW_DRAFT" : "INCOMPLETE_DRAFT",
                     "dataValues": dataValuesAndEventDate.dataValues
                 };
             };

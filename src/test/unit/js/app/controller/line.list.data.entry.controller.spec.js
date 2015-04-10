@@ -305,5 +305,85 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(eventPayload);
             });
+
+            it("should save incomplete events", function() {
+                var program = {
+                    'id': 'Prg1',
+                };
+
+                var programStage = {
+                    'id': 'PrgStage1',
+                    'programStageSections': [{
+                        'id': 'section1',
+                        'programStageDataElements': [{
+                            "compulsory": true,
+                            "dataElement": {
+                                "id": "de1",
+                                'attributeValues': [{
+                                    'attribute': {
+                                        'code': 'useAsEventDate'
+                                    },
+                                    'value': 'true'
+                                }]
+                            }
+                        }, {
+                            "compulsory": true,
+                            "dataElement": {
+                                "id": "de2"
+                            }
+                        }]
+                    }, {
+                        'id': 'section2',
+                        'programStageDataElements': [{
+                            "dataElement": {
+                                "id": "de3"
+                            }
+                        }]
+                    }]
+                };
+
+
+                spyOn(location, "hash");
+
+                scope.program = program;
+                scope.loadEventsView = jasmine.createSpy("loadEventsView");
+                scope.resourceBundle = {
+                    'eventSaveSuccess': 'Event saved successfully'
+                };
+                scope.programId = "p2";
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
+                scope.$apply();
+
+                scope.dataValues = {
+                    'de1': "2015-02-03",
+                    'de2': undefined,
+                    'de3': "blah"
+                };
+
+                scope.patientOrigin = {
+                    "selected": originOrgUnits[0]
+                };
+                scope.save(programStage);
+                scope.$apply();
+
+                var actualPayloadInUpsertCall = programEventRepository.upsert.calls.first().args[0];
+
+                expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
+                expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
+                expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("o1");
+                expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2015-02-03");
+                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("INCOMPLETE_DRAFT");
+                expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([{
+                    "dataElement": 'de1',
+                    "value": '2015-02-03'
+                }, {
+                    "dataElement": 'de2',
+                    "value": undefined
+                }, {
+                    "dataElement": 'de3',
+                    "value": 'blah'
+                }]);
+            });
         });
     });

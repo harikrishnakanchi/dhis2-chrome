@@ -37,23 +37,23 @@
                                                     <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</label>
                                                 </div>
                                                 <div class="col-sm-6 col-md-6" ng-if="de.dataElement.isIncluded">
-                                                    <input type="text" class="form-control" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory" />
-                                                    <input type="number" class="form-control" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory" ng-pattern="numberPattern" />
-                                                    <input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet &amp;&amp; !isEventDateSubstitute(de.dataElement)" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory" />
-                                                    <input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet &amp;&amp; isEventDateSubstitute(de.dataElement)" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory" min="{{ minDateInCurrentPeriod }}" max="{{ maxDateInCurrentPeriod }}" />
+                                                    <input type="text" class="form-control" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" />
+                                                    <input type="number" class="form-control" ng-if="de.dataElement.type === 'int' &amp;&amp; !de.dataElement.optionSet" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-pattern="numberPattern" />
+                                                    <input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet &amp;&amp; !isEventDateSubstitute(de.dataElement)" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" />
+                                                    <input type="date" class="form-control" ng-if="de.dataElement.type === 'date' &amp;&amp; !de.dataElement.optionSet &amp;&amp; isEventDateSubstitute(de.dataElement)" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" min="{{ minDateInCurrentPeriod }}" max="{{ maxDateInCurrentPeriod }}" required />
                                                     <div ng-if="de.dataElement.type === 'bool' &amp;&amp; !de.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
                                                         <div class="radio-inline">
                                                             <label for="Yes">
-                                                                <input type="radio" ng-model="dataValues[de.dataElement.id]" value="true" ng-required="de.compulsory"> {{resourceBundle.yes}}
+                                                                <input type="radio" ng-model="dataValues[de.dataElement.id]" value="true"> {{resourceBundle.yes}}
                                                             </label>
                                                         </div>
                                                         <div class="radio-inline">
                                                             <label for="No">
-                                                                <input type="radio" ng-model="dataValues[de.dataElement.id]" value="false" ng-required="de.compulsory"> {{resourceBundle.no}}
+                                                                <input type="radio" ng-model="dataValues[de.dataElement.id]" value="false"> {{resourceBundle.no}}
                                                             </label>
                                                         </div>
                                                     </div>
-                                                    <select ng-options="o.code as o.displayName for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" ng-required="de.compulsory">
+                                                    <select ng-options="o.code as o.displayName for o in getOptionsFor(de.dataElement.optionSet.id)" ng-if="de.dataElement.optionSet" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}">
                                                         <option value=""></option>
                                                     </select>
                                                     <div ng-show="form.eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$dirty &amp;&amp; form.eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}.$invalid">
