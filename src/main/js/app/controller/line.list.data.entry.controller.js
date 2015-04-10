@@ -4,7 +4,6 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             $scope.form = $scope.form || {};
             $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.dataValues = {};
-            $scope.eventDates = {};
             $scope.patientOrigin = {};
             $scope.minDateInCurrentPeriod = $scope.week.startOfWeek;
             $scope.maxDateInCurrentPeriod = $scope.week.endOfWeek;
@@ -130,8 +129,6 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 if ($scope.event) {
                     $scope.isNewMode = false;
                     $scope.patientOrigin.selected = $scope.originOrgUnitsById[$scope.event.orgUnit];
-                    $scope.eventDates[$scope.event.program] = $scope.eventDates[$scope.event.program] ? $scope.eventDates[$scope.event.program] : {};
-                    $scope.eventDates[$scope.event.program][$scope.event.programStage] = new Date($scope.event.eventDate);
                     _.forEach($scope.event.dataValues, function(dv) {
                         $scope.dataValues[dv.dataElement] = formatValue(dv);
                     });
