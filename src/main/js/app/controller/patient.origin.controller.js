@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhisId, orgUnitMapper) {
-    return function($scope, $hustle, $q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator) {
+    return function($scope, $hustle, $q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper) {
         var patientOrigins = [];
 
         $scope.save = function() {
@@ -29,6 +29,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 var allOriginOrgUnits = [];
                 var associatedDatasetIds = [];
                 var associatedPrograms = [];
+                var allOriginOrgUnitsUnderLineListModule = [];
 
                 var doAssociations = function(originOrgUnits, siblingOriginOrgUnit) {
                     var associate = function(datasets, program) {
@@ -62,17 +63,44 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                             $scope.resourceBundle.uploadProgramDesc + _.pluck(allOriginOrgUnits, "name"));
                 };
 
+                var createOrgUnitGroups = function() {
+                    if (!_.isEmpty(allOriginOrgUnitsUnderLineListModule))
+                        return orgUnitGroupHelper.createOrgUnitGroups(allOriginOrgUnitsUnderLineListModule, false);
+                };
+
+                var getBooleanAttributeValue = function(attributeValues, attributeCode) {
+                    var attr = _.find(attributeValues, {
+                        "attribute": {
+                            "code": attributeCode
+                        }
+                    });
+
+                    return attr && attr.value === 'true';
+                };
+
+                var isLinelistService = function(orgUnit) {
+                    return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
+                };
+
+
                 return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
-                    var promises = _.map(modules, function(module) {
-                        return orgUnitRepository.findAllByParent(module.id).then(function(siblingOriginOrgUnits) {
-                            return originOrgunitCreator.create(module, $scope.patientOrigin).then(function(originOrgUnits) {
-                                allOriginOrgUnits = allOriginOrgUnits.concat(originOrgUnits);
-                                return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
+                        var promises = _.map(modules, function(module) {
+                            return orgUnitRepository.findAllByParent(module.id).then(function(siblingOriginOrgUnits) {
+                                return originOrgunitCreator.create(module, $scope.patientOrigin).then(function(originOrgUnits) {
+                                    allOriginOrgUnits = allOriginOrgUnits.concat(originOrgUnits);
+                                    if (isLinelistService(module))
+                                        allOriginOrgUnitsUnderLineListModule = allOriginOrgUnitsUnderLineListModule.concat(originOrgUnits);
+                                    else
+                                        allOriginOrgUnitsUnderLineListModule = allOriginOrgUnitsUnderLineListModule.concat(module);
+
+                                    return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
+                                });
                             });
                         });
-                    });
-                    return $q.all(promises);
-                }).then(publishMessages);
+                        return $q.all(promises);
+                    })
+                    .then(createOrgUnitGroups)
+                    .then(publishMessages);
             };
 
             $scope.patientOrigin.id = dhisId.get($scope.patientOrigin.name);

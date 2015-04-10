@@ -127,61 +127,6 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
                 expect(orgUnitRepository.upsert).toHaveBeenCalledWith(originOrgUnits);
             });
 
-            it("should add origins to orgunit groups if the module is a linelist service", function() {
-                var module = {
-                    "id": "mod1",
-                    "name": "mod1",
-                    "parent": {
-                        "id": "opunit1"
-                    },
-                    "attributeValues": [{
-                        "value": "true",
-                        "attribute": {
-                            "name": "Is Linelist Service",
-                            "code": "isLineListService",
-                        }
-                    }]
-                };
-                var patientOrigin = {
-                    "id": "o1",
-                    "name": "o1"
-                };
-
-                var originOrgUnits = [{
-                    "name": 'o1',
-                    "shortName": 'o1',
-                    "displayName": 'o1',
-                    "id": 'o1mod1',
-                    "level": 7,
-                    "openingDate": undefined,
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": 'Type',
-                            "name": 'Type'
-                        },
-                        "value": 'Patient Origin'
-                    }, {
-                        "attribute": {
-                            "code": 'isNewDataModel',
-                            "name": 'Is New Data Model'
-                        },
-                        "value": 'true'
-                    }],
-                    "parent": {
-                        "id": 'mod1'
-                    }
-                }];
-
-                spyOn(dhisId, "get").and.callFake(function(name) {
-                    return name;
-                });
-
-                originOrgunitCreator.create(module, patientOrigin);
-                scope.$apply();
-
-                expect(orgUnitGroupHelper.createOrgUnitGroups.calls.argsFor(0)[0]).toEqual(originOrgUnits);
-            });
-
             it("should add origins to origin dataset", function() {
                 var module = {
                     "id": "mod1",

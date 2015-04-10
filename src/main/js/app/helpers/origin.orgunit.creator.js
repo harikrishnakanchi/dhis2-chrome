@@ -19,36 +19,13 @@ define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
                 });
             };
 
-            var getBooleanAttributeValue = function(attributeValues, attributeCode) {
-                var attr = _.find(attributeValues, {
-                    "attribute": {
-                        "code": attributeCode
-                    }
-                });
-
-                return attr && attr.value === 'true';
-            };
-
-            var isLinelistService = function(orgUnit) {
-                return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
-            };
-
             return getOriginOUPayload().then(function(originOUPayload) {
                 return datasetRepository.getOriginDatasets().then(function(originDatasets) {
-                    if (isLinelistService(module)) {
-                        return orgUnitRepository.upsert(originOUPayload)
-                            .then(_.partial(orgUnitGroupHelper.createOrgUnitGroups, originOUPayload, false))
-                            .then(_.partial(datasetRepository.associateOrgUnits, originDatasets, originOUPayload))
-                            .then(function() {
-                                return originOUPayload;
-                            });
-                    } else {
-                        return orgUnitRepository.upsert(originOUPayload)
-                            .then(_.partial(datasetRepository.associateOrgUnits, originDatasets, originOUPayload))
-                            .then(function() {
-                                return originOUPayload;
-                            });
-                    }
+                    return orgUnitRepository.upsert(originOUPayload)
+                        .then(_.partial(datasetRepository.associateOrgUnits, originDatasets, originOUPayload))
+                        .then(function() {
+                            return originOUPayload;
+                        });
                 });
             });
         };
