@@ -125,14 +125,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     "data": [periodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + periodAndOrgUnit.period
+                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
 
                 var uploadApprovalPromise = $hustle.publish({
                     "data": [periodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + periodAndOrgUnit.period
+                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
 
                 return $q.all([uploadCompletionPromise, uploadApprovalPromise]);
@@ -200,14 +200,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     "data": payload,
                     "type": "uploadDataValues",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadDataValuesDesc + periodAndOrgUnit.period
+                    "desc": $scope.resourceBundle.uploadDataValuesDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
 
                 var deleteApprovalsPromise = $hustle.publish({
                     "data": periodAndOrgUnit,
                     "type": "deleteApprovals",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period
+                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
 
                 return $q.all([uploadDataValuesPromise, deleteApprovalsPromise]);

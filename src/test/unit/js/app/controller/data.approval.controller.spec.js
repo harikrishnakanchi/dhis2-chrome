@@ -224,6 +224,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 var storedBy = "dataentryuser";
                 scope.currentModule = {
                     id: 'mod1',
+                    name: 'Mod1',
                     parent: {
                         id: 'parent'
                     }
@@ -238,7 +239,10 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": [periodAndOrgUnit],
-                    "type": "uploadCompletionData"
+                    "type": "uploadCompletionData",
+                    "locale": "en",
+                    "desc": "approve data at project level for 2014W14, Module: Mod1"
+
                 }, "dataValues");
 
                 expect(scope.firstLevelApproveSuccess).toBe(true);
@@ -344,6 +348,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 var approvedBy = "dataentryuser";
                 scope.currentModule = {
                     id: 'mod1',
+                    name: 'Mod1',
                     parent: {
                         id: 'parent'
                     }
@@ -359,7 +364,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "data": [periodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": "en",
-                    "desc": "approve data at coordination level for 2014W14"
+                    "desc": "approve data at coordination level for 2014W14, Module: Mod1"
                 }, "dataValues");
                 expect(scope.secondLevelApproveSuccess).toBe(true);
                 expect(scope.approveError).toBe(false);

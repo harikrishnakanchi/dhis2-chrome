@@ -99,7 +99,9 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             var publishToDhis = function() {
                 return $hustle.publish({
                     "data": [periodAndOrgUnit],
-                    "type": "uploadCompletionData"
+                    "type": "uploadCompletionData",
+                    "locale": $scope.currentUser.locale,
+                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
             };
 
@@ -142,7 +144,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     "data": [periodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + periodAndOrgUnit.period
+                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
             };
 

@@ -102,7 +102,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     "data": periodAndOrgUnit,
                     "type": "deleteApprovals",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period
+                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
 
                 return $q.all([uploadDataValuesPromise, deleteApprovalsPromise]);
@@ -146,14 +146,14 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     "data": [periodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + periodAndOrgUnit.period
+                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
 
                 var uploadApprovalPromise = $hustle.publish({
                     "data": [periodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + periodAndOrgUnit.period
+                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
 
                 return $q.all([uploadProgramPromise, uploadCompletionPromise, uploadApprovalPromise]);

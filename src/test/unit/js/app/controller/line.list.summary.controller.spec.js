@@ -301,6 +301,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
                 scope.year = "2014";
+                scope.currentModule = {
+                    'id': 'currentModuleId',
+                    'name': 'Mod1'
+                };
 
                 scope.submit();
                 scope.$apply();
@@ -322,7 +326,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     },
                     "type": "deleteApprovals",
                     "locale": "en",
-                    "desc": "restart approval process for 2014W44"
+                    "desc": "restart approval process for 2014W44, Module: Mod1"
                 }, "dataValues");
                 expect(scope.resultMessageType).toEqual("success");
                 expect(scope.resultMessage).toEqual("Event submitted succesfully");
@@ -367,6 +371,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 scope.$apply();
 
                 scope.year = "2014";
+                scope.currentModule = {
+                    'id': 'currentModuleId',
+                    'name': 'Mod1'
+                };
                 scope.submitAndApprove();
                 scope.$apply();
 
@@ -386,7 +394,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                         'period': '2014W44'
                     }],
                     'locale': 'en',
-                    'desc': 'approve data at project level for 2014W44',
+                    'desc': 'approve data at project level for 2014W44, Module: Mod1',
                     "type": "uploadCompletionData"
                 }, "dataValues");
                 expect(hustle.publish).toHaveBeenCalledWith({
@@ -395,7 +403,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                         'period': '2014W44'
                     }],
                     'locale': 'en',
-                    'desc': 'approve data at coordination level for 2014W44',
+                    'desc': 'approve data at coordination level for 2014W44, Module: Mod1',
                     "type": "uploadApprovalData"
                 }, "dataValues");
 

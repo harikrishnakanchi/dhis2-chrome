@@ -303,6 +303,12 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
                 spyOn(scope.dataentryForm, '$setPristine');
 
+                scope.currentModule = {
+                    'id': 'mod1',
+                    'name': "Mod1"
+
+                };
+
                 var aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository);
 
                 scope.submit();
@@ -313,7 +319,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     data: [],
                     type: 'uploadDataValues',
                     locale: 'en',
-                    desc: 'upload data for 2014W14'
+                    desc: 'upload data for 2014W14, Module: Mod1'
                 }, 'dataValues');
 
                 expect(scope.submitSuccess).toBe(true);
@@ -718,6 +724,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 scope.currentModule = {
                     id: 'mod1',
+                    name: "Mod1",
                     parent: {
                         id: 'parent'
                     }
@@ -732,13 +739,13 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "data": [periodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": "en",
-                    "desc": "approve data at project level for 2014W14"
+                    "desc": "approve data at project level for 2014W14, Module: Mod1"
                 }, "dataValues");
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": [periodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": "en",
-                    "desc": "approve data at coordination level for 2014W14"
+                    "desc": "approve data at coordination level for 2014W14, Module: Mod1"
                 }, "dataValues");
                 expect(scope.submitAndApprovalSuccess).toBe(true);
             });
@@ -785,7 +792,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "data": periodAndOrgUnit,
                     "type": "deleteApprovals",
                     "locale": "en",
-                    "desc": "restart approval process for 2014W14"
+                    "desc": "restart approval process for 2014W14, Module: undefined"
                 }, "dataValues");
             });
 
