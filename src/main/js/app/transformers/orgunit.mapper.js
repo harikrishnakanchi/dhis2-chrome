@@ -268,8 +268,10 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                     }
                 };
 
-                if (!_.isUndefined(patientOrigin.longitude) && !_.isUndefined(patientOrigin.latitude))
+                if (!_.isUndefined(patientOrigin.longitude) && !_.isUndefined(patientOrigin.latitude)) {
                     patientOriginPayload.coordinates = "[" + patientOrigin.longitude + "," + patientOrigin.latitude + "]";
+                    patientOriginPayload.featureType = "Point";
+                }
                 return patientOriginPayload;
             });
         });

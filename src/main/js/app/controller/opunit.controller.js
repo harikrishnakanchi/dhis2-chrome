@@ -78,8 +78,10 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 "attributeValues": getAttributeValues(opUnit.type, opUnit.hospitalUnitCode)
             });
 
-            if (!_.isUndefined(opUnit.longitude) && !_.isUndefined(opUnit.latitude))
+            if (!_.isUndefined(opUnit.longitude) && !_.isUndefined(opUnit.latitude)) {
                 opUnit.coordinates = "[" + opUnit.longitude + "," + opUnit.latitude + "]";
+                opUnit.featureType = "Point";
+            }
 
             opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode', 'latitude', 'longitude']);
 
@@ -112,8 +114,10 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 "attributeValues": getAttributeValues(opUnit.type, opUnit.hospitalUnitCode)
             });
 
-            if (!_.isUndefined(opUnit.longitude) && !_.isUndefined(opUnit.latitude))
+            if (!_.isUndefined(opUnit.longitude) && !_.isUndefined(opUnit.latitude)) {
                 opUnit.coordinates = "[" + opUnit.longitude + "," + opUnit.latitude + "]";
+                opUnit.featureType = "Point";
+            }
 
             opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode', 'latitude', 'longitude']);
 
