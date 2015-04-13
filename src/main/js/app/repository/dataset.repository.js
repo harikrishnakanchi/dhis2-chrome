@@ -65,6 +65,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
         var getAllDatasetIds = function() {
             var store = db.objectStore("dataSets");
             return store.getAll().then(function(data) {
+                data = filterNewDatasets(data);
                 return _.pluck(data, "id");
             });
         };
