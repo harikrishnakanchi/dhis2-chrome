@@ -119,71 +119,6 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             expect(result).toEqual(expected);
         });
 
-        it("should get all new linelist data sets", function() {
-            var allDataSets = [{
-                "id": "dataSet1",
-                "name": "NeoNat",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "true"
-                }]
-            }, {
-                "id": "dataSet2",
-                "name": "Obgyn",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "false"
-                }]
-            }, {
-                "id": "dataSet3",
-                "name": "ER linelist",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "false"
-                }]
-            }];
-
-            var expected = [{
-                "id": "dataSet1",
-                "name": "NeoNat",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "true"
-                }]
-            }];
-            mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
-            var result;
-            datasetRepository.getAllLinelistDatasets().then(function(r) {
-                result = r;
-            });
-            scope.$apply();
-            expect(mockStore.getAll).toHaveBeenCalled();
-            expect(result).toEqual(expected);
-        });
-
         it("should get datasets for OrgUnit", function() {
             var expectedDatasets = [{
                 "id": "ds1"
@@ -198,30 +133,6 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             scope.$apply();
 
             expect(actualValues).toEqual(expectedDatasets);
-        });
-
-        it("should update data sets", function() {
-            var datasets = [{
-                "id": "DS_Physio",
-                "organisationUnits": [{
-                    "name": "Mod1",
-                    "id": "hvybNW8qEov"
-                }]
-            }];
-
-            var result = datasetRepository.upsert(datasets);
-
-            var expectedDatasets = [{
-                "id": "DS_Physio",
-                "clientLastUpdated": "2014-05-30T12:43:54.972Z",
-                "organisationUnits": [{
-                    "name": "Mod1",
-                    "id": "hvybNW8qEov"
-                }],
-                "orgUnitIds": ["hvybNW8qEov"]
-            }];
-
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasets);
         });
 
         it("should get dataset specified by id", function() {

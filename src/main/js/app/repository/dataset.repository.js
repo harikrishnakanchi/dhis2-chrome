@@ -52,16 +52,6 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
-        var getAllLinelistDatasets = function() {
-            var store = db.objectStore("dataSets");
-            return store.getAll().then(function(all) {
-                var filtered = filterNewDatasets(all);
-                return _.filter(filtered, function(ds) {
-                    return getBooleanAttributeValue(ds.attributeValues, "isLineListService");
-                });
-            });
-        };
-
         var getAllDatasetIds = function() {
             var store = db.objectStore("dataSets");
             return store.getAll().then(function(data) {
@@ -147,10 +137,8 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             "findAll": findAll,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
             "getAllDatasetIds": getAllDatasetIds,
-            "upsert": upsert,
             "getAllForOrgUnit": getAllForOrgUnit,
             "getEnriched": getEnriched,
-            "getAllLinelistDatasets": getAllLinelistDatasets,
             "getAllAggregateDatasets": getAllAggregateDatasets,
             "getOriginDatasets": getOriginDatasets,
             "associateOrgUnits": associateOrgUnits

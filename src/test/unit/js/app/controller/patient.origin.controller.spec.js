@@ -52,7 +52,6 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, siblingOriginOrgUnits));
 
             datasetRepository = new DatasetRepository();
-            spyOn(datasetRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(datasetRepository, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, {}));
             spyOn(datasetRepository, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
 

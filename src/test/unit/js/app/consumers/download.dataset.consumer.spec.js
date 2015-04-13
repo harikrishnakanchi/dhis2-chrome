@@ -24,7 +24,6 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                     'organisationUnits': []
                 }];
 
-                spyOn(datasetRepository, 'upsert');
                 spyOn(datasetRepository, 'upsertDhisDownloadedData');
                 spyOn(datasetRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, dhisDatasets));
@@ -106,7 +105,6 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                     }]
                 };
 
-                spyOn(datasetRepository, 'upsert');
                 spyOn(datasetRepository, 'upsertDhisDownloadedData');
                 spyOn(datasetRepository, 'findAll').and.returnValue(utils.getPromise(q, [locallyUpdatedDataset]));
                 spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, [dhisUpdatedDataset]));

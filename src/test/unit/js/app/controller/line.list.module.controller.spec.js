@@ -63,9 +63,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }]));
 
                 datasetRepo = new DatasetRepository();
-                spyOn(datasetRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(datasetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
-                spyOn(datasetRepo, "getAllLinelistDatasets").and.returnValue(utils.getPromise(q, allDatasets));
                 orgUnitGroupHelper = new OrgUnitGroupHelper();
                 spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
 
