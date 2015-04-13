@@ -57,9 +57,9 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
                 $scope.saveFailure = true;
             };
 
-            return orgUnitRepository.upsert(dhisProject)
+            return orgUnitRepository.upsert([dhisProject])
                 .then(function(data) {
-                    return publishMessage(data, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + data.name);
+                    return publishMessage(data, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + data[0].name);
                 })
                 .then(onSuccess, onError);
         };

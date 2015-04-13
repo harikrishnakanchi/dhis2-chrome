@@ -114,9 +114,9 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
             scope.save(newOrgUnit, parent);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith([expectedNewOrgUnit]);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "data": expectedNewOrgUnit,
+                "data": [expectedNewOrgUnit],
                 "type": "upsertOrgUnit",
                 "locale": "en",
                 "desc": "create organisation unit: Org1"

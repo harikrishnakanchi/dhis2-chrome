@@ -84,9 +84,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             spyOn(location, 'hash');
             rootScope.$on('resetProjects', function() {
                 expect(orgUnitMapper.mapToProjectForDhis).toHaveBeenCalledWith(newOrgUnit, parent);
-                expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
+                expect(orgUnitRepo.upsert).toHaveBeenCalledWith([expectedNewOrgUnit]);
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    data: expectedNewOrgUnit,
+                    data: [expectedNewOrgUnit],
                     type: "upsertOrgUnit",
                     locale: "en",
                     desc: "upsert org unit blah"
@@ -122,9 +122,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             scope.update({}, {});
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedNewOrgUnit);
+            expect(orgUnitRepo.upsert).toHaveBeenCalledWith([expectedNewOrgUnit]);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: expectedNewOrgUnit,
+                data: [expectedNewOrgUnit],
                 type: "upsertOrgUnit",
                 locale: "en",
                 desc: "upsert org unit blah"

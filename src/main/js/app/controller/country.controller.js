@@ -47,14 +47,15 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     "data": data,
                     "type": "upsertOrgUnit",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.upsertOrgUnitDesc + data.name
+                    "desc": $scope.resourceBundle.upsertOrgUnitDesc + data[0].name
                 }, "dataValues").then(function() {
                     return data;
                 });
             };
 
             $scope.loading = true;
-            return orgUnitRepository.upsert(newOrgUnit)
+
+            return orgUnitRepository.upsert([newOrgUnit])
                 .then(saveToDhis)
                 .then(onSuccess, onError)
                 .finally(function() {
