@@ -41,7 +41,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
 
                 scope.resourceBundle = {
-                    "uploadProgramEventsDesc": "submit cases",
+                    "uploadProgramEventsDesc": "submit cases for ",
                     "deleteEventDesc": "delete cases",
                     "uploadApprovalDataDesc": "approve data at coordination level for ",
                     "uploadCompletionDataDesc": "approve data at project level for ",
@@ -317,7 +317,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 expect(hustle.publish).toHaveBeenCalledWith({
                     type: 'uploadProgramEvents',
                     locale: 'en',
-                    desc: 'submit cases'
+                    desc: 'submit cases for 2014W44, Module: Mod1'
                 }, 'dataValues');
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": {
@@ -386,7 +386,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 expect(hustle.publish).toHaveBeenCalledWith({
                     type: 'uploadProgramEvents',
                     locale: 'en',
-                    desc: 'submit cases'
+                    desc: 'submit cases for 2014W44, Module: Mod1'
                 }, 'dataValues');
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": [{

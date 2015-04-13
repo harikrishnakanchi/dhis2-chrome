@@ -218,7 +218,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     return getDatasets().then(function(datasets) {
                         return datasetRepository.associateOrgUnits(datasets, originOrgUnits).then(function() {
                             return publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset",
-                                $scope.resourceBundle.associateOrgUnitToDatasetDesc + _.pluck(originOrgUnits, "name"));
+                                $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
                         });
                     });
                 };

@@ -36,7 +36,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "uploadPatientOriginDetailsDesc": "create patient origin ",
                 "upsertOrgUnitDesc": "upsert ",
                 "uploadProgramDesc": "upload program for ",
-                "associateOrgUnitToDatasetDesc": "associate datasets for "
+                "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit "
             };
 
             orgUnitGroupHelper = new OrgUnitGroupHelper();
@@ -249,7 +249,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "data": ["ds1"],
                 "type": "associateOrgUnitToDataset",
                 "locale": "en",
-                "desc": "associate datasets for origin org unit"
+                "desc": "associate selected services to origins of Op Unit Project1"
             }, "dataValues"]);
 
             expect(hustle.publish.calls.argsFor(3)).toEqual([{

@@ -96,7 +96,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var uploadDataValuesPromise = $hustle.publish({
                     "type": "uploadProgramEvents",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadProgramEventsDesc
+                    "desc": $scope.resourceBundle.uploadProgramEventsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
 
                 var deleteApprovalsPromise = $hustle.publish({
@@ -140,7 +140,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var uploadProgramPromise = $hustle.publish({
                     "type": "uploadProgramEvents",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadProgramEventsDesc
+                    "desc": $scope.resourceBundle.uploadProgramEventsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
 
                 var uploadCompletionPromise = $hustle.publish({

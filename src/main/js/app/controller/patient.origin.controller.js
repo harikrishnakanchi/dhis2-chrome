@@ -56,7 +56,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
 
                     associatedDatasetIds = _.flatten(associatedDatasetIds);
                     publishMessage(associatedDatasetIds, "associateOrgUnitToDataset",
-                        $scope.resourceBundle.associateOrgUnitToDatasetDesc + _.pluck(allOriginOrgUnits, "name"));
+                        $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
 
                     if (!_.isEmpty(associatedPrograms))
                         publishMessage(associatedPrograms, "uploadProgram",
