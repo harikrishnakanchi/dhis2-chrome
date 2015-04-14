@@ -127,8 +127,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
                 });
                 return _.map(datasets, function(ds) {
                     ds.organisationUnits = ds.organisationUnits || [];
-                    if (!_.contains(ds.organisationUnits, ouPayload))
-                        ds.organisationUnits = ds.organisationUnits.concat(ouPayload);
+                    ds.organisationUnits = ds.organisationUnits.concat(ouPayload);
                     return ds;
                 });
             };
