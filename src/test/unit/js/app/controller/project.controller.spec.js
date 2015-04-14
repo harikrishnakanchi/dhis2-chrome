@@ -508,7 +508,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 id: '123',
                 name: "blah blah",
                 userCredentials: {
-                    disabled: false
+                    disabled: false,
+                    username: "blah blah"
                 }
             };
 
@@ -516,7 +517,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 id: '123',
                 name: "blah blah",
                 userCredentials: {
-                    disabled: true
+                    disabled: true,
+                    username: "blah blah"
                 }
             };
 

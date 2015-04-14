@@ -162,7 +162,7 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
                 user.userCredentials.disabled = $scope.isUserToBeDisabled;
                 return userRepository.upsert(user)
                     .then(function(data) {
-                        return publishMessage(data, "updateUser", $scope.resourceBundle.updateUserDesc + user.name);
+                        return publishMessage(data, "updateUser", $scope.resourceBundle.updateUserDesc + user.userCredentials.username);
                     });
             };
 
