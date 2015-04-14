@@ -262,7 +262,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 $scope.loading = true;
                 return $q.all([saveExcludedDataElements(enrichedModule),
                         orgUnitRepository.upsert(enrichedModule),
-                        publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.updateOrgUnitDesc + enrichedModule.name)
+                        publishMessage(enrichedModule, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + enrichedModule.name)
                     ])
                     .then(_.partial(onSuccess, enrichedModule), onError)
                     .finally(function() {

@@ -106,8 +106,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                 scope.resourceBundle = {
                     "disableOrgUnitDesc": "disable organisation unit: ",
-                    "upsertOrgUnitDesc": "create organisation unit: ",
-                    "updateOrgUnitDesc": "update organisation unit: ",
+                    "upsertOrgUnitDesc": "save organisation unit: ",
                     "associateOrgUnitToDatasetDesc": "associate datasets for ",
                     "uploadSystemSettingDesc": "upload sys settings for "
                 };
@@ -311,7 +310,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     data: newLineListModule,
                     type: "upsertOrgUnit",
                     locale: "en",
-                    desc: "create organisation unit: Module2"
+                    desc: "save organisation unit: Module2"
                 }, "dataValues");
 
                 expect(scope.saveFailure).toBe(false);
@@ -488,7 +487,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     data: enrichedLineListModule,
                     type: "upsertOrgUnit",
                     locale: "en",
-                    desc: "update organisation unit: new name"
+                    desc: "save organisation unit: new name"
                 }, "dataValues");
             });
 
@@ -721,7 +720,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "data": originOrgUnit,
                     "type": "upsertOrgUnit",
                     "locale": "en",
-                    "desc": "create organisation unit: origin org unit"
+                    "desc": "save organisation unit: origin org unit"
                 }, "dataValues"]);
             });
 

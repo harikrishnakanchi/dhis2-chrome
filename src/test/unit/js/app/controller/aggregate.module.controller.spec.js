@@ -82,8 +82,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 scope.resourceBundle = {
                     "disableOrgUnitDesc": "disable organisation unit: ",
-                    "upsertOrgUnitDesc": "create organisation unit: ",
-                    "updateOrgUnitDesc": "update organisation unit: ",
+                    "upsertOrgUnitDesc": "save organisation unit: ",
                     "uploadSystemSettingDesc": "upload sys settings for "
                 };
 
@@ -172,7 +171,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     data: enrichedAggregateModule,
                     type: "upsertOrgUnit",
                     locale: "en",
-                    desc: "create organisation unit: Module1"
+                    desc: "save organisation unit: Module1"
                 }, "dataValues");
             });
 
@@ -582,7 +581,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     data: expectedModule,
                     type: "upsertOrgUnit",
                     locale: "en",
-                    desc: "update organisation unit: module NEW name"
+                    desc: "save organisation unit: module NEW name"
                 }, "dataValues");
             });
 
@@ -972,7 +971,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "data": originOrgUnit,
                     "type": "upsertOrgUnit",
                     "locale": "en",
-                    "desc": "create organisation unit: origin org unit"
+                    "desc": "save organisation unit: origin org unit"
                 }, "dataValues"]);
             });
 
