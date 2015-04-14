@@ -142,6 +142,12 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             $scope.isUserToBeDisabled = !user.userCredentials.disabled;
             $scope.userStateSuccessfullyToggled = false;
 
+            var confirmationMessage = $scope.isUserToBeDisabled === true ? $scope.resourceBundle.userDisableConfMessage : $scope.resourceBundle.userEnableConfMessage;
+
+            $scope.modalMessages = {
+                "confirmationMessage": confirmationMessage
+            };
+
             var modalInstance = $modal.open({
                 templateUrl: 'templates/toggle-disable-state-confirmation.html',
                 controller: 'confirmDialogController',
