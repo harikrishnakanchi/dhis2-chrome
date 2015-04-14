@@ -550,13 +550,35 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }]
             };
 
-            orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, [project1]));
+            orgUnitRepo.getAllProjects.and.returnValue(utils.getPromise(q, [project1]));
 
             projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
             scope.$apply();
 
             expect(scope.existingProjectCodes).toEqual(["AF101"]);
         });
+
+        it("should get the names of all peer projects while preparing new form", function() {
+            var project1 = {
+                "id": "Kabul1",
+                "name": "Kabul-AF101",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "projCode"
+                    },
+                    "value": "AF101"
+                }]
+            };
+
+            orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, [project1]));
+
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
+            scope.$apply();
+
+            expect(scope.peerProjects).toEqual(["Kabul-AF101"]);
+        });
+
+
 
         it("should take the user to the view page of the parent country on clicking cancel", function() {
             var parentOrgUnit = {

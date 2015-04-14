@@ -205,10 +205,9 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
         var prepareNewForm = function() {
             $scope.reset();
-            return orgUnitRepository.findAllByParent($scope.orgUnit.id).then(function(allOrgUnits) {
-                $scope.peerProjects = _.pluck(allOrgUnits, "name");
-                $scope.existingProjectCodes = _.transform(allOrgUnits, function(acc, orgUnit) {
-                    var projCodeAttribute = _.find(orgUnit.attributeValues, {
+            orgUnitRepository.getAllProjects().then(function(allProjects) {
+                $scope.existingProjectCodes = _.transform(allProjects, function(acc, project) {
+                    var projCodeAttribute = _.find(project.attributeValues, {
                         'attribute': {
                             'code': "projCode"
                         }
@@ -217,6 +216,10 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
                         acc.push(projCodeAttribute.value);
                     }
                 }, []);
+            });
+
+            return orgUnitRepository.findAllByParent($scope.orgUnit.id).then(function(allOrgUnits) {
+                $scope.peerProjects = _.pluck(allOrgUnits, "name");
             });
         };
 
