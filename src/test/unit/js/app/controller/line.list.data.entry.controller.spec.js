@@ -288,10 +288,10 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         'program': "Prg1",
                         'programStage': "PrgStage1",
                         'orgUnit': "o1",
-                        'eventDate': new Date("2014-12-31"),
+                        'eventDate': new Date("2014,12,31"),
                         'dataValues': [{
                             "dataElement": "de1",
-                            "value": new Date("2014-12-31")
+                            "value": new Date("2014,12,31")
                         }, {
                             "dataElement": "de2",
                             "value": 13
