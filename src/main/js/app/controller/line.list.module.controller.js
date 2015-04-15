@@ -201,23 +201,21 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var associateToDatasets = function(originOrgUnits) {
-                    var getDatasets = function() {
-                        var getSummaryDatasetId = function() {
-                            return _.find($scope.program.attributeValues, {
-                                "attribute": {
-                                    "code": "associatedDataSet"
-                                }
-                            }).value;
-                        };
 
-                        return $q.all([datasetRepository.getOriginDatasets(), datasetRepository.get(getSummaryDatasetId())]).then(function(datasets) {
-                            return datasets[0].concat(datasets[1]);
-                        });
-                    };
+                    return datasetRepository.getAll().then(function(allDatasets) {
 
-                    return getDatasets().then(function(datasets) {
-                        return datasetRepository.associateOrgUnits(datasets, originOrgUnits).then(function() {
-                            return publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset",
+                        var originDatasetIds = _.pluck(_.filter(allDatasets, "isOriginDataset"), "id");
+
+                        var summaryDatasetId = _.find($scope.program.attributeValues, {
+                            "attribute": {
+                                "code": "associatedDataSet"
+                            }
+                        }).value;
+
+                        var datasetIds = _.flattenDeep([summaryDatasetId, originDatasetIds]);
+
+                        return datasetRepository.associateOrgUnits(datasetIds, originOrgUnits).then(function() {
+                            return publishMessage(datasetIds, "associateOrgUnitToDataset",
                                 $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
                         });
                     });

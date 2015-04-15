@@ -24,7 +24,11 @@ define(["deleteApprovalConsumer", "angularMocks", "utils", "approvalService", "a
 
             spyOn(approvalService, "markAsIncomplete").and.returnValue(utils.getPromise(q, {}));
             spyOn(approvalService, "markAsUnapproved").and.returnValue(utils.getPromise(q, {}));
-            spyOn(datasetRepository, "getAllDatasetIds").and.returnValue(utils.getPromise(q, allDatasetIds));
+            spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, [{
+                "id": allDatasetIds[0]
+            }, {
+                "id": allDatasetIds[1]
+            }]));
 
             spyOn(approvalDataRepository, "invalidateApproval").and.returnValue(utils.getPromise(q, undefined));
         }));

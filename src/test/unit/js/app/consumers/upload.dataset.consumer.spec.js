@@ -20,7 +20,7 @@ define(["uploadDatasetConsumer", "utils", "angularMocks", "datasetService", "dat
 
         it("should save datasets to dhis", function() {
             spyOn(datasetService, "associateDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
-            spyOn(datasetRepository, "findAll").and.returnValue(utils.getPromise(q, allDatasets));
+            spyOn(datasetRepository, "findAllDhisDatasets").and.returnValue(utils.getPromise(q, allDatasets));
             uploadDatasetConsumer = new UploadDatasetConsumer(datasetService, datasetRepository);
 
             message = {

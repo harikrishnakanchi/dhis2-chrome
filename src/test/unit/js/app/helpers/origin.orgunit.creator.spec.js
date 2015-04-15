@@ -16,7 +16,7 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
 
                 spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
-                spyOn(datasetRepository, "getOriginDatasets").and.returnValue(utils.getPromise(q, {}));
+                spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, {}));
                 spyOn(datasetRepository, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
 
                 spyOn(patientOriginRepository, "get");
@@ -165,20 +165,23 @@ define(["originOrgunitCreator", "angularMocks", "utils", "orgUnitRepository", "p
                     }
                 }];
 
-                var originDataset = [{
+                var allDatasets = [{
+                    "id": "ds1",
+                    "isOriginDataset": false
+                }, {
                     "id": "ods1",
-                    "name": "origin"
+                    "isOriginDataset": true
                 }];
 
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
 
-                datasetRepository.getOriginDatasets.and.returnValue(utils.getPromise(q, originDataset));
+                datasetRepository.getAll.and.returnValue(utils.getPromise(q, allDatasets));
 
                 originOrgunitCreator.create(module, patientOrigin);
                 scope.$apply();
-                expect(datasetRepository.associateOrgUnits.calls.argsFor(0)[0]).toEqual(originDataset);
+                expect(datasetRepository.associateOrgUnits.calls.argsFor(0)[0]).toEqual(["ods1"]);
                 expect(datasetRepository.associateOrgUnits.calls.argsFor(0)[1]).toEqual(originOrgUnits);
             });
         });

@@ -1,5 +1,5 @@
-define(["moment", "approvalDataTransformer", "properties", "lodash", "indexedDBLogger", "zipUtils"], function(moment, approvalDataTransformer, properties, _, indexedDBLogger, zipUtils) {
-    return function($scope, $hustle, $q, $rootScope, approvalHelper, datasetRepository, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location, approvalDataRepository) {
+define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], function(moment, properties, _, indexedDBLogger, zipUtils) {
+    return function($scope, $hustle, $q, $rootScope, approvalHelper, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location, approvalDataRepository) {
         $scope.approveSuccessForLevelOne = false;
         $scope.approveSuccessForLevelTwo = false;
         $scope.approveSuccessForLevelThree = false;

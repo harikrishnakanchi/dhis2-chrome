@@ -1,7 +1,7 @@
-define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepository", "datasetRepository", "dataRepository", "utils", "moment", "timecop", "lodash"],
-    function(ApprovalHelper, mocks, ApprovalDataRepository, OrgUnitRepository, DatasetRepository, DataRepository, utils, moment, timecop, _) {
+define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepository", "dataRepository", "utils", "moment", "timecop", "lodash"],
+    function(ApprovalHelper, mocks, ApprovalDataRepository, OrgUnitRepository, DataRepository, utils, moment, timecop, _) {
         describe("approval helper", function() {
-            var hustle, approvalDataRepository, orgUnitRepository, datasetRepository, dataRepository, q, approvalHelper, scope;
+            var hustle, approvalDataRepository, orgUnitRepository, dataRepository, q, approvalHelper, scope;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($hustle, $q, $rootScope) {
@@ -12,14 +12,13 @@ define(["approvalHelper", "angularMocks", "approvalDataRepository", "orgUnitRepo
                 approvalDataRepository = new ApprovalDataRepository();
 
                 orgUnitRepository = new OrgUnitRepository();
-                datasetRepository = new DatasetRepository();
                 dataRepository = new DataRepository();
 
                 spyOn(hustle, "publish");
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
-                approvalHelper = new ApprovalHelper(hustle, q, scope, orgUnitRepository, datasetRepository, approvalDataRepository, dataRepository);
+                approvalHelper = new ApprovalHelper(hustle, q, scope, orgUnitRepository, approvalDataRepository, dataRepository);
             }));
 
             afterEach(function() {

@@ -13,7 +13,9 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 };
 
                 datasetRepository = {
-                    "getAllDatasetIds": jasmine.createSpy("getAllDatasetIds").and.returnValue(utils.getPromise(q, ["DS_OPD"]))
+                    "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [{
+                        "id": "DS_OPD"
+                    }]))
                 };
 
                 approvalDataRepository = {
@@ -33,7 +35,9 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
             it("should download approval data from dhis based on user module ids and dataset", function() {
                 userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
 
-                datasetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, ["ds1"]));
+                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
+                    "id": "ds1"
+                }]));
 
                 message = {
                     "data": {
@@ -45,7 +49,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 scope.$apply();
 
                 expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
-                expect(datasetRepository.getAllDatasetIds).toHaveBeenCalled();
+                expect(datasetRepository.getAll).toHaveBeenCalled();
 
                 expect(approvalService.getCompletionData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
                 expect(approvalService.getApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
@@ -54,7 +58,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
             it("should not download approval data from dhis if the user does not have any preferred moduleids", function() {
                 userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, []));
 
-                datasetRepository.getAllDatasetIds.and.returnValue(utils.getPromise(q, ["ds1"]));
+                datasetRepository.getAll.and.returnValue(utils.getPromise(q, ["ds1"]));
 
                 message = {
                     "data": {

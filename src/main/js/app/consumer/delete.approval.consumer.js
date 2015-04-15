@@ -1,4 +1,4 @@
-define([], function() {
+define(["lodash"], function(_) {
     return function(approvalService, approvalDataRepository, datasetRepository, $q) {
         this.run = function(message) {
             var periodAndOrgUnit = message.data.data;
@@ -10,9 +10,10 @@ define([], function() {
                 });
             };
 
-            return datasetRepository.getAllDatasetIds().then(function(allDatasets) {
-                var markAsIncompletePromise = approvalService.markAsIncomplete(allDatasets, periodAndOrgUnit.period, periodAndOrgUnit.orgUnit);
-                var markAsUnapprovedPromise = approvalService.markAsUnapproved(allDatasets, periodAndOrgUnit.period, periodAndOrgUnit.orgUnit);
+            return datasetRepository.getAll().then(function(allDatasets) {
+                var allDatasetIds = _.pluck(allDatasets, "id");
+                var markAsIncompletePromise = approvalService.markAsIncomplete(allDatasetIds, periodAndOrgUnit.period, periodAndOrgUnit.orgUnit);
+                var markAsUnapprovedPromise = approvalService.markAsUnapproved(allDatasetIds, periodAndOrgUnit.period, periodAndOrgUnit.orgUnit);
                 return $q.all([markAsIncompletePromise, markAsUnapprovedPromise])
                     .then(invalidateApproval);
             });

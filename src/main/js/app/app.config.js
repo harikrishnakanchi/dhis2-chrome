@@ -96,8 +96,6 @@ require.config({
         "toTree": "app/transformers/to.tree",
         "systemSettingsTransformer": "app/transformers/system.settings.transformer",
         "datasetTransformer": "app/transformers/dataset.transformer",
-        "groupSections": "app/transformers/group.sections",
-        "approvalDataTransformer": "app/transformers/approval.data.transformer",
         "programTransformer": "app/transformers/program.transformer",
 
         //Database Utilities

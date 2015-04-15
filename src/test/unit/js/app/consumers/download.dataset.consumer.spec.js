@@ -25,7 +25,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                 }];
 
                 spyOn(datasetRepository, 'upsertDhisDownloadedData');
-                spyOn(datasetRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepository, 'findAllDhisDatasets').and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, dhisDatasets));
 
                 var message = {
@@ -57,7 +57,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                 }];
 
                 spyOn(datasetRepository, 'upsertDhisDownloadedData');
-                spyOn(datasetRepository, 'findAll').and.returnValue(utils.getPromise(q, localDataset));
+                spyOn(datasetRepository, 'findAllDhisDatasets').and.returnValue(utils.getPromise(q, localDataset));
                 spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, dhisDatasets));
 
                 var message = {
@@ -106,7 +106,7 @@ define(["downloadDatasetConsumer", "datasetService", "utils", "angularMocks", "d
                 };
 
                 spyOn(datasetRepository, 'upsertDhisDownloadedData');
-                spyOn(datasetRepository, 'findAll').and.returnValue(utils.getPromise(q, [locallyUpdatedDataset]));
+                spyOn(datasetRepository, 'findAllDhisDatasets').and.returnValue(utils.getPromise(q, [locallyUpdatedDataset]));
                 spyOn(datasetService, 'getAll').and.returnValue(utils.getPromise(q, [dhisUpdatedDataset]));
 
                 var message = {

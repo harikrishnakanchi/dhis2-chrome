@@ -1,69 +1,57 @@
 define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransformer, moment) {
     return function(db, $q) {
-        var get = function(datasetId) {
+        var self = this;
+
+        this.getAll = function() {
             var store = db.objectStore("dataSets");
-            return store.find(datasetId);
-        };
-
-        var findAll = function(datasetIds) {
-            var store = db.objectStore("dataSets");
-            var query = db.queryBuilder().$in(datasetIds).compile();
-            return store.each(query);
-        };
-
-        var getEnriched = function(datasets, excludedDataElements) {
-            var getEntitiesFromDb = function(storeName) {
-                var store = db.objectStore(storeName);
-                return store.getAll();
-            };
-
-            var sectionPromise = getEntitiesFromDb("sections");
-            var dataElementsPromise = getEntitiesFromDb("dataElements");
-
-            return $q.all([sectionPromise, dataElementsPromise]).then(function(data) {
-                var sections = data[0];
-                var dataElements = data[1];
-                return datasetTransformer.enrichDatasets(datasets, sections, dataElements, excludedDataElements);
+            return store.getAll().then(function(dsFromDb) {
+                datasets = _.map(dsFromDb, datasetTransformer.mapDatasetForView);
+                datasets = _.filter(datasets, "isNewDataModel");
+                return datasets;
             });
         };
 
-        var filterNewDatasets = function(datasets) {
-            return _.filter(datasets, function(ds) {
-                return getBooleanAttributeValue(ds.attributeValues, "isNewDataModel");
-            });
-        };
-
-        var getBooleanAttributeValue = function(attributes, attributeCode) {
-            var attr = _.find(attributes, {
-                "attribute": {
-                    "code": attributeCode
-                }
-            });
-            return attr && attr.value === "true";
-        };
-
-        var getAllAggregateDatasets = function() {
+        this.findAllForOrgUnits = function(orgUnitIds) {
             var store = db.objectStore("dataSets");
-            return store.getAll().then(function(all) {
-                var filtered = filterNewDatasets(all);
-                return _.reject(filtered, function(ds) {
-                    return getBooleanAttributeValue(ds.attributeValues, "isLineListService") || getBooleanAttributeValue(ds.attributeValues, "isOriginDataset");
+            var query = db.queryBuilder().$in(orgUnitIds).$index("by_organisationUnit").compile();
+            return store.each(query).then(function(dsFromDb) {
+                datasets = _.map(dsFromDb, datasetTransformer.mapDatasetForView);
+                datasets = _.filter(datasets, "isNewDataModel");
+                datasets = _.uniq(_.sortBy(datasets, 'id'), true, 'id');
+                return datasets;
+            });
+        };
+
+        this.includeDataElements = function(datasets, excludedDataElements) {
+            var sectionIds = _.pluck(_.flatten(_.pluck(datasets, "sections")), "id");
+            var store = db.objectStore("sections");
+            var query = db.queryBuilder().$in(sectionIds).compile();
+            return store.each(query).then(function(sections) {
+                var dataElementIds = _.pluck(_.flatten(_.pluck(sections, "dataElements")), "id");
+                var store = db.objectStore("dataElements");
+                var query = db.queryBuilder().$in(dataElementIds).compile();
+                return store.each(query).then(function(dataElements) {
+                    return datasetTransformer.enrichWithSectionsAndDataElements(datasets, sections, dataElements, excludedDataElements);
                 });
             });
         };
 
-        var getAllDatasetIds = function() {
-            var store = db.objectStore("dataSets");
-            return store.getAll().then(function(data) {
-                data = filterNewDatasets(data);
-                return _.pluck(data, "id");
-            });
-        };
+        this.includeCategoryOptionCombinations = function(datasets) {
+            var getAll = function(storeName) {
+                var store = db.objectStore(storeName);
+                return store.getAll();
+            };
 
-        var getAllForOrgUnit = function(orgUnitId) {
-            var store = db.objectStore("dataSets");
-            var query = db.queryBuilder().$eq(orgUnitId).$index("by_organisationUnit").compile();
-            return store.each(query);
+            var categoryCombosPromise = getAll("categoryCombos");
+            var categoriesPromise = getAll("categories");
+            var categoryOptionCombosPromise = getAll("categoryOptionCombos");
+
+            return $q.all([categoryCombosPromise, categoriesPromise, categoryOptionCombosPromise]).then(function(data) {
+                var allCategoryCombos = data[0];
+                var allCategories = data[1];
+                var allCategoryOptionCombos = data[2];
+                return datasetTransformer.enrichWithCategoryOptionCombinations(datasets, allCategoryCombos, allCategories, allCategoryOptionCombos);
+            });
         };
 
         var extractOrgUnitIdsForIndexing = function(dataSets) {
@@ -73,75 +61,40 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
-        var upsert = function(payload) {
-            var dataSets = !_.isArray(payload) ? [payload] : payload;
-
-            dataSets = _.map(dataSets, function(ds) {
-                ds.clientLastUpdated = moment().toISOString();
-                return ds;
-            });
-
-            dataSets = extractOrgUnitIdsForIndexing(dataSets);
-            var store = db.objectStore("dataSets");
-            return store.upsert(dataSets).then(function() {
-                return dataSets;
-            });
-        };
-
-        var upsertDhisDownloadedData = function(payload) {
-            var dataSets = !_.isArray(payload) ? [payload] : payload;
-            dataSets = extractOrgUnitIdsForIndexing(dataSets);
-            var store = db.objectStore("dataSets");
-            return store.upsert(dataSets).then(function() {
-                return dataSets;
-            });
-        };
-
-        var getOriginDatasets = function() {
-            var store = db.objectStore("dataSets");
-            return store.getAll().then(function(allDatasets) {
-                return _.filter(allDatasets, function(ds) {
-                    return getBooleanAttributeValue(ds.attributeValues, "isOriginDataset");
-                });
-            });
-        };
-
-        var associateOrgUnits = function(datasets, orgUnits) {
-
-            var addOrgUnitsToDatasets = function(datasets) {
-                return _.map(datasets, function(ds) {
+        this.associateOrgUnits = function(datasetIds, orgUnits) {
+            return self.findAllDhisDatasets(datasetIds).then(function(datasets) {
+                var updatedDatasets = _.map(datasets, function(ds) {
                     ds.organisationUnits = ds.organisationUnits || [];
-
-                    var ouPayload = _.map(orgUnits, function(orgUnit) {
+                    var orgUnitsForDataset = _.transform(orgUnits, function(results, orgUnit) {
                         var orgUnitToAdd = {
                             "id": orgUnit.id,
                             "name": orgUnit.name
                         };
-                        if (!_.some(ds.organisationUnits, orgUnitToAdd)) {
-                            return orgUnitToAdd;
-                        }
+                        if (!_.some(ds.organisationUnits, orgUnitToAdd))
+                            results.add(orgUnitToAdd);
                     });
 
-                    ds.organisationUnits = ds.organisationUnits.concat(_.filter(ouPayload, undefined));
+                    ds.organisationUnits = ds.organisationUnits.concat(orgUnitsForDataset);
                     return ds;
                 });
-            };
 
-            var updatedDatasets = addOrgUnitsToDatasets(datasets);
-            return upsert(updatedDatasets);
-
+                return self.upsertDhisDownloadedData(updatedDatasets);
+            });
         };
 
-        return {
-            "get": get,
-            "findAll": findAll,
-            "upsertDhisDownloadedData": upsertDhisDownloadedData,
-            "getAllDatasetIds": getAllDatasetIds,
-            "getAllForOrgUnit": getAllForOrgUnit,
-            "getEnriched": getEnriched,
-            "getAllAggregateDatasets": getAllAggregateDatasets,
-            "getOriginDatasets": getOriginDatasets,
-            "associateOrgUnits": associateOrgUnits
+        this.findAllDhisDatasets = function(datasetIds) {
+            var store = db.objectStore("dataSets");
+            var query = db.queryBuilder().$in(datasetIds).compile();
+            return store.each(query);
+        };
+
+        this.upsertDhisDownloadedData = function(payload) {
+            var dataSets = !_.isArray(payload) ? [payload] : payload;
+            dataSets = extractOrgUnitIdsForIndexing(dataSets);
+            var store = db.objectStore("dataSets");
+            return store.upsert(dataSets).then(function() {
+                return dataSets;
+            });
         };
     };
 });

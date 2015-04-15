@@ -4,7 +4,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
         describe("dataApprovalController ", function() {
             var scope, routeParams, db, q, location, anchorScroll, dataApprovalController, rootScope, approvalStore,
                 saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getApprovalDataSpy, getDataValuesSpy,
-                orgUnits, window, approvalStoreSpy, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, systemSettingRepository, origin1, origin2, geographicOrigins;
+                orgUnits, window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, systemSettingRepository, origin1, origin2, geographicOrigins;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -24,14 +24,13 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 dataRepository = new DataRepository();
                 approvalDataRepository = new ApprovalDataRepository();
                 datasetRepository = new DatasetRepository();
-
-                geographicOrigins = [{
-                    id: 'origin1',
-                    name: "Geographic Origin"
-                }];
+                spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, []));
 
                 scope.currentModule = {
                     id: 'mod2',
+                    name: 'Mod2',
                     parent: {
                         id: 'parent'
                     }
@@ -71,7 +70,6 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 getOrgUnitSpy.and.returnValue(utils.getPromise(q, parentProject));
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, {}));
-                spyOn(datasetRepository, "getOriginDatasets").and.returnValue(utils.getPromise(q, geographicOrigins));
 
                 var queryBuilder = function() {
                     this.$index = function() {
@@ -165,9 +163,6 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "ok": "ok"
                 });
 
-                approvalStoreSpy = spyOn(approvalStore, "each");
-                approvalStoreSpy.and.returnValue(utils.getPromise(q, [{}]));
-
                 getApprovalDataSpy = spyOn(approvalDataRepository, "getApprovalData");
                 getApprovalDataSpy.and.returnValue(utils.getPromise(q, {}));
 
@@ -230,6 +225,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     }
                 };
 
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository);
                 scope.$apply();
 
                 scope.firstLevelApproval();
@@ -354,6 +350,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     }
                 };
 
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository);
                 scope.$apply();
 
                 scope.secondLevelApproval();
@@ -412,18 +409,6 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 }];
 
                 expect(scope.sum(dataValues, orgUnits, "de1")).toBe(6);
-            });
-
-            it("should group sections based on datasets", function() {
-                scope.$apply();
-
-                var dataSetKeys = _.keys(scope.groupedSections);
-                expect(dataSetKeys.length).toBe(3);
-                expect(dataSetKeys).toContain("DS_OPD");
-                expect(dataSetKeys).toContain("Vacc");
-
-                expect(scope.groupedSections.DS_OPD.length).toBe(2);
-                expect(scope.groupedSections.Vacc.length).toBe(1);
             });
         });
     });

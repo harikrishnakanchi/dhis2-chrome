@@ -1,5 +1,5 @@
 define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], function(DatasetRepository, mocks, utils, testData, timecop) {
-    describe("dataset repository", function() {
+    xdescribe("dataset repository", function() {
         var db, mockDB, mockStore, datasetRepository, q, scope, sectionsdata, datasetsdata, dataElementsdata, sectionStore, dataElementStore;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
@@ -28,7 +28,7 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
 
         it("should find all datasets", function() {
             var datasetIds = ["ds1", "ds2"];
-            datasetRepository.findAll(datasetIds);
+            datasetRepository.findAllDhisDatasets(datasetIds);
             scope.$apply();
 
             expect(mockStore.each).toHaveBeenCalled();
@@ -135,24 +135,6 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
             expect(actualValues).toEqual(expectedDatasets);
         });
 
-        it("should get dataset specified by id", function() {
-            var result;
-
-            var dataset = {
-                "id": "ds1"
-            };
-
-            mockStore.find.and.returnValue(utils.getPromise(q, dataset));
-
-            datasetRepository.get("ds1").then(function(data) {
-                result = data;
-            });
-            scope.$apply();
-
-            expect(mockStore.find).toHaveBeenCalledWith("ds1");
-            expect(result).toEqual(dataset);
-        });
-
         it("should get all the dataset ids", function() {
             var result;
 
@@ -188,6 +170,11 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                         "code": "isNewDataModel",
                     },
                     "value": "false"
+                }],
+                "sections": [{
+                    "id": "Sec1"
+                }, {
+                    "id": "Sec2"
                 }]
             }];
 
@@ -203,15 +190,8 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                     },
                     "value": "false"
                 }],
-                "dataElements": [
-
-                ],
                 "sections": [{
                     "id": "Sec1",
-                    "dataSet": {
-                        "name": "OPD",
-                        "id": "DS_OPD"
-                    },
                     "dataElements": [{
                         "id": "DE1",
                         "name": "DE1 - ITFC",
@@ -231,10 +211,6 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                     "isIncluded": true
                 }, {
                     "id": "Sec2",
-                    "dataSet": {
-                        "name": "OPD",
-                        "id": "DS_OPD"
-                    },
                     "dataElements": [{
                         "id": "DE1",
                         "name": "DE1 - ITFC",

@@ -36,7 +36,11 @@ define(["uploadCompletionDataConsumer", "angularMocks", "approvalService", "appr
                     "status": "NEW"
                 }];
 
-                spyOn(datasetRepository, "getAllDatasetIds").and.returnValue(utils.getPromise(q, allDatasetIds));
+                spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, [{
+                    'id': allDatasetIds[0]
+                }, {
+                    'id': allDatasetIds[1]
+                }]));
                 spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, approvalData));
 
                 message = {
@@ -90,7 +94,11 @@ define(["uploadCompletionDataConsumer", "angularMocks", "approvalService", "appr
 
                 var approvalData = [approval, approvalThatIsMarkedAsCompleteOnly];
 
-                spyOn(datasetRepository, "getAllDatasetIds").and.returnValue(utils.getPromise(q, ['d1', 'd2']));
+                spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, [{
+                    'id': 'd1'
+                }, {
+                    'id': 'd2'
+                }]));
                 spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, approvalData));
 
                 message = {

@@ -21,7 +21,10 @@ define(["lodash"], function(_) {
     };
 
     var getAuthHeader = function(callback) {
-        chrome.storage.local.get("auth_header", callback);
+        callback({
+            "auth_header": "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA=="
+        });
+        // chrome.storage.local.get("auth_header", callback);
     };
 
     var createNotification = function(title, message) {

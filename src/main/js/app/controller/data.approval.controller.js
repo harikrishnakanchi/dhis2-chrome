@@ -1,14 +1,12 @@
-define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer, properties) {
+define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties) {
     return function($scope, $routeParams, $q, $hustle, db, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, datasetRepository) {
 
-        var scrollToTop = function() {
-            $location.hash();
-            $anchorScroll();
-        };
+        var currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
 
-        var getPeriod = function() {
-            return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
+        var currentPeriodAndOrgUnit = {
+            "period": currentPeriod,
+            "orgUnit": $scope.currentModule.id
         };
 
         var resetForm = function() {
@@ -21,6 +19,11 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
             $scope.excludedDataElements = {};
         };
 
+        var scrollToTop = function() {
+            $location.hash();
+            $anchorScroll();
+        };
+
         $scope.getDatasetState = function(id, isFirst) {
             if (isFirst && !(id in $scope.isDatasetOpen)) {
                 $scope.isDatasetOpen[id] = true;
@@ -30,16 +33,6 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         $scope.maxcolumns = function(headers) {
             return _.last(headers).length;
-        };
-
-        $scope.getDataSetName = function(id) {
-            return _.find($scope.dataSets, function(dataSet) {
-                return id === dataSet.id;
-            }).name;
-        };
-
-        $scope.shouldDataBeEnteredForOrgUnit = function(orgUnitId) {
-            return _.contains($scope.currentOrgUnitIdIncludingChildrenIds, orgUnitId);
         };
 
         $scope.getValue = function(dataValues, dataElementId, option, orgUnits) {
@@ -89,19 +82,14 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
 
         $scope.firstLevelApproval = function() {
 
-            var periodAndOrgUnit = {
-                "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id
-            };
-
             var completedBy = $scope.currentUser.userCredentials.username;
 
             var publishToDhis = function() {
                 return $hustle.publish({
-                    "data": [periodAndOrgUnit],
+                    "data": [currentPeriodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
             };
 
@@ -116,7 +104,7 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.approveError = true;
             };
 
-            approvalDataRepository.markAsComplete(periodAndOrgUnit, completedBy)
+            approvalDataRepository.markAsComplete(currentPeriodAndOrgUnit, completedBy)
                 .then(publishToDhis)
                 .then(onSuccess, onError)
                 .finally(scrollToTop);
@@ -134,74 +122,49 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                 $scope.approveError = true;
             };
 
-            var periodAndOrgUnit = {
-                "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id
-            };
 
             var publishToDhis = function() {
                 return $hustle.publish({
-                    "data": [periodAndOrgUnit],
+                    "data": [currentPeriodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
             };
 
             var approvedBy = $scope.currentUser.userCredentials.username;
 
-            approvalDataRepository.markAsApproved(periodAndOrgUnit, approvedBy)
+            approvalDataRepository.markAsApproved(currentPeriodAndOrgUnit, approvedBy)
                 .then(publishToDhis)
                 .then(onSuccess, onError)
                 .finally(scrollToTop);
         };
 
         var init = function() {
-
-            var getAll = function(storeName) {
-                var store = db.objectStore(storeName);
-                return store.getAll();
-            };
-
-            var setData = function(data) {
-                $scope.geographicOrigin = data[8];
-                $scope.dataSets = data[0];
-                $scope.moduleChildren = _.pluck(data[7], "id");
-                $scope.currentOrgUnitIdIncludingChildrenIds = _.flatten([$scope.currentModule.id, $scope.moduleChildren]);
-                $scope.excludedDataElements = data[6] && data[6].value ? data[6].value.dataElements : undefined;
-                return data;
-            };
-
-            var transformDataSet = function(data) {
-                $scope.groupedSections = groupSections.enrichGroupedSections(data);
-                return data;
-            };
-
-            var dataSetPromise = getAll('dataSets');
-            var sectionPromise = getAll("sections");
-            var dataElementsPromise = getAll("dataElements");
-            var comboPromise = getAll("categoryCombos");
-            var categoriesPromise = getAll("categories");
-            var categoryOptionCombosPromise = getAll("categoryOptionCombos");
-            var geographicOriginDatasetPromise = datasetRepository.getOriginDatasets();
-            var excludedDataElementPromise = systemSettingRepository.get($scope.currentModule.id);
-            var getChildrenPromise = orgUnitRepository.findAllByParent([$scope.currentModule.id]);
-
-            var getAllData = $q.all([dataSetPromise, sectionPromise, dataElementsPromise, comboPromise, categoriesPromise, categoryOptionCombosPromise, excludedDataElementPromise, getChildrenPromise, geographicOriginDatasetPromise]);
-
             $scope.loading = true;
-            getAllData.then(setData).then(transformDataSet).then(function() {
-                var periodAndOrgUnit = {
-                    "period": getPeriod(),
-                    "orgUnit": $scope.currentModule.id
-                };
 
-                approvalDataRepository.getApprovalData(periodAndOrgUnit).then(function(data) {
-                    $scope.isCompleted = !_.isEmpty(data) && data.isComplete;
-                    $scope.isApproved = !_.isEmpty(data) && data.isApproved;
+            var loadModuleAndOriginOrgUnits = function() {
+                return orgUnitRepository.findAllByParent([$scope.currentModule.id]).then(function(originOrgUnits) {
+                    $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.currentModule, originOrgUnits]), "id");
                 });
+            };
 
-                dataRepository.getDataValues(getPeriod(), $scope.currentOrgUnitIdIncludingChildrenIds).then(function(dataValues) {
+            var loadExcludedDataElements = function() {
+                return systemSettingRepository.get($scope.currentModule.id).then(function(systemSettings) {
+                    $scope.excludedDataElements = systemSettings && systemSettings.value ? systemSettings.value.dataElements : undefined;
+                });
+            };
+
+            return $q.all([loadModuleAndOriginOrgUnits(), loadExcludedDataElements()]).then(function() {
+
+                var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
+                    .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
+                    .then(datasetRepository.includeCategoryOptionCombinations)
+                    .then(function(datasets) {
+                        $scope.dataSets = datasets;
+                    });
+
+                var loadDataValuesPromise = dataRepository.getDataValues(currentPeriod, $scope.moduleAndOriginOrgUnitIds).then(function(dataValues) {
                     dataValues = dataValues || [];
                     var isDraft = !_.some(dataValues, {
                         "isDraft": true
@@ -210,28 +173,15 @@ define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment"
                     $scope.isSubmitted = (!_.isEmpty(dataValues) && isDraft);
                 });
 
-                var setCurrentGroupedSections = function() {
-                    var datasetsAssociatedWithModule = _.pluck(datasetTransformer.getAssociatedDatasets($scope.currentModule.id, $scope.dataSets), 'id');
-
-                    var allDatasetsAssociatedWithOrigins = _.uniq(_.flatten(_.map($scope.moduleChildren, function(origin) {
-                        return _.pluck(datasetTransformer.getAssociatedDatasets(origin, $scope.dataSets), 'id');
-                    })));
-
-                    var allRelevantDatasetIds = _.uniq(allDatasetsAssociatedWithOrigins.concat(datasetsAssociatedWithModule));
-
-                    $scope.currentGroupedSections = _.pick($scope.groupedSections, _.without(allRelevantDatasetIds, $scope.geographicOrigin[0].id));
-                    var selectedDatasets = _.keys($scope.currentGroupedSections);
-                    _.each(selectedDatasets, function(selectedDataset) {
-                        $scope.currentGroupedSections[selectedDataset] = groupSections.filterDataElements($scope.currentGroupedSections[selectedDataset], $scope.excludedDataElements);
-                    });
-
-                    $scope.currentGroupedSectionsForOrigins = _.pick($scope.groupedSections, $scope.geographicOrigin[0].id);
-                };
-
-                setCurrentGroupedSections();
+                var loadApprovalDataPromise = approvalDataRepository.getApprovalData(currentPeriodAndOrgUnit).then(function(data) {
+                    $scope.isCompleted = !_.isEmpty(data) && data.isComplete;
+                    $scope.isApproved = !_.isEmpty(data) && data.isApproved;
+                });
 
                 if ($scope.dataentryForm !== undefined)
                     $scope.dataentryForm.$setPristine();
+
+                return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadApprovalDataPromise]);
 
             }).finally(function() {
                 $scope.loading = false;

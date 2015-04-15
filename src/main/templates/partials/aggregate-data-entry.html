@@ -15,16 +15,16 @@
                 <input type="button" class="printTallySheetBtn" ng-click="printWindow()" value="{{resourceBundle.printTallySheetBtnValue}}" ng-show="currentModule"></input>
             </div>
             <accordion close-others="false">
-                <div ng-repeat="(dataSetId, sections) in currentGroupedSections" ng-class="'dataset-acc-wrapper'">
-                    <accordion-group is-open="getDatasetState(dataSetId, $first)[dataSetId]">
+                <div ng-class="'dataset-acc-wrapper'">
+                    <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false }" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
                         <accordion-heading>
-                            <span ng-if="!resourceBundle[dataSetId]">{{ getDataSetName(dataSetId) }}</span>
-                            <span ng-if="resourceBundle[dataSetId]">{{ resourceBundle[dataSetId] }}</span>
-                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSetId], 'glyphicon-chevron-right': !isDatasetOpen[dataSetId]}"></i>
+                            <span ng-if="!resourceBundle[dataSet.id]">{{ dataSet.name }}</span>
+                            <span ng-if="resourceBundle[dataSet.id]">{{ resourceBundle[dataSet.id] }}</span>
+                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
                         </accordion-heading>
                         <div class="exp-coll-group">
                             <accordion close-others="false">
-                                <accordion-group ng-repeat="section in sections | orderBy: 'sortOrder'" is-open="isopen[section.id]" ng-form="sectionForm">
+                                <accordion-group ng-repeat="section in dataSet.sections | filter:{ isIncluded: true } | orderBy: 'sortOrder'" is-open="isopen[section.id]" ng-form="sectionForm">
                                     <div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
                                         <p>{{resourceBundle.invalidExpression}}</p>
                                     </div>
@@ -33,7 +33,7 @@
                                         <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
                                         <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
                                     </accordion-heading>
-                                    <table class="table table-bordered" ng-if="isDatasetOpen[dataSetId] || printingTallySheet">
+                                    <table class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                         <thead>
                                             <tr ng-repeat="category in section.headers">
                                                 <th class="display-print" ng-if="$index===0">
@@ -53,11 +53,68 @@
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody ng-repeat="orgUnit in section.orgUnits">
-                                            <tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm" ng-if="shouldDataBeEnteredForOrgUnit(orgUnit.id)">
+                                        <tbody>
+                                            <tr ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true }" ng-form="dataElementForm">
                                                 <td>
                                                     <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
                                                     <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}</span>
+                                                </td>
+                                                <td ng-repeat="option in section.categoryOptionComboIds">
+                                                    <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
+                                                        <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, currentModule.id)['value']" ng-focus="restoreExpression(currentModule.id, dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(currentModule.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed()" />
+                                                        <br/>
+                                                    </ng-form>
+                                                </td>
+                                                <td class="last-column">{{sum(dataValues[orgUnit.id][dataElement.id])}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </accordion-group>
+                            </accordion>
+                        </div>
+                    </accordion-group>
+                    <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: true }" is-open="getDatasetState(dataSet.id, false)[dataSet.id]">
+                        <accordion-heading>
+                            <span ng-if="!resourceBundle[dataSet.id]">{{ dataSet.name }}</span>
+                            <span ng-if="resourceBundle[dataSet.id]">{{ resourceBundle[dataSet.id] }}</span>
+                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
+                        </accordion-heading>
+                        <div class="exp-coll-group">
+                            <accordion close-others="false">
+                                <accordion-group ng-repeat="section in dataSet.sections | filter:{ isIncluded: true } | orderBy: 'sortOrder'" is-open="isopen[section.id]" ng-form="sectionForm">
+                                    <div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
+                                        <p>{{resourceBundle.invalidExpression}}</p>
+                                    </div>
+                                    <accordion-heading>
+                                        <span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span>
+                                        <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
+                                        <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
+                                    </accordion-heading>
+                                    <table class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
+                                        <thead>
+                                            <tr ng-repeat="category in section.headers">
+                                                <th class="display-print" ng-if="$index===0">
+                                                    <span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span>
+                                                    <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
+                                                </th>
+                                                <th class="display-print" ng-if="$index>0">
+                                                </th>
+                                                <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
+                                                    <span ng-if="!resourceBundle[option.id]">{{option.name}}</span>
+                                                    <span ng-if="resourceBundle[option.id]">{{resourceBundle[option.id]}}</span>
+                                                </th>
+                                                <th ng-hide="$last" class="last-column">
+                                                </th>
+                                                <th ng-show="$last" class="last-column">
+                                                    {{ resourceBundle.totalLabel }}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ng-repeat="orgUnit in dataSet.organisationUnits | orderBy: 'name'" ng-if="moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) &gt;= 0">
+                                            <tr ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true }" ng-form="dataElementForm">
+                                                <td>
+                                                    <span ng-if="resourceBundle[orgUnit.id]"> {{ orgUnit[dataElement.id] }}</span>
+                                                    <span ng-if="!resourceBundle[orgUnit.id]">{{ orgUnit.name }}</span>
                                                 </td>
                                                 <td ng-repeat="option in section.categoryOptionComboIds">
                                                     <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
@@ -74,58 +131,6 @@
                         </div>
                     </accordion-group>
                 </div>
-                <accordion-group ng-repeat="(dataSetId, sections) in currentGroupedSectionsForOrigins" is-open="getDatasetState(dataSetId, $first)[dataSetId]">
-                    <accordion-heading>
-                        <span ng-if="!resourceBundle[dataSetId]">{{ getDataSetName(dataSetId) }}</span>
-                        <span ng-if="resourceBundle[dataSetId]">{{ resourceBundle[dataSetId] }}</span>
-                        <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSetId], 'glyphicon-chevron-right': !isDatasetOpen[dataSetId]}"></i>
-                    </accordion-heading>
-                    <div class="exp-coll-group">
-                        <accordion close-others="false">
-                            <accordion-group ng-repeat="section in sections" is-open="isopen[section.id]" ng-form="sectionForm">
-                                <div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
-                                    <p>{{resourceBundle.invalidExpression}}</p>
-                                </div>
-                                <accordion-heading>
-                                    <span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span>
-                                    <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
-                                    <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
-                                </accordion-heading>
-                                <table class="table table-bordered" ng-if="isDatasetOpen[dataSetId] || printingTallySheet">
-                                    <thead>
-                                        <tr ng-repeat="category in section.headers">
-                                            <th></th>
-                                            <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
-                                                <span ng-if="!resourceBundle[option.id]">{{option.name}}</span>
-                                                <span ng-if="resourceBundle[option.id]">{{resourceBundle[option.id]}}</span>
-                                            </th>
-                                            <th ng-hide="$last" class="last-column">
-                                            </th>
-                                            <th ng-show="$last" class="last-column">
-                                                {{ resourceBundle.totalLabel }}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody ng-repeat="orgUnit in section.orgUnits | orderBy: 'name'">
-                                        <tr ng-repeat="dataElement in section.dataElements" ng-form="dataElementForm" ng-if="shouldDataBeEnteredForOrgUnit(orgUnit.id)">
-                                            <td>
-                                                <span ng-if="resourceBundle[orgUnit.id]"> {{resourceBundle[orgUnit.id]}}</span>
-                                                <span ng-if="!resourceBundle[orgUnit.id]"> {{ orgUnit.name }}</span>
-                                            </td>
-                                            <td ng-repeat="option in section.categoryOptionComboIds">
-                                                <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
-                                                    <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit.id)['value']" ng-focus="restoreExpression(orgUnit.id, dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(orgUnit.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed()" />
-                                                    <br/>
-                                                </ng-form>
-                                            </td>
-                                            <td class="last-column">{{sum(dataValues[orgUnit.id][dataElement.id])}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </accordion-group>
-                        </accordion>
-                    </div>
-                </accordion-group>
             </accordion>
             <div>
                 <input type="button" class="btn btn-main" id="dataEntrySave" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}" />

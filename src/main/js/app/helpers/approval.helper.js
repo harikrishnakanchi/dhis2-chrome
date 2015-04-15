@@ -1,5 +1,5 @@
-define(["properties", "datasetTransformer", "moment", "approvalDataTransformer", "dateUtils"], function(properties, datasetTransformer, moment, approvalDataTransformer, dateUtils) {
-    return function($hustle, $q, $rootScope, orgUnitRepository, datasetRepository, approvalDataRepository, dataRepository) {
+define(["properties", "moment", "dateUtils"], function(properties, moment, dateUtils) {
+    return function($hustle, $q, $rootScope, orgUnitRepository, approvalDataRepository, dataRepository) {
         var getApprovalStatus = function(orgUnitId) {
             var getStatus = function(modules, submittedPeriods, approvedPeriodsData) {
                 var dataSetCompletePeriods = approvedPeriodsData.dataSetCompletePeriods;

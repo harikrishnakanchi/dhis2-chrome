@@ -13,6 +13,11 @@ define(["lodash"], function(_) {
                 "code": "isNewDataModel",
             },
             "value": "false"
+        }],
+        "sections": [{
+            "id": "Sec1"
+        }, {
+            "id": "Sec2"
         }]
     }, {
         "name": "Vaccination",
@@ -27,6 +32,9 @@ define(["lodash"], function(_) {
                 "code": "isNewDataModel",
             },
             "value": "true"
+        }],
+        "sections": [{
+            "id": "Sec3"
         }]
     }, {
         "name": "Geographic Origin",
@@ -43,6 +51,9 @@ define(["lodash"], function(_) {
                 "code": "isNewDataModel",
             },
             "value": "true"
+        }],
+        "sections": [{
+            "id": "Origin"
         }]
     }];
 
@@ -70,9 +81,11 @@ define(["lodash"], function(_) {
 
     var categoryCombos = [{
         "id": "CC1",
+        "name": "CatCombo1",
         "categories": [categories[0], categories[1]]
     }, {
         "id": "CC2",
+        "name": "CatCombo2",
         "categories": [categories[1]]
     }];
 
@@ -155,29 +168,43 @@ define(["lodash"], function(_) {
         "name": "DE1 - ITFC",
         "shortName": "DE1 - ITFC",
         "formName": "DE1",
-        "categoryCombo": categoryCombos[0]
+        "categoryCombo": {
+            "id": categoryCombos[0].id,
+            "name": categoryCombos[0].name
+        }
     }, {
         "id": "DE2",
         "name": "DE2 - ITFC",
         "shortName": "DE2 - ITFC",
         "formName": "DE2",
-        "categoryCombo": categoryCombos[1]
+        "categoryCombo": {
+            "id": categoryCombos[1].id,
+            "name": categoryCombos[1].name
+        }
     }, {
         "id": "DE3",
         "name": "DE3 - ITFC",
         "shortName": "DE3 - ITFC",
         "formName": "DE3",
-        "categoryCombo": categoryCombos[1]
+        "categoryCombo": {
+            "id": categoryCombos[1].id,
+            "name": categoryCombos[1].name
+        }
     }, {
         "id": "DE4",
         "name": "DE4 - ITFC",
         "shortName": "DE4 - ITFC",
         "formName": "DE4",
-        "categoryCombo": categoryCombos[1]
+        "categoryCombo": {
+            "id": categoryCombos[1].id,
+            "name": categoryCombos[1].name
+        }
     }];
 
     var sections = [{
         "id": "Sec1",
+        "name": "Section 1",
+        "sortOrder": 0,
         "dataSet": _.pick(dataSets[0], ['name', 'id']),
         "dataElements": [{
             "id": "DE1",
@@ -191,6 +218,8 @@ define(["lodash"], function(_) {
         }]
     }, {
         "id": "Sec2",
+        "name": "Section 2",
+        "sortOrder": 1,
         "dataSet": _.pick(dataSets[0], ['name', 'id']),
         "dataElements": [{
             "id": "DE1",
@@ -198,6 +227,8 @@ define(["lodash"], function(_) {
         }]
     }, {
         "id": "Sec3",
+        "name": "Section 3",
+        "sortOrder": 0,
         "dataSet": _.pick(dataSets[1], ['name', 'id']),
         "dataElements": [{
             "id": "DE3",
@@ -205,6 +236,8 @@ define(["lodash"], function(_) {
         }]
     }, {
         "id": "Origin",
+        "name": "Origin",
+        "sortOrder": 0,
         "dataSet": _.pick(dataSets[2], ['name', 'id']),
         "dataElements": [{
             "id": "DE4",

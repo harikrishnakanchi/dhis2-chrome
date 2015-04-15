@@ -2,12 +2,12 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
     return function(datasetRepository, userPreferenceRepository, $q, approvalService, approvalDataRepository) {
 
         var getMetadata = function() {
-            return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAllDatasetIds()]);
+            return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAll()]);
         };
 
         var getCompletionAndApprovalData = function(metadata) {
             var userModuleIds = metadata[0];
-            var allDataSetIds = metadata[1];
+            var allDataSetIds = _.pluck(metadata[1], "id");
 
             if (userModuleIds.length === 0 || allDataSetIds.length === 0)
                 return;

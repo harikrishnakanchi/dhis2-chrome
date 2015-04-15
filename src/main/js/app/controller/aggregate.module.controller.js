@@ -59,8 +59,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var getAllAggregateDatasets = function() {
-                    return datasetRepository.getAllAggregateDatasets().then(function(ds) {
-                        return datasetRepository.getEnriched(ds, $scope.excludedDataElements);
+                    return datasetRepository.getAll().then(function(datasets) {
+                        return _.filter(datasets, "isAggregateService");
                     });
                 };
 
@@ -69,7 +69,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         $scope.originalDatasets = datasets;
 
                         var partitionedDatasets = _.partition(datasets, function(ds) {
-                            return _.contains(ds.orgUnitIds, $scope.module.id);
+                            return _.any(ds.organisationUnits, "id", $scope.module.id);
                         });
 
                         $scope.associatedDatasets = partitionedDatasets[0];
@@ -79,8 +79,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var getOriginDatasets = function() {
-                    return datasetRepository.getOriginDatasets().then(function(data) {
-                        $scope.originDatasets = data;
+                    return datasetRepository.getAll().then(function(datasets) {
+                        $scope.originDatasets = _.filter(datasets, "isOriginDataset");
                     });
                 };
 
@@ -177,8 +177,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var enrichedModule = {};
 
                 var associateToDatasets = function(datasets, orgUnits) {
-                    return datasetRepository.associateOrgUnits(datasets, orgUnits).then(function() {
-                        return publishMessage(_.pluck(datasets, "id"), "associateOrgUnitToDataset",
+                    var datasetIds = _.pluck(datasets, "id");
+                    return datasetRepository.associateOrgUnits(datasetIds, orgUnits).then(function() {
+                        return publishMessage(datasetIds, "associateOrgUnitToDataset",
                             $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
                     });
                 };
@@ -259,11 +260,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.selectDataSet = function(item) {
                 if (_.isEmpty(item))
                     return;
-                $scope.selectedDataset = item;
-                _.each($scope.selectedDataset.sections, function(section) {
-                    $scope.isExpanded[section.id] = false;
+                return datasetRepository.includeDataElements([item]).then(function(datasets) {
+                    $scope.selectedDataset = datasets[0];
+                    _.each($scope.selectedDataset.sections, function(section) {
+                        $scope.isExpanded[section.id] = false;
+                    });
+                    $scope.isExpanded[$scope.selectedDataset.sections[0].id] = true;
                 });
-                $scope.isExpanded[$scope.selectedDataset.sections[0].id] = true;
             };
 
             $scope.discardDataSet = function(module, items) {

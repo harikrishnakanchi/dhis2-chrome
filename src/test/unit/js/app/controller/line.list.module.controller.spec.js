@@ -8,7 +8,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
         describe("line list module controller", function() {
             var scope, lineListModuleController, mockOrgStore, db, q, datasets, sections,
                 dataElements, sectionsdata, dataElementsdata, orgUnitRepo, hustle, systemSettingRepo,
-                fakeModal, allPrograms, programsRepo, datasetRepo, allDatasets, originOrgunitCreator;
+                fakeModal, allPrograms, programsRepo, datasetRepo, originOrgunitCreator;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
@@ -24,7 +24,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "attribute": {
                             "code": "associatedDataSet"
                         },
-                        "value": "ds1Code"
+                        "value": "Ds1"
                     }]
                 }];
 
@@ -37,20 +37,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 programsRepo.getProgramForOrgUnit = function() {};
                 programsRepo.associateOrgUnits = jasmine.createSpy("associateOrgUnits").and.returnValue(utils.getPromise(q, []));
 
-                allDatasets = [{
-                    "id": "ds1",
-                    "code": "ds1Code",
-                    "name": "dataSet1",
-                    "organisationUnits": [{
-                        id: 'Module1Id',
-                        name: 'Module1'
-                    }]
-                }, {
-                    "id": "ds2",
-                    "code": "ds2Code",
-                    "name": "dataSet2"
-                }];
-
                 originOrgunitCreator = new OriginOrgunitCreator();
                 spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, {}));
 
@@ -62,8 +48,18 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "id": "originOrgUnit"
                 }]));
 
+                var allDatasets = [{
+                    "id": "Ds1",
+                    "isOriginDataset": false
+                }, {
+                    "id": "OrgDs1",
+                    "isOriginDataset": true
+                }];
+
                 datasetRepo = new DatasetRepository();
                 spyOn(datasetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, {}));
+                spyOn(datasetRepo, "getAll").and.returnValue(utils.getPromise(q, allDatasets));
+
                 orgUnitGroupHelper = new OrgUnitGroupHelper();
                 spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
 
@@ -170,8 +166,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }]
                 };
 
-                spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
                 spyOn(systemSettingRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
@@ -246,9 +240,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 fillNewModuleForm();
                 selectProgram();
 
-                spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, {}));
-
                 scope.save();
                 scope.$apply();
 
@@ -288,19 +279,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "name": "Project1",
                         "id": "someid"
                     }
-                };
-
-                var datasetWithNewModule = {
-                    "id": "ds1",
-                    "code": "ds1Code",
-                    "name": "dataSet1",
-                    "organisationUnits": [{
-                        id: 'Module1Id',
-                        name: 'Module1'
-                    }, {
-                        id: 'Module2someid',
-                        name: 'Module2'
-                    }]
                 };
 
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(newLineListModule);
@@ -704,8 +682,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
                 spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
-                spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
                 scope.$apply();
@@ -740,7 +716,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                         "attribute": {
                             "code": "associatedDataSet"
                         },
-                        "value": "ds1Code"
+                        "value": "Ds1"
                     }]
                 };
 
@@ -770,16 +746,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }
                 }];
 
-                var originDataset = [{
-                    "id": "Ds1",
-                    "name": "Ds1"
-                }];
-
-                var summaryDataset = {
-                    "id": "Ds2",
-                    "name": "Ds2"
-                };
-
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
@@ -788,8 +754,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
                 spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
-                spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, originDataset));
-                spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, summaryDataset));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
                 originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
 
@@ -798,7 +762,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.$apply();
 
                 expect(programsRepo.associateOrgUnits).toHaveBeenCalledWith(program, originOrgUnit);
-                expect(datasetRepo.associateOrgUnits).toHaveBeenCalledWith(originDataset.concat(summaryDataset), originOrgUnit);
+                expect(datasetRepo.associateOrgUnits).toHaveBeenCalledWith(["Ds1", "OrgDs1"], originOrgUnit);
             });
 
             it("should create org unit groups", function() {
@@ -863,8 +827,6 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
                 spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
-                spyOn(datasetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
                 originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
 

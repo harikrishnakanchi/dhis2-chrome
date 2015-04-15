@@ -1,6 +1,6 @@
-define(["lodash", "dataValuesMapper", "groupSections", "orgUnitMapper", "moment", "datasetTransformer"],
-    function(_, dataValuesMapper, groupSections, orgUnitMapper, moment, datasetTransformer) {
-        return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository, programRepository) {
+define(["lodash", "moment"],
+    function(_, moment) {
+        return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository) {
 
             var isLineListService = function(orgUnit) {
                 var attr = _.find(orgUnit.attributeValues, {

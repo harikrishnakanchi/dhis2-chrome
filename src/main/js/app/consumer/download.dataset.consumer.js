@@ -16,7 +16,7 @@ define(['moment', 'lodashUtils'], function(moment, _) {
 
         var mergeAndSave = function(allDhisDatasets) {
             var dataSetIds = _.pluck(allDhisDatasets, "id");
-            return datasetRepository.findAll(dataSetIds)
+            return datasetRepository.findAllDhisDatasets(dataSetIds)
                 .then(_.curry(mergeBy.union)("organisationUnits", "id", allDhisDatasets))
                 .then(datasetRepository.upsertDhisDownloadedData);
         };

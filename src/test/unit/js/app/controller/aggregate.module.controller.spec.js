@@ -6,7 +6,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
         OrgUnitRepository, OriginOrgunitCreator) {
 
         describe("aggregate module controller", function() {
-            var scope, aggregateModuleController, mockOrgStore, db, q, location, datasetsdata, orgUnitRepo, orgunitGroupRepo, hustle,
+            var scope, aggregateModuleController, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
                 dataSetRepo, systemSettingRepo, fakeModal, allPrograms, originOrgunitCreator;
 
             beforeEach(module('hustle'));
@@ -20,8 +20,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 orgUnitRepo = new OrgUnitRepository();
                 orgunitGroupRepo = utils.getMockRepo(q);
-                dataSetRepo = utils.getMockRepo(q);
-                datasetsdata = testData.get("dataSets");
 
                 spyOn(orgUnitRepo, "upsert").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepo, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, {}));
@@ -32,13 +30,14 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(originOrgunitCreator, "create").and.returnValue(utils.getPromise(q, {}));
 
                 dataSetRepo = new DatasetRepository();
-                spyOn(dataSetRepo, "getAllAggregateDatasets").and.returnValue(utils.getPromise(q, datasetsdata));
-                spyOn(dataSetRepo, "getOriginDatasets").and.returnValue(utils.getPromise(q, []));
-                spyOn(dataSetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, []));
-                spyOn(dataSetRepo, "getEnriched");
+                spyOn(dataSetRepo, "getAll").and.returnValue(utils.getPromise(q, []));
+                spyOn(dataSetRepo, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
+                spyOn(dataSetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, undefined));
+                spyOn(dataSetRepo, "includeDataElements").and.returnValue(utils.getPromise(q, []));
+
 
                 systemSettingRepo = utils.getMockRepo(q);
-                systemSettingRepo.get = function() {};
+                systemSettingRepo.get = jasmine.createSpy("get").and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
                 spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
@@ -108,11 +107,10 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
 
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
-                dataSetRepo.getOriginDatasets.and.returnValue(utils.getPromise(q, {}));
+
 
                 scope.$apply();
 
@@ -234,12 +232,11 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
                 scope.save();
                 scope.$apply();
 
-                expect(dataSetRepo.associateOrgUnits).toHaveBeenCalledWith(associatedDatasets, [enrichedModule]);
+                expect(dataSetRepo.associateOrgUnits).toHaveBeenCalledWith(["ds1"], [enrichedModule]);
             });
 
             it("should save excluded data elements for the module", function() {
@@ -251,7 +248,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 orgUnitRepo.get.and.returnValue(utils.getPromise(q, parent));
 
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
@@ -292,8 +288,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         }]
                     }]
                 }];
-
-                dataSetRepo.getOriginDatasets.and.returnValue(utils.getPromise(q, {}));
 
                 scope.associatedDatasets = enrichedAssociatedDatasets;
                 scope.save();
@@ -377,7 +371,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 systemSettingRepo.upsert.and.returnValue(utils.getPromise(q, {}));
 
                 scope.save();
@@ -387,7 +380,22 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should set datasets associated with module for edit", function() {
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+                var datasets = [{
+                    "id": "ds1",
+                    "organisationUnits": [{
+                        "id": "mod1"
+                    }],
+                    "isAggregateService": true,
+                    "sections": []
+                }, {
+                    "id": "ds2",
+                    "organisationUnits": [{
+                        "id": "mod2"
+                    }],
+                    "isAggregateService": true,
+                    "sections": []
+                }];
+
                 scope.orgUnit = {
                     "id": "mod2",
                     "parent": {
@@ -397,23 +405,19 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 scope.isNewMode = false;
 
-                spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, [datasetsdata[1]]));
-                dataSetRepo.getEnriched.and.callFake(function(ds) {
-                    return ds;
-                });
+                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
+                dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
+                dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, datasets));
                 aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
                 scope.$apply();
 
                 expect(scope.isDisabled).toBeFalsy();
                 expect(scope.associatedDatasets.length).toEqual(1);
-                expect(scope.nonAssociatedDataSets).toEqual([datasetsdata[0], datasetsdata[2]]);
-                expect(scope.selectedDataset).toEqual(scope.associatedDatasets[0]);
-                expect(scope.getEnriched);
+                expect(scope.nonAssociatedDataSets).toEqual([datasets[0]]);
+                expect(scope.selectedDataset).toEqual(datasets[1]);
             });
 
             it("should disable update button", function() {
-                spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, []));
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 scope.orgUnit = {
                     "id": "mod2",
                     "parent": {
@@ -446,7 +450,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should update system setting while updating module", function() {
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {
+                systemSettingRepo.get.and.returnValue(utils.getPromise(q, {
                     "key": 1,
                     "value": {}
                 }));
@@ -509,8 +513,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should update module name", function() {
-                spyOn(dataSetRepo, "getAllForOrgUnit").and.returnValue(utils.getPromise(q, []));
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 var oldid = "oldid";
                 var parent = {
                     "id": "par1",
@@ -586,7 +588,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should return false if datasets for modules are selected", function() {
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 scope.$apply();
                 scope.associatedDatasets = [{
                     'id': 'ds_11',
@@ -600,7 +601,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should return true if dataset is not selected", function() {
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 scope.$apply();
                 scope.associatedDatasets = [];
 
@@ -742,9 +742,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should select a dataset", function() {
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
-                scope.$apply();
-
                 var dataset = {
                     name: "Malaria",
                     id: "dataset_1",
@@ -754,7 +751,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                         'id': 'Id2'
                     }]
                 };
+                dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, [dataset]));
 
+                scope.$apply();
                 scope.selectDataSet(dataset);
                 scope.$apply();
 
@@ -764,14 +763,12 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should return false if no dataset is selected", function() {
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 scope.$apply();
                 scope.selectedDataset = undefined;
                 expect(scope.areDataElementsSelectedForSection()).toEqual(false);
             });
 
             it("should return true if any one section is selected for dataset", function() {
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 scope.$apply();
 
                 scope.selectedDataset = {
@@ -799,7 +796,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should disable module", function() {
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
                 var parent = {
                     "id": "par1",
                     "name": "Par1"
@@ -880,7 +876,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should change collapsed", function() {
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
                 scope.collapseSection = {
                     "sectionId": true
@@ -960,7 +955,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 });
 
                 originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
                 scope.save();
                 scope.$apply();
@@ -987,9 +981,12 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     }
                 };
 
-                var originDatasets = [{
+                var allDatasets = [{
+                    "id": "ds1",
+                    "isOriginDataset": false
+                }, {
                     "id": "originds1",
-                    "name": "originds1"
+                    "isOriginDataset": true
                 }];
 
                 var originOrgUnit = [{
@@ -1015,15 +1012,15 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     return name;
                 });
 
-                dataSetRepo.getOriginDatasets.and.returnValue(utils.getPromise(q, originDatasets));
-                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, allDatasets));
                 originOrgunitCreator.create.and.returnValue(utils.getPromise(q, originOrgUnit));
 
                 scope.save();
                 scope.$apply();
 
                 expect(dataSetRepo.associateOrgUnits.calls.count()).toEqual(2);
-                expect(dataSetRepo.associateOrgUnits.calls.argsFor(1)).toEqual([originDatasets, originOrgUnit]);
+                expect(dataSetRepo.associateOrgUnits.calls.argsFor(1)[0]).toEqual(["originds1"]);
+                expect(dataSetRepo.associateOrgUnits.calls.argsFor(1)[1]).toEqual(originOrgUnit);
             });
 
             it("should take the user to the view page of the parent opUnit on clicking cancel", function() {

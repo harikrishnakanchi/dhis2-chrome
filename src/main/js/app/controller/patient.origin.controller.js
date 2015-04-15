@@ -33,8 +33,9 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
 
                 var doAssociations = function(originOrgUnits, siblingOriginOrgUnit) {
                     var associate = function(datasets, program) {
-                        associatedDatasetIds = associatedDatasetIds.concat(_.pluck(datasets, "id"));
-                        return datasetRepository.associateOrgUnits(datasets, originOrgUnits).then(function() {
+                        var datasetIds = _.pluck(datasets, "id");
+                        associatedDatasetIds = associatedDatasetIds.concat(datasetIds);
+                        return datasetRepository.associateOrgUnits(datasetIds, originOrgUnits).then(function() {
                             if (program) {
                                 associatedPrograms.push(program);
                                 programRepository.associateOrgUnits(program, originOrgUnits);
@@ -43,7 +44,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                     };
 
                     var getDatasetsAndProgram = function(orgUnitId) {
-                        return $q.all([datasetRepository.getAllForOrgUnit(orgUnitId), programRepository.getProgramForOrgUnit(orgUnitId)]);
+                        return $q.all([datasetRepository.findAllForOrgUnits([orgUnitId]), programRepository.getProgramForOrgUnit(orgUnitId)]);
                     };
 
                     return getDatasetsAndProgram(siblingOriginOrgUnit.id).then(function(data) {
