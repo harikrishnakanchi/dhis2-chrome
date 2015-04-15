@@ -16,7 +16,7 @@
             <div class="panel-body">
                 <ul>
                     <li class="form-group">
-                        <label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label">Name</label>
+                        <label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label required">Name</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" not-in="peerProjects" required/>
                             <div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
@@ -26,7 +26,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="newOrgUnitProjCode" class="col-sm-4 col-md-4  control-label">Project Code</label>
+                        <label for="newOrgUnitProjCode" class="col-sm-4 col-md-4 control-label required">Project Code</label>
                         <div class="col-sm-6 col-md-6">
                             <input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitProjCode" id="newOrgUnitProjCode" ng-model="newOrgUnit.projectCode" not-in="existingProjectCodes" required/>
                             <div ng-show="createForm.newOrgUnitProjCode.$dirty &amp;&amp; createForm.newOrgUnitProjCode.$invalid">
@@ -36,7 +36,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="newOrgUnitLocation" class="col-sm-4 col-md-4  control-label">Location</label>
+                        <label for="newOrgUnitLocation" class="col-sm-4 col-md-4 control-label">Location</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="text" class="form-control" name="newOrgUnitLocation" id="newOrgUnitLocation" ng-model="newOrgUnit.location" />
                         </div>
@@ -58,7 +58,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="newOrgUnitReasonForIntervention" class="col-sm-4 col-md-4 control-label">Reason for intervention</label>
+                        <label for="newOrgUnitReasonForIntervention" class="col-sm-4 col-md-4 control-label required">Reason for intervention</label>
                         <div class="col-sm-6 col-md-6">
                             <select type="text" class="form-control" name="newOrgUnitReasonForIntervention" id="newOrgUnitReasonForIntervention" ng-model="newOrgUnit.reasonForIntervention" title="{{newOrgUnit.reasonForIntervention}}" ng-options="r as r for r in reasonForIntervention" required>
                                 <option value=""></option>
@@ -77,7 +77,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="newOrgUnitModelOfManagement" class="col-sm-4 col-md-4 control-label">Model of management</label>
+                        <label for="newOrgUnitModelOfManagement" class="col-sm-4 col-md-4 control-label required">Model of management</label>
                         <div class="col-sm-6 col-md-6">
                             <select type="text" class="form-control" name="newOrgUnitModelOfManagement" id="newOrgUnitModelOfManagement" ng-model="newOrgUnit.modelOfManagement" title="{{newOrgUnit.modelOfManagement}}" ng-options="model as model for model in modelOfManagement" required>
                                 <option value=""></option>
@@ -88,7 +88,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
+                        <label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label required">Opening Date</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="date" class="msf-date-input" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required>
                             <div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid">

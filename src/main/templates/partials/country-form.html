@@ -15,7 +15,7 @@
             <form name="createForm" class="form-horizontal" role="form" novalidate ng-submit="save(newOrgUnit, orgUnit)">
                 <ul>
                     <li class="form-group">
-                        <label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label">Name</label>
+                        <label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label required">Name</label>
                         <div class="col-sm-6">
                             <input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required not-in="allCountries" />
                             <div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
@@ -25,7 +25,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
+                        <label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label required">Opening Date</label>
                         <div class="col-sm-6 col-md-6">
                             <p class="input-group">
                                 <div>

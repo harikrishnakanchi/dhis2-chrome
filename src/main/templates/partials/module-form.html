@@ -11,7 +11,7 @@
             <div class="well">
                 <ul>
                     <li class="form-group">
-                        <label for="moduleName" class="col-sm-4 col-md-4 control-label">Module name</label>
+                        <label for="moduleName" class="col-sm-4 col-md-4 control-label required">Module name</label>
                         <div class="col-sm-4">
                             <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="Module Name" ng-model="module.name" not-in="allModules" ng-disabled="isDisabled==true" required>
                             <div ng-show="form.moduleName{{$index}}.$dirty &amp;&amp; form.moduleName{{$index}}.$invalid">
@@ -21,7 +21,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="moduleOpeningDate" class="col-sm-4 col-md-4 control-label">Opening Date</label>
+                        <label for="moduleOpeningDate" class="col-sm-4 col-md-4 control-label required">Opening Date</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="date" name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" required>
                             <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; form.moduleOpeningDate.$invalid">
@@ -31,7 +31,7 @@
                         </div>
                     </li>
                     <li class="form-group add-service-label">
-                        <label for="moduleName" class="col-sm-4 col-md-4 control-label " ng-show="isNewMode">Add service</label>
+                        <label for="moduleName" class="col-sm-4 col-md-4 control-label required" ng-show="isNewMode">Add service</label>
                         <label for="moduleName" class="col-sm-4 col-md-4 control-label" ng-hide="isNewMode">Services</label>
                     </li>
                     <li class="form-group">

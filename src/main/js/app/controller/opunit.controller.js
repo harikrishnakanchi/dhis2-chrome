@@ -168,6 +168,11 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             modalInstance.result.then(okCallback);
         };
 
+        $scope.areCoordinatesCompulsory = function() {
+            return (!_.isEmpty($scope.opUnit.latitude) || !_.isEmpty($scope.opUnit.longitude) ||
+                $scope.form.longitude.$invalid || $scope.form.latitude.$invalid);
+        };
+
         $scope.disable = function(orgUnit) {
             var modalMessages = {
                 "confirmationMessage": $scope.resourceBundle.disableOrgUnitConfirmationMessage

@@ -16,7 +16,7 @@
             <form name="form" class="form-horizontal" role="form" ng-submit="save(opUnit)" novalidate>
                 <ul>
                     <li class="form-group">
-                        <label for="opUnitType" class="col-sm-4 col-md-4 control-label">Operation unit type</label>
+                        <label for="opUnitType" class="col-sm-4 col-md-4 control-label required">Operation unit type</label>
                         <div class="col-sm-8 col-md-8 form-inline">
                             <div class="radio-inline">
                                 <label for="hospital">
@@ -33,7 +33,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="opUnitName" class="col-sm-4 col-md-4 control-label">Name of the unit</label>
+                        <label for="opUnitName" class="col-sm-4 col-md-4 control-label required">Name of the unit</label>
                         <div class="col-sm-4">
                             <input type="text" class="form-control" name="opUnitName{{$index}}" id="opUnitName{{$index}}" placeholder="Operation Unit Name" ng-model="opUnit.name" not-in="allOpunitNames" ng-disabled="isDisabled" required />
                             <div ng-show="form.opUnitName{{$index}}.$dirty &amp;&amp; form.opUnitName{{$index}}.$invalid">
@@ -43,7 +43,7 @@
                         </div>
                     </li>
                     <li class="form-group" ng-if="opUnit.type==='Hospital'">
-                        <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label">Hospital Unit Code</label>
+                        <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label required">Hospital Unit Code</label>
                         <div class="col-sm-6 col-md-6">
                             <select type="text" class="form-control" name="hospitalUnitCode" id="hospitalUnitCode" ng-model="opUnit.hospitalUnitCode" title="{{newOrgUnit.hospitalUnitCode}}" ng-options="h as h for h in hospitalUnitCodes" ng-disabled="isDisabled" required>
                                 <option value=""></option>
@@ -54,7 +54,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="longitude" class="col-sm-4 col-md-4 control-label">Longitude</label>
+                        <label for="longitude" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': areCoordinatesCompulsory() }">Longitude</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="number" step="0.1" min="-180" max="180" class="form-control" name="longitude" id="longitude" ng-model="opUnit.longitude" ng-required="opUnit.latitude !== undefined &amp;&amp; opUnit.latitude !== null" />
                             <div ng-show="form.longitude.$dirty &amp;&amp; form.longitude.$invalid">
@@ -64,7 +64,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="latitude" class="col-sm-4 col-md-4 control-label">Latitude</label>
+                        <label for="latitude" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': areCoordinatesCompulsory() }">Latitude</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="number" step="0.1" min="-90" max="90" class="form-control" name="latitude" id="latitude" ng-model="opUnit.latitude" ng-required="opUnit.longitude !== undefined &amp;&amp; opUnit.longitude !== null" />
                             <div ng-show="form.latitude.$dirty &amp;&amp; form.latitude.$invalid">

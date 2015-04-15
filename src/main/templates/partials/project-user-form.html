@@ -8,7 +8,7 @@
             <div class="panel-body">
                 <ul>
                     <li class="form-group">
-                        <label for="userName" class="col-sm-4 col-md-4 control-label">Username</label>
+                        <label for="userName" class="col-sm-4 col-md-4 control-label required">Username</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="text" class="form-control" name="userName" id="userName" ng-model="projectUser.username" not-in="existingUsers" ng-pattern="userNameMatchExpr" placeholder="Username should begin with {{userNamePrefix}}" required/>
                             <div ng-show="createForm.userName.$dirty &amp;&amp; createForm.userName.$invalid">
@@ -19,7 +19,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="userRole" class="col-sm-4 col-md-4 control-label">Role</label>
+                        <label for="userRole" class="col-sm-4 col-md-4 control-label required">Role</label>
                         <div class="col-sm-6 col-md-6">
                             <select type="text" class="form-control" name="userRole" id="userRole" ng-model="projectUser.userRole " ng-options="role as role.name for role in userRoles" required>
                                 <option value=""></option>
