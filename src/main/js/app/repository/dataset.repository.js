@@ -119,15 +119,20 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
         var associateOrgUnits = function(datasets, orgUnits) {
 
             var addOrgUnitsToDatasets = function(datasets) {
-                var ouPayload = _.map(orgUnits, function(orgUnit) {
-                    return {
-                        "id": orgUnit.id,
-                        "name": orgUnit.name
-                    };
-                });
                 return _.map(datasets, function(ds) {
                     ds.organisationUnits = ds.organisationUnits || [];
-                    ds.organisationUnits = ds.organisationUnits.concat(ouPayload);
+
+                    var ouPayload = _.map(orgUnits, function(orgUnit) {
+                        var orgUnitToAdd = {
+                            "id": orgUnit.id,
+                            "name": orgUnit.name
+                        };
+                        if (!_.some(ds.organisationUnits, orgUnitToAdd)) {
+                            return orgUnitToAdd;
+                        }
+                    });
+
+                    ds.organisationUnits = ds.organisationUnits.concat(_.filter(ouPayload, undefined));
                     return ds;
                 });
             };
