@@ -15,7 +15,7 @@
                             <accordion close-others="false">
                                 <ul>
                                     <li class="form-group">
-                                        <label for="patientOrigin" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.patientOriginLabel }}</label>
+                                        <label for="patientOrigin" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.patientOriginLabel }}</label>
                                         <div class="col-sm-6 col-md-6">
                                             <select ng-options="o.name for o in originOrgUnits | orderBy: 'name'" ng-model="patientOrigin.selected" name="patientOrigin" required>
                                                 <option value=""></option>
@@ -34,7 +34,7 @@
                                             <li class="form-group" ng-if="de.dataElement.isIncluded">
                                                 <div ng-if="de.dataElement.isIncluded">
                                                     <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="resourceBundle[de.dataElement.id]">{{ resourceBundle[de.dataElement.id] }}</label>
-                                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</label>
+                                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': de.compulsory }" ng-if="!resourceBundle[de.dataElement.id]"> {{ de.dataElement.formName }}</label>
                                                 </div>
                                                 <div class="col-sm-6 col-md-6" ng-if="de.dataElement.isIncluded">
                                                     <input type="text" class="form-control" ng-if="de.dataElement.type === 'string' &amp;&amp; !de.dataElement.optionSet" ng-model="dataValues[de.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{de.dataElement.id}}" />
