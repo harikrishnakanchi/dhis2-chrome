@@ -23,7 +23,6 @@ define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
                 return datasetRepository.getAll().then(function(allDatasets) {
                     var originDatasetIds = _.pluck(_.filter(allDatasets, "isOriginDataset"), "id");
                     return orgUnitRepository.upsert(originOUPayload)
-                        .then(_.partial(datasetRepository.associateOrgUnits, originDatasetIds, originOUPayload))
                         .then(function() {
                             return originOUPayload;
                         });

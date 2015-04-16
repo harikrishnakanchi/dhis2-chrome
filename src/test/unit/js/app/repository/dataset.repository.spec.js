@@ -290,8 +290,19 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                 "name": "NeoNat"
             }];
 
+            var inputOrgunits = [{
+                "id": "ou1",
+                "name": "ou1"
+            }, {
+                "id": "ou2",
+                "name": "ou1"
+            }];
+
             var orgUnits = [{
                 "id": "ou1",
+                "name": "ou1"
+            }, {
+                "id": "ou2",
                 "name": "ou1"
             }];
 
@@ -300,9 +311,9 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                 "name": "NeoNat",
                 "organisationUnits": orgUnits,
                 "clientLastUpdated": "2014-05-30T12:43:54.972Z",
-                "orgUnitIds": ["ou1"]
+                "orgUnitIds": ["ou1", "ou2"]
             }];
-            datasetRepository.associateOrgUnits(datasets, orgUnits);
+            datasetRepository.associateOrgUnits(datasets, inputOrgunits);
 
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
         });
