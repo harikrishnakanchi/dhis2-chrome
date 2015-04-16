@@ -29,7 +29,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 var allOriginOrgUnits = [];
                 var associatedDatasetIds = [];
                 var associatedPrograms = [];
-                var allOriginOrgUnitsUnderLineListModule = [];
+                var orgUnitsForGroups = [];
 
                 var doAssociations = function(originOrgUnits, siblingOriginOrgUnit) {
                     var associate = function(datasets, program) {
@@ -65,8 +65,8 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 };
 
                 var createOrgUnitGroups = function() {
-                    if (!_.isEmpty(allOriginOrgUnitsUnderLineListModule))
-                        return orgUnitGroupHelper.createOrgUnitGroups(allOriginOrgUnitsUnderLineListModule, false);
+                    if (!_.isEmpty(orgUnitsForGroups))
+                        return orgUnitGroupHelper.createOrgUnitGroups(orgUnitsForGroups, false);
                 };
 
                 var getBooleanAttributeValue = function(attributeValues, attributeCode) {
@@ -90,9 +90,9 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                                 return originOrgunitCreator.create(module, $scope.patientOrigin).then(function(originOrgUnits) {
                                     allOriginOrgUnits = allOriginOrgUnits.concat(originOrgUnits);
                                     if (isLinelistService(module))
-                                        allOriginOrgUnitsUnderLineListModule = allOriginOrgUnitsUnderLineListModule.concat(originOrgUnits);
+                                        orgUnitsForGroups = orgUnitsForGroups.concat(originOrgUnits);
                                     else
-                                        allOriginOrgUnitsUnderLineListModule = allOriginOrgUnitsUnderLineListModule.concat(module);
+                                        orgUnitsForGroups = orgUnitsForGroups.concat(module);
 
                                     return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
                                 });
