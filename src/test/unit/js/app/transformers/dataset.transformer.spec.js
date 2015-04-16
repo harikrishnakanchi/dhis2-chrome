@@ -275,7 +275,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
             var allCategoryCombos = testData.get("categoryCombos");
             var allCategories = testData.get("categories");
             var allCategoryOptionCombos = testData.get("categoryOptionCombos");
-            var enrichedDatasets = datasetTransformer.enrichWithCategoryOptionCombinations(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos)
+            var enrichedDatasets = datasetTransformer.enrichWithCategoryOptionCombinations(dataSets, allCategoryCombos, allCategories, allCategoryOptionCombos);
 
             var expectedSectionHeaders = [
                 [{
