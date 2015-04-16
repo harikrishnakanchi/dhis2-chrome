@@ -130,7 +130,8 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             var loadEvent = function() {
                 var formatValue = function(dv) {
                     if (dv.type === "date") {
-                        dv.value = dv.value.replace(/-/g, ',');
+                        if (dv.value)
+                            dv.value = dv.value.replace(/-/g, ',');
                         return new Date(dv.value);
                     }
 
