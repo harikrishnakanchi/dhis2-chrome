@@ -5,7 +5,7 @@ define(["lodash"], function(_) {
 
             var invalidateApproval = function() {
                 return approvalDataRepository.getApprovalData(periodAndOrgUnit).then(function(approvalData) {
-                    if (approvalData.status === "DELETED")
+                    if (approvalData && approvalData.status === "DELETED")
                         return approvalDataRepository.invalidateApproval(approvalData.period, approvalData.orgUnit);
                 });
             };
