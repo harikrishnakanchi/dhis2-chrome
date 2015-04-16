@@ -1,175 +1,123 @@
-define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], function(DatasetRepository, mocks, utils, testData, timecop) {
-    xdescribe("dataset repository", function() {
-        var db, mockDB, mockStore, datasetRepository, q, scope, sectionsdata, datasetsdata, dataElementsdata, sectionStore, dataElementStore;
+define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "utils"], function(DatasetRepository, datasetTransformer, testData, mocks, utils) {
+    describe("dataset repository", function() {
+        var mockStore, datasetRepository, q, scope;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
-            mockDB = utils.getMockDB($q);
-            mockStore = mockDB.objectStore;
             scope = $rootScope.$new();
 
+            var mockDB = utils.getMockDB($q);
+            mockStore = mockDB.objectStore;
 
-            sectionsdata = testData.get("sections");
-            datasetsdata = testData.get("dataSets");
-            dataElementsdata = testData.get("dataElements");
-
-            sectionStore = utils.getMockStore(q, "", sectionsdata);
-            dataElementStore = utils.getMockStore(q, "", dataElementsdata);
             datasetRepository = new DatasetRepository(mockDB.db, q);
-
-            Timecop.install();
-            Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
         }));
 
-        afterEach(function() {
-            Timecop.returnToPresent();
-            Timecop.uninstall();
-        });
-
-        it("should find all datasets", function() {
-            var datasetIds = ["ds1", "ds2"];
-            datasetRepository.findAllDhisDatasets(datasetIds);
-            scope.$apply();
-
-            expect(mockStore.each).toHaveBeenCalled();
-            expect(mockStore.each.calls.argsFor(0)[0].inList).toEqual(datasetIds);
-        });
-
-        it("should get all new aggregate data sets", function() {
+        it("should transform and get all datasets after filtering out current datasets", function() {
             var allDataSets = [{
-                "id": "dataSet1",
-                "name": "NeoNat",
+                "id": "ds1",
                 "attributeValues": [{
                     "attribute": {
                         "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "false"
-                }]
-            }, {
-                "id": "dataSet2",
-                "name": "Obgyn",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "false"
-                }]
-            }, {
-                "id": "dataSet3",
-                "name": "ER linelist",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
                     },
                     "value": "true"
                 }]
             }, {
-                "id": "geographicOrigin",
-                "name": "Geographic Origin",
+                "id": "ds2",
                 "attributeValues": [{
                     "attribute": {
                         "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    },
-                    "value": "false"
-                }, {
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "true"
-                }]
-            }];
-
-            var expected = [{
-                "id": "dataSet1",
-                "name": "NeoNat",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }, {
-                    "attribute": {
-                        "code": "isOriginDataset"
                     },
                     "value": "false"
                 }]
             }];
-            mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
-            var result;
-            datasetRepository.getAllAggregateDatasets().then(function(r) {
-                result = r;
-            });
-            scope.$apply();
-            expect(mockStore.getAll).toHaveBeenCalled();
-            expect(result).toEqual(expected);
-        });
 
-        it("should get datasets for OrgUnit", function() {
-            var expectedDatasets = [{
-                "id": "ds1"
-            }];
-            mockStore.each.and.returnValue(utils.getPromise(q, expectedDatasets));
-
-            var actualValues;
-            datasetRepository.getAllForOrgUnit("ou1").then(function(data) {
-                actualValues = data;
-            });
-
-            scope.$apply();
-
-            expect(actualValues).toEqual(expectedDatasets);
-        });
-
-        it("should get all the dataset ids", function() {
-            var result;
-
-            var allDataSets = [{
-                "id": 123,
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "true"
-                }]
-            }];
             mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
 
-            datasetRepository.getAllDatasetIds().then(function(data) {
-                result = data;
+            var actualDatasets;
+            datasetRepository.getAll().then(function(datasets) {
+                actualDatasets = datasets;
             });
             scope.$apply();
 
-            expect(mockStore.getAll).toHaveBeenCalled();
-            expect(result).toEqual([123]);
+            expect(actualDatasets.length).toEqual(1);
+            expect(actualDatasets[0].id).toEqual("ds1");
+            expect(actualDatasets[0].attributeValues).toBeUndefined();
         });
 
-        it("should get enriched datasets", function() {
-            var datasets = [{
-                "id": "DS_OPD",
-                "name": "DS_OPD",
+        it("should get all unique datasets by orgUnitIds after filtering out current datasets", function() {
+            var allDataSetsForOu1 = [{
+                "id": "ds1",
                 "organisationUnits": [{
-                    "id": "mod1"
+                    "id": "ou1"
                 }],
                 "attributeValues": [{
                     "attribute": {
-                        "code": "isNewDataModel",
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }]
+            }, {
+                "id": "ds2",
+                "organisationUnits": [{
+                    "id": "ou1"
+                }, {
+                    "id": "ou2"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }]
+            }];
+
+            var allDataSetsForOu2 = [{
+                "id": "ds2",
+                "organisationUnits": [{
+                    "id": "ou1"
+                }, {
+                    "id": "ou2"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }]
+            }, {
+                "id": "ds3",
+                "organisationUnits": [{
+                    "id": "ou2"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
                     },
                     "value": "false"
+                }]
+            }];
+
+            mockStore.each.and.returnValue(utils.getPromise(q, allDataSetsForOu1.concat(allDataSetsForOu2)));
+
+            var actualDatasets;
+            datasetRepository.findAllForOrgUnits(["ou1", "ou2"]).then(function(datasets) {
+                actualDatasets = datasets;
+            });
+            scope.$apply();
+
+            expect(actualDatasets.length).toEqual(2);
+            expect(actualDatasets[0].id).toEqual("ds1");
+            expect(actualDatasets[1].id).toEqual("ds2");
+            expect(actualDatasets[0].attributeValues).toBeUndefined();
+            expect(actualDatasets[1].attributeValues).toBeUndefined();
+        });
+
+        it("should get datasets with sections and dataElements", function() {
+            var dataSets = [{
+                "name": "OPD",
+                "id": "DS_OPD",
+                "organisationUnits": [{
+                    "id": "mod1"
                 }],
                 "sections": [{
                     "id": "Sec1"
@@ -178,142 +126,152 @@ define(["datasetRepository", "angularMocks", "utils", "testData", "timecop"], fu
                 }]
             }];
 
-            var expectedEnrichedDS = [{
+            mockStore.each.and.callFake(function(query) {
+                if (query.inList[0] === "Sec1")
+                    return utils.getPromise(q, testData.get("sections"));
+                if (query.inList[0] === "DE1")
+                    return utils.getPromise(q, testData.get("dataElements"));
+            });
+
+            var actualDatasets;
+
+            datasetRepository.includeDataElements(dataSets, ["DE1"]).then(function(data) {
+                actualDatasets = data;
+            });
+
+            scope.$apply();
+
+            expect(actualDatasets.length).toBe(1);
+            expect(actualDatasets[0].id).toBe("DS_OPD");
+            expect(actualDatasets[0].sections.length).toBe(2);
+            expect(actualDatasets[0].sections[0].id).toBe("Sec1");
+            expect(actualDatasets[0].sections[0].isIncluded).toBe(true);
+            expect(actualDatasets[0].sections[1].id).toBe("Sec2");
+            expect(actualDatasets[0].sections[1].isIncluded).toBe(false);
+            expect(actualDatasets[0].sections[0].dataElements.length).toBe(3);
+            expect(actualDatasets[0].sections[0].dataElements[0].id).toBe("DE1");
+            expect(actualDatasets[0].sections[0].dataElements[0].isIncluded).toBe(false);
+            expect(actualDatasets[0].sections[0].dataElements[1].id).toBe("DE2");
+            expect(actualDatasets[0].sections[0].dataElements[1].isIncluded).toBe(true);
+            expect(actualDatasets[0].sections[0].dataElements[2].id).toBe("DE4");
+            expect(actualDatasets[0].sections[0].dataElements[2].isIncluded).toBe(true);
+        });
+
+        it("should get datasets with sections headers", function() {
+            var dataSets = [{
                 "id": "DS_OPD",
-                "name": "DS_OPD",
-                "organisationUnits": [{
-                    "id": "mod1"
-                }],
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isNewDataModel"
-                    },
-                    "value": "false"
-                }],
                 "sections": [{
                     "id": "Sec1",
                     "dataElements": [{
                         "id": "DE1",
-                        "name": "DE1 - ITFC",
-                        "isIncluded": true,
-                        "formName": "DE1"
-                    }, {
-                        "id": "DE2",
-                        "name": "DE2 - ITFC",
-                        "isIncluded": true,
-                        "formName": "DE2"
-                    }, {
-                        "id": "DE4",
-                        "name": "DE4 - ITFC",
-                        "isIncluded": true,
-                        "formName": "DE4"
-                    }],
-                    "isIncluded": true
-                }, {
-                    "id": "Sec2",
-                    "dataElements": [{
-                        "id": "DE1",
-                        "name": "DE1 - ITFC",
-                        "isIncluded": true,
-                        "formName": "DE1"
-                    }],
-                    "isIncluded": true
+                        "categoryCombo": {
+                            "id": "CC1"
+                        }
+                    }]
                 }]
             }];
 
-            var db = utils.getMockDB(q).db;
-
-            db.objectStore.and.callFake(function(storeName) {
-                if (storeName === "sections")
-                    return sectionStore;
-                if (storeName === "dataElements")
-                    return dataElementStore;
-                return utils.getMockStore(q, "", testData.get(storeName));
+            mockStore.getAll.and.callFake(function(query) {
+                if (mockStore.storeName === "categoryCombos")
+                    return utils.getPromise(q, testData.get("categoryCombos"));
+                if (mockStore.storeName === "categories")
+                    return utils.getPromise(q, testData.get("categories"));
+                if (mockStore.storeName === "categoryOptionCombos")
+                    return utils.getPromise(q, testData.get("categoryOptionCombos"));
             });
 
-            datasetRepository = new DatasetRepository(db, q);
+            var actualDatasets;
 
-            var actualEnrichedDS;
-
-            datasetRepository.getEnriched(datasets).then(function(data) {
-                actualEnrichedDS = data;
+            datasetRepository.includeCategoryOptionCombinations(dataSets).then(function(data) {
+                actualDatasets = data;
             });
 
             scope.$apply();
-            expect(actualEnrichedDS).toEqual(expectedEnrichedDS);
+
+            var expectedSectionHeaders = [
+                [{
+                    "id": "CO1",
+                    "name": "Resident"
+                }, {
+                    "id": "CO2",
+                    "name": "Migrant"
+                }],
+                [{
+                    "id": "CO3",
+                    "name": "LessThan5"
+                }, {
+                    "id": "CO4",
+                    "name": "GreaterThan5"
+                }, {
+                    "id": "CO3",
+                    "name": "LessThan5"
+                }, {
+                    "id": "CO4",
+                    "name": "GreaterThan5"
+                }]
+            ];
+            expect(actualDatasets[0].sections[0].headers).toEqual(expectedSectionHeaders);
+            expect(actualDatasets[0].sections[0].categoryOptionComboIds).toEqual(['1', '2', '3', '4']);
         });
 
-        it("should get all origin datasets", function() {
-            var allDataSets = [{
-                "id": "dataSet1",
+        it("should upsert datasets downloaded from dhis", function() {
+            var datasets = [{
+                "id": "ds1",
                 "name": "NeoNat",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "true"
-                }]
-            }, {
-                "id": "dataSet2",
-                "name": "Obgyn",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "false"
+                "organisationUnits": [{
+                    "id": "ou1",
+                    "name": "ou1"
                 }]
             }];
-
-            var expectedResult = [{
-                "id": "dataSet1",
-                "name": "NeoNat",
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "isOriginDataset"
-                    },
-                    "value": "true"
-                }]
-            }];
-
-            mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
-            var actualResult;
-            datasetRepository.getOriginDatasets().then(function(r) {
-                actualResult = r;
-            });
+            datasetRepository.upsertDhisDownloadedData(datasets);
             scope.$apply();
-            expect(actualResult).toEqual(expectedResult);
+
+            var expectedDatasetUpsert = [{
+                "id": "ds1",
+                "name": "NeoNat",
+                "organisationUnits": [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }],
+                "orgUnitIds": ["ou1"]
+            }];
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
         });
 
         it("should associate org units to datasets", function() {
             var datasets = [{
-                "id": "dataSet1",
-                "name": "NeoNat"
+                "id": "ds1",
+                "name": "NeoNat",
+                "organisationUnits": [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }]
             }];
 
-            var inputOrgunits = [{
+            var orgunits = [{
                 "id": "ou1",
                 "name": "ou1"
             }, {
                 "id": "ou2",
-                "name": "ou1"
-            }];
-
-            var orgUnits = [{
-                "id": "ou1",
-                "name": "ou1"
-            }, {
-                "id": "ou2",
-                "name": "ou1"
+                "name": "ou2"
             }];
 
             var expectedDatasetUpsert = [{
-                "id": "dataSet1",
+                "id": "ds1",
                 "name": "NeoNat",
-                "organisationUnits": orgUnits,
-                "clientLastUpdated": "2014-05-30T12:43:54.972Z",
+                "organisationUnits": [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }, {
+                    "id": "ou2",
+                    "name": "ou2"
+                }],
                 "orgUnitIds": ["ou1", "ou2"]
             }];
-            datasetRepository.associateOrgUnits(datasets, inputOrgunits);
+
+            mockStore.each.and.returnValue(utils.getPromise(q, datasets));
+            datasetRepository.associateOrgUnits(["ds1"], orgunits);
+            scope.$apply();
 
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
         });

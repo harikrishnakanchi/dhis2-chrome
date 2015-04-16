@@ -26,7 +26,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             return _.map(sections, function(section) {
                 var enrichedSection = _.pick(indexedSections[section.id], "id", "name", "sortOrder", "dataElements");
                 enrichedSection.dataElements = enrichDataElements(enrichedSection.dataElements);
-                enrichedSection.isIncluded = !_.any(enrichedSection.dataElements, {
+                enrichedSection.isIncluded = !_.every(enrichedSection.dataElements, {
                     "isIncluded": false
                 });
                 return enrichedSection;

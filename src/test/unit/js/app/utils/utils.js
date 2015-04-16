@@ -57,7 +57,8 @@ define([], function() {
         };
 
         var db = {
-            "objectStore": jasmine.createSpy("objectStore").and.callFake(function() {
+            "objectStore": jasmine.createSpy("objectStore").and.callFake(function(storeName) {
+                mockStore.storeName = storeName;
                 return mockStore;
             }),
             "queryBuilder": queryBuilder,
