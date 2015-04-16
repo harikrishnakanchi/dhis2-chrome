@@ -71,7 +71,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
                             "name": orgUnit.name
                         };
                         if (!_.some(ds.organisationUnits, orgUnitToAdd))
-                            results.add(orgUnitToAdd);
+                            results.push(orgUnitToAdd);
                     });
 
                     ds.organisationUnits = ds.organisationUnits.concat(orgUnitsForDataset);
