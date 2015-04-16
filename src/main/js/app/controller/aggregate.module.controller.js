@@ -69,7 +69,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         $scope.originalDatasets = datasets;
 
                         var partitionedDatasets = _.partition(datasets, function(ds) {
-                            return _.any(ds.organisationUnits, "id", $scope.module.id);
+                            if ($scope.module.id)
+                                return _.any(ds.organisationUnits, "id", $scope.module.id);
+                            return false;
                         });
 
                         $scope.associatedDatasets = partitionedDatasets[0];
