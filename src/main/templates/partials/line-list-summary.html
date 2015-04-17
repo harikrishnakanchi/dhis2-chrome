@@ -53,9 +53,11 @@
                                                 <span ng-if="dataValue.type !== 'date' &amp;&amp; dataValue.type !== 'bool'">{{ getDisplayValue(dataValue) }}</span>
                                             </td>
                                             <td>
-                                                <a href="" id="" title="Submitted" class="submitted">
-                                                    <span class="glyphicon glyphicon-ok" ng-if="!event.localStatus || event.localStatus === 'READY_FOR_DHIS'"></span>
-                                                    <span class="glyphicon glyphicon-adjust" ng-if="event.localStatus === 'INCOMPLETE_DRAFT'">
+                                                <a href="" id="" title="Submitted" ng-if="!event.localStatus || event.localStatus === 'READY_FOR_DHIS'" class="submitted">
+                                                    <span class="glyphicon glyphicon-ok"></span>
+                                                </a>
+                                                <a href="" id="" title="Incomplete" ng-if="event.localStatus === 'INCOMPLETE_DRAFT'" class="submitted">
+                                                    <span class="glyphicon glyphicon-adjust">
                                                     </span>
                                                 </a>
                                             </td>
