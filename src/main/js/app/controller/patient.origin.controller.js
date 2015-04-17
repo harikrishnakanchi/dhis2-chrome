@@ -25,7 +25,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 return error;
             };
 
-            var createOrgUnits = function() {
+            var createOrgUnitsAndGroups = function() {
                 var allOriginOrgUnits = [];
                 var associatedDatasetIds = [];
                 var associatedPrograms = [];
@@ -64,11 +64,6 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                             $scope.resourceBundle.uploadProgramDesc + _.pluck(allOriginOrgUnits, "name"));
                 };
 
-                var createOrgUnitGroups = function() {
-                    if (!_.isEmpty(orgUnitsForGroups))
-                        return orgUnitGroupHelper.createOrgUnitGroups(orgUnitsForGroups, false);
-                };
-
                 var getBooleanAttributeValue = function(attributeValues, attributeCode) {
                     var attr = _.find(attributeValues, {
                         "attribute": {
@@ -83,22 +78,27 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                     return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
                 };
 
+                var createOrgUnitGroups = function() {
+                    if (!_.isEmpty(orgUnitsForGroups))
+                        return orgUnitGroupHelper.createOrgUnitGroups(orgUnitsForGroups, false);
+                };
+
+                var createOrgUnits = function(module) {
+                    return orgUnitRepository.findAllByParent(module.id).then(function(siblingOriginOrgUnits) {
+                        return originOrgunitCreator.create(module, $scope.patientOrigin).then(function(originOrgUnits) {
+                            allOriginOrgUnits = allOriginOrgUnits.concat(originOrgUnits);
+                            orgUnitsForGroups = isLinelistService(module) ? orgUnitsForGroups.concat(originOrgUnits) : orgUnitsForGroups.concat(module);
+                            return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
+                        });
+                    });
+                };
 
                 return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
-                        var promises = _.map(modules, function(module) {
-                            return orgUnitRepository.findAllByParent(module.id).then(function(siblingOriginOrgUnits) {
-                                return originOrgunitCreator.create(module, $scope.patientOrigin).then(function(originOrgUnits) {
-                                    allOriginOrgUnits = allOriginOrgUnits.concat(originOrgUnits);
-                                    if (isLinelistService(module))
-                                        orgUnitsForGroups = orgUnitsForGroups.concat(originOrgUnits);
-                                    else
-                                        orgUnitsForGroups = orgUnitsForGroups.concat(module);
-
-                                    return doAssociations(originOrgUnits, siblingOriginOrgUnits[0]);
-                                });
+                        return _.reduce(modules, function(prevPromise, module) {
+                            return prevPromise.then(function() {
+                                return createOrgUnits(module);
                             });
-                        });
-                        return $q.all(promises);
+                        }, $q.when({}));
                     })
                     .then(createOrgUnitGroups)
                     .then(publishMessages);
@@ -116,7 +116,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
             $scope.loading = true;
             return patientOriginRepository.upsert(payload)
                 .then(_.partial(publishMessage, payload, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(payload.origins, "name")))
-                .then(createOrgUnits)
+                .then(createOrgUnitsAndGroups)
                 .then(onSuccess, onFailure)
                 .finally(function() {
                     $scope.loading = false;
@@ -135,6 +135,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
         var init = function() {
             $scope.patientOrigin = {};
             $scope.existingPatientOrigins = [];
+
             return patientOriginRepository.get($scope.orgUnit.id).then(function(patientOriginDetails) {
                 if (!_.isEmpty(patientOriginDetails)) {
                     patientOrigins = patientOriginDetails.origins;
