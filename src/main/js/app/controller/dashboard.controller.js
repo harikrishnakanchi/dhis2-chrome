@@ -278,8 +278,8 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
             };
 
             var modalMessages = {
-                "ok": $scope.resourceBundle.confirmExport,
-                "title": $scope.resourceBundle.confirmExportTitle,
+                "ok": $scope.resourceBundle.confirmImport,
+                "title": $scope.resourceBundle.confirmImportTitle,
                 "confirmationMessage": $scope.resourceBundle.loadCloneConfirmationMessage
             };
 
