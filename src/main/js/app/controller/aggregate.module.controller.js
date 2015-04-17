@@ -12,7 +12,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.nonAssociatedDataSets = [];
             $scope.associatedDatasets = [];
             $scope.selectedDataset = {};
-            $scope.excludedDataElements = [];
+            var excludedDataElements = [];
 
             var init = function() {
                 var initModule = function() {
@@ -45,7 +45,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 var getExcludedDataElements = function() {
                     return systemSettingRepository.get($scope.module.id).then(function(systemSettings) {
                         if (!_.isEmpty(systemSettings) && !_.isEmpty(systemSettings.value))
-                            $scope.excludedDataElements = systemSettings.value.dataElements;
+                            excludedDataElements = systemSettings.value.dataElements;
                     });
                 };
 
@@ -262,7 +262,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.selectDataSet = function(item) {
                 if (_.isEmpty(item))
                     return;
-                return datasetRepository.includeDataElements([item]).then(function(datasets) {
+                return datasetRepository.includeDataElements([item], excludedDataElements).then(function(datasets) {
                     $scope.selectedDataset = datasets[0];
                     _.each($scope.selectedDataset.sections, function(section) {
                         $scope.isExpanded[section.id] = false;
