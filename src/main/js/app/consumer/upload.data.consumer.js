@@ -11,7 +11,8 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
         };
 
         this.run = function(message) {
-            return preparePayload(message.data.data).then(uploadData);
+            if (!_.isEmpty(message.data.data))
+                return preparePayload(message.data.data).then(uploadData);
         };
     };
 });
