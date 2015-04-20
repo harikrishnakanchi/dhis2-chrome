@@ -1,8 +1,8 @@
 /*global Date:true*/
-define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository", "datasetRepository"],
-    function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository, DatasetRepository) {
+define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository", "datasetRepository", "programRepository"],
+    function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository, DatasetRepository, ProgramRepository) {
         describe("dataApprovalController ", function() {
-            var scope, routeParams, db, q, location, anchorScroll, dataApprovalController, rootScope, approvalStore,
+            var scope, routeParams, q, location, anchorScroll, dataApprovalController, rootScope, approvalStore,
                 saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getApprovalDataSpy, getDataValuesSpy,
                 orgUnits, window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, systemSettingRepository, origin1, origin2, geographicOrigins;
 
@@ -21,12 +21,6 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
 
                 scope = $rootScope.$new();
-                dataRepository = new DataRepository();
-                approvalDataRepository = new ApprovalDataRepository();
-                datasetRepository = new DatasetRepository();
-                spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, []));
 
                 scope.currentModule = {
                     id: 'mod2',
@@ -53,42 +47,6 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "weekYear": 2014
                 };
 
-                orgUnitRepository = new OrgUnitRepository();
-                systemSettingRepository = new SystemSettingRepository();
-                parentProject = {
-                    'id': 'parent',
-                    'attributeValues': [{
-                        'attribute': {
-                            'code': 'Type',
-                            'name': 'Type',
-                        },
-                        'value': 'Project'
-                    }]
-                };
-
-                getOrgUnitSpy = spyOn(orgUnitRepository, "getParentProject");
-                getOrgUnitSpy.and.returnValue(utils.getPromise(q, parentProject));
-                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
-                spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, {}));
-
-                var queryBuilder = function() {
-                    this.$index = function() {
-                        return this;
-                    };
-                    this.$eq = function(v) {
-                        return this;
-                    };
-                    this.compile = function() {
-                        return "blah";
-                    };
-                    return this;
-                };
-
-                db = {
-                    "objectStore": function() {},
-                    "queryBuilder": queryBuilder
-                };
-
                 scope.dataentryForm = {
                     $setPristine: function() {}
                 };
@@ -96,29 +54,6 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 scope.resourceBundle = {
                     "dataApprovalConfirmationMessage": ""
                 };
-
-                var getMockStore = function(data) {
-                    var getAll = function() {
-                        return utils.getPromise(q, data);
-                    };
-                    var upsert = function() {};
-                    var find = function() {};
-                    var each = function() {};
-
-                    return {
-                        getAll: getAll,
-                        upsert: upsert,
-                        find: find,
-                        each: each,
-                    };
-                };
-                approvalStore = getMockStore("approvals");
-
-                spyOn(db, 'objectStore').and.callFake(function(storeName) {
-                    if (storeName === "approvals")
-                        return approvalStore;
-                    return getMockStore(testData.get(storeName));
-                });
 
                 rootScope.currentUser = {
                     "firstName": "test1",
@@ -153,26 +88,6 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "deleteApprovalsDesc": "restart approval process for "
                 };
 
-                spyOn(location, "hash");
-
-                saveSuccessPromise = utils.getPromise(q, {
-                    "ok": "ok"
-                });
-
-                saveErrorPromise = utils.getRejectedPromise(q, {
-                    "ok": "ok"
-                });
-
-                getApprovalDataSpy = spyOn(approvalDataRepository, "getApprovalData");
-                getApprovalDataSpy.and.returnValue(utils.getPromise(q, {}));
-
-                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
-
-                getDataValuesSpy = spyOn(dataRepository, "getDataValues");
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
-
-                spyOn(hustle, "publish");
-
                 fakeModal = {
                     close: function() {
                         this.result.confirmCallBack();
@@ -183,8 +98,54 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     open: function(object) {}
                 };
 
+                saveSuccessPromise = utils.getPromise(q, {
+                    "ok": "ok"
+                });
+
+                saveErrorPromise = utils.getRejectedPromise(q, {
+                    "ok": "ok"
+                });
+
+                spyOn(location, "hash");
+
+                datasetRepository = new DatasetRepository();
+                spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, []));
+
+                programRepository = new ProgramRepository();
+                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, undefined));
+
+                orgUnitRepository = new OrgUnitRepository();
+                parentProject = {
+                    'id': 'parent',
+                    'attributeValues': [{
+                        'attribute': {
+                            'code': 'Type',
+                            'name': 'Type',
+                        },
+                        'value': 'Project'
+                    }]
+                };
+                getOrgUnitSpy = spyOn(orgUnitRepository, "getParentProject");
+                getOrgUnitSpy.and.returnValue(utils.getPromise(q, parentProject));
+                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [origin1, origin2]));
-                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository);
+
+                systemSettingRepository = new SystemSettingRepository();
+                spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, {}));
+
+                approvalDataRepository = new ApprovalDataRepository();
+                getApprovalDataSpy = spyOn(approvalDataRepository, "getApprovalData");
+                getApprovalDataSpy.and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
+
+                dataRepository = new DataRepository();
+                getDataValuesSpy = spyOn(dataRepository, "getDataValues");
+                getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
+
+                spyOn(hustle, "publish");
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository);
             }));
 
             afterEach(function() {
@@ -225,7 +186,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     }
                 };
 
-                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository);
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository);
                 scope.$apply();
 
                 scope.firstLevelApproval();
@@ -350,7 +311,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     }
                 };
 
-                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, db, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository);
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository);
                 scope.$apply();
 
                 scope.secondLevelApproval();

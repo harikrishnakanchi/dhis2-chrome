@@ -9,6 +9,18 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
         return attr && attr.value === "true";
     };
 
+    var getAttributeValue = function(attributes, attributeCode) {
+        var attr = _.find(attributes, {
+            "attribute": {
+                "code": attributeCode
+            }
+        });
+        if (attr && attr.value)
+            return attr.value;
+        else
+            return undefined;
+    };
+
     this.mapDatasetForView = function(dataset) {
         var resultDataset = _.pick(dataset, ["id", "name", "shortName", "organisationUnits", "sections"]);
         resultDataset.isAggregateService = !getBooleanAttributeValue(dataset.attributeValues, "isLineListService") && !getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset");
@@ -36,6 +48,9 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
         var enrichDataElements = function(dataElements) {
             return _.map(dataElements, function(dataElement) {
                 var enrichedDataElement = _.pick(indexedDataElements[dataElement.id], "id", "name", "formName", "categoryCombo");
+                var associatedProgram = getAttributeValue(indexedDataElements[dataElement.id].attributeValues, "associatedProgram");
+                if (!_.isEmpty(associatedProgram))
+                    enrichedDataElement.associatedProgramId = associatedProgram;
                 enrichedDataElement.isIncluded = _.isEmpty(excludedDataElements) ? true : !_.contains(excludedDataElements, dataElement.id);
                 return enrichedDataElement;
             });

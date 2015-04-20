@@ -1,6 +1,6 @@
 /*global Date:true*/
-define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository", "datasetRepository"],
-    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository, DatasetRepository) {
+define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository", "datasetRepository", "programRepository"],
+    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository, DatasetRepository, ProgramRepository) {
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, db, q, location, anchorScroll, aggregateDataEntryController, rootScope,
                 saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getDataValuesSpy,
@@ -58,20 +58,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     }
                 };
 
-                dataRepository = new DataRepository();
-                approvalDataRepository = new ApprovalDataRepository();
-                orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, parentProject));
-                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
-                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [origin1, origin2]));
-
-                systemSettingRepository = new SystemSettingRepository();
-                spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, {}));
-
-                scope.dataentryForm = {
-                    $setPristine: function() {}
-                };
-
                 scope.resourceBundle = {
                     "dataApprovalConfirmationMessage": ""
                 };
@@ -109,24 +95,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "deleteApprovalsDesc": "restart approval process for "
                 };
 
-                spyOn(location, "hash");
-
-                saveSuccessPromise = utils.getPromise(q, {
-                    "ok": "ok"
-                });
-
-                saveErrorPromise = utils.getRejectedPromise(q, {
-                    "ok": "ok"
-                });
-
-                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {}));
-                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
-
-                getDataValuesSpy = spyOn(dataRepository, "getDataValues");
-                getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
-
-                spyOn(hustle, "publish");
-
                 fakeModal = {
                     close: function() {
                         this.result.confirmCallBack();
@@ -137,12 +105,47 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     open: function(object) {}
                 };
 
+                saveSuccessPromise = utils.getPromise(q, {
+                    "ok": "ok"
+                });
+
+                saveErrorPromise = utils.getRejectedPromise(q, {
+                    "ok": "ok"
+                });
+
+                scope.dataentryForm = {
+                    $setPristine: function() {}
+                };
+
+                spyOn(location, "hash");
+
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, parentProject));
+                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [origin1, origin2]));
+
+                programRepository = new ProgramRepository();
+                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, undefined));
+
+                systemSettingRepository = new SystemSettingRepository();
+                spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, {}));
+
+                approvalDataRepository = new ApprovalDataRepository();
+                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
+
+                dataRepository = new DataRepository();
+                getDataValuesSpy = spyOn(dataRepository, "getDataValues");
+                getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
+
+                spyOn(hustle, "publish");
+
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, []));
 
-                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository);
+                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository);
             }));
 
             afterEach(function() {

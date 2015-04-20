@@ -258,6 +258,91 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
             expect(actualEnrichedDatasets[1].sections).toContain(expectedSectionsForVacc[0]);
         });
 
+        it("should set associated program ids on data elements where available", function() {
+            var originDataset = {
+                "id": "ds1",
+                "name": "Origin Dataset",
+                "organisationUnits": [{
+                    "id": "ou1"
+                }, {
+                    "id": "ou2"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isOriginDataset"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    },
+                    "value": "false"
+                }],
+                "sections": [{
+                    "id": "Sec1"
+                }]
+            };
+
+            var sections = [{
+                "id": "Sec1",
+                "name": "Origin",
+                "sortOrder": 0,
+                "dataSet": _.pick(originDataset, ['name', 'id']),
+                "dataElements": [{
+                    "id": "DE1",
+                    "name": "Number of Patients - Origin - Origin Dataset"
+                }, {
+                    "id": "DE2",
+                    "name": "Number of Patients (Burn Unit) - Origin - Origin Dataset"
+                }]
+            }];
+
+            var dataElements = [{
+                "id": "DE1",
+                "name": "Number of Patients - Origin - Origin Dataset",
+                "shortName": "NumPatients",
+                "formName": "Number of Patients",
+                "categoryCombo": {
+                    "id": "default"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "associatedProgram",
+                        "id": "uDpmgVfegeR",
+                        "name": "Associated Program"
+                    },
+                    "value": ""
+                }]
+            }, {
+                "id": "DE2",
+                "name": "Number of Patients (Burn Unit) - Origin - Origin Dataset",
+                "shortName": "NumPatients",
+                "formName": "Number of Patients (Burn Unit)",
+                "categoryCombo": {
+                    "id": "default"
+                },
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "associatedProgram",
+                        "id": "uDpmgVfegeR",
+                        "name": "Associated Program"
+                    },
+                    "value": "a0a11378e0e"
+                }]
+            }];
+
+
+            var actualEnrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements([originDataset], sections, dataElements);
+
+            expect(actualEnrichedDatasets[0].sections[0].dataElements[0].associatedProgramId).toBeUndefined();
+            expect(actualEnrichedDatasets[0].sections[0].dataElements[1].associatedProgramId).toEqual("a0a11378e0e");
+        });
+
         it("should enrich datasets with category option combinations", function() {
             var dataSets = [{
                 "id": "DS_OPD",

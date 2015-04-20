@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties) {
-    return function($scope, $routeParams, $q, $hustle, db, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
-        $timeout, orgUnitRepository, datasetRepository) {
+    return function($scope, $routeParams, $q, $hustle, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
+        $timeout, orgUnitRepository, datasetRepository, programRepository) {
 
         var currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
 
@@ -17,6 +17,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             $scope.secondLevelApproveSuccess = false;
             $scope.approveError = false;
             $scope.excludedDataElements = {};
+            $scope.associatedProgramId = undefined;
         };
 
         var scrollToTop = function() {
@@ -143,9 +144,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
         var init = function() {
             $scope.loading = true;
 
-            var loadModuleAndOriginOrgUnits = function() {
+            var loadAssociatedOrgUnitsAndPrograms = function() {
                 return orgUnitRepository.findAllByParent([$scope.currentModule.id]).then(function(originOrgUnits) {
                     $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.currentModule, originOrgUnits]), "id");
+                    return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
+                        if (program)
+                            $scope.associatedProgramId = program.id;
+                    });
                 });
             };
 
@@ -155,7 +160,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 });
             };
 
-            return $q.all([loadModuleAndOriginOrgUnits(), loadExcludedDataElements()]).then(function() {
+            return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements()]).then(function() {
 
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))

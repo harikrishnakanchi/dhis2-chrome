@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, properties) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
-        dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository) {
+        dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository) {
 
         var currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
 
@@ -20,6 +20,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             $scope.submitError = false;
             $scope.projectIsAutoApproved = false;
             $scope.excludedDataElements = {};
+            $scope.associatedProgramId = undefined;
         };
 
         var confirmAndProceed = function(okCallback, message, doNotConfirm) {
@@ -263,9 +264,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         var init = function() {
             $scope.loading = true;
 
-            var loadModuleAndOriginOrgUnits = function() {
+            var loadAssociatedOrgUnitsAndPrograms = function() {
                 return orgUnitRepository.findAllByParent([$scope.currentModule.id]).then(function(originOrgUnits) {
                     $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.currentModule, originOrgUnits]), "id");
+                    return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
+                        if (program)
+                            $scope.associatedProgramId = program.id;
+                    });
                 });
             };
 
@@ -275,8 +280,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 });
             };
 
-            return $q.all([loadModuleAndOriginOrgUnits(), loadExcludedDataElements()]).then(function() {
-
+            return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements()]).then(function() {
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
