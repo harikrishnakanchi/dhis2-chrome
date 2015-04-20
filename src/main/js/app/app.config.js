@@ -31,6 +31,7 @@ require.config({
         "angular-ui-equals": "lib/angularjs-directives/src/equals/equals",
         "angular-treeview": "lib/angularjs-directives/src/treeview/angular.treeview",
         "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",
+        "angular-autocomplete": "lib/angularjs-directives/src/autocomplete/autocomplete",
         "md5": "lib/js-md5/js/md5",
 
         //Controllers
@@ -178,6 +179,9 @@ require.config({
         },
         'hustleModule': {
             deps: ["angular", "hustle"]
+        },
+        'angular-autocomplete': {
+            deps: ["angular"]
         }
     }
 });
