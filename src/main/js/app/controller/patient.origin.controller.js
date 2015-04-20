@@ -100,8 +100,8 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                             });
                         }, $q.when({}));
                     })
-                    .then(createOrgUnitGroups)
-                    .then(publishMessages);
+                    .then(publishMessages)
+                    .then(createOrgUnitGroups);
             };
 
             $scope.patientOrigin.id = dhisId.get($scope.patientOrigin.name);
