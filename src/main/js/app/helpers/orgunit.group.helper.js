@@ -2,16 +2,11 @@ define([], function() {
     return function($hustle, $q, $scope, orgUnitRepository, orgUnitGroupRepository) {
         this.createOrgUnitGroups = function(orgunits, isUpdateProject) {
             var getOrgUnitGroups = function() {
-                return orgUnitGroupRepository.getAll()
-                    .then(function(result) {
-                        return result;
-                    });
+                return orgUnitGroupRepository.getAll();
             };
 
             var getAttributes = function(orgunit) {
-                return orgUnitRepository.getProjectAndOpUnitAttributes(orgunit).then(function(result) {
-                    return result;
-                });
+                return orgUnitRepository.getProjectAndOpUnitAttributes(orgunit);
             };
 
             var addOrgunitsToOrgUnitGroups = function(orgUnitGroups) {
@@ -59,7 +54,7 @@ define([], function() {
                 };
 
                 var upsertOrgUnitGroup = function(orgUnitGroups) {
-                    orgUnitGroupRepository.upsert(orgUnitGroups).then(function() {
+                    return orgUnitGroupRepository.upsert(orgUnitGroups).then(function() {
                         return $hustle.publish({
                             "data": orgUnitGroups,
                             "type": "upsertOrgUnitGroups",
