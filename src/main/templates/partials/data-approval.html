@@ -8,9 +8,6 @@
         <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
         <div class="alert alert-danger" ng-if="(!isApproved || !isCompleted) &amp;&amp; dataValues !== undefined &amp;&amp; (!isSubmitted || hasRoles(['Coordination Level Approver']) &amp;&amp;!isCompleted) &amp;&amp; hasRoles(['Project Level Approver', 'Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
         <form name="dataentryForm" id="dataentry" ng-if="(isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) || (isCompleted &amp;&amp; hasRoles(['Coordination Level Approver']))">
-            <div class="text-right">
-                <input type="button" class="printTallySheetBtn" ng-click="printWindow()" value="{{resourceBundle.printTallySheetBtnValue}}" ng-show="currentModule"></input>
-            </div>
             <accordion close-others="false">
                 <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false }" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
                     <accordion-heading>

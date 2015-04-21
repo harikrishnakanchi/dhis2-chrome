@@ -74,13 +74,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             return _.sum(allValues);
         };
 
-        $scope.printWindow = function() {
-            $scope.printingTallySheet = true;
-            $timeout(function() {
-                $window.print();
-            }, 0);
-        };
-
         $scope.firstLevelApproval = function() {
 
             var completedBy = $scope.currentUser.userCredentials.username;
