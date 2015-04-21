@@ -32,7 +32,7 @@ define(["lodash"], function(_) {
                 promises.push(metadataRepository.upsertMetadata(metadata));
                 promises.push(orgUnitRepository.upsertDhisDownloadedData(metadata.organisationUnits));
                 promises.push(orgUnitGroupRepository.upsertDhisDownloadedData(metadata.organisationUnitGroups));
-                promises.push(datasetRepository.upsertDhisDownloadedData(metadata.dataSets));
+                promises.push(datasetRepository.upsertDhisDownloadedData(metadata.dataSets, metadata.sections));
                 promises.push(programRepository.upsertDhisDownloadedData(metadata.programs));
                 return $q.all(promises).then(function() {
                     return metadata;

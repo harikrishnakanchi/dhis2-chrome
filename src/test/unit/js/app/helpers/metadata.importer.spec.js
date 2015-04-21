@@ -44,13 +44,17 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 var programs = [{
                     'id': 'prog1'
                 }];
+                var sections = [{
+                    "id": "sec1"
+                }];
                 var metadataCreateDate = moment().toISOString();
                 var dhisMetadata = {
                     'created': metadataCreateDate,
                     'organisationUnits': orgUnits,
                     'organisationUnitGroups': orgUnitGroups,
                     "dataSets": dataSets,
-                    'programs': programs
+                    'programs': programs,
+                    'sections': sections
                 };
 
                 var setting1 = "{\"clientLastUpdated\":\"2015-02-16T09:55:28.681Z\",\"dataElements\":[\"a3e1a48467b\",\"a8a704935cb\"]}";
@@ -73,7 +77,7 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 expect(metadataRepository.upsertMetadata).toHaveBeenCalledWith(dhisMetadata);
                 expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnits);
                 expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitGroups);
-                expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(dataSets);
+                expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(dataSets, sections);
                 expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programs);
                 expect(systemSettingRepository.upsert).toHaveBeenCalledWith(systemSettings);
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith("metaData", metadataCreateDate);

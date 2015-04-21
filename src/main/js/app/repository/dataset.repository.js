@@ -88,9 +88,23 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             return store.each(query);
         };
 
-        this.upsertDhisDownloadedData = function(payload) {
-            var dataSets = !_.isArray(payload) ? [payload] : payload;
+        var associateSectionsToDatasets = function(dataSets, sections) {
+            var indexedSections = _.groupBy(sections, function(section) {
+                return section.dataSet.id;
+            });
+
+            return _.map(dataSets, function(ds) {
+                ds.sections = _.map(indexedSections[ds.id], function(section) {
+                    return _.pick(section, "id", "name");
+                });
+                return ds;
+            });
+        };
+
+        this.upsertDhisDownloadedData = function(dataSets, sections) {
+            dataSets = !_.isArray(dataSets) ? [dataSets] : dataSets;
             dataSets = extractOrgUnitIdsForIndexing(dataSets);
+            dataSets = sections ? associateSectionsToDatasets(dataSets, sections) : dataSets;
             var store = db.objectStore("dataSets");
             return store.upsert(dataSets).then(function() {
                 return dataSets;

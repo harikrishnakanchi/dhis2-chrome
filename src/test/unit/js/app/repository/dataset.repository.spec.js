@@ -238,6 +238,43 @@ define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
         });
 
+        it("should upsert datasets downloaded from dhis with given sections", function() {
+            var datasets = [{
+                "id": "ds1",
+                "name": "NeoNat",
+                "organisationUnits": [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }]
+            }];
+
+            var sections = [{
+                "id": "s1",
+                "name": "section1",
+                "dataSet": {
+                    "id": "ds1"
+                }
+            }];
+
+            datasetRepository.upsertDhisDownloadedData(datasets, sections);
+            scope.$apply();
+
+            var expectedDatasetUpsert = [{
+                "id": "ds1",
+                "name": "NeoNat",
+                "organisationUnits": [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }],
+                "sections": [{
+                    "id": "s1",
+                    "name": "section1"
+                }],
+                "orgUnitIds": ["ou1"]
+            }];
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedDatasetUpsert);
+        });
+
         it("should associate org units to datasets", function() {
             var datasets = [{
                 "id": "ds1",
