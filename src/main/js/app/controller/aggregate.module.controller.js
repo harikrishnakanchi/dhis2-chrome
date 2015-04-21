@@ -157,7 +157,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             var onSuccess = function(enrichedModule) {
                 $scope.saveFailure = false;
                 if ($scope.$parent.closeNewForm)
-                    $scope.$parent.closeNewForm(enrichedModule, "savedModule");
+                    $scope.$parent.closeNewForm(enrichedModule.parent, "savedModule");
                 return enrichedModule;
             };
 
