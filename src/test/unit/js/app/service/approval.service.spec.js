@@ -402,8 +402,36 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             httpBackend.flush();
         });
 
-        it("should mark data as unapproved in dhis", function() {
+        it("should mark data as unapproved in dhis if mayUnapprove permission exists", function() {
+            var approvalStatus = {
+                "dataApprovalStateResponses": [{
+                    "permissions": {
+                        "mayUnapprove": true
+                    }
+                }]
+            };
+
+            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&ds=170b8cd5e53&endDate=2014-01-05&ou=17yugc&pe=Weekly&startDate=2013-12-30")
+                .respond(200, approvalStatus);
             httpBackend.expectDELETE(properties.dhis.url + "/api/dataApprovals?ds=170b8cd5e53&ou=17yugc&pe=2014W01").respond(200, "ok");
+
+            var approvalService = new ApprovalService(http, db, q);
+            approvalService.markAsUnapproved(["170b8cd5e53"], "2014W01", "17yugc");
+
+            httpBackend.flush();
+        });
+
+        it("should not make a call to delete approvals in dhis if mayUnapprove permission doesn't exists", function() {
+            var approvalStatus = {
+                "dataApprovalStateResponses": [{
+                    "permissions": {
+                        "mayUnapprove": false
+                    }
+                }]
+            };
+
+            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&ds=170b8cd5e53&endDate=2014-01-05&ou=17yugc&pe=Weekly&startDate=2013-12-30")
+                .respond(200, approvalStatus);
 
             var approvalService = new ApprovalService(http, db, q);
             approvalService.markAsUnapproved(["170b8cd5e53"], "2014W01", "17yugc");

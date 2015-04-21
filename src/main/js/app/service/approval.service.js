@@ -46,13 +46,38 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
         };
 
         this.markAsUnapproved = function(dataSets, period, orgUnit) {
-            return $http.delete(dhisUrl.approvalL2, {
-                params: {
-                    "ds": dataSets,
-                    "pe": period,
-                    "ou": orgUnit
+            var doGet = function() {
+                var startDate = moment(period, "GGGG[W]W");
+
+                return $http.get(dhisUrl.approvalStatus, {
+                    "params": {
+                        "ds": dataSets,
+                        "startDate": startDate.format("YYYY-MM-DD"),
+                        "endDate": startDate.add(6, 'days').format("YYYY-MM-DD"),
+                        "ou": [orgUnit],
+                        "pe": "Weekly",
+                        "children": true
+                    }
+                });
+            };
+
+            var doDelete = function(responseFromGET) {
+                var mayUnapprovePermissions = _.map(responseFromGET.data.dataApprovalStateResponses, function(status) {
+                    return status.permissions.mayUnapprove;
+                });
+
+                if (!_.isEmpty(responseFromGET.data.dataApprovalStateResponses) && _.any(mayUnapprovePermissions)) {
+                    return $http.delete(dhisUrl.approvalL2, {
+                        params: {
+                            "ds": dataSets,
+                            "pe": period,
+                            "ou": orgUnit
+                        }
+                    });
                 }
-            });
+            };
+
+            return doGet().then(doDelete);
         };
 
         this.getCompletionData = function(orgUnits, dataSets) {
