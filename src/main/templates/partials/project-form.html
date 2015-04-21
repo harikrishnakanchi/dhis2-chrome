@@ -44,9 +44,8 @@
                     <li class="form-group">
                         <label for="newOrgUnitContext" class="col-sm-4 col-md-4 control-label">Context</label>
                         <div class="col-sm-6 col-md-6">
-                            <select type="text" class="form-control" name="newOrgUnitContext" id="newOrgUnitContext" ng-model="newOrgUnit.context" title="{{newOrgUnit.context}}" ng-options="o as o for o in allContexts">
-                                <option value=""></option>
-                            </select>
+                            <autocomplete tab-activation="true" click-activation="true" data="allContexts" ng-model="newOrgUnit.context">
+                            </autocomplete>
                         </div>
                     </li>
                     <li class="form-group">

@@ -6,7 +6,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
-                "ui.multiselect", "ui.notIn", "ui.equals", "hustle"
+                "ui.multiselect", "ui.notIn", "ui.equals", "hustle", "autocomplete"
             ]);
             services.init(app);
             repositories.init(app);
