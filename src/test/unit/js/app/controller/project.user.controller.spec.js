@@ -100,9 +100,14 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                 "lastname": "blah",
             };
 
+            scope.createForm = {
+                "$setPristine": jasmine.createSpy("$setPristine")
+            };
+
             scope.reset();
 
             expect(scope.projectUser).toEqual({});
+            expect(scope.createForm.$setPristine).toHaveBeenCalled();
         });
 
         it("should take the user to the view page of the project on clicking cancel", function() {

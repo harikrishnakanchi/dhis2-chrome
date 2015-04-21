@@ -29,6 +29,7 @@ define(["dhisId"], function(dhisId) {
 
         $scope.reset = function() {
             $scope.projectUser = {};
+            $scope.createForm.$setPristine();
         };
 
         $scope.save = function(projectUser) {
