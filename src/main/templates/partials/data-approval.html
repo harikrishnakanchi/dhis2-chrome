@@ -2,7 +2,11 @@
     <div class="loading" ng-show="loading">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
-    <section class="panel tab-panel" ng-if="week &amp;&amp; currentModule">
+    <div class="text-right" ng-if="isLineListModule">
+        <a id="" href="" ng-click="goOffline()" class="btn btn-default">Go Offline</a>
+    </div>
+    <div ng-if="isOfflineApproval" ng-include="'templates/partials/line-list-offline-approval.html'"></div>
+    <section class="panel tab-panel" ng-if="week &amp;&amp; currentModule &amp;&amp; !isOfflineApproval">
         <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
         <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
         <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>

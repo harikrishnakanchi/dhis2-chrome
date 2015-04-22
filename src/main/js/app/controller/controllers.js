@@ -1,8 +1,13 @@
-define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'aggregateModuleController', 'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController',
-        'projectUserController', 'selectProjectController', 'aggregateDataEntryController', 'lineListDataEntryController', 'indicatorController', 'patientOriginController', 'productKeyController', 'lineListSummaryController', 'dataApprovalController', 'dataEntryApprovalDashboardController'
+define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'aggregateModuleController',
+        'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController', 'selectProjectController',
+        'aggregateDataEntryController', 'lineListDataEntryController', 'indicatorController', 'patientOriginController', 'productKeyController',
+        'lineListSummaryController', 'dataApprovalController', 'dataEntryApprovalDashboardController', 'lineListOfflineApprovalController'
     ],
-    function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, aggregateModuleController, lineListModuleController, projectController, countryController, confirmDialogController,
-        projectUserController, selectProjectController, aggregateDataEntryController, lineListDataEntryController, indicatorController, patientOriginController, productKeyController, lineListSummaryController, dataApprovalController, dataEntryApprovalDashboardController) {
+    function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, aggregateModuleController,
+        lineListModuleController, projectController, countryController, confirmDialogController, projectUserController, selectProjectController,
+        aggregateDataEntryController, lineListDataEntryController, indicatorController, patientOriginController, productKeyController,
+        lineListSummaryController, dataApprovalController, dataEntryApprovalDashboardController, lineListOfflineApprovalController) {
+
         var init = function(app) {
             app.controller('dashboardController', ['$scope', '$hustle', '$q', '$rootScope', '$modal', '$timeout', 'indexeddbUtils', 'filesystemService', 'sessionHelper', '$location', dashboardController]);
             app.controller('dataEntryApprovalDashboardController', ['$scope', '$hustle', '$q', '$rootScope', '$modal', '$timeout', '$location', 'orgUnitRepository', 'approvalDataRepository', 'dataRepository', dataEntryApprovalDashboardController]);
@@ -23,10 +28,9 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('projectUserController', ['$scope', '$hustle', 'userRepository', projectUserController]);
             app.controller('selectProjectController', ['$scope', '$location', '$rootScope', 'orgUnitRepository', 'userRepository', 'userPreferenceRepository', selectProjectController]);
             app.controller('indicatorController', ['$scope', 'indicatorRepository', indicatorController]);
-
             app.controller('patientOriginController', ['$scope', '$hustle', '$q', 'patientOriginRepository', 'orgUnitRepository', 'datasetRepository', 'programRepository', 'originOrgunitCreator', 'orgUnitGroupHelper', patientOriginController]);
-
             app.controller('productKeyController', ['$scope', '$location', '$rootScope', 'metadataImporter', productKeyController]);
+            app.controller('lineListOfflineApprovalController', ['$scope', lineListOfflineApprovalController]);
         };
         return {
             init: init

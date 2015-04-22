@@ -134,15 +134,22 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 .finally(scrollToTop);
         };
 
+        $scope.goOffline = function() {
+            $scope.isOfflineApproval = true;
+        };
+
         var init = function() {
             $scope.loading = true;
+            $scope.isOfflineApproval = false;
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
                 return orgUnitRepository.findAllByParent([$scope.currentModule.id]).then(function(originOrgUnits) {
                     $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.currentModule, originOrgUnits]), "id");
                     return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
-                        if (program)
+                        if (program) {
                             $scope.associatedProgramId = program.id;
+                            $scope.isLineListModule = true;
+                        }
                     });
                 });
             };
