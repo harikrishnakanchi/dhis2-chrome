@@ -1,99 +1,47 @@
 define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
-    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, orgUnitRepository, approvalDataRepository, dataRepository) {
-        $scope.approveSuccessForLevelOne = false;
-        $scope.approveSuccessForLevelTwo = false;
-        $scope.approveSuccessForLevelThree = false;
+    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository) {
 
-        $scope.weeks = {
-            "approveAllItems": false
-        };
+        $rootScope.$watch("currentUser.selectedProject", function() {
+            init();
+        });
 
         $scope.formatPeriods = function(period) {
             m = moment(period, "GGGG[W]W");
             return m.format("[W]W") + " - " + m.startOf("isoWeek").toDate().toLocaleDateString() + " - " + m.endOf("isoWeek").toDate().toLocaleDateString();
         };
 
-        $scope.toggleSelectAllOption = function(status) {
-            if (status === false) {
-                $scope.weeks.approveAllItems = false;
-            } else {
-                var selectWeekFlag = true;
-                _.forEach($scope.itemsAwaitingApprovalAtUserLevel, function(item) {
-                    _.forEach(item.status, function(status) {
-                        if (status.shouldBeApproved === false || status.shouldBeApproved === undefined)
-                            selectWeekFlag = false;
-                    });
-                    $scope.weeks.approveAllItems = selectWeekFlag;
-                });
-            }
-        };
+        $scope.toggleSelectAll = function(selectedAllItemsForApproval) {
+            var itemsAwaitingApprovalAtUserLevel = [];
 
-        $scope.toggleAllItemsAwaitingApproval = function() {
-            _.forEach($scope.itemsAwaitingApprovalAtUserLevel, function(item) {
-                _.forEach(item.status, function(status) {
-                    status.shouldBeApproved = $scope.weeks.approveAllItems;
+            if ($rootScope.hasRoles(['Project Level Approver']))
+                itemsAwaitingApprovalAtUserLevel = _.filter($scope.dashboardData, {
+                    'isSubmitted': true,
+                    'isComplete': false
                 });
+
+            if ($rootScope.hasRoles(['Coordination Level Approver']))
+                itemsAwaitingApprovalAtUserLevel = _.filter($scope.dashboardData, {
+                    'isSubmitted': true,
+                    'isComplete': true,
+                    'isApproved': false
+                });
+
+            _.each(itemsAwaitingApprovalAtUserLevel, function(item) {
+                item.selectedForApproval = selectedAllItemsForApproval;
             });
         };
 
-        $scope.areApprovalItemsSelected = function() {
-            return filterItemsToBeApproved().length > 0;
-        };
-
         $scope.bulkApprove = function() {
-            var itemsToBeApproved = filterItemsToBeApproved();
-
-            var moveApprovedItemsToNextLevel = function() {
-                var incrementApprovalLevel = function(status) {
-                    status = _.map(status, function(s) {
-                        s.nextApprovalLevel = s.nextApprovalLevel < 2 ? s.nextApprovalLevel + 1 : undefined;
-                        return s;
-                    });
-
-                    return _.filter(status, function(s) {
-                        return s.nextApprovalLevel !== undefined;
-                    });
-                };
-                _.each(itemsToBeApproved, function(approvedItem) {
-                    approvedItem.status = incrementApprovalLevel(approvedItem.status);
-                    var existingOtherLevelItem = _.find($scope.itemsAwaitingApprovalAtOtherLevels, function(otherLevelItem) {
-                        return approvedItem.moduleId === otherLevelItem.moduleId;
-                    });
-
-                    if (!_.isEmpty(approvedItem.status)) {
-                        if (!existingOtherLevelItem) {
-                            $scope.itemsAwaitingApprovalAtOtherLevels.push(approvedItem);
-                        } else {
-                            existingOtherLevelItem.status = existingOtherLevelItem.status.concat(approvedItem.status);
-                        }
-                    }
-                });
-            };
-
 
             var successPromise = function(data) {
-                $scope.itemsAwaitingApprovalAtUserLevel = filterItems($scope.itemsAwaitingApprovalAtUserLevel, false);
-                moveApprovedItemsToNextLevel();
-                if ($scope.userApprovalLevel === 1) {
-                    $scope.approveSuccessForLevelOne = true;
-                    $scope.approveSuccessForLevelTwo = false;
-                    $scope.approveSuccessForLevelThree = false;
-                } else if ($scope.userApprovalLevel === 2) {
-                    $scope.approveSuccessForLevelTwo = true;
-                    $scope.approveSuccessForLevelOne = false;
-                    $scope.approveSuccessForLevelThree = false;
-                } else {
-                    $scope.approveSuccessForLevelOne = false;
-                    $scope.approveSuccessForLevelTwo = false;
-                    $scope.approveSuccessForLevelThree = true;
-                }
+                $scope.approveSuccess = true;
                 $scope.approveError = false;
 
                 $timeout(function() {
                     $scope.approveSuccess = false;
                 }, properties.messageTimeout);
 
-                return data;
+                init();
             };
 
             var errorPromise = function(data) {
@@ -104,36 +52,34 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                     $scope.approveError = false;
                 }, properties.messageTimeout);
 
-                return data;
+                init();
             };
 
             var approve = function() {
-                var periodsAndOrgUnits = _.flatten(_.map(itemsToBeApproved, function(item) {
-                    return _.map(item.status, function(status) {
-                        return {
-                            "period": status.period,
+
+                var periodsAndOrgUnitsToBeApproved = _.transform($scope.dashboardData, function(results, item) {
+                    if (item.selectedForApproval === true)
+                        results.push({
+                            "period": item.period,
                             "orgUnit": item.moduleId
-                        };
-                    });
-                }));
+                        });
+                });
 
                 var publishToDhis = function(messageType, desc) {
-                    var promises = [];
-                    promises.push($hustle.publish({
-                        "data": periodsAndOrgUnits,
+                    return $hustle.publish({
+                        "data": periodsAndOrgUnitsToBeApproved,
                         "type": messageType,
                         "locale": $scope.currentUser.locale,
                         "desc": desc
-                    }, "dataValues"));
-                    return $q.all(promises);
+                    }, "dataValues");
                 };
 
-                if ($scope.userApprovalLevel === 1)
-                    return approvalDataRepository.markAsComplete(periodsAndOrgUnits, $rootScope.currentUser.userCredentials.username)
-                        .then(_.partial(publishToDhis, "uploadCompletionData", $scope.resourceBundle.uploadCompletionDataDesc + _.pluck(periodsAndOrgUnits, "period")));
-                if ($scope.userApprovalLevel === 2)
-                    return approvalDataRepository.markAsApproved(periodsAndOrgUnits, $rootScope.currentUser.userCredentials.username)
-                        .then(_.partial(publishToDhis, "uploadApprovalData", $scope.resourceBundle.uploadApprovalDataDesc + _.pluck(periodsAndOrgUnits, "period")));
+                if ($rootScope.hasRoles(['Project Level Approver']))
+                    return approvalDataRepository.markAsComplete(periodsAndOrgUnitsToBeApproved, $rootScope.currentUser.userCredentials.username)
+                        .then(_.partial(publishToDhis, "uploadCompletionData", $scope.resourceBundle.uploadCompletionDataDesc + _.pluck(periodsAndOrgUnitsToBeApproved, "period")));
+                if ($rootScope.hasRoles(['Coordination Level Approver']))
+                    return approvalDataRepository.markAsApproved(periodsAndOrgUnitsToBeApproved, $rootScope.currentUser.userCredentials.username)
+                        .then(_.partial(publishToDhis, "uploadApprovalData", $scope.resourceBundle.uploadApprovalDataDesc + _.pluck(periodsAndOrgUnitsToBeApproved, "period")));
             };
 
             var modalMessages = {
@@ -144,15 +90,6 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                 approve().then(successPromise, errorPromise);
             }, modalMessages);
         };
-
-        $scope.getApprovalLevelName = function(level) {
-            if (level === 1) return "Project Level";
-            if (level === 2) return "Coordination Level";
-        };
-
-        $rootScope.$watch("currentUser.selectedProject", function() {
-            init();
-        });
 
         var showModal = function(okCallback, message) {
             $scope.modalMessages = message;
@@ -165,231 +102,149 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             return modalInstance.result.then(okCallback);
         };
 
-        var filterItems = function(items, withSelectedItems) {
-            items = _.map(items, function(item) {
-                item.status = _.filter(item.status, function(status) {
-                    status.shouldBeApproved = status.shouldBeApproved ? status.shouldBeApproved : false;
-                    return status.shouldBeApproved === withSelectedItems;
+        var getUserModules = function() {
+            return orgUnitRepository.getAllModulesInOrgUnits([$rootScope.currentUser.selectedProject.id]);
+        };
+
+        var getDataSubmissionInfo = function(moduleIds, startPeriod, endPeriod) {
+            return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(data) {
+
+                data = _.reject(data, 'isDraft', true);
+
+                var dataSubmissionInfo = _.map(data, function(datum) {
+                    return {
+                        "period": dateUtils.getFormattedPeriod(datum.period),
+                        "moduleId": datum.orgUnit,
+                        "isSubmitted": true
+                    };
                 });
-                return item;
-            });
 
-            return _.filter(items, function(item) {
-                return item.status.length > 0;
+                return _.indexBy(dataSubmissionInfo, function(data) {
+                    return data.period + data.moduleId;
+                });
             });
         };
 
-        var filterItemsToBeApproved = function() {
-            return filterItems(_.cloneDeep($scope.itemsAwaitingApprovalAtUserLevel), true);
-        };
+        var getEventsSubmissionInfo = function(moduleIds, startPeriod, endPeriod) {
+            return orgUnitRepository.findAllByParent(moduleIds).then(function(orginOrgUnits) {
+                var indexedOrginOrgUnits = _.indexBy(orginOrgUnits, "id");
 
-        var getApprovalStatus = function(orgUnitId) {
-            var getStatus = function(modules, submittedPeriods, approvedPeriodsData) {
-                var dataSetCompletePeriods = approvedPeriodsData.dataSetCompletePeriods;
-                var approvalData = approvedPeriodsData.approvalData;
-                var findIndex = function(array, orgUnitId) {
-                    return _.findIndex(array, function(obj) {
-                        return obj.orgUnitId === orgUnitId;
+                return programEventRepository.getEventsFromPeriod(startPeriod, orginOrgUnits).then(function(data) {
+
+                    data = _.reject(data, function(dataum) {
+                        return dataum.localStatus && dataum.localStatus !== "READY_FOR_DHIS";
                     });
-                };
 
-                var isSubmitted = function(submittedPeriods, orgUnitId, period) {
-                    var index = findIndex(submittedPeriods, orgUnitId);
-                    return index > -1 ? _.contains(submittedPeriods[index].period, period) : false;
-                };
-
-                var isComplete = function(dataSetCompletePeriods, orgUnitId, period) {
-                    var index = findIndex(dataSetCompletePeriods, orgUnitId);
-                    return index > -1 ? _.contains(dataSetCompletePeriods[index].period, period) : false;
-                };
-
-                var getApprovalLevel = function(approvalData, orgUnitId, period) {
-                    if (approvalData[orgUnitId]) {
-                        var data = _.find(approvalData[orgUnitId], {
-                            "period": period
-                        }) || {};
-
-                        if (data.isApproved) {
-                            return 2;
-                        }
-                    }
-                };
-
-                var getNextApprovalLevel = function(currentApprovalLevel, submitted) {
-                    if (!currentApprovalLevel && submitted) return 1;
-                    return currentApprovalLevel < 2 ? currentApprovalLevel + 1 : undefined;
-                };
-
-                var getWeeksToDisplayStatus = function(openingDate) {
-                    var orgUnitDuration = moment().diff(moment(openingDate), 'weeks');
-                    return orgUnitDuration > properties.weeksToDisplayStatusInDashboard ? properties.weeksToDisplayStatusInDashboard : orgUnitDuration + 1;
-                };
-
-                return _.map(modules, function(mod) {
-                    var weeksToDisplayStatus = getWeeksToDisplayStatus(mod.openingDate);
-                    var status = _.map(_.range(weeksToDisplayStatus - 1, -1, -1), function(i) {
-                        var period = dateUtils.toDhisFormat(moment().isoWeek(moment().isoWeek() - i));
-                        var submitted = isSubmitted(submittedPeriods, mod.id, period);
-                        var approvalLevel = isComplete(dataSetCompletePeriods, mod.id, period) ? 1 : undefined;
-                        approvalLevel = getApprovalLevel(approvalData, mod.id, period) || approvalLevel;
-
-                        var nextApprovalLevel = getNextApprovalLevel(approvalLevel, submitted);
-
+                    var eventsSubmissionInfo = _.uniq(_.map(data, function(datum) {
                         return {
-                            "period": period,
-                            "submitted": submitted,
-                            "nextApprovalLevel": nextApprovalLevel
+                            "period": dateUtils.getFormattedPeriod(datum.period),
+                            "moduleId": indexedOrginOrgUnits[datum.orgUnit].parent.id,
+                            "isSubmitted": true
                         };
+                    }));
+
+                    return _.indexBy(eventsSubmissionInfo, function(data) {
+                        return data.period + data.moduleId;
                     });
-
-                    return {
-                        "moduleId": mod.id,
-                        "moduleName": mod.parent.name + " - " + mod.name,
-                        "status": status
-                    };
-                });
-            };
-
-            return orgUnitRepository.getAllModulesInOrgUnits([orgUnitId]).then(function(modules) {
-                return $q.all([
-                    getSubmittedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard),
-                    getApprovedPeriodsForModules(modules, properties.weeksToDisplayStatusInDashboard)
-                ]).then(function(data) {
-                    var submittedPeriods = data[0];
-                    var approvedPeriodsData = data[1];
-                    return getStatus(modules, submittedPeriods, approvedPeriodsData);
                 });
             });
         };
 
-        var getSubmittedPeriodsForModules = function(modules, numOfWeeks) {
+        var getApprovalsInfo = function(moduleIds, startPeriod, endPeriod) {
+            return approvalDataRepository.getApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(data) {
+
+                data = _.reject(data, 'status', 'DELETED');
+
+                var approvalData = _.map(data, function(datum) {
+                    return {
+                        "period": dateUtils.getFormattedPeriod(datum.period),
+                        "moduleId": datum.orgUnit,
+                        "isComplete": datum.isComplete,
+                        "isApproved": datum.isApproved
+                    };
+                });
+
+                return _.indexBy(approvalData, function(data) {
+                    return data.period + data.moduleId;
+                });
+            });
+        };
+
+        var loadDashboard = function(modules) {
+
+            var moduleIds = _.pluck(modules, "id");
+            var startPeriod = dateUtils.toDhisFormat(moment().subtract(properties.weeksToDisplayStatusInDashboard, 'week'));
             var endPeriod = dateUtils.toDhisFormat(moment());
-            var startPeriod = dateUtils.toDhisFormat(moment().subtract(numOfWeeks, 'week'));
 
-            var filterDraftData = function(data) {
-                return _.filter(data, function(datum) {
-                    return datum.isDraft !== true;
+            var getDataSubmissionInfoPromise = getDataSubmissionInfo(moduleIds, startPeriod, endPeriod);
+            var getEventsSubmissionInfoPromise = getEventsSubmissionInfo(moduleIds, startPeriod, endPeriod);
+            var getApprovalsInfoPromise = getApprovalsInfo(moduleIds, startPeriod, endPeriod);
+
+            return $q.all([getDataSubmissionInfoPromise, getEventsSubmissionInfoPromise, getApprovalsInfoPromise]).then(function(data) {
+
+                var submittedData = data[0];
+                var submittedEventsData = data[1];
+                var approvalData = data[2];
+
+                var results = [];
+                _.each(modules, function(module) {
+                    var weeksToDisplayStatus = _.min([properties.weeksToDisplayStatusInDashboard, moment().diff(moment(module.openingDate), 'weeks') + 1]);
+
+                    results = results.concat(_.times(weeksToDisplayStatus, function(n) {
+                        var period = dateUtils.toDhisFormat(moment().subtract(weeksToDisplayStatus - n - 1, 'weeks'));
+                        return {
+                            "moduleId": module.id,
+                            "moduleName": module.parent.name + " - " + module.name,
+                            "period": period,
+                            "isSubmitted": submittedData[period + module.id] && submittedData[period + module.id].isSubmitted || submittedEventsData[period + module.id] && submittedEventsData[period + module.id].isSubmitted || false,
+                            "isComplete": approvalData[period + module.id] && approvalData[period + module.id].isComplete || false,
+                            "isApproved": approvalData[period + module.id] && approvalData[period + module.id].isApproved || false
+                        };
+                    }));
                 });
-            };
 
-            return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, _.pluck(modules, "id")).then(function(data) {
-                data = filterDraftData(data);
-                var dataValuesByOrgUnit = _.groupBy(data, 'orgUnit');
-                return _.map(_.keys(dataValuesByOrgUnit), function(moduleId) {
-                    return {
-                        "orgUnitId": moduleId,
-                        "period": _.pluck(dataValuesByOrgUnit[moduleId], "period")
-                    };
+                $scope.dashboardData = _.sortByAll(results, "moduleName", "period");
+
+                $scope.itemsAwaitingSubmission = _.filter($scope.dashboardData, {
+                    'isSubmitted': false
                 });
-            });
-        };
 
-        var filterDeletedData = function(data) {
-            return _.filter(data, function(datum) {
-                return datum.status !== "DELETED";
-            });
-        };
-
-        var filterLevelOneApprovedData = function(data) {
-            return _.filter(data, function(datum) {
-                return datum.isComplete && !datum.isApproved && datum.status !== "DELETED";
-            });
-        };
-
-        var filterLevelTwoApprovedData = function(data) {
-            return _.filter(data, function(datum) {
-                return datum.isApproved && datum.status !== "DELETED";
-            });
-        };
-
-        var getApprovedPeriodsForModules = function(modules, numOfWeeks) {
-            var result = {};
-            var endPeriod = dateUtils.toDhisFormat(moment());
-            var startPeriod = dateUtils.toDhisFormat(moment().subtract(numOfWeeks, 'week'));
-
-            return approvalDataRepository.getApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, _.pluck(modules, "id")).then(function(data) {
-                var completeData = filterLevelOneApprovedData(data);
-                var approvedData = filterLevelTwoApprovedData(data);
-
-                var completeDataByOrgUnit = _.groupBy(completeData, 'orgUnit');
-                result.dataSetCompletePeriods = _.map(_.keys(completeDataByOrgUnit), function(moduleId) {
-                    return {
-                        "orgUnitId": moduleId,
-                        "period": _.pluck(completeDataByOrgUnit[moduleId], "period")
-                    };
+                $scope.itemsAwaitingApprovalAtUserLevel = [];
+                $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
+                    'isSubmitted': true
                 });
-                result.approvalData = _.groupBy(data, 'orgUnit');
-                return result;
+
+                if ($rootScope.hasRoles(['Project Level Approver'])) {
+                    $scope.itemsAwaitingApprovalAtUserLevel = _.filter($scope.dashboardData, {
+                        'isSubmitted': true,
+                        'isComplete': false
+                    });
+                    $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
+                        'isSubmitted': true,
+                        'isComplete': true,
+                        'isApproved': false
+                    });
+                }
+
+                if ($rootScope.hasRoles(['Coordination Level Approver'])) {
+                    $scope.itemsAwaitingApprovalAtUserLevel = _.filter($scope.dashboardData, {
+                        'isSubmitted': true,
+                        'isComplete': true,
+                        'isApproved': false
+                    });
+                    $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
+                        'isSubmitted': true,
+                        'isComplete': false
+                    });
+                }
             });
         };
 
         var init = function() {
-            var filterModulesWithNoItems = function(data) {
-                return _.filter(data, function(datum) {
-                    return datum.status.length > 0;
-                });
-            };
-
-            var filterItemsAwaitingSubmission = function(approvalStatusData) {
-                var itemsAwaitingSubmissionPerModule = _.map(approvalStatusData, function(data) {
-                    var filteredData = _.cloneDeep(data);
-                    filteredData.status = _.filter(filteredData.status, function(status) {
-                        return !status.submitted;
-                    });
-                    return filteredData;
-                });
-
-                return filterModulesWithNoItems(itemsAwaitingSubmissionPerModule);
-            };
-
-            var filterItemsAwaitingApprovalAtUserLevel = function(approvalStatusData, userApprovalLevel) {
-                var itemsAwaitingApprovalPerModule = _.map(approvalStatusData, function(data) {
-                    var filteredData = _.cloneDeep(data);
-                    filteredData.status = _.filter(filteredData.status, function(status) {
-                        return status.nextApprovalLevel === userApprovalLevel;
-                    });
-                    return filteredData;
-                });
-
-                return filterModulesWithNoItems(itemsAwaitingApprovalPerModule);
-            };
-
-            var filterItemsAwaitingApprovalAtOtherLevels = function(approvalStatusData, userApprovalLevel) {
-                var itemsAwaitingApprovalPerModule = _.map(approvalStatusData, function(data) {
-                    var filteredData = _.cloneDeep(data);
-                    filteredData.status = _.filter(filteredData.status, function(status) {
-                        return status.nextApprovalLevel && status.nextApprovalLevel !== userApprovalLevel;
-                    });
-                    return filteredData;
-                });
-                return filterModulesWithNoItems(itemsAwaitingApprovalPerModule);
-            };
-
-            var getUserApprovalLevel = function() {
-                var getApproverLevelFromRole = function(roleName) {
-                    if (roleName === "Project Level Approver") return 1;
-                    if (roleName === "Coordination Level Approver") return 2;
-                    if (roleName === "Desk Level Approver") return 3;
-                };
-
-                var approvalRole = _.filter($rootScope.currentUser.userCredentials.userRoles, function(role) {
-                    return role.name.indexOf("Approver") > -1;
-                });
-
-                return approvalRole[0] ? getApproverLevelFromRole(approvalRole[0].name) : undefined;
-            };
-
-            if ($rootScope.hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver']) && $rootScope.currentUser && $rootScope.currentUser.selectedProject) {
-                $scope.loading = true;
-                getApprovalStatus($rootScope.currentUser.selectedProject.id).then(function(approvalStatusData) {
-                    $scope.userApprovalLevel = getUserApprovalLevel();
-                    $scope.itemsAwaitingSubmission = filterItemsAwaitingSubmission(approvalStatusData);
-                    $scope.itemsAwaitingApprovalAtUserLevel = $scope.userApprovalLevel ? filterItemsAwaitingApprovalAtUserLevel(approvalStatusData, $scope.userApprovalLevel) : [];
-                    $scope.itemsAwaitingApprovalAtOtherLevels = filterItemsAwaitingApprovalAtOtherLevels(approvalStatusData, $scope.userApprovalLevel);
-
-                    $scope.loading = false;
-                });
-            }
+            $scope.loading = true;
+            getUserModules().then(loadDashboard).finally(function() {
+                $scope.loading = false;
+            });
         };
 
         init();

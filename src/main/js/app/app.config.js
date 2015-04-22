@@ -32,6 +32,7 @@ require.config({
         "angular-treeview": "lib/angularjs-directives/src/treeview/angular.treeview",
         "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",
         "angular-autocomplete": "lib/angularjs-directives/src/autocomplete/autocomplete",
+        "angular-filter": "lib/angular-filter/dist/angular-filter",
         "md5": "lib/js-md5/js/md5",
 
         //Controllers
@@ -182,6 +183,9 @@ require.config({
             deps: ["angular", "hustle"]
         },
         'angular-autocomplete': {
+            deps: ["angular"]
+        },
+        'angular-filter': {
             deps: ["angular"]
         }
     }

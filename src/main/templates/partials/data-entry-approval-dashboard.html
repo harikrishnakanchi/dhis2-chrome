@@ -1,6 +1,6 @@
 <div ng-controller="dataEntryApprovalDashboardController">
-    <div ng-show="approveSuccessForLevelOne" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
-    <div ng-show="approveSuccessForLevelTwo" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
+    <div ng-show="approveSuccess &amp;&amp; hasRoles(['Project Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
+    <div ng-show="approveSuccess &amp;&amp; hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
     <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
     <form name="approvalForm">
         <table class="table table-bordered msf-table" ng-if="itemsAwaitingApprovalAtUserLevel.length > 0">
@@ -9,18 +9,18 @@
                 <tr>
                     <th>{{resourceBundle.moduleLabel}}</th>
                     <th ng-model="weeks">
-                        <input type="checkbox" class="dashboard-form-checkbox" ng-model="weeks.approveAllItems" ng-change="toggleAllItemsAwaitingApproval()">{{resourceBundle.weekLabel}}
+                        <input type="checkbox" class="dashboard-form-checkbox" ng-change="toggleSelectAll(selectedAllItemsForApproval)" ng-model="selectedAllItemsForApproval" ng-checked="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === itemsAwaitingApprovalAtUserLevel.length">{{resourceBundle.weekLabel}}
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="item in itemsAwaitingApprovalAtUserLevel | orderBy:'moduleName'">
-                    <td>{{item.moduleName}}</td>
+                <tr ng-repeat="(moduleId, items) in itemsAwaitingApprovalAtUserLevel | orderBy:'moduleName' | groupBy: 'moduleId'">
+                    <td>{{items[0].moduleName}}</td>
                     <td>
                         <ul>
-                            <li ng-repeat="status in item.status">
-                                <input type="checkbox" class="dashboard-form-checkbox" ng-model="status.shouldBeApproved" ng-change="toggleSelectAllOption(status.shouldBeApproved)">
-                                <a ng-href="#/data-entry/{{item.moduleId}}/{{status.period}}">{{formatPeriods(status.period)}}</a>
+                            <li ng-repeat="item in items | orderBy: 'period'">
+                                <input type="checkbox" class="dashboard-form-checkbox" ng-model="item.selectedForApproval" />
+                                <a ng-href="#/data-entry/{{item.moduleId}}/{{item.period}}">{{formatPeriods(item.period)}}</a>
                             </li>
                         </ul>
                     </td>
@@ -28,7 +28,7 @@
                 <tr>
                     <td></td>
                     <td>
-                        <input type="submit" ng-disabled="!areApprovalItemsSelected()" value="{{resourceBundle.approveBtnValue}}" class="btn btn-default" ng-click="bulkApprove()">
+                        <input type="submit" ng-disabled="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === 0" value="{{resourceBundle.approveBtnValue}}" class="btn btn-default" ng-click="bulkApprove()" />
                     </td>
                 </tr>
             </tbody>
@@ -44,13 +44,13 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="item in itemsAwaitingSubmission | orderBy:'moduleName'">
-                    <td>{{item.moduleName}}</td>
+                <tr ng-repeat="(moduleId, items) in itemsAwaitingSubmission | orderBy:'moduleName' | groupBy: 'moduleId'">
+                    <td>{{items[0].moduleName}}</td>
                     <td>
                         <ul>
-                            <li ng-repeat="status in item.status">
-                                <a ng-href="#/data-entry/{{item.moduleId}}/{{status.period}}" ng-if="!userApprovalLevel">{{formatPeriods(status.period)}}</a>
-                                <span ng-if="userApprovalLevel">{{formatPeriods(status.period)}}</span>
+                            <li ng-repeat="item in items | orderBy: 'period'">
+                                <a ng-href="#/data-entry/{{item.moduleId}}/{{item.period}}" ng-if="hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</a>
+                                <span ng-if="!hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</span>
                             </li>
                         </ul>
                     </td>
@@ -58,8 +58,8 @@
             </tbody>
         </table>
         <table class="table table-bordered msf-table" ng-if="itemsAwaitingApprovalAtOtherLevels.length > 0">
-            <caption class="msf-table-caption" ng-if="userApprovalLevel">{{resourceBundle.itemsAwaitingApprovalAtOtherLevelLabel}}</caption>
-            <caption class="msf-table-caption" ng-if="!userApprovalLevel">{{resourceBundle.itemsAwaitingApproval}}</caption>
+            <caption class="msf-table-caption" ng-if="!hasRoles(['Data entry user'])">{{resourceBundle.itemsAwaitingApprovalAtOtherLevelLabel}}</caption>
+            <caption class="msf-table-caption" ng-if="hasRoles(['Data entry user'])">{{resourceBundle.itemsAwaitingApproval}}</caption>
             <thead>
                 <tr>
                     <th>{{resourceBundle.moduleLabel}}</th>
@@ -68,20 +68,21 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="item in itemsAwaitingApprovalAtOtherLevels | orderBy:'moduleName'">
-                    <td>{{item.moduleName}}</td>
+                <tr ng-repeat="(moduleId, items) in itemsAwaitingApprovalAtOtherLevels | orderBy:'moduleName' | groupBy: 'moduleId'">
+                    <td>{{items[0].moduleName}}</td>
                     <td>
                         <ul>
-                            <li ng-repeat="status in item.status | orderBy:'period'">
-                                <a ng-href="#/data-entry/{{item.moduleId}}/{{status.period}}" ng-if="!userApprovalLevel">{{formatPeriods(status.period)}}</a>
-                                <span ng-if="userApprovalLevel">{{formatPeriods(status.period)}}</span>
+                            <li ng-repeat="item in items | omit: 'isApproved === true' | orderBy: 'period'">
+                                <a ng-href="#/data-entry/{{item.moduleId}}/{{item.period}}" ng-if="hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</a>
+                                <span ng-if="!hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</span>
                             </li>
                         </ul>
                     </td>
                     <td>
                         <ul>
-                            <li ng-repeat="status in item.status | orderBy:'period'">
-                                {{getApprovalLevelName(status.nextApprovalLevel)}}
+                            <li ng-repeat="item in items | omit: 'isApproved === true' | orderBy: 'period'">
+                                <span ng-if="!item.isComplete">Project Level</span>
+                                <span ng-if="item.isComplete">Coordination Level</span>
                             </li>
                         </ul>
                     </td>
