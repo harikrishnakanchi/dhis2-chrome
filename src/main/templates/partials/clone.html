@@ -1,0 +1,20 @@
+<div ng-controller="appCloneController">
+    <div class="loading" ng-show="cloning">
+        <img src="img/ajax-loader.gif" class="spinner" />
+    </div>
+    <div class="btn-group" dropdown is-open="status.isopen">
+        <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+            {{resourceBundle.importExportMenuLabel}} <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="" ng-click="createClone()">{{resourceBundle.createCloneLabel}}</a>
+            </li>
+            <li><a href="" ng-click="loadClone()">{{resourceBundle.loadCloneLabel}}</a>
+            </li>
+            <li class="divider"></li>
+            <li>
+                <a href="" ng-click="dumpLogs()">{{resourceBundle.dumpLogsLabel}}</a>
+            </li>
+        </ul>
+    </div>
+</div>
