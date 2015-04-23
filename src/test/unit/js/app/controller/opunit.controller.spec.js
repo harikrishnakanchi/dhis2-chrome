@@ -696,6 +696,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "origins": [{
                     "name": "Not Specified",
                     "id": "OpUnit1ParentIdNot Specified",
+                    "isDisabled": false,
                     "clientLastUpdated": "2014-10-29T12:43:54.972Z"
                 }]
             };

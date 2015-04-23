@@ -67,6 +67,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             origins = [{
                 "id": "origin1",
                 "name": "Origin1",
+                "isDisabled": false,
                 "longitude": 100,
                 "latitude": 80,
                 "clientLastUpdated": "2014-05-30T12:43:54.972Z"
@@ -113,6 +114,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 origins: [{
                     "id": "Origin1",
                     "name": "Origin1",
+                    "isDisabled": false,
                     "longitude": 100,
                     "latitude": 80,
                     clientLastUpdated: "2014-04-01T00:00:00.000Z",
@@ -149,12 +151,14 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 origins: [{
                     "id": "origin1",
                     "name": "Origin1",
+                    "isDisabled": false,
                     "longitude": 100,
                     "latitude": 80,
                     "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                 }, {
                     "id": "Origin2",
                     "name": "Origin2",
+                    "isDisabled": false,
                     "longitude": 100,
                     "latitude": 80,
                     "clientLastUpdated": "2014-04-01T00:00:00.000Z",

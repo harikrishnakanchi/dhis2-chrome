@@ -108,6 +108,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
 
             $scope.patientOrigin.id = dhisId.get($scope.patientOrigin.name);
             $scope.patientOrigin.clientLastUpdated = moment().toISOString();
+            $scope.patientOrigin.isDisabled = false;
             patientOrigins.push($scope.patientOrigin);
 
             var payload = {

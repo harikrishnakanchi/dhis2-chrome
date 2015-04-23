@@ -91,6 +91,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 "origins": [{
                     "name": "Not Specified",
                     "id": dhisId.get(opUnit.id + "Not Specified"),
+                    "isDisabled": false,
                     "clientLastUpdated": moment().toISOString()
                 }]
             };
