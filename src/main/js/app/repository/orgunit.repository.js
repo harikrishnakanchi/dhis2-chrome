@@ -180,6 +180,26 @@ define(["moment", "lodashUtils"], function(moment, _) {
             });
         };
 
+        var getAllOriginsByName = function(opUnit, originName) {
+            var moduleIds = _.pluck(opUnit.children, "id");
+            var originIds = [];
+            var getOriginIds = function() {
+                var origins;
+                return findAll(moduleIds).then(function(modules) {
+                    _.forEach(modules, function(module) {
+                        origin = _.find(module.children, {
+                            "name": originName
+                        });
+                        originIds.push(origin.id);
+                    });
+                });
+            };
+
+            return getOriginIds().then(function() {
+                return findAll(originIds);
+            });
+        };
+
         return {
             "upsert": upsert,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
@@ -191,7 +211,8 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getAllProjects": getAllProjects,
             "getParentProject": getParentProject,
             "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
-            "getChildOrgUnitNames": getChildOrgUnitNames
+            "getChildOrgUnitNames": getChildOrgUnitNames,
+            "getAllOriginsByName": getAllOriginsByName
         };
     };
 });

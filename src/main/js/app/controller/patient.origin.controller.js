@@ -152,23 +152,13 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
             };
 
             var getOriginsToUpsert = function() {
-                return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
-                    var originPromises = _.map(modules, function(module) {
-                        return orgUnitRepository.findAllByParent(module.id).then(function(origins) {
-                            var originToEdit = _.find(origins, {
-                                "name": oldName
-                            });
 
-                            if (!_.isEmpty(originToEdit)) {
-                                originToEdit.name = $scope.patientOrigin.name;
-                                originToEdit.displayName = $scope.patientOrigin.name;
-                                originToEdit.shortName = $scope.patientOrigin.name;
-                                originToEdit.coordinates = "[" + $scope.patientOrigin.longitude + "," + $scope.patientOrigin.latitude + "]";
-                                originsToUpsert.push(originToEdit);
-                            }
-                        });
+                return orgUnitRepository.getAllOriginsByName($scope.orgUnit, oldName).then(function(origins) {
+                    return _.map(origins, function(originToEdit) {
+                        originToEdit.name = originToEdit.displayName = originToEdit.shortName = originToEdit.displayShortName = $scope.patientOrigin.name;
+                        originToEdit.coordinates = "[" + $scope.patientOrigin.longitude + "," + $scope.patientOrigin.latitude + "]";
+                        originsToUpsert.push(originToEdit);
                     });
-                    return $q.all(originPromises);
                 });
             };
 

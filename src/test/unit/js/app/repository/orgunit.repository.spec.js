@@ -89,7 +89,11 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 }],
                 "parent": {
                     "id": "project"
-                }
+                },
+                "children": [{
+                    "id": "module",
+                    "name": "module"
+                }]
             };
 
             module = {
@@ -108,7 +112,11 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 }],
                 "parent": {
                     "id": "opUnit"
-                }
+                },
+                "children": [{
+                    "id": "Unknown",
+                    "name": "Unknown"
+                }]
             };
 
             originOU = {
@@ -336,6 +344,25 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             scope.$apply();
 
             expect(orgUnitNames).toEqual(["module"]);
+        });
+
+        it("should get all origins by name", function() {
+            var origins;
+
+            mockOrgStore.each.and.callFake(function(query) {
+                if (query.inList[0] === "module")
+                    return utils.getPromise(q, [module]);
+                else
+                    return utils.getPromise(q, originOU);
+            });
+
+            orgUnitRepository.getAllOriginsByName(opUnit, "Unknown").then(function(data) {
+                origins = data;
+            });
+
+            scope.$apply();
+
+            expect(origins).toEqual(originOU);
         });
     });
 });

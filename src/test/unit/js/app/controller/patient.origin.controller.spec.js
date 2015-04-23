@@ -48,8 +48,9 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-            spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
+            spyOn(orgUnitRepository, "getAllOriginsByName").and.returnValue(utils.getPromise(q, []));
+
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, siblingOriginOrgUnits));
 
             datasetRepository = new DatasetRepository();
@@ -311,6 +312,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "name": "New Origin 1",
                 "shortName": "New Origin 1",
                 "displayName": "New Origin 1",
+                "displayShortName": "New Origin 1",
                 "coordinates": "[100,80]"
             };
 
@@ -335,8 +337,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 }]
             };
 
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [origin1]));
+            orgUnitRepository.getAllOriginsByName.and.returnValue(utils.getPromise(q, [origin1]));
             patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper);
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigin));
 
@@ -366,7 +367,9 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "desc": "create patient origin New Origin 1"
             }, "dataValues"]);
 
-            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("prj1");
+            expect(orgUnitRepository.getAllOriginsByName).toHaveBeenCalledWith({
+                "id": "prj1"
+            }, "Origin 1");
             expect(orgUnitRepository.upsert).toHaveBeenCalledWith([newOrigin1]);
             expect(hustle.publish.calls.argsFor(1)).toEqual([{
                 "data": [newOrigin1],
