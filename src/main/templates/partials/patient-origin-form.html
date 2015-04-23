@@ -3,10 +3,12 @@
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorAddingPatientOriginDetails }}</div>
-    <form name="createForm" class="form-horizontal" role="form" novalidate ng-submit="save()">
+    <div ng-show="updateFailure" class="alert alert-danger">{{ resourceBundle.errorUpdatingPatientOriginDetails }}</div>
+    <form name="createForm" class="form-horizontal" role="form" novalidate>
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Add Patient Origin</h3>
+                <h3 ng-show="!showEditOriginForm" class="panel-title">Add Patient Origin</h3>
+                <h3 ng-show="showEditOriginForm" class="panel-title">Patient Origin</h3>
             </div>
             <div class="panel-body">
                 <ul>
@@ -42,7 +44,8 @@
                     </li>
                     <li>
                         <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
-                            <input type="submit" class="btn btn-main" ng-disabled="createForm.$invalid" value="Save" />
+                            <input type="submit" ng-if="!showEditOriginForm" class="btn btn-main" ng-disabled="createForm.$invalid" value="Save" ng-click="save()" />
+                            <input type="button" ng-if="showEditOriginForm" class="btn btn-main" ng-disabled="createForm.$invalid" value="Update" ng-click="update()" />
                             <input type="button" class="btn" ng-click="reset()" value="Reset">
                             <input type="button" class="btn" ng-click="closeForm()" value="Back" />
                         </div>

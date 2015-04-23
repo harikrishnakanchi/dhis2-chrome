@@ -1,16 +1,18 @@
 define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhisId, orgUnitMapper) {
     return function($scope, $hustle, $q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper) {
         var patientOrigins = [];
+        var oldName = "";
+
+        var publishMessage = function(data, action, desc) {
+            return $hustle.publish({
+                "data": data,
+                "type": action,
+                "locale": $scope.currentUser.locale,
+                "desc": desc
+            }, "dataValues");
+        };
 
         $scope.save = function() {
-            var publishMessage = function(data, action, desc) {
-                return $hustle.publish({
-                    "data": data,
-                    "type": action,
-                    "locale": $scope.currentUser.locale,
-                    "desc": desc
-                }, "dataValues");
-            };
 
             var onSuccess = function(data) {
                 $scope.saveFailure = false;
@@ -132,16 +134,89 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
             $scope.$parent.closeNewForm($scope.orgUnit);
         };
 
-        var init = function() {
-            $scope.patientOrigin = {};
-            $scope.existingPatientOrigins = [];
+        $scope.update = function() {
+            var originsToUpsert = [];
+            var updatedPatientOrigin = {};
 
-            return patientOriginRepository.get($scope.orgUnit.id).then(function(patientOriginDetails) {
-                if (!_.isEmpty(patientOriginDetails)) {
-                    patientOrigins = patientOriginDetails.origins;
-                    $scope.existingPatientOrigins = _.pluck(patientOrigins, "name");
-                }
-            });
+            var onSuccess = function(data) {
+                $scope.updateFailure = false;
+                if ($scope.$parent.closeNewForm)
+                    $scope.$parent.closeNewForm($scope.orgUnit, "updatedOriginDetails");
+                return data;
+            };
+
+            var onFailure = function(error) {
+                $scope.updateSuccess = false;
+                $scope.updateFailure = true;
+                return error;
+            };
+
+            var getOriginsToUpsert = function() {
+                return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
+                    var originPromises = _.map(modules, function(module) {
+                        return orgUnitRepository.findAllByParent(module.id).then(function(origins) {
+                            var originToEdit = _.find(origins, {
+                                "name": oldName
+                            });
+
+                            if (!_.isEmpty(originToEdit)) {
+                                originToEdit.name = $scope.patientOrigin.name;
+                                originToEdit.displayName = $scope.patientOrigin.name;
+                                originToEdit.shortName = $scope.patientOrigin.name;
+                                originToEdit.coordinates = "[" + $scope.patientOrigin.longitude + "," + $scope.patientOrigin.latitude + "]";
+                                originsToUpsert.push(originToEdit);
+                            }
+                        });
+                    });
+                    return $q.all(originPromises);
+                });
+            };
+
+            var getSystemSetting = function() {
+                return patientOriginRepository.get($scope.orgUnit.id).then(function(patientOrigin) {
+                    var originToUpdate = _.remove(patientOrigin.origins, function(origin) {
+                        return origin.id == $scope.patientOrigin.id;
+                    })[0];
+
+                    originToUpdate.name = $scope.patientOrigin.name;
+                    originToUpdate.latitude = $scope.patientOrigin.latitude;
+                    originToUpdate.longitude = $scope.patientOrigin.longitude;
+                    originToUpdate.clientLastUpdated = moment().toISOString();
+
+                    patientOrigin.origins.push(originToUpdate);
+                    updatedPatientOrigin = patientOrigin;
+                });
+            };
+
+            var publishUpdateMessages = function() {
+                patientOriginRepository.upsert(updatedPatientOrigin).then(function() {
+                    publishMessage(updatedPatientOrigin, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(updatedPatientOrigin.origins, "name"));
+                });
+                orgUnitRepository.upsert(originsToUpsert).then(function() {
+                    publishMessage(originsToUpsert, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(originsToUpsert, "name")));
+                });
+            };
+
+            getOriginsToUpsert()
+                .then(getSystemSetting)
+                .then(publishUpdateMessages)
+                .then(onSuccess, onFailure);
+        };
+
+        var init = function() {
+            if (_.isEmpty($scope.patientOrigin)) {
+                $scope.patientOrigin = {};
+                $scope.existingPatientOrigins = [];
+
+                return patientOriginRepository.get($scope.orgUnit.id).then(function(patientOriginDetails) {
+                    if (!_.isEmpty(patientOriginDetails)) {
+                        patientOrigins = patientOriginDetails.origins;
+                        $scope.existingPatientOrigins = _.pluck(patientOrigins, "name");
+                    }
+                });
+            } else {
+                oldName = $scope.patientOrigin.name;
+            }
         };
 
         init();

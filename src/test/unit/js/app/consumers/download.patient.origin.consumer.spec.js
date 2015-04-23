@@ -14,12 +14,6 @@ define(["downloadPatientOriginConsumer", "patientOriginService", "utils", "angul
                         'longitude': '180',
                         'clientLastUpdated': "2014-05-30T12:43:54.972Z"
 
-                    }, {
-                        'id': 'origin2',
-                        'name': 'origin2',
-                        'latitude': '80',
-                        'longitude': '180',
-                        'clientLastUpdated': "2014-05-30T12:43:54.972Z"
                     }]
                 }, {
                     orgUnit: "prj2",
@@ -37,20 +31,31 @@ define(["downloadPatientOriginConsumer", "patientOriginService", "utils", "angul
             }));
 
             it("should merge patient origin details", function() {
-                var localOriginDetails = {
-                    orgUnit: "prj1",
-                    origins: [{
-                        'id': 'origin3',
-                        'name': 'origin3',
-                        'latitude': '80',
-                        'longitude': '180',
-                        'clientLastUpdated': "2014-06-01T12:50:54.972Z",
-                    }]
-                };
+                var localOriginDetails = [{
+                        orgUnit: "prj1",
+                        origins: [{
+                            'id': 'origin3',
+                            'name': 'origin3',
+                            'latitude': '80',
+                            'longitude': '180',
+                            'clientLastUpdated': "2014-06-01T12:50:54.972Z",
+                        }]
+                    }, {
+                        orgUnit: "prj2",
+                        origins: [{
+                            'id': 'origin4',
+                            'name': 'Neworigin4',
+                            'latitude': '10',
+                            'longitude': '5',
+                            'clientLastUpdated': "2014-05-31T12:43:54.972Z"
+                        }]
+                    }
+
+                ];
 
                 spyOn(patientOriginService, "getAll").and.returnValue(utils.getPromise(q, dhisPatientOriginDetails));
                 spyOn(patientOriginRepository, "upsert");
-                spyOn(patientOriginRepository, "findAll").and.returnValue(utils.getPromise(q, [localOriginDetails]));
+                spyOn(patientOriginRepository, "findAll").and.returnValue(utils.getPromise(q, localOriginDetails));
 
                 downloadPatientOriginConsumer = new DownloadPatientOriginConsumer(patientOriginService, patientOriginRepository, mergeBy);
                 downloadPatientOriginConsumer.run();
@@ -69,12 +74,6 @@ define(["downloadPatientOriginConsumer", "patientOriginService", "utils", "angul
                         'clientLastUpdated': "2014-05-30T12:43:54.972Z"
 
                     }, {
-                        'id': 'origin2',
-                        'name': 'origin2',
-                        'latitude': '80',
-                        'longitude': '180',
-                        'clientLastUpdated': "2014-05-30T12:43:54.972Z"
-                    }, {
                         'id': 'origin3',
                         'name': 'origin3',
                         'latitude': '80',
@@ -85,15 +84,16 @@ define(["downloadPatientOriginConsumer", "patientOriginService", "utils", "angul
                     orgUnit: "prj2",
                     origins: [{
                         'id': 'origin4',
-                        'name': 'origin4',
-                        'latitude': '80',
-                        'longitude': '180',
-                        'clientLastUpdated': "2014-05-30T12:43:54.972Z"
+                        'name': 'Neworigin4',
+                        'latitude': '10',
+                        'longitude': '5',
+                        'clientLastUpdated': "2014-05-31T12:43:54.972Z"
                     }]
                 }];
 
                 expect(patientOriginService.getAll).toHaveBeenCalled();
-                expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedUpserts);
+                expect(patientOriginRepository.upsert.calls.argsFor(0)).toEqual([expectedUpserts[0]]);
+                expect(patientOriginRepository.upsert.calls.argsFor(1)).toEqual([expectedUpserts[1]]);
             });
         });
     });

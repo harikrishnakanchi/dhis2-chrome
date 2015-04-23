@@ -9,11 +9,23 @@ define(['lodashUtils'], function(_) {
         };
 
         var mergeAndSave = function(remotePatientOrigins) {
-            var projectIds = _.pluck(remotePatientOrigins, "orgUnit");
+            var opUnitIds = _.pluck(remotePatientOrigins, "orgUnit");
 
-            return patientOriginRepository.findAll(projectIds)
-                .then(_.curry(mergeBy.union)("origins", "orgUnit", remotePatientOrigins))
-                .then(patientOriginRepository.upsert);
+            return patientOriginRepository.findAll(opUnitIds).then(function(localPatientOrigins) {
+                return _.forEach(remotePatientOrigins, function(remotePatientOrigin) {
+                    var originFoundLocally = _.find(localPatientOrigins, {
+                        "orgUnit": remotePatientOrigin.orgUnit
+                    });
+
+                    if (originFoundLocally) {
+                        var updatedOrigins = mergeBy.lastUpdated({}, remotePatientOrigin.origins, originFoundLocally.origins);
+                        remotePatientOrigin.origins = updatedOrigins;
+                        return patientOriginRepository.upsert(remotePatientOrigin);
+                    } else {
+                        return patientOriginRepository.upsert(remotePatientOrigin);
+                    }
+                });
+            });
         };
 
         return {

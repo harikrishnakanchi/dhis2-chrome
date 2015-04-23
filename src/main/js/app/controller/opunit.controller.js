@@ -5,6 +5,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         $scope.opUnit = {
             'openingDate': moment().format("YYYY-MM-DD")
         };
+        $scope.showEditOriginForm = false;
 
         var saveToDhis = function(data, desc) {
             return $hustle.publish({
@@ -89,6 +90,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 "orgUnit": opUnit.id,
                 "origins": [{
                     "name": "Not Specified",
+                    "id": dhisId.get(opUnit.id + "Not Specified"),
                     "clientLastUpdated": moment().toISOString()
                 }]
             };
@@ -139,6 +141,12 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 .finally(function() {
                     $scope.loading = false;
                 });
+        };
+
+        $scope.editPatientOrigin = function(origin) {
+            $scope.patientOrigin = origin;
+            $scope.showEditOriginForm = true;
+            $scope.formTemplateUrl = "templates/partials/patient-origin-form.html" + '?' + moment().format("X");
         };
 
         $scope.closeForm = function() {
