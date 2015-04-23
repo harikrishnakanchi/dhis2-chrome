@@ -81,9 +81,9 @@ define(["moment", "lodashUtils"], function(moment, _) {
             return store.each(query).then(rejectCurrentAndDisabled);
         };
 
-        var getProjectAndOpUnitAttributes = function(moduleOrOrigin) {
+        var getProjectAndOpUnitAttributes = function(moduleOrOriginId) {
             var getAttributes = function(orgUnits) {
-                return get(moduleOrOrigin.id).then(function(enrichedModuleOrOrigin) {
+                return get(moduleOrOriginId).then(function(enrichedModuleOrOrigin) {
                     var isOrigin = _.any(enrichedModuleOrOrigin.attributeValues, {
                         "value": "Patient Origin"
                     });

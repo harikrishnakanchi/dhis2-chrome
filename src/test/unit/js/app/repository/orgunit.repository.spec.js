@@ -283,7 +283,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
                 "value": "PRJ001"
             }];
 
-            orgUnitRepository.getProjectAndOpUnitAttributes(module).then(function(data) {
+            orgUnitRepository.getProjectAndOpUnitAttributes(module.id).then(function(data) {
                 actualAttributes = data;
             });
 

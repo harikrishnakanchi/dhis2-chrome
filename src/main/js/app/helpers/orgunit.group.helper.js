@@ -5,8 +5,8 @@ define([], function() {
                 return orgUnitGroupRepository.getAll();
             };
 
-            var getAttributes = function(orgunit) {
-                return orgUnitRepository.getProjectAndOpUnitAttributes(orgunit);
+            var getAttributes = function(orgunitId) {
+                return orgUnitRepository.getProjectAndOpUnitAttributes(orgunitId);
             };
 
             var addOrgunitsToOrgUnitGroups = function(orgUnitGroups) {
@@ -64,7 +64,7 @@ define([], function() {
                     });
                 };
 
-                return getAttributes(orgunits[0]).then(addToGroup).then(upsertOrgUnitGroup);
+                return getAttributes(orgunits[0].id).then(addToGroup).then(upsertOrgUnitGroup);
             };
 
             return getOrgUnitGroups().then(addOrgunitsToOrgUnitGroups);
