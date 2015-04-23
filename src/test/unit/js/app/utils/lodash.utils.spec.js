@@ -104,6 +104,39 @@ define(["lodashUtils"], function(_) {
             expect(actualResult).toEqual(expectedResult);
         });
 
+        it("should give difference of two object arrays by given key", function() {
+            var arr1 = [{
+                "id": 1,
+                "name": "one"
+            }, {
+                "id": 2,
+                "name": "two"
+            }, {
+                "id": 3,
+                "name": "three"
+            }];
+
+            var arr2 = [{
+                "id": 3,
+                "name": "three"
+            }, {
+                "id": 4,
+                "name": "four"
+            }];
+
+            var expectedResult = [{
+                "id": 1,
+                "name": "one"
+            }, {
+                "id": 2,
+                "name": "two"
+            }];
+
+            var actualResult = _.differenceBy(arr1, arr2, "id");
+
+            expect(actualResult).toEqual(expectedResult);
+        });
+
         describe("minWhile test suite", function() {
             it("should return minimum object from a collection based on natural ordering of given key", function() {
                 var collection = [{

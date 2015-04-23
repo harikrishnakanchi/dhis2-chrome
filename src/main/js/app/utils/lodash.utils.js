@@ -86,5 +86,14 @@ define(["lodash"], function(_) {
         return result;
     };
 
+    _.differenceBy = function(list1, list2, key) {
+        return _.transform(list1, function(acc, object) {
+            var matchingObject = _.find(list2, key, object[key]);
+            if (!matchingObject) {
+                acc.push(object);
+            }
+        }, []);
+    };
+
     return _;
 });
