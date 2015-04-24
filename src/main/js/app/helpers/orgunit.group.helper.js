@@ -33,7 +33,10 @@ define([], function() {
                 return orgUnitRepository.getProjectAndOpUnitAttributes(orgUnits[0].id).then(function(attributeValues) {
                     _.forEach(attributeValues, function(attr) {
                         var group = findGroupByAttrValue(attr);
-                        group.organisationUnits = group.organisationUnits.concat(orgUnitsToAdd);
+                        if (group) {
+                            group.organisationUnits = group.organisationUnits ? group.organisationUnits : [];
+                            group.organisationUnits = group.organisationUnits.concat(orgUnitsToAdd);
+                        }
                     });
                 });
             };
