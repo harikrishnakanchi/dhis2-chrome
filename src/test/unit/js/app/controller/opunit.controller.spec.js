@@ -817,7 +817,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "attribute": {
                         "code": "isDisabled"
                     },
-                    "value": true
+                    "value": "true"
                 }]
             }, {
                 "id": "o3",
@@ -831,7 +831,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "attribute": {
                         "code": "isDisabled"
                     },
-                    "value": true
+                    "value": "true"
                 }]
 
             }];
@@ -913,7 +913,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "attribute": {
                         "code": "isDisabled"
                     },
-                    "value": false
+                    "value": "false"
                 }]
             }];
 

@@ -161,11 +161,11 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     "attribute": {
                         "code": "isDisabled"
                     },
-                    "value": false
+                    "value": 'false'
                 });
             }
 
-            attr[0].value = attr[0].value === "true" ? false : true;
+            attr[0].value = attr[0].value === 'true' ? 'false' : 'true';
             attributeValues.push(attr[0]);
             return attributeValues;
         };

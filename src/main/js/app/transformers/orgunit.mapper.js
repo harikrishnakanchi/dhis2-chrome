@@ -268,6 +268,16 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                     }
                 };
 
+                if (patientOrigin.isDisabled === true) {
+                    var isDisabledAttr = {
+                        "attribute": {
+                            "code": "isDisabled",
+                        },
+                        "value": "true"
+                    };
+                    patientOriginPayload.attributeValues.push(isDisabledAttr);
+                }
+
                 if (!_.isUndefined(patientOrigin.longitude) && !_.isUndefined(patientOrigin.latitude)) {
                     patientOriginPayload.coordinates = "[" + patientOrigin.longitude + "," + patientOrigin.latitude + "]";
                     patientOriginPayload.featureType = "Point";
