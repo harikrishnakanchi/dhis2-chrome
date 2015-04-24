@@ -137,6 +137,32 @@ define(["lodashUtils"], function(_) {
             expect(actualResult).toEqual(expectedResult);
         });
 
+        it("should return true or false based on whether array contains an object by comparing the given key", function() {
+            var arr = [{
+                "id": 1,
+                "name": "one"
+            }, {
+                "id": 2,
+                "name": "two"
+            }, {
+                "id": 3,
+                "name": "three"
+            }];
+
+            var obj1 = {
+                "id": 3,
+                "name": "three"
+            };
+
+            var obj2 = {
+                "id": 4,
+                "name": "four"
+            };
+
+            expect(_.containsBy(arr, obj1, "id")).toBeTruthy();
+            expect(_.containsBy(arr, obj2, "id")).toBeFalsy();
+        });
+
         describe("minWhile test suite", function() {
             it("should return minimum object from a collection based on natural ordering of given key", function() {
                 var collection = [{

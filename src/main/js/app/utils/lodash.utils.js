@@ -95,5 +95,10 @@ define(["lodash"], function(_) {
         }, []);
     };
 
+    _.containsBy = function(list, searchKey, comparisonKey) {
+        var comparisonKeys = _.pluck(list, comparisonKey);
+        return _.contains(comparisonKeys, searchKey[comparisonKey]);
+    };
+
     return _;
 });
