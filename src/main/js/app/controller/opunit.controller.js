@@ -150,6 +150,80 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             $scope.formTemplateUrl = "templates/partials/patient-origin-form.html" + '?' + moment().format("X");
         };
 
+        var setBooleanAttributeValue = function(attributeValues, attributeCode) {
+            var attr = _.remove(attributeValues, {
+                "attribute": {
+                    "code": attributeCode
+                }
+            });
+            if (_.isEmpty(attr)) {
+                attr.push({
+                    "attribute": {
+                        "code": "isDisabled"
+                    },
+                    "value": false
+                });
+            }
+
+            attr[0].value = attr[0].value === "true" ? false : true;
+            attributeValues.push(attr[0]);
+            return attributeValues;
+        };
+
+        var toggle = function(originToEnableDisable) {
+            _.map($scope.originDetails, function(origin) {
+                if (origin.id === originToEnableDisable.id)
+                    origin.isDisabled = !origin.isDisabled;
+                return origin;
+            });
+
+            var originsToUpsert = [];
+            var updatedPatientOrigin;
+
+            var getOriginsToUpsertAndToggleState = function() {
+                return orgUnitRepository.getAllOriginsByName($scope.orgUnit, originToEnableDisable.name, false).then(function(origins) {
+                    return _.map(origins, function(originToEdit) {
+                        originToEdit.attributeValues = setBooleanAttributeValue(originToEdit.attributeValues, "isDisabled");
+                        originsToUpsert.push(originToEdit);
+                    });
+                });
+            };
+
+            var getSystemSettingsAndToggleState = function() {
+                return patientOriginRepository.get($scope.orgUnit.id).then(function(patientOrigin) {
+                    var originToUpdate = _.remove(patientOrigin.origins, function(origin) {
+                        return origin.id == originToEnableDisable.id;
+                    })[0];
+                    originToUpdate.isDisabled = !originToUpdate.isDisabled;
+                    patientOrigin.origins.push(originToUpdate);
+                    updatedPatientOrigin = patientOrigin;
+                });
+            };
+
+            var publishUpdateMessages = function() {
+                patientOriginRepository.upsert(updatedPatientOrigin).then(function() {
+                    publishMessage(updatedPatientOrigin, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(updatedPatientOrigin.origins, "name"));
+                });
+                orgUnitRepository.upsert(originsToUpsert).then(function() {
+                    publishMessage(originsToUpsert, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(originsToUpsert, "name")));
+                });
+            };
+
+            getOriginsToUpsertAndToggleState()
+                .then(getSystemSettingsAndToggleState)
+                .then(publishUpdateMessages);
+        };
+
+        $scope.toggleOriginDisabledState = function(originToEnableDisable) {
+            var confirmationMessage = originToEnableDisable.isDisabled === true ? $scope.resourceBundle.enableOriginConfirmationMessage : $scope.resourceBundle.disableOriginConfirmationMessage;
+            var modalMessages = {
+                "confirmationMessage": confirmationMessage
+            };
+            showModal(function() {
+                toggle(originToEnableDisable);
+            }, modalMessages);
+        };
+
         $scope.closeForm = function() {
             $scope.$parent.closeNewForm($scope.orgUnit);
         };

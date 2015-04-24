@@ -74,11 +74,16 @@ define(["moment", "lodashUtils"], function(moment, _) {
             return store.each(query);
         };
 
-        var findAllByParent = function(parentIds) {
+        var findAllByParent = function(parentIds, rejectDisabled) {
+            rejectDisabled = _.isUndefined(rejectDisabled) ? true : rejectDisabled;
             parentIds = _.isArray(parentIds) ? parentIds : [parentIds];
             var store = db.objectStore("organisationUnits");
             var query = db.queryBuilder().$in(parentIds).$index("by_parent").compile();
-            return store.each(query).then(rejectCurrentAndDisabled);
+
+            if (rejectDisabled)
+                return store.each(query).then(rejectCurrentAndDisabled);
+
+            return store.each(query);
         };
 
         var getProjectAndOpUnitAttributes = function(moduleOrOriginId) {
@@ -180,23 +185,14 @@ define(["moment", "lodashUtils"], function(moment, _) {
             });
         };
 
-        var getAllOriginsByName = function(opUnit, originName) {
-            var moduleIds = _.pluck(opUnit.children, "id");
-            var originIds = [];
-            var getOriginIds = function() {
-                var origins;
-                return findAll(moduleIds).then(function(modules) {
-                    _.forEach(modules, function(module) {
-                        origin = _.find(module.children, {
-                            "name": originName
-                        });
-                        originIds.push(origin.id);
+        var getAllOriginsByName = function(opUnit, originName, rejectDisabledOrigins) {
+            return findAllByParent(opUnit.id).then(function(modules) {
+                var moduleIds = _.pluck(modules, "id");
+                return findAllByParent(moduleIds, rejectDisabledOrigins).then(function(origins) {
+                    return _.remove(origins, {
+                        "name": originName
                     });
                 });
-            };
-
-            return getOriginIds().then(function() {
-                return findAll(originIds);
             });
         };
 

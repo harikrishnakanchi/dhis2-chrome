@@ -154,7 +154,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
 
             var getOriginsToUpsert = function() {
 
-                return orgUnitRepository.getAllOriginsByName($scope.orgUnit, oldName).then(function(origins) {
+                return orgUnitRepository.getAllOriginsByName($scope.orgUnit, oldName, true).then(function(origins) {
                     return _.map(origins, function(originToEdit) {
                         originToEdit.name = originToEdit.displayName = originToEdit.shortName = originToEdit.displayShortName = $scope.patientOrigin.name;
                         originToEdit.coordinates = "[" + $scope.patientOrigin.longitude + "," + $scope.patientOrigin.latitude + "]";

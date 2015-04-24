@@ -373,7 +373,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             expect(orgUnitRepository.getAllOriginsByName).toHaveBeenCalledWith({
                 "id": "prj1"
-            }, "Origin 1");
+            }, "Origin 1", true);
             expect(orgUnitRepository.upsert).toHaveBeenCalledWith([newOrigin1]);
             expect(hustle.publish.calls.argsFor(1)).toEqual([{
                 "data": [newOrigin1],

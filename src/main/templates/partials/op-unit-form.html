@@ -97,6 +97,7 @@
                             <th>latitude</th>
                             <th>longitude</th>
                             <th>Edit</th>
+                            <th>Enable/Disable</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -105,8 +106,17 @@
                             <td> {{origin.latitude}}</td>
                             <td> {{origin.longitude}}</td>
                             <td>
-                                <a title="edit" class="edit" ng-click="editPatientOrigin(origin)">
+                                <a title="edit" ng-if="!origin.isDisabled" class="edit" ng-click="editPatientOrigin(origin)">
                                     <span class="glyphicon glyphicon-edit"></span>
+                                </a>
+                                <span ng-if="origin.isDisabled" class="glyphicon glyphicon-ban-circle"></span>
+                            </td>
+                            <td>
+                                <a ng-if="!origin.isDisabled" href="" title="Disable" class="delete" ng-click="toggleOriginDisabledState(origin)">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </a>
+                                <a ng-if="origin.isDisabled" href="" title="Enable" class="delete" ng-click="toggleOriginDisabledState(origin)">
+                                    <span class="glyphicon glyphicon-ok"></span>
                                 </a>
                             </td>
                         </tr>

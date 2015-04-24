@@ -1,8 +1,8 @@
 /*global Date:true*/
-define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository) {
     describe("op unit controller", function() {
 
-        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper, patientOriginRepository;
+        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper, patientOriginRepository, orgUnitRepository;
 
         beforeEach(module("hustle"));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -12,12 +12,14 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             hustle = $hustle;
             location = $location;
 
-            orgUnitRepo = utils.getMockRepo(q);
-            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
-            orgUnitRepo.getChildOrgUnitNames = jasmine.createSpy("getChildOrgUnitNames").and.returnValue(utils.getPromise(q, []));
-            orgUnitRepo.upsert = jasmine.createSpy("upsert").and.callFake(function(orgUnits) {
+            orgUnitRepository = new OrgUnitRepository();
+
+            spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, "getChildOrgUnitNames").and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, "upsert").and.callFake(function(orgUnits) {
                 return utils.getPromise(q, [orgUnits]);
             });
+            spyOn(orgUnitRepository, "getAllOriginsByName").and.returnValue(utils.getPromise(q, {}));
 
             orgUnitGroupHelper = new OrgUnitGroupHelper();
             scope.orgUnit = {
@@ -27,14 +29,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }
             };
 
-            patientOriginRepository = {
-                "get": function() {
-                    return utils.getPromise(q, [{}]);
-                },
-                "upsert": function() {
-                    return utils.getPromise(q, {});
-                }
-            };
+            patientOriginRepository = new PatientOriginRepository();
+            spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, {}));
+            spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
             scope.currentUser = {
                 "locale": "en"
@@ -57,7 +54,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 },
                 open: function(object) {}
             };
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
         }));
 
         afterEach(function() {
@@ -134,7 +131,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.save(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
+            expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
@@ -216,7 +213,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.save(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
+            expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
@@ -294,7 +291,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.save(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
+            expect(orgUnitRepository.upsert.calls.argsFor(0)[0]).toEqual(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
@@ -350,9 +347,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             scope.isNewMode = false;
 
-            spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, patientOrigins));
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
 
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
 
             scope.$apply();
             expect(scope.opUnit.name).toEqual("opUnit1");
@@ -388,7 +385,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
             scope.isNewMode = false;
 
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepo, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
 
             scope.$apply();
             expect(scope.isDisabled).toBeTruthy();
@@ -456,7 +453,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "locale": "en",
                 "desc": "undefinedmod1"
             };
-            orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modulesUnderOpunit));
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             spyOn(hustle, "publish");
             spyOn(fakeModal, "open").and.returnValue({
                 result: utils.getPromise(q, {})
@@ -465,7 +462,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.disable(opunit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOrgUnits);
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOrgUnits);
             expect(hustle.publish).toHaveBeenCalledWith(expectedHustleMessage, "dataValues");
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(opunit.parent, "disabledOpUnit");
             expect(scope.isDisabled).toEqual(true);
@@ -555,7 +552,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.update(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnit);
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
@@ -653,7 +650,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.update(opUnit);
             scope.$apply();
 
-            expect(orgUnitRepo.upsert).toHaveBeenCalledWith(expectedOpUnit);
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOpUnit);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "data": [expectedOpUnit],
                 "type": "upsertOrgUnit",
@@ -718,9 +715,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }
             }));
 
-            spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-
-
             scope.save(opUnit);
             scope.$apply();
 
@@ -775,5 +769,192 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(orgunitsToAssociate, true);
         });
+
+        it("should disable patient origin", function() {
+            scope.orgUnit = {
+                "id": "opUnit1Id",
+                "name": "OpUnit1"
+            };
+
+            var originToEnableDisable = {
+                "id": "0",
+                "name": "origin1"
+            };
+
+            var patientOrigin = {
+                "orgUnit": "opUnit1Id",
+                "origins": [{
+                    "id": "0",
+                    "name": "origin1",
+                    "isDisabled": false
+                }]
+            };
+
+            var origins = [{
+                "id": "o1",
+                "name": "origin1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isDisabled"
+                    },
+                    "value": "false"
+                }]
+            }, {
+                "id": "o3",
+                "name": "origin1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isSomething"
+                    },
+                    "value": "false"
+                }]
+            }];
+
+            var expectedOrgUnitUpsert = [{
+                "id": "o1",
+                "name": "origin1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isDisabled"
+                    },
+                    "value": true
+                }]
+            }, {
+                "id": "o3",
+                "name": "origin1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isSomething"
+                    },
+                    "value": "false"
+                }, {
+                    "attribute": {
+                        "code": "isDisabled"
+                    },
+                    "value": true
+                }]
+
+            }];
+
+            var expectedPatientOriginUpsert = {
+                "orgUnit": "opUnit1Id",
+                "origins": [{
+                    "id": "0",
+                    "name": "origin1",
+                    "isDisabled": true
+                }]
+            };
+
+            orgUnitRepository.getAllOriginsByName.and.returnValue(utils.getPromise(q, origins));
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigin));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
+                "data": {
+                    "data": []
+                }
+            }));
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
+
+            scope.toggleOriginDisabledState(originToEnableDisable);
+            scope.$apply();
+            expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPatientOriginUpsert);
+            expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
+                "data": expectedPatientOriginUpsert,
+                "type": "uploadPatientOriginDetails",
+                "locale": "en",
+                "desc": "create patient origin origin1"
+            }, "dataValues");
+
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOrgUnitUpsert);
+            expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
+                "data": expectedOrgUnitUpsert,
+                "type": "upsertOrgUnit",
+                "locale": "en",
+                "desc": "upsert org unit origin1"
+            }, "dataValues");
+        });
+
+        it("should enable patient origin", function() {
+            scope.orgUnit = {
+                "id": "opUnit1Id",
+                "name": "OpUnit1"
+            };
+
+            var originToEnableDisable = {
+                "id": "0",
+                "name": "origin1"
+            };
+
+            var patientOrigin = {
+                "orgUnit": "opUnit1Id",
+                "origins": [{
+                    "id": "0",
+                    "name": "origin1",
+                    "isDisabled": true
+                }]
+            };
+
+            var origins = [{
+                "id": "o1",
+                "name": "origin1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isDisabled"
+                    },
+                    "value": "true"
+                }]
+            }];
+
+            var expectedOrgUnitUpsert = [{
+                "id": "o1",
+                "name": "origin1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isDisabled"
+                    },
+                    "value": false
+                }]
+            }];
+
+            var expectedPatientOriginUpsert = {
+                "orgUnit": "opUnit1Id",
+                "origins": [{
+                    "id": "0",
+                    "name": "origin1",
+                    "isDisabled": false
+                }]
+            };
+
+            orgUnitRepository.getAllOriginsByName.and.returnValue(utils.getPromise(q, origins));
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigin));
+            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
+                "data": {
+                    "data": []
+                }
+            }));
+            spyOn(fakeModal, "open").and.returnValue({
+                result: utils.getPromise(q, {})
+            });
+
+            scope.toggleOriginDisabledState(originToEnableDisable);
+            scope.$apply();
+            expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPatientOriginUpsert);
+            expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
+                "data": expectedPatientOriginUpsert,
+                "type": "uploadPatientOriginDetails",
+                "locale": "en",
+                "desc": "create patient origin origin1"
+            }, "dataValues");
+
+            expect(orgUnitRepository.upsert).toHaveBeenCalledWith(expectedOrgUnitUpsert);
+            expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
+                "data": expectedOrgUnitUpsert,
+                "type": "upsertOrgUnit",
+                "locale": "en",
+                "desc": "upsert org unit origin1"
+            }, "dataValues");
+        });
+
     });
 });
