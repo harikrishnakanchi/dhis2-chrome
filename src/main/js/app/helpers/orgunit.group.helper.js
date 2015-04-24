@@ -1,73 +1,58 @@
 define([], function() {
     return function($hustle, $q, $scope, orgUnitRepository, orgUnitGroupRepository) {
-        this.createOrgUnitGroups = function(orgunits, isUpdateProject) {
+        this.createOrgUnitGroups = function(orgUnits, isUpdateProject) {
+            var orgUnitGroups;
             var getOrgUnitGroups = function() {
-                return orgUnitGroupRepository.getAll();
+                return orgUnitGroupRepository.getAll().then(function(data) {
+                    orgUnitGroups = data;
+                });
             };
 
-            var getAttributes = function(orgunitId) {
-                return orgUnitRepository.getProjectAndOpUnitAttributes(orgunitId);
+            var removeOrgUnitsFromOldGroups = function() {
+                if (isUpdateProject) {
+                    orgUnitGroups = _.map(orgUnitGroups, function(group) {
+                        group.organisationUnits = _.differenceBy(group.organisationUnits, orgUnits, "id");
+                        return group;
+                    });
+                }
             };
 
-            var addOrgunitsToOrgUnitGroups = function(orgUnitGroups) {
-                var addToGroup = function(attributes) {
-                    var orgunitsToAdd = _.map(orgunits, function(orgunit) {
-                        return {
-                            'id': orgunit.id,
-                            'name': orgunit.name
-                        };
-                    });
-
-                    var modifiedOrgUnitGroups = [];
-                    _.forEach(orgUnitGroups, function(orgUnitGroup) {
-                        var res;
-                        if (orgUnitGroup.name.indexOf("Unit Code - ") !== -1) {
-                            var orgUnitGroupName = orgUnitGroup.name.replace("Unit Code - ", "");
-                            res = _.find(attributes, {
-                                'value': orgUnitGroupName.trim()
-                            });
-                        } else {
-                            res = _.find(attributes, {
-                                'value': orgUnitGroup.name.trim()
-                            });
-                        }
-
-                        if (isUpdateProject) {
-                            orgUnitGroup.organisationUnits = _.filter(orgUnitGroup.organisationUnits, function(obj) {
-                                return !_.findWhere(orgunitsToAdd, {
-                                    id: obj.id
-                                });
-                            });
-                            orgUnitGroup.organisationUnits = _.reject(orgUnitGroup.organisationUnits, orgunitsToAdd);
-                        }
-
-                        var isOrgUnitAbsent = !_.find(orgUnitGroup.organisationUnits, orgunitsToAdd);
-
-                        if (res !== undefined && isOrgUnitAbsent) {
-                            _.forEach(orgunitsToAdd, function(orgunitToAdd) {
-                                orgUnitGroup.organisationUnits.push(orgunitToAdd);
-                            });
-                        }
-                        modifiedOrgUnitGroups.push(orgUnitGroup);
-                    });
-                    return modifiedOrgUnitGroups;
+            var addOrgUnitsToNewGroups = function() {
+                var findGroupByAttrValue = function(attribute) {
+                    var attrValue = attribute.attribute.code === "hospitalUnitCode" ? "Unit Code - " + attribute.value : attribute.value;
+                    return _.find(orgUnitGroups, "name", attrValue);
                 };
 
-                var upsertOrgUnitGroup = function(orgUnitGroups) {
-                    return orgUnitGroupRepository.upsert(orgUnitGroups).then(function() {
-                        return $hustle.publish({
-                            "data": orgUnitGroups,
-                            "type": "upsertOrgUnitGroups",
-                            "locale": $scope.currentUser.locale,
-                            "desc": $scope.resourceBundle.upsertOrgUnitGroupsDesc
-                        }, "dataValues");
-                    });
-                };
+                var orgUnitsToAdd = _.map(orgUnits, function(orgUnit) {
+                    return {
+                        'id': orgUnit.id,
+                        'name': orgUnit.name
+                    };
+                });
 
-                return getAttributes(orgunits[0].id).then(addToGroup).then(upsertOrgUnitGroup);
+                return orgUnitRepository.getProjectAndOpUnitAttributes(orgUnits[0].id).then(function(attributeValues) {
+                    _.forEach(attributeValues, function(attr) {
+                        var group = findGroupByAttrValue(attr);
+                        group.organisationUnits = group.organisationUnits.concat(orgUnitsToAdd);
+                    });
+                });
             };
 
-            return getOrgUnitGroups().then(addOrgunitsToOrgUnitGroups);
+            var upsertOrgUnitGroups = function() {
+                return orgUnitGroupRepository.upsert(orgUnitGroups).then(function() {
+                    return $hustle.publish({
+                        "data": orgUnitGroups,
+                        "type": "upsertOrgUnitGroups",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.upsertOrgUnitGroupsDesc
+                    }, "dataValues");
+                });
+            };
+
+            return getOrgUnitGroups()
+                .then(removeOrgUnitsFromOldGroups)
+                .then(addOrgUnitsToNewGroups)
+                .then(upsertOrgUnitGroups);
         };
 
         this.getOrgUnitsToAssociateForUpdate = function(orgunits) {
@@ -95,7 +80,6 @@ define([], function() {
 
             });
             return _.flatten(orgUnitsToAssociate);
-
         };
     };
 });

@@ -38,14 +38,9 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
 
                 var projectAndOpunitAttributes = [{
                     "attribute": {
-                        "name": "Type",
-                        "id": "a1fa2777924"
-                    },
-                    "value": "Operation Unit"
-                }, {
-                    "attribute": {
                         "name": "Hospital Unit Code",
-                        "id": "c6d3c8a7286"
+                        "id": "c6d3c8a7286",
+                        "code": "hospitalUnitCode"
                     },
                     "value": "C2"
                 }, {
@@ -56,18 +51,6 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                     "value": "Hospital"
                 }, {
                     "attribute": {
-                        "name": "Type",
-                        "id": "a1fa2777924"
-                    },
-                    "value": "Project"
-                }, {
-                    "attribute": {
-                        "name": "Project Code",
-                        "id": "fa5e00d5cd2"
-                    },
-                    "value": "CI146"
-                }, {
-                    "attribute": {
                         "name": "Context",
                         "id": "Gy8V8WeGgYs"
                     },
@@ -75,10 +58,6 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 }];
 
                 var orgunitgroups = [{
-                    "name": "General Population",
-                    "id": "afbdf5ffe08",
-                    "organisationUnits": []
-                }, {
                     "name": "Hospital",
                     "id": "a8b42a1c9b8",
                     "organisationUnits": []
@@ -90,13 +69,16 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                     "name": "Unit Code - C2",
                     "id": "a9ab62b5ef3",
                     "organisationUnits": []
+                }, {
+                    "name": "Unit Code - A",
+                    "id": "w2aws2d2ef3",
+                    "organisationUnits": [{
+                        "id": 'a72ec34b863',
+                        "name": 'OBGYN'
+                    }]
                 }];
 
                 var expectedOutput = [{
-                    "name": "General Population",
-                    "id": "afbdf5ffe08",
-                    "organisationUnits": []
-                }, {
                     "name": 'Hospital',
                     "id": 'a8b42a1c9b8',
                     "organisationUnits": [{
@@ -117,6 +99,10 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                         "id": 'a72ec34b863',
                         "name": 'OBGYN'
                     }]
+                }, {
+                    "name": "Unit Code - A",
+                    "id": "w2aws2d2ef3",
+                    "organisationUnits": []
                 }];
 
                 spyOn(orgUnitGroupRepository, "getAll").and.returnValue(utils.getPromise(q, orgunitgroups));
@@ -124,10 +110,10 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 spyOn(orgUnitRepository, "getProjectAndOpUnitAttributes").and.returnValue(utils.getPromise(q, projectAndOpunitAttributes));
                 orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepository, orgUnitGroupRepository);
 
-                orgUnitGroupHelper.createOrgUnitGroups(modules, false);
+                orgUnitGroupHelper.createOrgUnitGroups(modules, true);
                 scope.$apply();
 
-                expect(orgUnitGroupRepository.upsert).toHaveBeenCalled();
+                expect(orgUnitGroupRepository.upsert).toHaveBeenCalledWith(expectedOutput);
                 expect(orgUnitRepository.getProjectAndOpUnitAttributes).toHaveBeenCalled();
                 expect(hustle.publish.calls.argsFor(0)).toEqual([{
                     "data": expectedOutput,
@@ -211,7 +197,6 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 var result = orgUnitGroupHelper.getOrgUnitsToAssociateForUpdate(modules);
 
                 expect(result).toEqual(expectedOutput);
-
             });
         });
     });
