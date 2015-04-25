@@ -46,7 +46,11 @@ define([], function() {
             var modifyGroups = function(groupsToModify) {
                 var removeOrgUnits = function(orgUnitGroups) {
                     return _.map(orgUnitGroups, function(group) {
-                        group.organisationUnits = _.differenceBy(group.organisationUnits, orgUnits, "id");
+                        group.organisationUnits = _.map(group.organisationUnits, function(ou) {
+                            if (_.containsBy(orgUnits, ou, "id"))
+                                ou.localStatus = "DELETED";
+                            return ou;
+                        });
                         return group;
                     });
                 };
@@ -55,7 +59,8 @@ define([], function() {
                     var orgUnitsToAdd = _.map(orgUnits, function(orgUnit) {
                         return {
                             'id': orgUnit.id,
-                            'name': orgUnit.name
+                            'name': orgUnit.name,
+                            'localStatus': 'NEW'
                         };
                     });
 

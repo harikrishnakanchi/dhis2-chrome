@@ -75,20 +75,26 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 var expectedOutput = [{
                     "name": "Unit Code - A",
                     "id": "w2aws2d2ef3",
-                    "organisationUnits": []
+                    "organisationUnits": [{
+                        "id": 'a72ec34b863',
+                        "name": 'OBGYN',
+                        "localStatus": "DELETED"
+                    }]
                 }, {
                     "name": 'Unit Code - C2',
                     "id": 'a9ab62b5ef3',
                     "organisationUnits": [{
                         "id": 'a72ec34b863',
-                        "name": 'OBGYN'
+                        "name": 'OBGYN',
+                        "localStatus": "NEW"
                     }]
                 }, {
                     "name": 'Hospital',
                     "id": 'a8b42a1c9b8',
                     "organisationUnits": [{
                         "id": 'a72ec34b863',
-                        "name": 'OBGYN'
+                        "name": 'OBGYN',
+                        "localStatus": "NEW"
                     }]
                 }];
 
