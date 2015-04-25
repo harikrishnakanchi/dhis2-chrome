@@ -49,12 +49,6 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                         "id": "52ec8ccaf8f"
                     },
                     "value": "Hospital"
-                }, {
-                    "attribute": {
-                        "name": "Context",
-                        "id": "Gy8V8WeGgYs"
-                    },
-                    "value": "Post-conflict"
                 }];
 
                 var orgunitgroups = [{
@@ -79,19 +73,9 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 }];
 
                 var expectedOutput = [{
-                    "name": 'Hospital',
-                    "id": 'a8b42a1c9b8',
-                    "organisationUnits": [{
-                        "id": 'a72ec34b863',
-                        "name": 'OBGYN'
-                    }]
-                }, {
-                    "name": 'Post-conflict',
-                    "id": 'a16b4a97ce4',
-                    "organisationUnits": [{
-                        "id": 'a72ec34b863',
-                        "name": 'OBGYN'
-                    }]
+                    "name": "Unit Code - A",
+                    "id": "w2aws2d2ef3",
+                    "organisationUnits": []
                 }, {
                     "name": 'Unit Code - C2',
                     "id": 'a9ab62b5ef3',
@@ -100,9 +84,12 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                         "name": 'OBGYN'
                     }]
                 }, {
-                    "name": "Unit Code - A",
-                    "id": "w2aws2d2ef3",
-                    "organisationUnits": []
+                    "name": 'Hospital',
+                    "id": 'a8b42a1c9b8',
+                    "organisationUnits": [{
+                        "id": 'a72ec34b863',
+                        "name": 'OBGYN'
+                    }]
                 }];
 
                 spyOn(orgUnitGroupRepository, "getAll").and.returnValue(utils.getPromise(q, orgunitgroups));

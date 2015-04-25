@@ -88,16 +88,19 @@ define(["lodash"], function(_) {
 
     _.differenceBy = function(list1, list2, key) {
         return _.transform(list1, function(acc, object) {
-            var matchingObject = _.find(list2, key, object[key]);
-            if (!matchingObject) {
-                acc.push(object);
-            }
+            if (!_.containsBy(list2, object, key)) acc.push(object);
         }, []);
     };
 
     _.containsBy = function(list, searchKey, comparisonKey) {
         var comparisonKeys = _.pluck(list, comparisonKey);
         return _.contains(comparisonKeys, searchKey[comparisonKey]);
+    };
+
+    _.intersectionBy = function(list1, list2, key) {
+        return _.transform(list1, function(acc, object) {
+            if (_.containsBy(list2, object, key)) acc.push(object);
+        }, []);
     };
 
     return _;

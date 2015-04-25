@@ -163,6 +163,36 @@ define(["lodashUtils"], function(_) {
             expect(_.containsBy(arr, obj2, "id")).toBeFalsy();
         });
 
+        it("should return intersection of two lists based on given key", function() {
+            var arr1 = [{
+                "id": 1,
+                "name": "one"
+            }, {
+                "id": 2,
+                "name": "two"
+            }, {
+                "id": 3,
+                "name": "three"
+            }];
+
+            var arr2 = [{
+                "id": 3,
+                "name": "three"
+            }, {
+                "id": 4,
+                "name": "four"
+            }];
+
+            var expectedResult = [{
+                "id": 3,
+                "name": "three"
+            }];
+
+            var actualResult = _.intersectionBy(arr1, arr2, "id");
+
+            expect(actualResult).toEqual(expectedResult);
+        });
+
         describe("minWhile test suite", function() {
             it("should return minimum object from a collection based on natural ordering of given key", function() {
                 var collection = [{
