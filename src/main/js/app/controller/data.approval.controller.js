@@ -160,13 +160,23 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 });
             };
 
+            var findallOrgUnits = function(orgUnits) {
+                var orgUnitIds = _.pluck(orgUnits, "id");
+                return orgUnitRepository.findAll(orgUnitIds);
+            };
+
             return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements()]).then(function() {
 
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
                     .then(function(datasets) {
-                        $scope.dataSets = datasets;
+                        return _.forEach(datasets, function(dataset) {
+                            return findallOrgUnits(dataset.organisationUnits).then(function(orgunits) {
+                                dataset.organisationUnits = orgunits;
+                                $scope.dataSets.push(dataset);
+                            });
+                        });
                     });
 
                 var loadDataValuesPromise = dataRepository.getDataValues(currentPeriod, $scope.moduleAndOriginOrgUnitIds).then(function(dataValues) {
