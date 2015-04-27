@@ -172,5 +172,26 @@ define(["orgUnitService", "angularMocks", "properties", "utils"], function(OrgUn
             httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?paging=false&fields=:all,!dataSets,!access,!href,!uuid').respond(200, "ok");
             httpBackend.flush();
         });
+
+        it("should return the id field if given org units are present in DHIS", function() {
+            var ids = ["abcd1234", "wert3456", "iujk8765"];
+            var expectedResponse = ["abcd1234", "wert3456"];
+
+            var httpResponse = {
+
+                "organisationUnits": [{
+                    "id": "abcd1234"
+                }, {
+                    "id": "wert3456"
+                }]
+            };
+
+            orgUnitService.getIds(ids).then(function(data) {
+                expect(data).toEqual(expectedResponse);
+            });
+
+            httpBackend.expectGET(properties.dhis.url + '/api/organisationUnits.json?filter=id:eq:abcd1234&filter=id:eq:wert3456&filter=id:eq:iujk8765&paging=false&fields=id').respond(200, httpResponse);
+            httpBackend.flush();
+        });
     });
 });

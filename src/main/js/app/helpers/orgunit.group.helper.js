@@ -24,6 +24,8 @@ define([], function() {
                 };
 
                 var getExistingGroupAssociations = function() {
+                    if (!isUpdateProject) return $q.when([]);
+
                     return $q.when(_.transform(orgUnitGroups, function(acc, group) {
                         if (!_.isEmpty(_.intersectionBy(group.organisationUnits, orgUnits, "id"))) acc.push(group);
                     }, []));

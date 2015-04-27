@@ -21,5 +21,12 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
                 return response.data.organisationUnits;
             });
         };
+
+        this.getIds = function(orgUnitIds) {
+            var url = dhisUrl.orgUnits + '?' + httpUtils.getParamString('id', orgUnitIds) + "&fields=id";
+            return $http.get(url).then(function(response) {
+                return _.pluck(response.data.organisationUnits, "id");
+            });
+        };
     };
 });
