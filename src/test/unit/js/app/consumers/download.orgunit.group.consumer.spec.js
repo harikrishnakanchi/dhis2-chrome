@@ -11,13 +11,18 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                 "name": "Most-at-risk Population",
                 "organisationUnits": [{
                     "id": "a119bd25ace",
-                    "name": "Out-patient General"
+                    "name": "Out-patient General",
+                    "localStatus": "NEW"
                 }, {
                     "id": "a0c51512f88",
-                    "name": "OBGYN"
+                    "name": "OBGYN",
+                    "localStatus": "DELETED"
                 }, {
                     "id": "a43bd484a05",
                     "name": "Laboratory"
+                }, {
+                    "id": "cccbd484a05",
+                    "name": "NeoNat"
                 }],
                 "lastUpdated": "2014-10-23T09:01:12.020+0000",
                 "shortName": "Most-at-risk Population"
@@ -44,7 +49,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             Timecop.uninstall();
         });
 
-        it("should over write local data with dhis data for upsertOrgUnitGroups message", function() {
+        it("should merge orgunits from local and remote org unit groups for upsertOrgUnitGroups message", function() {
             var localCopy = payload;
             var message = {
                 "data": {
@@ -53,13 +58,10 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                 }
             };
 
-            var orgUnitFromDHIS = [{
+            var orgUnitGroupsFromDHIS = [{
                 "id": "a35778ed565",
                 "name": "Most-at-risk Population",
                 "organisationUnits": [{
-                    "id": "a119bd25ace",
-                    "name": "Out-patient General"
-                }, {
                     "id": "a0c51512f88",
                     "name": "OBGYN"
                 }, {
@@ -67,54 +69,29 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                     "name": "Laboratory"
                 }],
                 "lastUpdated": "2014-10-28T09:01:12.020+0000",
-                "shortName": "Most-at-risk Population"
+                "shortName": "Most-at-risk Populationdsadasd"
             }];
 
-            spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
-            spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
-            spyOn(orgUnitGroupService, 'upsert');
-            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
-
-            downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
-
-            downloadOrgUnitGroupConsumer.run(message);
-            scope.$apply();
-
-            expect(orgUnitGroupService.get).toHaveBeenCalledWith(["a35778ed565"]);
-            expect(orgUnitGroupService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
-            expect(orgUnitGroupRepository.findAll).toHaveBeenCalledWith(["a35778ed565"]);
-            expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS);
-        });
-
-        it("should ignore dhis data for upsertOrgUnitGroups message", function() {
-            var localCopy = payload;
-            var message = {
-                "data": {
-                    "data": payload,
-                    "type": "upsertOrgUnitGroups"
-                }
-            };
-
-            var orgUnitFromDHIS = [{
+            var expectedOrgUnitGroups = [{
                 "id": "a35778ed565",
                 "name": "Most-at-risk Population",
                 "organisationUnits": [{
-                    "id": "a119bd25ace",
-                    "name": "Out-patient General"
-                }, {
-                    "id": "a0c51512f88",
-                    "name": "OBGYN"
-                }, {
                     "id": "a43bd484a05",
                     "name": "Laboratory"
+                }, {
+                    "id": "a119bd25ace",
+                    "name": "Out-patient General",
+                    "localStatus": "NEW"
+                }, {
+                    "id": "a0c51512f88",
+                    "name": "OBGYN",
+                    "localStatus": "DELETED"
                 }],
-                "lastUpdated": "2014-09-28T09:01:12.020+0000",
-                "shortName": "Most-at-risk Population"
+                "lastUpdated": "2014-10-28T09:01:12.020+0000",
+                "shortName": "Most-at-risk Populationdsadasd"
             }];
 
-            spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
-            spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
+            spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
             spyOn(orgUnitGroupService, 'upsert');
             spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
 
@@ -123,14 +100,13 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             downloadOrgUnitGroupConsumer.run(message);
             scope.$apply();
 
-            expect(orgUnitGroupService.get).toHaveBeenCalledWith(["a35778ed565"]);
             expect(orgUnitGroupService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
             expect(orgUnitGroupRepository.findAll).toHaveBeenCalledWith(["a35778ed565"]);
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsert).not.toHaveBeenCalled();
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(expectedOrgUnitGroups);
         });
 
-        it("should overwrite local data with dhis data for downloadOrgUnitGroups message", function() {
+        it("should merge orgunits from local and remote org unit groups for downloadOrgUnitGroups message", function() {
             var localCopy = payload;
             var message = {
                 "data": {
@@ -139,25 +115,34 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                 }
             };
 
-            var orgUnitFromDHIS = [{
+            var orgUnitGroupsFromDHIS = [{
                 "id": "a35778ed565",
                 "name": "Most-at-risk Population",
                 "organisationUnits": [{
-                    "id": "a119bd25ace",
-                    "name": "Out-patient General"
-                }, {
                     "id": "a0c51512f88",
                     "name": "OBGYN"
-                }, {
-                    "id": "a43bd484a05",
-                    "name": "Laboratory"
                 }],
                 "lastUpdated": "2014-10-28T09:01:12.020+0000",
                 "shortName": "Most-at-risk Population"
             }];
 
-            spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
-            spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
+            var expectedOrgUnitGroups = [{
+                "id": "a35778ed565",
+                "name": "Most-at-risk Population",
+                "organisationUnits": [{
+                    "id": "a119bd25ace",
+                    "name": "Out-patient General",
+                    "localStatus": "NEW"
+                }, {
+                    "id": "a0c51512f88",
+                    "name": "OBGYN",
+                    "localStatus": "DELETED"
+                }],
+                "lastUpdated": "2014-10-28T09:01:12.020+0000",
+                "shortName": "Most-at-risk Population"
+            }];
+
+            spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
             spyOn(orgUnitGroupService, 'upsert');
             spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
 
@@ -167,51 +152,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             scope.$apply();
 
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS);
-        });
-
-        it("should ignore dhis data for downloadOrgUnitGroups message", function() {
-            var localCopy = payload;
-            var message = {
-                "data": {
-                    "data": [],
-                    "type": "downloadOrgUnitGroups"
-                }
-            };
-
-            var orgUnitFromDHIS = {
-                "data": {
-                    "organisationUnitGroups": [{
-                        "id": "a35778ed565",
-                        "name": "Most-at-risk Population",
-                        "organisationUnits": [{
-                            "id": "a119bd25ace",
-                            "name": "Out-patient General"
-                        }, {
-                            "id": "a0c51512f88",
-                            "name": "OBGYN"
-                        }, {
-                            "id": "a43bd484a05",
-                            "name": "Laboratory"
-                        }],
-                        "lastUpdated": "2014-09-28T09:01:12.020+0000",
-                        "shortName": "Most-at-risk Population"
-                    }]
-                }
-            };
-
-            spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
-            spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
-            spyOn(orgUnitGroupService, 'upsert');
-            spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
-
-            downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
-
-            downloadOrgUnitGroupConsumer.run(message);
-            scope.$apply();
-
-            expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsert).not.toHaveBeenCalled();
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(expectedOrgUnitGroups);
         });
 
         it("should upsert lastUpdated time in change log", function() {
@@ -222,13 +163,13 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                 }
             };
 
-            var orgUnitFromDHIS = {
+            var orgUnitGroupsFromDHIS = {
                 "data": {
                     "organisationUnitGroups": []
                 }
             };
 
-            spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
+            spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
             spyOn(orgUnitGroupService, 'upsert');
             spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
@@ -248,7 +189,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                 }
             };
 
-            var orgUnitFromDHIS = [{
+            var orgUnitGroupsFromDHIS = [{
                 "id": "a35778ed565",
                 "name": "Most-at-risk Population",
                 "organisationUnits": [{
@@ -265,8 +206,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
                 "shortName": "Most-at-risk Population"
             }];
 
-            spyOn(orgUnitGroupService, 'get').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
-            spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitFromDHIS));
+            spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
             spyOn(orgUnitGroupService, 'upsert');
             spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
@@ -276,7 +216,7 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             scope.$apply();
 
             expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
-            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitFromDHIS);
+            expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitGroupsFromDHIS);
         });
     });
 });

@@ -8,31 +8,40 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var download = function(locallyModifiedOrgUnitGroupIds) {
-            var downloadLocallyChanged = function() {
-                if (_.isEmpty(locallyModifiedOrgUnitGroupIds))
-                    return [];
-
-                var orgUnitGroupIds = _.pluck(locallyModifiedOrgUnitGroupIds, "id");
-                return orgUnitGroupService.get(orgUnitGroupIds);
-            };
-
-            var downloadRemotelyChanged = function() {
-                return changeLogRepository.get("orgUnitGroups").then(function(lastUpdatedTime) {
-                    return orgUnitGroupService.getAll(lastUpdatedTime);
-                });
-            };
-
-            return $q.all([downloadLocallyChanged(), downloadRemotelyChanged()]).then(function(data) {
-                var locallyChanged = data[0];
-                var remotelyChanged = data[1];
-                return _.unionBy([locallyChanged, remotelyChanged], "id");
+            return changeLogRepository.get("orgUnitGroups").then(function(lastUpdatedTime) {
+                return orgUnitGroupService.getAll(lastUpdatedTime);
             });
         };
 
         var mergeAndSave = function(orgUnitGroupsFromDHIS) {
+            var mergeOrgUnits = function(remoteOrgUnits, localOrgUnits) {
+                var partitionedLocalOrgUnits = _.partition(localOrgUnits, function(orgUnit) {
+                    return orgUnit.localStatus !== undefined;
+                });
+
+                var locallyModifiedOrgUnits = partitionedLocalOrgUnits[0];
+                var otherLocalOrgUnits = partitionedLocalOrgUnits[1];
+
+                var otherRemoteOrgUnits = _.reject(remoteOrgUnits, function(orgUnit) {
+                    return _.containsBy(locallyModifiedOrgUnits, orgUnit, "id");
+                });
+
+                return otherRemoteOrgUnits.concat(locallyModifiedOrgUnits);
+            };
+
+            var mergeOrgUnitGroups = function(remoteOrgUnitGroups, localOrgUnitGroups) {
+                return _.map(remoteOrgUnitGroups, function(remoteOrgUnitGroup) {
+                    var localOrgUnitGroup = _.find(localOrgUnitGroups, "id", remoteOrgUnitGroup.id);
+                    if (localOrgUnitGroup) {
+                        remoteOrgUnitGroup.organisationUnits = mergeOrgUnits(remoteOrgUnitGroup.organisationUnits, localOrgUnitGroup.organisationUnits);
+                    }
+                    return remoteOrgUnitGroup;
+                });
+            };
+
             var orgUnitGroupIdsToMerge = _.pluck(orgUnitGroupsFromDHIS, "id");
             return orgUnitGroupRepository.findAll(orgUnitGroupIdsToMerge)
-                .then(_.curry(mergeBy.lastUpdated)({}, orgUnitGroupsFromDHIS))
+                .then(_.curry(mergeOrgUnitGroups)(orgUnitGroupsFromDHIS))
                 .then(orgUnitGroupRepository.upsertDhisDownloadedData);
         };
 
