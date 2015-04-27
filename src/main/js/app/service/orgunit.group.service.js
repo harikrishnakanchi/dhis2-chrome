@@ -8,7 +8,7 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
 
         this.get = function(orgUnitGroupIds) {
             orgUnitGroupIds = _.isArray(orgUnitGroupIds) ? orgUnitGroupIds : [orgUnitGroupIds];
-            var url = dhisUrl.orgUnitGroups + '?' + httpUtils.getParamString('id', orgUnitGroupIds);
+            var url = dhisUrl.orgUnitGroups + '?' + httpUtils.getParamString('id', orgUnitGroupIds) + '&fields=:all';
             return $http.get(url).then(function(response) {
                 return response.data.organisationUnitGroups;
             });

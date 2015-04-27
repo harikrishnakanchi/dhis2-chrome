@@ -2,7 +2,7 @@ define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
     return function($http, db) {
         this.get = function(orgUnitIds) {
             orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
-            var url = dhisUrl.orgUnits + '?' + httpUtils.getParamString('id', orgUnitIds) + ',!dataSets,!access,!href,!uuid';
+            var url = dhisUrl.orgUnits + '?' + httpUtils.getParamString('id', orgUnitIds) + '&fields=:all,!dataSets,!access,!href,!uuid';
             return $http.get(url).then(function(response) {
                 return response.data.organisationUnits;
             });
