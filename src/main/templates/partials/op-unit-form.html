@@ -46,9 +46,11 @@
                         <li class="form-group" ng-if="opUnit.type==='Hospital'">
                             <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label required">Hospital Unit Code</label>
                             <div class="col-sm-6 col-md-6">
-                                <select type="text" class="form-control" name="hospitalUnitCode" id="hospitalUnitCode" ng-model="opUnit.hospitalUnitCode" title="{{newOrgUnit.hospitalUnitCode}}" ng-options="h as h for h in hospitalUnitCodes" ng-disabled="isDisabled" required>
+                                <!-- <select type="text" class="form-control" name="hospitalUnitCode" id="hospitalUnitCode" ng-model="opUnit.hospitalUnitCode" title="{{newOrgUnit.hospitalUnitCode}}" ng-options="h as h for h in hospitalUnitCodes" ng-disabled="isDisabled" required>
                                     <option value=""></option>
-                                </select>
+                                </select> -->
+                                <autocomplete tab-activation="true" click-activation="true" data="hospitalUnitCodes" ng-model="opUnit.hospitalUnitCode">
+                                </autocomplete>
                                 <div ng-show="form.hospitalUnitCode.$dirty &amp;&amp; form.hospitalUnitCode.$invalid">
                                     <span class="errortxt" ng-show="form.hospitalUnitCode.$error.required">{{resourceBundle.hospitalUnitCodeValidation}}</span>
                                 </div>
