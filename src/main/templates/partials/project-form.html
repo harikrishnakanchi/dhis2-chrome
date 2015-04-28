@@ -51,9 +51,6 @@
                     <li class="form-group">
                         <label for="newOrgUnitPopType" class="col-sm-4 col-md-4 control-label">Type of population</label>
                         <div class="col-sm-6 col-md-6">
-                            <!-- <select type="text" class="form-control" name="newOrgUnitPopType" id="newOrgUnitPopType" ng-model="newOrgUnit.populationType" title="{{newOrgUnit.populationType}}" ng-options="o as o for o in allPopTypes">
-                                <option value=""></option>
-                            </select> -->
                             <autocomplete tab-activation="true" click-activation="true" data="allPopTypes" ng-model="newOrgUnit.populationType">
                             </autocomplete>
                         </div>
@@ -61,9 +58,6 @@
                     <li class="form-group">
                         <label for="newOrgUnitReasonForIntervention" class="col-sm-4 col-md-4 control-label required">Reason for intervention</label>
                         <div class="col-sm-6 col-md-6">
-                            <!-- <select type="text" class="form-control" name="newOrgUnitReasonForIntervention" id="newOrgUnitReasonForIntervention" ng-model="newOrgUnit.reasonForIntervention" title="{{newOrgUnit.reasonForIntervention}}" ng-options="r as r for r in reasonForIntervention" required>
-                                <option value=""></option>
-                            </select> -->
                             <autocomplete tab-activation="true" click-activation="true" data="reasonForIntervention" ng-model="newOrgUnit.reasonForIntervention">
                             </autocomplete>
                             <div ng-show="createForm.newOrgUnitReasonForIntervention.$dirty &amp;&amp; createForm.newOrgUnitReasonForIntervention.$invalid">
@@ -74,9 +68,6 @@
                     <li class="form-group">
                         <label for="newOrgUnitModeOfOperation" class="col-sm-4 col-md-4 control-label">Mode of operation</label>
                         <div class="col-sm-6 col-md-6">
-                            <!-- <select type="text" class="form-control" name="newOrgUnitModeOfOperation" id="newOrgUnitModeOfOperation" ng-model="newOrgUnit.modeOfOperation" title="{{newOrgUnit.modeOfOperation}}" ng-options="mode as mode for mode in modeOfOperation">
-                                <option value=""></option>
-                            </select> -->
                             <autocomplete tab-activation="true" click-activation="true" data="modeOfOperation" ng-model="newOrgUnit.modeOfOperation">
                             </autocomplete>
                         </div>
@@ -84,9 +75,6 @@
                     <li class="form-group">
                         <label for="newOrgUnitModelOfManagement" class="col-sm-4 col-md-4 control-label required">Model of management</label>
                         <div class="col-sm-6 col-md-6">
-                            <!--  <select type="text" class="form-control" name="newOrgUnitModelOfManagement" id="newOrgUnitModelOfManagement" ng-model="newOrgUnit.modelOfManagement" title="{{newOrgUnit.modelOfManagement}}" ng-options="model as model for model in modelOfManagement" required>
-                                <option value=""></option>
-                            </select> -->
                             <autocomplete tab-activation="true" click-activation="true" data="modelOfManagement" ng-model="newOrgUnit.modelOfManagement">
                             </autocomplete>
                             <div ng-show="createForm.newOrgUnitModelOfManagement.$dirty &amp;&amp; createForm.newOrgUnitModelOfManagement.$invalid">
