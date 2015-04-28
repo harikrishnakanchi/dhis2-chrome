@@ -1,15 +1,13 @@
 define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository) {
     describe("project controller tests", function() {
-        var scope, timeout, q, location, anchorScroll, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository;
+        var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository;
 
         beforeEach(module('hustle'));
-        beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
+        beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
             scope = $rootScope.$new();
             rootScope = $rootScope;
             hustle = $hustle;
             q = $q;
-            timeout = $timeout;
-            location = $location;
             orgUnitGroupHelper = new OrgUnitGroupHelper();
 
             orgUnitRepo = utils.getMockRepo(q);
@@ -41,7 +39,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             scope.resourceBundle = {
                 "upsertOrgUnitDesc": "upsert org unit ",
-                "updateUserDesc": "update user ",
                 "uploadApprovalDataDesc": "approve data at coordination level for ",
                 "uploadCompletionDataDesc": "approve data at project level for "
             };
@@ -50,22 +47,10 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "locale": "en"
             };
 
-            fakeModal = {
-                close: function() {
-                    this.result.confirmCallBack();
-                },
-                dismiss: function(type) {
-                    this.result.cancelCallback(type);
-                },
-                open: function(object) {}
-            };
-
-            anchorScroll = jasmine.createSpy();
-
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper, approvalDataRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository);
         }));
 
         afterEach(function() {
@@ -397,145 +382,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             scope.isNewMode = false;
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper);
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
-        });
-
-        it('should set project users in view mode', function() {
-            scope.orgUnit = {
-                "name": "anyname",
-                "parent": {
-                    "id": "someId"
-                }
-            };
-            scope.isNewMode = false;
-            var users = [{
-                'userCredentials': {
-                    'username': 'foobar',
-                    'userRoles': [{
-                        "name": 'Data Entry User',
-                        "id": 'Role1Id'
-                    }, {
-                        "name": 'Project Level Approver',
-                        "id": 'Role2Id'
-                    }]
-                }
-            }, {
-                'userCredentials': {
-                    'username': 'blah',
-                    'userRoles': [{
-                        "name": 'Data Entry User',
-                        "id": 'Role1Id'
-                    }, {
-                        "name": 'Coordination Level Approver',
-                        "id": 'Role3Id'
-                    }]
-                }
-            }];
-
-            var expectedUsers = [{
-                'roles': 'Data Entry User, Project Level Approver',
-                'userCredentials': {
-                    'username': 'foobar',
-                    'userRoles': [{
-                        "name": 'Data Entry User',
-                        "id": 'Role1Id'
-                    }, {
-                        "name": 'Project Level Approver',
-                        "id": 'Role2Id',
-                    }]
-                }
-            }, {
-                'roles': 'Data Entry User, Coordination Level Approver',
-                'userCredentials': {
-                    'username': 'blah',
-                    'userRoles': [{
-                        "name": 'Data Entry User',
-                        "id": 'Role1Id'
-                    }, {
-                        "name": 'Coordination Level Approver',
-                        "id": 'Role3Id'
-                    }]
-                }
-            }];
-            spyOn(userRepository, "getAllProjectUsers").and.returnValue(utils.getPromise(q, users));
-
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
-            scope.$apply();
-
-            expect(scope.projectUsers).toEqual(expectedUsers);
-        });
-
-        it("should set user project as currently selected project", function() {
-            scope.orgUnit = {
-                "name": "anyname",
-            };
-            scope.currentUser = {
-                "id": "msfadmin"
-            };
-            scope.setUserProject();
-
-            expect(scope.currentUser.organisationUnits[0]).toEqual(scope.orgUnit);
-        });
-
-        it("should not toggle user's disabled state if confirmation cancelled", function() {
-            spyOn(fakeModal, 'open').and.returnValue({
-                result: utils.getRejectedPromise(q, {})
-            });
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
-            var user = {
-                id: '123',
-                name: "blah blah",
-                userCredentials: {
-                    disabled: false
-                }
-            };
-            scope.toggleUserDisabledState(user, true);
-            scope.$apply();
-
-            expect(scope.userStateSuccessfullyToggled).toBe(false);
-        });
-
-        it("should toggle user's disabled state if confirmed", function() {
-            spyOn(fakeModal, 'open').and.returnValue({
-                result: utils.getPromise(q, {})
-            });
-
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal);
-
-            var user = {
-                id: '123',
-                name: "blah blah",
-                userCredentials: {
-                    disabled: false,
-                    username: "blah blah"
-                }
-            };
-
-            var expectedUser = {
-                id: '123',
-                name: "blah blah",
-                userCredentials: {
-                    disabled: true,
-                    username: "blah blah"
-                }
-            };
-
-            var expectedMessage = {
-                data: user,
-                type: 'updateUser',
-                locale: 'en',
-                desc: 'update user blah blah'
-            };
-            spyOn(userRepository, "upsert").and.returnValue(utils.getPromise(q, user));
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
-            scope.toggleUserDisabledState(user);
-            scope.$apply();
-
-            expect(scope.userStateSuccessfullyToggled).toBe(true);
-            expect(userRepository.upsert).toHaveBeenCalledWith(expectedUser);
-            expect(hustle.publish).toHaveBeenCalledWith(expectedMessage, "dataValues");
         });
 
         it("should get all existing project codes while preparing new form", function() {
@@ -552,7 +401,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             orgUnitRepo.getAllProjects.and.returnValue(utils.getPromise(q, [project1]));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper);
             scope.$apply();
 
             expect(scope.existingProjectCodes).toEqual(["AF101"]);
@@ -572,13 +421,11 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, [project1]));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper);
             scope.$apply();
 
             expect(scope.peerProjects).toEqual(["Kabul-AF101"]);
         });
-
-
 
         it("should take the user to the view page of the parent country on clicking cancel", function() {
             var parentOrgUnit = {
@@ -594,7 +441,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 return;
             });
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, location, timeout, anchorScroll, userRepository, fakeModal, orgUnitGroupHelper);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper);
 
             scope.closeForm(parentOrgUnit);
 
@@ -663,8 +510,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             scope.$apply();
 
             expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(orgunitsToAssociate, true);
-
-
         });
     });
 

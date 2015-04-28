@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper, properties) {
 
-    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, $location, $timeout, $anchorScroll, userRepository, $modal, orgUnitGroupHelper, approvalDataRepository) {
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository) {
 
         $scope.allContexts = ['Internal instability', 'Stable', 'Post-conflict', 'Cross-border instability'].sort();
         $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
@@ -137,72 +137,6 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             });
         };
 
-        $scope.toggleUserDisabledState = function(user) {
-            $scope.toggleStateUsername = user.userCredentials.username;
-            $scope.isUserToBeDisabled = !user.userCredentials.disabled;
-            $scope.userStateSuccessfullyToggled = false;
-
-            var confirmationMessage = $scope.isUserToBeDisabled === true ? $scope.resourceBundle.userDisableConfMessage : $scope.resourceBundle.userEnableConfMessage;
-
-            $scope.modalMessages = {
-                "confirmationMessage": confirmationMessage
-            };
-
-            var modalInstance = $modal.open({
-                templateUrl: 'templates/toggle-disable-state-confirmation.html',
-                controller: 'confirmDialogController',
-                scope: $scope
-            });
-
-            var onTimeOut = function() {
-                $scope.userStateSuccessfullyToggled = false;
-            };
-
-            var okConfirmation = function() {
-                user.userCredentials.disabled = $scope.isUserToBeDisabled;
-                return userRepository.upsert(user)
-                    .then(function(data) {
-                        return publishMessage(data, "updateUser", $scope.resourceBundle.updateUserDesc + user.userCredentials.username);
-                    });
-            };
-
-            modalInstance.result.then(okConfirmation).then(function() {
-                $scope.userStateSuccessfullyToggled = true;
-                $timeout(onTimeOut, properties.messageTimeout);
-            }, function() {
-                $scope.userStateSuccessfullyToggled = false;
-                $timeout(onTimeOut, properties.messageTimeout);
-            });
-        };
-
-        $scope.setUserProject = function() {
-            $scope.currentUser.organisationUnits = [$scope.orgUnit];
-        };
-
-        var scrollToTop = function() {
-            $location.hash();
-            $anchorScroll();
-        };
-
-        var setProjectUsersForEdit = function(projectUsers) {
-            var roleNamesToDisplay = ["Data entry user", "Project Level Approver", "Coordination Level Approver"];
-
-            var shouldDisplayUser = function(userRoleNames) {
-                return _.intersection(_.pluck(userRoleNames, "name"), roleNamesToDisplay).length === 1;
-            };
-
-            $scope.projectUsers = [];
-            _.each(projectUsers, function(user) {
-                if (shouldDisplayUser(user.userCredentials.userRoles)) {
-                    var roles = user.userCredentials.userRoles.map(function(role) {
-                        return role.name;
-                    });
-                    user.roles = roles.join(", ");
-                    $scope.projectUsers.push(user);
-                }
-            });
-        };
-
         var prepareNewForm = function() {
             $scope.reset();
             orgUnitRepository.getAllProjects().then(function(allProjects) {
@@ -228,7 +162,6 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
             $scope.newOrgUnit = orgUnitMapper.mapToProject($scope.orgUnit);
             orgUnitRepository.getAllProjects().then(function(allProjects) {
                 $scope.peerProjects = _.without(orgUnitRepository.getChildOrgUnitNames($scope.orgUnit.parent.id), $scope.orgUnit.name);
-                userRepository.getAllProjectUsers($scope.orgUnit).then(setProjectUsersForEdit);
             });
         };
 

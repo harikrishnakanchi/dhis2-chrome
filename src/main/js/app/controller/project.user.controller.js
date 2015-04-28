@@ -1,5 +1,5 @@
-define(["dhisId"], function(dhisId) {
-    return function($scope, $hustle, userRepository) {
+define(["dhisId", "properties"], function(dhisId, properties) {
+    return function($scope, $hustle, $timeout, $modal, userRepository) {
 
         var allRoles = [{
             "name": "Data entry user"
@@ -18,8 +18,81 @@ define(["dhisId"], function(dhisId) {
             $scope.userNameMatchExpr = new RegExp($scope.userNamePrefix + "(.)+", "i");
 
             $scope.userRoles = allRoles;
-            userRepository.getAllUsernames().then(function(data) {
-                $scope.existingUsers = data;
+            userRepository.getAllUsernames()
+                .then(setExistingUserNames)
+                .then(loadOrgUnitUsers);
+        };
+
+        var setExistingUserNames = function(data) {
+            $scope.existingUsers = data;
+        };
+
+        var loadOrgUnitUsers = function() {
+            return userRepository.getAllProjectUsers($scope.orgUnit).then(function(orgUnitUsers) {
+                var roleNamesToDisplay = ["Data entry user", "Project Level Approver", "Coordination Level Approver"];
+
+                var shouldDisplayUser = function(userRoleNames) {
+                    return _.intersection(_.pluck(userRoleNames, "name"), roleNamesToDisplay).length === 1;
+                };
+
+                $scope.orgUnitUsers = [];
+                _.each(orgUnitUsers, function(user) {
+                    if (shouldDisplayUser(user.userCredentials.userRoles)) {
+                        var roles = user.userCredentials.userRoles.map(function(role) {
+                            return role.name;
+                        });
+                        user.roles = roles.join(", ");
+                        $scope.orgUnitUsers.push(user);
+                    }
+                });
+            });
+        };
+
+        var publishMessage = function(data, action, desc) {
+            return $hustle.publish({
+                "data": data,
+                "type": action,
+                "locale": $scope.currentUser.locale,
+                "desc": desc
+            }, "dataValues").then(function() {
+                return data;
+            });
+        };
+
+        $scope.toggleUserDisabledState = function(user) {
+            $scope.toggleStateUsername = user.userCredentials.username;
+            $scope.isUserToBeDisabled = !user.userCredentials.disabled;
+            $scope.userStateSuccessfullyToggled = false;
+
+            var confirmationMessage = $scope.isUserToBeDisabled === true ? $scope.resourceBundle.userDisableConfMessage : $scope.resourceBundle.userEnableConfMessage;
+
+            $scope.modalMessages = {
+                "confirmationMessage": confirmationMessage
+            };
+
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/toggle-disable-state-confirmation.html',
+                controller: 'confirmDialogController',
+                scope: $scope
+            });
+
+            var onTimeOut = function() {
+                $scope.userStateSuccessfullyToggled = false;
+            };
+
+            var okConfirmation = function() {
+                user.userCredentials.disabled = $scope.isUserToBeDisabled;
+                return userRepository.upsert(user).then(function(data) {
+                    return publishMessage(data, "updateUser", $scope.resourceBundle.updateUserDesc + user.userCredentials.username);
+                });
+            };
+
+            modalInstance.result.then(okConfirmation).then(function() {
+                $scope.userStateSuccessfullyToggled = true;
+                $timeout(onTimeOut, properties.messageTimeout);
+            }, function() {
+                $scope.userStateSuccessfullyToggled = false;
+                $timeout(onTimeOut, properties.messageTimeout);
             });
         };
 
@@ -53,15 +126,6 @@ define(["dhisId"], function(dhisId) {
                     "id": $scope.orgUnit.id,
                     "name": $scope.orgUnit.name
                 }]
-            };
-
-            var publishMessage = function(data, action, desc) {
-                return $hustle.publish({
-                    "data": data,
-                    "type": action,
-                    "locale": $scope.currentUser.locale,
-                    "desc": desc
-                }, "dataValues");
             };
 
             var onSuccess = function(data) {

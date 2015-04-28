@@ -122,36 +122,5 @@
             </div>
         </div>
     </form>
-    <div class="panel panel-default" ng-if="!isNewMode &amp;&amp; projectUsers.length !== 0">
-        <div class="panel-heading">
-            <h3 class="panel-title">Project User List</h3>
-        </div>
-        <div class="panel-body">
-            <div ng-show="isUserToBeDisabled &amp;&amp; userStateSuccessfullyToggled" class="alert alert-success">{{ resourceBundle.userDisableSuccess }}</div>
-            <div ng-show="!isUserToBeDisabled &amp;&amp; userStateSuccessfullyToggled" class="alert alert-success">{{ resourceBundle.userEnableSuccess }}</div>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Role</th>
-                        <th>Enable/Disable</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="user in projectUsers | orderBy: 'userCredentials.username'">
-                        <td> {{user.userCredentials.username}}</td>
-                        <td> {{user.roles}}</td>
-                        <td>
-                            <a ng-if="!user.userCredentials.disabled" href="" title="Disable" class="delete" ng-if="user.roles != 'Superuser'" ng-click="toggleUserDisabledState(user)">
-                                <span class="glyphicon glyphicon-remove"></span>
-                            </a>
-                            <a ng-if="user.userCredentials.disabled" href="" title="Enable" class="delete" ng-if="user.roles != 'Superuser'" ng-click="toggleUserDisabledState(user)">
-                                <span class="glyphicon glyphicon-ok"></span>
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <div ng-include="'templates/partials/project-user-form.html'"></div>
 </div>
