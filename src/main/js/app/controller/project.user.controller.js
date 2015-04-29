@@ -1,26 +1,37 @@
 define(["dhisId", "properties"], function(dhisId, properties) {
     return function($scope, $hustle, $timeout, $modal, userRepository) {
 
-        var allRoles = [{
-            "name": "Data entry user"
-        }, {
-            "name": "Project Level Approver"
-        }, {
-            "name": "Coordination Level Approver"
-        }];
+        var allRoles = {
+            "Project": [{
+                "name": "Data entry user"
+            }, {
+                "name": "Project Level Approver"
+            }],
+            "Country": [{
+                "name": "Coordination Level Approver"
+            }]
+        };
 
         var init = function() {
-            $scope.userNamePrefix = _.find($scope.orgUnit.attributeValues, {
-                'attribute': {
-                    'code': 'projCode'
-                }
-            }).value.toLowerCase() + "_";
+            $scope.userNamePrefix = getAttributeValue($scope.orgUnit.attributeValues, 'projCode').toLowerCase();
+            $scope.userNamePrefix = _.isEmpty($scope.userNamePrefix) ? $scope.userNamePrefix : $scope.userNamePrefix + "_";
             $scope.userNameMatchExpr = new RegExp($scope.userNamePrefix + "(.)+", "i");
 
-            $scope.userRoles = allRoles;
+            var orgUnitType = getAttributeValue($scope.orgUnit.attributeValues, 'Type');
+            $scope.userRoles = allRoles[orgUnitType];
             userRepository.getAllUsernames()
                 .then(setExistingUserNames)
                 .then(loadOrgUnitUsers);
+        };
+
+        var getAttributeValue = function(attributeValues, attributeCode) {
+            var attr = _.find(attributeValues, {
+                'attribute': {
+                    'code': attributeCode
+                }
+            });
+
+            return attr ? attr.value : "";
         };
 
         var setExistingUserNames = function(data) {
@@ -29,7 +40,7 @@ define(["dhisId", "properties"], function(dhisId, properties) {
 
         var loadOrgUnitUsers = function() {
             return userRepository.getAllProjectUsers($scope.orgUnit).then(function(orgUnitUsers) {
-                var roleNamesToDisplay = ["Data entry user", "Project Level Approver", "Coordination Level Approver"];
+                var roleNamesToDisplay = _.pluck($scope.userRoles, "name");
 
                 var shouldDisplayUser = function(userRoleNames) {
                     return _.intersection(_.pluck(userRoleNames, "name"), roleNamesToDisplay).length === 1;

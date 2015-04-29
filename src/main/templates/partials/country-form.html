@@ -4,6 +4,7 @@
     </div>
     <div class="top-actions" ng-if="!isNewMode">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Project" ng-click="openInNewMode('Project')" />
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />
     </div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorCountry }}</div>
     <div class="panel panel-default">
@@ -49,4 +50,5 @@
             </form>
         </div>
     </div>
+    <div ng-include="'templates/partials/project-user-form.html'"></div>
 </div>

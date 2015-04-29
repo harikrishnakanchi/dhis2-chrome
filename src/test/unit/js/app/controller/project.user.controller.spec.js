@@ -14,11 +14,14 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                 "id": "someId",
                 "attributeValues": [{
                     "attribute": {
-                        "code": "projCode",
-                        "name": "Project Code",
-                        "id": "fa5e00d5cd2"
+                        "code": "projCode"
                     },
                     "value": "PRJ"
+                }, {
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Project"
                 }]
             };
 
@@ -143,7 +146,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
             expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
         });
 
-        it('should set project users in view mode', function() {
+        it('should set users for selected orgunit in view mode', function() {
             scope.orgUnit = {
                 "name": "anyname",
                 "parent": {
@@ -187,19 +190,8 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                         "id": 'Role2Id',
                     }]
                 }
-            }, {
-                'roles': 'Data Entry User, Coordination Level Approver',
-                'userCredentials': {
-                    'username': 'blah',
-                    'userRoles': [{
-                        "name": 'Data Entry User',
-                        "id": 'Role1Id'
-                    }, {
-                        "name": 'Coordination Level Approver',
-                        "id": 'Role3Id'
-                    }]
-                }
             }];
+
             userRepository.getAllProjectUsers.and.returnValue(utils.getPromise(q, users));
 
             scope.$apply();
