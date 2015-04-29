@@ -54,7 +54,6 @@ require.config({
         "countryController": "app/controller/country.controller",
         "confirmDialogController": "app/controller/confirm.dialog.controller",
         "projectUserController": "app/controller/project.user.controller",
-        "selectProjectController": "app/controller/select.project.controller",
         "indicatorController": "app/controller/indicator.controller",
         "patientOriginController": "app/controller/patient.origin.controller",
         "productKeyController": "app/controller/product.key.controller",

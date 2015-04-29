@@ -1,10 +1,10 @@
 define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'aggregateModuleController',
-        'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController', 'selectProjectController',
+        'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController',
         'aggregateDataEntryController', 'lineListDataEntryController', 'indicatorController', 'patientOriginController', 'productKeyController',
         'lineListSummaryController', 'dataApprovalController', 'dataEntryApprovalDashboardController', 'lineListOfflineApprovalController', 'appCloneController'
     ],
     function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, aggregateModuleController,
-        lineListModuleController, projectController, countryController, confirmDialogController, projectUserController, selectProjectController,
+        lineListModuleController, projectController, countryController, confirmDialogController, projectUserController,
         aggregateDataEntryController, lineListDataEntryController, indicatorController, patientOriginController, productKeyController,
         lineListSummaryController, dataApprovalController, dataEntryApprovalDashboardController, lineListOfflineApprovalController, appCloneController) {
 
@@ -26,7 +26,6 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('countryController', ['$scope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', countryController]);
             app.controller('confirmDialogController', ['$scope', '$modalInstance', confirmDialogController]);
             app.controller('projectUserController', ['$scope', '$hustle', '$timeout', '$modal', 'userRepository', projectUserController]);
-            app.controller('selectProjectController', ['$scope', '$location', '$rootScope', 'orgUnitRepository', 'userRepository', 'userPreferenceRepository', selectProjectController]);
             app.controller('indicatorController', ['$scope', 'indicatorRepository', indicatorController]);
             app.controller('patientOriginController', ['$scope', '$hustle', '$q', 'patientOriginRepository', 'orgUnitRepository', 'datasetRepository', 'programRepository', 'originOrgunitCreator', 'orgUnitGroupHelper', patientOriginController]);
             app.controller('productKeyController', ['$scope', '$location', '$rootScope', 'metadataImporter', productKeyController]);
