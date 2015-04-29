@@ -1,6 +1,6 @@
 define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRepository", "orgUnitRepository", "dataRepository", "utils", "moment", "timecop", "lodash"],
     function(DataEntryApprovalDashboardController, mocks, ApprovalDataRepository, OrgUnitRepository, DataRepository, utils, moment, timecop, _) {
-        describe("approval helper", function() {
+        describe("dataEntryApprovalDashboardController", function() {
             var q, rootScope, db, hustle, scope, location, timeout, fakeModal, approvalDataRepository, orgUnitRepository, dataRepository;
 
             beforeEach(module('hustle'));
@@ -66,13 +66,16 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "organisationUnits": [{
                         "id": "123",
                         "name": "MISSIONS EXPLOS"
-                    }]
+                    }],
+                    "selectedProject": {
+                        "id": "123",
+                        "name": "MISSIONS EXPLOS"
+                    }
                 };
 
                 dashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository);
 
                 scope.$apply();
-                timeout.flush();
 
                 expect(scope.userApprovalLevel).toBe(1);
             });

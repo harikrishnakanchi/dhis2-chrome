@@ -293,12 +293,10 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
 
         it("should get all projects", function() {
             var expectedProject = _.cloneDeep(project);
-            expectedProject.code = "PRJ001";
 
             orgUnitRepository.getAllProjects().then(function(data) {
                 expect(data.length).toEqual(1);
                 expect(data[0]).toEqual(expectedProject);
-                expect(expectedProject.code).toEqual("PRJ001");
             });
 
             scope.$apply();

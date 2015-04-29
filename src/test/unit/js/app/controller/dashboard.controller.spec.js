@@ -50,42 +50,5 @@ define(["dashboardController", "angularMocks", "utils", "lodash"],
                     expect(hustle.publish.calls.argsFor(i)).toEqual(expectedHustleArgs[i]);
                 });
             });
-
-            it("should set current users project", function() {
-                scope.$parent.projects = [{
-                    "id": 321,
-                    "name": "Prj1"
-                }, {
-                    "id": "123"
-                }];
-
-                rootScope.currentUser = {
-                    "firstName": "test1",
-                    "lastName": "test1last",
-                    "userCredentials": {
-                        "username": "dataentryuser",
-                        "userRoles": [{
-                            "name": 'Superuser'
-                        }]
-                    },
-                    "organisationUnits": [{
-                        "id": "123",
-                        "name": "MISSIONS EXPLOS"
-                    }]
-                };
-
-                rootScope.hasRoles = function(args) {
-                    if (args[0] === "Superuser")
-                        return true;
-                    else
-                        return false;
-                };
-
-                dashboardController = new DashboardController(scope, hustle, q, rootScope, timeout);
-
-                scope.$apply();
-
-                expect(scope.$parent.currentUserProject.id).toBe("123");
-            });
         });
     });

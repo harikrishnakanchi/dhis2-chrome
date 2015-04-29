@@ -106,7 +106,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
         it("should determine username prefix and return validate username", function() {
             var specifiedUserName = "prj_afdssd";
 
-            expect(scope.userNamePrefix).toEqual("prj_");
+            expect(scope.userNamePlaceHolder).toEqual("Username should begin with prj_");
             expect(scope.userNameMatchExpr.test(specifiedUserName)).toEqual(true);
         });
 

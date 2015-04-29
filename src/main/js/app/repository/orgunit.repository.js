@@ -112,30 +112,13 @@ define(["moment", "lodashUtils"], function(moment, _) {
         };
 
         var getAllProjects = function() {
-            var getAttributeValue = function(orgUnit, attrCode) {
-                return _.find(orgUnit.attributeValues, {
-                    "attribute": {
-                        "code": attrCode
-                    }
-                }).value;
-            };
-
             var filterProjects = function(orgUnits) {
                 return _.filter(orgUnits, function(orgUnit) {
                     return isOfType(orgUnit, "Project");
                 });
             };
 
-            var mapProjectCode = function(orgUnits) {
-                return _.map(orgUnits, function(orgUnit) {
-                    orgUnit.code = getAttributeValue(orgUnit, "projCode");
-                    return orgUnit;
-                });
-            };
-
-            return getAll()
-                .then(filterProjects)
-                .then(mapProjectCode);
+            return getAll().then(filterProjects);
         };
 
         var getParentProject = function(orgUnitId) {

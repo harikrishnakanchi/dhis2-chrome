@@ -139,6 +139,11 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             $scope.isOfflineApproval = true;
         };
 
+        $rootScope.$watch("currentUser.selectedProject", function() {
+            resetForm();
+            init();
+        });
+
         var init = function() {
             $scope.loading = true;
             $scope.isOfflineApproval = false;
@@ -199,7 +204,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     $scope.dataentryForm.$setPristine();
 
                 return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadApprovalDataPromise]);
-
             }).finally(function() {
                 $scope.loading = false;
             });

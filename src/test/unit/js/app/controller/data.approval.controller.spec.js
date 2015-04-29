@@ -70,15 +70,19 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                         }]
                     },
                     "organisationUnits": [{
-                        id: "proj_1",
+                        "id": "proj_1",
                         "name": "MISSIONS EXPLOS"
                     }, {
-                        id: "test1",
+                        "id": "test1",
                         "name": "MISSIONS EXPLOS123"
                     }, {
-                        id: "test2",
+                        "id": "test2",
                         "name": "MISSIONS EXPLOS345"
-                    }]
+                    }],
+                    "selectedProject": {
+                        "id": "proj_1",
+                        "name": "MISSIONS EXPLOS"
+                    }
                 };
 
                 scope.resourceBundle = {
@@ -153,7 +157,6 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 Timecop.uninstall();
             });
 
-
             it("should submit data for first level approval", function() {
                 var levelOneApprovalDataSaved = false;
                 getApprovalDataSpy.and.callFake(function() {
@@ -209,6 +212,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
             });
 
             it("should not submit data for approval", function() {
+                scope.$apply();
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });

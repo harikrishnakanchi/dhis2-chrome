@@ -53,14 +53,23 @@ define(["lodash", "moment"],
             });
 
             var setAvailableModules = function() {
-                return orgUnitRepository.getAllModulesInOrgUnits(_.pluck($rootScope.currentUser.organisationUnits, "id")).then(function(modules) {
-                    modules = _.map(modules, function(module) {
-                        module.displayName = module.parent.name + ' - ' + module.name;
-                        return module;
+                if ($rootScope.currentUser) {
+                    return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(modules) {
+                        modules = _.map(modules, function(module) {
+                            module.displayName = module.parent.name + ' - ' + module.name;
+                            return module;
+                        });
+                        $scope.modules = modules;
                     });
-                    $scope.modules = modules;
-                });
+                } else {
+                    $scope.modules = [];
+                    return $q.when({});
+                }
             };
+
+            $rootScope.$watch("currentUser.selectedProject", function() {
+                init();
+            });
 
             var init = function() {
                 var setInitialModuleAndWeek = function() {
@@ -91,6 +100,7 @@ define(["lodash", "moment"],
 
                 $location.hash('top');
                 $scope.loading = true;
+
                 setAvailableModules()
                     .then(setInitialModuleAndWeek)
                     .finally(function() {

@@ -1,7 +1,7 @@
 define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "userRepository", "metadataImporter", "sessionHelper", "chromeUtils"],
     function(MainController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, UserRepository, MetadataImporter, SessionHelper, chromeUtils) {
         describe("main controller", function() {
-            var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, getAllProjectsSpy, db,
+            var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, getAllProjectsSpy, db, frenchResourceBundle,
                 translationStore, userPreferenceRepository, location, orgUnitRepository, userRepository, metadataImporter, sessionHelper;
 
             beforeEach(mocks.inject(function($rootScope, $q, $location) {
@@ -71,22 +71,25 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 getAllProjectsSpy = spyOn(orgUnitRepository, "getAllProjects");
                 getAllProjectsSpy.and.returnValue(utils.getPromise(q, []));
 
+                spyOn(userPreferenceRepository, "save");
+                spyOn(userPreferenceRepository, "get").and.returnValue(utils.getPromise(q, {
+                    'orgUnits': [{
+                        'id': 111
+                    }]
+                }));
+                spyOn(orgUnitRepository, "getAll").and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
+
                 mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
                     userRepository, metadataImporter, sessionHelper);
             }));
 
-            it("should load projects", function() {
-                var projectList = [{
-                    "blah": "moreBlah"
-                }];
-
-                getAllProjectsSpy.and.returnValue(utils.getPromise(q, projectList));
+            it("should import metadata", function() {
                 mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
                     userRepository, metadataImporter, sessionHelper);
                 scope.$apply();
 
                 expect(metadataImporter.run).toHaveBeenCalled();
-                expect(scope.projects).toEqual(projectList);
             });
 
             it("should logout user", function() {
@@ -111,18 +114,12 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                     }]
                 };
                 rootScope.currentUser.locale = "fr";
-                var frenchResourceBundle = {
+
+                frenchResourceBundle = {
                     "data": {
                         "login": "french"
                     }
                 };
-                spyOn(userPreferenceRepository, "save");
-                spyOn(userPreferenceRepository, "get").and.returnValue(utils.getPromise(q, {
-                    'orgUnits': [{
-                        'id': 111
-                    }]
-                }));
-                spyOn(orgUnitRepository, "getAll").and.returnValue(utils.getPromise(q, []));
                 getResourceBundleSpy.and.returnValue(utils.getPromise(q, frenchResourceBundle));
 
                 scope.$apply();
@@ -138,77 +135,6 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                         "id": '123'
                     }]
                 });
-            });
-
-            it("should save user", function() {
-                rootScope.currentUser = {
-                    "userCredentials": {
-                        "username": "1"
-                    },
-                    "locale": "en",
-                    "organisationUnits": [{
-                        "id": "123"
-                    }]
-                };
-                var current = {
-                    "id": 321,
-                    "name": "Prj1"
-                };
-                var old = {
-                    "id": "123"
-                };
-
-                scope.currentUserProject = current;
-                scope.oldUserProject = old;
-
-                var projectList = [current, old];
-                getAllProjectsSpy.and.returnValue(utils.getPromise(q, projectList));
-
-                spyOn(userRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-                spyOn(userPreferenceRepository, "save");
-                spyOn(userPreferenceRepository, "get").and.returnValue(utils.getPromise(q, {
-                    'orgUnits': [{
-                        'id': "123"
-                    }]
-                }));
-
-                scope.saveUser();
-                scope.$apply();
-
-                expect(userRepository.upsert).toHaveBeenCalledWith(rootScope.currentUser);
-                expect(rootScope.currentUser.organisationUnits).toEqual([current]);
-                expect(userPreferenceRepository.save).toHaveBeenCalledWith({
-                    "username": '1',
-                    "locale": "en",
-                    "orgUnits": [current]
-                });
-                expect(scope.currentUserProject).toEqual({
-                    id: '123'
-                });
-            });
-
-            it("should not allow changing project if on selectproject page", function() {
-                location.path("/selectproject");
-
-                expect(scope.canChangeProject(true, true)).toBeFalsy();
-            });
-
-            it("should allow changing project if not on selectproject page", function() {
-                location.path("/somethingelse");
-
-                expect(scope.canChangeProject(true, true)).toBeTruthy();
-            });
-
-            it("should not allow changing project if not admin", function() {
-                location.path("/somethingelse");
-
-                expect(scope.canChangeProject(true, false)).toBeFalsy();
-            });
-
-            it("should not allow changing project if not loggedin", function() {
-                location.path("/somethingelse");
-
-                expect(scope.canChangeProject(false, true)).toBeFalsy();
             });
 
             it("should redirect to product key page", function() {
@@ -233,6 +159,31 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
 
                 expect(rootScope.auth_header).toEqual("Basic Auth");
                 expect(location.path).toHaveBeenCalledWith("/login");
+            });
+
+            it("should reset projects on current user's org units changes", function() {
+                var projects = [{
+                    "id": "prj1"
+                }, {
+                    "id": "prj2"
+                }];
+
+                rootScope.currentUser = {
+                    "userCredentials": {
+                        "username": "username"
+                    },
+                    "organisationUnits": [{
+                        "id": "someOrgUnit"
+                    }]
+                };
+
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, projects));
+                scope.$apply();
+                rootScope.$apply();
+
+                expect(scope.projects).toEqual(projects);
+                expect(scope.selectedProject).toEqual(projects[0]);
+                expect(rootScope.currentUser.selectedProject).toEqual(projects[0]);
             });
         });
     });

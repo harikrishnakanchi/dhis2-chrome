@@ -71,15 +71,5 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             $scope.messageClass = isErrorMessage ? "alert alert-danger" : "alert alert-success";
             $timeout(hideMessage, properties.messageTimeout);
         };
-
-        var init = function() {
-            if ($rootScope.hasRoles(['Superuser']) && $rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
-                $scope.$parent.currentUserProject = _.find($scope.$parent.projects, {
-                    "id": $rootScope.currentUser.organisationUnits[0].id
-                });
-            }
-        };
-
-        init();
     };
 });

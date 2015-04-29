@@ -12,12 +12,12 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return userPreferenceRepository.save(userPreferences);
         };
 
-        $scope.canChangeProject = function(hasUserLoggedIn, isAdmin) {
-            return hasUserLoggedIn && isAdmin && $location.path() !== "/selectproject";
+        $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
+            return hasUserLoggedIn && isCoordinationApprover;
         };
 
         $scope.getFormattedOption = function(project) {
-            return project.parent.name + ' - ' + project.name + ' (' + project.code + ')';
+            return project.parent.name + ' - ' + project.name;
         };
 
         $rootScope.$watch("currentUser.locale", function() {
@@ -50,38 +50,15 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return $rootScope.currentUser ? getResourceBundle($rootScope.currentUser.locale, true) : getResourceBundle("en", false);
         });
 
-        $scope.saveUser = function() {
-            if (!_.isEmpty($scope.oldUserProject)) {
-                $rootScope.currentUser.organisationUnits = _.reject($rootScope.currentUser.organisationUnits, {
-                    "id": $scope.oldUserProject.id
+        var resetProjects = function() {
+            if ($rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
+                var orgUnitIds = _.pluck($rootScope.currentUser.organisationUnits, "id");
+                return orgUnitRepository.findAllByParent(orgUnitIds).then(function(orgUnits) {
+                    $scope.projects = orgUnits;
+                    $scope.selectedProject = $scope.projects[0];
+                    $rootScope.currentUser.selectedProject = $scope.projects[0];
                 });
             }
-            $rootScope.currentUser.organisationUnits = $rootScope.currentUser.organisationUnits ? $rootScope.currentUser.organisationUnits : [];
-            $rootScope.currentUser.organisationUnits.push({
-                "id": $scope.currentUserProject.id,
-                "name": $scope.currentUserProject.name
-            });
-
-            return userRepository.upsert($rootScope.currentUser).then(saveUserPreferences);
-        };
-
-        var resetProjects = function() {
-            var assignCurrentProject = function() {
-                if (!_.isEmpty($rootScope.currentUser)) {
-                    userPreferenceRepository.get($rootScope.currentUser.userCredentials.username).then(function(data) {
-                        if (!_.isEmpty(data) && !_.isEmpty(data.orgUnits)) {
-                            $scope.currentUserProject = _.find($scope.projects, {
-                                "id": data.orgUnits[0].id
-                            });
-                            $scope.oldUserProject = $scope.currentUserProject;
-                        }
-                    });
-                }
-            };
-
-            orgUnitRepository.getAllProjects().then(function(orgUnits) {
-                $scope.projects = orgUnits;
-            }).then(assignCurrentProject);
         };
 
         var getAuthHeader = function() {
@@ -96,15 +73,13 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             resetProjects();
         }, true);
 
-        $rootScope.$watch("currentUser", function() {
-            resetProjects();
-        }, true);
-
         $scope.logout = function() {
             sessionHelper.logout();
         };
 
-        $rootScope.$on('resetProjects', resetProjects);
+        $scope.setSelectedProject = function() {
+            $rootScope.currentUser.selectedProject = $scope.selectedProject;
+        };
 
         var showProductKeyPage = function() {
             $location.path("/productKeyPage");
@@ -113,7 +88,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         var setAuthHeaderOnRootscope = function(result) {
             $rootScope.auth_header = result;
             $location.path("/login");
-            metadataImporter.run().then(resetProjects);
+            metadataImporter.run();
         };
 
         var init = function() {

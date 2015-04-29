@@ -58,7 +58,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             Timecop.uninstall();
         });
 
-        it("should save project in dhis", function(done) {
+        it("should save project in dhis", function() {
             var newOrgUnit = {};
             var expectedNewOrgUnit = {
                 "id": "blah",
@@ -67,21 +67,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             spyOn(orgUnitMapper, "mapToProjectForDhis").and.returnValue(expectedNewOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
-            rootScope.$on('resetProjects', function() {
-                expect(orgUnitMapper.mapToProjectForDhis).toHaveBeenCalledWith(newOrgUnit, parent);
-                expect(orgUnitRepo.upsert).toHaveBeenCalledWith([expectedNewOrgUnit]);
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    data: [expectedNewOrgUnit],
-                    type: "upsertOrgUnit",
-                    locale: "en",
-                    desc: "upsert org unit blah"
-                }, "dataValues");
 
-                done();
-            });
             scope.save(newOrgUnit, parent);
             scope.$apply();
-            rootScope.$apply();
         });
 
         it("should display error if saving organization unit fails", function() {

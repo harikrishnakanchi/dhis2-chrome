@@ -150,6 +150,10 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             if (level === 2) return "Coordination Level";
         };
 
+        $rootScope.$watch("currentUser.selectedProject", function() {
+            init();
+        });
+
         var showModal = function(okCallback, message) {
             $scope.modalMessages = message;
             var modalInstance = $modal.open({
@@ -375,9 +379,9 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                 return approvalRole[0] ? getApproverLevelFromRole(approvalRole[0].name) : undefined;
             };
 
-            if ($rootScope.hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver']) && $rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
+            if ($rootScope.hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver']) && $rootScope.currentUser && $rootScope.currentUser.selectedProject) {
                 $scope.loading = true;
-                getApprovalStatus($rootScope.currentUser.organisationUnits[0].id).then(function(approvalStatusData) {
+                getApprovalStatus($rootScope.currentUser.selectedProject.id).then(function(approvalStatusData) {
                     $scope.userApprovalLevel = getUserApprovalLevel();
                     $scope.itemsAwaitingSubmission = filterItemsAwaitingSubmission(approvalStatusData);
                     $scope.itemsAwaitingApprovalAtUserLevel = $scope.userApprovalLevel ? filterItemsAwaitingApprovalAtUserLevel(approvalStatusData, $scope.userApprovalLevel) : [];

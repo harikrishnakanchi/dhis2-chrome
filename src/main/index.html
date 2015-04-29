@@ -37,10 +37,10 @@
                     </li>
                 </ul>
             </div>
-            <div class="container" ng-hide="true">
+            <div class="container">
                 <ul class="nav navbar-nav navbar-right">
-                    <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Superuser']))">
-                        <select name="project" class="select_project input-sm" ng-model="currentUserProject" ng-options="getFormattedOption(p) for p in projects | orderBy:getFormattedOption" ng-change="saveUser()">
+                    <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Coordination Level Approver']))">
+                        <select name="project" class="select_project input-sm" ng-model="selectedProject" ng-options="getFormattedOption(p) for p in projects | orderBy:getFormattedOption" ng-change="setSelectedProject()">
                         </select>
                     </li>
                 </ul>

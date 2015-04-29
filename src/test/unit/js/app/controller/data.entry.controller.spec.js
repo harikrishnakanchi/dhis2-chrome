@@ -37,7 +37,11 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     }, {
                         id: "test2",
                         "name": "MISSIONS EXPLOS345"
-                    }]
+                    }],
+                    "selectedProject": {
+                        id: "proj_1",
+                        "name": "MISSIONS EXPLOS"
+                    }
                 };
 
                 allModules = [{
