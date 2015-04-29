@@ -20,6 +20,7 @@
         "js-md5": "1.1.0",
         "hustle": "https://github.com/orthecreedence/hustle.git",
         "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git",
+        "angucomplete-alt": "0.0.39",
         "timecop": "0.1.1",
         "jszip": "2.5.0",
         "sjcl": "1.0.2"

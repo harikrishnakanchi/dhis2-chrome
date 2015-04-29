@@ -33,9 +33,10 @@
                     <li class="form-group">
                         <label for="program" class="col-sm-4 col-md-4 control-label required">{{resourceBundle.selectProgramLabel}}</label>
                         <div class="col-sm-6 col-md-6">
-                            <select type="text" ng-change="getEnrichedProgram(program.id)" name="programsDropDown" id="programsDropDown" ng-model="program" ng-disabled="!isNewMode" ng-options="program.name for program in allPrograms">
-                                <option value=""></option>
-                            </select>
+                            <div class="col-sm-6 col-md-6">
+                                <div disable-input="!isNewMode" angucomplete-alt="" id="ex9" placeholder="Start Typing..." pause="100" selected-object="onProgramSelect" local-data="allPrograms" search-fields="name" title-field="name" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" initial-value="{{program.name}}" class="ng-isolate-scope">
+                                </div>
+                            </div>
                         </div>
                         <div>
                         </div>

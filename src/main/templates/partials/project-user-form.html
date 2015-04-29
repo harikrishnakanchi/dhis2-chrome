@@ -21,9 +21,8 @@
                     <li class="form-group">
                         <label for="userRole" class="col-sm-4 col-md-4 control-label required">Role</label>
                         <div class="col-sm-6 col-md-6">
-                            <select type="text" class="form-control" name="userRole" id="userRole" ng-model="projectUser.userRole " ng-options="role as role.name for role in userRoles" required>
-                                <option value=""></option>
-                            </select>
+                            <div angucomplete-alt id="ex1" placeholder="Start Typing..." pause="100" selected-object="projectUser.userRole" local-data="userRoles" search-fields="name" title-field="name" minlength="0" input-class="form-control form-control-small">
+                            </div>
                             <div ng-show="createForm.userRole.$dirty &amp;&amp; createForm.userRole.$invalid">
                                 <span ng-show="createForm.userRole.$error.required" class="errortxt">{{resourceBundle.roleValidation}}</span>
                             </div>

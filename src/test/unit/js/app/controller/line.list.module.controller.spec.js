@@ -572,11 +572,15 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }]
                 };
 
+                var selectedObject = {
+                    "originalObject": program
+                };
+
                 spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
                 spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, program));
                 spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
 
-                scope.getEnrichedProgram("surgery1").then(function(data) {
+                scope.onProgramSelect(selectedObject).then(function(data) {
                     expect(scope.enrichedProgram).toEqual(program);
                     expect(scope.collapseSection).toEqual({
                         sectionId1: false,

@@ -33,6 +33,7 @@ require.config({
         "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",
         "angular-autocomplete": "lib/angularjs-directives/src/autocomplete/autocomplete",
         "angular-filter": "lib/angular-filter/dist/angular-filter",
+        "angucomplete-alt": "lib/angucomplete-alt/angucomplete-alt",
         "md5": "lib/js-md5/js/md5",
 
         //Controllers

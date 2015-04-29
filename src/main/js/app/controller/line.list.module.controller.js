@@ -68,17 +68,22 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                                 $scope.program = _.find($scope.allPrograms, function(p) {
                                     return p.id == prg.id;
                                 });
-                                $scope.getEnrichedProgram(prg.id);
+                                getEnrichedProgram(prg.id);
                             }
                         });
                     });
                 };
 
-                $scope.getEnrichedProgram = function(progId) {
+                var getEnrichedProgram = function(progId) {
                     return programRepository.get(progId, $scope.excludedDataElements).then(function(data) {
                         $scope.enrichedProgram = data;
                         resetCollapse();
                     });
+                };
+
+                $scope.onProgramSelect = function(selected) {
+                    $scope.program = selected.originalObject;
+                    return getEnrichedProgram($scope.program.id);
                 };
 
                 var setUpModule = function() {

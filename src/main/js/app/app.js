@@ -1,12 +1,13 @@
 define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "migrator", "migrations", "properties", "queuePostProcessInterceptor", "monitors", "helpers", "indexedDBLogger",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
-        "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals", "angular-ui-dropdown", "angular-autocomplete", "angular-filter"
+        "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals", "angular-ui-dropdown", "angular-autocomplete", "angular-filter", "angucomplete-alt"
+
     ],
     function(angular, Q, services, dbutils, controllers, repositories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers, indexedDBLogger) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
-                "ui.multiselect", "ui.notIn", "ui.equals", "hustle", "autocomplete", "angular.filter"
+                "ui.multiselect", "ui.notIn", "ui.equals", "hustle", "autocomplete", "angular.filter", "angucomplete-alt"
             ]);
             services.init(app);
             repositories.init(app);
