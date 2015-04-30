@@ -57,7 +57,11 @@
                                                     <span class="glyphicon glyphicon-ok"></span>
                                                 </a>
                                                 <a href="" id="" title="Incomplete" ng-if="event.localStatus === 'INCOMPLETE_DRAFT'" class="submitted">
-                                                    <span class="glyphicon glyphicon-adjust">
+                                                    <span class="glyphicon glyphicon-star-empty">
+                                                    </span>
+                                                </a>
+                                                <a href="" id="" title="Complete" ng-if="event.localStatus === 'NEW_DRAFT' || event.localStatus === 'UPDATED_DRAFT'" class="submitted">
+                                                    <span class="glyphicon glyphicon-star">
                                                     </span>
                                                 </a>
                                             </td>
@@ -68,7 +72,7 @@
                                             </td>
                                             <td ng-hide="!isDataEntryAllowed()">
                                                 <a href="" id="" ng-click="deleteEvent(event)" title="Delete" class="delete">
-                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                    <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             </td>
                                         </tr>
