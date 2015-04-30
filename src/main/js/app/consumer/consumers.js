@@ -13,7 +13,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
         var init = function(app) {
             app.service('mergeBy', ['$log', mergeBy]);
             app.service("downloadDataConsumer", ["dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "$q", "approvalDataRepository", "mergeBy", downloadDataConsumer]);
-            app.service("downloadApprovalConsumer", ["datasetRepository", "userPreferenceRepository", "$q", "approvalService", "approvalDataRepository", downloadApprovalConsumer]);
+            app.service("downloadApprovalConsumer", ["datasetRepository", "userPreferenceRepository", "orgUnitRepository", "$q", "approvalService", "approvalDataRepository", downloadApprovalConsumer]);
             app.service("uploadDataConsumer", ["dataService", "dataRepository", uploadDataConsumer]);
             app.service("uploadCompletionDataConsumer", ["approvalService", "approvalDataRepository", "datasetRepository", "$q", uploadCompletionDataConsumer]);
             app.service("uploadApprovalDataConsumer", ["approvalService", "approvalDataRepository", "datasetRepository", "$q", uploadApprovalDataConsumer]);

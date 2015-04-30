@@ -177,7 +177,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
 
             var actualApprovalData;
             approvalService = new ApprovalService(http, db, q);
-            approvalService.getCompletionData(orgUnits, dataSets).then(function(data) {
+            approvalService.getCompletionData(orgUnits, [], dataSets).then(function(data) {
                 actualApprovalData = data;
             });
 
@@ -194,6 +194,104 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 "orgUnit": "ou1",
                 "completedBy": "testproj_approver_l1",
                 "completedOn": "2014-01-10T00:00:00.000+0000",
+                "isComplete": true
+            }];
+
+            expect(actualApprovalData).toEqual(expectedApprovalData);
+        });
+
+        it("should get completion data for line list modules", function() {
+            var startDate = moment().subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
+            var endDate = moment().format("YYYY-MM-DD");
+
+            var dhisApprovalData = {
+                "completeDataSetRegistrations": [{
+                    "dataSet": {
+                        "id": "d1"
+                    },
+                    "period": {
+                        "id": "2014W1"
+                    },
+                    "organisationUnit": {
+                        "id": "org1"
+                    },
+                    "date": "2014-01-03T00:00:00.000+0000",
+                    "lastModifiedTime": "2014-01-03T00:00:00.000+0000",
+                    "storedBy": "testproj_approver_l1"
+                }, {
+                    "dataSet": {
+                        "id": "d2"
+                    },
+                    "period": {
+                        "id": "2014W1"
+                    },
+                    "organisationUnit": {
+                        "id": "org1"
+                    },
+                    "date": "2014-01-03T00:00:00.000+0000",
+                    "lastModifiedTime": "2014-01-03T00:00:00.000+0000",
+                    "storedBy": "testproj_approver_l1"
+                }, {
+                    "dataSet": {
+                        "id": "d1"
+                    },
+                    "period": {
+                        "id": "2014W1"
+                    },
+                    "organisationUnit": {
+                        "id": "org2"
+                    },
+                    "date": "2014-01-10T00:00:00.000+0000",
+                    "lastModifiedTime": "2014-01-10T00:00:00.000+0000",
+                    "storedBy": "testproj_approver_l1"
+                }, {
+                    "dataSet": {
+                        "id": "d2"
+                    },
+                    "period": {
+                        "id": "2014W1"
+                    },
+                    "organisationUnit": {
+                        "id": "org2"
+                    },
+                    "date": "2014-01-10T00:00:00.000+0000",
+                    "lastModifiedTime": "2014-01-10T00:00:00.000+0000",
+                    "storedBy": "testproj_approver_l1"
+                }]
+            };
+
+            httpBackend.expectGET(properties.dhis.url + "/api/completeDataSetRegistrations?children=true&dataSet=d1&dataSet=d2&endDate=" + endDate + "&orgUnit=ou1&orgUnit=ou2&startDate=" + startDate).respond(200, dhisApprovalData);
+
+            var originOrgUnits = [{
+                "id": "org1",
+                "parent": {
+                    "id": "mod1"
+                }
+            }, {
+                "id": "org2",
+                "parent": {
+                    "id": "mod1"
+                }
+            }, {
+                "id": "org3",
+                "parent": {
+                    "id": "mod2"
+                }
+            }];
+
+            var actualApprovalData;
+            approvalService = new ApprovalService(http, db, q);
+            approvalService.getCompletionData(orgUnits, originOrgUnits, dataSets).then(function(data) {
+                actualApprovalData = data;
+            });
+
+            httpBackend.flush();
+
+            var expectedApprovalData = [{
+                "period": "2014W01",
+                "orgUnit": "mod1",
+                "completedBy": "testproj_approver_l1",
+                "completedOn": "2014-01-03T00:00:00.000+0000",
                 "isComplete": true
             }];
 
@@ -325,7 +423,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 }]
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&ds=d1&ds=d2&endDate=" + endDate + "&ou=ou1&ou=ou2&pe=Weekly&startDate=" + startDate).respond(200, dhisApprovalData);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?ds=d1&ds=d2&endDate=" + endDate + "&ou=ou1&ou=ou2&pe=Weekly&startDate=" + startDate).respond(200, dhisApprovalData);
 
             var actualApprovalData;
             approvalService = new ApprovalService(http, db, q);
@@ -383,7 +481,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             approvalService = new ApprovalService(http, db, q);
 
             var status;
-            approvalService.getCompletionData(orgUnits, dataSets).then(undefined, function(data) {
+            approvalService.getCompletionData(orgUnits, [], dataSets).then(undefined, function(data) {
                 status = data.status;
             });
 
@@ -411,7 +509,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 }]
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&ds=170b8cd5e53&endDate=2014-01-05&ou=17yugc&pe=Weekly&startDate=2013-12-30")
+            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?ds=170b8cd5e53&endDate=2014-01-05&ou=17yugc&pe=Weekly&startDate=2013-12-30")
                 .respond(200, approvalStatus);
             httpBackend.expectDELETE(properties.dhis.url + "/api/dataApprovals?ds=170b8cd5e53&ou=17yugc&pe=2014W01").respond(200, "ok");
 
@@ -430,7 +528,7 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
                 }]
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?children=true&ds=170b8cd5e53&endDate=2014-01-05&ou=17yugc&pe=Weekly&startDate=2013-12-30")
+            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?ds=170b8cd5e53&endDate=2014-01-05&ou=17yugc&pe=Weekly&startDate=2013-12-30")
                 .respond(200, approvalStatus);
 
             var approvalService = new ApprovalService(http, db, q);

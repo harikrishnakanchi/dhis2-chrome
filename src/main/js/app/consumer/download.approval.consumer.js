@@ -1,13 +1,25 @@
 define(["moment", "properties", "lodash", "dateUtils"], function(moment, properties, _, dateUtils) {
-    return function(datasetRepository, userPreferenceRepository, $q, approvalService, approvalDataRepository) {
+    return function(datasetRepository, userPreferenceRepository, orgUnitRepository, $q, approvalService, approvalDataRepository) {
 
         var getMetadata = function() {
-            return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAll()]);
+            return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAll()]).then(function(data) {
+                var userModuleIds = data[0];
+                var allDataSetIds = _.pluck(data[1], "id");
+                var originOrgUnits = [];
+
+                if (_.isEmpty(userModuleIds))
+                    return [userModuleIds, originOrgUnits, allDataSetIds];
+
+                return orgUnitRepository.findAllByParent(userModuleIds).then(function(originOrgUnits) {
+                    return [userModuleIds, originOrgUnits, allDataSetIds];
+                });
+            });
         };
 
         var getCompletionAndApprovalData = function(metadata) {
             var userModuleIds = metadata[0];
-            var allDataSetIds = _.pluck(metadata[1], "id");
+            var originOrgUnits = metadata[1];
+            var allDataSetIds = metadata[2];
 
             if (userModuleIds.length === 0 || allDataSetIds.length === 0)
                 return;
@@ -16,8 +28,10 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
             var startPeriod = dateUtils.toDhisFormat(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
             var endPeriod = dateUtils.toDhisFormat(moment());
 
-            var getDhisCompletionDataPromise = approvalService.getCompletionData(userModuleIds, allDataSetIds);
+            var getDhisCompletionDataPromise = approvalService.getCompletionData(userModuleIds, originOrgUnits, allDataSetIds);
+
             var getDhisApprovalDataPromise = approvalService.getApprovalData(userModuleIds, allDataSetIds);
+
             var getApprovalDataPromise = approvalDataRepository.getApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, userModuleIds);
 
             return $q.all([getDhisCompletionDataPromise, getDhisApprovalDataPromise, getApprovalDataPromise]);

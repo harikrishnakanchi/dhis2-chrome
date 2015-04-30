@@ -723,6 +723,8 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 scope.bulkApprove();
                 scope.$apply();
 
+                expect(fakeModal.open).toHaveBeenCalled();
+
                 expect(approvalDataRepository.markAsComplete).toHaveBeenCalledWith([{
                     "orgUnit": "mod2",
                     "period": "2014W01"
@@ -780,6 +782,8 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
 
                 scope.bulkApprove();
                 scope.$apply();
+
+                expect(fakeModal.open).toHaveBeenCalled();
 
                 expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith([{
                     "orgUnit": "mod2",

@@ -1,8 +1,8 @@
-define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "datasetRepository", "userPreferenceRepository", "approvalService", "moment"],
-    function(DownloadApprovalConsumer, mocks, properties, utils, DatasetRepository, UserPreferenceRepository, ApprovalService, moment) {
+define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "datasetRepository", "orgUnitRepository", "userPreferenceRepository", "approvalService", "moment"],
+    function(DownloadApprovalConsumer, mocks, properties, utils, DatasetRepository, OrgUnitRepository, UserPreferenceRepository, ApprovalService, moment) {
         describe("download data consumer", function() {
 
-            var approvalDataRepository, datasetRepository, userPreferenceRepository, q, scope, downloadApprovalConsumer, message, approvalService;
+            var approvalDataRepository, datasetRepository, userPreferenceRepository, orgUnitRepository, q, scope, downloadApprovalConsumer, message, approvalService;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
@@ -29,7 +29,10 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                     "getApprovalData": jasmine.createSpy("getApprovalData").and.returnValue(utils.getPromise(q, []))
                 };
 
-                downloadApprovalConsumer = new DownloadApprovalConsumer(datasetRepository, userPreferenceRepository, q, approvalService, approvalDataRepository);
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
+
+                downloadApprovalConsumer = new DownloadApprovalConsumer(datasetRepository, userPreferenceRepository, orgUnitRepository, q, approvalService, approvalDataRepository);
             }));
 
             it("should download approval data from dhis based on user module ids and dataset", function() {
@@ -38,6 +41,12 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
                     "id": "ds1"
                 }]));
+
+                var originOrgUnits = [{
+                    "id": "org1"
+                }];
+
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
                 message = {
                     "data": {
@@ -51,7 +60,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
                 expect(datasetRepository.getAll).toHaveBeenCalled();
 
-                expect(approvalService.getCompletionData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
+                expect(approvalService.getCompletionData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], originOrgUnits, ["ds1"]);
                 expect(approvalService.getApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
             });
 

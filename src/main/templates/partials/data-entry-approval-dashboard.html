@@ -72,7 +72,7 @@
                     <td>{{items[0].moduleName}}</td>
                     <td>
                         <ul>
-                            <li ng-repeat="item in items | omit: 'isApproved === true' | orderBy: 'period'">
+                            <li ng-repeat="item in items | orderBy: 'period'">
                                 <a ng-href="#/data-entry/{{item.moduleId}}/{{item.period}}" ng-if="hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</a>
                                 <span ng-if="!hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</span>
                             </li>
@@ -80,7 +80,7 @@
                     </td>
                     <td>
                         <ul>
-                            <li ng-repeat="item in items | omit: 'isApproved === true' | orderBy: 'period'">
+                            <li ng-repeat="item in items | orderBy: 'period'">
                                 <span ng-if="!item.isComplete">Project Level</span>
                                 <span ng-if="item.isComplete">Coordination Level</span>
                             </li>

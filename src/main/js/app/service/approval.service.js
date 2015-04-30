@@ -55,8 +55,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                         "startDate": startDate.format("YYYY-MM-DD"),
                         "endDate": startDate.add(6, 'days').format("YYYY-MM-DD"),
                         "ou": [orgUnit],
-                        "pe": "Weekly",
-                        "children": true
+                        "pe": "Weekly"
                     }
                 });
             };
@@ -80,30 +79,33 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             return doGet().then(doDelete);
         };
 
-        this.getCompletionData = function(orgUnits, dataSets) {
-            var transform = function(completeDataSetRegistrations) {
-                var registrationsGroupedByPeriodAndOu = _.groupBy(completeDataSetRegistrations, function(registration) {
-                    return [registration.period.id, registration.organisationUnit.id];
-                });
+        this.getCompletionData = function(orgUnits, originOrgUnits, dataSets) {
+            var transform = function(response) {
+                if (!response.data.completeDataSetRegistrations)
+                    return [];
 
-                return _.map(registrationsGroupedByPeriodAndOu, function(item) {
-                    return {
-                        'period': dateUtils.getFormattedPeriod(_.pluck(item, 'period')[0].id),
-                        'orgUnit': _.pluck(item, 'organisationUnit')[0].id,
-                        'completedBy': _.pluck(item, 'storedBy')[0],
-                        'completedOn': _.pluck(item, 'date')[0],
-                        "isComplete": true
-                    };
-                });
-            };
+                var indexedOriginOrgUnits = _.indexBy(originOrgUnits, "id");
 
-            var onSuccess = function(response) {
-                var deferred = $q.defer();
-                if (response.data.completeDataSetRegistrations)
-                    deferred.resolve(transform(response.data.completeDataSetRegistrations));
-                else
-                    deferred.resolve([]);
-                return deferred.promise;
+                return _.transform(response.data.completeDataSetRegistrations, function(results, registration) {
+
+                    var period = dateUtils.getFormattedPeriod(registration.period.id);
+                    var orgUnit = registration.organisationUnit.id;
+                    if (indexedOriginOrgUnits[orgUnit])
+                        orgUnit = indexedOriginOrgUnits[orgUnit].parent.id;
+
+                    if (!_.any(results, {
+                            "period": period,
+                            "orgUnit": orgUnit
+                        })) {
+                        results.push({
+                            'period': period,
+                            'orgUnit': orgUnit,
+                            'completedBy': registration.storedBy,
+                            'completedOn': registration.date,
+                            'isComplete': true
+                        });
+                    }
+                }, []);
             };
 
             var endDate = moment().format("YYYY-MM-DD");
@@ -117,11 +119,15 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     "orgUnit": orgUnits,
                     "children": true
                 }
-            }).then(onSuccess);
+            }).then(transform);
         };
 
         this.getApprovalData = function(orgUnits, dataSets) {
-            var transform = function(dataApprovalStateResponses) {
+
+            var transform = function(response) {
+                if (!response.data.dataApprovalStateResponses)
+                    return [];
+
                 var approvalStatusOrder = {
                     "UNAPPROVABLE": -1,
                     "UNAPPROVED_READY": 0,
@@ -131,7 +137,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     "ACCEPTED_HERE": 2
                 };
 
-                var approvalDataGroupedByPeriodAndOu = _.groupBy(dataApprovalStateResponses, function(approvalData) {
+                var approvalDataGroupedByPeriodAndOu = _.groupBy(response.data.dataApprovalStateResponses, function(approvalData) {
                     return [approvalData.period.id, approvalData.organisationUnit.id];
                 });
 
@@ -159,15 +165,6 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                 }, []);
             };
 
-            var onSuccess = function(response) {
-                var deferred = $q.defer();
-                if (response.data.dataApprovalStateResponses)
-                    deferred.resolve(transform(response.data.dataApprovalStateResponses));
-                else
-                    deferred.resolve([]);
-                return deferred.promise;
-            };
-
             var endDate = moment().format("YYYY-MM-DD");
             var startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
 
@@ -177,10 +174,9 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     "startDate": startDate,
                     "endDate": endDate,
                     "ou": orgUnits,
-                    "pe": "Weekly",
-                    "children": true
+                    "pe": "Weekly"
                 }
-            }).then(onSuccess);
+            }).then(transform);
         };
     };
 });

@@ -127,9 +127,10 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
         var getEventsSubmissionInfo = function(moduleIds, startPeriod, endPeriod) {
             return orgUnitRepository.findAllByParent(moduleIds).then(function(orginOrgUnits) {
+                var orginOrgUnitIds = _.pluck(orginOrgUnits, "id");
                 var indexedOrginOrgUnits = _.indexBy(orginOrgUnits, "id");
 
-                return programEventRepository.getEventsFromPeriod(startPeriod, orginOrgUnits).then(function(data) {
+                return programEventRepository.getEventsFromPeriod(startPeriod, orginOrgUnitIds).then(function(data) {
 
                     data = _.reject(data, function(dataum) {
                         return dataum.localStatus && dataum.localStatus !== "READY_FOR_DHIS";
@@ -211,7 +212,8 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                 $scope.itemsAwaitingApprovalAtUserLevel = [];
                 $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
-                    'isSubmitted': true
+                    'isSubmitted': true,
+                    'isApproved': false
                 });
 
                 if ($rootScope.hasRoles(['Project Level Approver'])) {
