@@ -46,8 +46,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "uploadApprovalDataDesc": "approve data at coordination level for ",
                     "uploadCompletionDataDesc": "approve data at project level for ",
                     "deleteApprovalsDesc": "restart approval process for ",
-                    "eventSubmitAndApproveSuccess": "Event(s) submitted and auto-approved successfully.",
-                    'eventSubmitSuccess': 'Event submitted succesfully'
+                    "eventSubmitAndApproveSuccess": " Event(s) submitted and auto-approved successfully.",
+                    'eventSubmitSuccess': ' Event submitted succesfully'
                 };
                 scope.week = {
                     "weekNumber": 44,
@@ -119,7 +119,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "getEventsFor": jasmine.createSpy("getEventsFor").and.returnValue(utils.getPromise(q, [])),
                     "upsert": jasmine.createSpy("upsert").and.returnValue(utils.getPromise(q, [])),
                     "delete": jasmine.createSpy("delete").and.returnValue(utils.getPromise(q, {})),
-                    "markEventsAsSubmitted": jasmine.createSpy("delete").and.returnValue(utils.getPromise(q, {}))
+                    "markEventsAsSubmitted": jasmine.createSpy("markEventsAsSubmitted").and.callFake(function(data) {
+                        return utils.getPromise(q, data);
+                    })
                 };
 
                 systemSettings = {
@@ -329,7 +331,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "desc": "restart approval process for 2014W44, Module: Mod1"
                 }, "dataValues");
                 expect(scope.resultMessageType).toEqual("success");
-                expect(scope.resultMessage).toEqual("Event submitted succesfully");
+                expect(scope.resultMessage).toEqual("11 Event submitted succesfully");
                 expect(location.hash).toHaveBeenCalled();
             });
 
@@ -408,7 +410,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 }, "dataValues");
 
                 expect(scope.resultMessageType).toEqual("success");
-                expect(scope.resultMessage).toEqual("Event(s) submitted and auto-approved successfully.");
+                expect(scope.resultMessage).toEqual("11 Event(s) submitted and auto-approved successfully.");
                 expect(location.hash).toHaveBeenCalled();
             });
 

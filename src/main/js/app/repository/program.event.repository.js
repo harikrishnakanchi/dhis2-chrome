@@ -78,7 +78,9 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
             return getEvents().then(updateEvents).then(function(newEvents) {
                 var store = db.objectStore('programEvents');
-                return store.upsert(newEvents);
+                return store.upsert(newEvents).then(function() {
+                    return newEvents;
+                });
             });
         };
 

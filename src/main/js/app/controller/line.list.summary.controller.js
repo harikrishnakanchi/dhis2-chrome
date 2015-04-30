@@ -93,7 +93,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var publishToDhis = function() {
-                var uploadDataValuesPromise = $hustle.publish({
+                var uploadEventsPromise = $hustle.publish({
                     "type": "uploadProgramEvents",
                     "locale": $scope.currentUser.locale,
                     "desc": $scope.resourceBundle.uploadProgramEventsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
@@ -106,23 +106,23 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
                 }, "dataValues");
 
-                return $q.all([uploadDataValuesPromise, deleteApprovalsPromise]);
+                return $q.all([uploadEventsPromise, deleteApprovalsPromise]);
             };
 
             var submit = function() {
-                return markEventsAsSubmitted()
-                    .then(clearAnyExisingApprovals)
-                    .then(publishToDhis);
+                return markEventsAsSubmitted().then(function(submittedEvents) {
+                    return clearAnyExisingApprovals().then(publishToDhis).then(function() {
+                        $scope.showResultMessage("success", submittedEvents.length + $scope.resourceBundle.eventSubmitSuccess);
+                        $scope.loadEventsView();
+                    });
+                });
             };
 
             var modalMessages = {
                 "confirmationMessage": $scope.resourceBundle.reapprovalConfirmationMessage
             };
             var confirmIf = ($scope.isCompleted || $scope.isApproved);
-            confirmAndProceed(submit, modalMessages, confirmIf).then(function() {
-                $scope.showResultMessage("success", $scope.resourceBundle.eventSubmitSuccess);
-                $scope.loadEventsView();
-            });
+            confirmAndProceed(submit, modalMessages, confirmIf);
         };
 
         $scope.submitAndApprove = function() {
@@ -161,19 +161,19 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var submitAndApprove = function() {
-                return markEventsAsSubmitted()
-                    .then(markAsApproved)
-                    .then(publishToDhis);
+                return markEventsAsSubmitted().then(function(submittedEvents) {
+                    return markAsApproved().then(publishToDhis).then(function() {
+                        $scope.showResultMessage("success", submittedEvents.length + $scope.resourceBundle.eventSubmitAndApproveSuccess);
+                        $scope.loadEventsView();
+                    });
+                });
             };
 
             var modalMessages = {
                 "confirmationMessage": $scope.resourceBundle.reapprovalConfirmationMessage
             };
             var confirmIf = ($scope.isCompleted || $scope.isApproved);
-            confirmAndProceed(submitAndApprove, modalMessages, confirmIf).then(function() {
-                $scope.showResultMessage("success", $scope.resourceBundle.eventSubmitAndApproveSuccess);
-                $scope.loadEventsView();
-            });
+            confirmAndProceed(submitAndApprove, modalMessages, confirmIf);
         };
 
         $scope.deleteEvent = function(event) {
