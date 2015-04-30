@@ -18,12 +18,12 @@ define(["lodash"], function(_) {
         var getUserModuleIds = function() {
             return getAll().then(function(userPreferences) {
                 userPreferences = userPreferences || [];
-                var userProjectIds = _.uniq(_.pluck(_.flatten(_.pluck(userPreferences, "orgUnits")), "id"));
+                var userOrgUnitIds = _.uniq(_.pluck(_.flatten(_.pluck(userPreferences, "orgUnits")), "id"));
 
-                if (_.isEmpty(userProjectIds))
+                if (_.isEmpty(userOrgUnitIds))
                     return [];
 
-                return orgUnitRepository.getAllModulesInOrgUnits(userProjectIds).then(function(userModules) {
+                return orgUnitRepository.getAllModulesInOrgUnits(userOrgUnitIds).then(function(userModules) {
                     return _.pluck(userModules, "id");
                 });
             });
