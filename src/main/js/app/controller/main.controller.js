@@ -7,7 +7,8 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             var userPreferences = {
                 'username': $rootScope.currentUser.userCredentials.username,
                 'locale': $rootScope.currentUser.locale,
-                'orgUnits': $rootScope.currentUser.organisationUnits || []
+                'orgUnits': $rootScope.currentUser.organisationUnits || [],
+                'selectedProject': $rootScope.currentUser.selectedProject
             };
             return userPreferenceRepository.save(userPreferences);
         };
@@ -50,13 +51,22 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return $rootScope.currentUser ? getResourceBundle($rootScope.currentUser.locale, true) : getResourceBundle("en", false);
         });
 
+        $rootScope.$watch("currentUser.selectedProject", function() {
+            if ($rootScope.currentUser && $rootScope.currentUser.selectedProject)
+                saveUserPreferences();
+        });
+
         var resetProjects = function() {
             if ($rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
                 var orgUnitIds = _.pluck($rootScope.currentUser.organisationUnits, "id");
                 return orgUnitRepository.findAllByParent(orgUnitIds).then(function(orgUnits) {
                     $scope.projects = orgUnits;
-                    $scope.selectedProject = $scope.projects[0];
-                    $rootScope.currentUser.selectedProject = $scope.projects[0];
+                    if ($rootScope.currentUser.selectedProject) {
+                        $scope.selectedProject = _.find($scope.projects, "id", $rootScope.currentUser.selectedProject.id);
+                    } else {
+                        $scope.selectedProject = $scope.projects[0];
+                        $rootScope.currentUser.selectedProject = $scope.projects[0];
+                    }
                 });
             }
         };

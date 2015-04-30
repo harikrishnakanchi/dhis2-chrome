@@ -75,7 +75,10 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 spyOn(userPreferenceRepository, "get").and.returnValue(utils.getPromise(q, {
                     'orgUnits': [{
                         'id': 111
-                    }]
+                    }],
+                    'selectedProject': {
+                        'id': 111
+                    }
                 }));
                 spyOn(orgUnitRepository, "getAll").and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
@@ -111,7 +114,10 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                     },
                     "organisationUnits": [{
                         "id": "123"
-                    }]
+                    }],
+                    "selectedProject": {
+                        "id": "prj1"
+                    }
                 };
                 rootScope.currentUser.locale = "fr";
 
@@ -133,7 +139,10 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                     "locale": 'fr',
                     "orgUnits": [{
                         "id": '123'
-                    }]
+                    }],
+                    "selectedProject": {
+                        "id": "prj1"
+                    }
                 });
             });
 

@@ -241,10 +241,12 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
         };
 
         var init = function() {
-            $scope.loading = true;
-            getUserModules().then(loadDashboard).finally(function() {
-                $scope.loading = false;
-            });
+            if ($rootScope.currentUser) {
+                $scope.loading = true;
+                return getUserModules().then(loadDashboard).finally(function() {
+                    $scope.loading = false;
+                });
+            }
         };
 
         init();

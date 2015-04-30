@@ -11,9 +11,10 @@ define(["md5", "lodash"], function(md5, _) {
             return userCredentialsStore.find(username);
         };
 
-        var setLocale = function() {
+        var loadUserPreferences = function() {
             return userPreferenceRepository.get($rootScope.currentUser.userCredentials.username).then(function(data) {
                 $rootScope.currentUser.locale = data ? data.locale : "en";
+                $rootScope.currentUser.selectedProject = data ? data.selectedProject : undefined;
             });
         };
 
@@ -21,7 +22,8 @@ define(["md5", "lodash"], function(md5, _) {
             var userPreferences = {
                 'username': $rootScope.currentUser.userCredentials.username,
                 'locale': $rootScope.currentUser.locale,
-                'orgUnits': $rootScope.currentUser.organisationUnits || []
+                'orgUnits': $rootScope.currentUser.organisationUnits || [],
+                'selectedProject': $rootScope.currentUser.selectedProject
             };
             return userPreferenceRepository.save(userPreferences);
         };
@@ -47,7 +49,7 @@ define(["md5", "lodash"], function(md5, _) {
                 $rootScope.isLoggedIn = true;
                 $rootScope.currentUser = user;
 
-                return setLocale()
+                return loadUserPreferences()
                     .then(saveUserPreferences)
                     .then(downloadDataValues)
                     .then(function() {

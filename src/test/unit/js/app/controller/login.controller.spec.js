@@ -11,7 +11,12 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             hustle = $hustle;
             q = $q;
             userPreferenceRepository = new UserPreferenceRepository();
-            spyOn(userPreferenceRepository, 'get').and.returnValue(utils.getPromise(q, {}));
+            spyOn(userPreferenceRepository, 'get').and.returnValue(utils.getPromise(q, {
+                "selectedProject": {
+                    "id": 123
+                },
+                "locale": "fr"
+            }));
 
             db = {
                 objectStore: function() {}
@@ -87,10 +92,13 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             expect(scope.invalidCredentials).toEqual(false);
             expect(userPreferenceRepository.save).toHaveBeenCalledWith({
                 username: "msfadmin",
-                locale: undefined,
+                locale: "fr",
                 orgUnits: [{
                     "id": 123
-                }]
+                }],
+                selectedProject: {
+                    "id": 123
+                }
             });
             expect(hustle.publish).toHaveBeenCalledWith({
                 "type": "downloadData"
