@@ -11,17 +11,6 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
         };
 
         $scope.dumpLogs = function() {
-            var createZip = function(fileNamePrefix, fileNameExtn, backupCallback) {
-                $scope.cloning = true;
-                return backupCallback().then(function(data) {
-                    $scope.cloning = false;
-                    var zippedData = zipUtils.zipData("logs", "log_", ".log", data);
-                    return filesystemService.writeFile("logs_" + moment().format("YYYYMMDD-HHmmss") + ".zip", zippedData);
-                }).finally(function() {
-                    $scope.cloning = false;
-                });
-            };
-
             var errorCallback = function(error) {
                 $scope.displayMessage($scope.resourceBundle.dumpLogsErrorMessage + error.name, true);
             };
@@ -30,7 +19,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
                 $scope.displayMessage($scope.resourceBundle.dumpLogsSuccessMessage + directory.name, false);
             };
 
-            createZip("logs_dump_", ".logs", _.partial(indexedDBLogger.exportLogs, "msfLogs"))
+            createZip("logs", "logs_dump_", ".logs", _.partial(indexedDBLogger.exportLogs, "msfLogs"))
                 .then(successCallback, errorCallback);
         };
 
@@ -50,7 +39,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
             };
 
             showModal(function() {
-                saveIdbBackup("dhis_idb_", ".clone", indexeddbUtils.backupEntireDB).then(successCallback, errorCallback);
+                createZip("dhis_idb", "dhis_idb_", ".clone", indexeddbUtils.backupEntireDB).then(successCallback, errorCallback);
             }, modalMessages);
         };
 
@@ -83,15 +72,12 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
             }, modalMessages);
         };
 
-        var saveIdbBackup = function(fileNamePrefix, fileNameExtn, backupCallback) {
+        var createZip = function(folderName, fileNamePrefix, fileNameExtn, backupCallback) {
             $scope.cloning = true;
             return backupCallback().then(function(data) {
-                var cloneFileName = fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + fileNameExtn;
-                var cloneFileContents = JSON.stringify(data);
                 $scope.cloning = false;
-                return filesystemService.writeFile(cloneFileName, new Blob([cloneFileContents], {
-                    "type": "application/json"
-                }));
+                var zippedData = zipUtils.zipData(folderName, fileNamePrefix, fileNameExtn, data);
+                return filesystemService.writeFile(fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + ".zip", zippedData);
             }).finally(function() {
                 $scope.cloning = false;
             });

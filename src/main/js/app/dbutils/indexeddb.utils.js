@@ -37,17 +37,19 @@ define(["lodash", "migrations"], function(_, migrations) {
 
             var msfData, hustleData;
             return backupMsf().then(function(data) {
-                msfData = data;
+                msfData = _.reduce(data, function(result, value, key) {
+                    result["msf__" + key] = value;
+                    return result;
+                }, {});
                 return data;
             }).then(backupHustle).then(function(data) {
                 hustleData = data;
                 db.switchDB("msf", migrations.length);
                 return data;
             }).then(function() {
-                return {
-                    "msf": msfData,
+                return _.merge(msfData, {
                     "hustle": hustleData
-                };
+                });
             });
         };
 

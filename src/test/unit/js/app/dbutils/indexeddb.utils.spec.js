@@ -42,8 +42,12 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
 
         it("should create a back up of the entire db", function() {
             var expectedBackup = {
-                "msf": getExpectedBackupResult(storeNames),
-                "hustle": getExpectedBackupResult(storeNames)
+                "msf__store1": allResult,
+                "msf__store2": allResult,
+                "hustle": {
+                    "store1": allResult,
+                    "store2": allResult
+                }
             };
 
             indexeddbUtils.backupEntireDB().then(function(actualBackup) {
