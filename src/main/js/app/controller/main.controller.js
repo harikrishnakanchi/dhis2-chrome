@@ -60,7 +60,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             if ($rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
                 var orgUnitIds = _.pluck($rootScope.currentUser.organisationUnits, "id");
                 return orgUnitRepository.findAllByParent(orgUnitIds).then(function(orgUnits) {
-                    $scope.projects = orgUnits;
+                    $scope.projects = _.sortBy(orgUnits, "name");
                     if ($rootScope.currentUser.selectedProject) {
                         $scope.selectedProject = _.find($scope.projects, "id", $rootScope.currentUser.selectedProject.id);
                     } else {
