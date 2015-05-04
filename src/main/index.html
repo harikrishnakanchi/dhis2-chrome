@@ -27,6 +27,11 @@
                         <p class="navbar-text" ng-show="!isDhisOnline" id="userOffline" tabindex="-1"> <span class="offline">{{currentUser.userCredentials.username}}</span> </p>
                     </li>
                     <li>
+                        <p class="navbar-text" ng-show="currentUser" id="syncRunningNotification" tabindex="-1">
+                            <span class="glyphicon" ng-class="{'glyphicon-open':msgInQueue, 'glyphicon-saved':!msgInQueue}"></span>
+                        </p>
+                    </li>
+                    <li>
                         <select id="languageSelectButton" ng-model="currentUser.locale" ng-if="currentUser" class="input-sm" tabindex="-1">
                             <option value="en">English</option>
                             <option dir="rtl" lang="fr" value="fr">Français</option>

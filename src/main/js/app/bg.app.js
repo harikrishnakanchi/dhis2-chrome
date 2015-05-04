@@ -37,8 +37,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['consumerRegistry', 'dhisMonitor', 'queuePostProcessInterceptor', '$hustle', '$log', '$rootScope',
-                function(consumerRegistry, dhisMonitor, queuePostProcessInterceptor, $hustle, $log, $rootScope) {
+            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$hustle', '$log', '$rootScope',
+                function(consumerRegistry, dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $hustle, $log, $rootScope) {
 
                     $hustle.registerInterceptor(queuePostProcessInterceptor);
 
@@ -120,6 +120,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         $rootScope.auth_header = result.auth_header;
                         checkOnlineStatusAndSync();
                     };
+
+                    hustleMonitor.start();
 
                     chrome.alarms.create('metadataSyncAlarm', {
                         periodInMinutes: properties.metadata.sync.intervalInMinutes

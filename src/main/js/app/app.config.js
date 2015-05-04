@@ -109,6 +109,7 @@ require.config({
 
         //Monitors
         "dhisMonitor": "app/monitors/dhis.monitor",
+        "hustleMonitor": "app/monitors/hustle.monitor",
         "monitors": "app/monitors/monitors",
 
         //Queue

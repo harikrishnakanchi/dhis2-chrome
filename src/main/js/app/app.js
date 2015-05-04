@@ -70,8 +70,8 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document',
-                function(dhisMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document) {
+            app.run(['dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document',
+                function(dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document) {
 
                     $document.on('keydown', function(e) {
                         disableBackspaceKey(e);
@@ -86,6 +86,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                     });
 
                     $rootScope.isDhisOnline = false;
+                    $rootScope.msgInQueue = false;
 
                     dhisMonitor.online(function() {
                         $rootScope.$apply(function() {
@@ -95,6 +96,18 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                     dhisMonitor.offline(function() {
                         $rootScope.$apply(function() {
                             $rootScope.isDhisOnline = false;
+                        });
+                    });
+
+                    hustleMonitor.msgInSyncQueue(function() {
+                        $rootScope.$apply(function() {
+                            $rootScope.msgInQueue = true;
+                        });
+                    });
+
+                    hustleMonitor.noMsgInSyncQueue(function() {
+                        $rootScope.$apply(function() {
+                            $rootScope.msgInQueue = false;
                         });
                     });
 
