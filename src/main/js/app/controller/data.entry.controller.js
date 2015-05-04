@@ -53,7 +53,7 @@ define(["lodash", "moment"],
             });
 
             var setAvailableModules = function() {
-                if ($rootScope.currentUser) {
+                if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
                     return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(modules) {
                         modules = _.map(modules, function(module) {
                             module.displayName = module.parent.name + ' - ' + module.name;
