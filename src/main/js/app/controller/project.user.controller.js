@@ -13,10 +13,10 @@ define(["dhisId", "properties"], function(dhisId, properties) {
         };
 
         var init = function() {
-            var userNamePrefix = getAttributeValue($scope.orgUnit.attributeValues, 'projCode').toLowerCase();
-            userNamePrefix = _.isEmpty(userNamePrefix) ? userNamePrefix : userNamePrefix + "_";
-            $scope.userNameMatchExpr = new RegExp(userNamePrefix + "(.)+", "i");
-            $scope.userNamePlaceHolder = _.isEmpty(userNamePrefix) ? "" : "Username should begin with " + userNamePrefix;
+            var projCode = getAttributeValue($scope.orgUnit.attributeValues, 'projCode').toLowerCase();
+            $scope.userNamePrefix = _.isEmpty(projCode) ? projCode : projCode + "_";
+            $scope.userNameMatchExpr = new RegExp($scope.userNamePrefix + "(.)+", "i");
+            $scope.userNamePlaceHolder = _.isEmpty($scope.userNamePrefix) ? "" : "Username should begin with " + $scope.userNamePrefix;
 
             var orgUnitType = getAttributeValue($scope.orgUnit.attributeValues, 'Type');
             $scope.userRoles = allRoles[orgUnitType];
