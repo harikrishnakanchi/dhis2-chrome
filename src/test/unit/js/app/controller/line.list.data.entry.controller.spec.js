@@ -10,6 +10,12 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 q = $q;
 
                 optionSets = [{
+                    'id': 'os1',
+                    'options': [{
+                        'id': 'os1o1',
+                        'name': 'os1o1 name'
+                    }]
+                }, {
                     'id': 'os2',
                     'options': [{
                         'id': 'os2o1',
@@ -65,30 +71,88 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 Timecop.uninstall();
             });
 
-            it("should find optionSets for id", function() {
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
-                scope.$apply();
+            it("should load optionSetMapping and dataValues on init", function() {
+                scope.program = {
+                    'programStages': [{
+                        'programStageSections': [{
+                            'programStageDataElements': [{
+                                "dataElement": {
+                                    "id": "de1"
+                                }
+                            }, {
+                                "dataElement": {
+                                    "id": "de2"
+                                }
+                            }, {
+                                "dataElement": {
+                                    "id": "de3"
+                                }
+                            }, {
+                                "dataElement": {
+                                    "id": "de4",
+                                    "optionSet": {
+                                        "id": "os1"
+                                    }
+                                }
+                            }]
+                        }]
+                    }]
+                };
 
-                expect(scope.getOptionsFor('os2')).toEqual([{
-                    'id': 'os2o1',
-                    'name': 'os2o1 name',
-                    'displayName': 'os2o1 name'
-                }]);
-            });
+                scope.event = {
+                    "event": "a41bd7adefc",
+                    "dataValues": [{
+                        "name": "Case Number - Measles Outbreak",
+                        "type": "string",
+                        "value": "66",
+                        "dataElement": "de1"
+                    }, {
+                        "name": "Date of admission - Measles Outbreak",
+                        "type": "date",
+                        "value": "2015-04-15",
+                        "dataElement": "de2"
+                    }, {
+                        "name": "Age at visit - Measles Outbreak",
+                        "type": "int",
+                        "value": 3,
+                        "dataElement": "de3"
+                    }, {
+                        "name": "Sex - Measles Outbreak",
+                        "type": "string",
+                        "value": "os1o1",
+                        "dataElement": "de4"
+                    }]
+                };
 
-            it("should translate options", function() {
                 scope.resourceBundle = {
                     'os2o1': 'os2o1 translated name'
                 };
-
                 var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
                 scope.$apply();
 
-                expect(scope.getOptionsFor('os2')).toEqual([{
-                    'id': 'os2o1',
-                    'name': 'os2o1 name',
-                    'displayName': 'os2o1 translated name'
-                }]);
+                expect(scope.optionSets).toEqual(optionSets);
+                expect(scope.optionSetMapping).toEqual({
+                    "os1": [{
+                        "id": 'os1o1',
+                        "name": 'os1o1 name',
+                        "displayName": 'os1o1 name',
+                    }],
+                    "os2": [{
+                        "id": 'os2o1',
+                        "name": 'os2o1 name',
+                        "displayName": 'os2o1 translated name'
+                    }]
+                });
+                expect(scope.dataValues).toEqual({
+                    'de1': '66',
+                    'de2': new Date("2015-04-15".replace(/-/g, ',')),
+                    'de3': 3,
+                    'de4': {
+                        'id': 'os1o1',
+                        'name': 'os1o1 name',
+                        'displayName': 'os1o1 name'
+                    }
+                });
             });
 
             it("should set min and max date for selected period", function() {

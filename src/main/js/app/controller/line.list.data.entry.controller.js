@@ -22,7 +22,13 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             var compulsoryFieldsPresent = true;
 
             var formatValue = function(value) {
-                return _.isDate(value) ? moment(value).format("YYYY-MM-DD") : value;
+                if (_.isObject(value) && value.originalObject)
+                    return value.originalObject.code;
+                if (_.isObject(value) && value.code)
+                    return value.code;
+                if (_.isDate(value))
+                    return moment(value).format("YYYY-MM-DD");
+                return value;
             };
 
             var dataValuesList = _.flatten(_.map(programStage.programStageSections, function(sections) {
@@ -69,19 +75,6 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             return attr && attr.value === "true";
         };
 
-        $scope.getOptionsFor = function(optionSetId) {
-            var optionSet = _.find($scope.optionSets, function(os) {
-                return optionSetId === os.id;
-            });
-
-            var options = optionSet ? optionSet.options : [];
-            _.each(options, function(o) {
-                o.displayName = $scope.resourceBundle[o.id] || o.name;
-            });
-
-            return options;
-        };
-
         $scope.update = function(programStage) {
             var buildPayloadFromView = function() {
                 var dataValuesAndEventDate = getDataValuesAndEventDate(programStage);
@@ -120,15 +113,38 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
         };
 
         var init = function() {
+            var allDataElementsMap = {};
+            var loadAllDataElements = function() {
+                if ($scope.program && $scope.program.programStages)
+                    allDataElementsMap = _.indexBy(_.pluck(_.flatten(_.pluck(_.flatten(_.pluck($scope.program.programStages, "programStageSections")), "programStageDataElements")), "dataElement"), "id");
+            };
+
+            var setOptionSetMapping = function() {
+                $scope.optionSetMapping = {};
+                _.forEach($scope.optionSets, function(optionSet) {
+                    var options = _.compact(optionSet.options);
+                    _.each(options, function(o) {
+                        o.displayName = $scope.resourceBundle[o.id] || o.name;
+                    });
+                    $scope.optionSetMapping[optionSet.id] = options;
+                });
+            };
+
             var loadOptionSets = function() {
                 var store = db.objectStore("optionSets");
                 return store.getAll().then(function(opSets) {
                     $scope.optionSets = opSets;
+                    setOptionSetMapping();
                 });
             };
 
             var loadEvent = function() {
                 var formatValue = function(dv) {
+                    var de = allDataElementsMap[dv.dataElement];
+                    if (de && de.optionSet) {
+                        return _.find($scope.optionSetMapping[de.optionSet.id], "id", dv.value);
+                    }
+
                     if (dv.type === "date") {
                         if (dv.value)
                             dv.value = dv.value.replace(/-/g, ',');
@@ -152,6 +168,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
             $scope.loading = true;
             resetForm();
+            loadAllDataElements();
             loadOptionSets().then(loadEvent).finally(function() {
                 $scope.loading = false;
             });
