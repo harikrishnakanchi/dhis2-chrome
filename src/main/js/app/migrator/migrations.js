@@ -86,17 +86,7 @@ define([], function() {
         create_index(translationsStore, "by_locale", "locale", false);
     };
 
-    var add_complete_datasets_store = function(db, tx) {
-        var completeDataSetsStore = create_store_with_key("completedDataSets", ["period", "orgUnit"], db);
-        create_index(completeDataSetsStore, "by_period", "period", false);
-    };
-
-    var add_approval_datasets_store = function(db, tx) {
-        var approvalDataSetsStore = create_store_with_key("approvedDataSets", ["period", "orgUnit"], db);
-        create_index(approvalDataSetsStore, "by_period", "period", false);
-    };
-
-     var add_approval_store = function(db, tx) {
+    var add_approval_store = function(db, tx) {
         var approvalDataSetsStore = create_store_with_key("approvals", ["period", "orgUnit"], db);
         create_index(approvalDataSetsStore, "by_period", "period", false);
     };
@@ -131,6 +121,10 @@ define([], function() {
         create_store_with_key("indicators", "id", db);
     };
 
+    var add_organisation_unit_group_sets_store = function(db, txt) {
+        create_store_with_key("organisationUnitGroupSets", "id", db);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -142,14 +136,13 @@ define([], function() {
         add_org_unit_group_store,
         add_system_settings_store,
         add_user_preference_store,
-        add_complete_datasets_store,
-        add_approval_datasets_store,
         add_approval_store,
         add_programs_store,
         add_program_events_store,
         add_dataset_store,
         add_org_unit_store,
         add_indicators_store,
-        add_patient_origin_store
+        add_patient_origin_store,
+        add_organisation_unit_group_sets_store
     ];
 });
