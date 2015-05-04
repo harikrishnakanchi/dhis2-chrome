@@ -1,4 +1,7 @@
 <div ng-controller="dataEntryApprovalDashboardController">
+    <div class="loading" ng-show="loading">
+        <img src="img/ajax-loader.gif" class="spinner" />
+    </div>
     <div ng-show="approveSuccess &amp;&amp; hasRoles(['Project Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
     <div ng-show="approveSuccess &amp;&amp; hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
     <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
