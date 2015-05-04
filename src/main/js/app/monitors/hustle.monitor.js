@@ -21,7 +21,7 @@ define(["properties", "chromeUtils"], function(properties, chromeUtils) {
             if (chrome.alarms) {
                 $log.info("Registering checkHustleQueueCountAlarm");
                 chrome.alarms.create('checkHustleQueueCountAlarm', {
-                    periodInMinutes: properties.queue.checkMsgcountDelay
+                    periodInMinutes: properties.queue.checkMsgcountDelayInMinutes
                 });
                 chrome.alarms.onAlarm.addListener(registerCallback("checkHustleQueueCountAlarm", checkHustleQueueCount));
             }

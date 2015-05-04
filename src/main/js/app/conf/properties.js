@@ -38,7 +38,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
                 3: 10000,
                 4: 10000
             },
-            "checkMsgcountDelay": 1
+            "checkMsgcountDelayInMinutes": 1
         },
         "logging": {
             "maxAgeinHours": 720
