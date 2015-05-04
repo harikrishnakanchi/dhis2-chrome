@@ -243,7 +243,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
         };
 
         var init = function() {
-            if ($rootScope.currentUser) {
+            if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
                 $scope.loading = true;
                 return getUserModules().then(loadDashboard).finally(function() {
                     $scope.loading = false;
