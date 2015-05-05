@@ -310,8 +310,12 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 });
 
                 var loadProjectPromise = orgUnitRepository.getParentProject($scope.currentModule.id).then(function(orgUnit) {
-                    var project = orgUnitMapper.mapToProject(orgUnit);
-                    $scope.projectIsAutoApproved = (project.autoApprove === "true");
+                    $scope.projectIsAutoApproved = _.any(orgUnit.attributeValues, {
+                        'attribute': {
+                            'code': "autoApprove"
+                        },
+                        "value": "true"
+                    });
                 });
 
                 var loadApprovalDataPromise = approvalDataRepository.getApprovalData(currentPeriodAndOrgUnit).then(function(data) {

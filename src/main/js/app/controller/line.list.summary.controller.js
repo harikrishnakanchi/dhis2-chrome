@@ -252,8 +252,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
             var setUpProjectAutoApprovedFlag = function() {
                 return orgUnitRepository.getParentProject($scope.currentModule.id).then(function(orgUnit) {
-                    var project = orgUnitMapper.mapToProject(orgUnit);
-                    $scope.projectIsAutoApproved = (project.autoApprove === "true");
+                    $scope.projectIsAutoApproved = _.any(orgUnit.attributeValues, {
+                        'attribute': {
+                            'code': "autoApprove"
+                        },
+                        "value": "true"
+                    });
                 });
             };
 

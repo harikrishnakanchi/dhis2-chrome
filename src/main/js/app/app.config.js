@@ -31,9 +31,8 @@ require.config({
         "angular-ui-equals": "lib/angularjs-directives/src/equals/equals",
         "angular-treeview": "lib/angularjs-directives/src/treeview/angular.treeview",
         "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",
-        "angular-autocomplete": "lib/angularjs-directives/src/autocomplete/autocomplete",
         "angular-filter": "lib/angular-filter/dist/angular-filter",
-        "angucomplete-alt": "lib/angucomplete-alt/angucomplete-alt",
+        "angucomplete-alt": "lib/angularjs-directives/src/angucomplete-alt/angucomplete-alt",
         "md5": "lib/js-md5/js/md5",
 
         //Controllers
@@ -92,6 +91,7 @@ require.config({
         "indicatorRepository": "app/repository/indicator.repository",
         "metadataRepository": "app/repository/metadata.repository",
         "patientOriginRepository": "app/repository/patient.origin.repository",
+        "orgUnitGroupSetRepository": "app/repository/org.unit.group.set.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
@@ -183,9 +183,6 @@ require.config({
         },
         'hustleModule': {
             deps: ["angular", "hustle"]
-        },
-        'angular-autocomplete': {
-            deps: ["angular"]
         },
         'angular-filter': {
             deps: ["angular"]

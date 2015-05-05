@@ -78,19 +78,58 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 }]
             };
 
-            var result = orgUnitMapper.mapToProject(dhisProject);
+            var allContexts = [{
+                "id": "a16b4a97ce4",
+                "name": "val2"
+            }];
+            var allPopTypes = [{
+                "id": "a35778ed565",
+                "name": "val5"
+            }, {
+                "id": "a48f665185e",
+                "name": "val6"
+            }];
+            var reasonForIntervention = [{
+                "id": "a8014cfca5c",
+                "name": "Armed Conflict"
+            }];
+            var modeOfOperation = [{
+                "id": "a560238bc90",
+                "name": "Direct Operation"
+            }];
+            var modelOfManagement = [{
+                "id": "a11a7a5d55a",
+                "name": "Collaboration"
+            }];
+
+            var result = orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement);
 
             var expectedResult = {
                 "name": dhisProject.name,
                 "openingDate": moment(dhisProject.openingDate).toDate(),
-                "context": "val2",
+                "context": {
+                    "id": "a16b4a97ce4",
+                    "name": "val2"
+                },
                 "location": "val3",
-                "populationType": "val5",
+                "populationType": {
+                    "id": "a35778ed565",
+                    "name": "val5"
+                },
                 "endDate": moment("2011-01-01").toDate(),
                 "projectCode": "RU118",
-                "reasonForIntervention": "Armed Conflict",
-                "modeOfOperation": "Direct Operation",
-                "modelOfManagement": "Collaboration",
+                "reasonForIntervention": {
+                    "id": "a8014cfca5c",
+                    "name": "Armed Conflict"
+                },
+                "modeOfOperation": {
+                    "id": "a560238bc90",
+                    "name": "Direct Operation"
+                },
+                "modelOfManagement": {
+                    "id": "a11a7a5d55a",
+                    "name": "Collaboration"
+                },
                 "autoApprove": "true"
             };
 
@@ -141,14 +180,24 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
             var orgUnit = {
                 "name": "Org1",
                 "openingDate": moment("2010-01-01").toDate(),
-                "context": "val2",
+                "context": {
+                    "title": "val2"
+                },
                 "location": "val3",
                 "endDate": moment("2011-01-01").toDate(),
-                "populationType": "val6",
+                "populationType": {
+                    "title": "val6"
+                },
                 "projectCode": "AB001",
-                "reasonForIntervention": "Armed Conflict",
-                "modeOfOperation": "Direct Operation",
-                "modelOfManagement": "Collaboration",
+                "reasonForIntervention": {
+                    "title": "Armed Conflict"
+                },
+                "modeOfOperation": {
+                    "title": "Direct Operation"
+                },
+                "modelOfManagement": {
+                    "title": "Collaboration"
+                },
                 "autoApprove": "true"
             };
 
@@ -544,14 +593,24 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
             var newProject = {
                 "name": "Org1",
                 "openingDate": moment("2010-01-01").toDate(),
-                "context": "val2",
+                "context": {
+                    "title": "val2"
+                },
                 "location": "val3",
                 "endDate": moment("2011-01-01").toDate(),
-                "populationType": "val6",
+                "populationType": {
+                    "name": "val6"
+                },
                 "projectCode": "AB001",
-                "reasonForIntervention": "Armed Conflict",
-                "modeOfOperation": "Direct Operation",
-                "modelOfManagement": "Collaboration",
+                "reasonForIntervention": {
+                    "name": "Armed Conflict"
+                },
+                "modeOfOperation": {
+                    "name": "Direct Operation"
+                },
+                "modelOfManagement": {
+                    "name": "Collaboration"
+                },
                 "autoApprove": "true"
             };
 

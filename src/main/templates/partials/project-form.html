@@ -44,22 +44,22 @@
                     <li class="form-group">
                         <label for="newOrgUnitContext" class="col-sm-4 col-md-4 control-label">Context</label>
                         <div class="col-sm-6 col-md-6">
-                            <autocomplete tab-activation="true" click-activation="true" data="allContexts" ng-model="newOrgUnit.context">
-                            </autocomplete>
+                            <div angucomplete-alt="" placeholder="Start Typing..." pause="100" selected-object="newOrgUnit.context" local-data="allContexts" search-fields="name" title-field="name" initial-value="{{newOrgUnit.context.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
+                            </div>
                         </div>
                     </li>
                     <li class="form-group">
                         <label for="newOrgUnitPopType" class="col-sm-4 col-md-4 control-label">Type of population</label>
                         <div class="col-sm-6 col-md-6">
-                            <autocomplete tab-activation="true" click-activation="true" data="allPopTypes" ng-model="newOrgUnit.populationType">
-                            </autocomplete>
+                            <div angucomplete-alt="" placeholder="Start Typing..." pause="100" selected-object="newOrgUnit.populationType" local-data="allPopTypes" search-fields="name" title-field="name" initial-value="{{newOrgUnit.populationType.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
+                            </div>
                         </div>
                     </li>
                     <li class="form-group">
                         <label for="newOrgUnitReasonForIntervention" class="col-sm-4 col-md-4 control-label required">Reason for intervention</label>
                         <div class="col-sm-6 col-md-6">
-                            <autocomplete tab-activation="true" click-activation="true" data="reasonForIntervention" ng-model="newOrgUnit.reasonForIntervention">
-                            </autocomplete>
+                            <div angucomplete-alt="" placeholder="Start Typing..." pause="100" selected-object="newOrgUnit.reasonForIntervention" local-data="reasonForIntervention" search-fields="name" title-field="name" initial-value="{{newOrgUnit.reasonForIntervention.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
+                            </div>
                             <div ng-show="createForm.newOrgUnitReasonForIntervention.$dirty &amp;&amp; createForm.newOrgUnitReasonForIntervention.$invalid">
                                 <span ng-show="createForm.newOrgUnitReasonForIntervention.$error.required" class="errortxt">{{resourceBundle.reasonForInterventionValidation}}</span>
                             </div>
@@ -68,15 +68,15 @@
                     <li class="form-group">
                         <label for="newOrgUnitModeOfOperation" class="col-sm-4 col-md-4 control-label">Mode of operation</label>
                         <div class="col-sm-6 col-md-6">
-                            <autocomplete tab-activation="true" click-activation="true" data="modeOfOperation" ng-model="newOrgUnit.modeOfOperation">
-                            </autocomplete>
+                            <div angucomplete-alt="" placeholder="Start Typing..." pause="100" selected-object="newOrgUnit.modeOfOperation" local-data="modeOfOperation" search-fields="name" title-field="name" initial-value="{{newOrgUnit.modeOfOperation.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
+                            </div>
                         </div>
                     </li>
                     <li class="form-group">
                         <label for="newOrgUnitModelOfManagement" class="col-sm-4 col-md-4 control-label required">Model of management</label>
                         <div class="col-sm-6 col-md-6">
-                            <autocomplete tab-activation="true" click-activation="true" data="modelOfManagement" ng-model="newOrgUnit.modelOfManagement">
-                            </autocomplete>
+                            <div angucomplete-alt="" placeholder="Start Typing..." pause="100" selected-object="newOrgUnit.modelOfManagement" local-data="modelOfManagement" search-fields="name" title-field="name" initial-value="{{newOrgUnit.modelOfManagement.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
+                            </div>
                             <div ng-show="createForm.newOrgUnitModelOfManagement.$dirty &amp;&amp; createForm.newOrgUnitModelOfManagement.$invalid">
                                 <span ng-show="createForm.newOrgUnitModelOfManagement.$error.required" class="errortxt">{{resourceBundle.modelOfManagementValidation}}</span>
                             </div>

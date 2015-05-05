@@ -1,6 +1,6 @@
-define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository) {
+define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository", "orgUnitGroupSetRepository"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository, OrgUnitGroupSetRepository) {
     describe("project controller tests", function() {
-        var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository;
+        var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository, orgUnitGroupSetRepository, orgUnitGroupSets;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
@@ -16,6 +16,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             orgUnitRepo.findAllByParent = jasmine.createSpy("findAllByParent").and.returnValue(utils.getPromise(q, []));
 
             approvalDataRepository = new ApprovalDataRepository();
+            orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
 
             userRepository = {
                 "upsert": function() {
@@ -50,12 +51,91 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository);
+            orgUnitGroupSets = [{
+                "name": "Mode Of Operation",
+                "code": "mode_of_operation",
+                "id": "a9ca3d1ed93",
+                "organisationUnitGroups": [{
+                    "id": "a560238bc90",
+                    "name": "Direct operation"
+                }, {
+                    "id": "a92cee050b0",
+                    "name": "Remote operation"
+                }]
+            }, {
+                "name": "Model Of Management",
+                "code": "model_of_management",
+                "id": "a2d4a1dee27",
+                "organisationUnitGroups": [{
+                    "id": "a11a7a5d55a",
+                    "name": "Collaboration"
+                }]
+            }, {
+                "name": "Reason For Intervention",
+                "code": "reason_for_intervention",
+                "id": "a86f66f29d4",
+                "organisationUnitGroups": [{
+                    "id": "a8014cfca5c",
+                    "name": "Natural Disaster"
+                }]
+            }, {
+                "name": "Type of Population",
+                "code": "type_of_population",
+                "id": "a8a579d5fab",
+                "organisationUnitGroups": [{
+                    "id": "a35778ed565",
+                    "name": "Most-at-risk Population"
+                }, {
+                    "id": "a48f665185e",
+                    "name": "Refugee"
+                }]
+            }, {
+                "name": "Context",
+                "code": "context",
+                "id": "a5c18ef7277",
+                "organisationUnitGroups": [{
+                    "id": "a16b4a97ce4",
+                    "name": "Post-conflict"
+                }]
+            }];
+            spyOn(orgUnitGroupSetRepository, "getAll").and.returnValue(utils.getPromise(q, orgUnitGroupSets));
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
         }));
 
         afterEach(function() {
             Timecop.returnToPresent();
             Timecop.uninstall();
+        });
+
+        it("should set initial value for project attributes on init", function() {
+            scope.$apply();
+
+            expect(scope.allContexts).toEqual([{
+                "id": "a16b4a97ce4",
+                "name": "Post-conflict"
+            }]);
+            expect(scope.allPopTypes).toEqual([{
+                "id": "a35778ed565",
+                "name": "Most-at-risk Population"
+            }, {
+                "id": "a48f665185e",
+                "name": "Refugee"
+            }]);
+            expect(scope.reasonForIntervention).toEqual([{
+                "id": "a8014cfca5c",
+                "name": "Natural Disaster"
+            }]);
+            expect(scope.modeOfOperation).toEqual([{
+                "id": "a560238bc90",
+                "name": "Direct operation"
+            }, {
+                "id": "a92cee050b0",
+                "name": "Remote operation"
+            }]);
+            expect(scope.modelOfManagement).toEqual([{
+                "id": "a11a7a5d55a",
+                "name": "Collaboration"
+            }]);
         });
 
         it("should save project in dhis", function() {
@@ -284,6 +364,8 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
         });
 
         it("should show project details when in view mode", function() {
+            scope.$apply();
+
             scope.newOrgUnit = {};
             scope.orgUnit = {
                 "name": "anyname",
@@ -295,7 +377,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                         "name": "Context",
                         "id": "Gy8V8WeGgYs"
                     },
-                    "value": "val2"
+                    "value": "Post-conflict"
                 }, {
                     "attribute": {
                         "code": "prjLoc",
@@ -316,7 +398,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                         "name": "Type of population",
                         "id": "Byx9QE6IvXB"
                     },
-                    "value": "val6"
+                    "value": "Most-at-risk Population"
                 }, {
                     "attribute": {
                         "code": "projCode",
@@ -330,14 +412,14 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                         name: 'Reason For Intervention',
                         id: 'e7af7f29053'
                     },
-                    value: 'Armed Conflict'
+                    value: 'Natural Disaster'
                 }, {
                     attribute: {
                         code: 'modeOfOperation',
                         name: 'Mode Of Operation',
                         id: 'a048b89d331'
                     },
-                    value: 'Direct Operation'
+                    value: 'Direct operation'
                 }, {
                     attribute: {
                         code: 'modelOfManagement',
@@ -357,20 +439,38 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             var expectedNewOrgUnit = {
                 'name': scope.orgUnit.name,
                 'openingDate': moment("2010-01-01").toDate(),
-                'context': "val2",
+                'context': {
+                    "id": "a16b4a97ce4",
+                    "name": "Post-conflict"
+                },
                 'location': "val3",
                 'endDate': moment("2011-01-01").toDate(),
-                'populationType': "val6",
+                'populationType': {
+                    "id": "a35778ed565",
+                    "name": "Most-at-risk Population"
+                },
                 'projectCode': 'RU118',
-                'reasonForIntervention': 'Armed Conflict',
-                'modeOfOperation': 'Direct Operation',
-                'modelOfManagement': 'Collaboration',
+                'reasonForIntervention': {
+                    "id": "a8014cfca5c",
+                    "name": "Natural Disaster"
+                },
+                'modeOfOperation': {
+                    "id": "a560238bc90",
+                    "name": 'Direct operation'
+                },
+                'modelOfManagement': {
+                    "id": "a11a7a5d55a",
+                    "name": 'Collaboration'
+                },
                 'autoApprove': 'true'
             };
 
             scope.isNewMode = false;
-
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper);
+            scope.orgUnit.parent = {
+                "id": "parentId"
+            };
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            scope.$apply();
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
         });
@@ -389,7 +489,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             orgUnitRepo.getAllProjects.and.returnValue(utils.getPromise(q, [project1]));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
             scope.$apply();
 
             expect(scope.existingProjectCodes).toEqual(["AF101"]);
@@ -409,7 +509,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, [project1]));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
             scope.$apply();
 
             expect(scope.peerProjects).toEqual(["Kabul-AF101"]);
@@ -429,7 +529,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 return;
             });
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
 
             scope.closeForm(parentOrgUnit);
 

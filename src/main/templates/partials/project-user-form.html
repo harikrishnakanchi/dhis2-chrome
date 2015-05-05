@@ -1,6 +1,6 @@
 <div ng-controller="projectUserController">
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorUser }}</div>
-    <form name="createForm" class="form-horizontal" role="form" novalidate ng-submit="save(projectUser, orgUnit)" ng-if="isNewMode">
+    <form name="createForm" class="form-horizontal" role="form" novalidate ng-if="isNewMode">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Create User</h3>
@@ -30,7 +30,7 @@
                     </li>
                     <li>
                         <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
-                            <input type="submit" class="btn btn-main" ng-disabled="createForm.$invalid" value="Save" />
+                            <input type="button" class="btn btn-main" ng-disabled="createForm.$invalid" value="Save" ng-click="save(projectUser, orgUnit)" />
                             <input type="button" class="btn" ng-click="reset()" value="Reset">
                             <input type="button" class="btn" ng-click="closeForm()" value="Back" />
                         </div>

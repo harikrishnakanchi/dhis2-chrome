@@ -1,12 +1,6 @@
 define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper, properties) {
 
-    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository) {
-
-        $scope.allContexts = ['Internal instability', 'Stable', 'Post-conflict', 'Cross-border instability'].sort();
-        $scope.allPopTypes = ['Internally Displaced People', 'General Population', 'Most-at-risk Population', 'Refugee'].sort();
-        $scope.reasonForIntervention = ['Armed Conflict', 'Access to health care', 'Natural Disaster', 'Epidemic'].sort();
-        $scope.modeOfOperation = ['Direct operation', 'Remote operation'].sort();
-        $scope.modelOfManagement = ['Collaboration', 'MSF management'].sort();
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository) {
 
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -158,17 +152,37 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
         var prepareEditForm = function() {
             $scope.reset();
-            $scope.newOrgUnit = orgUnitMapper.mapToProject($scope.orgUnit);
+            $scope.newOrgUnit = orgUnitMapper.mapToProject($scope.orgUnit, $scope.allContexts, $scope.allPopTypes, $scope.reasonForIntervention, $scope.modeOfOperation, $scope.modelOfManagement);
             orgUnitRepository.getAllProjects().then(function(allProjects) {
                 $scope.peerProjects = _.without(orgUnitRepository.getChildOrgUnitNames($scope.orgUnit.parent.id), $scope.orgUnit.name);
             });
         };
 
         var init = function() {
-            if ($scope.isNewMode)
-                prepareNewForm();
-            else
-                prepareEditForm();
+            orgUnitGroupSetRepository.getAll().then(function(data) {
+                $scope.allContexts = _.find(data, {
+                    "code": "context"
+                }).organisationUnitGroups;
+                $scope.allPopTypes = _.find(data, {
+                    "code": "type_of_population"
+                }).organisationUnitGroups;
+                $scope.reasonForIntervention = _.find(data, {
+                    "code": "reason_for_intervention"
+                }).organisationUnitGroups;
+                $scope.modeOfOperation = _.find(data, {
+                    "code": "mode_of_operation"
+                }).organisationUnitGroups;
+                $scope.modelOfManagement = _.find(data, {
+                    "code": "model_of_management"
+                }).organisationUnitGroups;
+
+                if ($scope.isNewMode)
+                    prepareNewForm();
+                else
+                    prepareEditForm();
+            });
+
+
         };
 
         init();
