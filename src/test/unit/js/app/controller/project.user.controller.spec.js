@@ -59,9 +59,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                 username: "ProJ_1_Blah",
                 password: "P@ssw0rd",
                 userRole: {
-                    originalObject: {
-                        name: 'SomeRole'
-                    }
+                    name: 'SomeRole'
                 }
             };
             var expectedUserPayload = {
@@ -72,7 +70,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                 "userCredentials": {
                     "username": "proj_1_blah",
                     "userRoles": [{
-                        "name": user.userRole.originalObject.name
+                        "name": user.userRole.name
                     }],
                     "password": "msfuser",
                 },

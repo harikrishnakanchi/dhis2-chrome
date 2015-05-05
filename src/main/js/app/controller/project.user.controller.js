@@ -126,7 +126,7 @@ define(["dhisId", "properties"], function(dhisId, properties) {
                 "userCredentials": {
                     "username": projectUser.username.toLowerCase(),
                     "userRoles": [{
-                        "name": projectUser.userRole.originalObject.name
+                        "name": projectUser.userRole.name
                     }],
                     "password": "msfuser"
                 },
