@@ -123,6 +123,7 @@ require.config({
         "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
         "zipUtils": "app/utils/zip.utils",
+        "cipherUtils": "app/utils/cipher.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",

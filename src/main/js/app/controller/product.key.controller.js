@@ -1,28 +1,13 @@
-define(["chromeUtils", "sjcl", "properties"], function(chromeUtils, sjcl, properties) {
+define(["chromeUtils", "cipherUtils"], function(chromeUtils, cipherUtils) {
     return function($scope, $location, $rootScope, metadataImporter) {
         var triggerImportAndSync = function() {
             metadataImporter.run();
             chromeUtils.sendMessage("productKeyDecrypted");
         };
 
-        var createCipherText = function(productKey) {
-            var cipherDetails = JSON.parse(atob(productKey));
-
-            return JSON.stringify({
-                "iv": cipherDetails.iv,
-                "salt": cipherDetails.salt,
-                "ct": cipherDetails.ct,
-                "iter": properties.encryption.iter,
-                "ks": properties.encryption.ks,
-                "ts": properties.encryption.ts,
-                "mode": properties.encryption.mode,
-                "cipher": properties.encryption.cipher
-            });
-        };
-
         $scope.setAuthHeaderAndProceed = function() {
             try {
-                var decryptedProductKey = sjcl.decrypt(properties.encryption.passphrase, createCipherText($scope.productKey));
+                var decryptedProductKey = cipherUtils.decrypt($scope.productKey);
 
                 chromeUtils.setAuthHeader(decryptedProductKey);
                 $rootScope.auth_header = decryptedProductKey;
