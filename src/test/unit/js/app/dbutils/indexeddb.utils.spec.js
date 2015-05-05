@@ -56,10 +56,40 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             scope.$digest();
         });
 
+        it("should create a back up of the entire db broken into chunks", function() {
+            var getResultInChunks = function(count) {
+                return _.times(count, function() {
+                    return {};
+                });
+            };
+
+            var store = db.objectStore("dataElements");
+            store.getAll.and.returnValue(utils.getPromise(q, getResultInChunks(5001)));
+            var expectedBackup = {
+                "msf__store1__0": getResultInChunks(5000),
+                "msf__store1__1": getResultInChunks(1),
+                "msf__store2__0": getResultInChunks(5000),
+                "msf__store2__1": getResultInChunks(1),
+                "hustle": {
+                    "store1": getResultInChunks(5001),
+                    "store2": getResultInChunks(5001)
+                }
+            };
+
+            indexeddbUtils.backupEntireDB().then(function(actualBackup) {
+                expect(actualBackup).toEqual(expectedBackup);
+            });
+
+            expect(db.dbInfo).toHaveBeenCalled();
+
+            scope.$digest();
+
+        });
+
         it("should create a back up of the entire db", function() {
             var expectedBackup = {
-                "msf__store1": allResult,
-                "msf__store2": allResult,
+                "msf__store1__0": allResult,
+                "msf__store2__0": allResult,
                 "hustle": {
                     "store1": allResult,
                     "store2": allResult

@@ -2,6 +2,7 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
     return function(db, $q, programEventRepository) {
         var hustleDBVersion = 5001;
         var msfLogsDBVersion = 5001;
+        var CHUNK_SIZE = 5000;
         var MSF = "msf";
         var HUSTLE = "hustle";
 
@@ -57,7 +58,10 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
             var msfData, hustleData;
             return backupMsf().then(function(data) {
                 msfData = _.reduce(data, function(result, value, key) {
-                    result[MSF + "__" + key] = value;
+                    var valueChunks = _.chunk(value, CHUNK_SIZE);
+                    _.each(valueChunks, function(chunk, index) {
+                        result[MSF + "__" + key + "__" + index] = chunk;
+                    });
                     return result;
                 }, {});
                 return data;
