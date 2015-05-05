@@ -14,7 +14,9 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             };
 
             var findResult = {};
-            var eachResult = {};
+            var eachResult = [{
+                "id": "identity"
+            }];
             allResult = [{
                 "id": "identity"
             }];
@@ -26,16 +28,30 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             indexeddbUtils = new IndexeddbUtils(db, q);
         }));
 
-        it("should create a back up for the given stores", function() {
+        it("should create a back up of entire stores if its a metadata store", function() {
             var stores = [storeNames[0]];
             var objectStore1 = db.objectStore(storeNames[0]);
             var expectedBackup = getExpectedBackupResult(stores);
 
-            indexeddbUtils.backupStores(stores).then(function(actualBackup) {
+            indexeddbUtils.backupStores("somedb", stores).then(function(actualBackup) {
                 expect(actualBackup).toEqual(expectedBackup);
             });
 
             expect(objectStore1.getAll).toHaveBeenCalled();
+
+            scope.$digest();
+        });
+
+        it("should create a back up of last 12 weeks data if its a project data store", function() {
+            var stores = ["dataValues"];
+            var objectStore1 = db.objectStore("dataValues");
+            var expectedBackup = getExpectedBackupResult(stores);
+
+            indexeddbUtils.backupStores("msf", stores).then(function(actualBackup) {
+                expect(actualBackup).toEqual(expectedBackup);
+            });
+
+            expect(objectStore1.each).toHaveBeenCalled();
 
             scope.$digest();
         });

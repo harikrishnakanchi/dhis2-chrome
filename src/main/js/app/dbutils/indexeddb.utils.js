@@ -1,12 +1,31 @@
-define(["lodash", "migrations"], function(_, migrations) {
-    return function(db, $q) {
+define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_, migrations, dateUtils, properties, moment) {
+    return function(db, $q, programEventRepository) {
         var hustleDBVersion = 5001;
         var msfLogsDBVersion = 5001;
+        var MSF = "msf";
+        var HUSTLE = "hustle";
 
-        var backupStores = function(storeNames) {
+        var backupByPeriod = function(storeName) {
+            var startDate = dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync);
+            var startPeriod = dateUtils.toDhisFormat(moment(startDate));
+            var endPeriod = dateUtils.toDhisFormat(moment());
+            var store = db.objectStore(storeName);
+            var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
+            return store.each(query);
+        };
+
+        var backupAll = function(storeName) {
+            var store = db.objectStore(storeName);
+            return store.getAll();
+        };
+
+        var backupByPeriodStores = ["dataValues", "programEvents"];
+
+        var backupStores = function(dbName, storeNames) {
             var backupPromises = _.map(storeNames, function(name) {
-                var store = db.objectStore(name);
-                return store.getAll();
+                var callback = (_.contains(backupByPeriodStores, name)) && (dbName === MSF) ? backupByPeriod : backupAll;
+                return callback(name);
+
             });
             return $q.all(backupPromises).then(function(data) {
                 return _.zipObject(storeNames, data);
@@ -21,30 +40,30 @@ define(["lodash", "migrations"], function(_, migrations) {
             return $q.all(truncatePromises);
         };
 
-        var backupDB = function() {
-            return getAllStoreNames().then(backupStores);
+        var backupDB = function(dbName) {
+            return getAllStoreNames().then(_.partial(backupStores, dbName));
         };
 
         var backupEntireDB = function() {
             var backupMsf = function() {
-                return backupDB();
+                return backupDB(MSF);
             };
 
             var backupHustle = function() {
-                db.switchDB("hustle", hustleDBVersion);
-                return backupDB();
+                db.switchDB(HUSTLE, hustleDBVersion);
+                return backupDB(HUSTLE);
             };
 
             var msfData, hustleData;
             return backupMsf().then(function(data) {
                 msfData = _.reduce(data, function(result, value, key) {
-                    result["msf__" + key] = value;
+                    result[MSF + "__" + key] = value;
                     return result;
                 }, {});
                 return data;
             }).then(backupHustle).then(function(data) {
                 hustleData = data;
-                db.switchDB("msf", migrations.length);
+                db.switchDB(MSF, migrations.length);
                 return data;
             }).then(function() {
                 return _.merge(msfData, {
@@ -56,7 +75,7 @@ define(["lodash", "migrations"], function(_, migrations) {
         var backupLogs = function() {
             db.switchDB("msfLogs", msfLogsDBVersion);
             return backupDB().then(function(logsData) {
-                db.switchDB("msf", migrations.length);
+                db.switchDB(MSF, migrations.length);
                 return {
                     "msfLogs": logsData
                 };
@@ -83,13 +102,13 @@ define(["lodash", "migrations"], function(_, migrations) {
             };
 
             var restoreHustle = function(data) {
-                db.switchDB("hustle", hustleDBVersion);
+                db.switchDB(HUSTLE, hustleDBVersion);
                 return restoreDB(data);
             };
 
             return restoreMsf(backupData.msf).then(function() {
                 return restoreHustle(backupData.hustle).then(function() {
-                    return db.switchDB("msf", migrations.length);
+                    return db.switchDB(MSF, migrations.length);
                 });
             });
         };
