@@ -16,11 +16,13 @@ define(["dhisId", "properties"], function(dhisId, properties) {
 
         var init = function() {
             var projCode = getAttributeValue($scope.orgUnit.attributeValues, 'projCode').toLowerCase();
-            $scope.userNamePrefix = _.isEmpty(projCode) ? projCode : projCode + "_";
-            $scope.userNameMatchExpr = new RegExp($scope.userNamePrefix + "(.)+", "i");
-            $scope.userNamePlaceHolder = _.isEmpty($scope.userNamePrefix) ? "" : "Username should begin with " + $scope.userNamePrefix;
-
             var orgUnitType = getAttributeValue($scope.orgUnit.attributeValues, 'Type');
+            var userNamePrefix = _.isEmpty(projCode) ? projCode : projCode + "_";
+            $scope.userNameMatchExpr = orgUnitType === "Country" ? new RegExp("[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}$") : new RegExp(userNamePrefix + "(.)+", "i");
+            $scope.patternValidationMessage = orgUnitType === "Country" ? $scope.resourceBundle.emailValidation : $scope.resourceBundle.usernamePrefixValidation + userNamePrefix;
+
+            $scope.userNamePlaceHolder = _.isEmpty(userNamePrefix) ? "" : "Username should begin with " + userNamePrefix;
+
             $scope.userRoles = allRoles[orgUnitType];
             userRepository.getAllUsernames()
                 .then(setExistingUserNames)
