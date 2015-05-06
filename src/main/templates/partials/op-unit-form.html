@@ -46,8 +46,8 @@
                         <li class="form-group" ng-if="opUnit.type==='Hospital'">
                             <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label required">Hospital Unit Code</label>
                             <div class="col-sm-6 col-md-6">
-                                <autocomplete tab-activation="true" click-activation="true" data="hospitalUnitCodes" ng-model="opUnit.hospitalUnitCode">
-                                </autocomplete>
+                                <div angucomplete-alt="" placeholder="Start Typing..." pause="100" selected-object="opUnit.hospitalUnitCode" local-data="hospitalUnitCodes" search-fields="name" title-field="name" initial-value="{{opUnit.hospitalUnitCode.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
+                                </div>
                                 <div ng-show="form.hospitalUnitCode.$dirty &amp;&amp; form.hospitalUnitCode.$invalid">
                                     <span class="errortxt" ng-show="form.hospitalUnitCode.$error.required">{{resourceBundle.hospitalUnitCodeValidation}}</span>
                                 </div>

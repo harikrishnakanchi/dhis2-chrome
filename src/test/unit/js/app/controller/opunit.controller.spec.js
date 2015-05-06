@@ -1,8 +1,8 @@
 /*global Date:true*/
-define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository) {
+define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "timecop", "moment", "dhisId", "orgUnitRepository", "patientOriginRepository", "orgUnitGroupSetRepository"], function(OpUnitController, mocks, utils, OrgUnitGroupHelper, timecop, moment, dhisId, OrgUnitRepository, PatientOriginRepository, OrgUnitGroupSetRepository) {
     describe("op unit controller", function() {
 
-        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper, patientOriginRepository, orgUnitRepository;
+        var scope, opUnitController, db, q, location, _Date, hustle, orgUnitRepo, fakeModal, orgUnitGroupHelper, patientOriginRepository, orgUnitRepository, orgUnitGroupSets, orgUnitGroupSetRepository;
 
         beforeEach(module("hustle"));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -13,6 +13,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             location = $location;
 
             orgUnitRepository = new OrgUnitRepository();
+            orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
 
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
             spyOn(orgUnitRepository, "getChildOrgUnitNames").and.returnValue(utils.getPromise(q, []));
@@ -54,7 +55,31 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 },
                 open: function(object) {}
             };
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
+
+            orgUnitGroupSets = [{
+                "name": "Hospital Unit Code",
+                "code": "hospital_unit_code",
+                "id": "a9ca3d1ed93",
+                "organisationUnitGroups": [{
+                    "id": "a9ab62b5ef3",
+                    "name": "Unit Code - C2"
+                }, {
+                    "id": "aedbab45572",
+                    "name": "Unit Code - B1"
+                }]
+            }, {
+                "name": "Model Of Management",
+                "code": "model_of_management",
+                "id": "a2d4a1dee27",
+                "organisationUnitGroups": [{
+                    "id": "a11a7a5d55a",
+                    "name": "Collaboration"
+                }]
+            }];
+
+            spyOn(orgUnitGroupSetRepository, "getAll").and.returnValue(utils.getPromise(q, orgUnitGroupSets));
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
+            scope.$apply();
         }));
 
         afterEach(function() {
@@ -67,7 +92,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "OpUnit1",
                 "type": "Hospital",
                 "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": "Unit Code - A"
+                "hospitalUnitCode": {
+                    "title": "Unit Code - A"
+                }
             };
 
             scope.orgUnit = {
@@ -140,12 +167,24 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             }, "dataValues");
         });
 
+        it("should set hospitalUnitCodes on scope on init", function() {
+            expect(scope.hospitalUnitCodes).toEqual([{
+                "id": "a9ab62b5ef3",
+                "name": "C2"
+            }, {
+                "id": "aedbab45572",
+                "name": "B1"
+            }]);
+        });
+
         it("should save operation unit with GIS coordinate information", function() {
             var opUnit = {
                 "name": "OpUnit1",
                 "type": "Hospital",
                 "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": "Unit Code - A",
+                "hospitalUnitCode": {
+                    "title": "Unit Code - A"
+                },
                 "latitude": 50,
                 "longitude": 25
             };
@@ -227,7 +266,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "OpUnit1",
                 "type": "Health Center",
                 "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": "Unit Code - A"
+                "hospitalUnitCode": {
+                    "title": "Unit Code - A"
+                }
             };
 
             scope.orgUnit = {
@@ -349,7 +390,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
 
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
 
             scope.$apply();
             expect(scope.opUnit.name).toEqual("opUnit1");
@@ -385,7 +426,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             };
             scope.isNewMode = false;
 
-            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository);
+            opUnitController = new OpUnitController(scope, q, hustle, orgUnitRepository, orgUnitGroupHelper, db, location, fakeModal, patientOriginRepository, orgUnitGroupSetRepository);
 
             scope.$apply();
             expect(scope.isDisabled).toBeTruthy();
@@ -473,7 +514,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "OpUnit1",
                 "type": "Hospital",
                 "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": "Unit Code - A"
+                "hospitalUnitCode": {
+                    "name": "Unit Code - A"
+                }
             };
 
             scope.orgUnit = {
@@ -567,7 +610,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "OpUnit1",
                 "type": "Hospital",
                 "openingDate": moment().format("YYYY-MM-DD"),
-                "hospitalUnitCode": "Unit Code - A",
+                "hospitalUnitCode": {
+                    "name": "Unit Code - A"
+                },
                 "latitude": 50,
                 "longitude": 25
             };
