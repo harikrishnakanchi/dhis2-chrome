@@ -1,6 +1,8 @@
 define(["dhisId", "properties"], function(dhisId, properties) {
     return function($scope, $hustle, $timeout, $modal, userRepository) {
 
+        $scope.projectUser = {};
+
         var allRoles = {
             "Project": [{
                 "name": "Data entry user"
@@ -113,8 +115,10 @@ define(["dhisId", "properties"], function(dhisId, properties) {
         };
 
         $scope.reset = function() {
-            $scope.projectUser = {};
-            $scope.createForm.$setPristine();
+            $scope.projectUser = {
+                "username": "",
+                "userRole": ""
+            };
         };
 
         $scope.save = function(projectUser) {

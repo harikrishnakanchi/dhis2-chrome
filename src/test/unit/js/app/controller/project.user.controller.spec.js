@@ -112,9 +112,15 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
 
         it("should reset form", function() {
             scope.projectUser = {
-                "name": "blah",
-                "id": "blah",
-                "lastname": "blah",
+                "username": "blah",
+                "userRole": {
+                    "name": "role1"
+                },
+            };
+
+            var expectedUser = {
+                "username": "",
+                "userRole": ""
             };
 
             scope.createForm = {
@@ -123,8 +129,7 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
 
             scope.reset();
 
-            expect(scope.projectUser).toEqual({});
-            expect(scope.createForm.$setPristine).toHaveBeenCalled();
+            expect(scope.projectUser).toEqual(expectedUser);
         });
 
         it("should take the user to the view page of the project on clicking cancel", function() {
