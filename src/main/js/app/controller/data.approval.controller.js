@@ -140,8 +140,11 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
         };
 
         $rootScope.$watch("currentUser.selectedProject", function() {
-            resetForm();
-            init();
+            if (!_.isEmpty($scope.currentUser)) {
+                resetForm();
+                init();
+            }
+
         });
 
         var init = function() {
