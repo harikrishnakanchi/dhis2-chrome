@@ -48,10 +48,35 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
                 $scope.displayMessage($scope.resourceBundle.loadCloneErrorMessage + error, true);
             };
 
+            var arrayBufferToString = function(buffer) {
+                var bufView = new Uint16Array(buffer);
+                var length = bufView.length;
+                var result = '';
+                for (var i = 0; i < length; i += 65535) {
+                    var addition = 65535;
+                    if (i + 65535 > length) {
+                        addition = length - i;
+                    }
+                    result += String.fromCharCode.apply(null, bufView.subarray(i, i + addition));
+                }
+                return result;
+            };
+
             var successCallback = function(fileData) {
                 $scope.cloning = true;
-                var fileContents = fileData.target.result;
-                indexeddbUtils.restore(JSON.parse(fileContents))
+                var zipFiles = zipUtils.readZipFile(fileData.target.result);
+
+                var result = {};
+                _.each(zipFiles, function(file) {
+                    if (file.name.endsWith(".clone")) {
+                        var content = JSON.parse(arrayBufferToString(file._data.getContent()));
+                        return _.merge(result, content);
+                    }
+                });
+
+
+
+                indexeddbUtils.restore(result)
                     .then(function() {
                         sessionHelper.logout();
                         $location.path("#/login");
@@ -68,7 +93,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
             };
 
             showModal(function() {
-                filesystemService.readFile(["clone"]).then(successCallback, errorCallback);
+                filesystemService.readFile(["zip"]).then(successCallback, errorCallback);
             }, modalMessages);
         };
 

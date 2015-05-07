@@ -1,5 +1,5 @@
-define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemService", "indexeddbUtils", "sessionHelper", "indexedDBLogger"],
-    function(AppCloneController, mocks, utils, timecop, FilesystemService, IndexeddbUtils, SessionHelper, indexedDBLogger) {
+define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemService", "indexeddbUtils", "sessionHelper", "indexedDBLogger", "zipUtils"],
+    function(AppCloneController, mocks, utils, timecop, FilesystemService, IndexeddbUtils, SessionHelper, indexedDBLogger, zipUtils) {
         describe("appCloneController", function() {
             var appCloneController, scope, q, timeout, location, idbDump, fakeModal;
 
@@ -95,6 +95,10 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                         "result": "{}"
                     }
                 }));
+
+                spyOn(zipUtils, "readZipFile").and.returnValue([{
+                    "name": "blah"
+                }]);
 
                 scope.loadClone();
                 scope.$apply();

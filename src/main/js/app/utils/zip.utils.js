@@ -15,7 +15,13 @@ define(["JSZip", "lodash"], function(JSZip, _) {
         return contents;
     };
 
+    var readZipFile = function(file) {
+        var zipObject = zip.load(file);
+        return zipObject.files;
+    };
+
     return {
-        "zipData": zipData
+        "zipData": zipData,
+        "readZipFile": readZipFile
     };
 });

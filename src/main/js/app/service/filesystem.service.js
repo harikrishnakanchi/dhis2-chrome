@@ -57,7 +57,7 @@ define([], function() {
                     reader.onloadend = function(data) {
                         deferred.resolve(data);
                     };
-                    reader.readAsText(file);
+                    reader.readAsArrayBuffer(file);
                 });
             });
 

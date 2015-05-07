@@ -45,6 +45,14 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
             return getAllStoreNames().then(_.partial(backupStores, dbName));
         };
 
+        var encodeBase64 = function(data) {
+            return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+        };
+
+        var decodeBase64 = function(data) {
+            return decodeURIComponent(escape(atob(data)));
+        };
+
         var backupEntireDB = function() {
             var backupMsf = function() {
                 return backupDB(MSF);
@@ -60,7 +68,7 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
                 msfData = _.reduce(data, function(result, value, key) {
                     var valueChunks = _.chunk(value, CHUNK_SIZE);
                     _.each(valueChunks, function(chunk, index) {
-                        result[MSF + "__" + key + "__" + index] = chunk;
+                        result[MSF + "__" + key + "__" + index] = encodeBase64(chunk);
                     });
                     return result;
                 }, {});
@@ -71,7 +79,7 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
                 return data;
             }).then(function() {
                 return _.merge(msfData, {
-                    "hustle": hustleData
+                    "hustle": encodeBase64(hustleData)
                 });
             });
         };
@@ -93,7 +101,7 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
                 var insertAll = function() {
                     var insertPromises = _.map(storeNames, function(name) {
                         var store = db.objectStore(name);
-                        store.insert(data[name]);
+                        store.insert(_.flatten(data[name]));
                     });
                     return $q.all(insertPromises);
                 };
@@ -101,16 +109,38 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
                 return truncate(storeNames).then(insertAll);
             };
 
+            var decodeData = function(data) {
+                var result = {};
+                _.each(data, function(val, key) {
+                    var obj = {};
+                    result[key] = decodeBase64(val);
+
+                });
+                return result;
+            };
+
             var restoreMsf = function(data) {
-                return restoreDB(data);
+                var backupDataByStore = {};
+                _.each(data, function(val, key) {
+                    if (key != "hustle") {
+                        var store = key.split("__")[1];
+                        var index = key.split("__")[2];
+                        if (_.isEmpty(backupDataByStore[store])) {
+                            backupDataByStore[store] = [];
+                        }
+                        backupDataByStore[store][index] = JSON.parse(val);
+                    }
+                });
+                return restoreDB(backupDataByStore);
             };
 
             var restoreHustle = function(data) {
                 db.switchDB(HUSTLE, hustleDBVersion);
-                return restoreDB(data);
+                return restoreDB(JSON.parse(data));
             };
 
-            return restoreMsf(backupData.msf).then(function() {
+            backupData = decodeData(backupData);
+            return restoreMsf(backupData).then(function() {
                 return restoreHustle(backupData.hustle).then(function() {
                     return db.switchDB(MSF, migrations.length);
                 });
