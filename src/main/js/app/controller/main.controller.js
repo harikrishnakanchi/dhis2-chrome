@@ -59,15 +59,20 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         var resetProjects = function() {
             if ($rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
                 var orgUnitIds = _.pluck($rootScope.currentUser.organisationUnits, "id");
-                return orgUnitRepository.findAllByParent(orgUnitIds).then(function(orgUnits) {
-                    $scope.projects = _.sortBy(orgUnits, "name");
-                    if ($rootScope.currentUser.selectedProject) {
-                        $scope.selectedProject = _.find($scope.projects, "id", $rootScope.currentUser.selectedProject.id);
-                    } else {
-                        $scope.selectedProject = $scope.projects[0];
-                        $rootScope.currentUser.selectedProject = $scope.projects[0];
-                    }
-                });
+                if ($rootScope.hasRoles(['Data entry user', 'Project Level Approver'])) {
+                    $scope.selectedProject = $rootScope.currentUser.organisationUnits[0];
+                    $rootScope.currentUser.selectedProject = $rootScope.currentUser.organisationUnits[0];
+                } else {
+                    return orgUnitRepository.findAllByParent(orgUnitIds).then(function(orgUnits) {
+                        $scope.projects = _.sortBy(orgUnits, "name");
+                        if ($rootScope.currentUser.selectedProject) {
+                            $scope.selectedProject = _.find($scope.projects, "id", $rootScope.currentUser.selectedProject.id);
+                        } else {
+                            $scope.selectedProject = $scope.projects[0];
+                            $rootScope.currentUser.selectedProject = $scope.projects[0];
+                        }
+                    });
+                }
             }
         };
 

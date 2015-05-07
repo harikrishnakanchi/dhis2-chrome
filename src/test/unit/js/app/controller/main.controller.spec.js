@@ -14,6 +14,8 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 metadataImporter = new MetadataImporter();
                 sessionHelper = new SessionHelper();
 
+                rootScope.hasRoles = jasmine.createSpy("hasRoles").and.returnValue(false);
+
                 spyOn(chromeUtils, "getAuthHeader").and.callFake(function(callBack) {
                     callBack({
                         "auth_header": "Basic Auth"
@@ -170,7 +172,7 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 expect(location.path).toHaveBeenCalledWith("/login");
             });
 
-            it("should reset projects on current user's org units changes", function() {
+            it("should reset projects on current user's org units changes for coordination approver", function() {
                 var projects = [{
                     "id": "prj1"
                 }, {
@@ -193,6 +195,29 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 expect(scope.projects).toEqual(projects);
                 expect(scope.selectedProject).toEqual(projects[0]);
                 expect(rootScope.currentUser.selectedProject).toEqual(projects[0]);
+            });
+
+            it("should reset projects on current user's org units changes for dataentry user and project approver", function() {
+                rootScope.currentUser = {
+                    "userCredentials": {
+                        "username": "username"
+                    },
+                    "organisationUnits": [{
+                        "id": "prj1"
+                    }]
+                };
+                rootScope.hasRoles.and.returnValue(true);
+
+                scope.$apply();
+                rootScope.$apply();
+
+                expect(scope.projects).toEqual([]);
+                expect(scope.selectedProject).toEqual({
+                    "id": "prj1"
+                });
+                expect(rootScope.currentUser.selectedProject).toEqual({
+                    "id": "prj1"
+                });
             });
         });
     });
