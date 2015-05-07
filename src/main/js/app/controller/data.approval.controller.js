@@ -171,6 +171,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 return orgUnitRepository.findAll(orgUnitIds);
             };
 
+            if (_.isEmpty($scope.currentModule))
+                return;
             return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements()]).then(function() {
 
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
