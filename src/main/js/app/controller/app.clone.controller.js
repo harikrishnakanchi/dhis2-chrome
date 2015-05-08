@@ -93,7 +93,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
             };
 
             showModal(function() {
-                filesystemService.readFile(["zip"]).then(successCallback, errorCallback);
+                filesystemService.readFile(["msf"]).then(successCallback, errorCallback);
             }, modalMessages);
         };
 
@@ -102,7 +102,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
             return backupCallback().then(function(data) {
                 $scope.cloning = false;
                 var zippedData = zipUtils.zipData(folderName, fileNamePrefix, fileNameExtn, data);
-                return filesystemService.writeFile(fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + ".zip", zippedData);
+                return filesystemService.writeFile(fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + ".msf", zippedData);
             }).finally(function() {
                 $scope.cloning = false;
             });
