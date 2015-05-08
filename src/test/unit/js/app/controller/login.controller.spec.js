@@ -1,6 +1,6 @@
-define(["loginController", "angularMocks", "utils", "userPreferenceRepository"], function(LoginController, mocks, utils, UserPreferenceRepository) {
+define(["loginController", "angularMocks", "utils", "sessionHelper"], function(LoginController, mocks, utils, SessionHelper) {
     describe("login controller", function() {
-        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, userPreferenceStore, userPreferenceRepository, hustle, fakeUserStoreSpy;
+        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, hustle, fakeUserStoreSpy, sessionHelper;
 
         beforeEach(module("hustle"));
 
@@ -10,13 +10,6 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             location = $location;
             hustle = $hustle;
             q = $q;
-            userPreferenceRepository = new UserPreferenceRepository();
-            spyOn(userPreferenceRepository, 'get').and.returnValue(utils.getPromise(q, {
-                "selectedProject": {
-                    "id": 123
-                },
-                "locale": "fr"
-            }));
 
             db = {
                 objectStore: function() {}
@@ -30,10 +23,6 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
                 "find": function() {}
             };
 
-            userPreferenceStore = {
-                "find": function() {}
-            };
-
             spyOn(location, 'path');
 
             spyOn(db, 'objectStore').and.callFake(function(storeName) {
@@ -41,8 +30,6 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
                     return fakeUserStore;
                 if (storeName === "localUserCredentials")
                     return fakeUserCredentialsStore;
-                if (storeName === "userPreferences")
-                    return userPreferenceStore;
             });
 
             fakeUserStoreSpy = spyOn(fakeUserStore, 'find');
@@ -70,11 +57,11 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
                 });
             });
 
-            spyOn(userPreferenceStore, 'find').and.returnValue(utils.getPromise(q, {}));
-            spyOn(userPreferenceRepository, 'save').and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish");
 
-            loginController = new LoginController(scope, $rootScope, location, db, q, hustle, userPreferenceRepository);
+            sessionHelper = new SessionHelper();
+            spyOn(sessionHelper, "login").and.returnValue(utils.getPromise(q, {}));
+            loginController = new LoginController(scope, location, db, q, hustle, sessionHelper);
         }));
 
         it("should login admin user with valid credentials and redirect to dashboard", function() {
@@ -86,20 +73,8 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
 
             expect(fakeUserStore.find).toHaveBeenCalledWith("msfadmin");
             expect(fakeUserCredentialsStore.find).toHaveBeenCalledWith("msfadmin");
-            expect(rootScope.currentUser.userCredentials.username).toEqual("msfadmin");
-            expect(rootScope.isLoggedIn).toEqual(true);
             expect(location.path).toHaveBeenCalledWith("/dashboard");
             expect(scope.invalidCredentials).toEqual(false);
-            expect(userPreferenceRepository.save).toHaveBeenCalledWith({
-                username: "msfadmin",
-                locale: "fr",
-                orgUnits: [{
-                    "id": 123
-                }],
-                selectedProject: {
-                    "id": 123
-                }
-            });
             expect(hustle.publish).toHaveBeenCalledWith({
                 "type": "downloadData"
             }, "dataValues");
@@ -124,8 +99,6 @@ define(["loginController", "angularMocks", "utils", "userPreferenceRepository"],
             scope.login();
             scope.$apply();
 
-            expect(rootScope.currentUser.userCredentials.username).toEqual('someprojectuser');
-            expect(rootScope.isLoggedIn).toEqual(true);
             expect(hustle.publish).toHaveBeenCalledWith({
                 "type": "downloadData"
             }, "dataValues");

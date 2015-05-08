@@ -1,20 +1,16 @@
-define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "userRepository", "metadataImporter", "sessionHelper", "chromeUtils"],
-    function(MainController, mocks, utils, UserPreferenceRepository, OrgUnitRepository, UserRepository, MetadataImporter, SessionHelper, chromeUtils) {
+define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionHelper", "chromeUtils"],
+    function(MainController, mocks, utils, MetadataImporter, SessionHelper, chromeUtils) {
         describe("main controller", function() {
-            var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, getAllProjectsSpy, db, frenchResourceBundle,
-                translationStore, userPreferenceRepository, location, orgUnitRepository, userRepository, metadataImporter, sessionHelper;
+            var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, db, frenchResourceBundle,
+                translationStore, location, metadataImporter, sessionHelper;
 
             beforeEach(mocks.inject(function($rootScope, $q, $location) {
                 scope = $rootScope.$new();
                 q = $q;
                 rootScope = $rootScope;
-                userPreferenceRepository = new UserPreferenceRepository();
-                orgUnitRepository = new OrgUnitRepository();
-                userRepository = new UserRepository();
+
                 metadataImporter = new MetadataImporter();
                 sessionHelper = new SessionHelper();
-
-                rootScope.hasRoles = jasmine.createSpy("hasRoles").and.returnValue(false);
 
                 spyOn(chromeUtils, "getAuthHeader").and.callFake(function(callBack) {
                     callBack({
@@ -64,34 +60,20 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 translationStore = getMockStore("translations");
 
                 spyOn(sessionHelper, "logout");
+                spyOn(sessionHelper, "login").and.returnValue(utils.getPromise(q, {}));
+
                 spyOn(translationStore, "each").and.returnValue(utils.getPromise(q, {}));
                 spyOn(db, 'objectStore').and.callFake(function(storeName) {
                     return translationStore;
                 });
 
                 spyOn(metadataImporter, "run").and.returnValue(utils.getPromise(q, {}));
-                getAllProjectsSpy = spyOn(orgUnitRepository, "getAllProjects");
-                getAllProjectsSpy.and.returnValue(utils.getPromise(q, []));
 
-                spyOn(userPreferenceRepository, "save");
-                spyOn(userPreferenceRepository, "get").and.returnValue(utils.getPromise(q, {
-                    'orgUnits': [{
-                        'id': 111
-                    }],
-                    'selectedProject': {
-                        'id': 111
-                    }
-                }));
-                spyOn(orgUnitRepository, "getAll").and.returnValue(utils.getPromise(q, []));
-                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
-
-                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
-                    userRepository, metadataImporter, sessionHelper);
+                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper);
             }));
 
             it("should import metadata", function() {
-                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
-                    userRepository, metadataImporter, sessionHelper);
+                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper);
                 scope.$apply();
 
                 expect(metadataImporter.run).toHaveBeenCalled();
@@ -136,16 +118,6 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                     "locale": "fr"
                 });
                 expect(rootScope.resourceBundle).toEqual(frenchResourceBundle.data);
-                expect(userPreferenceRepository.save).toHaveBeenCalledWith({
-                    "username": '1',
-                    "locale": 'fr',
-                    "orgUnits": [{
-                        "id": '123'
-                    }],
-                    "selectedProject": {
-                        "id": "prj1"
-                    }
-                });
             });
 
             it("should redirect to product key page", function() {
@@ -155,8 +127,7 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                     callBack({});
                 });
 
-                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, userPreferenceRepository, orgUnitRepository,
-                    userRepository, metadataImporter, sessionHelper);
+                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper);
 
                 scope.$apply();
 
@@ -172,46 +143,23 @@ define(["mainController", "angularMocks", "utils", "userPreferenceRepository", "
                 expect(location.path).toHaveBeenCalledWith("/login");
             });
 
-            it("should reset projects on current user's org units changes for coordination approver", function() {
-                var projects = [{
-                    "id": "prj1"
-                }, {
-                    "id": "prj2"
-                }];
-
-                rootScope.currentUser = {
-                    "userCredentials": {
-                        "username": "username"
-                    },
-                    "organisationUnits": [{
-                        "id": "someOrgUnit"
-                    }]
-                };
-
-                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, projects));
-                scope.$apply();
-                rootScope.$apply();
-
-                expect(scope.projects).toEqual(projects);
-                expect(scope.selectedProject).toEqual(projects[0]);
-                expect(rootScope.currentUser.selectedProject).toEqual(projects[0]);
-            });
-
-            it("should reset projects on current user's org units changes for dataentry user and project approver", function() {
+            it("should reset projects on current user's org units changes", function() {
                 rootScope.currentUser = {
                     "userCredentials": {
                         "username": "username"
                     },
                     "organisationUnits": [{
                         "id": "prj1"
-                    }]
+                    }],
+                    "selectedProject": {
+                        "id": "prj1"
+                    }
                 };
-                rootScope.hasRoles.and.returnValue(true);
 
                 scope.$apply();
                 rootScope.$apply();
 
-                expect(scope.projects).toEqual([]);
+                expect(scope.projects).toEqual(rootScope.currentUser.organisationUnits);
                 expect(scope.selectedProject).toEqual({
                     "id": "prj1"
                 });

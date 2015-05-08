@@ -45,7 +45,7 @@
             <div class="container">
                 <ul class="nav navbar-nav navbar-right">
                     <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Coordination Level Approver']))">
-                        <select name="project" class="select_project input-sm" ng-model="selectedProject" ng-options="getFormattedOption(p) for p in projects | orderBy:getFormattedOption" ng-change="setSelectedProject()">
+                        <select name="project" class="select_project input-sm" ng-model="selectedProject" ng-options="p.name for p in projects | orderBy:'name'" ng-change="setSelectedProject()">
                         </select>
                     </li>
                 </ul>

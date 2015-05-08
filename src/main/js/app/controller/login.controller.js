@@ -1,5 +1,5 @@
 define(["md5", "lodash"], function(md5, _) {
-    return function($scope, $rootScope, $location, db, $q, $hustle, userPreferenceRepository) {
+    return function($scope, $location, db, $q, $hustle, sessionHelper) {
         var getUser = function() {
             var userStore = db.objectStore("users");
             return userStore.find($scope.username.toLowerCase());
@@ -9,23 +9,6 @@ define(["md5", "lodash"], function(md5, _) {
             var userCredentialsStore = db.objectStore("localUserCredentials");
             var username = $scope.username.toLowerCase() === "msfadmin" ? "msfadmin" : "project_user";
             return userCredentialsStore.find(username);
-        };
-
-        var loadUserPreferences = function() {
-            return userPreferenceRepository.get($rootScope.currentUser.userCredentials.username).then(function(data) {
-                $rootScope.currentUser.locale = data ? data.locale : "en";
-                $rootScope.currentUser.selectedProject = data ? data.selectedProject : undefined;
-            });
-        };
-
-        var saveUserPreferences = function() {
-            var userPreferences = {
-                'username': $rootScope.currentUser.userCredentials.username,
-                'locale': $rootScope.currentUser.locale,
-                'orgUnits': $rootScope.currentUser.organisationUnits || [],
-                'selectedProject': $rootScope.currentUser.selectedProject
-            };
-            return userPreferenceRepository.save(userPreferences);
         };
 
         var downloadDataValues = function() {
@@ -46,11 +29,7 @@ define(["md5", "lodash"], function(md5, _) {
                 $scope.invalidCredentials = false;
             } else if (user && md5($scope.password) === userCredentials.password) {
                 $scope.invalidCredentials = false;
-                $rootScope.isLoggedIn = true;
-                $rootScope.currentUser = user;
-
-                return loadUserPreferences()
-                    .then(saveUserPreferences)
+                return sessionHelper.login(user)
                     .then(downloadDataValues)
                     .then(function() {
                         $location.path("/dashboard");
