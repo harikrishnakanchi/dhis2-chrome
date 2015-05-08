@@ -89,7 +89,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.msf', jasmine.any(Blob));
             });
 
-            it("should load clone to indexed db from selected file", function() {
+            xit("should load clone to indexed db from selected file", function() {
                 spyOn(filesystemService, "readFile").and.returnValue(utils.getPromise(q, {
                     "target": {
                         "result": "{}"
