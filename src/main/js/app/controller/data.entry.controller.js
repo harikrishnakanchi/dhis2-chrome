@@ -67,9 +67,7 @@ define(["lodash", "moment"],
                 }
             };
 
-            $rootScope.$watch("currentUser.selectedProject", function() {
-                init();
-            });
+            $scope.$on('selectedProjectUpdated', init);
 
             var init = function() {
                 var setInitialModuleAndWeek = function() {
@@ -92,8 +90,11 @@ define(["lodash", "moment"],
                         };
                     };
 
-                    if ($routeParams.module && $routeParams.week) {
+                    if ($routeParams.module) {
                         setSelectedModule($routeParams.module);
+                    }
+
+                    if ($routeParams.module && $routeParams.week) {
                         setSelectedWeek($routeParams.week);
                     }
                 };

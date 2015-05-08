@@ -1,20 +1,6 @@
-<!-- temporary styling -->
-<div style="margin:30px;">
-    <div class="menu">
-        <a id="linkToDataEntry" ng-if="hasRoles(['Data entry user'])" href="#/data-entry" class="btn btn-default">{{ resourceBundle.dataEntryLabel }}</a>
-        <a id="linkToDataApproval" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])" href="#/data-entry" class="btn btn-default">{{ resourceBundle.approveDataLabel }}</a>
-        <a id="linkToProjects" ng-if="hasRoles(['Superuser'])" href="#/projects" class="btn btn-default">{{ resourceBundle.projectsLabel }}</a>
-        <a id="linkToDownloadData" ng-if="hasRoles(['Superuser', 'Data entry user', 'Project Level Approver', 'Coordination Level Approver'])" href="" ng-click="syncNow()" class="btn btn-default">{{ resourceBundle.downloadDataLabel }}</a>
-        <div ng-include="'templates/partials/clone.html'"></div>
-        <div class="loading" ng-show="cloning">
-            <img src="img/ajax-loader.gif" class="spinner" />
-        </div>
-        <span ng-show="showMessage" class="{{messageClass}} download-msg-alert">{{message}}</span>
+<div>
+    <div class="loading" ng-show="loading">
+        <img src="img/ajax-loader.gif" class="spinner" />
     </div>
-    <div>
-        <div class="loading" ng-show="loading">
-            <img src="img/ajax-loader.gif" class="spinner" />
-        </div>
-        <div ng-if="hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver'])" ng-include="'templates/partials/data-entry-approval-dashboard.html'"></div>
-    </div>
+    <div ng-if="hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver'])" ng-include="'templates/partials/data-entry-approval-dashboard.html'"></div>
 </div>

@@ -56,7 +56,12 @@ define([], function() {
             $rootScope.currentUser = {
                 "userCredentials": user.userCredentials
             };
-            return loadUserPreferences().then(loadSession);
+
+            var broadcast = function() {
+                $rootScope.$broadcast('userPreferencesUpdated');
+            };
+
+            return loadUserPreferences().then(loadSession).then(broadcast);
         };
     };
 });

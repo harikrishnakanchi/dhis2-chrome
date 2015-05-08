@@ -1,8 +1,8 @@
-define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionHelper", "chromeUtils"],
-    function(MainController, mocks, utils, MetadataImporter, SessionHelper, chromeUtils) {
+define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionHelper", "chromeUtils", "orgUnitRepository"],
+    function(MainController, mocks, utils, MetadataImporter, SessionHelper, chromeUtils, OrgUnitRepository) {
         describe("main controller", function() {
             var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, db, frenchResourceBundle,
-                translationStore, location, metadataImporter, sessionHelper;
+                translationStore, location, metadataImporter, sessionHelper, orgUnitRepository;
 
             beforeEach(mocks.inject(function($rootScope, $q, $location) {
                 scope = $rootScope.$new();
@@ -11,6 +11,9 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
 
                 metadataImporter = new MetadataImporter();
                 sessionHelper = new SessionHelper();
+                orgUnitRepository = new OrgUnitRepository();
+
+                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
 
                 spyOn(chromeUtils, "getAuthHeader").and.callFake(function(callBack) {
                     callBack({
@@ -69,11 +72,11 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
 
                 spyOn(metadataImporter, "run").and.returnValue(utils.getPromise(q, {}));
 
-                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper);
+                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
             }));
 
             it("should import metadata", function() {
-                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper);
+                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
                 scope.$apply();
 
                 expect(metadataImporter.run).toHaveBeenCalled();
@@ -127,7 +130,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                     callBack({});
                 });
 
-                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper);
+                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
 
                 scope.$apply();
 
@@ -156,8 +159,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                     }
                 };
 
-                scope.$apply();
-                rootScope.$apply();
+                rootScope.$broadcast('userPreferencesUpdated');
 
                 expect(scope.projects).toEqual(rootScope.currentUser.organisationUnits);
                 expect(scope.selectedProject).toEqual({

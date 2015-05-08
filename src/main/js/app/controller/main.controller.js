@@ -1,9 +1,14 @@
 define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, ngI18nResourceBundle, db, metadataImporter, sessionHelper) {
+    return function($q, $scope, $location, $rootScope, ngI18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
             return hasUserLoggedIn && isCoordinationApprover;
+        };
+
+        $scope.isActive = function(viewLocationRegex) {
+            var re = new RegExp(viewLocationRegex);
+            return re.test($location.path());
         };
 
         $rootScope.$watch("currentUser.locale", function() {
@@ -34,11 +39,30 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return $rootScope.currentUser ? getResourceBundle($rootScope.currentUser.locale, true) : getResourceBundle("en", false);
         });
 
-        var resetProjects = function() {
+        var loadProjects = function() {
             if ($rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
                 $scope.projects = _.sortBy($rootScope.currentUser.organisationUnits, "name");
                 $scope.selectedProject = _.find($scope.projects, "id", $rootScope.currentUser.selectedProject.id);
             }
+        };
+
+        var loadUserLineListModules = function() {
+            return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(modules) {
+                $scope.allUserLineListModules = _.transform(modules, function(result, module) {
+                    var attr = _.find(module.attributeValues, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "true"
+                    });
+
+                    if (!attr)
+                        return;
+
+                    module.displayName = module.parent.name + ' - ' + module.name;
+                    result.push(module);
+                }, []);
+            });
         };
 
         var getAuthHeader = function() {
@@ -49,16 +73,13 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return deferred.promise;
         };
 
-        $rootScope.$watch("currentUser.organisationUnits", function() {
-            resetProjects();
-        }, true);
-
         $scope.logout = function() {
             sessionHelper.logout();
         };
 
         $scope.setSelectedProject = function() {
             $rootScope.currentUser.selectedProject = $scope.selectedProject;
+            $scope.$broadcast('selectedProjectUpdated');
         };
 
         var showProductKeyPage = function() {
@@ -71,7 +92,13 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             metadataImporter.run();
         };
 
+        $scope.$on('userPreferencesUpdated', function() {
+            loadProjects();
+            loadUserLineListModules();
+        });
+
         var init = function() {
+            $scope.allUserLineListModules = [];
             getAuthHeader().then(function(result) {
                 if (_.isEmpty(result)) {
                     return showProductKeyPage();
