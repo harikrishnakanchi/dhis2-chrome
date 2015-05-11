@@ -291,6 +291,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                     return hospitalUnitCode;
                 });
 
+                $scope.hospitalUnitCodes = _.sortBy($scope.hospitalUnitCodes, 'name');
+
                 if (!$scope.isNewMode) {
                     var coordinates = $scope.orgUnit.coordinates;
                     coordinates = coordinates ? coordinates.substr(1, coordinates.length - 2).split(",") : coordinates;

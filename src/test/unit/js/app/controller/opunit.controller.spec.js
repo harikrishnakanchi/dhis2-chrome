@@ -169,11 +169,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
         it("should set hospitalUnitCodes on scope on init", function() {
             expect(scope.hospitalUnitCodes).toEqual([{
-                "id": "a9ab62b5ef3",
-                "name": "C2"
-            }, {
                 "id": "aedbab45572",
                 "name": "B1"
+            }, {
+                "id": "a9ab62b5ef3",
+                "name": "C2"
             }]);
         });
 
