@@ -139,14 +139,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             $scope.isOfflineApproval = true;
         };
 
-        $rootScope.$watch("currentUser.selectedProject", function() {
-            if (!_.isEmpty($scope.currentUser)) {
-                resetForm();
-                init();
-            }
-
-        });
-
         var init = function() {
             $scope.loading = true;
             $scope.isOfflineApproval = false;

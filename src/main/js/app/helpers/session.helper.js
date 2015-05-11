@@ -1,6 +1,6 @@
 define([], function() {
     return function($rootScope, $q, userPreferenceRepository, orgUnitRepository) {
-        var savePreferences = function() {
+        var saveSessionState = function() {
             var userPreferences = {
                 "username": $rootScope.currentUser.userCredentials.username,
                 "locale": $rootScope.currentUser.locale,
@@ -10,14 +10,14 @@ define([], function() {
             return userPreferenceRepository.save(userPreferences);
         };
 
-        this.logout = function() {
-            return savePreferences().then(function() {
+        var logout = function() {
+            return saveSessionState().then(function() {
                 $rootScope.isLoggedIn = false;
                 $rootScope.currentUser = undefined;
             });
         };
 
-        this.login = function(user) {
+        var login = function(user) {
             var loadUserPreferences = function() {
                 return userPreferenceRepository.get(user.userCredentials.username);
             };
@@ -48,7 +48,7 @@ define([], function() {
                 if (userPreferences) {
                     return setUserPreferences(userPreferences);
                 } else {
-                    return setDefaultPreferences().then(savePreferences);
+                    return setDefaultPreferences().then(saveSessionState);
                 }
             };
 
@@ -62,6 +62,12 @@ define([], function() {
             };
 
             return loadUserPreferences().then(loadSession).then(broadcast);
+        };
+
+        return {
+            "saveSessionState": saveSessionState,
+            "logout": logout,
+            "login": login
         };
     };
 });

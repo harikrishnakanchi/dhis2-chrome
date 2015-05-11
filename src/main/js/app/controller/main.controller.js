@@ -47,22 +47,24 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         };
 
         var loadUserLineListModules = function() {
-            return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(modules) {
-                $scope.allUserLineListModules = _.transform(modules, function(result, module) {
-                    var attr = _.find(module.attributeValues, {
-                        "attribute": {
-                            "code": "isLineListService"
-                        },
-                        "value": "true"
-                    });
+            if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
+                return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(modules) {
+                    $scope.allUserLineListModules = _.transform(modules, function(result, module) {
+                        var attr = _.find(module.attributeValues, {
+                            "attribute": {
+                                "code": "isLineListService"
+                            },
+                            "value": "true"
+                        });
 
-                    if (!attr)
-                        return;
+                        if (!attr)
+                            return;
 
-                    module.displayName = module.parent.name + ' - ' + module.name;
-                    result.push(module);
-                }, []);
-            });
+                        module.displayName = module.parent.name + ' - ' + module.name;
+                        result.push(module);
+                    }, []);
+                });
+            }
         };
 
         var getAuthHeader = function() {
@@ -77,9 +79,10 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             sessionHelper.logout();
         };
 
-        $scope.setSelectedProject = function() {
-            $rootScope.currentUser.selectedProject = $scope.selectedProject;
-            $scope.$broadcast('selectedProjectUpdated');
+        $scope.setSelectedProject = function(selectedProject) {
+            $rootScope.currentUser.selectedProject = selectedProject;
+            $rootScope.$emit('selectedProjectUpdated');
+            sessionHelper.saveSessionState();
         };
 
         var showProductKeyPage = function() {
@@ -92,7 +95,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             metadataImporter.run();
         };
 
-        $scope.$on('userPreferencesUpdated', function() {
+        $rootScope.$on('userPreferencesUpdated', function() {
             loadProjects();
             loadUserLineListModules();
         });

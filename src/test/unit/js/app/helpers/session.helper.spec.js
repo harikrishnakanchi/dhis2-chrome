@@ -120,5 +120,25 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
                 expect(rootScope.currentUser).toEqual(expectedUser);
                 expect(userPreferenceRepository.save).toHaveBeenCalled();
             });
+
+            it("should save session state", function() {
+                rootScope.currentUser = user;
+                rootScope.currentUser.locale = "en";
+                rootScope.$apply();
+
+                sessionHelper.saveSessionState();
+
+                var expectedState = {
+                    "username": "coordination@approver.level",
+                    "locale": "en",
+                    "organisationUnits": [{
+                        "id": 123,
+                        "name": "Some Country"
+                    }],
+                    "selectedProject": undefined
+                };
+
+                expect(userPreferenceRepository.save).toHaveBeenCalledWith(expectedState);
+            });
         });
     });

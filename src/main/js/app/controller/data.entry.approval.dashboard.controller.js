@@ -1,7 +1,7 @@
 define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
     return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository) {
 
-        $rootScope.$watch("currentUser.selectedProject", function() {
+        $rootScope.$on('selectedProjectUpdated', function() {
             init();
         });
 

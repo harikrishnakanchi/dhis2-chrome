@@ -72,7 +72,7 @@
                     </ul>
                 </li>
                 <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Coordination Level Approver']))" style="float:right;">
-                    <select name="project" class="select_project input-sm" ng-model="selectedProject" ng-options="p.name for p in projects | orderBy:'name'" ng-change="setSelectedProject()">
+                    <select name="project" class="select_project input-sm" ng-model="selectedProject" ng-options="p.name for p in projects | orderBy:'name'" ng-change="setSelectedProject(selectedProject)">
                     </select>
                 </li>
             </ul>
