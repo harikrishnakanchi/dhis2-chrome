@@ -168,5 +168,10 @@
     "enableOriginConfirmationMessage": "Patient Origin will be enabled. Are you sure?",
     "emailValidation": "This is not a valid Email.",
     "successNotification": "Success",
-    "errorNotification": "Error"
+    "errorNotification": "Error",
+    "connectedNoPendingRequests": "Online with no pending requests",
+    "connectedWithPendingRequests": "Online with pending requests",
+    "notConnectedNoPendingRequests": "Offline with no pending requests",
+    "notConnectedWithPendingRequests": "Offline with pending requests",
+    "menu": "Menu"
 }
