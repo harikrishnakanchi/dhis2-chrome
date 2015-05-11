@@ -83,6 +83,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             $rootScope.currentUser.selectedProject = selectedProject;
             $rootScope.$emit('selectedProjectUpdated');
             sessionHelper.saveSessionState();
+            $location.path("/dashboard");
         };
 
         var showProductKeyPage = function() {

@@ -63,6 +63,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 translationStore = getMockStore("translations");
 
                 spyOn(sessionHelper, "logout");
+                spyOn(sessionHelper, "saveSessionState");
                 spyOn(sessionHelper, "login").and.returnValue(utils.getPromise(q, {}));
 
                 spyOn(translationStore, "each").and.returnValue(utils.getPromise(q, {}));
@@ -168,6 +169,21 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 expect(rootScope.currentUser.selectedProject).toEqual({
                     "id": "prj1"
                 });
+            });
+
+            it("should save session state and redirect user to dashboard when project selection changes", function() {
+                var selectedProject = {
+                    "id": "p1"
+                };
+                spyOn(location, "path");
+
+                rootScope.currentUser = {};
+
+                scope.setSelectedProject(selectedProject);
+                scope.$apply();
+
+                expect(sessionHelper.saveSessionState).toHaveBeenCalled();
+                expect(location.path).toHaveBeenCalledWith("/dashboard");
             });
         });
     });
