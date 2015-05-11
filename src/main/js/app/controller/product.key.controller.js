@@ -1,5 +1,5 @@
 define(["chromeUtils", "cipherUtils"], function(chromeUtils, cipherUtils) {
-    return function($scope, $location, $rootScope, metadataImporter) {
+    return function($scope, $location, $rootScope, metadataImporter, sessionHelper) {
         var triggerImportAndSync = function() {
             metadataImporter.run();
             chromeUtils.sendMessage("productKeyDecrypted");
@@ -13,6 +13,8 @@ define(["chromeUtils", "cipherUtils"], function(chromeUtils, cipherUtils) {
                 $rootScope.auth_header = decryptedProductKey;
 
                 triggerImportAndSync();
+                if ($rootScope.currentUser)
+                    sessionHelper.logout();
                 $location.path("/login");
             } catch (err) {
                 $scope.isKeyInvalid = true;
