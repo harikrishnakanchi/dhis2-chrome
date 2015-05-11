@@ -12,11 +12,19 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
 
         $scope.dumpLogs = function() {
             var errorCallback = function(error) {
-                $scope.displayMessage($scope.resourceBundle.dumpLogsErrorMessage + error.name, true);
+                var notificationMessages = {
+                    "notificationMessage": $scope.resourceBundle.dumpLogsErrorMessage + error.name,
+                    "notificationTitle": $scope.resourceBundle.errorNotification
+                };
+                showNotification(notificationMessages);
             };
 
             var successCallback = function(directory) {
-                $scope.displayMessage($scope.resourceBundle.dumpLogsSuccessMessage + directory.name, false);
+                var notificationMessages = {
+                    "notificationMessage": $scope.resourceBundle.dumpLogsSuccessMessage + directory.name,
+                    "notificationTitle": $scope.resourceBundle.successNotification
+                };
+                showNotification(notificationMessages);
             };
 
             createZip("logs", "logs_dump_", ".logs", _.partial(indexedDBLogger.exportLogs, "msfLogs"))
@@ -25,11 +33,19 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
 
         $scope.createClone = function() {
             var errorCallback = function(error) {
-                $scope.displayMessage($scope.resourceBundle.createCloneErrorMessage + error.name, true);
+                var notificationMessages = {
+                    "notificationMessage": $scope.resourceBundle.createCloneErrorMessage + error.name,
+                    "notificationTitle": $scope.resourceBundle.errorNotification
+                };
+                showNotification(notificationMessages);
             };
 
             var successCallback = function(directory) {
-                $scope.displayMessage($scope.resourceBundle.createCloneSuccessMessage + directory.name, false);
+                var notificationMessages = {
+                    "notificationMessage": $scope.resourceBundle.createCloneSuccessMessage + directory.name,
+                    "notificationTitle": $scope.resourceBundle.successNotification
+                };
+                showNotification(notificationMessages);
             };
 
             var modalMessages = {
@@ -45,7 +61,11 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
 
         $scope.loadClone = function() {
             var errorCallback = function(error) {
-                $scope.displayMessage($scope.resourceBundle.loadCloneErrorMessage + error, true);
+                var notificationMessages = {
+                    "notificationMessage": $scope.resourceBundle.loadCloneErrorMessage + error,
+                    "notificationTitle": $scope.resourceBundle.errorNotification
+                };
+                showNotification(notificationMessages);
             };
 
             var arrayBufferToString = function(buffer) {
@@ -105,6 +125,15 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
                 return filesystemService.writeFile(fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + ".msf", zippedData);
             }).finally(function() {
                 $scope.cloning = false;
+            });
+        };
+
+        var showNotification = function(message) {
+            $scope.notificationMessages = message;
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/notification-dialog.html',
+                controller: 'notificationDialogController',
+                scope: $scope
             });
         };
 

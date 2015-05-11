@@ -1,12 +1,12 @@
 define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'aggregateModuleController',
         'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController',
         'aggregateDataEntryController', 'lineListDataEntryController', 'indicatorController', 'patientOriginController', 'productKeyController',
-        'lineListSummaryController', 'dataApprovalController', 'dataEntryApprovalDashboardController', 'lineListOfflineApprovalController', 'appCloneController', 'downloadDataController'
+        'lineListSummaryController', 'dataApprovalController', 'dataEntryApprovalDashboardController', 'lineListOfflineApprovalController', 'appCloneController', 'downloadDataController', 'notificationDialogController'
     ],
     function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, aggregateModuleController,
         lineListModuleController, projectController, countryController, confirmDialogController, projectUserController,
         aggregateDataEntryController, lineListDataEntryController, indicatorController, patientOriginController, productKeyController,
-        lineListSummaryController, dataApprovalController, dataEntryApprovalDashboardController, lineListOfflineApprovalController, appCloneController, downloadDataController) {
+        lineListSummaryController, dataApprovalController, dataEntryApprovalDashboardController, lineListOfflineApprovalController, appCloneController, downloadDataController, notificationDialogController) {
 
         var init = function(app) {
             app.controller('dashboardController', ['$scope', '$hustle', '$q', '$rootScope', '$timeout', dashboardController]);
@@ -25,6 +25,7 @@ define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnit
             app.controller('loginController', ['$scope', '$location', '$indexedDB', '$q', '$hustle', 'sessionHelper', loginController]);
             app.controller('countryController', ['$scope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', countryController]);
             app.controller('confirmDialogController', ['$scope', '$modalInstance', confirmDialogController]);
+            app.controller('notificationDialogController', ['$scope', '$modalInstance', notificationDialogController]);
             app.controller('projectUserController', ['$scope', '$hustle', '$timeout', '$modal', 'userRepository', projectUserController]);
             app.controller('indicatorController', ['$scope', 'indicatorRepository', indicatorController]);
             app.controller('patientOriginController', ['$scope', '$hustle', '$q', 'patientOriginRepository', 'orgUnitRepository', 'datasetRepository', 'programRepository', 'originOrgunitCreator', 'orgUnitGroupHelper', patientOriginController]);

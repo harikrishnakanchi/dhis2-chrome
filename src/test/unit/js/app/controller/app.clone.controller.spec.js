@@ -106,7 +106,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 expect(filesystemService.readFile).toHaveBeenCalled();
                 expect(indexeddbUtils.restore).toHaveBeenCalled();
                 expect(sessionHelper.logout).toHaveBeenCalled();
-                expect(location.path).toHaveBeenCalledWith('#/login');
+                expect(location.path).toHaveBeenCalledWith('/login');
             });
 
             it("should dump logs to a file", function() {
