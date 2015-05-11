@@ -56,17 +56,17 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
             var userPrefs = [{
                 "username": "msfadmin",
                 "locale": "en",
-                "orgUnits": []
+                "organisationUnits": []
             }, {
                 "username": "new_user",
                 "locale": "en",
-                "orgUnits": [{
+                "organisationUnits": [{
                     "id": "proj1"
                 }]
             }, {
                 "username": "new2_user",
                 "locale": "en",
-                "orgUnits": [{
+                "organisationUnits": [{
                     "id": "proj2"
                 }]
             }];
