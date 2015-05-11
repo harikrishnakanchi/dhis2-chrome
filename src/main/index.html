@@ -31,12 +31,7 @@
                                 </li>
                                 <li>
                                     <button type="button" class="btn btn-link" ng-disabled="disabled">
-                                        <span class="glyphicon" ng-class="{'glyphicon-open':msgInQueue, 'glyphicon-saved':!msgInQueue}"></span>
-                                    </button>
-                                </li>
-                                <li>
-                                    <button type="button" class="btn btn-link" ng-disabled="disabled">
-                                        <span ng-class="{'online':isDhisOnline, 'offline':!isDhisOnline}" tabindex="-1"></span>
+                                        <span class="glyphicon" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline, 'dhis-offline':!isDhisOnline}"></span>
                                     </button>
                                 </li>
                                 <li ng-show="isLoggedIn">
