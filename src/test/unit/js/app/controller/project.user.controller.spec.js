@@ -123,8 +123,10 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
                 "userRole": ""
             };
 
-            scope.createForm = {
-                "$setPristine": jasmine.createSpy("$setPristine")
+            scope.form = {
+                "userForm": {
+                    "$setPristine": jasmine.createSpy("$setPristine")
+                }
             };
 
             scope.reset();

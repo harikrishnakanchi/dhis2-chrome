@@ -24,6 +24,7 @@ define(["dhisId", "properties"], function(dhisId, properties) {
             $scope.userNamePlaceHolder = _.isEmpty(userNamePrefix) ? "" : "Username should begin with " + userNamePrefix;
 
             $scope.userRoles = allRoles[orgUnitType];
+            $scope.form = {};
             userRepository.getAllUsernames()
                 .then(setExistingUserNames)
                 .then(loadOrgUnitUsers);
@@ -121,6 +122,7 @@ define(["dhisId", "properties"], function(dhisId, properties) {
                 "username": "",
                 "userRole": ""
             };
+            $scope.form.userForm.$setPristine();
         };
 
         $scope.save = function(projectUser) {
