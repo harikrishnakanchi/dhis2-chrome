@@ -3,7 +3,7 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
         $scope.syncNow = function() {
 
             var onSuccess = function(response) {
-                chromeUtils.createNotification("Download data", $scope.resourceBundle.syncComplete);
+                chromeUtils.createNotification($scope.resourceBundle.syncScheduledHeader, $scope.resourceBundle.syncScheduled);
             };
 
             var downloadMetadata = $hustle.publish({
