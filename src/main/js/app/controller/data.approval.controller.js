@@ -175,11 +175,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     .then(datasetRepository.includeCategoryOptionCombinations)
                     .then(function(datasets) {
                         $scope.dataSets = [];
-                        return _.forEach(datasets, function(dataset) {
+                        var dataSetPromises = _.map(datasets, function(dataset) {
                             return findallOrgUnits(dataset.organisationUnits).then(function(orgunits) {
                                 dataset.organisationUnits = orgunits;
-                                $scope.dataSets.push(dataset);
+                                return dataset;
                             });
+                        });
+                        return $q.all(dataSetPromises).then(function(datasets) {
+                            $scope.dataSets = datasets;
                         });
                     });
 
