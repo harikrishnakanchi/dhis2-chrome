@@ -11,6 +11,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             if ($scope.form && $scope.form.eventDataEntryForm) {
                 $scope.form.eventDataEntryForm.$setPristine();
             }
+            $scope.$broadcast('angucomplete-alt:clearInput');
         };
 
         var getPeriod = function() {
