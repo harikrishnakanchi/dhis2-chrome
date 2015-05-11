@@ -42,7 +42,9 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         var loadProjects = function() {
             if ($rootScope.currentUser && $rootScope.currentUser.organisationUnits) {
                 $scope.projects = _.sortBy($rootScope.currentUser.organisationUnits, "name");
-                $scope.selectedProject = _.find($scope.projects, "id", $rootScope.currentUser.selectedProject.id);
+                if (!_.isEmpty($scope.projects) && $rootScope.currentUser.selectedProject) {
+                    $scope.selectedProject = _.find($scope.projects, "id", $rootScope.currentUser.selectedProject.id);
+                }
             }
         };
 
