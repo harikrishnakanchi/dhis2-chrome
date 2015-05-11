@@ -79,7 +79,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
                 indexeddbUtils.restore(result)
                     .then(function() {
                         sessionHelper.logout();
-                        $location.path("#/login");
+                        $location.path("/login");
                     }, errorCallback)
                     .finally(function() {
                         $scope.cloning = false;
