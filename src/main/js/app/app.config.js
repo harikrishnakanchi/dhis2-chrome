@@ -59,6 +59,7 @@ require.config({
         "patientOriginController": "app/controller/patient.origin.controller",
         "productKeyController": "app/controller/product.key.controller",
         "appCloneController": "app/controller/app.clone.controller",
+        "downloadDataController": "app/controller/download.data.controller",
 
         //Services
         "services": "app/service/services",
