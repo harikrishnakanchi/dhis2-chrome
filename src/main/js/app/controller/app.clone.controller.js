@@ -68,7 +68,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
 
                 var result = {};
                 _.each(zipFiles, function(file) {
-                    if (file.name.endsWith(".clone")) {
+                    if (_.endsWith(file.name, ".clone")) {
                         var content = JSON.parse(arrayBufferToString(file._data.getContent()));
                         return _.merge(result, content);
                     }
