@@ -31,8 +31,8 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
 
                 spyOn(indexeddbUtils, "backupEntireDB").and.returnValue(utils.getPromise(q, idbDump));
                 spyOn(indexeddbUtils, "restore").and.returnValue(utils.getPromise(q, {}));
-                spyOn(sessionHelper, "logout");
-                spyOn(location, "path");
+                spyOn(sessionHelper, "logout").and.returnValue(utils.getPromise(q, {}));
+                spyOn(location, "path").and.returnValue(utils.getPromise(q, {}));
                 spyOn(fakeModal, 'open').and.returnValue({
                     result: utils.getPromise(q, {})
                 });
@@ -89,7 +89,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 expect(filesystemService.writeFile).toHaveBeenCalledWith('dhis_idb_20140530-124354.msf', jasmine.any(Blob));
             });
 
-            xit("should load clone to indexed db from selected file", function() {
+            it("should load clone to indexed db from selected file", function() {
                 spyOn(filesystemService, "readFile").and.returnValue(utils.getPromise(q, {
                     "target": {
                         "result": "{}"
