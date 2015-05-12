@@ -24,11 +24,15 @@ define([], function() {
 
             var setUserPreferences = function(userPreferences) {
                 $rootScope.currentUser.locale = userPreferences.locale;
-                $rootScope.currentUser.organisationUnits = userPreferences.organisationUnits;
                 $rootScope.currentUser.selectedProject = userPreferences.selectedProject;
             };
 
             var setDefaultPreferences = function() {
+                $rootScope.currentUser.locale = "en";
+                $rootScope.currentUser.selectedProject = _.isEmpty($rootScope.currentUser.organisationUnits) ? undefined : $rootScope.currentUser.organisationUnits[0];
+            };
+
+            var setUserOrgUnits = function() {
                 var getUserOrgUnits = function() {
                     if ($rootScope.hasRoles(["Coordination Level Approver"])) {
                         return orgUnitRepository.findAllByParent(user.organisationUnits[0].id);
@@ -37,18 +41,16 @@ define([], function() {
                     }
                 };
 
-                $rootScope.currentUser.locale = "en";
                 return getUserOrgUnits().then(function(data) {
                     $rootScope.currentUser.organisationUnits = data;
-                    $rootScope.currentUser.selectedProject = _.isEmpty(data) ? undefined : data[0];
                 });
             };
-
             var loadSession = function(userPreferences) {
                 if (userPreferences) {
                     return setUserPreferences(userPreferences);
                 } else {
-                    return setDefaultPreferences().then(saveSessionState);
+                    setDefaultPreferences();
+                    return saveSessionState();
                 }
             };
 
@@ -61,7 +63,7 @@ define([], function() {
                 $rootScope.$broadcast('userPreferencesUpdated');
             };
 
-            return loadUserPreferences().then(loadSession).then(broadcast);
+            return setUserOrgUnits().then(loadUserPreferences).then(loadSession).then(broadcast);
         };
 
         return {
