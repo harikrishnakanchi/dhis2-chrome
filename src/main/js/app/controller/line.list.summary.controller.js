@@ -179,13 +179,27 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         $scope.deleteEvent = function(event) {
             var eventId = event.event;
 
-            var saveToDhis = function() {
-                return $hustle.publish({
+            var periodAndOrgUnit = {
+                "period": getPeriod(),
+                "orgUnit": $scope.currentModule.id
+            };
+
+            var publishToDhis = function() {
+                var deleteEventPromise = $hustle.publish({
                     "data": eventId,
                     "type": "deleteEvent",
                     "locale": $scope.currentUser.locale,
                     "desc": $scope.resourceBundle.deleteEventDesc
                 }, "dataValues");
+
+                var deleteApprovalsPromise = $hustle.publish({
+                    "data": periodAndOrgUnit,
+                    "type": "deleteApprovals",
+                    "locale": $scope.currentUser.locale,
+                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                }, "dataValues");
+
+                return $q.all([deleteEventPromise, deleteApprovalsPromise]);
             };
 
             var hardDelete = function() {
@@ -199,7 +213,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 };
 
                 return programEventRepository.upsert(eventsPayload)
-                    .then(saveToDhis);
+                    .then(publishToDhis);
             };
 
             var deleteOnConfirm = function() {
