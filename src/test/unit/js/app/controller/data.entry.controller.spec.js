@@ -1,14 +1,13 @@
-define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "orgUnitRepository", "programRepository", "timecop"],
-    function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, OrgUnitRepository, ProgramRepository, timecop) {
+define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "dataRepository", "orgUnitRepository"],
+    function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, OrgUnitRepository) {
         describe("dataEntryController ", function() {
 
-            var scope, rootScope, q, anchorScroll, location, window, timeout, orgUnitRepository, allModules, routeParams;
+            var scope, rootScope, q, location, window, orgUnitRepository, allModules, routeParams;
 
-            beforeEach(mocks.inject(function($rootScope, $q, $anchorScroll, $location) {
+            beforeEach(mocks.inject(function($rootScope, $q, $location) {
                 scope = $rootScope.$new();
                 rootScope = $rootScope;
                 q = $q;
-                anchorScroll = $anchorScroll;
                 location = $location;
 
                 spyOn(location, "hash");
@@ -44,50 +43,46 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     }
                 };
 
-                allModules = [{
-                    'name': 'mod1',
-                    'displayName': 'mod1',
-                    'id': 'mod1',
-                    'parent': {
-                        id: "proj_1"
-                    },
-                    'attributeValues': [{
-                        'attribute': {
-                            id: "a1fa2777924"
-                        },
-                        value: "Module"
-                    }, {
-                        'attribute': {
-                            code: "isDisabled"
-                        },
-                        value: false
-                    }]
-                }];
-
                 orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, allModules));
-
-                programRepository = new ProgramRepository();
-                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {}));
-
                 routeParams = {};
-
-                Timecop.install();
-                Timecop.freeze("2014-05-05");
             }));
 
-            afterEach(function() {
-                Timecop.returnToPresent();
-                Timecop.uninstall();
-            });
-
             it("should initialize modules", function() {
+                scope.isAggregateData = true;
+                scope.$apply();
+
                 var modules = [{
                     'id': 'mod1',
                     'name': 'mod1',
                     'parent': {
                         'name': 'op1'
                     }
+                }, {
+                    'name': 'linelistMod',
+                    'id': 'llmod',
+                    'parent': {
+                        'name': 'op1'
+                    },
+                    'attributeValues': [{
+                        'attribute': {
+                            'code': 'isLineListService'
+
+                        },
+                        'value': "true"
+                    }]
+                }, {
+                    'id': 'aggMod',
+                    'name': 'aggMod',
+                    'parent': {
+                        'name': 'op1'
+                    },
+                    'attributeValues': [{
+                        'attribute': {
+                            'code': 'isLineListService'
+
+                        },
+                        'value': "false"
+                    }]
                 }];
 
                 var expectedModules = [{
@@ -97,6 +92,20 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     'parent': {
                         'name': 'op1'
                     }
+                }, {
+                    'id': 'aggMod',
+                    'name': 'aggMod',
+                    'displayName': 'op1 - aggMod',
+                    'parent': {
+                        'name': 'op1'
+                    },
+                    'attributeValues': [{
+                        'attribute': {
+                            'code': 'isLineListService'
+
+                        },
+                        'value': "false"
+                    }]
                 }];
 
                 orgUnitRepository = new OrgUnitRepository();
@@ -108,7 +117,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.modules).toEqual(expectedModules);
             });
 
-            it("should set initial values for modules and week from route params", function() {
+            xit("should set initial values for modules and week from route params", function() {
                 routeParams = {
                     "module": allModules[0].name,
                     "week": "2014W31"
@@ -129,135 +138,5 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 expect(scope.currentModule).toEqual(allModules[0]);
             });
 
-            it("should load the aggregate data entry template by default", function() {
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
-                scope.$apply();
-
-                scope.week = {};
-                scope.currentModule = {};
-                scope.$apply();
-
-                expect(scope.formTemplateUrl.indexOf("templates/aggregate-data-entry.html?")).toEqual(0);
-                expect(scope.programId).toBe(undefined);
-            });
-
-            it("should load the list-list entry template for a data entry user if current module contains line list porgrams", function() {
-                rootScope.hasRoles.and.callFake(function(roles) {
-                    if (_.includes(roles, "Data entry user"))
-                        return true;
-                });
-
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
-                scope.$apply();
-
-                scope.week = {};
-                scope.currentModule = {
-                    "id": "mod1",
-                    "name": "mod1",
-                    "attributeValues": [{
-                        "attribute": {
-                            "code": "isLineListService"
-                        },
-                        "value": "true"
-                    }]
-                };
-                scope.$apply();
-
-                expect(scope.formTemplateUrl.indexOf("templates/line-list-summary.html?")).toEqual(0);
-            });
-
-            it("should load the approval template if user is a project level approver", function() {
-                rootScope.hasRoles.and.callFake(function(roles) {
-                    if (_.includes(roles, "Project Level Approver"))
-                        return true;
-                });
-
-                programRepository = new ProgramRepository();
-                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {
-                    'id': 'p1'
-                }));
-
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
-                scope.$apply();
-
-                scope.week = {};
-                scope.currentModule = {};
-                scope.$apply();
-
-                expect(scope.formTemplateUrl.indexOf("templates/partials/data-approval.html?")).toEqual(0);
-                expect(scope.programId).toBe(undefined);
-            });
-
-            it("should load the approval template if user is an Coordination Level approver", function() {
-                rootScope.hasRoles.and.callFake(function(roles) {
-                    if (_.includes(roles, "Coordination Level Approver"))
-                        return true;
-                });
-
-                programRepository = new ProgramRepository();
-                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, {
-                    'id': 'p1'
-                }));
-
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
-                scope.$apply();
-
-                scope.week = {};
-                scope.currentModule = {};
-                scope.$apply();
-
-                expect(scope.formTemplateUrl.indexOf("templates/partials/data-approval.html?")).toEqual(0);
-                expect(scope.programId).toBe(undefined);
-            });
-
-            it("should not load the template only if module is undefined", function() {
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
-                scope.$apply();
-
-                scope.week = {};
-                scope.currentModule = undefined;
-                scope.$apply();
-
-                expect(scope.formTemplateUrl).toEqual(undefined);
-            });
-
-            it("should not load the template only if period is undefined", function() {
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
-                scope.$apply();
-
-                scope.week = undefined;
-                scope.currentModule = {};
-                scope.$apply();
-
-                expect(scope.formTemplateUrl).toEqual(undefined);
-            });
-
-            it("should not load the template if module's opening date is in future", function() {
-                rootScope.currentUser.userCredentials = {
-                    "username": "dataentryuser",
-                    "userRoles": [{
-                        "name": 'Data entry user'
-                    }]
-                };
-
-                programRepository = new ProgramRepository();
-
-                scope.resourceBundle = {
-                    "openingDateInFutureError": "Data entry form will open from Week "
-                };
-
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
-                scope.$apply();
-
-                scope.week = {};
-                scope.currentModule = {
-                    "openingDate": "2015-03-03"
-                };
-                scope.$apply();
-
-                expect(scope.formTemplateUrl).toBeUndefined();
-                expect(scope.programId).toBeUndefined();
-                expect(scope.errorMessage).toEqual("Data entry form will open from Week 10");
-            });
         });
     });

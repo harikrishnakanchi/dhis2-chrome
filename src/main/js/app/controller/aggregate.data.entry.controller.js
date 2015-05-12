@@ -2,13 +2,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
         dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository) {
 
-        var currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
-        $scope.dataSets = [];
-
-        var currentPeriodAndOrgUnit = {
-            "period": currentPeriod,
-            "orgUnit": $scope.currentModule.id
-        };
+        var currentPeriod, currentPeriodAndOrgUnit;
 
         var resetForm = function() {
             $scope.isopen = {};
@@ -22,6 +16,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             $scope.projectIsAutoApproved = false;
             $scope.excludedDataElements = {};
             $scope.associatedProgramId = undefined;
+        };
+
+        $scope.printWindow = function() {
+            $scope.printingTallySheet = true;
+            $timeout(function() {
+                $window.print();
+            }, 0);
         };
 
         var confirmAndProceed = function(okCallback, message, doNotConfirm) {
@@ -90,13 +91,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             $scope.dataValues[orgUnit][elementId][option].value = $scope.dataValues[orgUnit][elementId][option].formula;
         };
 
-        $scope.printWindow = function() {
-            $scope.printingTallySheet = true;
-            $timeout(function() {
-                $window.print();
-            }, 0);
-        };
-
         $scope.getDatasetState = function(id, isFirst) {
             if (isFirst && !(id in $scope.isDatasetOpen)) {
                 $scope.isDatasetOpen[id] = true;
@@ -114,6 +108,38 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         $scope.maxcolumns = function(headers) {
             return _.last(headers).length;
         };
+
+        var save = function(asDraft) {
+
+            var payload = dataValuesMapper.mapToDomain($scope.dataValues, currentPeriod, $scope.currentUser.userCredentials.username);
+
+            var publishToDhis = function() {
+                var uploadDataValuesPromise = $hustle.publish({
+                    "data": payload,
+                    "type": "uploadDataValues",
+                    "locale": $scope.currentUser.locale,
+                    "desc": $scope.resourceBundle.uploadDataValuesDesc + currentPeriod + ", Module: " + $scope.selectedModule.name
+                }, "dataValues");
+
+                var deleteApprovalsPromise = $hustle.publish({
+                    "data": currentPeriodAndOrgUnit,
+                    "type": "deleteApprovals",
+                    "locale": $scope.currentUser.locale,
+                    "desc": $scope.resourceBundle.deleteApprovalsDesc + currentPeriod + ", Module: " + $scope.selectedModule.name
+                }, "dataValues");
+
+                return $q.all([uploadDataValuesPromise, deleteApprovalsPromise]);
+            };
+
+            if (asDraft) {
+                return dataRepository.saveAsDraft(payload);
+            } else {
+                return dataRepository.save(payload)
+                    .then(_.partial(approvalDataRepository.clearApprovals, currentPeriodAndOrgUnit))
+                    .then(publishToDhis);
+            }
+        };
+
 
         $scope.saveAsDraft = function() {
             var successPromise = function() {
@@ -137,7 +163,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             var successPromise = function() {
                 $scope.saveSuccess = false;
                 $scope.submitSuccess = true;
-                init();
+                initializeForm();
                 scrollToTop();
             };
 
@@ -163,7 +189,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             var successPromise = function() {
                 $scope.saveSuccess = false;
                 $scope.submitAndApprovalSuccess = true;
-                init();
+                initializeForm();
                 scrollToTop();
             };
 
@@ -179,14 +205,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     "data": [currentPeriodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriod + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriod + ", Module: " + $scope.selectedModule.name
                 }, "dataValues");
 
                 var uploadApprovalPromise = $hustle.publish({
                     "data": [currentPeriodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriod + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriod + ", Module: " + $scope.selectedModule.name
                 }, "dataValues");
 
                 return $q.all([uploadCompletionPromise, uploadApprovalPromise]);
@@ -221,53 +247,25 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             }
         });
 
-        var save = function(asDraft) {
-
-            var payload = dataValuesMapper.mapToDomain($scope.dataValues, currentPeriod, $scope.currentUser.userCredentials.username);
-
-            var publishToDhis = function() {
-                var uploadDataValuesPromise = $hustle.publish({
-                    "data": payload,
-                    "type": "uploadDataValues",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadDataValuesDesc + currentPeriod + ", Module: " + $scope.currentModule.name
-                }, "dataValues");
-
-                var deleteApprovalsPromise = $hustle.publish({
-                    "data": currentPeriodAndOrgUnit,
-                    "type": "deleteApprovals",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.deleteApprovalsDesc + currentPeriod + ", Module: " + $scope.currentModule.name
-                }, "dataValues");
-
-                return $q.all([uploadDataValuesPromise, deleteApprovalsPromise]);
-            };
-
-            if (asDraft) {
-                return dataRepository.saveAsDraft(payload);
-            } else {
-                return dataRepository.save(payload)
-                    .then(_.partial(approvalDataRepository.clearApprovals, currentPeriodAndOrgUnit))
-                    .then(publishToDhis);
-            }
-        };
-
-        $scope.getDataSetName = function(id) {
-            return _.find($scope.dataSets, function(dataSet) {
-                return id === dataSet.id;
-            }).name;
-        };
-
         $scope.isDataEntryAllowed = function() {
             return moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
         };
 
-        var init = function() {
+        $scope.$on('errorInfo', function(event, errorMessage) {
+            $scope.errorMessage = errorMessage;
+        });
+
+        var initializeForm = function() {
             $scope.loading = true;
+            currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
+            currentPeriodAndOrgUnit = {
+                "period": currentPeriod,
+                "orgUnit": $scope.selectedModule.id
+            };
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
-                return orgUnitRepository.findAllByParent([$scope.currentModule.id]).then(function(originOrgUnits) {
-                    $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.currentModule, originOrgUnits]), "id");
+                return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
+                    $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.selectedModule, originOrgUnits]), "id");
                     return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
                         if (program)
                             $scope.associatedProgramId = program.id;
@@ -276,7 +274,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             };
 
             var loadExcludedDataElements = function() {
-                return systemSettingRepository.get($scope.currentModule.id).then(function(systemSettings) {
+                return systemSettingRepository.get($scope.selectedModule.id).then(function(systemSettings) {
                     $scope.excludedDataElements = systemSettings && systemSettings.value ? systemSettings.value.dataElements : undefined;
                 });
             };
@@ -285,6 +283,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 var orgUnitIds = _.pluck(orgUnits, "id");
                 return orgUnitRepository.findAll(orgUnitIds);
             };
+
 
             return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements()]).then(function() {
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
@@ -309,7 +308,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     $scope.isSubmitted = (!_.isEmpty(dataValues) && isDraft);
                 });
 
-                var loadProjectPromise = orgUnitRepository.getParentProject($scope.currentModule.id).then(function(orgUnit) {
+                var loadProjectPromise = orgUnitRepository.getParentProject($scope.selectedModule.id).then(function(orgUnit) {
                     $scope.projectIsAutoApproved = _.any(orgUnit.attributeValues, {
                         'attribute': {
                             'code': "autoApprove"
@@ -331,6 +330,19 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             }).finally(function() {
                 $scope.loading = false;
             });
+        };
+
+        $scope.$on('moduleWeekInfo', function(event, data) {
+
+            $scope.selectedModule = data[0];
+            $scope.week = data[1];
+            $scope.errorMessage = undefined;
+            resetForm();
+            initializeForm();
+        });
+
+        var init = function() {
+            $scope.isAggregateData = true;
         };
 
         resetForm();

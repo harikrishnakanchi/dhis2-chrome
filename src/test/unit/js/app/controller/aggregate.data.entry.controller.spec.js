@@ -27,7 +27,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "weekNumber": 14,
                     "weekYear": 2014
                 };
-                scope.currentModule = {
+                scope.selectedModule = {
                     'id': 'mod1',
                     'name': 'Mod1',
                     'parent': {
@@ -146,6 +146,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, []));
 
                 aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository);
+
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
 
             afterEach(function() {

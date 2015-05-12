@@ -42,6 +42,10 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/product-key.html',
                         controller: 'productKeyController'
                     }).
+                    when('/aggregate-data-entry', {
+                        templateUrl: 'templates/aggregate-data-entry.html',
+                        controller: 'aggregateDataEntryController'
+                    }).
                     otherwise({
                         redirectTo: '/dashboard'
                     });

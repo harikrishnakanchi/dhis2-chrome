@@ -1,19 +1,21 @@
-<div class="dataentrypage">
-    <div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
-    <div class="module-select">
-        <weekselector year="year" month="month" week="week" labels="resourceBundle" language="currentUser.locale" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
-        <ul class="form">
-            <li class="form-group">
-                <label for="module">{{resourceBundle.moduleLabel}}</label>
-                <select name="module" id="module" class="input-sm" ng-model="currentModule" ng-options="module.displayName for module in modules | orderBy:'displayName'">
-                    <option value="">-</option>
-                </select>
-            </li>
-        </ul>
-    </div>
-    <div ng-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-    <div ng-if="!errorMessage" ng-include="formTemplateUrl"></div>
-    <div class="loading" ng-show="loading">
-        <img src="img/ajax-loader.gif" class="spinner" />
+<div ng-controller="dataEntryController">
+    <div class="dataentrypage">
+        <div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
+        <div class="module-select">
+            <weekselector year="year" month="month" week="week" labels="resourceBundle" language="currentUser.locale" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
+            <ul class="form">
+                <li class="form-group">
+                    <label for="module">{{resourceBundle.moduleLabel}}</label>
+                    <select name="module" id="module" class="input-sm" ng-model="currentModule" ng-options="module.displayName for module in modules | orderBy:'displayName'">
+                        <option value="">-</option>
+                    </select>
+                </li>
+            </ul>
+        </div>
+        <div ng-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+        <!-- <div ng-if="!errorMessage" ng-include="formTemplateUrl"></div> -->
+        <div class="loading" ng-show="loading">
+            <img src="img/ajax-loader.gif" class="spinner" />
+        </div>
     </div>
 </div>

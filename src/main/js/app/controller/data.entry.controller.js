@@ -2,40 +2,18 @@ define(["lodash", "moment"],
     function(_, moment) {
         return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository) {
 
-            var isLineListService = function(orgUnit) {
-                var attr = _.find(orgUnit.attributeValues, {
-                    "attribute": {
-                        "code": "isLineListService"
-                    }
-                });
-                return attr && attr.value == "true";
-            };
-
             $scope.$watchCollection('[week, currentModule]', function() {
                 $scope.errorMessage = undefined;
                 if ($scope.week && $scope.currentModule) {
                     if (isOpeningDateInFuture()) {
                         $scope.errorMessage = $scope.resourceBundle.openingDateInFutureError + moment($scope.currentModule.openingDate).isoWeek();
+                        $scope.$emit('errorInfo', $scope.errorMessage);
                         return;
-                    } else {
-                        return loadTemplate();
                     }
+                    $scope.$emit('moduleWeekInfo', [$scope.currentModule, $scope.week]);
                 }
+
             });
-
-            var loadTemplate = function() {
-                if (isLineListService($scope.currentModule) && $scope.hasRoles(['Data entry user'])) {
-                    $scope.formTemplateUrl = "templates/line-list-summary.html" + '?' + moment().format("X");
-                    return;
-                }
-
-                if ($scope.hasRoles(['Project Level Approver', 'Coordination Level Approver'])) {
-                    $scope.formTemplateUrl = "templates/partials/data-approval.html" + '?' + moment().format("X");
-                    return;
-                }
-
-                $scope.formTemplateUrl = "templates/aggregate-data-entry.html" + '?' + moment().format("X");
-            };
 
             var isOpeningDateInFuture = function() {
                 return moment($scope.currentModule.openingDate).isAfter(moment($scope.week.endOfWeek));
@@ -52,14 +30,29 @@ define(["lodash", "moment"],
                 }
             });
 
+            var isLineListService = function(orgUnit) {
+                var attr = _.find(orgUnit.attributeValues, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    }
+                });
+                return attr && attr.value == "true";
+            };
+
+            var getFilteredModulesWithDisplayNames = function(modules) {
+                modules = _.filter(modules, function(module) {
+                    return $scope.isAggregateData ? !isLineListService(module) : isLineListService(module);
+                });
+                return _.map(modules, function(module) {
+                    module.displayName = module.parent.name + ' - ' + module.name;
+                    return module;
+                });
+            };
+
             var setAvailableModules = function() {
                 if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
                     return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(modules) {
-                        modules = _.map(modules, function(module) {
-                            module.displayName = module.parent.name + ' - ' + module.name;
-                            return module;
-                        });
-                        $scope.modules = modules;
+                        $scope.modules = getFilteredModulesWithDisplayNames(modules);
                     });
                 } else {
                     $scope.modules = [];
@@ -71,32 +64,32 @@ define(["lodash", "moment"],
 
             var init = function() {
                 var setInitialModuleAndWeek = function() {
-                    var setSelectedModule = function(moduleId) {
-                        $scope.currentModule = _.find($scope.modules, function(module) {
-                            return module.id === moduleId;
-                        });
-                    };
+                    // var setSelectedModule = function(moduleId) {
+                    //     $scope.currentModule = _.find($scope.modules, function(module) {
+                    //         return module.id === moduleId;
+                    //     });
+                    // };
 
-                    var setSelectedWeek = function(period) {
-                        var m = moment(period, "GGGG[W]W");
+                    // var setSelectedWeek = function(period) {
+                    //     var m = moment(period, "GGGG[W]W");
 
-                        $scope.year = m.year();
-                        $scope.month = m.month();
-                        $scope.week = {
-                            "weekNumber": m.isoWeek(),
-                            "weekYear": m.isoWeekYear(),
-                            "startOfWeek": m.startOf("isoWeek").format("YYYY-MM-DD"),
-                            "endOfWeek": m.endOf("isoWeek").format("YYYY-MM-DD")
-                        };
-                    };
+                    //     $scope.year = m.year();
+                    //     $scope.month = m.month();
+                    //     $scope.week = {
+                    //         "weekNumber": m.isoWeek(),
+                    //         "weekYear": m.isoWeekYear(),
+                    //         "startOfWeek": m.startOf("isoWeek").format("YYYY-MM-DD"),
+                    //         "endOfWeek": m.endOf("isoWeek").format("YYYY-MM-DD")
+                    //     };
+                    // };
 
-                    if ($routeParams.module) {
-                        setSelectedModule($routeParams.module);
-                    }
+                    // if ($routeParams.module) {
+                    //     setSelectedModule($routeParams.module);
+                    // }
 
-                    if ($routeParams.module && $routeParams.week) {
-                        setSelectedWeek($routeParams.week);
-                    }
+                    // if ($routeParams.module && $routeParams.week) {
+                    //     setSelectedWeek($routeParams.week);
+                    // }
                 };
 
                 $location.hash('top');
