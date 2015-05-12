@@ -137,7 +137,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.currentModule = {};
                 scope.$apply();
 
-                expect(scope.formTemplateUrl.indexOf("templates/partials/aggregate-data-entry.html?")).toEqual(0);
+                expect(scope.formTemplateUrl.indexOf("templates/aggregate-data-entry.html?")).toEqual(0);
                 expect(scope.programId).toBe(undefined);
             });
 
@@ -163,7 +163,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 };
                 scope.$apply();
 
-                expect(scope.formTemplateUrl.indexOf("templates/partials/line-list-summary.html?")).toEqual(0);
+                expect(scope.formTemplateUrl.indexOf("templates/line-list-summary.html?")).toEqual(0);
             });
 
             it("should load the approval template if user is a project level approver", function() {

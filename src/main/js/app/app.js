@@ -31,7 +31,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         controller: 'loginController'
                     }).
                     when('/data-entry/:module?/:week?', {
-                        templateUrl: 'templates/data-entry.html',
+                        templateUrl: 'templates/partials/data-entry.html',
                         controller: 'dataEntryController'
                     }).
                     when('/projects', {

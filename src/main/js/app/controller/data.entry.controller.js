@@ -25,7 +25,7 @@ define(["lodash", "moment"],
 
             var loadTemplate = function() {
                 if (isLineListService($scope.currentModule) && $scope.hasRoles(['Data entry user'])) {
-                    $scope.formTemplateUrl = "templates/partials/line-list-summary.html" + '?' + moment().format("X");
+                    $scope.formTemplateUrl = "templates/line-list-summary.html" + '?' + moment().format("X");
                     return;
                 }
 
@@ -34,7 +34,7 @@ define(["lodash", "moment"],
                     return;
                 }
 
-                $scope.formTemplateUrl = "templates/partials/aggregate-data-entry.html" + '?' + moment().format("X");
+                $scope.formTemplateUrl = "templates/aggregate-data-entry.html" + '?' + moment().format("X");
             };
 
             var isOpeningDateInFuture = function() {
