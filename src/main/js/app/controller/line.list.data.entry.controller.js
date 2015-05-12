@@ -94,7 +94,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 var dataValuesAndEventDate = getDataValuesAndEventDate(programStage);
 
                 $scope.event = {
-                    "event": dhisId.get($scope.program.id + programStage.id + $scope.currentModule.id + moment().format()),
+                    "event": dhisId.get($scope.program.id + programStage.id + $scope.selectedModule.id + moment().format()),
                     "program": $scope.program.id,
                     "programStage": programStage.id,
                     "orgUnit": $scope.patientOrigin.selected.id,

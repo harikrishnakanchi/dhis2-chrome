@@ -85,7 +85,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         $scope.submit = function() {
             var periodAndOrgUnit = {
                 "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id
+                "orgUnit": $scope.selectedModule.id
             };
 
             var clearAnyExisingApprovals = function() {
@@ -96,14 +96,14 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var uploadEventsPromise = $hustle.publish({
                     "type": "uploadProgramEvents",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadProgramEventsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.uploadProgramEventsDesc + periodAndOrgUnit.period + ", Module: " + $scope.selectedModule.name
                 }, "dataValues");
 
                 var deleteApprovalsPromise = $hustle.publish({
                     "data": periodAndOrgUnit,
                     "type": "deleteApprovals",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.selectedModule.name
                 }, "dataValues");
 
                 return $q.all([uploadEventsPromise, deleteApprovalsPromise]);
@@ -128,7 +128,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         $scope.submitAndApprove = function() {
             var periodAndOrgUnit = {
                 "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id
+                "orgUnit": $scope.selectedModule.id
             };
 
             var markAsApproved = function() {
@@ -140,21 +140,21 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var uploadProgramPromise = $hustle.publish({
                     "type": "uploadProgramEvents",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadProgramEventsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.uploadProgramEventsDesc + periodAndOrgUnit.period + ", Module: " + $scope.selectedModule.name
                 }, "dataValues");
 
                 var uploadCompletionPromise = $hustle.publish({
                     "data": [periodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.selectedModule.name
                 }, "dataValues");
 
                 var uploadApprovalPromise = $hustle.publish({
                     "data": [periodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + periodAndOrgUnit.period + ", Module: " + $scope.selectedModule.name
                 }, "dataValues");
 
                 return $q.all([uploadProgramPromise, uploadCompletionPromise, uploadApprovalPromise]);
@@ -181,7 +181,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
             var periodAndOrgUnit = {
                 "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id
+                "orgUnit": $scope.selectedModule.id
             };
 
             var publishToDhis = function() {
@@ -196,7 +196,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     "data": periodAndOrgUnit,
                     "type": "deleteApprovals",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.selectedModule.name
                 }, "dataValues");
 
                 return $q.all([deleteEventPromise, deleteApprovalsPromise]);
@@ -238,20 +238,24 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         var init = function() {
+            $scope.isAggregateData = false;
+        };
+
+        var initializeForm = function() {
             var periodAndOrgUnit = {
                 "period": getPeriod(),
-                "orgUnit": $scope.currentModule.id
+                "orgUnit": $scope.selectedModule.id
             };
 
             var loadPrograms = function() {
                 var getExcludedDataElementsForModule = function() {
-                    return systemSettingRepository.get($scope.currentModule.id).then(function(data) {
+                    return systemSettingRepository.get($scope.selectedModule.id).then(function(data) {
                         return data && data.value ? data.value.dataElements : [];
                     });
                 };
 
                 var getProgram = function(excludedDataElements) {
-                    return orgUnitRepository.findAllByParent($scope.currentModule.id).then(function(originOrgUnits) {
+                    return orgUnitRepository.findAllByParent($scope.selectedModule.id).then(function(originOrgUnits) {
                         return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
                             return programRepository.get(program.id, excludedDataElements);
                         });
@@ -265,7 +269,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var setUpProjectAutoApprovedFlag = function() {
-                return orgUnitRepository.getParentProject($scope.currentModule.id).then(function(orgUnit) {
+                return orgUnitRepository.getParentProject($scope.selectedModule.id).then(function(orgUnit) {
                     $scope.projectIsAutoApproved = _.any(orgUnit.attributeValues, {
                         'attribute': {
                             'code': "autoApprove"
@@ -283,7 +287,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var loadOriginsOrgUnits = function() {
-                return orgUnitRepository.findAllByParent($scope.currentModule.id).then(function(data) {
+                return orgUnitRepository.findAllByParent($scope.selectedModule.id).then(function(data) {
                     $scope.originOrgUnits = data;
                     $scope.originOrgUnitsById = _.indexBy(data, "id");
                 });
@@ -300,6 +304,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 $scope.loading = false;
             });
         };
+
+        $scope.$on('moduleWeekInfo', function(event, data) {
+            $scope.selectedModule = data[0];
+            $scope.week = data[1];
+            initializeForm();
+        });
 
         init();
     };

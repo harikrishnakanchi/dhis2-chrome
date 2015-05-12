@@ -64,7 +64,7 @@
                 <li role="presentation" ng-class="{ active: isActive('\/data-entry\/[a-zA-Z0-9]{11}')}" class="dropdown" ng-if="hasRoles(['Data entry user'])" dropdown>
                     <a class="dropdown-toggle" dropdown-toggle href="" role="button">Line List Data Entry <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li ng-repeat="module in allUserLineListModules | orderBy:'displayName'"><a ng-href="#/data-entry/{{module.id}}" tabindex="-1">{{module.displayName}}</a></li>
+                        <li ng-repeat="module in allUserLineListModules | orderBy:'displayName'"><a ng-href="#/line-list-summary/{{module.id}}" tabindex="-1">{{module.displayName}}</a></li>
                     </ul>
                 </li>
                 <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Coordination Level Approver']))" style="float:right;">

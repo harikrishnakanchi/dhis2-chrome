@@ -37,7 +37,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "endOfWeek": "2014-11-02"
                 };
 
-                scope.currentModule = {
+                scope.selectedModule = {
                     'id': 'currentModuleId',
                     'parent': {
                         'id': 'par1'

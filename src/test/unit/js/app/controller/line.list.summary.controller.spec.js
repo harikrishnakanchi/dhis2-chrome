@@ -55,7 +55,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "startOfWeek": "2014-10-27",
                     "endOfWeek": "2014-11-02"
                 };
-                scope.currentModule = {
+                scope.selectedModule = {
                     'id': 'currentModuleId',
                     'parent': {
                         'id': 'par1'
@@ -183,6 +183,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
             it("should set projectIsAutoApproved on scope on init", function() {
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 expect(scope.projectIsAutoApproved).toEqual(true);
@@ -197,6 +198,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     'isApproved': true
                 }));
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
                 expect(scope.isCompleted).toEqual(true);
                 expect(scope.isApproved).toEqual(true);
@@ -214,6 +216,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 programRepository.get.and.returnValue(utils.getPromise(q, programAndStageData));
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 expect(programRepository.get).toHaveBeenCalledWith('someProgram', ['de1', 'de3']);
@@ -222,6 +225,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
             it("should load patient origin org units on init", function() {
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 expect(scope.originOrgUnits).toEqual(originOrgUnits);
@@ -289,6 +293,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 expect(scope.program).toEqual(expectedProgram);
@@ -301,14 +306,16 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
                 scope.year = "2014";
-                scope.currentModule = {
+                scope.selectedModule = {
                     'id': 'currentModuleId',
                     'name': 'Mod1'
                 };
 
                 scope.submit();
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("someProgram", "2014W44", ["o1", "o2"]);
@@ -354,6 +361,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
                 scope.year = "2014";
 
@@ -370,10 +378,11 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 scope.year = "2014";
-                scope.currentModule = {
+                scope.selectedModule = {
                     'id': 'currentModuleId',
                     'name': 'Mod1'
                 };
@@ -434,6 +443,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
                 scope.year = "2014";
 
@@ -450,6 +460,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 });
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 var eventToDelete = event1;
@@ -480,6 +491,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 });
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 var eventToDelete = event1;
@@ -500,6 +512,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 });
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 var eventToDelete = event1;
@@ -553,6 +566,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 var actualValue = scope.getDisplayValue(dataValue);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 expect(actualValue).toEqual("Male");
@@ -566,6 +580,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 };
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                scope.$apply();
 
                 expect(scope.isDataEntryAllowed()).toBeFalsy();
                 scope.$apply();

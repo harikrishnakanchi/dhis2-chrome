@@ -64,11 +64,11 @@ define(["lodash", "moment"],
 
             var init = function() {
                 var setInitialModuleAndWeek = function() {
-                    // var setSelectedModule = function(moduleId) {
-                    //     $scope.currentModule = _.find($scope.modules, function(module) {
-                    //         return module.id === moduleId;
-                    //     });
-                    // };
+                    var setSelectedModule = function(moduleId) {
+                        $scope.currentModule = _.find($scope.modules, function(module) {
+                            return module.id === moduleId;
+                        });
+                    };
 
                     // var setSelectedWeek = function(period) {
                     //     var m = moment(period, "GGGG[W]W");
@@ -83,9 +83,9 @@ define(["lodash", "moment"],
                     //     };
                     // };
 
-                    // if ($routeParams.module) {
-                    //     setSelectedModule($routeParams.module);
-                    // }
+                    if ($routeParams.module) {
+                        setSelectedModule($routeParams.module);
+                    }
 
                     // if ($routeParams.module && $routeParams.week) {
                     //     setSelectedWeek($routeParams.week);

@@ -46,6 +46,10 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/aggregate-data-entry.html',
                         controller: 'aggregateDataEntryController'
                     }).
+                    when('/line-list-summary/:module?', {
+                        templateUrl: 'templates/line-list-summary.html',
+                        controller: 'lineListSummaryController'
+                    }).
                     otherwise({
                         redirectTo: '/dashboard'
                     });

@@ -333,7 +333,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         };
 
         $scope.$on('moduleWeekInfo', function(event, data) {
-
             $scope.selectedModule = data[0];
             $scope.week = data[1];
             $scope.errorMessage = undefined;
