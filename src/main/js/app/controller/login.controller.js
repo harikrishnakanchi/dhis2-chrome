@@ -1,5 +1,5 @@
 define(["md5", "lodash"], function(md5, _) {
-    return function($scope, $location, db, $q, $hustle, sessionHelper) {
+    return function($rootScope, $scope, $location, db, $q, $hustle, sessionHelper) {
         var getUser = function() {
             var userStore = db.objectStore("users");
             return userStore.find($scope.username.toLowerCase());
@@ -32,7 +32,10 @@ define(["md5", "lodash"], function(md5, _) {
                 return sessionHelper.login(user)
                     .then(downloadDataValues)
                     .then(function() {
-                        $location.path("/dashboard");
+                        if ($rootScope.hasRoles(['Superuser']))
+                            $location.path("/projects");
+                        else
+                            $location.path("/dashboard");
                     });
             }
         };

@@ -23,6 +23,9 @@ define(["loginController", "angularMocks", "utils", "sessionHelper"], function(L
                 "find": function() {}
             };
 
+            rootScope = {
+                "hasRoles": jasmine.createSpy("hasRoles").and.returnValue(false)
+            };
             spyOn(location, 'path');
 
             spyOn(db, 'objectStore').and.callFake(function(storeName) {
@@ -61,7 +64,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper"], function(L
 
             sessionHelper = new SessionHelper();
             spyOn(sessionHelper, "login").and.returnValue(utils.getPromise(q, {}));
-            loginController = new LoginController(scope, location, db, q, hustle, sessionHelper);
+            loginController = new LoginController(rootScope, scope, location, db, q, hustle, sessionHelper);
         }));
 
         it("should login admin user with valid credentials and redirect to dashboard", function() {
