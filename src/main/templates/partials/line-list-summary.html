@@ -56,7 +56,7 @@
                                                 <a href="" id="" title="Submitted" ng-if="!event.localStatus || event.localStatus === 'READY_FOR_DHIS'" class="submitted">
                                                     <span class="glyphicon glyphicon-ok"></span>
                                                 </a>
-                                                <a href="" id="" title="Incomplete" ng-if="event.localStatus === 'INCOMPLETE_DRAFT'" class="submitted">
+                                                <a href="" id="" title="Incomplete" ng-if="event.localStatus === 'NEW_INCOMPLETE_DRAFT' || event.localStatus === 'UPDATED_INCOMPLETE_DRAFT'" class="submitted">
                                                     <span class="glyphicon glyphicon-star-empty">
                                                     </span>
                                                 </a>

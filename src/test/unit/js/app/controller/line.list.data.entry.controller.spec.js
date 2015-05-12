@@ -437,7 +437,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
                 expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("o1");
                 expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2015-02-03");
-                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("INCOMPLETE_DRAFT");
+                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW_INCOMPLETE_DRAFT");
                 expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([{
                     "dataElement": 'de1',
                     "value": '2015-02-03'

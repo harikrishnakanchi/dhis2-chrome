@@ -81,7 +81,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 var dataValuesAndEventDate = getDataValuesAndEventDate(programStage);
                 $scope.event.orgUnit = $scope.patientOrigin.selected.id;
                 $scope.event.eventDate = dataValuesAndEventDate.eventDate;
-                $scope.event.localStatus = dataValuesAndEventDate.compulsoryFieldsPresent ? "UPDATED_DRAFT" : "INCOMPLETE_DRAFT";
+                $scope.event.localStatus = dataValuesAndEventDate.compulsoryFieldsPresent ? "UPDATED_DRAFT" : "UPDATED_INCOMPLETE_DRAFT";
                 $scope.event.dataValues = dataValuesAndEventDate.dataValues;
             };
 
@@ -99,7 +99,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                     "programStage": programStage.id,
                     "orgUnit": $scope.patientOrigin.selected.id,
                     "eventDate": dataValuesAndEventDate.eventDate,
-                    "localStatus": dataValuesAndEventDate.compulsoryFieldsPresent ? "NEW_DRAFT" : "INCOMPLETE_DRAFT",
+                    "localStatus": dataValuesAndEventDate.compulsoryFieldsPresent ? "NEW_DRAFT" : "NEW_INCOMPLETE_DRAFT",
                     "dataValues": dataValuesAndEventDate.dataValues
                 };
             };

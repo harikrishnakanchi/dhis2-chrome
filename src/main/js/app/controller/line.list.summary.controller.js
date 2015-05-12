@@ -217,7 +217,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var deleteOnConfirm = function() {
-                var deleteFunction = event.localStatus === "NEW_DRAFT" ? hardDelete : softDelete;
+                var deleteFunction = event.localStatus === "NEW_DRAFT" || event.localStatus === "NEW_INCOMPLETE_DRAFT" ? hardDelete : softDelete;
                 return deleteFunction.apply().then(function() {
                     $scope.showResultMessage("success", $scope.resourceBundle.eventDeleteSuccess);
                     $scope.loadEventsView();
