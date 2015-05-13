@@ -61,6 +61,7 @@ require.config({
         "productKeyController": "app/controller/product.key.controller",
         "appCloneController": "app/controller/app.clone.controller",
         "downloadDataController": "app/controller/download.data.controller",
+        "selectLanguageController": "app/controller/select.language.controller",
 
         //Services
         "services": "app/service/services",

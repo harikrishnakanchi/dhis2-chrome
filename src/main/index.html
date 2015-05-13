@@ -22,13 +22,6 @@
                         <div class="nav navbar-nav navbar-right">
                             <p class="text-right">&nbsp;<small ng-show="isLoggedIn">Logged in as {{currentUser.userCredentials.username}} <a ng-click="logout()" href="#/login" tabindex="-1">({{ resourceBundle.logoutLabel }})</a></small></p>
                             <ul class="nav navbar-nav navbar-right">
-                                <li ng-show="false">
-                                    <select id="languageSelectButton" ng-model="currentUser.locale" ng-if="currentUser" class="input-sm" tabindex="-1">
-                                        <option value="en">English</option>
-                                        <option dir="rtl" lang="fr" value="fr">Français</option>
-                                        <option dir="rtl" lang="ar" value="ar">العربية</option>
-                                    </select>
-                                </li>
                                 <li>
                                     <button type="button" class="btn btn-link" ng-disabled="disabled">
                                         <span class="glyphicon" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline, 'dhis-offline':!isDhisOnline}" ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
@@ -43,6 +36,7 @@
                                         <ul class="dropdown-menu" role="menu">
                                             <li ng-include="'templates/partials/download-data.html'"> </li>
                                             <li class="dropdown-submenu pull-left" ng-include="'templates/partials/clone.html'"></li>
+                                            <li class="dropdown-submenu pull-left" ng-include="'templates/partials/select-language.html'"></li>
                                             <li><a href="#/productKeyPage" tabindex="-1">Update Product Key</a></li>
                                             <li class="divider"></li>
                                             <li><a ng-click="logout()" href="#/login" id="linkToLogout" tabindex="-1">{{ resourceBundle.logoutLabel }}</a></li>

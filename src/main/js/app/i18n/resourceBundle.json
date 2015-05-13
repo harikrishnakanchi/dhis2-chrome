@@ -173,5 +173,6 @@
     "connectedWithPendingRequests": "Online with pending requests",
     "notConnectedNoPendingRequests": "Offline with no pending requests",
     "notConnectedWithPendingRequests": "Offline with pending requests",
-    "menu": "Menu"
+    "menu": "Menu",
+    "selectLanguageLabel": "Select language"
 }

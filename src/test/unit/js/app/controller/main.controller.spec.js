@@ -95,35 +95,6 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 expect(rootScope.resourceBundle).toEqual({});
             });
 
-            it("should change resourceBundle if locale changes", function() {
-                rootScope.currentUser = {
-                    "userCredentials": {
-                        "username": "1"
-                    },
-                    "organisationUnits": [{
-                        "id": "123"
-                    }],
-                    "selectedProject": {
-                        "id": "prj1"
-                    }
-                };
-                rootScope.currentUser.locale = "fr";
-
-                frenchResourceBundle = {
-                    "data": {
-                        "login": "french"
-                    }
-                };
-                getResourceBundleSpy.and.returnValue(utils.getPromise(q, frenchResourceBundle));
-
-                scope.$apply();
-
-                expect(i18nResourceBundle.get).toHaveBeenCalledWith({
-                    "locale": "fr"
-                });
-                expect(rootScope.resourceBundle).toEqual(frenchResourceBundle.data);
-            });
-
             it("should redirect to product key page", function() {
                 spyOn(location, "path");
 

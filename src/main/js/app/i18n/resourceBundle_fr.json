@@ -86,5 +86,7 @@
     "no": "No",
     "invalidPattern": "is invalid",
     "projectCodeExists": "Project code already exists",
-    "dateInvalid": "Not a valid date"
+    "dateInvalid": "Not a valid date",
+    "selectLanguageLabel": "Choisir la langue",
+    "importExportMenuLabel": "Import / Export to USB "
 }
