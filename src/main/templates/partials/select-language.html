@@ -1,6 +1,6 @@
 <a href="" tabindex="-1">{{resourceBundle.selectLanguageLabel}}</a>
 <ul ng-controller="selectLanguageController" class="dropdown-menu" role="menu">
-    <li><a href="" ng-click="changeLanguagePreference('en')">English</a></li>
-    <li><a href="" ng-click="changeLanguagePreference('fr')">Français</a></li>
-    <li><a href="" ng-click="changeLanguagePreference('ar')">العربية</a></li>
+    <li><a href="" ng-click="changeLanguagePreference('en')">English <span ng-show="currentUser.locale=='en'" class="glyphicon glyphicon-ok"></span></a></li>
+    <li><a href="" ng-click="changeLanguagePreference('fr')">Français <span ng-show="currentUser.locale=='fr'" class="glyphicon glyphicon-ok"></span></a></li>
+    <li><a href="" ng-click="changeLanguagePreference('ar')">العربية <span ng-show="currentUser.locale=='ar'" class="glyphicon glyphicon-ok"></span></a></li>
 </ul>
