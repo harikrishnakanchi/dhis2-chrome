@@ -50,6 +50,10 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/line-list-summary.html',
                         controller: 'lineListSummaryController'
                     }).
+                    when('/data-approval', {
+                        templateUrl: 'templates/data-approval.html',
+                        controller: 'dataApprovalController'
+                    }).
                     otherwise({
                         redirectTo: '/dashboard'
                     });

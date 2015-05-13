@@ -53,7 +53,7 @@
             <ul class="nav nav-tabs">
                 <li role="presentation" ng-class="{ active: isActive('\/dashboard$')}" ng-if="!hasRoles(['Superuser'])"><a href="#/dashboard">Home</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/data-entry$')}" ng-if="hasRoles(['Data entry user'])"><a href="#/aggregate-data-entry">{{ resourceBundle.dataEntryLabel }}</a></li>
-                <li role="presentation" ng-class="{ active: isActive('\/data-entry$')}" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])"><a href="#/data-entry">{{ resourceBundle.approveDataLabel }}</a></li>
+                <li role="presentation" ng-class="{ active: isActive('\/data-entry$')}" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])"><a href="#/data-approval">{{ resourceBundle.approveDataLabel }}</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/projects$')}" ng-if="hasRoles(['Superuser'])"><a href="#/projects">{{ resourceBundle.projectsLabel }}</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/data-entry\/[a-zA-Z0-9]{11}')}" class="dropdown" ng-if="hasRoles(['Data entry user'])" dropdown>
                     <a class="dropdown-toggle" dropdown-toggle href="" role="button">Line List Data Entry <span class="caret"></span></a>

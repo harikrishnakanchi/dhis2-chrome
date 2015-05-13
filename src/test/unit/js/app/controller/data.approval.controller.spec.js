@@ -22,7 +22,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
                 scope = $rootScope.$new();
 
-                scope.currentModule = {
+                scope.selectedModule = {
                     id: 'mod2',
                     name: 'Mod2',
                     parent: {
@@ -150,6 +150,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
                 spyOn(hustle, "publish");
                 dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
 
             afterEach(function() {
@@ -181,7 +182,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "orgUnit": 'mod1'
                 };
                 var storedBy = "dataentryuser";
-                scope.currentModule = {
+                scope.selectedModule = {
                     id: 'mod1',
                     name: 'Mod1',
                     parent: {
@@ -190,6 +191,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 };
 
                 dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 scope.firstLevelApproval();
@@ -307,7 +309,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "orgUnit": 'mod1',
                 };
                 var approvedBy = "dataentryuser";
-                scope.currentModule = {
+                scope.selectedModule = {
                     id: 'mod1',
                     name: 'Mod1',
                     parent: {
@@ -316,6 +318,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 };
 
                 dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository);
+                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 scope.secondLevelApproval();

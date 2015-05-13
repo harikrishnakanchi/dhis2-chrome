@@ -2,13 +2,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
     return function($scope, $routeParams, $q, $hustle, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, datasetRepository, programRepository) {
 
-        var currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
-        $scope.dataSets = [];
-
-        var currentPeriodAndOrgUnit = {
-            "period": currentPeriod,
-            "orgUnit": $scope.currentModule.id
-        };
+        var currentPeriod, currentPeriodAndOrgUnit;
 
         var resetForm = function() {
             $scope.isopen = {};
@@ -84,14 +78,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     "data": [currentPeriodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriodAndOrgUnit.period + ", Module: " + $scope.selectedModule.name
                 }, "dataValues");
             };
 
             var onSuccess = function() {
                 $scope.firstLevelApproveSuccess = true;
                 $scope.approveError = false;
-                init();
+                initializeForm();
             };
 
             var onError = function() {
@@ -109,7 +103,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             var onSuccess = function() {
                 $scope.secondLevelApproveSuccess = true;
                 $scope.approveError = false;
-                init();
+                initializeForm();
             };
 
             var onError = function() {
@@ -123,7 +117,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     "data": [currentPeriodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriodAndOrgUnit.period + ", Module: " + $scope.currentModule.name
+                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriodAndOrgUnit.period + ", Module: " + $scope.selectedModule.name
                 }, "dataValues");
             };
 
@@ -139,13 +133,18 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             $scope.isOfflineApproval = true;
         };
 
-        var init = function() {
+        var initializeForm = function() {
+            currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
+            currentPeriodAndOrgUnit = {
+                "period": currentPeriod,
+                "orgUnit": $scope.selectedModule.id
+            };
             $scope.loading = true;
             $scope.isOfflineApproval = false;
 
             var loadAssociatedOrgUnitsAndPrograms = function() {
-                return orgUnitRepository.findAllByParent([$scope.currentModule.id]).then(function(originOrgUnits) {
-                    $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.currentModule, originOrgUnits]), "id");
+                return orgUnitRepository.findAllByParent([$scope.selectedModule.id]).then(function(originOrgUnits) {
+                    $scope.moduleAndOriginOrgUnitIds = _.pluck(_.flattenDeep([$scope.selectedModule, originOrgUnits]), "id");
                     return programRepository.getProgramForOrgUnit(originOrgUnits[0].id).then(function(program) {
                         if (program) {
                             $scope.associatedProgramId = program.id;
@@ -156,7 +155,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             };
 
             var loadExcludedDataElements = function() {
-                return systemSettingRepository.get($scope.currentModule.id).then(function(systemSettings) {
+                return systemSettingRepository.get($scope.selectedModule.id).then(function(systemSettings) {
                     $scope.excludedDataElements = systemSettings && systemSettings.value ? systemSettings.value.dataElements : undefined;
                 });
             };
@@ -166,7 +165,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 return orgUnitRepository.findAll(orgUnitIds);
             };
 
-            if (_.isEmpty($scope.currentModule))
+            if (_.isEmpty($scope.selectedModule))
                 return;
             return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements()]).then(function() {
 
@@ -174,7 +173,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
                     .then(function(datasets) {
-                        $scope.dataSets = [];
                         var dataSetPromises = _.map(datasets, function(dataset) {
                             return findallOrgUnits(dataset.organisationUnits).then(function(orgunits) {
                                 dataset.organisationUnits = orgunits;
@@ -208,6 +206,23 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 $scope.loading = false;
             });
         };
+
+        var init = function() {
+            $scope.isAggregateData = true;
+        };
+
+        $scope.$on('errorInfo', function(event, errorMessage) {
+            $scope.approveError = true;
+        });
+
+
+        $scope.$on('moduleWeekInfo', function(event, data) {
+            $scope.selectedModule = data[0];
+            $scope.week = data[1];
+            $scope.approveError = false;
+            resetForm();
+            initializeForm();
+        });
 
         resetForm();
         init();
