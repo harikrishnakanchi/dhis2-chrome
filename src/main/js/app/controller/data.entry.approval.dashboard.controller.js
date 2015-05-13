@@ -181,6 +181,15 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             var getEventsSubmissionInfoPromise = getEventsSubmissionInfo(moduleIds, startPeriod, endPeriod);
             var getApprovalsInfoPromise = getApprovalsInfo(moduleIds, startPeriod, endPeriod);
 
+            var isLineListService = function(module) {
+                var attr = _.find(module.attributeValues, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    }
+                });
+                return attr && attr.value == "true";
+            };
+
             return $q.all([getDataSubmissionInfoPromise, getEventsSubmissionInfoPromise, getApprovalsInfoPromise]).then(function(data) {
 
                 var submittedData = data[0];
@@ -199,7 +208,8 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                             "period": period,
                             "isSubmitted": submittedData[period + module.id] && submittedData[period + module.id].isSubmitted || submittedEventsData[period + module.id] && submittedEventsData[period + module.id].isSubmitted || false,
                             "isComplete": approvalData[period + module.id] && approvalData[period + module.id].isComplete || false,
-                            "isApproved": approvalData[period + module.id] && approvalData[period + module.id].isApproved || false
+                            "isApproved": approvalData[period + module.id] && approvalData[period + module.id].isApproved || false,
+                            "isLineListService": isLineListService(module)
                         };
                     }));
                 });
@@ -240,6 +250,19 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                     });
                 }
             });
+        };
+
+        $scope.getTemplateUrl = function(item) {
+
+            if (item.isLineListService && $scope.hasRoles(['Data entry user'])) {
+                return "#/line-list-summary/" + item.moduleId + "/" + item.period;
+            }
+
+            if ($scope.hasRoles(['Project Level Approver', 'Coordination Level Approver'])) {
+                return "#/data-approval/" + item.moduleId + "/" + item.period;
+            }
+
+            return "#/aggregate-data-entry/" + item.moduleId + "/" + item.period;
         };
 
         var init = function() {

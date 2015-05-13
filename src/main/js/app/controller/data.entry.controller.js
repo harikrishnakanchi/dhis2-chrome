@@ -70,26 +70,26 @@ define(["lodash", "moment"],
                         });
                     };
 
-                    // var setSelectedWeek = function(period) {
-                    //     var m = moment(period, "GGGG[W]W");
+                    var setSelectedWeek = function(period) {
+                        var m = moment(period, "GGGG[W]W");
 
-                    //     $scope.year = m.year();
-                    //     $scope.month = m.month();
-                    //     $scope.week = {
-                    //         "weekNumber": m.isoWeek(),
-                    //         "weekYear": m.isoWeekYear(),
-                    //         "startOfWeek": m.startOf("isoWeek").format("YYYY-MM-DD"),
-                    //         "endOfWeek": m.endOf("isoWeek").format("YYYY-MM-DD")
-                    //     };
-                    // };
+                        $scope.year = m.year();
+                        $scope.month = m.month();
+                        $scope.week = {
+                            "weekNumber": m.isoWeek(),
+                            "weekYear": m.isoWeekYear(),
+                            "startOfWeek": m.startOf("isoWeek").format("YYYY-MM-DD"),
+                            "endOfWeek": m.endOf("isoWeek").format("YYYY-MM-DD")
+                        };
+                    };
 
                     if ($routeParams.module) {
                         setSelectedModule($routeParams.module);
                     }
 
-                    // if ($routeParams.module && $routeParams.week) {
-                    //     setSelectedWeek($routeParams.week);
-                    // }
+                    if ($routeParams.module && $routeParams.week) {
+                        setSelectedWeek($routeParams.week);
+                    }
                 };
 
                 $location.hash('top');

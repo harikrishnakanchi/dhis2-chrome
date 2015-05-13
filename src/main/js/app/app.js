@@ -30,10 +30,6 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/login.html',
                         controller: 'loginController'
                     }).
-                    when('/data-entry/:module?/:week?', {
-                        templateUrl: 'templates/partials/data-entry.html',
-                        controller: 'dataEntryController'
-                    }).
                     when('/projects', {
                         templateUrl: 'templates/orgunits.html',
                         controller: 'orgUnitContoller'
@@ -42,15 +38,15 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/product-key.html',
                         controller: 'productKeyController'
                     }).
-                    when('/aggregate-data-entry', {
+                    when('/aggregate-data-entry/:module?/:week?', {
                         templateUrl: 'templates/aggregate-data-entry.html',
                         controller: 'aggregateDataEntryController'
                     }).
-                    when('/line-list-summary/:module?', {
+                    when('/line-list-summary/:module?/:week?', {
                         templateUrl: 'templates/line-list-summary.html',
                         controller: 'lineListSummaryController'
                     }).
-                    when('/data-approval', {
+                    when('/data-approval/:module?/:week?', {
                         templateUrl: 'templates/data-approval.html',
                         controller: 'dataApprovalController'
                     }).

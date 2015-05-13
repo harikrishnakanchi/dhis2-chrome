@@ -808,5 +808,113 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 });
 
             });
+
+
+            it("should return the aggregate data entry template url by default", function() {
+
+                dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+                rootScope.hasRoles.and.callFake(function(roles) {
+                    if (_.contains(roles, 'Data entry user'))
+                        return true;
+                    return false;
+                });
+                rootScope.currentUser.userCredentials = {
+                    "username": "dataentryuser",
+                    "userRoles": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Data entry user'
+                    }]
+                };
+                var item = {
+                    "moduleId": "mod1",
+                    "period": "2014W01",
+                    'isSubmitted': true,
+                    'isComplete': false,
+                    'isLineListService': false
+                };
+
+                var result = scope.getTemplateUrl(item);
+                expect(result).toEqual("#/aggregate-data-entry/mod1/2014W01");
+            });
+
+            it("should return the list-list entry template url for a data entry user if current module contains line list porgrams", function() {
+                dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+                rootScope.hasRoles.and.callFake(function(roles) {
+                    if (_.contains(roles, 'Data entry user'))
+                        return true;
+                    return false;
+                });
+                rootScope.currentUser.userCredentials = {
+                    "username": "dataentryuser",
+                    "userRoles": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Data entry user'
+                    }]
+                };
+                rootScope.$apply();
+                var item = {
+                    "moduleId": "mod1",
+                    "period": "2014W01",
+                    'isSubmitted': true,
+                    'isComplete': false,
+                    'isLineListService': true
+                };
+
+                var result = scope.getTemplateUrl(item);
+                expect(result).toEqual("#/line-list-summary/mod1/2014W01");
+            });
+
+            it("should return the approval template if user is a project level approver", function() {
+                dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+                rootScope.hasRoles.and.callFake(function(roles) {
+                    if (_.contains(roles, 'Project Level Approver'))
+                        return true;
+                    return false;
+                });
+                rootScope.currentUser.userCredentials = {
+                    "username": "projectLevelApprover",
+                    "userRoles": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Project Level Approver'
+                    }]
+                };
+                var item = {
+                    "moduleId": "mod1",
+                    "period": "2014W01",
+                    'isSubmitted': true,
+                    'isComplete': false,
+                    'isLineListService': true
+                };
+
+                var result = scope.getTemplateUrl(item);
+                expect(result).toEqual("#/data-approval/mod1/2014W01");
+            });
+
+            it("should return the approval template if user is a coordination level approver", function() {
+                dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+                rootScope.hasRoles.and.callFake(function(roles) {
+                    if (_.contains(roles, 'Coordination Level Approver'))
+                        return true;
+                    return false;
+                });
+                rootScope.currentUser.userCredentials = {
+                    "username": "projectLevelApprover",
+                    "userRoles": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Coordination Level Approver'
+                    }]
+                };
+                var item = {
+                    "moduleId": "mod1",
+                    "period": "2014W01",
+                    'isSubmitted': true,
+                    'isComplete': false,
+                    'isLineListService': true
+                };
+
+                var result = scope.getTemplateUrl(item);
+                expect(result).toEqual("#/data-approval/mod1/2014W01");
+            });
         });
+
     });

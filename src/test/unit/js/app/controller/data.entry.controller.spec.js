@@ -2,7 +2,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
     function(DataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, DataRepository, OrgUnitRepository) {
         describe("dataEntryController ", function() {
 
-            var scope, rootScope, q, location, window, orgUnitRepository, allModules, routeParams;
+            var scope, rootScope, q, location, window, orgUnitRepository, routeParams, modules;
 
             beforeEach(mocks.inject(function($rootScope, $q, $location) {
                 scope = $rootScope.$new();
@@ -45,13 +45,8 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
 
                 orgUnitRepository = new OrgUnitRepository();
                 routeParams = {};
-            }));
 
-            it("should initialize modules", function() {
-                scope.isAggregateData = true;
-                scope.$apply();
-
-                var modules = [{
+                modules = [{
                     'id': 'mod1',
                     'name': 'mod1',
                     'parent': {
@@ -84,6 +79,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                         'value': "false"
                     }]
                 }];
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
+            }));
+
+            it("should initialize modules", function() {
+                scope.isAggregateData = true;
+                scope.$apply();
+
+
 
                 var expectedModules = [{
                     'id': 'mod1',
@@ -108,18 +112,15 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     }]
                 }];
 
-                orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
-
                 dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
                 scope.$apply();
 
                 expect(scope.modules).toEqual(expectedModules);
             });
 
-            xit("should set initial values for modules and week from route params", function() {
+            it("should set initial values for modules and week from route params", function() {
                 routeParams = {
-                    "module": allModules[0].name,
+                    "module": modules[1].id,
                     "week": "2014W31"
                 };
 
@@ -135,7 +136,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                     "startOfWeek": '2014-07-28',
                     "endOfWeek": '2014-08-03'
                 });
-                expect(scope.currentModule).toEqual(allModules[0]);
+                expect(scope.currentModule).toEqual(modules[1]);
             });
 
         });
