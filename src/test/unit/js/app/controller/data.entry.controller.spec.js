@@ -111,7 +111,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
 
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
                 scope.$apply();
 
                 expect(scope.modules).toEqual(expectedModules);
@@ -126,7 +126,7 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 scope.resourceBundle = {
                     "openingDateInFutureError": "openingDateInFutureError"
                 };
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository, programRepository);
+                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
                 scope.$apply();
 
                 expect(scope.week).toEqual({

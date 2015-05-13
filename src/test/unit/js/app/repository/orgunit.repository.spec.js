@@ -146,7 +146,7 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
 
-            orgUnitRepository = new OrgUnitRepository(mockDb.db, datasetRepository, programRepository, q);
+            orgUnitRepository = new OrgUnitRepository(mockDb.db, q);
         }));
 
         afterEach(function() {
