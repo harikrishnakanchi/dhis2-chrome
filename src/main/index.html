@@ -17,7 +17,7 @@
                 <nav class="navbar">
                     <div class="container-fluid">
                         <div class="navbar-header">
-                            <a class="navbar-brand" ng-href="{{currentUser ? '#/dashboard' : '#'}}" tabindex="-1"><img src="img/logo.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1"></a>
+                            <img src="img/logo.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1">
                         </div>
                         <div class="nav navbar-nav navbar-right">
                             <p class="text-right login-message">&nbsp;<small ng-show="isLoggedIn">Logged in as {{currentUser.userCredentials.username}} <a ng-click="logout()" href="#/login" tabindex="-1">({{ resourceBundle.logoutLabel }})</a></small></p>
