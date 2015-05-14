@@ -109,7 +109,10 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 expect(orgUnitGroupRepository.upsert).toHaveBeenCalledWith(expectedOutput);
                 expect(orgUnitRepository.getProjectAndOpUnitAttributes).toHaveBeenCalled();
                 expect(hustle.publish.calls.argsFor(0)).toEqual([{
-                    "data": expectedOutput,
+                    "data": {
+                        "orgUnitGroupIds": ["w2aws2d2ef3", "a9ab62b5ef3", "a8b42a1c9b8"],
+                        "orgUnitIds": ["a72ec34b863"]
+                    },
                     "type": "upsertOrgUnitGroups",
                     "locale": "en",
                     "desc": "upsertOrgUnitGroupsDesc"

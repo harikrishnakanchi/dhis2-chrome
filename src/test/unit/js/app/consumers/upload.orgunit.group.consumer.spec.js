@@ -1,4 +1,4 @@
-define(["uploadOrgUnitGroupConsumer", "orgUnitGroupService", "orgUnitGroupRepository", "orgUnitService", "angularMocks", "utils"], function(UploadOrgUnitGroupConsumer, OrgUnitGroupService, OrgUnitGroupRepository, OrgUnitService, mocks, utils) {
+define(["uploadOrgUnitGroupConsumer", "orgUnitGroupService", "orgUnitGroupRepository", "angularMocks", "utils"], function(UploadOrgUnitGroupConsumer, OrgUnitGroupService, OrgUnitGroupRepository, mocks, utils) {
     describe("uploadOrgUnitGroupConsumer", function() {
         var uploadOrgUnitGroupConsumer, message, payload, orgUnitGroupService, q, scope, orgUnitGroupRepository, orgUnitGroupFromIDB, orgUnitService;
 
@@ -8,8 +8,14 @@ define(["uploadOrgUnitGroupConsumer", "orgUnitGroupService", "orgUnitGroupReposi
 
             orgUnitGroupService = new OrgUnitGroupService();
             orgUnitGroupRepository = new OrgUnitGroupRepository();
-            orgUnitService = new OrgUnitService();
 
+            spyOn(orgUnitGroupService, "upsert").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitGroupRepository, "clearStatusFlag").and.returnValue(utils.getPromise(q, {}));
+
+            uploadOrgUnitGroupConsumer = new UploadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, q);
+        }));
+
+        it("should upload orgunit groups to dhis", function() {
             orgUnitGroupFromIDB = {
                 "id": "a35778ed565",
                 "lastUpdated": "2014-10-20T09:01:12.020+0000",
@@ -32,30 +38,20 @@ define(["uploadOrgUnitGroupConsumer", "orgUnitGroupService", "orgUnitGroupReposi
                 }]
             };
 
-            var orgUnitIdsFromDHIS = ["o1"];
-
-            spyOn(orgUnitGroupRepository, "get").and.callFake(function() {
-                return orgUnitGroupFromIDB;
-            });
-            spyOn(orgUnitGroupRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
-            spyOn(orgUnitGroupService, "upsert").and.returnValue(utils.getPromise(q, {}));
-            spyOn(orgUnitService, "getIds").and.returnValue(utils.getPromise(q, orgUnitIdsFromDHIS));
-
-            uploadOrgUnitGroupConsumer = new UploadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, orgUnitService, q);
-        }));
-
-        it("should upload orgunit groups to dhis", function() {
-            payload = [{
-                "id": "a35778ed565",
-                "name": "Most-at-risk Population"
-            }];
+            spyOn(orgUnitGroupRepository, "findAll").and.returnValue(utils.getPromise(q, [orgUnitGroupFromIDB]));
 
             message = {
-                data: {
-                    data: payload,
-                    type: "upsertOrgUnitGroups"
+                "data": {
+                    "data": {
+                        "orgUnitGroupIds": ["a35778ed565"],
+                        "orgUnitIds": ["o1", "o3", "o4"]
+                    },
+                    "type": "upsertOrgUnitGroups"
                 }
             };
+
+            uploadOrgUnitGroupConsumer.run(message);
+            scope.$apply();
 
             var expectedDhisPayload = [{
                 "id": "a35778ed565",
@@ -65,38 +61,15 @@ define(["uploadOrgUnitGroupConsumer", "orgUnitGroupService", "orgUnitGroupReposi
                     "id": "o1",
                     "name": "org1"
                 }, {
-                    "id": "o2",
-                    "name": "org2",
-                    "localStatus": "NEW"
-                }, {
                     "id": "o4",
                     "name": "org4"
                 }]
             }];
 
-            var expectedIdbPayload = [{
-                "id": "a35778ed565",
-                "lastUpdated": "2014-10-20T09:01:12.020+0000",
-                "name": "Most-at-risk Population",
-                "organisationUnits": [{
-                    "id": "o1",
-                    "name": "org1"
-                }, {
-                    "id": "o2",
-                    "name": "org2",
-                    "localStatus": "NEW"
-                }, {
-                    "id": "o4",
-                    "name": "org4"
-                }]
-            }];
-
-            uploadOrgUnitGroupConsumer.run(message);
-            scope.$apply();
-
-            expect(orgUnitService.getIds).toHaveBeenCalledWith(["o1", "o2"]);
+            expect(orgUnitGroupRepository.findAll).toHaveBeenCalledWith(["a35778ed565"]);
             expect(orgUnitGroupService.upsert).toHaveBeenCalledWith(expectedDhisPayload);
-            expect(orgUnitGroupRepository.upsert).toHaveBeenCalledWith(expectedIdbPayload);
+            expect(orgUnitGroupRepository.clearStatusFlag.calls.count()).toEqual(1);
+            expect(orgUnitGroupRepository.clearStatusFlag.calls.argsFor(0)).toEqual(["a35778ed565", ["o1", "o3", "o4"]]);
         });
     });
 });

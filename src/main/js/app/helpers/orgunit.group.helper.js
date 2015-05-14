@@ -79,7 +79,10 @@ define([], function() {
             var upsertOrgUnitGroups = function(orgUnitGroups) {
                 return orgUnitGroupRepository.upsert(orgUnitGroups).then(function() {
                     return $hustle.publish({
-                        "data": orgUnitGroups,
+                        "data": {
+                            "orgUnitGroupIds": _.pluck(orgUnitGroups, "id"),
+                            "orgUnitIds": _.pluck(orgUnits, "id")
+                        },
                         "type": "upsertOrgUnitGroups",
                         "locale": $scope.currentUser.locale,
                         "desc": $scope.resourceBundle.upsertOrgUnitGroupsDesc

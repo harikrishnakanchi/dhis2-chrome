@@ -1,5 +1,6 @@
 define(["moment"], function(moment) {
-    return function(db) {
+    return function(db, $q) {
+        var self = this;
         this.getAll = function() {
             var store = db.objectStore("orgUnitGroups");
             return store.getAll();
@@ -23,9 +24,23 @@ define(["moment"], function(moment) {
 
         this.upsertDhisDownloadedData = function(payload) {
             var store = db.objectStore("orgUnitGroups");
-
             return store.upsert(payload).then(function() {
                 return payload;
+            });
+        };
+
+        this.clearStatusFlag = function(orgUnitGroupId, orgUnitIds) {
+            var store = db.objectStore("orgUnitGroups");
+            return self.get(orgUnitGroupId).then(function(orgUnitGroup) {
+                orgUnitGroup.organisationUnits = _.transform(orgUnitGroup.organisationUnits, function(acc, orgUnit) {
+                    if (orgUnit.localStatus === "DELETED" && _.contains(orgUnitIds, orgUnit.id))
+                        return;
+                    if (_.contains(orgUnitIds, orgUnit.id))
+                        acc.push(_.omit(orgUnit, "localStatus"));
+                    else
+                        acc.push(orgUnit);
+                }, []);
+                return store.upsert(orgUnitGroup);
             });
         };
 

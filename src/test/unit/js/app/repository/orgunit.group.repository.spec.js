@@ -1,12 +1,13 @@
 define(["orgUnitGroupRepository", "angularMocks", "utils", "timecop"], function(OrgUnitGroupRepository, mocks, utils, timecop) {
     describe("orgunitgroup repository", function() {
-        var db, mockStore, scope, orgUnitGroupRepository;
+        var db, mockStore, scope, orgUnitGroupRepository, q;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
+            q = $q;
             scope = $rootScope.$new();
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
-            orgUnitGroupRepository = new OrgUnitGroupRepository(mockDB.db);
+            orgUnitGroupRepository = new OrgUnitGroupRepository(mockDB.db, q);
 
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
@@ -62,6 +63,50 @@ define(["orgUnitGroupRepository", "angularMocks", "utils", "timecop"], function(
             orgUnitGroupRepository.get(id);
 
             expect(mockStore.find).toHaveBeenCalledWith(id);
+        });
+
+        it("should clear local status", function() {
+            var ougInDb = {
+                "id": "oug1",
+                "organisationUnits": [{
+                    "id": "ou1",
+                    "localStatus": "NEW"
+                }, {
+                    "id": "ou2",
+                    "localStatus": "DELETED"
+                }, {
+                    "id": "ou3"
+                }, {
+                    "id": "ou4",
+                    "localStatus": "NEW"
+                }, {
+                    "id": "ou5",
+                    "localStatus": "DELETED"
+                }, {
+                    "id": "ou6"
+                }]
+            };
+
+            mockStore.find.and.returnValue(utils.getPromise(q, ougInDb));
+            orgUnitGroupRepository.clearStatusFlag("oug1", ["ou0", "ou1", "ou2", "ou3"]);
+            scope.$apply();
+
+            expect(mockStore.upsert).toHaveBeenCalledWith({
+                "id": "oug1",
+                "organisationUnits": [{
+                    "id": "ou1"
+                }, {
+                    "id": "ou3"
+                }, {
+                    "id": "ou4",
+                    "localStatus": "NEW"
+                }, {
+                    "id": "ou5",
+                    "localStatus": "DELETED"
+                }, {
+                    "id": "ou6"
+                }]
+            });
         });
     });
 });
