@@ -23,10 +23,8 @@
                             <p class="text-right">&nbsp;<small ng-show="isLoggedIn">Logged in as {{currentUser.userCredentials.username}} <a ng-click="logout()" href="#/login" tabindex="-1">({{ resourceBundle.logoutLabel }})</a></small></p>
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
-                                    <button type="button" class="btn btn-link" ng-disabled="disabled">
-                                        <span class="glyphicon" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline, 'dhis-offline':!isDhisOnline}" ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
+                                    <span class="glyphicon dhis-status" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline, 'dhis-offline':!isDhisOnline}" ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
                                         || !isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.notConnectedNoPendingRequests || !isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.notConnectedWithPendingRequests}}"></span>
-                                    </button>
                                 </li>
                                 <li ng-show="isLoggedIn">
                                     <div class="btn-group" dropdown>
