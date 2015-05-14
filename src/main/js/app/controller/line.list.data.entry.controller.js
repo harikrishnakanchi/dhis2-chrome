@@ -143,7 +143,9 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                 var formatValue = function(dv) {
                     var de = allDataElementsMap[dv.dataElement];
                     if (de && de.optionSet) {
-                        return _.find($scope.optionSetMapping[de.optionSet.id], "id", dv.value);
+                        return _.find($scope.optionSetMapping[de.optionSet.id], function(optionSet) {
+                            return optionSet.id === dv.value;
+                        });
                     }
 
                     if (dv.type === "date") {
