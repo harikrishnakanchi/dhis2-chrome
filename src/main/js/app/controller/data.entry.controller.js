@@ -39,10 +39,24 @@ define(["lodash", "moment"],
                 return attr && attr.value == "true";
             };
 
-            var getFilteredModulesWithDisplayNames = function(modules) {
-                modules = _.filter(modules, function(module) {
-                    return $scope.isAggregateData ? !isLineListService(module) : isLineListService(module);
+            var getAggregateModules = function(modules) {
+                return _.filter(modules, function(module) {
+                    return !isLineListService(module);
                 });
+            };
+
+            var getLineListModules = function(modules) {
+                return _.filter(modules, function(module) {
+                    return isLineListService(module);
+                });
+            };
+
+            var getFilteredModulesWithDisplayNames = function(modules) {
+                if ($scope.dataType === "linelist")
+                    modules = getLineListModules(modules);
+                if ($scope.dataType == "aggregate")
+                    modules = getAggregateModules(modules);
+
                 return _.map(modules, function(module) {
                     module.displayName = module.parent.name + ' - ' + module.name;
                     return module;

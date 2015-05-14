@@ -208,7 +208,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
         };
 
         var init = function() {
-            $scope.isAggregateData = true;
+            $scope.dataType = "all";
         };
 
         $scope.$on('errorInfo', function(event, errorMessage) {

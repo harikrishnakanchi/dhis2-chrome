@@ -238,7 +238,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         var init = function() {
-            $scope.isAggregateData = false;
+            $scope.dataType = "linelist";
         };
 
         var initializeForm = function() {

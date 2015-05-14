@@ -343,7 +343,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         });
 
         var init = function() {
-            $scope.isAggregateData = true;
+            $scope.dataType = "aggregate";
         };
 
         resetForm();
