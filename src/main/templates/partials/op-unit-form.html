@@ -45,7 +45,7 @@
                         </li>
                         <li class="form-group" ng-if="opUnit.type==='Hospital'">
                             <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label required">Hospital Unit Code</label>
-                            <div class="col-sm-6 col-md-6">
+                            <div class="col-sm-4">
                                 <div angucomplete-alt="" placeholder="Start Typing..." pause="100" selected-object="opUnit.hospitalUnitCode" local-data="hospitalUnitCodes" search-fields="name" title-field="name" initial-value="{{opUnit.hospitalUnitCode.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
                                 </div>
                                 <div ng-show="form.hospitalUnitCode.$dirty &amp;&amp; form.hospitalUnitCode.$invalid">
@@ -55,7 +55,7 @@
                         </li>
                         <li class="form-group">
                             <label for="longitude" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': areCoordinatesCompulsory() }">Longitude</label>
-                            <div class="col-sm-6 col-md-6">
+                            <div class="col-sm-4">
                                 <input type="number" step="0.1" min="-180" max="180" class="form-control" name="longitude" id="longitude" ng-model="opUnit.longitude" ng-required="opUnit.latitude !== undefined &amp;&amp; opUnit.latitude !== null" />
                                 <div ng-show="form.longitude.$dirty &amp;&amp; form.longitude.$invalid">
                                     <span ng-show="form.longitude.$invalid &amp;&amp; !form.longitude.$error.required" class="errortxt">{{resourceBundle.longitudeRangeValidation}}</span>
@@ -65,7 +65,7 @@
                         </li>
                         <li class="form-group">
                             <label for="latitude" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': areCoordinatesCompulsory() }">Latitude</label>
-                            <div class="col-sm-6 col-md-6">
+                            <div class="col-sm-4">
                                 <input type="number" step="0.1" min="-90" max="90" class="form-control" name="latitude" id="latitude" ng-model="opUnit.latitude" ng-required="opUnit.longitude !== undefined &amp;&amp; opUnit.longitude !== null" />
                                 <div ng-show="form.latitude.$dirty &amp;&amp; form.latitude.$invalid">
                                     <span ng-show="form.latitude.$invalid &amp;&amp; !form.latitude.$error.required" class="errortxt">{{resourceBundle.latitudeRangeValidation}}</span>
@@ -74,10 +74,13 @@
                             </div>
                         </li>
                     </ul>
-                    <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6 button-group">
+                    <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-4 button-group">
                         <input type="submit" class="btn btn-main" ng-disabled="form.$invalid" ng-if="isNewMode" value="Save" />
-                        <input type="button" class="btn btn-main" ng-disabled="form.$invalid || !form.$dirty" ng-if="!isNewMode &amp;&amp; !(isDisabled)" ng-click="update(opUnit) " value="Update " />
-                        <input type="button " class="btn btn-main " ng-click="disable(orgUnit) " value="Disable " ng-if="!isNewMode &amp;&amp; !(isDisabled) " />
+                        <input type="button" class="btn btn-main" ng-disabled="form.$invalid || !form.$dirty" ng-if="!isNewMode &amp;&amp; !(isDisabled)" ng-click="update(opUnit) " value="Update" />
+
+
+
+                        <input type="button" class="btn" ng-click="disable(orgUnit) " value="Disable" ng-if="!isNewMode &amp;&amp; !(isDisabled) " />
                         <input type="button" class="btn" ng-if="isNewMode" ng-click="reset()" value="Reset">
                         <input type="button" class="btn" class="btn" ng-if="isNewMode" ng-click="closeForm()" value="Back" />
                     </div>
