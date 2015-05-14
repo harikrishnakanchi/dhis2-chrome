@@ -20,7 +20,7 @@
                             <a class="navbar-brand" ng-href="{{currentUser ? '#/dashboard' : '#'}}" tabindex="-1"><img src="img/logo.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1"></a>
                         </div>
                         <div class="nav navbar-nav navbar-right">
-                            <p class="text-right">&nbsp;<small ng-show="isLoggedIn">Logged in as {{currentUser.userCredentials.username}} <a ng-click="logout()" href="#/login" tabindex="-1">({{ resourceBundle.logoutLabel }})</a></small></p>
+                            <p class="text-right login-message">&nbsp;<small ng-show="isLoggedIn">Logged in as {{currentUser.userCredentials.username}} <a ng-click="logout()" href="#/login" tabindex="-1">({{ resourceBundle.logoutLabel }})</a></small></p>
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
                                     <span class="glyphicon dhis-status" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline, 'dhis-offline':!isDhisOnline}" ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
