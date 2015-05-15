@@ -1,5 +1,5 @@
 define(['lodash', 'overrides'], function(_, overrides) {
-    var url = "http://172.18.41.2:8080/dhis";
+    var url = "http://localhost:8080";
     var properties = {
         "metadata": {
             "sync": {
