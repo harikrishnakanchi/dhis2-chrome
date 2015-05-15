@@ -1,8 +1,8 @@
 {
     "logoutLabel": "Logout",
-    "dataEntryLabel": "Data Entry",
-    "approveDataLabel": "Approve data",
-    "projectsLabel": "Projects",
+    "dataEntryLabel": "Aggregate Data Entry",
+    "approveDataLabel": "APPROVE DATA",
+    "projectsLabel": "PROJECT SET UP",
     "downloadDataLabel": "Download data from DHIS",
     "totalLabel": "Total",
     "invalidExpression": "Must be a valid expression containing digits and '+'.",
@@ -169,10 +169,10 @@
     "emailValidation": "This is not a valid Email.",
     "successNotification": "Success",
     "errorNotification": "Error",
-    "connectedNoPendingRequests": "Online with no pending requests",
-    "connectedWithPendingRequests": "Online with pending requests",
-    "notConnectedNoPendingRequests": "Offline with no pending requests",
-    "notConnectedWithPendingRequests": "Offline with pending requests",
+    "connectedNoPendingRequests": "ONLINE - NO PENDING REQUESTS",
+    "connectedWithPendingRequests": "ONLINE - PENDING REQUESTS",
+    "notConnectedNoPendingRequests": "OFFLINE - NO PENDING REQUESTS",
+    "notConnectedWithPendingRequests": "OFFLINE - PENDING REQUESTS",
     "menu": "Menu",
     "selectLanguageLabel": "Select language"
 }
