@@ -82,8 +82,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 $scope.onProgramSelect = function(selected) {
-                    $scope.program = selected.originalObject;
-                    return getEnrichedProgram($scope.program.id);
+                    if (selected) {
+                        $scope.program = selected.originalObject;
+                        return getEnrichedProgram($scope.program.id);
+                    }
+                    $scope.program = {};
                 };
 
                 var setUpModule = function() {

@@ -591,6 +591,17 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.$apply();
             });
 
+            it("should set program to blank on scope when the program name is cleared on the form", function() {
+                spyOn(programsRepo, "get").and.returnValue(utils.getPromise(q, {}));
+                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+
+                scope.onProgramSelect();
+                expect(scope.program).toEqual({});
+                expect(programsRepo.get).not.toHaveBeenCalled();
+
+                scope.$apply();
+            });
+
             it("should change collapsed", function() {
                 scope.collapseSection = {
                     "sectionId": true
