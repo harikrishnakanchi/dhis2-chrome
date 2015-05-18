@@ -3,7 +3,7 @@
     <div ng-show="selectedModule &amp;&amp; week  &amp;&amp; !errorMessage">
         <section class="panel tab-panel" ng-if="week &amp;&amp; selectedModule">
             <div ng-show="saveSuccess" class="alert alert-success">{{resourceBundle.dataSaveSuccess}}</div>
-            <div ng-show="isSubmitted &amp;&amp; !isCompleted &amp;&amp; !isApproved" class="alert alert-success">{{resourceBundle.dataSubmittedForApproval}}</div>
+            <div ng-show="isSubmitted &amp;&amp; !isCompleted &amp;&amp; !isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.dataSubmittedForApproval}}</div>
             <div ng-show="isCompleted &amp;&amp; !isApproved" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
             <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
             <div ng-show="submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.dataSubmitAndApproved}}</div>
