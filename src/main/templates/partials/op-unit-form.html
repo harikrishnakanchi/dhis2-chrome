@@ -46,7 +46,7 @@
                         <li class="form-group" ng-if="opUnit.type==='Hospital'">
                             <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label required">Hospital Unit Code</label>
                             <div class="col-sm-4">
-                                <div angucomplete-alt="" placeholder="Start Typing..." pause="100" selected-object="opUnit.hospitalUnitCode" local-data="hospitalUnitCodes" search-fields="name" title-field="name" initial-value="{{opUnit.hospitalUnitCode.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
+                                <div angucomplete-alt="" name="hospitalUnitCode" form-name="form" placeholder="Start Typing..." pause="100" selected-object="opUnit.hospitalUnitCode" local-data="hospitalUnitCodes" search-fields="name" title-field="name" initial-value="{{opUnit.hospitalUnitCode.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
                                 </div>
                                 <div ng-show="form.hospitalUnitCode.$dirty &amp;&amp; form.hospitalUnitCode.$invalid">
                                     <span class="errortxt" ng-show="form.hospitalUnitCode.$error.required">{{resourceBundle.hospitalUnitCodeValidation}}</span>
@@ -77,9 +77,6 @@
                     <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-4 button-group">
                         <input type="submit" class="btn btn-main" ng-disabled="form.$invalid" ng-if="isNewMode" value="Save" />
                         <input type="button" class="btn btn-main" ng-disabled="form.$invalid || !form.$dirty" ng-if="!isNewMode &amp;&amp; !(isDisabled)" ng-click="update(opUnit) " value="Update" />
-
-
-
                         <input type="button" class="btn" ng-click="disable(orgUnit) " value="Disable" ng-if="!isNewMode &amp;&amp; !(isDisabled) " />
                         <input type="button" class="btn" ng-if="isNewMode" ng-click="reset()" value="Reset">
                         <input type="button" class="btn" class="btn" ng-if="isNewMode" ng-click="closeForm()" value="Back" />
