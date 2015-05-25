@@ -85,7 +85,7 @@
                     <li class="form-group">
                         <label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label required">Opening Date</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="date" class="msf-date-input" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" required>
+                            <input type="date" class="msf-date-input" name="newOrgUnitOpeningDate" ng-model="newOrgUnit.openingDate" max="9999-12-31" required>
                             <div ng-show="createForm.newOrgUnitOpeningDate.$dirty &amp;&amp; createForm.newOrgUnitOpeningDate.$invalid">
                                 <span ng-show="createForm.newOrgUnitOpeningDate.$error.required" class="errortxt">{{resourceBundle.openingDateValidation}}</span>
                                 <span ng-show="createForm.newOrgUnitOpeningDate.$invalid" class="errortxt">{{resourceBundle.invalidDateError}}</span>
@@ -95,7 +95,7 @@
                     <li class="form-group">
                         <label for="newOrgUnitEndDate" class="col-sm-4 col-md-4 control-label">End Date</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="date" class="msf-date-input" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate">
+                            <input type="date" class="msf-date-input" name="newOrgUnitEndDate" ng-model="newOrgUnit.endDate" max="9999-12-31">
                             <div ng-show="createForm.newOrgUnitEndDate.$dirty &amp;&amp; createForm.newOrgUnitEndDate.$invalid">
                                 <span ng-show="createForm.newOrgUnitEndDate.$invalid" class="errortxt">{{resourceBundle.invalidDateError}}</span>
                             </div>
