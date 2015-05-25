@@ -545,13 +545,6 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "active": true,
                 "shortName": "OBGYN",
                 "id": "a72ec34b863",
-                "children": [{
-                    "id": "child1",
-                    "name": "child1"
-                }, {
-                    "id": "child2",
-                    "name": "child2"
-                }],
                 "attributeValues": [{
                     "attribute": {
                         "code": "Type",
@@ -565,7 +558,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }]
             }];
 
-            var orgunitsToAssociate = [{
+            var originOrgUnits = [{
                 "id": "child1",
                 "name": "child1"
             }, {
@@ -584,20 +577,29 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }]
             };
 
+            orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
             spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitMapper, "mapToExistingProject").and.returnValue(newOrgUnit);
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
             spyOn(location, 'hash');
             orgUnitRepo.getAllModulesInOrgUnits = jasmine.createSpy("getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
-            spyOn(orgUnitGroupHelper, "getOrgUnitsToAssociateForUpdate").and.returnValue(orgunitsToAssociate);
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
 
+            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
 
             scope.update(newOrgUnit, orgUnit);
             scope.$apply();
 
-            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(orgunitsToAssociate, true);
+
+            var expectedOrgunitsToAssociate = [{
+                "id": "child1",
+                "name": "child1"
+            }, {
+                "id": "child2",
+                "name": "child2"
+            }];
+
+            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(expectedOrgunitsToAssociate, true);
         });
     });
 

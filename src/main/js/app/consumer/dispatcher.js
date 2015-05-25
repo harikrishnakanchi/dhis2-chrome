@@ -5,7 +5,7 @@ define(["lodash"], function(_) {
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer) {
 
         this.run = function(message) {
-            $log.info("Processing message: " + message.data.type);
+            $log.info("Processing message: " +  message.data.type, message.data);
             switch (message.data.type) {
                 case "downloadMetadata":
                     return downloadMetadataConsumer.run(message);

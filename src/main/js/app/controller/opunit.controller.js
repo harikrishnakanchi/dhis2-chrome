@@ -15,13 +15,12 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }, "dataValues");
         };
 
-        var onSuccess = function(hustlePayload) {
-            var opUnits = hustlePayload === undefined ? [$scope.orgUnit] : hustlePayload.data.data;
+        var onSuccess = function() {
             if ($scope.$parent.closeNewForm)
-                $scope.$parent.closeNewForm(opUnits[0], "savedOpUnit");
+                $scope.$parent.closeNewForm($scope.orgUnit.id, "savedOpUnit");
         };
 
-        var onError = function(data) {
+        var onError = function() {
             $scope.saveFailure = true;
         };
 
@@ -114,7 +113,6 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 'shortName': opUnit.name,
                 'level': $scope.orgUnit.level,
                 'parent': _.pick($scope.orgUnit.parent, "name", "id"),
-                'children': $scope.orgUnit.children,
                 "attributeValues": getAttributeValues(opUnit.type, opUnit.hospitalUnitCode)
             });
 
@@ -125,20 +123,44 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
 
             opUnit = _.omit(opUnit, ['type', 'hospitalUnitCode', 'latitude', 'longitude']);
 
-            var updateOrgUnitGroupsForModules = function() {
-                return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(function(modules) {
-                    var orgUnitsToAssociate = orgUnitGroupHelper.getOrgUnitsToAssociateForUpdate(modules);
-                    $q.when(orgUnitsToAssociate).then(function(orgUnitsToAssociate) {
-                        if (!_.isEmpty(orgUnitsToAssociate))
-                            return orgUnitGroupHelper.createOrgUnitGroups(orgUnitsToAssociate, true);
-                    });
+            var getModulesInOpUnit = function() {
+                return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id);
+            };
 
+            var createOrgUnitGroups = function(modules) {
+                var partitionedModules = _.partition(modules, function(module) {
+                    return _.any(module.attributeValues, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "true"
+                    });
+                });
+
+                var aggregateModules = partitionedModules[1];
+                var lineListModules = partitionedModules[0];
+
+                var groupCreatePromises = [];
+
+                if (!_.isEmpty(aggregateModules)) {
+                    groupCreatePromises.push(orgUnitGroupHelper.createOrgUnitGroups(aggregateModules, true));
+                }
+
+                if (!_.isEmpty(lineListModules)) {
+                    groupCreatePromises.push(orgUnitRepository.findAllByParent(_.pluck(lineListModules, "id"))
+                        .then(_.partial(orgUnitGroupHelper.createOrgUnitGroups, _, true)));
+                }
+
+                return $q.all(groupCreatePromises).then(function() {
+                    return modules;
                 });
             };
 
             $scope.loading = true;
             return orgUnitRepository.upsert(opUnit)
-                .then(saveToDhis).then(updateOrgUnitGroupsForModules)
+                .then(saveToDhis)
+                .then(getModulesInOpUnit)
+                .then(createOrgUnitGroups)
                 .then(onSuccess, onError)
                 .finally(function() {
                     $scope.loading = false;

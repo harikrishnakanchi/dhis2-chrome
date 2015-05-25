@@ -100,8 +100,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.orgUnit = {
                 "level": "4",
                 "name": "Parent",
-                "id": "ParentId",
-                "children": []
+                "id": "ParentId"
             };
 
             var expectedOpUnit = {
@@ -192,8 +191,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.orgUnit = {
                 "level": "4",
                 "name": "Parent",
-                "id": "ParentId",
-                "children": []
+                "id": "ParentId"
             };
 
             var expectedOpUnit = {
@@ -274,8 +272,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.orgUnit = {
                 "level": "4",
                 "name": "Parent",
-                "id": "ParentId",
-                "children": []
+                "id": "ParentId"
             };
 
             var expectedOpUnit = {
@@ -528,8 +525,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "parent": {
                     "name": "Parent",
                     "id": "ParentId"
-                },
-                "children": []
+                }
             };
 
             var expectedOpUnit = {
@@ -542,7 +538,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "name": "Parent",
                     "id": "ParentId"
                 },
-                "children": [],
                 "attributeValues": [{
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -574,7 +569,19 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }]
             };
 
-            var orgunitsToAssociate = [{
+            var modulesUnderOpunit = [{
+                "id": "aggMod1"
+            }, {
+                "id": "lineMod1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isLineListService",
+                    },
+                    "value": "true"
+                }]
+            }];
+
+            var originOrgUnits = [{
                 "id": "child1",
                 "name": "child1"
             }, {
@@ -582,15 +589,11 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "child2"
             }];
 
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
+            spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
             spyOn(location, "hash");
-
-            spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
-                "data": {
-                    "data": []
-                }
-            }));
+            spyOn(hustle, "publish");
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
-            spyOn(orgUnitGroupHelper, "getOrgUnitsToAssociateForUpdate").and.returnValue(orgunitsToAssociate);
 
             scope.update(opUnit);
             scope.$apply();
@@ -626,8 +629,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "parent": {
                     "name": "Parent",
                     "id": "ParentId"
-                },
-                "children": []
+                }
             };
 
             var expectedOpUnit = {
@@ -640,7 +642,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "name": "Parent",
                     "id": "ParentId"
                 },
-                "children": [],
                 "attributeValues": [{
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -690,7 +691,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 }
             }));
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
-            spyOn(orgUnitGroupHelper, "getOrgUnitsToAssociateForUpdate").and.returnValue(utils.getPromise(q, orgunitsToAssociate));
 
             scope.update(opUnit);
             scope.$apply();
@@ -702,7 +702,6 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "locale": "en",
                 "desc": "upsert org unit OpUnit1"
             }, "dataValues");
-            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalled();
         });
 
         it("should take the user to the view page of the parent project on clicking cancel", function() {
@@ -746,8 +745,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.orgUnit = {
                 "level": "4",
                 "name": "Parent",
-                "id": "ParentId",
-                "children": []
+                "id": "ParentId"
             };
 
             spyOn(location, "hash");
@@ -789,11 +787,22 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "parent": {
                     "name": "Parent",
                     "id": "ParentId"
-                },
-                "children": []
+                }
             };
 
-            var orgunitsToAssociate = [{
+            var modulesUnderOpunit = [{
+                "id": "aggMod1"
+            }, {
+                "id": "lineMod1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isLineListService",
+                    },
+                    "value": "true"
+                }]
+            }];
+
+            var originOrgUnits = [{
                 "id": "child1",
                 "name": "child1"
             }, {
@@ -801,7 +810,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                 "name": "child2"
             }];
 
-            spyOn(orgUnitGroupHelper, "getOrgUnitsToAssociateForUpdate").and.returnValue(orgunitsToAssociate);
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
+            spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
+
             spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
                 "data": {
@@ -812,7 +823,15 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.update(opUnit);
             scope.$apply();
 
-            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(orgunitsToAssociate, true);
+
+            var expectedOrgunitsToAssociate = [{
+                "id": "child1",
+                "name": "child1"
+            }, {
+                "id": "child2",
+                "name": "child2"
+            }];
+            expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith(expectedOrgunitsToAssociate, true);
         });
 
         it("should disable patient origin", function() {

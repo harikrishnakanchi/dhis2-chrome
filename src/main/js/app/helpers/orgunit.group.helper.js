@@ -95,32 +95,5 @@ define([], function() {
                 .then(modifyGroups)
                 .then(upsertOrgUnitGroups);
         };
-
-        this.getOrgUnitsToAssociateForUpdate = function(orgunits) {
-            var getBooleanAttributeValue = function(attributeValues, attributeCode) {
-                var attr = _.find(attributeValues, {
-                    "attribute": {
-                        "code": attributeCode
-                    }
-                });
-
-                return attr && attr.value === 'true';
-            };
-
-            var isLinelistService = function(orgUnit) {
-                return getBooleanAttributeValue(orgUnit.attributeValues, "isLineListService");
-            };
-
-            var orgUnitsToAssociate = [];
-
-            _.forEach(orgunits, function(orgunit) {
-                if (isLinelistService(orgunit))
-                    orgUnitsToAssociate.push(orgunit.children);
-                else
-                    orgUnitsToAssociate.push(orgunit);
-
-            });
-            return _.flatten(orgUnitsToAssociate);
-        };
     };
 });

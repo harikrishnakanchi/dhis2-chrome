@@ -1,4 +1,4 @@
-define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper, properties) {
+define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, orgUnitMapper, properties, _) {
 
     return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository) {
 
@@ -77,49 +77,76 @@ define(["moment", "orgUnitMapper", "properties"], function(moment, orgUnitMapper
 
         $scope.update = function(newOrgUnit, orgUnit) {
 
-            var publishApprovalsToDhis = function(periodAndOrgUnits) {
+            var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
 
-                var uploadCompletionPromise = $hustle.publish({
-                    "data": periodAndOrgUnits,
-                    "type": "uploadCompletionData",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
-                }, "dataValues");
-
-                var uploadApprovalPromise = $hustle.publish({
-                    "data": periodAndOrgUnits,
-                    "type": "uploadApprovalData",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
-                }, "dataValues");
-
-                return $q.all([uploadCompletionPromise, uploadApprovalPromise]);
+            var getModulesInProject = function() {
+                return orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id]);
             };
 
-            var createOrgUnitGroups = function() {
-                _.forEach(dhisProject.children, function(opunit) {
-                    orgUnitRepository.getAllModulesInOrgUnits([opunit.id]).then(function(modules) {
-                        var orgUnitsToAssociate = orgUnitGroupHelper.getOrgUnitsToAssociateForUpdate(modules);
-                        $q.when(orgUnitsToAssociate).then(function(orgUnitsToAssociate) {
-                            orgUnitGroupHelper.createOrgUnitGroups(orgUnitsToAssociate, true);
-                        });
+            var createOrgUnitGroups = function(modules) {
+                var partitionedModules = _.partition(modules, function(module) {
+                    return _.any(module.attributeValues, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "true"
                     });
                 });
+
+                var aggregateModules = partitionedModules[1];
+                var lineListModules = partitionedModules[0];
+
+                var groupCreatePromises = [];
+
+                if (!_.isEmpty(aggregateModules)) {
+                    groupCreatePromises.push(orgUnitGroupHelper.createOrgUnitGroups(aggregateModules, true));
+                }
+
+                if (!_.isEmpty(lineListModules)) {
+                    groupCreatePromises.push(orgUnitRepository.findAllByParent(_.pluck(lineListModules, "id"))
+                        .then(_.partial(orgUnitGroupHelper.createOrgUnitGroups, _, true)));
+                }
+
+                return $q.all(groupCreatePromises).then(function() {
+                    return modules;
+                });
             };
 
-            var dhisProject = orgUnitMapper.mapToExistingProject(newOrgUnit, orgUnit);
-            return saveToDbAndPublishMessage(dhisProject).then(function(data) {
-                createOrgUnitGroups();
-                orgUnitRepository.getAllModulesInOrgUnits([dhisProject.id]).then(function(modules) {
-                    if (newOrgUnit.autoApprove === "true") {
-                        var periodAndOrgUnits = getPeriodsAndOrgUnitsForAutoApprove(modules);
-                        return approvalDataRepository.markAsApproved(periodAndOrgUnits, "admin")
-                            .then(_.partial(publishApprovalsToDhis, periodAndOrgUnits));
-                    } else {
-                        return data;
-                    }
-                });
-            });
+            var autoApprove = function(modules) {
+                if (newOrgUnit.autoApprove !== "true")
+                    return modules;
+
+                var publishApprovalsToDhis = function(periodAndOrgUnits) {
+
+                    var uploadCompletionPromise = $hustle.publish({
+                        "data": periodAndOrgUnits,
+                        "type": "uploadCompletionData",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
+                    }, "dataValues");
+
+                    var uploadApprovalPromise = $hustle.publish({
+                        "data": periodAndOrgUnits,
+                        "type": "uploadApprovalData",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
+                    }, "dataValues");
+
+                    return $q.all([uploadCompletionPromise, uploadApprovalPromise]);
+                };
+
+                var periodAndOrgUnits = getPeriodsAndOrgUnitsForAutoApprove(modules);
+                return approvalDataRepository.markAsApproved(periodAndOrgUnits, "admin")
+                    .then(_.partial(publishApprovalsToDhis, periodAndOrgUnits))
+                    .then(function() {
+                        return modules;
+                    });
+            };
+
+            return saveToDbAndPublishMessage(dhisProject)
+                .then(getModulesInProject)
+                .then(createOrgUnitGroups)
+                .then(autoApprove);
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
