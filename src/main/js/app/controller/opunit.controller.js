@@ -15,9 +15,9 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }, "dataValues");
         };
 
-        var onSuccess = function() {
+        var exitForm = function(orgUnitToLoadOnExit) {
             if ($scope.$parent.closeNewForm)
-                $scope.$parent.closeNewForm($scope.orgUnit.id, "savedOpUnit");
+                $scope.$parent.closeNewForm(orgUnitToLoadOnExit, "savedOpUnit");
         };
 
         var onError = function() {
@@ -101,7 +101,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 .then(_.partial(publishMessage, patientOriginPayload, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(patientOriginPayload.origins, "name")))
                 .then(_.partial(orgUnitRepository.upsert, opUnit))
                 .then(saveToDhis)
-                .then(onSuccess, onError)
+                .then(_.partial(exitForm, opUnit))
+                .catch(onError)
                 .finally(function() {
                     $scope.loading = false;
                 });
@@ -161,7 +162,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 .then(saveToDhis)
                 .then(getModulesInOpUnit)
                 .then(createOrgUnitGroups)
-                .then(onSuccess, onError)
+                .then(_.partial(exitForm, opUnit))
+                .catch(onError)
                 .finally(function() {
                     $scope.loading = false;
                 });
