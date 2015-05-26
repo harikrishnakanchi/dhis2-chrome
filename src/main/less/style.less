@@ -91,11 +91,15 @@ body {
             }
         }
         li.active {
-            a, a:focus, a:hover {
+            a, a:focus, a:hover, a.line-list-selections:hover {
                 background: #ddd;
                 border: 1px solid #ddd;
                 border-bottom-color: transparent;
                 color: black;
+            }
+            a.line-list-selections {
+                background: white;
+                border: 0px;
             }
         }
     }
