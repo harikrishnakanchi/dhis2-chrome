@@ -593,7 +593,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
             spyOn(location, "hash");
             spyOn(hustle, "publish");
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
 
             scope.update(opUnit);
             scope.$apply();
@@ -690,7 +690,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "data": []
                 }
             }));
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
 
             scope.update(opUnit);
             scope.$apply();
@@ -813,7 +813,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modulesUnderOpunit));
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
 
-            spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+            spyOn(orgUnitGroupHelper, "createOrgUnitGroups").and.returnValue(utils.getPromise(q, {}));
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {
                 "data": {
                     "data": []
@@ -825,6 +825,8 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
 
             var expectedOrgunitsToAssociate = [{
+                "id": "aggMod1"
+            }, {
                 "id": "child1",
                 "name": "child1"
             }, {

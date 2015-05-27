@@ -141,19 +141,16 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 var aggregateModules = partitionedModules[1];
                 var lineListModules = partitionedModules[0];
 
-                var groupCreatePromises = [];
-
-                if (!_.isEmpty(aggregateModules)) {
-                    groupCreatePromises.push(orgUnitGroupHelper.createOrgUnitGroups(aggregateModules, true));
+                if (_.isEmpty(lineListModules)) {
+                    return orgUnitGroupHelper.createOrgUnitGroups(aggregateModules, true).then(function() {
+                        return modules;
+                    });
                 }
 
-                if (!_.isEmpty(lineListModules)) {
-                    groupCreatePromises.push(orgUnitRepository.findAllByParent(_.pluck(lineListModules, "id"))
-                        .then(_.partial(orgUnitGroupHelper.createOrgUnitGroups, _, true)));
-                }
-
-                return $q.all(groupCreatePromises).then(function() {
-                    return modules;
+                return orgUnitRepository.findAllByParent(_.pluck(lineListModules, "id")).then(function(originGroups) {
+                    return orgUnitGroupHelper.createOrgUnitGroups(aggregateModules.concat(originGroups), true).then(function() {
+                        return modules;
+                    });
                 });
             };
 

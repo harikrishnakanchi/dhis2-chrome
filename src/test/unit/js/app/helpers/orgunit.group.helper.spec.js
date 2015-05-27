@@ -58,6 +58,13 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 }, {
                     "name": "Post-conflict",
                     "id": "a16b4a97ce4",
+                    "organisationUnits": [{
+                        "id": 'a72ec34b863',
+                        "name": 'OBGYN'
+                    }]
+                }, {
+                    "name": "General Population",
+                    "id": "a16b4653ce4",
                     "organisationUnits": []
                 }, {
                     "name": "Unit Code - C2",
@@ -73,6 +80,14 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 }];
 
                 var expectedOutput = [{
+                    "name": "Post-conflict",
+                    "id": "a16b4a97ce4",
+                    "organisationUnits": [{
+                        "id": 'a72ec34b863',
+                        "name": 'OBGYN',
+                        "localStatus": "DELETED"
+                    }]
+                }, {
                     "name": "Unit Code - A",
                     "id": "w2aws2d2ef3",
                     "organisationUnits": [{
@@ -110,7 +125,7 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                 expect(orgUnitRepository.getProjectAndOpUnitAttributes).toHaveBeenCalled();
                 expect(hustle.publish.calls.argsFor(0)).toEqual([{
                     "data": {
-                        "orgUnitGroupIds": ["w2aws2d2ef3", "a9ab62b5ef3", "a8b42a1c9b8"],
+                        "orgUnitGroupIds": ["a16b4a97ce4", "w2aws2d2ef3", "a9ab62b5ef3", "a8b42a1c9b8"],
                         "orgUnitIds": ["a72ec34b863"]
                     },
                     "type": "upsertOrgUnitGroups",
