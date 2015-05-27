@@ -1,8 +1,8 @@
-define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository"],
-    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository) {
+define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository"],
+    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, q, programRepository, db, mockStore, allEvents, optionSets, originOrgUnits;
+            var scope, q, programRepository, db, mockStore, allEvents, optionSets, originOrgUnits, optionSetRepository, optionSetMapping;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -61,6 +61,21 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, []));
+
+                optionSetRepository = new OptionSetRepository();
+                optionSetMapping = {
+                    "os1": [{
+                        "id": 'os1o1',
+                        "name": 'os1o1 name',
+                        "displayName": 'os1o1 name',
+                    }],
+                    "os2": [{
+                        "id": 'os2o1',
+                        "name": 'os2o1 name',
+                        "displayName": 'os2o1 translated name'
+                    }]
+                };
+                spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, optionSetMapping));
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
@@ -127,22 +142,10 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.resourceBundle = {
                     'os2o1': 'os2o1 translated name'
                 };
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
                 scope.$apply();
 
-                expect(scope.optionSets).toEqual(optionSets);
-                expect(scope.optionSetMapping).toEqual({
-                    "os1": [{
-                        "id": 'os1o1',
-                        "name": 'os1o1 name',
-                        "displayName": 'os1o1 name',
-                    }],
-                    "os2": [{
-                        "id": 'os2o1',
-                        "name": 'os2o1 name',
-                        "displayName": 'os2o1 translated name'
-                    }]
-                });
+                expect(scope.optionSetMapping).toEqual(optionSetMapping);
                 expect(scope.dataValues).toEqual({
                     'de1': '66',
                     'de2': new Date("2015-04-15".replace(/-/g, ',')),
@@ -164,7 +167,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "endOfWeek": "2014-11-16"
                 };
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
                 scope.$apply();
 
                 expect(moment(scope.minDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-10");
@@ -215,7 +218,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
                 scope.programId = "p2";
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
                 scope.$apply();
 
                 scope.dataValues = {
@@ -262,7 +265,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     'id': 'PrgStage1',
                 };
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
                 scope.$apply();
 
                 scope.patientOrigin = {
@@ -337,7 +340,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     }]
                 };
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
                 scope.$apply();
 
                 scope.patientOrigin = {
@@ -416,7 +419,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
                 scope.programId = "p2";
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
                 scope.$apply();
 
                 scope.dataValues = {

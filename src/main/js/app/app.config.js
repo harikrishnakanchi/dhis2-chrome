@@ -95,6 +95,7 @@ require.config({
         "metadataRepository": "app/repository/metadata.repository",
         "patientOriginRepository": "app/repository/patient.origin.repository",
         "orgUnitGroupSetRepository": "app/repository/org.unit.group.set.repository",
+        "optionSetRepository": "app/repository/option.set.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",

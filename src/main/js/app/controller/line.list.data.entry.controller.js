@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
-    return function($scope, db, programEventRepository) {
+    return function($scope, db, programEventRepository, optionSetRepository) {
         var resetForm = function() {
             $scope.form = $scope.form || {};
             $scope.numberPattern = "^[1-9][0-9]*$";
@@ -120,22 +120,9 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                     allDataElementsMap = _.indexBy(_.pluck(_.flatten(_.pluck(_.flatten(_.pluck($scope.program.programStages, "programStageSections")), "programStageDataElements")), "dataElement"), "id");
             };
 
-            var setOptionSetMapping = function() {
-                $scope.optionSetMapping = {};
-                _.forEach($scope.optionSets, function(optionSet) {
-                    var options = _.compact(optionSet.options);
-                    _.each(options, function(o) {
-                        o.displayName = $scope.resourceBundle[o.id] || o.name;
-                    });
-                    $scope.optionSetMapping[optionSet.id] = options;
-                });
-            };
-
             var loadOptionSets = function() {
-                var store = db.objectStore("optionSets");
-                return store.getAll().then(function(opSets) {
-                    $scope.optionSets = opSets;
-                    setOptionSetMapping();
+                return optionSetRepository.getOptionSetMapping($scope.resourceBundle).then(function(optionSetMapping){
+                    $scope.optionSetMapping = optionSetMapping;
                 });
             };
 
