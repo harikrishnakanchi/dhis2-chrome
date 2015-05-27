@@ -1,3 +1,24 @@
 <div ng-controller="lineListOfflineApprovalController">
-    {{message}}
+    <div ng-repeat="programStage in program.programStages">
+        <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
+            <div ng-repeat="psde in section.programStageDataElements">
+                <div ng-if="shouldShowInOfflineSummary(psde.dataElement.id)">
+                    {{psde.dataElement.name}}
+                    <table class="table table-bordered">
+                        <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]" ng-if="getCount(option.id) !== 0">
+                            <td>{{option.name}}</td>
+                            <td>{{getCount(option.id)}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <table class="table table-bordered">
+    Procedures Performed
+        <tr ng-repeat="pdv in procedureDataValueIds">
+            <td>{{getProcedureName(procedureDataValues[pdv][0],pdv)}}</td>
+            <td>{{getProcedureCount(pdv)}}</td>
+        </tr>
+    </table>
 </div>
