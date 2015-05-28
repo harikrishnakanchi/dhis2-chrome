@@ -46,6 +46,10 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             scrollToTop();
         };
 
+        $scope.showPatientOriginInSummaryTable = function() {
+            return $scope.program.name === "Burn Unit" || $scope.program.name === "Cholera Treatment Centre";
+        };
+
         $scope.loadEventsView = function() {
             $scope.eventForm = {
                 allEvents: []

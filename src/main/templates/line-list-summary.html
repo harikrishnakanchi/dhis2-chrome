@@ -34,7 +34,7 @@
                                     <thead>
                                         <tr>
                                             <th>{{ resourceBundle.eventDateLabel }}</th>
-                                            <th>{{ resourceBundle.patientOriginLabel }}</th>
+                                            <th ng-if="showPatientOriginInSummaryTable()">{{ resourceBundle.patientOriginLabel }}</th>
                                             <th ng-repeat="dataValue in eventForm.allEvents[0].dataValues" ng-if="dataValue.showInEventSummary">
                                                 {{ dataValue.formName }}
                                             </th>
@@ -46,7 +46,7 @@
                                     <tbody>
                                         <tr ng-repeat="event in eventForm.allEvents">
                                             <td>{{ getFormattedDate(event.eventDate) }}</td>
-                                            <td>{{ originOrgUnitsById[event.orgUnit].name }}</td>
+                                            <td ng-if="showPatientOriginInSummaryTable()">{{ originOrgUnitsById[event.orgUnit].name }}</td>
                                             <td ng-repeat="dataValue in event.dataValues" ng-if="dataValue.showInEventSummary">
                                                 <span ng-if="dataValue.type === 'date'">{{ getFormattedDate(dataValue.value) }}</span>
                                                 <span ng-if="dataValue.type === 'bool' &amp;&amp; dataValue.value === 'true'">{{ resourceBundle.yes }}</span>
