@@ -22,6 +22,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         }
                     ]);
 
+                    $provide.decorator('$window', function($delegate) {
+                        $delegate.history = null;
+                        return $delegate;
+                    });
+
                     $indexedDBProvider.connection('msf');
                     $httpProvider.interceptors.push('configureRequestInterceptor');
                     $httpProvider.interceptors.push('cleanupPayloadInterceptor');
