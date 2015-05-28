@@ -61,6 +61,11 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         }
                     ]);
 
+                    $provide.decorator('$window', function($delegate) {
+                        $delegate.history = null;
+                        return $delegate;
+                    });
+
                     $indexedDBProvider.connection('msf')
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
