@@ -78,7 +78,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     "data": [currentPeriodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriodAndOrgUnit.period + ", Module: " + $scope.selectedModule.name
+                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriodAndOrgUnit.period + ", " + $scope.selectedModule.name
                 }, "dataValues");
             };
 
@@ -117,7 +117,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     "data": [currentPeriodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriodAndOrgUnit.period + ", Module: " + $scope.selectedModule.name
+                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriodAndOrgUnit.period + ", " + $scope.selectedModule.name
                 }, "dataValues");
             };
 

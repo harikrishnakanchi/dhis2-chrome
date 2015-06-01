@@ -7,13 +7,13 @@
     <form name="createForm" class="form-horizontal" role="form" novalidate>
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 ng-show="!showEditOriginForm" class="panel-title">Add Patient Origin</h3>
-                <h3 ng-show="showEditOriginForm" class="panel-title">Patient Origin</h3>
+                <h3 ng-show="!showEditOriginForm" class="panel-title">{{ resourceBundle.addPatientOriginLabel }}</h3>
+                <h3 ng-show="showEditOriginForm" class="panel-title">{{ resourceBundle.patientOriginLabel }}</h3>
             </div>
             <div class="panel-body">
                 <ul>
                     <li class="form-group">
-                        <label for="name" class="col-sm-4 col-md-4 control-label required">Enter a origin name</label>
+                        <label for="name" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.enterOriginNameLabel }}</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="text" class="form-control" name="name" id="name" ng-model="patientOrigin.name" not-in="existingPatientOrigins" required/>
                             <div ng-show="createForm.name.$dirty &amp;&amp; createForm.name.$invalid">
@@ -23,7 +23,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="longitude" class="col-sm-4 col-md-4 control-label required">Longitude</label>
+                        <label for="longitude" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.longitudeLabel }}</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="number" step="0.1" min="-180" max="180" class="form-control" name="longitude" id="longitude" ng-model="patientOrigin.longitude" required/>
                             <div ng-show="createForm.longitude.$dirty &amp;&amp; createForm.longitude.$invalid">
@@ -33,7 +33,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="latitude" class="col-sm-4 col-md-4 control-label required">Latitude</label>
+                        <label for="latitude" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.latitudeLabel }}</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="number" step="0.1" min="-90" max="90" class="form-control" name="latitude" id="latitude" ng-model="patientOrigin.latitude" required/>
                             <div ng-show="createForm.latitude.$dirty &amp;&amp; createForm.latitude.$invalid">
@@ -44,10 +44,10 @@
                     </li>
                     <li>
                         <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
-                            <input type="submit" ng-if="!showEditOriginForm" class="btn btn-main" ng-disabled="createForm.$invalid" value="Save" ng-click="save()" />
-                            <input type="button" ng-if="showEditOriginForm" class="btn btn-main" ng-disabled="createForm.$invalid" value="Update" ng-click="update()" />
-                            <input type="button" class="btn" ng-click="reset()" value="Reset">
-                            <input type="button" class="btn" ng-click="closeForm()" value="Back" />
+                            <input type="submit" ng-if="!showEditOriginForm" class="btn btn-main" ng-disabled="createForm.$invalid" value="{{ resourceBundle.saveBtnValue }}" ng-click="save()" />
+                            <input type="button" ng-if="showEditOriginForm" class="btn btn-main" ng-disabled="createForm.$invalid" value="{{ resourceBundle.updateBtnValue }}" ng-click="update()" />
+                            <input type="button" class="btn" ng-click="reset()" value="{{ resourceBundle.resetBtnValue }}">
+                            <input type="button" class="btn" ng-click="closeForm()" value="{{ resourceBundle.backBtnValue }}" />
                         </div>
                     </li>
                 </ul>

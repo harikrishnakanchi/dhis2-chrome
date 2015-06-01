@@ -31,7 +31,8 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
 
             scope.resourceBundle = {
                 "createUserDesc": "create user ",
-                "updateUserDesc": "update user "
+                "updateUserDesc": "update user ",
+                "usernamePrefixValidation": "Username should begin with"
             };
 
             fakeModal = {

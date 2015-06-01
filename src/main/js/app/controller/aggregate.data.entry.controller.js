@@ -118,14 +118,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     "data": payload,
                     "type": "uploadDataValues",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadDataValuesDesc + currentPeriod + ", Module: " + $scope.selectedModule.name
+                    "desc": $scope.resourceBundle.uploadDataValuesDesc + currentPeriod + ", " + $scope.selectedModule.name
                 }, "dataValues");
 
                 var deleteApprovalsPromise = $hustle.publish({
                     "data": currentPeriodAndOrgUnit,
                     "type": "deleteApprovals",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.deleteApprovalsDesc + currentPeriod + ", Module: " + $scope.selectedModule.name
+                    "desc": $scope.resourceBundle.deleteApprovalsDesc + currentPeriod + ", " + $scope.selectedModule.name
                 }, "dataValues");
 
                 return $q.all([uploadDataValuesPromise, deleteApprovalsPromise]);
@@ -205,14 +205,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     "data": [currentPeriodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriod + ", Module: " + $scope.selectedModule.name
+                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriod + ", " + $scope.selectedModule.name
                 }, "dataValues");
 
                 var uploadApprovalPromise = $hustle.publish({
                     "data": [currentPeriodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriod + ", Module: " + $scope.selectedModule.name
+                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriod + ", " + $scope.selectedModule.name
                 }, "dataValues");
 
                 return $q.all([uploadCompletionPromise, uploadApprovalPromise]);

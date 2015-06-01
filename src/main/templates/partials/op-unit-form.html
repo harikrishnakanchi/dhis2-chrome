@@ -4,39 +4,39 @@
     </div>
     <div ng-show="!showEditOriginForm">
         <div class="top-actions" ng-if="!isNewMode">
-            <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Aggregate Module" ng-if="!(isDisabled)" ng-click="openInNewMode('Module')" />
-            <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Linelist Module" ng-if="!(isDisabled)" ng-click="openInNewMode('LineListModule')" />
-            <input type="button" class="btn btn-sub btn-sm pull-right" value="Add Patient Origin" ng-click="openInNewMode('Patient Origin')" />
+            <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createAggregateModuleBtnLabel }}" ng-if="!(isDisabled)" ng-click="openInNewMode('Module')" />
+            <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createLinelistModuleBtnLabel }}" ng-if="!(isDisabled)" ng-click="openInNewMode('LineListModule')" />
+            <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.addPatientOriginBtnLabel }}" ng-click="openInNewMode('Patient Origin')" />
         </div>
         <div class="panel panel-default panelWith-Overflow-Visible">
             <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorOpUnit }}</div>
             <div class="panel-heading">
-                <h3 class="panel-title">Operation Unit Details</h3>
+                <h3 class="panel-title">{{ resourceBundle.operationUnitDetailsLabel }}</h3>
             </div>
             <div class="panel-body">
                 <form name="form" class="form-horizontal" role="form" ng-submit="save(opUnit)" novalidate>
                     <ul>
                         <li class="form-group">
-                            <label for="opUnitType" class="col-sm-4 col-md-4 control-label required">Operation unit type</label>
+                            <label for="opUnitType" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.operationUnitTypeLabel }}</label>
                             <div class="col-sm-8 col-md-8 form-inline">
                                 <div class="radio-inline">
                                     <label for="hospital">
-                                        <input type="radio" ng-model="opUnit.type" id="hospital" value="Hospital" ng-disabled="isDisabled" required> Hospital </label>
+                                        <input type="radio" ng-model="opUnit.type" id="hospital" value="Hospital" ng-disabled="isDisabled" required> {{ resourceBundle.hospitalLabel }} </label>
                                 </div>
                                 <div class="radio-inline">
                                     <label for="healthcenter">
-                                        <input type="radio" ng-model="opUnit.type" id="healthcenter" value="Health Center" ng-disabled="isDisabled" required> Health Center </label>
+                                        <input type="radio" ng-model="opUnit.type" id="healthcenter" value="Health Center" ng-disabled="isDisabled" required> {{ resourceBundle.healthCenterLabel }} </label>
                                 </div>
                                 <div class="radio-inline">
                                     <label for="community">
-                                        <input type="radio" ng-model="opUnit.type" id="community" value="Community" ng-disabled="isDisabled" required> Community </label>
+                                        <input type="radio" ng-model="opUnit.type" id="community" value="Community" ng-disabled="isDisabled" required> {{ resourceBundle.communityLabel }} </label>
                                 </div>
                             </div>
                         </li>
                         <li class="form-group">
-                            <label for="opUnitName" class="col-sm-4 col-md-4 control-label required">Name of the unit</label>
+                            <label for="opUnitName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.nameOfTheUnitLabel }}</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control" name="opUnitName{{$index}}" id="opUnitName{{$index}}" placeholder="Operation Unit Name" ng-model="opUnit.name" not-in="allOpunitNames" ng-disabled="isDisabled" required />
+                                <input type="text" class="form-control" name="opUnitName{{$index}}" id="opUnitName{{$index}}" placeholder="{{ resourceBundle.operationUnitNameLabel }}" ng-model="opUnit.name" not-in="allOpunitNames" ng-disabled="isDisabled" required />
                                 <div ng-show="form.opUnitName{{$index}}.$dirty &amp;&amp; form.opUnitName{{$index}}.$invalid">
                                     <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                     <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
@@ -44,9 +44,9 @@
                             </div>
                         </li>
                         <li class="form-group" ng-if="opUnit.type==='Hospital'">
-                            <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label required">Hospital Unit Code</label>
+                            <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.hospitalUnitCodeLabel }}</label>
                             <div class="col-sm-4">
-                                <div angucomplete-alt="" name="hospitalUnitCode" form-name="form" placeholder="Start Typing..." pause="100" selected-object="opUnit.hospitalUnitCode" local-data="hospitalUnitCodes" search-fields="name" title-field="name" initial-value="{{opUnit.hospitalUnitCode.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
+                                <div angucomplete-alt="" name="hospitalUnitCode" form-name="form" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="opUnit.hospitalUnitCode" local-data="hospitalUnitCodes" search-fields="name" title-field="name" initial-value="{{opUnit.hospitalUnitCode.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
                                 </div>
                                 <div ng-show="form.hospitalUnitCode.$dirty &amp;&amp; form.hospitalUnitCode.$invalid">
                                     <span class="errortxt" ng-show="form.hospitalUnitCode.$error.required">{{resourceBundle.hospitalUnitCodeValidation}}</span>
@@ -54,7 +54,7 @@
                             </div>
                         </li>
                         <li class="form-group">
-                            <label for="longitude" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': areCoordinatesCompulsory() }">Longitude</label>
+                            <label for="longitude" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': areCoordinatesCompulsory() }">{{ resourceBundle.longitudeLabel }}</label>
                             <div class="col-sm-4">
                                 <input type="number" step="0.1" min="-180" max="180" class="form-control" name="longitude" id="longitude" ng-model="opUnit.longitude" ng-required="opUnit.latitude !== undefined &amp;&amp; opUnit.latitude !== null" />
                                 <div ng-show="form.longitude.$dirty &amp;&amp; form.longitude.$invalid">
@@ -64,7 +64,7 @@
                             </div>
                         </li>
                         <li class="form-group">
-                            <label for="latitude" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': areCoordinatesCompulsory() }">Latitude</label>
+                            <label for="latitude" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': areCoordinatesCompulsory() }">{{ resourceBundle.latitudeLabel }}</label>
                             <div class="col-sm-4">
                                 <input type="number" step="0.1" min="-90" max="90" class="form-control" name="latitude" id="latitude" ng-model="opUnit.latitude" ng-required="opUnit.longitude !== undefined &amp;&amp; opUnit.longitude !== null" />
                                 <div ng-show="form.latitude.$dirty &amp;&amp; form.latitude.$invalid">
@@ -75,28 +75,28 @@
                         </li>
                     </ul>
                     <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-4 button-group">
-                        <input type="submit" class="btn btn-main" ng-disabled="form.$invalid" ng-if="isNewMode" value="Save" />
-                        <input type="button" class="btn btn-main" ng-disabled="form.$invalid || !form.$dirty" ng-if="!isNewMode &amp;&amp; !(isDisabled)" ng-click="update(opUnit) " value="Update" />
-                        <input type="button" class="btn" ng-click="disable(orgUnit) " value="Disable" ng-if="!isNewMode &amp;&amp; !(isDisabled) " />
-                        <input type="button" class="btn" ng-if="isNewMode" ng-click="reset()" value="Reset">
-                        <input type="button" class="btn" class="btn" ng-if="isNewMode" ng-click="closeForm()" value="Back" />
+                        <input type="submit" class="btn btn-main" ng-disabled="form.$invalid" ng-if="isNewMode" value="{{ resourceBundle.saveBtnValue }}" />
+                        <input type="button" class="btn btn-main" ng-disabled="form.$invalid || !form.$dirty" ng-if="!isNewMode &amp;&amp; !(isDisabled)" ng-click="update(opUnit) " value="{{ resourceBundle.updateBtnValue }}" />
+                        <input type="button" class="btn" ng-click="disable(orgUnit)" value="{{ resourceBundle.disableBtnValue }}" ng-if="!isNewMode &amp;&amp; !(isDisabled) " />
+                        <input type="button" class="btn" ng-if="isNewMode" ng-click="reset()" value="{{ resourceBundle.resetBtnValue }}">
+                        <input type="button" class="btn" class="btn" ng-if="isNewMode" ng-click="closeForm()" value="{{ resourceBundle.backBtnValue }}" />
                     </div>
                 </form>
             </div>
         </div>
         <div class="panel panel-default" ng-if="!isNewMode &amp;&amp; originDetails &amp;&amp; originDetails.length !== 0">
             <div class="panel-heading">
-                <h3 class="panel-title">Patient Origins</h3>
+                <h3 class="panel-title">{{ resourceBundle.patientOriginsLabel }}</h3>
             </div>
             <div class="panel-body">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Origin</th>
-                            <th>latitude</th>
-                            <th>longitude</th>
-                            <th>Edit</th>
-                            <th>Enable/Disable</th>
+                            <th>{{ resourceBundle.originLabel }}</th>
+                            <th>{{ resourceBundle.latitudeLabel }}</th>
+                            <th>{{ resourceBundle.longitudeLabel }}</th>
+                            <th>{{ resourceBundle.editLabel }}</th>
+                            <th>{{ resourceBundle.enableDisableLabel }}</th>
                         </tr>
                     </thead>
                     <tbody>

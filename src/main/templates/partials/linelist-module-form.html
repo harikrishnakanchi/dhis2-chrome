@@ -4,16 +4,16 @@
     </div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorModule }}</div>
     <div class="panel-heading">
-        <h3 class="panel-title">Module Details</h3>
+        <h3 class="panel-title">{{ resourceBundle.moduleDetailsLabel }}</h3>
     </div>
     <div class="panel-body">
         <form class="form-horizontal" name="form" role="form" novalidate>
             <div class="well">
                 <ul>
                     <li class="form-group">
-                        <label for="moduleName" class="col-sm-4 col-md-4 control-label required">Module name</label>
+                        <label for="moduleName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.moduleNameLabel }}</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="Module Name" ng-model="module.name" not-in="allModules" ng-disabled="isDisabled==true" required>
+                            <input type="text" class="form-control" name="moduleName{{$index}}" id="moduleName{{$index}}" placeholder="{{ resourceBundle.moduleNameLabel }}" ng-model="module.name" not-in="allModules" ng-disabled="isDisabled==true" required>
                             <div ng-show="form.moduleName{{$index}}.$dirty &amp;&amp; form.moduleName{{$index}}.$invalid">
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                 <span class="errortxt" ng-show="form.moduleName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
@@ -21,7 +21,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="moduleOpeningDate" class="col-sm-4 col-md-4 control-label required">Opening Date</label>
+                        <label for="moduleOpeningDate" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.openingDateLabel }}</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="date" name="moduleOpeningDate" ng-model="module.openingDate" ng-disabled="isDisabled==true" max="9999-12-31" required>
                             <div ng-show="form.moduleOpeningDate.$dirty &amp;&amp; form.moduleOpeningDate.$invalid">
@@ -33,7 +33,7 @@
                     <li class="form-group">
                         <label for="program" class="col-sm-4 col-md-4 control-label required">{{resourceBundle.selectProgramLabel}}</label>
                         <div class="col-sm-6 col-md-6">
-                            <div disable-input="!isNewMode" angucomplete-alt="" name="program" form-name="form" id="ex9" placeholder="Start Typing..." pause="100" selected-object="onProgramSelect" local-data="allPrograms" search-fields="name" title-field="name" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" initial-value="{{program.name}}" class="ng-isolate-scope">
+                            <div disable-input="!isNewMode" angucomplete-alt="" name="program" form-name="form" id="ex9" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="onProgramSelect" local-data="allPrograms" search-fields="name" title-field="name" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" initial-value="{{program.name}}" class="ng-isolate-scope">
                             </div>
                         </div>
                         <div>
@@ -67,10 +67,10 @@
                 </ul>
             </div>
             <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6 button-group">
-                <input type="button" class="btn btn-main" ng-click="save(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton()" value="Save" ng-if="isNewMode" />
-                <input type="button" class="btn btn-main" ng-click="update(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton() || isDisabled==true || !form.$dirty" value="Update" ng-if="!isNewMode &amp;&amp; !(isDisabled==true)" />
-                <input type="button" class="btn btn-main" ng-click="disable(module)" value="Disable" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !(isDisabled==true)" />
-                <input type="button" class="btn" ng-if="isNewMode" ng-click="closeForm()" value="Back" />
+                <input type="button" class="btn btn-main" ng-click="save(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton()" value="{{ resourceBundle.saveBtnValue }}" ng-if="isNewMode" />
+                <input type="button" class="btn btn-main" ng-click="update(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton() || isDisabled==true || !form.$dirty" value="{{ resourceBundle.updateBtnValue }}" ng-if="!isNewMode &amp;&amp; !(isDisabled==true)" />
+                <input type="button" class="btn btn-main" ng-click="disable(module)" value="{{ resourceBundle.disableBtnValue }}" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !(isDisabled==true)" />
+                <input type="button" class="btn" ng-if="isNewMode" ng-click="closeForm()" value="{{ resourceBundle.backBtnValue }}" />
             </div>
         </form>
     </div>

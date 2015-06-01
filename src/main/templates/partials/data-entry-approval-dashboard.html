@@ -84,8 +84,8 @@
                     <td>
                         <ul>
                             <li ng-repeat="item in items | orderBy: 'period'">
-                                <span ng-if="!item.isComplete">Project Level</span>
-                                <span ng-if="item.isComplete">Coordination Level</span>
+                                <span ng-if="!item.isComplete">{{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
+                                <span ng-if="item.isComplete">{{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
                             </li>
                         </ul>
                     </td>

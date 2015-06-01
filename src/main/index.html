@@ -20,7 +20,7 @@
                             <img src="img/logo.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1">
                         </div>
                         <div class="nav navbar-nav navbar-right">
-                            <p class="text-right login-message">&nbsp;<small ng-show="isLoggedIn">Logged in as {{currentUser.userCredentials.username}} <a ng-click="logout()" href="#/login" tabindex="-1">({{ resourceBundle.logoutLabel }})</a></small></p>
+                            <p class="text-right login-message">&nbsp;<small ng-show="isLoggedIn">{{ resourceBundle.loggedInLabel }} {{currentUser.userCredentials.username}} <a ng-click="logout()" href="#/login" tabindex="-1">({{ resourceBundle.logoutLabel }})</a></small></p>
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
                                     <span class="glyphicon dhis-status" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline, 'dhis-offline':!isDhisOnline}" ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
@@ -35,7 +35,7 @@
                                             <li ng-include="'templates/partials/download-data.html'"> </li>
                                             <li class="dropdown-submenu pull-left" ng-include="'templates/partials/clone.html'"></li>
                                             <li class="dropdown-submenu pull-left" ng-include="'templates/partials/select-language.html'"></li>
-                                            <li><a href="#/productKeyPage" tabindex="-1">Update Product Key</a></li>
+                                            <li><a href="#/productKeyPage" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
                                             <li class="divider"></li>
                                             <li><a ng-click="logout()" href="#/login" id="linkToLogout" tabindex="-1">{{ resourceBundle.logoutLabel }}</a></li>
                                         </ul>
@@ -49,12 +49,14 @@
         </header>
         <div class="container" style="padding-top:10px;" ng-if="isLoggedIn">
             <ul class="nav nav-tabs">
-                <li role="presentation" ng-class="{ active: isActive('\/dashboard$')}" ng-if="!hasRoles(['Superuser'])"><a href="#/dashboard">HOME</a></li>
+                <li role="presentation" ng-class="{ active: isActive('\/dashboard$')}" ng-if="!hasRoles(['Superuser'])">
+                    <a href="#/dashboard">{{ resourceBundle.homeMenuLabel }}</a>
+                </li>
                 <li role="presentation" ng-class="{ active: isActive('\/aggregate-data-entry$')}" ng-if="hasRoles(['Data entry user'])"><a href="#/aggregate-data-entry">{{ resourceBundle.dataEntryLabel }}</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/data-approval$')}" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])"><a href="#/data-approval">{{ resourceBundle.approveDataLabel }}</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/projects$')}" ng-if="hasRoles(['Superuser'])"><a href="#/projects">{{ resourceBundle.projectsLabel }}</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/line-list-summary\/[a-zA-Z0-9]{11}')}" class="dropdown" ng-if="hasRoles(['Data entry user']) && allUserLineListModules.length > 0" dropdown>
-                    <a class="dropdown-toggle" dropdown-toggle href="" role="button">LineList Data Entry <span class="caret"></span></a>
+                    <a class="dropdown-toggle" dropdown-toggle href="" role="button">{{ resourceBundle.lineListDataEntryMenuLabel }} <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         <li ng-repeat="module in allUserLineListModules | orderBy:'displayName'"><a class="line-list-selections" ng-href="#/line-list-summary/{{module.id}}" tabindex="-1">{{module.displayName}}</a></li>
                     </ul>

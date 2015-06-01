@@ -203,7 +203,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "data": [periodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": "en",
-                    "desc": "approve data at project level for 2014W14, Module: Mod1"
+                    "desc": "approve data at project level for 2014W14, Mod1"
 
                 }, "dataValues");
 
@@ -329,7 +329,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "data": [periodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": "en",
-                    "desc": "approve data at coordination level for 2014W14, Module: Mod1"
+                    "desc": "approve data at coordination level for 2014W14, Mod1"
                 }, "dataValues");
                 expect(scope.secondLevelApproveSuccess).toBe(true);
                 expect(scope.approveError).toBe(false);

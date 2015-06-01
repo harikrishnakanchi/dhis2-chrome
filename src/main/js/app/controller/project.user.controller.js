@@ -5,12 +5,15 @@ define(["dhisId", "properties"], function(dhisId, properties) {
 
         var allRoles = {
             "Project": [{
-                "name": "Data entry user"
+                "name": "Data entry user",
+                "displayName": $scope.resourceBundle.dataEntryUserLabel
             }, {
-                "name": "Project Level Approver"
+                "name": "Project Level Approver",
+                "displayName": $scope.resourceBundle.projectLevelUserLabel
             }],
             "Country": [{
-                "name": "Coordination Level Approver"
+                "name": "Coordination Level Approver",
+                "displayName": $scope.resourceBundle.coordinationLevelUserLabel
             }]
         };
 
@@ -21,7 +24,7 @@ define(["dhisId", "properties"], function(dhisId, properties) {
             $scope.userNameMatchExpr = orgUnitType === "Country" ? new RegExp("[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\\.[a-zA-Z]{2,4}$", "i") : new RegExp(userNamePrefix + "(.)+", "i");
             $scope.patternValidationMessage = orgUnitType === "Country" ? $scope.resourceBundle.emailValidation : $scope.resourceBundle.usernamePrefixValidation + userNamePrefix;
 
-            $scope.userNamePlaceHolder = _.isEmpty(userNamePrefix) ? "" : "Username should begin with " + userNamePrefix;
+            $scope.userNamePlaceHolder = _.isEmpty(userNamePrefix) ? "" : $scope.resourceBundle.usernamePrefixValidation + " " + userNamePrefix;
 
             $scope.userRoles = allRoles[orgUnitType];
             $scope.form = {};

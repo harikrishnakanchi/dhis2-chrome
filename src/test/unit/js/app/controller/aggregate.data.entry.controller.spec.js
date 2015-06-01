@@ -258,7 +258,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     data: [],
                     type: 'uploadDataValues',
                     locale: 'en',
-                    desc: 'upload data for 2014W14, Module: Mod1'
+                    desc: 'upload data for 2014W14, Mod1'
                 }, 'dataValues');
 
                 expect(scope.submitSuccess).toBe(true);
@@ -617,13 +617,13 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "data": [periodAndOrgUnit],
                     "type": "uploadCompletionData",
                     "locale": "en",
-                    "desc": "approve data at project level for 2014W14, Module: Mod1"
+                    "desc": "approve data at project level for 2014W14, Mod1"
                 }, "dataValues");
                 expect(hustle.publish).toHaveBeenCalledWith({
                     "data": [periodAndOrgUnit],
                     "type": "uploadApprovalData",
                     "locale": "en",
-                    "desc": "approve data at coordination level for 2014W14, Module: Mod1"
+                    "desc": "approve data at coordination level for 2014W14, Mod1"
                 }, "dataValues");
                 expect(scope.submitAndApprovalSuccess).toBe(true);
             });
@@ -667,7 +667,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "data": periodAndOrgUnit,
                     "type": "deleteApprovals",
                     "locale": "en",
-                    "desc": "restart approval process for 2014W14, Module: Mod1"
+                    "desc": "restart approval process for 2014W14, Mod1"
                 }, "dataValues");
             });
 

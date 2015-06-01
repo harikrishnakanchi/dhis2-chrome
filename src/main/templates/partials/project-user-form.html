@@ -3,12 +3,12 @@
     <form name="form.userForm" class="form-horizontal" role="form" novalidate ng-if="isNewMode">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Create User</h3>
+                <h3 class="panel-title">{{ resourceBundle.createUserLabel }}</h3>
             </div>
             <div class="panel-body">
                 <ul>
                     <li class="form-group">
-                        <label for="userName" class="col-sm-4 col-md-4 control-label required">Username</label>
+                        <label for="userName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.usernameLabel }}</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="text" class="form-control" name="userName" id="userName" ng-model="projectUser.username" not-in="existingUsers" ng-pattern="userNameMatchExpr" placeholder="{{userNamePlaceHolder}}" required/>
                             <div ng-show="form.userForm.userName.$dirty &amp;&amp; form.userForm.userName.$invalid">
@@ -19,9 +19,9 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="userRole" class="col-sm-4 col-md-4 control-label required">Role</label>
+                        <label for="userRole" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.roleLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <select type="text" class="form-control" name="userRole" id="userRole" ng-model="projectUser.userRole " ng-options="role as role.name for role in userRoles" required>
+                            <select type="text" class="form-control" name="userRole" id="userRole" ng-model="projectUser.userRole " ng-options="role as role.displayName for role in userRoles" required>
                                 <option value=""></option>
                             </select>
                             <div ng-show="form.userForm.userRole.$dirty &amp;&amp; form.userForm.userRole.$invalid">
@@ -31,9 +31,9 @@
                     </li>
                     <li>
                         <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
-                            <input type="button" class="btn btn-main" ng-disabled="form.userForm.$invalid" value="Save" ng-click="save(projectUser, orgUnit)" />
-                            <input type="button" class="btn" ng-click="reset()" value="Reset">
-                            <input type="button" class="btn" ng-click="closeForm()" value="Back" />
+                            <input type="button" class="btn btn-main" ng-disabled="form.userForm.$invalid" value="{{ resourceBundle.saveBtnValue }}" ng-click="save(projectUser, orgUnit)" />
+                            <input type="button" class="btn" ng-click="reset()" value="{{ resourceBundle.resetBtnValue }}">
+                            <input type="button" class="btn" ng-click="closeForm()" value="{{ resourceBundle.backBtnValue }}" />
                         </div>
                     </li>
                 </ul>
@@ -43,7 +43,7 @@
     <div ng-if="!isNewMode">
         <div class="panel panel-default" ng-if="!isNewMode &amp;&amp; orgUnitUsers.length !== 0">
             <div class="panel-heading">
-                <h3 class="panel-title">User List</h3>
+                <h3 class="panel-title">{{ resourceBundle.userListLabel }}</h3>
             </div>
             <div class="panel-body">
                 <div ng-show="isUserToBeDisabled &amp;&amp; userStateSuccessfullyToggled" class="alert alert-success">{{ resourceBundle.userDisableSuccess }}</div>
@@ -51,9 +51,9 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Username</th>
-                            <th>Role</th>
-                            <th>Enable/Disable</th>
+                            <th>{{ resourceBundle.usernameLabel }}</th>
+                            <th>{{ resourceBundle.roleLabel }}</th>
+                            <th>{{ resourceBundle.enableDisableLabel }}</th>
                         </tr>
                     </thead>
                     <tbody>

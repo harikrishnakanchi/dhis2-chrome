@@ -3,20 +3,20 @@
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
     <div class="top-actions" ng-if="!isNewMode">
-        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create Project" ng-click="openInNewMode('Project')" />
-        <input type="button" class="btn btn-sub btn-sm pull-right" value="Create User" ng-click="openInNewMode('User')" />
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createProjectBtnLabel }}" ng-click="openInNewMode('Project')" />
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createUserBtnLabel }}" ng-click="openInNewMode('User')" />
     </div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorCountry }}</div>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 ng-if="isNewMode" class="panel-title">Create Country</h3>
-            <h3 ng-if="!isNewMode" class="panel-title">Country Details</h3>
+            <h3 ng-if="isNewMode" class="panel-title">{{ resourceBundle.createCountryLabel }}</h3>
+            <h3 ng-if="!isNewMode" class="panel-title">{{ resourceBundle.countryDetailsLabel }}</h3>
         </div>
         <div class="panel-body">
             <form name="createForm" class="form-horizontal" role="form" novalidate ng-submit="save(newOrgUnit, orgUnit)">
                 <ul>
                     <li class="form-group">
-                        <label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label required">Name</label>
+                        <label for="newOrgUnitName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.nameLabel }}</label>
                         <div class="col-sm-6">
                             <input ng-disabled="!isNewMode" type="text" class="form-control" name="newOrgUnitName" id="newOrgUnitName" ng-model="newOrgUnit.name" required not-in="allCountries" />
                             <div ng-show="createForm.newOrgUnitName.$dirty &amp;&amp; createForm.newOrgUnitName.$invalid">
@@ -26,7 +26,7 @@
                         </div>
                     </li>
                     <li class="form-group">
-                        <label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label required">Opening Date</label>
+                        <label for="newOrgUnitOpeningDate" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.openingDateLabel }}</label>
                         <div class="col-sm-6 col-md-6">
                             <p class="input-group">
                                 <div>
@@ -41,9 +41,9 @@
                     </li>
                     <li ng-if="isNewMode">
                         <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
-                            <input type="submit" class="btn btn-main" ng-disabled="createForm.$invalid" value="Save" />
-                            <input type="button" class="btn" ng-click="reset()" value="Reset">
-                            <input type="button" class="btn" ng-click="closeForm(orgUnit)" value="Back">
+                            <input type="submit" class="btn btn-main" ng-disabled="createForm.$invalid" value="{{ resourceBundle.saveBtnValue }}" />
+                            <input type="button" class="btn" ng-click="reset()" value="{{ resourceBundle.resetBtnValue }}">
+                            <input type="button" class="btn" ng-click="closeForm(orgUnit)" value="{{ resourceBundle.backBtnValue }}">
                         </div>
                     </li>
                 </ul>
