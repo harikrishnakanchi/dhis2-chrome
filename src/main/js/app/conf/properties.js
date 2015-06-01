@@ -6,7 +6,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
                 "intervalInMinutes": 720,
             },
             "types": ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements",
-                "sections", "organisationUnitLevels", "users", "programStages", "optionSets", "indicators", "translations", "organisationUnitGroupSets"
+                "sections", "organisationUnitLevels", "users", "programStages", "optionSets", "translations", "organisationUnitGroupSets"
             ]
         },
         "http": {

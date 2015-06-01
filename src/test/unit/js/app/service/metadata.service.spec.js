@@ -62,7 +62,7 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
             };
 
             var filterString = "attributes=false&dataApprovalLevels=false&userRoles=false&userGroups=false&options=false" +
-                "&dashboardItems=false&dashboards=false&dataElementGroups=false&dataElementGroupSets=false&indicatorTypes=false" +
+                "&dashboardItems=false&dashboards=false&dataElementGroups=false&dataElementGroupSets=false&indicators=false&indicatorTypes=false" +
                 "&organisationUnits=false&organisationUnitGroups=false&sqlViews=false&charts=false" +
                 "&reportTables=false&dataSets=false&eventReports=false&eventCharts=false&programs=false&programStageSections=false" +
                 "&trackedEntities=false";
@@ -86,7 +86,7 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
             };
 
             var filterString = "attributes=false&dataApprovalLevels=false&userRoles=false&userGroups=false&options=false" +
-                "&dashboardItems=false&dashboards=false&dataElementGroups=false&dataElementGroupSets=false&indicatorTypes=false" +
+                "&dashboardItems=false&dashboards=false&dataElementGroups=false&dataElementGroupSets=false&indicators=false&indicatorTypes=false" +
                 "&organisationUnits=false&organisationUnitGroups=false&sqlViews=false&charts=false" +
                 "&reportTables=false&dataSets=false&eventReports=false&eventCharts=false&programs=false&programStageSections=false" +
                 "&trackedEntities=false";
