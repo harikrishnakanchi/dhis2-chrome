@@ -9,7 +9,7 @@ define(["moment", "dhisUrl"], function(moment, dhisUrl) {
                 "params": {
                     "startDate": startDate,
                     "endDate": moment().format("YYYY-MM-DD"),
-                    "paging": false,
+                    "skipPaging": true,
                     "orgUnit": orgUnitId,
                     "ouMode": "DESCENDANTS"
                 }

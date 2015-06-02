@@ -29,7 +29,7 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
             var orgUnitId = "ou1";
             var endDate = moment().format("YYYY-MM-DD");
             var startDate = '2014-09-25';
-            httpBackend.expectGET(properties.dhis.url + "/api/events?endDate=" + endDate + "&orgUnit=ou1&ouMode=DESCENDANTS&paging=false&startDate=" + startDate).respond(200, expectedEvents);
+            httpBackend.expectGET(properties.dhis.url + "/api/events?endDate=" + endDate + "&orgUnit=ou1&ouMode=DESCENDANTS&skipPaging=true&startDate=" + startDate).respond(200, expectedEvents);
 
             eventService.getRecentEvents(startDate, orgUnitId).then(function(response) {
                 expect(response).toEqual(expectedEvents);
