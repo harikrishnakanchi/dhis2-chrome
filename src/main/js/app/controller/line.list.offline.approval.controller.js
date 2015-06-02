@@ -1,9 +1,18 @@
 define(["lodash", "moment"], function(_, moment) {
     return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository) {
 
-        $scope.getCount = function(optionId) {
+        $scope.isGenderFilterApplied = false;
+        $scope.isAgeFilterApplied = false;
+
+        $scope.getCount = function(optionCode, dataElementId, filterCode) {
             return _.filter($scope.dataValues._showInOfflineSummary, function(dv) {
-                return dv.value === optionId;
+                return dv.value === optionCode && dv.dataElement === dataElementId && applyGenderFilters(dv, filterCode) && applyAgeFilters(dv, filterCode);
+            }).length;
+        };
+
+        $scope.getProcedureCount = function(optionCode, filterCode) {
+            return _.filter($scope.dataValues._procedures, function(dv) {
+                return dv.value === optionCode && applyGenderFilters(dv, filterCode) && applyAgeFilters(dv, filterCode);
             }).length;
         };
 
@@ -12,17 +21,34 @@ define(["lodash", "moment"], function(_, moment) {
             return _.contains(dataElementIds, dataElementId);
         };
 
-        $scope.getProcedureCount = function(optionId) {
-            return _.filter($scope.dataValues._procedures, function(dv) {
-                return dv.value === optionId;
-            }).length;
+        $scope.shouldShowInGenderFilter = function(optionCode, dataElementId) {
+            return $scope.getCount(optionCode, dataElementId, "Male") !== 0 || $scope.getCount(optionCode, dataElementId, "Female") !== 0 || $scope.getCount(optionCode, dataElementId, "Not recorded") !== 0;
         };
 
-        $scope.getProcedureName = function(dataValue, optionId) {
-            var option = _.find($scope.optionSetMapping[dataValue.optionSet.id], {
-                'id': optionId
-            });
-            return option.name;
+        $scope.shouldShowInAgeFilter = function(optionCode, dataElementId) {
+            return $scope.getCount(optionCode, dataElementId, [0, 5]) !== 0 || $scope.getCount(optionCode, dataElementId, [5, 15]) !== 0 || $scope.getCount(optionCode, dataElementId, [14, 9999]) !== 0;
+        };
+
+
+        var applyGenderFilters = function(dv, code) {
+            if ($scope.isGenderFilterApplied) {
+                var result = _.any($scope.eventsMap[dv.eventId], {
+                    "value": code + "_" + $scope.program.name
+                });
+                return result;
+            } else
+                return true;
+        };
+
+        var applyAgeFilters = function(dv, ageRange) {
+            if ($scope.isAgeFilterApplied) {
+                var result = _.any($scope.eventsMap[dv.eventId], function(dataValue) {
+                    var intValue = parseInt(dataValue.value);
+                    return _.endsWith(dataValue.code, "_age_showInOfflineSummaryFilters") && intValue > ageRange[0] && intValue < ageRange[1];
+                });
+                return result;
+            } else
+                return true;
         };
 
         var getPeriod = function() {
@@ -49,8 +75,12 @@ define(["lodash", "moment"], function(_, moment) {
 
         var loadGroupedDataValues = function(events) {
             var allDataValues = _.flatten(_.map(events, function(event) {
-                return event.dataValues;
+                return _.map(event.dataValues, function(edv) {
+                    edv.eventId = event.event;
+                    return edv;
+                });
             }));
+            $scope.eventsMap = _.groupBy(allDataValues, "eventId");
 
             $scope.dataValues = _.groupBy(allDataValues, function(dv) {
                 if (_.endsWith(dv.code, "_showInOfflineSummary")) {
@@ -63,7 +93,8 @@ define(["lodash", "moment"], function(_, moment) {
                     return "_procedures";
                 }
             });
-            $scope.procedureDataValueIds = _.unique(_.pluck($scope.dataValues._procedures, "value"));
+
+            $scope.procedureDataValueCodes = _.unique(_.pluck($scope.dataValues._procedures, "value"));
             $scope.procedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
         };
 

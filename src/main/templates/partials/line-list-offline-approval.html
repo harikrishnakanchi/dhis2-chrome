@@ -1,24 +1,110 @@
 <div ng-controller="lineListOfflineApprovalController">
-    <div ng-repeat="programStage in program.programStages">
-        <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
-            <div ng-repeat="psde in section.programStageDataElements">
-                <div ng-if="shouldShowInOfflineSummary(psde.dataElement.id)">
-                    {{psde.dataElement.name}}
-                    <table class="table table-bordered">
-                        <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]" ng-if="getCount(option.id) !== 0">
-                            <td>{{option.name}}</td>
-                            <td>{{getCount(option.id)}}</td>
-                        </tr>
-                    </table>
+    <input type="checkbox" ng-model="isGenderFilterApplied" /> Filter By Gender
+    <input type="checkbox" ng-model="isAgeFilterApplied" /> Filter By Age
+    <div ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
+        <div ng-repeat="programStage in program.programStages">
+            <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
+                <div ng-repeat="psde in section.programStageDataElements">
+                    <div ng-if="shouldShowInOfflineSummary(psde.dataElement.id)">
+                        {{psde.dataElement.name}}
+                        <table class="table table-bordered">
+                            <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]" ng-if="getCount(option.code, psde.dataElement.id) !== 0">
+                                <td>{{option.name}}</td>
+                                <td>{{getCount(option.code, psde.dataElement.id)}}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
+        <table class="table table-bordered">
+            Procedures Performed
+            <tr ng-repeat="pdv in procedureDataValueCodes">
+                <td>{{pdv}}</td>
+                <td>{{procedureDataValues[pdv].length}}</td>
+            </tr>
+        </table>
     </div>
-    <table class="table table-bordered">
-    Procedures Performed
-        <tr ng-repeat="pdv in procedureDataValueIds">
-            <td>{{getProcedureName(procedureDataValues[pdv][0],pdv)}}</td>
-            <td>{{getProcedureCount(pdv)}}</td>
-        </tr>
-    </table>
+    <div ng-if="isGenderFilterApplied">
+        <div ng-repeat="programStage in program.programStages">
+            <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
+                <div ng-repeat="psde in section.programStageDataElements">
+                    <div ng-if="shouldShowInOfflineSummary(psde.dataElement.id)">
+                        {{psde.dataElement.name}}
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Option Name</th>
+                                <th>Male</th>
+                                <th>Female</th>
+                                <th>Not recorded</th>
+                            </tr>
+                            <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]" ng-if="shouldShowInGenderFilter(option.code, psde.dataElement.id)">
+                                <td>{{option.name}}</td>
+                                <td>{{getCount(option.code, psde.dataElement.id, "Male")}}</td>
+                                <td>{{getCount(option.code,psde.dataElement.id, "Female")}}</td>
+                                <td>{{getCount(option.code,psde.dataElement.id, "Not recorded")}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered">
+            Procedures Performed
+            <tr>
+                <th>Option Name</th>
+                <th>Male</th>
+                <th>Female</th>
+                <th>Not recorded</th>
+            </tr>
+            <tr ng-repeat="pdv in procedureDataValueCodes">
+                <td>{{pdv}}</td>
+                <td>{{getProcedureCount(pdv,"Male")}}</td>
+                <td>{{getProcedureCount(pdv,"Female")}}</td>
+                <td>{{getProcedureCount(pdv,"Not recorded")}}</td>
+            </tr>
+        </table>
+    </div>
+    <div ng-if="isAgeFilterApplied">
+        <div ng-repeat="programStage in program.programStages">
+            <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
+                <div ng-repeat="psde in section.programStageDataElements">
+                    <div ng-if="shouldShowInOfflineSummary(psde.dataElement.id)">
+                        {{psde.dataElement.name}}
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Option Name</th>
+                                <th>
+                                    < 5 </th>
+                                        <th> 5 - 14 </th>
+                                        <th> > 15</th>
+                            </tr>
+                            <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]" ng-if="shouldShowInAgeFilter(option.code, psde.dataElement.id)">
+                                <td>{{option.name}}</td>
+                                <td>{{getCount(option.code, psde.dataElement.id, [0,5])}}</td>
+                                <td>{{getCount(option.code,psde.dataElement.id, [5,15])}}</td>
+                                <td>{{getCount(option.code,psde.dataElement.id, [14, 9999])}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered">
+            Procedures Performed
+            <tr>
+                <th>Option Name</th>
+                <th>
+                    < 5 </th>
+                        <th> 5 - 14 </th>
+                        <th> > 15</th>
+            </tr>
+            <tr ng-repeat="pdv in procedureDataValueCodes">
+                <td>{{pdv}}</td>
+                <td>{{getProcedureCount(pdv,[0,5])}}</td>
+                <td>{{getProcedureCount(pdv,[5,15])}}</td>
+                <td>{{getProcedureCount(pdv,[14, 9999])}}</td>
+            </tr>
+        </table>
+    </div>
 </div>

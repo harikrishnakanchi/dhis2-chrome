@@ -30,27 +30,48 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     "event": "event1",
                     "dataValues": [{
                         "code": "_showInOfflineSummary",
-                        "value": "option1",
-                        "dataElement": "de1",
+                        "value": "Green",
+                        "dataElement": "Triage Status",
+
                     }, {
                         "code": "_showInOfflineSummary",
-                        "value": "option2",
-                        "dataElement": "de2",
+                        "value": "4 months",
+                        "dataElement": "Time between admission and discharge",
+                    }, {
+                        "code": "_procedures",
+                        "value": "procedure 1",
+                        "dataElement": "Procedure performed 1",
                     }, {
                         "code": "_showInOfflineSummaryFilters",
-                        "value": "option1",
-                        "dataElement": "de3",
+                        "value": "Male_er",
+                        "dataElement": "gender",
+                    }, {
+                        "code": "_age_showInOfflineSummaryFilters",
+                        "value": 6,
+                        "dataElement": "age",
                     }]
                 }, {
                     "event": "event2",
                     "dataValues": [{
-                        "code": "_procedures",
-                        "value": "option3",
-                        "dataElement": "de4",
+                        "code": "_showInOfflineSummary",
+                        "value": "Green",
+                        "dataElement": "Triage Status",
                     }, {
                         "code": "_procedures",
-                        "value": "option3",
-                        "dataElement": "de5",
+                        "value": "procedure 1",
+                        "dataElement": "Procedure performed 1",
+                    }, {
+                        "code": "_procedures",
+                        "value": "procedure 2",
+                        "dataElement": "Procedure performed 2",
+                    }, {
+                        "code": "_showInOfflineSummaryFilters",
+                        "value": "Female_er",
+                        "dataElement": "gender",
+                    }, {
+                        "code": "_age_showInOfflineSummaryFilters",
+                        "value": 4,
+                        "dataElement": "age",
                     }]
                 }];
 
@@ -85,68 +106,121 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.optionSetMapping).toEqual(optionSetMapping);
                 expect(scope.dataValues).toEqual({
                     "_showInOfflineSummary": [{
-                        "code": '_showInOfflineSummary',
-                        "value": 'option1',
-                        "dataElement": "de1"
+                        "code": "_showInOfflineSummary",
+                        "value": "Green",
+                        "dataElement": "Triage Status",
+                        "eventId": "event1"
                     }, {
-                        "code": '_showInOfflineSummary',
-                        "value": 'option2',
-                        "dataElement": "de2"
+                        "code": "_showInOfflineSummary",
+                        "value": "4 months",
+                        "dataElement": "Time between admission and discharge",
+                        "eventId": "event1"
+                    }, {
+                        "code": "_showInOfflineSummary",
+                        "value": "Green",
+                        "dataElement": "Triage Status",
+                        "eventId": "event2"
                     }],
                     "_showInOfflineSummaryFilters": [{
-                        "code": '_showInOfflineSummaryFilters',
-                        "value": 'option1',
-                        "dataElement": "de3"
+                        "code": "_showInOfflineSummaryFilters",
+                        "value": "Male_er",
+                        "dataElement": "gender",
+                        "eventId": "event1"
+                    }, {
+                        "code": "_age_showInOfflineSummaryFilters",
+                        "value": 6,
+                        "dataElement": "age",
+                        "eventId": "event1"
+                    }, {
+                        "code": "_showInOfflineSummaryFilters",
+                        "value": "Female_er",
+                        "dataElement": "gender",
+                        "eventId": "event2"
+                    }, {
+                        "code": "_age_showInOfflineSummaryFilters",
+                        "value": 4,
+                        "dataElement": "age",
+                        "eventId": "event2"
                     }],
                     "_procedures": [{
-                        "code": '_procedures',
-                        "value": 'option3',
-                        "dataElement": "de4"
+                        "code": "_procedures",
+                        "value": "procedure 1",
+                        "dataElement": "Procedure performed 1",
+                        "eventId": "event1"
                     }, {
-                        "code": '_procedures',
-                        "value": 'option3',
-                        "dataElement": "de5"
+                        "code": "_procedures",
+                        "value": "procedure 1",
+                        "dataElement": "Procedure performed 1",
+                        "eventId": "event2"
+                    }, {
+                        "code": "_procedures",
+                        "value": "procedure 2",
+                        "dataElement": "Procedure performed 2",
+                        "eventId": "event2"
                     }]
                 });
-                expect(scope.procedureDataValueIds).toEqual(["option3"]);
+                expect(scope.procedureDataValueCodes).toEqual(['procedure 1', 'procedure 2']);
                 expect(scope.procedureDataValues).toEqual({
-                    "option3": [{
-                        "code": '_procedures',
-                        "value": 'option3',
-                        "dataElement": "de4"
+                    "procedure 1": [{
+                        "code": "_procedures",
+                        "value": "procedure 1",
+                        "dataElement": "Procedure performed 1",
+                        "eventId": "event1"
                     }, {
-                        "code": '_procedures',
-                        "value": 'option3',
-                        "dataElement": "de5"
+                        "code": "_procedures",
+                        "value": "procedure 1",
+                        "dataElement": "Procedure performed 1",
+                        "eventId": "event2"
+                    }],
+                    "procedure 2": [{
+                        "code": "_procedures",
+                        "value": "procedure 2",
+                        "dataElement": "Procedure performed 2",
+                        "eventId": "event2"
                     }]
                 });
             });
 
-            it("should get count", function() {
-                expect(scope.getCount("option1")).toEqual(1);
+            it("should get count when no filters are applied", function() {
+                expect(scope.getCount("Green", "Triage Status")).toEqual(2);
             });
 
-            it("should get procedure count", function() {
-                expect(scope.getProcedureCount("option3")).toEqual(2);
-            });
-
-            it("should get procedure name", function() {
-                var dataValue = {
-                    "optionSet": {
-                        "id": "os1",
-                    }
+            it("should get count when gender filter is applied", function() {
+                scope.isGenderFilterApplied = true;
+                scope.program = {
+                    "name": "er"
                 };
-                var result = scope.getProcedureName(dataValue, "os1o1");
+                scope.$apply();
 
-                expect(result).toEqual("os1o1 name");
+                expect(scope.getCount("Green", "Triage Status", "Female")).toEqual(1);
+            });
+
+            it("should get count when age filter is applied", function() {
+                scope.isAgeFilterApplied = true;
+                scope.program = {
+                    "name": "er"
+                };
+                scope.$apply();
+
+                expect(scope.getCount("Green", "Triage Status", [0, 5])).toEqual(1);
             });
 
             it("should return true if it should be shown in offline summary", function() {
-                expect(scope.shouldShowInOfflineSummary("de1")).toEqual(true);
+                expect(scope.shouldShowInOfflineSummary("Triage Status")).toEqual(true);
             });
 
             it("should return false if it should not be shown in offline summary", function() {
-                expect(scope.shouldShowInOfflineSummary("de4")).toEqual(false);
+                expect(scope.shouldShowInOfflineSummary("gender")).toEqual(false);
+            });
+
+            it("should return true if it should be shown in gender filter", function() {
+                expect(scope.shouldShowInGenderFilter("Green", "Triage Status")).toEqual(true);
+                expect(scope.shouldShowInGenderFilter("Foobar")).toEqual(false);
+            });
+
+            it("should return true if it should be shown in gender filter", function() {
+                expect(scope.shouldShowInAgeFilter("Green", "Triage Status")).toEqual(true);
+                expect(scope.shouldShowInAgeFilter("Foobar")).toEqual(false);
             });
         });
     });
