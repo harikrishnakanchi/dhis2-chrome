@@ -246,5 +246,16 @@
     "selectLanguageLabel": "Select language",
     "projectTypeLabel": "Project Type",
     "epidemicIsolationUnitLabel": "Epidemic Isolation Unit",
-    "mobileClinicLabel": "Mobile Clinic"
+    "mobileClinicLabel": "Mobile Clinic",
+    "filterByGender": "Filter By Gender",
+    "filterByAge": "Filter By Age",
+    "optionName": "Option Name",
+    "numberOfEvents": "Number of Events",
+    "proceduresPerformed": "Procedures Performed",
+    "male": "Male",
+    "female": "Female",
+    "notRecorded": "Not Recorded",
+    "lessThanFive": "< 5 Years",
+    "fiveToFourtenn": " 5 - 14 Years",
+    "greaterThanFifteen": ">= 15 Years"
 }
