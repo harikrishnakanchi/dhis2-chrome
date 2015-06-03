@@ -31,6 +31,14 @@
                                     <label for="community">
                                         <input type="radio" ng-model="opUnit.type" id="community" value="Community" ng-disabled="isDisabled" required> {{ resourceBundle.communityLabel }} </label>
                                 </div>
+                                <div class="radio-inline">
+                                    <label for="epidemicIsolationUnit">
+                                        <input type="radio" ng-model="opUnit.type" id="epidemicIsolationUnit" value="Epidemic Isolation Unit" ng-disabled="isDisabled" required> {{ resourceBundle.epidemicIsolationUnitLabel }} </label>
+                                </div>
+                                <div class="radio-inline">
+                                    <label for="mobileClinic">
+                                        <input type="radio" ng-model="opUnit.type" id="mobileClinic" value="Mobile Clinic" ng-disabled="isDisabled" required> {{ resourceBundle.mobileClinicLabel }} </label>
+                                </div>
                             </div>
                         </li>
                         <li class="form-group">

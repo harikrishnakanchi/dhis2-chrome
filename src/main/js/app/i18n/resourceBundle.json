@@ -244,6 +244,7 @@
     "notConnectedWithPendingRequests": "OFFLINE - PENDING REQUESTS",
     "menu": "Menu",
     "selectLanguageLabel": "Select language",
-    "projectTypeLabel": "Project Type"
-
+    "projectTypeLabel": "Project Type",
+    "epidemicIsolationUnitLabel": "Epidemic Isolation Unit",
+    "mobileClinicLabel": "Mobile Clinic"
 }
