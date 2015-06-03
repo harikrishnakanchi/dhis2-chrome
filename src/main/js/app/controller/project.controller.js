@@ -176,7 +176,7 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
 
         var prepareEditForm = function() {
             $scope.reset();
-            $scope.newOrgUnit = orgUnitMapper.mapToProject($scope.orgUnit, $scope.allContexts, $scope.allPopTypes, $scope.reasonForIntervention, $scope.modeOfOperation, $scope.modelOfManagement);
+            $scope.newOrgUnit = orgUnitMapper.mapToProject($scope.orgUnit, $scope.allContexts, $scope.allPopTypes, $scope.reasonForIntervention, $scope.modeOfOperation, $scope.modelOfManagement, $scope.allProjectTypes);
             orgUnitRepository.getAllProjects().then(function(allProjects) {
                 $scope.peerProjects = _.without(orgUnitRepository.getChildOrgUnitNames($scope.orgUnit.parent.id), $scope.orgUnit.name);
             });
@@ -198,6 +198,9 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
                 }).organisationUnitGroups;
                 $scope.modelOfManagement = _.find(data, {
                     "code": "model_of_management"
+                }).organisationUnitGroups;
+                $scope.allProjectTypes = _.find(data, {
+                    "code": "project_type"
                 }).organisationUnitGroups;
 
                 if ($scope.isNewMode)

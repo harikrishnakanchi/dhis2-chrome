@@ -243,5 +243,7 @@
     "notConnectedNoPendingRequests": "OFFLINE - NO PENDING REQUESTS",
     "notConnectedWithPendingRequests": "OFFLINE - PENDING REQUESTS",
     "menu": "Menu",
-    "selectLanguageLabel": "Select language"
+    "selectLanguageLabel": "Select language",
+    "projectTypeLabel": "Project Type"
+
 }

@@ -75,6 +75,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Auto Approve"
                     },
                     "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "projectType",
+                        "name": "Project Type"
+                    },
+                    "value": "Some Type"
                 }]
             };
 
@@ -101,8 +107,12 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "id": "a11a7a5d55a",
                 "name": "Collaboration"
             }];
+            var allProjectTypes = [{
+                "id": "a11a7aty65a",
+                "name": "Some Type"
+            }];
 
-            var result = orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement);
+            var result = orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
 
             var expectedResult = {
                 "name": dhisProject.name,
@@ -118,6 +128,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 },
                 "endDate": moment("2011-01-01").toDate(),
                 "projectCode": "RU118",
+                "projectType": {
+                    "id": "a11a7aty65a",
+                    "name": "Some Type"
+                },
                 "reasonForIntervention": {
                     "id": "a8014cfca5c",
                     "name": "Armed Conflict"
@@ -166,6 +180,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "populationType": undefined,
                 "endDate": undefined,
                 "projectCode": "RU118",
+                "projectType": undefined,
                 "reasonForIntervention": undefined,
                 "modeOfOperation": undefined,
                 "modelOfManagement": undefined,
@@ -176,7 +191,6 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
         });
 
         it("should transform orgUnit to contain attributes as per DHIS", function() {
-
             var orgUnit = {
                 "name": "Org1",
                 "openingDate": moment("2010-01-01").toDate(),
@@ -189,6 +203,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "title": "val6"
                 },
                 "projectCode": "AB001",
+                "projectType": {
+                    "name": "Some Type"
+                },
                 "reasonForIntervention": {
                     "title": "Armed Conflict"
                 },
@@ -303,6 +320,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Is New Data Model"
                     },
                     "value": "true"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "projectType",
+                        "name": "Project Type"
+                    },
+                    "value": "Some Type"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -602,6 +627,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "name": "val6"
                 },
                 "projectCode": "AB001",
+                "projectType": {
+                    "name": "Some Type"
+                },
                 "reasonForIntervention": {
                     "name": "Armed Conflict"
                 },
@@ -701,6 +729,14 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Is New Data Model"
                     },
                     "value": "true"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "projectType",
+                        "name": "Project Type"
+                    },
+                    "value": "Some Type"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",

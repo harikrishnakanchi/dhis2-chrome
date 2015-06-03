@@ -36,6 +36,14 @@
                         </div>
                     </li>
                     <li class="form-group">
+                        <label for="newOrgUnitProjType" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.projectTypeLabel }}</label>
+                        <div class="col-sm-6 col-md-6">
+                            <select name="newOrgUnitProjType" id="newOrgUnitProjType" class="input-sm" ng-model="newOrgUnit.projectType" ng-options="p.name for p in allProjectTypes | orderBy:'name'">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class="form-group">
                         <label for="newOrgUnitLocation" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.locationLabel }}</label>
                         <div class="col-sm-6 col-md-6">
                             <input type="text" class="form-control" name="newOrgUnitLocation" id="newOrgUnitLocation" ng-model="newOrgUnit.location" />

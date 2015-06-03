@@ -81,6 +81,14 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "name": "Is New Data Model"
             },
             "value": "true"
+        }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
+            "attribute": {
+                "code": "projectType",
+                "name": "Project Type"
+            },
+            "value": orgUnit.projectType ? orgUnit.projectType.title || orgUnit.projectType.name : orgUnit.projectType
         });
 
         if (orgUnit.endDate)
@@ -152,7 +160,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return attribute ? attribute.value : undefined;
     };
 
-    this.mapToProject = function(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement) {
+    this.mapToProject = function(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes) {
         var endDate = self.getAttributeValue(dhisProject, "prjEndDate");
         var autoApprove = self.getAttributeValue(dhisProject, "autoApprove");
         return {
@@ -167,6 +175,9 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             }),
             'endDate': endDate ? moment(endDate).toDate() : undefined,
             'projectCode': self.getAttributeValue(dhisProject, "projCode"),
+            'projectType': _.find(allProjectTypes, {
+                "name": self.getAttributeValue(dhisProject, "projectType")
+            }),
             'reasonForIntervention': _.find(reasonForIntervention, {
                 "name": self.getAttributeValue(dhisProject, "reasonForIntervention")
             }),
