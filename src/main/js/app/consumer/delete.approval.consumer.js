@@ -10,12 +10,19 @@ define(["lodash"], function(_) {
                 });
             };
 
+            var markAsIncomplete = function(allDatasetIds){
+                return approvalService.markAsIncomplete(allDatasetIds, periodAndOrgUnit.period, periodAndOrgUnit.orgUnit);
+            };
+
+            var markAsUnapproved = function(allDatasetIds){
+                return approvalService.markAsUnapproved(allDatasetIds, periodAndOrgUnit.period, periodAndOrgUnit.orgUnit).then(function(data){
+                    return allDatasetIds;
+                });
+            };
+
             return datasetRepository.getAll().then(function(allDatasets) {
                 var allDatasetIds = _.pluck(allDatasets, "id");
-                var markAsIncompletePromise = approvalService.markAsIncomplete(allDatasetIds, periodAndOrgUnit.period, periodAndOrgUnit.orgUnit);
-                var markAsUnapprovedPromise = approvalService.markAsUnapproved(allDatasetIds, periodAndOrgUnit.period, periodAndOrgUnit.orgUnit);
-                return $q.all([markAsIncompletePromise, markAsUnapprovedPromise])
-                    .then(invalidateApproval);
+                return markAsUnapproved(allDatasetIds).then(markAsIncomplete).then(invalidateApproval);
             });
         };
     };
