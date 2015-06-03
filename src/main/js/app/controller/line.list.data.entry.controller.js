@@ -121,7 +121,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             };
 
             var loadOptionSets = function() {
-                return optionSetRepository.getOptionSetMapping($scope.resourceBundle).then(function(optionSetMapping){
+                return optionSetRepository.getOptionSetMapping($scope.resourceBundle).then(function(optionSetMapping) {
                     $scope.optionSetMapping = optionSetMapping;
                 });
             };
@@ -131,7 +131,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                     var de = allDataElementsMap[dv.dataElement];
                     if (de && de.optionSet) {
                         return _.find($scope.optionSetMapping[de.optionSet.id], function(optionSet) {
-                            return optionSet.id === dv.value;
+                            return optionSet.code === dv.value;
                         });
                     }
 
