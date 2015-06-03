@@ -13,12 +13,14 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     'id': 'os1',
                     'options': [{
                         'id': 'os1o1',
+                        'code': 'os1o1',
                         'name': 'os1o1 name'
                     }]
                 }, {
                     'id': 'os2',
                     'options': [{
                         'id': 'os2o1',
+                        'code': 'os2o1',
                         'name': 'os2o1 name'
                     }]
                 }];
@@ -66,11 +68,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 optionSetMapping = {
                     "os1": [{
                         "id": 'os1o1',
+                        "code": 'os1o1',
                         "name": 'os1o1 name',
                         "displayName": 'os1o1 name',
                     }],
                     "os2": [{
                         "id": 'os2o1',
+                        "code": 'os2o1',
                         "name": 'os2o1 name',
                         "displayName": 'os2o1 translated name'
                     }]
@@ -152,6 +156,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     'de3': 3,
                     'de4': {
                         'id': 'os1o1',
+                        'code': 'os1o1',
                         'name': 'os1o1 name',
                         'displayName': 'os1o1 name'
                     }
