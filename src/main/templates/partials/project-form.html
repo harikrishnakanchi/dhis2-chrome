@@ -38,9 +38,8 @@
                     <li class="form-group">
                         <label for="newOrgUnitProjType" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.projectTypeLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <select name="newOrgUnitProjType" id="newOrgUnitProjType" class="input-sm" ng-model="newOrgUnit.projectType" ng-options="p.name for p in allProjectTypes | orderBy:'name'">
-                                <option value=""></option>
-                            </select>
+                            <div angucomplete-alt="" name="newOrgUnitProjType" form-name="createForm" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="newOrgUnit.projectType" local-data="allProjectTypes" search-fields="name" title-field="name" initial-value="{{newOrgUnit.projectType.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" class="ng-isolate-scope">
+                            </div>
                         </div>
                     </li>
                     <li class="form-group">
