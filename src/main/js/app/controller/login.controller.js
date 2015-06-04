@@ -12,9 +12,15 @@ define(["md5", "lodash"], function(md5, _) {
         };
 
         var downloadDataValues = function() {
-            return $hustle.publish({
+            var downloadDataPromise = $hustle.publish({
                 "type": "downloadData"
             }, "dataValues");
+
+            var downloadEventDataPromise = $hustle.publish({
+                "type": "downloadEventData"
+            }, "dataValues");
+
+            return $q.all([downloadDataPromise, downloadEventDataPromise]);
         };
 
         var authenticateOrPromptUserForPassword = function(data) {
