@@ -56,7 +56,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
             $scope.eventForm.showEventForm = false;
             return programEventRepository.getEventsFor($scope.program.id, getPeriod(), _.pluck($scope.originOrgUnits, "id")).then(function(events) {
-                $scope.eventForm.allEvents = $scope.eventForm.allEvents.concat(events);
+                $scope.eventForm.allEvents = events;
             });
         };
 
