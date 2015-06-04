@@ -129,6 +129,9 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             };
 
             var createOrgUnitGroups = function(modules) {
+                if (_.isEmpty(modules))
+                    return;
+
                 var partitionedModules = _.partition(modules, function(module) {
                     return _.any(module.attributeValues, {
                         "attribute": {
