@@ -120,14 +120,6 @@ define(["dhisId", "properties"], function(dhisId, properties) {
             $scope.$parent.closeNewForm($scope.orgUnit);
         };
 
-        $scope.reset = function() {
-            $scope.projectUser = {
-                "username": "",
-                "userRole": ""
-            };
-            $scope.form.userForm.$setPristine();
-        };
-
         $scope.save = function(projectUser) {
             var userPayload = {
                 "username": projectUser.username.toLowerCase(),

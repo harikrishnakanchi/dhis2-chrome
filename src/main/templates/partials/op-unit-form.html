@@ -86,7 +86,6 @@
                         <input type="submit" class="btn btn-main" ng-disabled="form.$invalid" ng-if="isNewMode" value="{{ resourceBundle.saveBtnValue }}" />
                         <input type="button" class="btn btn-main" ng-disabled="form.$invalid || !form.$dirty" ng-if="!isNewMode &amp;&amp; !(isDisabled)" ng-click="update(opUnit) " value="{{ resourceBundle.updateBtnValue }}" />
                         <input type="button" class="btn" ng-click="disable(orgUnit)" value="{{ resourceBundle.disableBtnValue }}" ng-if="!isNewMode &amp;&amp; !(isDisabled) " />
-                        <input type="button" class="btn" ng-if="isNewMode" ng-click="reset()" value="{{ resourceBundle.resetBtnValue }}">
                         <input type="button" class="btn" class="btn" ng-if="isNewMode" ng-click="closeForm()" value="{{ resourceBundle.backBtnValue }}" />
                     </div>
                 </form>

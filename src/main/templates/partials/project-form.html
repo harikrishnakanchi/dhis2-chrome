@@ -122,7 +122,6 @@
                         <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
                             <input type="button" class="btn btn-main" ng-if="isNewMode" ng-click="save(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid" value="{{ resourceBundle.saveBtnValue }}" />
                             <input type="button" class="btn btn-main" ng-if="!isNewMode" ng-click="update(newOrgUnit, orgUnit)" ng-disabled="createForm.$invalid || !createForm.$dirty" value="{{ resourceBundle.updateBtnValue }}" />
-                            <input type="button" class="btn" ng-click="reset()" ng-if="isNewMode" value="{{ resourceBundle.resetBtnValue }}" />
                             <input type="button" class="btn" ng-if="isNewMode" ng-click="closeForm(orgUnit)" value="{{ resourceBundle.backBtnValue }}" />
                         </div>
                     </li>

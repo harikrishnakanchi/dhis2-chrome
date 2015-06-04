@@ -126,11 +126,6 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 });
         };
 
-        $scope.reset = function() {
-            $scope.patientOrigin = {};
-            $scope.createForm.$setPristine();
-        };
-
         $scope.closeForm = function() {
             $scope.$parent.closeNewForm($scope.orgUnit);
         };

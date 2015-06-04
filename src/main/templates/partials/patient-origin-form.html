@@ -46,7 +46,6 @@
                         <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6">
                             <input type="submit" ng-if="!showEditOriginForm" class="btn btn-main" ng-disabled="createForm.$invalid" value="{{ resourceBundle.saveBtnValue }}" ng-click="save()" />
                             <input type="button" ng-if="showEditOriginForm" class="btn btn-main" ng-disabled="createForm.$invalid" value="{{ resourceBundle.updateBtnValue }}" ng-click="update()" />
-                            <input type="button" class="btn" ng-click="reset()" value="{{ resourceBundle.resetBtnValue }}">
                             <input type="button" class="btn" ng-click="closeForm()" value="{{ resourceBundle.backBtnValue }}" />
                         </div>
                     </li>

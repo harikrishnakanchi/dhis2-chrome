@@ -111,30 +111,6 @@ define(["projectUserController", "angularMocks", "utils", "dhisId"], function(Pr
             expect(scope.userNameMatchExpr.test(specifiedUserName)).toEqual(true);
         });
 
-        it("should reset form", function() {
-            scope.projectUser = {
-                "username": "blah",
-                "userRole": {
-                    "name": "role1"
-                },
-            };
-
-            var expectedUser = {
-                "username": "",
-                "userRole": ""
-            };
-
-            scope.form = {
-                "userForm": {
-                    "$setPristine": jasmine.createSpy("$setPristine")
-                }
-            };
-
-            scope.reset();
-
-            expect(scope.projectUser).toEqual(expectedUser);
-        });
-
         it("should take the user to the view page of the project on clicking cancel", function() {
             scope.orgUnit = {
                 "id": "parent",

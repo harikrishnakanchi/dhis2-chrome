@@ -287,12 +287,6 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }, modalMessages);
         };
 
-        $scope.reset = function() {
-            $scope.opUnit = {
-                'openingDate': moment().format("YYYY-MM-DD")
-            };
-        };
-
         var setOriginDetails = function(originDetails) {
             if (!_.isEmpty(originDetails)) {
                 $scope.originDetails = _.reject(originDetails.origins, function(origin) {
