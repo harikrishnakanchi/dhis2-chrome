@@ -188,6 +188,10 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 "orgUnit": $scope.selectedModule.id
             };
 
+            var clearAnyExisingApprovals = function() {
+                return approvalDataRepository.clearApprovals(periodAndOrgUnit);
+            };
+
             var publishToDhis = function() {
                 var deleteEventPromise = $hustle.publish({
                     "data": eventId,
@@ -217,6 +221,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 };
 
                 return programEventRepository.upsert(eventsPayload)
+                    .then(clearAnyExisingApprovals)
                     .then(publishToDhis);
             };
 

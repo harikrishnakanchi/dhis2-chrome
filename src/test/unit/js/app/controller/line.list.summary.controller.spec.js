@@ -455,6 +455,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
             it("should soft-delete event which is POSTed to DHIS", function() {
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
+                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
@@ -481,6 +482,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(softDeletedEventPayload);
                 expect(eventToDelete.localStatus).toEqual("DELETED");
                 expect(programEventRepository.getEventsFor).toHaveBeenCalled();
+                expect(approvalDataRepository.clearApprovals).toHaveBeenCalled();
             });
 
             it("should hard delete a local event", function() {
@@ -507,6 +509,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
             it("should soft delete a locally updated event which is already submitted to DHIS", function() {
                 event1.localStatus = "UPDATED_DRAFT";
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
+                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
                 spyOn(fakeModal, "open").and.returnValue({
                     result: utils.getPromise(q, {})
                 });
@@ -533,6 +536,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(softDeletedEventPayload);
                 expect(eventToDelete.localStatus).toEqual("DELETED");
                 expect(programEventRepository.getEventsFor).toHaveBeenCalled();
+                expect(approvalDataRepository.clearApprovals).toHaveBeenCalled();
             });
 
             it("should get data value", function() {
