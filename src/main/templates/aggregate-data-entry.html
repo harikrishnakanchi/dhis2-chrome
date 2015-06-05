@@ -53,7 +53,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true }" ng-form="dataElementForm">
+                                                <tr ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } | orderBy: 'name'" ng-form="dataElementForm">
                                                     <td>
                                                         <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
                                                         <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}</span>
