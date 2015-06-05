@@ -187,24 +187,12 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
 
         var init = function() {
             orgUnitGroupSetRepository.getAll().then(function(data) {
-                $scope.allContexts = _.find(data, {
-                    "code": "context"
-                }).organisationUnitGroups;
-                $scope.allPopTypes = _.find(data, {
-                    "code": "type_of_population"
-                }).organisationUnitGroups;
-                $scope.reasonForIntervention = _.find(data, {
-                    "code": "reason_for_intervention"
-                }).organisationUnitGroups;
-                $scope.modeOfOperation = _.find(data, {
-                    "code": "mode_of_operation"
-                }).organisationUnitGroups;
-                $scope.modelOfManagement = _.find(data, {
-                    "code": "model_of_management"
-                }).organisationUnitGroups;
-                $scope.allProjectTypes = _.find(data, {
-                    "code": "project_type"
-                }).organisationUnitGroups;
+                $scope.allContexts = _.sortBy(_.find(data, "code", "context").organisationUnitGroups, "name");
+                $scope.allPopTypes = _.sortBy(_.find(data, "code", "type_of_population").organisationUnitGroups, "name");
+                $scope.reasonForIntervention = _.sortBy(_.find(data, "code", "reason_for_intervention").organisationUnitGroups, "name");
+                $scope.modeOfOperation = _.sortBy(_.find(data, "code", "mode_of_operation").organisationUnitGroups, "name");
+                $scope.modelOfManagement = _.sortBy(_.find(data, "code", "model_of_management").organisationUnitGroups, "name");
+                $scope.allProjectTypes = _.sortBy(_.find(data, "code", "project_type").organisationUnitGroups, "name");
 
                 if ($scope.isNewMode)
                     prepareNewForm();

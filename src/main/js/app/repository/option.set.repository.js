@@ -16,12 +16,11 @@ define(['lodash'], function(_) {
                     _.each(options, function(o) {
                         o.displayName = resourceBundle[o.id] || o.name;
                     });
-                    optionSetMapping[optionSet.id] = options;
+                    optionSetMapping[optionSet.id] = _.sortBy(options, 'name');
                 });
-                
+
                 return optionSetMapping;
             });
         };
-
     };
 });
