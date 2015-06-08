@@ -282,6 +282,14 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 expect(scope.isApproved).toEqual(true);
             });
 
+            it("should not show form when data is not available", function() {
+                scope.dataValues = {};
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository);
+                scope.$apply();
+
+                expect(scope.showForm()).toEqual(false);
+            });
+
             it("should submit data for second level approval", function() {
                 var levelTwoApprovalDataSaved = false;
                 getApprovalDataSpy.and.callFake(function() {
