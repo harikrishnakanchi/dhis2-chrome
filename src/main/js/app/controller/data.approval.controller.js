@@ -20,6 +20,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             $anchorScroll();
         };
 
+        $scope.showForm = function() {
+            if (_.isEmpty($scope.dataValues))
+                return false;
+
+            return ($scope.isSubmitted && $rootScope.hasRoles(['Project Level Approver'])) || ($scope.isCompleted && $rootScope.hasRoles(['Coordination Level Approver']));
+        };
+
         $scope.getDatasetState = function(id, isFirst) {
             if (isFirst && !(id in $scope.isDatasetOpen)) {
                 $scope.isDatasetOpen[id] = true;
