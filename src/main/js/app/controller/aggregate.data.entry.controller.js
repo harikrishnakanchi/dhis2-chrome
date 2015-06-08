@@ -239,7 +239,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             return false;
         };
 
-        $scope.$watch('dataentryForm.$dirty', function(dirty) {
+        var deregisterDirtyFormWatcher = $scope.$watch('dataentryForm.$dirty', function(dirty) {
             if (dirty) {
                 $scope.preventNavigation = true;
             } else {
@@ -345,6 +345,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         $scope.$on('$destroy', function() {
             deregisterErrorInfoListener();
             deregisterModuleWeekInfoListener();
+            deregisterDirtyFormWatcher();
         });
 
         var init = function() {

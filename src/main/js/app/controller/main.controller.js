@@ -11,7 +11,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return re.test($location.path());
         };
 
-        $rootScope.$watch("currentUser.locale", function() {
+        var deregisterCurrentUserLocaleWatcher = $rootScope.$watch("currentUser.locale", function() {
             var getResourceBundle = function(locale, shouldFetchTranslations) {
                 var fetchResourceBundleFromDb = function() {
                     var store = db.objectStore('translations');
@@ -105,6 +105,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         $scope.$on('$destroy', function() {
             deregisterUserPreferencesListener();
+            deregisterCurrentUserLocaleWatcher();
         });
 
         var init = function() {

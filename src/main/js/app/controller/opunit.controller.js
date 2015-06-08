@@ -80,7 +80,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
             }, "dataValues");
         };
 
-        $scope.$watch("opUnit.type", function() {
+        var deregisterOpunitTypeWatcher = $scope.$watch("opUnit.type", function() {
             if (_.isEmpty($scope.opUnit.type))
                 return;
 
@@ -320,6 +320,10 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 });
             }
         };
+
+        $scope.$on('$destroy', function() {
+            deregisterOpunitTypeWatcher();
+        });
 
         var init = function() {
             orgUnitGroupSetRepository.getAll().then(function(data) {
