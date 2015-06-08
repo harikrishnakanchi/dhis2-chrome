@@ -6,33 +6,108 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
             scope = $rootScope;
-        }));
 
-        it("should add period and upsert event payload", function() {
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
-            var eventData = {
-                'events': [{
-                    'event': 'e1',
-                    'eventDate': '2010-11-07'
+        }));
+
+        it("should extract period and case number and upsert event payload", function() {
+
+            var dataElementsData = [{
+                "id": "d1",
+                "code": "code1_event_code"
+            }, {
+                "id": "d2",
+                "code": "code2"
+            }, {
+                "id": "d3",
+                "code": "code3_event_code"
+            }, {
+                "id": "d4",
+                "code": "code4"
+            }];
+
+            mockStore.each.and.callFake(function(query) {
+                if (mockStore.storeName === "dataElements")
+                    return utils.getPromise(q, dataElementsData);
+                return utils.getPromise(q, undefined);
+            });
+
+            var event1ForP1 = {
+                "event": "ev1",
+                "program": "p1",
+                "programStage": "ps1",
+                "orgUnit": "ou1",
+                "eventDate": "2015-06-01T00:00:00",
+                "dataValues": [{
+                    "value": "C1",
+                    "dataElement": "d1"
+                }, {
+                    "value": "Male_Emergency Department",
+                    "dataElement": "d2"
                 }]
             };
 
-            var expectedEventData = [{
-                'event': 'e1',
-                'eventDate': '2010-11-07',
-                'period': '2010W44'
-            }];
+            var event2ForP1 = {
+                "event": "ev2",
+                "program": "p1",
+                "programStage": "ps1",
+                "orgUnit": "ou1",
+                "eventDate": "2015-06-02T00:00:00",
+                "dataValues": [{
+                    "value": "C2",
+                    "dataElement": "d1"
+                }, {
+                    "value": "Female_Emergency Department",
+                    "dataElement": "d2"
+                }]
+            };
 
-            programEventRepository.upsert(eventData).then(function(data) {
-                expect(data).toEqual({
-                    'events': expectedEventData
-                });
+            var event3ForP2 = {
+                "event": "ev3",
+                "program": "p2",
+                "programStage": "ps2",
+                "orgUnit": "ou2",
+                "eventDate": "2015-06-01T00:00:00",
+                "dataValues": [{
+                    "value": "C3",
+                    "dataElement": "d3"
+                }, {
+                    "value": "Male_Burn Unit",
+                    "dataElement": "d4"
+                }]
+            };
+
+            var eventsPayload = {
+                "events": [event1ForP1, event2ForP1, event3ForP2]
+            };
+
+            var returnValue;
+            programEventRepository.upsert(eventsPayload).then(function(data) {
+                returnValue = data;
             });
             scope.$apply();
 
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedEventData);
+            var expectedEvent1ForP1 = _.clone(event1ForP1);
+            expectedEvent1ForP1.period = "2015W23";
+            expectedEvent1ForP1.eventCode = "C1";
+
+            var expectedEvent2ForP1 = _.clone(event2ForP1);
+            expectedEvent2ForP1.period = "2015W23";
+            expectedEvent2ForP1.eventCode = "C2";
+
+            var expectedEvent3ForP2 = _.clone(event3ForP2);
+            expectedEvent3ForP2.period = "2015W23";
+            expectedEvent3ForP2.eventCode = "C3";
+
+            var expectedEventData = {
+                "events": [expectedEvent1ForP1, expectedEvent2ForP1, expectedEvent3ForP2]
+            };
+
+            expect(mockStore.each.calls.argsFor(0)[0].inList).toEqual(["d1", "d2", "d3", "d4"]);
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedEventData.events);
+            expect(returnValue).toEqual(expectedEventData);
         });
 
         it("should get event by id", function() {

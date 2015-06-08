@@ -1,19 +1,54 @@
 define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, properties, dateUtils) {
     return function(db, $q) {
         this.upsert = function(eventsPayload) {
-            var updatePeriod = function(eventsPayload) {
-                _.each(eventsPayload.events, function(event) {
-                    event.period = event.period || moment(event.eventDate).format("GGGG[W]WW");
-                });
-                return eventsPayload;
+
+            var extractEventCode = function(events) {
+
+                var getEventCodeDataElementIds = function() {
+                    var store = db.objectStore("dataElements");
+                    var uniqueDataElementIds = _.uniq(_.flatten(_.pluck(_.flatten(_.pluck(events, 'dataValues')), 'dataElement')));
+                    var query = db.queryBuilder().$in(uniqueDataElementIds).compile();
+                    return store.each(query).then(function(dataElements) {
+                        return _.pluck(_.filter(dataElements, function(dataElement) {
+                            return _.endsWith(dataElement.code, '_code');
+                        }), "id");
+                    });
+                };
+
+                var mergeEventCodesIntoEvents = function(dataElementsForEventCode) {
+                    return _.map(events, function(ev) {
+                        var dataElementContainingEventCode = _.find(ev.dataValues, function(dv) {
+                            return _.contains(dataElementsForEventCode, dv.dataElement);
+                        });
+                        if (dataElementContainingEventCode)
+                            ev.eventCode = dataElementContainingEventCode.value;
+                        return ev;
+                    });
+                };
+
+                return getEventCodeDataElementIds()
+                    .then(mergeEventCodesIntoEvents);
             };
 
-            eventsPayload = updatePeriod(eventsPayload);
+            var extractPeriod = function(events) {
+                return _.map(events, function(ev) {
+                    ev.period = ev.period || moment(ev.eventDate).format("GGGG[W]WW");
+                    return ev;
+                });
+            };
 
-            var store = db.objectStore("programEvents");
-            return store.upsert(eventsPayload.events).then(function() {
-                return eventsPayload;
-            });
+            var doUpsert = function(events) {
+                var store = db.objectStore("programEvents");
+                return store.upsert(events).then(function() {
+                    return {
+                        "events": events
+                    };
+                });
+            };
+
+            return extractEventCode(eventsPayload.events)
+                .then(extractPeriod)
+                .then(doUpsert);
         };
 
         this.getEvent = function(eventId) {

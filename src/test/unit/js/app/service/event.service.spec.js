@@ -44,7 +44,8 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
                     "event": "Event1",
                     "eventDate": "2001-01-01",
                     "period": "2001W01",
-                    "localStatus": "NEW"
+                    "localStatus": "NEW",
+                    "eventCode": "C1"
                 }]
             };
 
