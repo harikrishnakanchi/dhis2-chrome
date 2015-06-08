@@ -14,10 +14,13 @@ define(["deleteApprovalConsumer", "angularMocks", "utils", "approvalService", "a
 
             message = {
                 "data": {
-                    "data": {
+                    "data": [{
                         "period": "2014W12",
                         "orgUnit": "org1"
-                    },
+                    }, {
+                        "period": "2014W10",
+                        "orgUnit": "org2"
+                    }],
                     "type": "deleteApprovals"
                 }
             };
@@ -35,7 +38,7 @@ define(["deleteApprovalConsumer", "angularMocks", "utils", "approvalService", "a
 
         it("should delete approval for all datasets from dhis", function() {
 
-            completeDataSets = {
+            completeDataSets = [{
                 "period": "2014W12",
                 "orgUnit": "org1",
                 "completedBy": "user1",
@@ -45,7 +48,17 @@ define(["deleteApprovalConsumer", "angularMocks", "utils", "approvalService", "a
                 "isComplete": true,
                 "isApproved": true,
                 "status": "DELETED"
-            };
+            }, {
+                "period": "2014W10",
+                "orgUnit": "org2",
+                "completedBy": "user1",
+                "completedOn": "2014-01-01T00:00:00.000Z",
+                "approvedBy": "user2",
+                "approvedOn": "2014-02-04T00:00:00.000Z",
+                "isComplete": true,
+                "isApproved": true,
+                "status": "DELETED"
+            }];
 
             spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, completeDataSets));
 
@@ -54,34 +67,40 @@ define(["deleteApprovalConsumer", "angularMocks", "utils", "approvalService", "a
 
             var data = message.data.data;
 
-            expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(allDatasetIds, data.period, data.orgUnit);
-            expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(allDatasetIds, data.period, data.orgUnit);
-            expect(approvalDataRepository.getApprovalData).toHaveBeenCalledWith({
-                "period": data.period,
-                "orgUnit": data.orgUnit
-            });
-            expect(approvalDataRepository.invalidateApproval).toHaveBeenCalledWith(data.period, data.orgUnit);
+            expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(allDatasetIds, data);
+            expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(allDatasetIds, data);
+            expect(approvalDataRepository.getApprovalData).toHaveBeenCalledWith(data);
+            expect(approvalDataRepository.invalidateApproval).toHaveBeenCalledWith('2014W12', 'org1');
+            expect(approvalDataRepository.invalidateApproval).toHaveBeenCalledWith('2014W10', 'org2');
         });
 
         it("should delete approval from dhis but not delete from the approval repo if module has been reapproved in the field app", function() {
-            completeDataSets = {
+            completeDataSets = [{
                 "period": "2014W12",
                 "orgUnit": "org1",
                 "completedBy": "user1",
                 "completedOn": "2014-01-02T00:00:00.000Z",
                 "isComplete": true,
                 "status": "NEW"
-            };
+            }];
 
             spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, completeDataSets));
+
+            message.data.data = [{
+                "period": "2014W12",
+                "orgUnit": "org1"
+            }];
 
             deleteApprovalConsumer.run(message);
             scope.$apply();
 
-            var data = message.data.data;
+            var data = [{
+                "period": "2014W12",
+                "orgUnit": "org1"
+            }];
 
-            expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(allDatasetIds, data.period, data.orgUnit);
-            expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(allDatasetIds, data.period, data.orgUnit);
+            expect(approvalService.markAsUnapproved).toHaveBeenCalledWith(allDatasetIds, data);
+            expect(approvalService.markAsIncomplete).toHaveBeenCalledWith(allDatasetIds, data);
 
             expect(approvalDataRepository.invalidateApproval).not.toHaveBeenCalled();
         });

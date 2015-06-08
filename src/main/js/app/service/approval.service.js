@@ -34,33 +34,38 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             return $http.post(dhisUrl.approvalMultipleL2, payload);
         };
 
-        this.markAsIncomplete = function(dataSets, period, orgUnit) {
-            return $http.delete(dhisUrl.approvalL1, {
-                params: {
-                    "ds": dataSets,
-                    "pe": period,
-                    "ou": orgUnit,
-                    "multiOu": true
-                }
+        this.markAsIncomplete = function(dataSets, periodsAndOrgUnits) {
+            var markAsIncompletePromises = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
+                return $http.delete(dhisUrl.approvalL1, {
+                    params: {
+                        "ds": dataSets,
+                        "pe": periodAndOrgUnit.period,
+                        "ou": periodAndOrgUnit.orgUnit,
+                        "multiOu": true
+                    }
+                });
             });
+
+            return $q.all(markAsIncompletePromises);
         };
 
-        this.markAsUnapproved = function(dataSets, period, orgUnit) {
-            var doGet = function() {
-                var startDate = moment(period, "GGGG[W]W");
+        this.markAsUnapproved = function(dataSets, periodsAndOrgUnits) {
+
+            var doGet = function(periodAndOrgUnit) {
+                var startDate = moment(periodAndOrgUnit.period, "GGGG[W]W");
 
                 return $http.get(dhisUrl.approvalStatus, {
                     "params": {
                         "ds": dataSets,
                         "startDate": startDate.format("YYYY-MM-DD"),
                         "endDate": startDate.add(6, 'days').format("YYYY-MM-DD"),
-                        "ou": [orgUnit],
+                        "ou": [periodAndOrgUnit.orgUnit],
                         "pe": "Weekly"
                     }
                 });
             };
 
-            var doDelete = function(responseFromGET) {
+            var doDelete = function(periodAndOrgUnit, responseFromGET) {
                 var mayUnapprovePermissions = _.map(responseFromGET.data.dataApprovalStateResponses, function(status) {
                     return status.permissions.mayUnapprove;
                 });
@@ -69,14 +74,18 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     return $http.delete(dhisUrl.approvalL2, {
                         params: {
                             "ds": dataSets,
-                            "pe": period,
-                            "ou": orgUnit
+                            "pe": periodAndOrgUnit.period,
+                            "ou": periodAndOrgUnit.orgUnit
                         }
                     });
                 }
             };
 
-            return doGet().then(doDelete);
+            var markAsUnapprovedPromises = _.map(periodsAndOrgUnits, function(periodAndOrgUnit){
+                return doGet(periodAndOrgUnit).then(_.curry(doDelete)(periodAndOrgUnit));
+            });
+
+            return $q.all(markAsUnapprovedPromises);
         };
 
         this.getCompletionData = function(orgUnits, originOrgUnits, dataSets) {
@@ -94,9 +103,9 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                         orgUnit = indexedOriginOrgUnits[orgUnit].parent.id;
 
                     if (!_.any(results, {
-                            "period": period,
-                            "orgUnit": orgUnit
-                        })) {
+                        "period": period,
+                        "orgUnit": orgUnit
+                    })) {
                         results.push({
                             'period': period,
                             'orgUnit': orgUnit,
