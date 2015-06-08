@@ -1,12 +1,12 @@
 define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
     return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository) {
 
-        var selectedProjectUpdatedListener = $rootScope.$on('selectedProjectUpdated', function() {
+        var deregisterSelectedProjectListener = $rootScope.$on('selectedProjectUpdated', function() {
             init();
         });
 
         $scope.$on('$destroy', function() {
-            selectedProjectUpdatedListener();
+            deregisterSelectedProjectListener();
         });
 
         $scope.formatPeriods = function(period) {

@@ -98,13 +98,13 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             metadataImporter.run();
         };
 
-        var userPreferencesUpdatedListener = $rootScope.$on('userPreferencesUpdated', function() {
+        var deregisterUserPreferencesListener = $rootScope.$on('userPreferencesUpdated', function() {
             loadProjects();
             loadUserLineListModules();
         });
 
         $scope.$on('$destroy', function() {
-            userPreferencesUpdatedListener();
+            deregisterUserPreferencesListener();
         });
 
         var init = function() {

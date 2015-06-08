@@ -74,10 +74,10 @@ define(["lodash", "moment"],
                 }
             };
 
-            var selectedProjectUpdatedListener = $scope.$on('selectedProjectUpdated', init);
+            var deregisterSelectedProjectListener = $scope.$on('selectedProjectUpdated', init);
 
             $scope.$on('$destroy', function() {
-                selectedProjectUpdatedListener();
+                deregisterSelectedProjectListener();
             });
 
             var init = function() {
