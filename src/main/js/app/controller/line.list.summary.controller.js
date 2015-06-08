@@ -314,10 +314,14 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             });
         };
 
-        $scope.$on('moduleWeekInfo', function(event, data) {
+        var moduleWeekInfoListener = $scope.$on('moduleWeekInfo', function(event, data) {
             $scope.selectedModule = data[0];
             $scope.week = data[1];
             initializeForm();
+        });
+
+        $scope.$on('$destroy', function() {
+            moduleWeekInfoListener();
         });
 
         init();

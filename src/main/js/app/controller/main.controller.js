@@ -98,9 +98,13 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             metadataImporter.run();
         };
 
-        $rootScope.$on('userPreferencesUpdated', function() {
+        var userPreferencesUpdatedListener = $rootScope.$on('userPreferencesUpdated', function() {
             loadProjects();
             loadUserLineListModules();
+        });
+
+        $scope.$on('$destroy', function() {
+            userPreferencesUpdatedListener();
         });
 
         var init = function() {

@@ -211,17 +211,21 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             $scope.dataType = "all";
         };
 
-        $scope.$on('errorInfo', function(event, errorMessage) {
+        var errorInfoListener = $scope.$on('errorInfo', function(event, errorMessage) {
             $scope.approveError = true;
         });
 
-
-        $scope.$on('moduleWeekInfo', function(event, data) {
+        var moduleWeekInfoListener = $scope.$on('moduleWeekInfo', function(event, data) {
             $scope.selectedModule = data[0];
             $scope.week = data[1];
             $scope.approveError = false;
             resetForm();
             initializeForm();
+        });
+
+        $scope.$on('$destroy', function() {
+            errorInfoListener();
+            moduleWeekInfoListener();
         });
 
         resetForm();

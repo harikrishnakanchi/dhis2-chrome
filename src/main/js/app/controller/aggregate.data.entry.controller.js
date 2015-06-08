@@ -251,7 +251,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             return moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
         };
 
-        $scope.$on('errorInfo', function(event, errorMessage) {
+        var errorInfoListener = $scope.$on('errorInfo', function(event, errorMessage) {
             $scope.errorMessage = errorMessage;
         });
 
@@ -334,12 +334,17 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             });
         };
 
-        $scope.$on('moduleWeekInfo', function(event, data) {
+        var moduleWeekInfoListener = $scope.$on('moduleWeekInfo', function(event, data) {
             $scope.selectedModule = data[0];
             $scope.week = data[1];
             $scope.errorMessage = undefined;
             resetForm();
             initializeForm();
+        });
+
+        $scope.$on('$destroy', function() {
+            errorInfoListener();
+            moduleWeekInfoListener();
         });
 
         var init = function() {
