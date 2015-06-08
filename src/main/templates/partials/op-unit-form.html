@@ -18,26 +18,8 @@
                     <ul>
                         <li class="form-group">
                             <label for="opUnitType" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.operationUnitTypeLabel }}</label>
-                            <div class="col-sm-8 col-md-8 form-inline">
-                                <div class="radio-inline">
-                                    <label for="hospital">
-                                        <input type="radio" ng-model="opUnit.type" id="hospital" value="Hospital" ng-disabled="isDisabled" required> {{ resourceBundle.hospitalLabel }} </label>
-                                </div>
-                                <div class="radio-inline">
-                                    <label for="healthcenter">
-                                        <input type="radio" ng-model="opUnit.type" id="healthcenter" value="Health Center" ng-disabled="isDisabled" required> {{ resourceBundle.healthCenterLabel }} </label>
-                                </div>
-                                <div class="radio-inline">
-                                    <label for="community">
-                                        <input type="radio" ng-model="opUnit.type" id="community" value="Community" ng-disabled="isDisabled" required> {{ resourceBundle.communityLabel }} </label>
-                                </div>
-                                <div class="radio-inline">
-                                    <label for="epidemicIsolationUnit">
-                                        <input type="radio" ng-model="opUnit.type" id="epidemicIsolationUnit" value="Epidemic Isolation Unit" ng-disabled="isDisabled" required> {{ resourceBundle.epidemicIsolationUnitLabel }} </label>
-                                </div>
-                                <div class="radio-inline">
-                                    <label for="mobileClinic">
-                                        <input type="radio" ng-model="opUnit.type" id="mobileClinic" value="Mobile Clinic" ng-disabled="isDisabled" required> {{ resourceBundle.mobileClinicLabel }} </label>
+                            <div class="col-sm-4">
+                                <div angucomplete-alt="" name="opUnitType" form-name="form" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="opUnit.type" local-data="opUnitTypes" search-fields="name" title-field="name" initial-value="{{opUnit.type.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
                                 </div>
                             </div>
                         </li>
@@ -51,7 +33,7 @@
                                 </div>
                             </div>
                         </li>
-                        <li class="form-group" ng-if="opUnit.type==='Hospital'">
+                        <li class="form-group" ng-if="showOpUnitCode">
                             <label for="hospitalUnitCode" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.hospitalUnitCodeLabel }}</label>
                             <div class="col-sm-4">
                                 <div angucomplete-alt="" name="hospitalUnitCode" form-name="form" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="opUnit.hospitalUnitCode" local-data="hospitalUnitCodes" search-fields="name" title-field="name" initial-value="{{opUnit.hospitalUnitCode.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">

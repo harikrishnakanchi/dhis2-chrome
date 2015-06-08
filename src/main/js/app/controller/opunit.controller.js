@@ -1,10 +1,22 @@
 define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, moment, orgUnitMapper) {
     return function($scope, $q, $hustle, orgUnitRepository, orgUnitGroupHelper, db, $location, $modal, patientOriginRepository, orgUnitGroupSetRepository) {
         $scope.isDisabled = false;
+        $scope.showOpUnitCode = false;
         $scope.opUnit = {
             'openingDate': moment().format("YYYY-MM-DD")
         };
         $scope.showEditOriginForm = false;
+        $scope.opUnitTypes = [{
+            "name": "Hospital"
+        }, {
+            "name": "Health Center"
+        }, {
+            "name": "Community"
+        }, {
+            "name": "Epidemic Isolation Unit"
+        }, {
+            "name": "Mobile Clinic"
+        }];
 
         var saveToDhis = function(data, desc) {
             return $hustle.publish({
@@ -25,7 +37,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         };
 
         var getAttributeValues = function(opUnitType, hospitalUnitCode) {
-            hospitalUnitCode = opUnitType === "Hospital" ? hospitalUnitCode : {
+            hospitalUnitCode = opUnitType.title === "Hospital" ? hospitalUnitCode : {
                 "name": ""
             };
             return [{
@@ -34,7 +46,7 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 "attribute": {
                     "code": "opUnitType"
                 },
-                "value": opUnitType
+                "value": opUnitType.title || opUnitType.name
             }, {
                 "created": moment().toISOString(),
                 "lastUpdated": moment().toISOString(),
@@ -67,6 +79,17 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                 "desc": desc
             }, "dataValues");
         };
+
+        $scope.$watch("opUnit.type", function() {
+            if (_.isEmpty($scope.opUnit.type))
+                return;
+
+            var opUnitCode = $scope.opUnit.type.title || $scope.opUnit.type.name;
+            if (opUnitCode === "Hospital")
+                $scope.showOpUnitCode = true;
+            else
+                $scope.showOpUnitCode = false;
+        });
 
         $scope.save = function(opUnit) {
             var parent = $scope.orgUnit;
@@ -319,14 +342,17 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
                             "code": "hospitalUnitCode"
                         }
                     }).value;
+                    var selectedOpUnitType = _.find($scope.orgUnit.attributeValues, {
+                        "attribute": {
+                            "code": "opUnitType"
+                        }
+                    }).value;
                     $scope.opUnit = {
                         'name': $scope.orgUnit.name,
                         'openingDate': $scope.orgUnit.openingDate,
-                        'type': _.find($scope.orgUnit.attributeValues, {
-                            "attribute": {
-                                "code": "opUnitType"
-                            }
-                        }).value,
+                        'type': _.find($scope.opUnitTypes, {
+                            "name": selectedOpUnitType
+                        }),
                         'hospitalUnitCode': _.find($scope.hospitalUnitCodes, {
                             "name": selectedHospitalUnitCode
                         })

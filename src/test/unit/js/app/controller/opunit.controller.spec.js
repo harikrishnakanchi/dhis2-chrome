@@ -90,7 +90,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         it("should save operation unit", function() {
             var opUnit = {
                 "name": "OpUnit1",
-                "type": "Hospital",
+                "type": {
+                    "title": "Hospital"
+                },
                 "openingDate": moment().format("YYYY-MM-DD"),
                 "hospitalUnitCode": {
                     "title": "Unit Code - A"
@@ -179,7 +181,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         it("should save operation unit with GIS coordinate information", function() {
             var opUnit = {
                 "name": "OpUnit1",
-                "type": "Hospital",
+                "type": {
+                    "title": "Hospital"
+                },
                 "openingDate": moment().format("YYYY-MM-DD"),
                 "hospitalUnitCode": {
                     "title": "Unit Code - A"
@@ -262,7 +266,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         it("should not ask for hospital unit code while saving operation unit if it is not hospital", function() {
             var opUnit = {
                 "name": "OpUnit1",
-                "type": "Health Center",
+                "type": {
+                    "title": "Health Center"
+                },
                 "openingDate": moment().format("YYYY-MM-DD"),
                 "hospitalUnitCode": {
                     "title": "Unit Code - A"
@@ -391,7 +397,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             scope.$apply();
             expect(scope.opUnit.name).toEqual("opUnit1");
-            expect(scope.opUnit.type).toEqual("Health Center");
+            expect(scope.opUnit.type.name).toEqual("Health Center");
             expect(scope.opUnit.longitude).toEqual(29);
             expect(scope.opUnit.latitude).toEqual(-45);
             expect(scope.isDisabled).toBeFalsy();
@@ -509,7 +515,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         it("should update operation unit", function() {
             var opUnit = {
                 "name": "OpUnit1",
-                "type": "Hospital",
+                "type": {
+                    "title": "Hospital"
+                },
                 "openingDate": moment().format("YYYY-MM-DD"),
                 "hospitalUnitCode": {
                     "name": "Unit Code - A"
@@ -611,7 +619,9 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
         it("should update operation unit with GIS coordinates", function() {
             var opUnit = {
                 "name": "OpUnit1",
-                "type": "Hospital",
+                "type": {
+                    "title": "Hospital"
+                },
                 "openingDate": moment().format("YYYY-MM-DD"),
                 "hospitalUnitCode": {
                     "name": "Unit Code - A"
