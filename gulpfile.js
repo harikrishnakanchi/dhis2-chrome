@@ -16,12 +16,14 @@ var rename = require('gulp-rename');
 var path = require('path');
 var preprocess = require("gulp-preprocess");
 var cat = require("gulp-cat");
+var zip = require('gulp-zip');
+var rest = require('restler');
+var Q = require('q');
+
 var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
 var metadata_sync_interval = argv.metadataSyncInterval || "1";
-var Q = require('q');
 var auth = argv.auth || "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA==";
-var rest = require('restler');
 
 gulp.task('test', function() {
     return gulp.src('_')
@@ -199,4 +201,10 @@ gulp.task('pack', ['less', 'config', 'download-metadata', 'download-systemSettin
     var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "dhis2_" + (argv.env || "dev")]);
     stream.write(process.stdout);
     return stream;
+});
+
+gulp.task('zip', ['less', 'config', 'download-metadata', 'download-systemSettings'], function() {
+    return gulp.src('./src/main')
+        .pipe(zip("dhis2_" + (argv.env || "dev") + ".zip"))
+        .pipe(gulp.dest(''));
 });

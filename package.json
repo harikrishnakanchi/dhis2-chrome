@@ -27,7 +27,8 @@
         "karma-chrome-launcher": "0.1.7",
         "karma-coverage": "0.2.7",
         "protractor": "2.0.0",
-        "ecstatic": "0.7.1"
+        "ecstatic": "0.7.1",
+        "gulp-zip": "3.0.2"
     },
     "name": "DHIS2-Chrome-App",
     "version": "0.0.1"
