@@ -4,8 +4,11 @@
         <div class="loading" ng-show="loading">
             <img src="img/ajax-loader.gif" class="spinner" />
         </div>
-        <div class="text-right" ng-if="isLineListModule">
-            <a id="" href="" ng-click="goOffline()" class="btn btn-default">Go Offline</a>
+        <div class="text-right" ng-if="isLineListModule &amp;&amp; !isOfflineApproval">
+            <a id="" href="" ng-click="goOffline()" class="btn btn-default">{{resourceBundle.showFieldAppSummary}}</a>
+        </div>
+        <div class="text-right" ng-if="isLineListModule &amp;&amp; isOfflineApproval">
+            <a id="" href="" ng-click="showDhisSummary()" class="btn btn-default">{{resourceBundle.showDhisSummary}}</a>
         </div>
         <div ng-if="isOfflineApproval" ng-include="'templates/partials/line-list-offline-approval.html'"></div>
         <section class="panel tab-panel" ng-if="week &amp;&amp; selectedModule &amp;&amp; !isOfflineApproval">

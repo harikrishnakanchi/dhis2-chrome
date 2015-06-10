@@ -94,6 +94,10 @@ define(["lodash", "moment"], function(_, moment) {
             return _.contains(dataElementIds, dataElementId);
         };
 
+        $scope.shouldShowProceduresInOfflineSummary = function() {
+            return !_.isEmpty($scope.procedureDataValueIds);
+        };
+
         var getPeriod = function() {
             return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
         };
@@ -141,6 +145,9 @@ define(["lodash", "moment"], function(_, moment) {
                 }
             });
 
+            $scope.dataValues._procedures = _.filter($scope.dataValues._procedures, function(dv) {
+                return !_.isEmpty(dv.value);
+            });
             groupedProcedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
             groupedDataValues = _.groupBy(allDataValues, "value");
 
@@ -150,10 +157,15 @@ define(["lodash", "moment"], function(_, moment) {
             $scope.procedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
         };
 
+        var setShowFilterFlag = function(){
+             $scope.showFilters = !_.isEmpty($scope.procedureDataValueIds) || !_.isEmpty( _.compact(_.pluck($scope.dataValues._showInOfflineSummary, "value")));
+        };
+
         var init = function() {
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping()]).then(function() {
                 return programEventRepository.getEventsFor($scope.associatedProgramId, getPeriod(), _.pluck($scope.originOrgUnits, "id")).then(function(events) {
                     loadGroupedDataValues(events);
+                    setShowFilterFlag();
                 });
             });
         };

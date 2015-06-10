@@ -140,6 +140,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             $scope.isOfflineApproval = true;
         };
 
+        $scope.showDhisSummary = function() {
+            $scope.isOfflineApproval = false;
+        };
+
         var initializeForm = function() {
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
             currentPeriodAndOrgUnit = {
