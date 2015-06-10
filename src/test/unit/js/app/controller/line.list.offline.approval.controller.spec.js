@@ -24,6 +24,15 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "id": 'os2o1',
                         "name": 'os2o1 name',
                         "displayName": 'os2o1 translated name'
+                    }],
+                    "gender_id": [{
+                        "id": 'male_id',
+                        "name": 'Male',
+                        "displayName": 'Male'
+                    }, {
+                        "id": 'female_id',
+                        "name": 'Female',
+                        "displayName": 'Female'
                     }]
                 };
                 events = [{
@@ -42,11 +51,14 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
                     }, {
-                        "code": "_showInOfflineSummaryFilters",
+                        "code": "_sex",
                         "value": "Male_er",
                         "dataElement": "gender",
+                        "optionSet": {
+                            "id": "gender_id"
+                        }
                     }, {
-                        "code": "_age_showInOfflineSummaryFilters",
+                        "code": "_age",
                         "value": 6,
                         "dataElement": "age",
                     }]
@@ -65,11 +77,11 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
                     }, {
-                        "code": "_showInOfflineSummaryFilters",
+                        "code": "_sex",
                         "value": "Female_er",
                         "dataElement": "gender",
                     }, {
-                        "code": "_age_showInOfflineSummaryFilters",
+                        "code": "_age",
                         "value": 4,
                         "dataElement": "age",
                     }]
@@ -85,7 +97,9 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, program));
 
                 optionSetRepository = new OptionSetRepository();
-                spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, optionSetMapping));
+                spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, {
+                    "optionSetMap": optionSetMapping
+                }));
 
                 scope.selectedModule = {
                     "id": "Mod1"
@@ -121,25 +135,29 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "dataElement": "Triage Status",
                         "eventId": "event2"
                     }],
-                    "_showInOfflineSummaryFilters": [{
-                        "code": "_showInOfflineSummaryFilters",
-                        "value": "Male_er",
-                        "dataElement": "gender",
-                        "eventId": "event1"
-                    }, {
-                        "code": "_age_showInOfflineSummaryFilters",
+                    "_age": [{
+                        "code": "_age",
                         "value": 6,
                         "dataElement": "age",
                         "eventId": "event1"
                     }, {
-                        "code": "_showInOfflineSummaryFilters",
-                        "value": "Female_er",
-                        "dataElement": "gender",
-                        "eventId": "event2"
-                    }, {
-                        "code": "_age_showInOfflineSummaryFilters",
+                        "code": "_age",
                         "value": 4,
                         "dataElement": "age",
+                        "eventId": "event2"
+                    }],
+                    "_sex": [{
+                        "code": "_sex",
+                        "value": "Male_er",
+                        "dataElement": "gender",
+                        "optionSet": {
+                            "id": "gender_id"
+                        },
+                        "eventId": "event1"
+                    }, {
+                        "code": "_sex",
+                        "value": "Female_er",
+                        "dataElement": "gender",
                         "eventId": "event2"
                     }],
                     "_procedures": [{
@@ -159,7 +177,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "eventId": "event2"
                     }]
                 });
-                expect(scope.procedureDataValueCodes).toEqual(['procedure 1', 'procedure 2']);
+                expect(scope.procedureDataValueIds).toEqual(['procedure 1', 'procedure 2']);
                 expect(scope.procedureDataValues).toEqual({
                     "procedure 1": [{
                         "code": "_procedures",
@@ -192,7 +210,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 scope.$apply();
 
-                expect(scope.getCount("Green", "Triage Status", "Female")).toEqual(1);
+                expect(scope.getCount("Green", "Male_er")).toEqual(1);
             });
 
             it("should get count when age filter is applied", function() {
@@ -213,14 +231,5 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.shouldShowInOfflineSummary("gender")).toEqual(false);
             });
 
-            it("should return true if it should be shown in gender filter", function() {
-                expect(scope.shouldShowInGenderFilter("Green", "Triage Status")).toEqual(true);
-                expect(scope.shouldShowInGenderFilter("Foobar")).toEqual(false);
-            });
-
-            it("should return true if it should be shown in gender filter", function() {
-                expect(scope.shouldShowInAgeFilter("Green", "Triage Status")).toEqual(true);
-                expect(scope.shouldShowInAgeFilter("Foobar")).toEqual(false);
-            });
         });
     });

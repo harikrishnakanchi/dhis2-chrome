@@ -3,52 +3,95 @@ define(["lodash", "moment"], function(_, moment) {
 
         $scope.isGenderFilterApplied = false;
         $scope.isAgeFilterApplied = false;
+        var groupedProcedureDataValues, groupedDataValues;
 
-        $scope.getCount = function(optionCode, dataElementId, filterCode) {
-            return _.filter($scope.dataValues._showInOfflineSummary, function(dv) {
-                return dv.value === optionCode && dv.dataElement === dataElementId && applyGenderFilters(dv, filterCode) && applyAgeFilters(dv, filterCode);
-            }).length;
+        $scope.getCount = function(optionId, genderFilterId, ageFilter) {
+            var count;
+            var applyGenderFilter = function() {
+                return _.intersection(_.pluck(groupedDataValues[optionId], "eventId"), _.pluck(groupedDataValues[genderFilterId], "eventId"));
+            };
+
+            var applyAgeFilter = function(eventIds) {
+                var count = 0;
+                var filteredEventIds;
+
+                _.forEach(eventIds, function(eventId) {
+                    var dataValue = _.find($scope.dataValues._age, {
+                        "eventId": eventId
+                    });
+                    if (dataValue.value > ageFilter[0] && dataValue.value < ageFilter[1])
+                        count++;
+                });
+                return count;
+            };
+
+            if ($scope.isGenderFilterApplied && !$scope.isAgeFilterApplied) {
+                filteredEventIds = applyGenderFilter();
+                count = _.isEmpty(filteredEventIds) ? 0 : filteredEventIds.length;
+                return count;
+            }
+            if ($scope.isAgeFilterApplied && !$scope.isGenderFilterApplied) {
+                filteredEventIds = _.pluck(groupedDataValues[optionId], "eventId");
+                return applyAgeFilter(filteredEventIds);
+            }
+
+            if ($scope.isAgeFilterApplied && $scope.isGenderFilterApplied) {
+                filteredEventIds = applyGenderFilter();
+                return applyAgeFilter(filteredEventIds);
+            }
+
+            count = _.isEmpty(groupedDataValues[optionId]) ? 0 : groupedDataValues[optionId].length;
+            return count;
         };
 
-        $scope.getProcedureCount = function(optionCode, filterCode) {
-            return _.filter($scope.dataValues._procedures, function(dv) {
-                return dv.value === optionCode && applyGenderFilters(dv, filterCode) && applyAgeFilters(dv, filterCode);
-            }).length;
+        $scope.getProcedureCount = function(optionId, genderFilterId, ageFilter) {
+            var count = 0;
+            var eventIds;
+
+            var applyGenderFilter = function() {
+                var filteredEventIds = [];
+                var eventIdsInOption = _.pluck(groupedProcedureDataValues[optionId], "eventId");
+                var eventIdsInFilter = _.pluck(groupedDataValues[genderFilterId], "eventId");
+                _.forEach(eventIdsInOption, function(eventId) {
+                    if (_.contains(eventIdsInFilter, eventId))
+                        filteredEventIds.push(eventId);
+                });
+                return filteredEventIds;
+            };
+
+            var applyAgeFilter = function(eventIds) {
+                count = 0;
+                _.forEach(eventIds, function(eventId) {
+                    var dataValue = _.find($scope.dataValues._age, {
+                        "eventId": eventId
+                    });
+                    if (dataValue.value > ageFilter[0] && dataValue.value < ageFilter[1])
+                        count++;
+                });
+                return count;
+            };
+
+            if ($scope.isGenderFilterApplied && !$scope.isAgeFilterApplied) {
+                return applyGenderFilter().length;
+            }
+
+            if ($scope.isAgeFilterApplied && !$scope.isGenderFilterApplied) {
+                eventIds = _.pluck(groupedProcedureDataValues[optionId], "eventId");
+                return applyAgeFilter(eventIds);
+            }
+
+            if ($scope.isAgeFilterApplied && $scope.isGenderFilterApplied) {
+                eventIds = applyGenderFilter();
+                return applyAgeFilter(eventIds);
+            }
+
+            count = _.isEmpty(groupedProcedureDataValues[optionId]) ? 0 : groupedProcedureDataValues[optionId].length;
+            return count;
         };
 
         $scope.shouldShowInOfflineSummary = function(dataElementId) {
             var dataElementIds = _.pluck($scope.dataValues._showInOfflineSummary, 'dataElement');
             return _.contains(dataElementIds, dataElementId);
-        };
-
-        $scope.shouldShowInGenderFilter = function(optionCode, dataElementId) {
-            return $scope.getCount(optionCode, dataElementId, "Male") !== 0 || $scope.getCount(optionCode, dataElementId, "Female") !== 0 || $scope.getCount(optionCode, dataElementId, "Not recorded") !== 0;
-        };
-
-        $scope.shouldShowInAgeFilter = function(optionCode, dataElementId) {
-            return $scope.getCount(optionCode, dataElementId, [0, 5]) !== 0 || $scope.getCount(optionCode, dataElementId, [5, 15]) !== 0 || $scope.getCount(optionCode, dataElementId, [14, 9999]) !== 0;
-        };
-
-
-        var applyGenderFilters = function(dv, code) {
-            if ($scope.isGenderFilterApplied) {
-                var result = _.any($scope.eventsMap[dv.eventId], {
-                    "value": code + "_" + $scope.program.name
-                });
-                return result;
-            } else
-                return true;
-        };
-
-        var applyAgeFilters = function(dv, ageRange) {
-            if ($scope.isAgeFilterApplied) {
-                var result = _.any($scope.eventsMap[dv.eventId], function(dataValue) {
-                    var intValue = parseInt(dataValue.value);
-                    return _.endsWith(dataValue.code, "_age_showInOfflineSummaryFilters") && intValue > ageRange[0] && intValue < ageRange[1];
-                });
-                return result;
-            } else
-                return true;
         };
 
         var getPeriod = function() {
@@ -68,8 +111,9 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var getOptionSetMapping = function() {
-            return optionSetRepository.getOptionSetMapping($scope.resourceBundle).then(function(optionSetMapping) {
-                $scope.optionSetMapping = optionSetMapping;
+            return optionSetRepository.getOptionSetMapping($scope.resourceBundle).then(function(data) {
+                $scope.optionSetMapping = data.optionSetMap;
+                $scope.optionMapping = data.optionMap;
             });
         };
 
@@ -86,15 +130,23 @@ define(["lodash", "moment"], function(_, moment) {
                 if (_.endsWith(dv.code, "_showInOfflineSummary")) {
                     return "_showInOfflineSummary";
                 }
-                if (_.endsWith(dv.code, "_showInOfflineSummaryFilters")) {
-                    return "_showInOfflineSummaryFilters";
+                if (_.endsWith(dv.code, "_age")) {
+                    return "_age";
+                }
+                if (_.endsWith(dv.code, "_sex")) {
+                    return "_sex";
                 }
                 if (_.endsWith(dv.code, "_procedures")) {
                     return "_procedures";
                 }
             });
 
-            $scope.procedureDataValueCodes = _.unique(_.pluck($scope.dataValues._procedures, "value"));
+            groupedProcedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
+            groupedDataValues = _.groupBy(allDataValues, "value");
+
+            $scope.genderOptions = $scope.optionSetMapping[$scope.dataValues._sex[0].optionSet.id];
+
+            $scope.procedureDataValueIds = _.keys(groupedProcedureDataValues);
             $scope.procedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
         };
 

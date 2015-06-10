@@ -121,8 +121,8 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             };
 
             var loadOptionSets = function() {
-                return optionSetRepository.getOptionSetMapping($scope.resourceBundle).then(function(optionSetMapping) {
-                    $scope.optionSetMapping = optionSetMapping;
+                return optionSetRepository.getOptionSetMapping($scope.resourceBundle).then(function(data) {
+                    $scope.optionSetMapping = data.optionSetMap;
                 });
             };
 

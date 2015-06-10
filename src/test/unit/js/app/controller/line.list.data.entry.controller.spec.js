@@ -79,7 +79,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         "displayName": 'os2o1 translated name'
                     }]
                 };
-                spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, optionSetMapping));
+                spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, {
+                    "optionSetMap": optionSetMapping
+                }));
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));

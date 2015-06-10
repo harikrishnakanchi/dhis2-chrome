@@ -7,7 +7,7 @@ define(["optionSetRepository", "angularMocks", "utils"], function(OptionSetRepos
             scope = $rootScope.$new();
             mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
-           
+
             optionSetRepository = new OptionSetRepository(mockDB.db);
         }));
 
@@ -45,16 +45,17 @@ define(["optionSetRepository", "angularMocks", "utils"], function(OptionSetRepos
             mockStore.getAll.and.returnValue(utils.getPromise(q, allOptionSets));
 
 
-            var result;
+            var optionSetMap, optionMap;
             var resourceBundle = {
                 'os2o1': 'os2o1 translated name'
             };
-            optionSetRepository.getOptionSetMapping(resourceBundle).then(function(optionSetMapping) {
-                result = optionSetMapping;
+            optionSetRepository.getOptionSetMapping(resourceBundle).then(function(data) {
+                optionSetMap = data.optionSetMap;
+                optionMap = data.optionMap;
             });
             scope.$apply();
 
-            expect(result).toEqual({
+            expect(optionSetMap).toEqual({
                 "os1": [{
                     "id": 'os1o1',
                     "name": 'os1o1 name',
@@ -65,6 +66,10 @@ define(["optionSetRepository", "angularMocks", "utils"], function(OptionSetRepos
                     "name": 'os2o1 name',
                     "displayName": 'os2o1 translated name'
                 }]
+            });
+            expect(optionMap).toEqual({
+                "os1o1": "os1o1 name",
+                "os2o1": "os2o1 translated name"
             });
 
 

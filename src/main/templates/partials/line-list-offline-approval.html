@@ -1,6 +1,6 @@
 <div ng-controller="lineListOfflineApprovalController">
-    <input type="checkbox" ng-disabled="isAgeFilterApplied" ng-model="isGenderFilterApplied" /> {{resourceBundle.filterByGender}}
-    <input type="checkbox" ng-disabled="isGenderFilterApplied" ng-model="isAgeFilterApplied" />{{resourceBundle.filterByAge}}
+    <input type="checkbox" ng-model="isGenderFilterApplied" /> {{resourceBundle.filterByGender}}
+    <input type="checkbox" ng-model="isAgeFilterApplied" />{{resourceBundle.filterByAge}}
     <div ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
         <div ng-repeat="programStage in program.programStages">
             <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
@@ -18,55 +18,9 @@
                                             <th>{{resourceBundle.numberOfEvents}}</th>
                                         </tr>
                                     </thead>
-                                    <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]" ng-if="getCount(option.code, psde.dataElement.id) !== 0">
-                                        <td>{{option.displayName}}</td>
-                                        <td>{{getCount(option.code, psde.dataElement.id)}}</td>
-                                    </tr>
-                                </table>
-                            </accordion-group>
-                        </accordion>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <accordion close-others="false">
-            <accordion-group>
-                <accordion-heading>
-                    <span>{{resourceBundle.proceduresPerformed}}</span>
-                </accordion-heading>
-                <table class="table table-bordered">
-                    <tr ng-repeat="pdv in procedureDataValueCodes">
-                        <td>{{pdv}}</td>
-                        <td>{{procedureDataValues[pdv].length}}</td>
-                    </tr>
-                </table>
-            </accordion-group>
-        </accordion>
-    </div>
-    <div ng-if="isGenderFilterApplied">
-        <div ng-repeat="programStage in program.programStages">
-            <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
-                <div ng-repeat="psde in section.programStageDataElements">
-                    <div ng-if="shouldShowInOfflineSummary(psde.dataElement.id)">
-                        <accordion close-others="false">
-                            <accordion-group>
-                                <accordion-heading>
-                                    <span>{{psde.dataElement.formName}}</span>
-                                </accordion-heading>
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>{{resourceBundle.optionName}}</th>
-                                            <th>{{resourceBundle.male}}</th>
-                                            <th>{{resourceBundle.female}}</th>
-                                            <th>{{resourceBundle.notRecorded}}</th>
-                                        </tr>
-                                    </thead>
                                     <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
                                         <td>{{option.displayName}}</td>
-                                        <td>{{getCount(option.code, psde.dataElement.id, "Male")}}</td>
-                                        <td>{{getCount(option.code,psde.dataElement.id, "Female")}}</td>
-                                        <td>{{getCount(option.code,psde.dataElement.id, "Not recorded")}}</td>
+                                        <td>{{getCount(option.id)}}</td>
                                     </tr>
                                 </table>
                             </accordion-group>
@@ -84,22 +38,68 @@
                     <thead>
                         <tr>
                             <th>{{resourceBundle.optionName}}</th>
-                            <th>{{resourceBundle.male}}</th>
-                            <th>{{resourceBundle.female}}</th>
-                            <th>{{resourceBundle.notRecorded}}</th>
+                            <th>{{resourceBundle.numberOfEvents}}</th>
                         </tr>
                     </thead>
-                    <tr ng-repeat="pdv in procedureDataValueCodes">
-                        <td>{{pdv}}</td>
-                        <td>{{getProcedureCount(pdv,"Male")}}</td>
-                        <td>{{getProcedureCount(pdv,"Female")}}</td>
-                        <td>{{getProcedureCount(pdv,"Not recorded")}}</td>
+                    <tr ng-repeat="pdv in procedureDataValueIds">
+                        <td>{{optionMapping[pdv]}}</td>
+                        <td>{{getProcedureCount(pdv)}}</td>
                     </tr>
                 </table>
             </accordion-group>
         </accordion>
     </div>
-    <div ng-if="isAgeFilterApplied">
+    <div ng-if="isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
+        <div ng-repeat="programStage in program.programStages">
+            <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
+                <div ng-repeat="psde in section.programStageDataElements">
+                    <div ng-if="shouldShowInOfflineSummary(psde.dataElement.id)">
+                        <accordion close-others="false">
+                            <accordion-group>
+                                <accordion-heading>
+                                    <span>{{psde.dataElement.formName}}</span>
+                                </accordion-heading>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>{{resourceBundle.optionName}}</th>
+                                            <th ng-repeat="genderOption in genderOptions"> {{genderOption.displayName}}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
+                                        <td>{{option.displayName}}</td>
+                                        <td ng-repeat="genderOption in genderOptions">{{getCount(option.id, genderOption.id)}}</td>
+                                    </tr>
+                                </table>
+                            </accordion-group>
+                        </accordion>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <accordion close-others="false">
+            <accordion-group>
+                <accordion-heading>
+                    <span>{{resourceBundle.proceduresPerformed}}</span>
+                </accordion-heading>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>{{resourceBundle.optionName}}</th>
+                            <th ng-repeat="genderOption in genderOptions"> {{genderOption.displayName}}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tr ng-repeat="pdv in procedureDataValueIds">
+                        <td>{{optionMapping[pdv]}}</td>
+                        <td ng-repeat="genderOption in genderOptions">{{getProcedureCount(pdv, genderOption.id)}}</td>
+                    </tr>
+                </table>
+            </accordion-group>
+        </accordion>
+    </div>
+    <div ng-if="isAgeFilterApplied &amp;&amp; !isGenderFilterApplied">
         <div ng-repeat="programStage in program.programStages">
             <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                 <div ng-repeat="psde in section.programStageDataElements">
@@ -120,9 +120,9 @@
                                         <thead>
                                             <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
                                                 <td>{{option.displayName}}</td>
-                                                <td>{{getCount(option.code, psde.dataElement.id, [0,5])}}</td>
-                                                <td>{{getCount(option.code,psde.dataElement.id, [5,15])}}</td>
-                                                <td>{{getCount(option.code,psde.dataElement.id, [14, 9999])}}</td>
+                                                <td>{{getCount(option.code, undefined, [0,5])}}</td>
+                                                <td>{{getCount(option.code, undefined, [5,15])}}</td>
+                                                <td>{{getCount(option.code, undefined, [14, 9999])}}</td>
                                             </tr>
                                 </table>
                             </accordion-group>
@@ -145,11 +145,99 @@
                             <th>{{resourceBundle.greaterThanFifteen}}</th>
                         </tr>
                     </thead>
-                    <tr ng-repeat="pdv in procedureDataValueCodes">
-                        <td>{{pdv}}</td>
-                        <td>{{getProcedureCount(pdv,[0,5])}}</td>
-                        <td>{{getProcedureCount(pdv,[5,15])}}</td>
-                        <td>{{getProcedureCount(pdv,[14, 9999])}}</td>
+                    <tr ng-repeat="pdv in procedureDataValueIds">
+                        <td>{{optionMapping[pdv]}}</td>
+                        <td>{{getProcedureCount(pdv, undefined,[0,5])}}</td>
+                        <td>{{getProcedureCount(pdv, undefined,[5,15])}}</td>
+                        <td>{{getProcedureCount(pdv, undefined,[14, 9999])}}</td>
+                    </tr>
+                </table>
+            </accordion-group>
+        </accordion>
+    </div>
+    <div ng-if="isAgeFilterApplied &amp;&amp; isGenderFilterApplied">
+        <div ng-repeat="programStage in program.programStages">
+            <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
+                <div ng-repeat="psde in section.programStageDataElements">
+                    <div ng-if="shouldShowInOfflineSummary(psde.dataElement.id)">
+                        <accordion close-others="false">
+                            <accordion-group>
+                                <accordion-heading>
+                                    <span>{{psde.dataElement.formName}}</span>
+                                </accordion-heading>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">{{resourceBundle.optionName}}</th>
+                                            <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.displayName}}
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>{{resourceBundle.lessThanFive}}</th>
+                                            <th>{{resourceBundle.fiveToFourtenn}}</th>
+                                            <th>{{resourceBundle.greaterThanFifteen}}</th>
+                                            <th>{{resourceBundle.lessThanFive}}</th>
+                                            <th>{{resourceBundle.fiveToFourtenn}}</th>
+                                            <th>{{resourceBundle.greaterThanFifteen}}</th>
+                                            <th>{{resourceBundle.lessThanFive}}</th>
+                                            <th>{{resourceBundle.fiveToFourtenn}}</th>
+                                            <th>{{resourceBundle.greaterThanFifteen}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
+                                        <td>{{option.displayName}}</td>
+                                        <td>{{getCount(option.code,genderOptions[0].id, [0,5])}}</td>
+                                        <td>{{getCount(option.code,genderOptions[0].id, [5,15])}}</td>
+                                        <td>{{getCount(option.code,genderOptions[0].id, [14, 9999])}}</td>
+                                        <td>{{getCount(option.code,genderOptions[1].id, [0,5])}}</td>
+                                        <td>{{getCount(option.code,genderOptions[1].id, [5,15])}}</td>
+                                        <td>{{getCount(option.code,genderOptions[1].id, [14, 9999])}}</td>
+                                        <td>{{getCount(option.code,genderOptions[2].id, [0,5])}}</td>
+                                        <td>{{getCount(option.code,genderOptions[2].id, [5,15])}}</td>
+                                        <td>{{getCount(option.code,genderOptions[2].id, [14, 9999])}}</td>
+                                    </tr>
+                                </table>
+                            </accordion-group>
+                        </accordion>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <accordion close-others="false">
+            <accordion-group>
+                <accordion-heading>
+                    <span>{{resourceBundle.proceduresPerformed}}</span>
+                </accordion-heading>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">{{resourceBundle.optionName}}</th>
+                            <th colspan="3" ng-repeat="genderOption in genderOptions"> {{genderOption.displayName}}
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>{{resourceBundle.lessThanFive}}</th>
+                            <th>{{resourceBundle.fiveToFourtenn}}</th>
+                            <th>{{resourceBundle.greaterThanFifteen}}</th>
+                            <th>{{resourceBundle.lessThanFive}}</th>
+                            <th>{{resourceBundle.fiveToFourtenn}}</th>
+                            <th>{{resourceBundle.greaterThanFifteen}}</th>
+                            <th>{{resourceBundle.lessThanFive}}</th>
+                            <th>{{resourceBundle.fiveToFourtenn}}</th>
+                            <th>{{resourceBundle.greaterThanFifteen}}</th>
+                        </tr>
+                    </thead>
+                    <tr ng-repeat="pdv in procedureDataValueIds">
+                        <td>{{optionMapping[pdv]}}</td>
+                        <td>{{getProcedureCount(pdv,genderOptions[0].id, [0,5])}}</td>
+                        <td>{{getProcedureCount(pdv,genderOptions[0].id, [5,15])}}</td>
+                        <td>{{getProcedureCount(pdv,genderOptions[0].id, [14, 9999])}}</td>
+                        <td>{{getProcedureCount(pdv,genderOptions[1].id, [0,5])}}</td>
+                        <td>{{getProcedureCount(pdv,genderOptions[1].id, [5,15])}}</td>
+                        <td>{{getProcedureCount(pdv,genderOptions[1].id, [14, 9999])}}</td>
+                        <td>{{getProcedureCount(pdv,genderOptions[2].id, [0,5])}}</td>
+                        <td>{{getProcedureCount(pdv,genderOptions[2].id, [5,15])}}</td>
+                        <td>{{getProcedureCount(pdv,genderOptions[2].id, [14, 9999])}}</td>
                     </tr>
                 </table>
             </accordion-group>
