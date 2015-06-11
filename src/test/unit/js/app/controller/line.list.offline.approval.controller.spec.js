@@ -260,6 +260,26 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 });
             });
 
+            it("should return set showFilters to false if there are no events", function() {
+                programEventRepository.getEventsFor.and.returnValue(utils.getPromise(q, []));
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository);
+                scope.$apply();
+
+                expect(scope.showFilters).toEqual(false);
+            });
+
+            it("should return true if there are procedure data values", function() {
+                expect(scope.shouldShowProceduresInOfflineSummary()).toEqual(true);
+            });
+
+            it("should return false if there are no procedure data values", function() {
+                programEventRepository.getEventsFor.and.returnValue(utils.getPromise(q, []));
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository);
+                scope.$apply();
+
+                expect(scope.shouldShowProceduresInOfflineSummary()).toEqual(false);
+            });
+
             it("should get count when no filters are applied", function() {
                 expect(scope.getCount(false, false, "Green")).toEqual(2);
             });
