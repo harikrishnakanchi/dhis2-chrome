@@ -50,6 +50,9 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "optionSet": {
+                            "id": "proc_id"
+                        }
                     }, {
                         "code": "_sex",
                         "value": "Male_er",
@@ -72,10 +75,16 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "optionSet": {
+                            "id": "proc_id"
+                        }
                     }, {
                         "code": "_procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
+                        "optionSet": {
+                            "id": "proc_id"
+                        }
                     }, {
                         "code": "_sex",
                         "value": "Female_er",
@@ -164,16 +173,25 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "optionSet": {
+                            "id": "proc_id"
+                        },
                         "eventId": "event1"
                     }, {
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "optionSet": {
+                            "id": "proc_id"
+                        },
                         "eventId": "event2"
                     }, {
                         "code": "_procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
+                        "optionSet": {
+                            "id": "proc_id"
+                        },
                         "eventId": "event2"
                     }]
                 });
@@ -183,17 +201,26 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "optionSet": {
+                            "id": "proc_id"
+                        },
                         "eventId": "event1"
                     }, {
                         "code": "_procedures",
                         "value": "procedure 1",
                         "dataElement": "Procedure performed 1",
+                        "optionSet": {
+                            "id": "proc_id"
+                        },
                         "eventId": "event2"
                     }],
                     "procedure 2": [{
                         "code": "_procedures",
                         "value": "procedure 2",
                         "dataElement": "Procedure performed 2",
+                        "optionSet": {
+                            "id": "proc_id"
+                        },
                         "eventId": "event2"
                     }]
                 });

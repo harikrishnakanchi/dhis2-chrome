@@ -152,13 +152,14 @@ define(["lodash", "moment"], function(_, moment) {
             groupedDataValues = _.groupBy(allDataValues, "value");
 
             $scope.genderOptions = $scope.optionSetMapping[$scope.dataValues._sex[0].optionSet.id];
+            $scope.procedureOptions = $scope.optionSetMapping[$scope.dataValues._procedures[0].optionSet.id];
 
             $scope.procedureDataValueIds = _.keys(groupedProcedureDataValues);
             $scope.procedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
         };
 
-        var setShowFilterFlag = function(){
-             $scope.showFilters = !_.isEmpty($scope.procedureDataValueIds) || !_.isEmpty( _.compact(_.pluck($scope.dataValues._showInOfflineSummary, "value")));
+        var setShowFilterFlag = function() {
+            $scope.showFilters = !_.isEmpty($scope.procedureDataValueIds) || !_.isEmpty(_.compact(_.pluck($scope.dataValues._showInOfflineSummary, "value")));
         };
 
         var init = function() {
