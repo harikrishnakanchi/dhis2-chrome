@@ -119,7 +119,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 scope.associatedProgramId = "Emergency Department";
 
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository);
                 scope.$apply();
             }));
 
@@ -224,6 +224,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "eventId": "event2"
                     }]
                 });
+                expect(scope.showFilters).toEqual(true);
             });
 
             it("should get count when no filters are applied", function() {

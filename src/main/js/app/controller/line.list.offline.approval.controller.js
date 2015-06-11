@@ -122,12 +122,15 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var loadGroupedDataValues = function(events) {
-            var allDataValues = _.flatten(_.map(events, function(event) {
+            var allDataValues = _.compact(_.flatten(_.map(events, function(event) {
                 return _.map(event.dataValues, function(edv) {
-                    edv.eventId = event.event;
-                    return edv;
+                    if (!_.isUndefined(edv.value)) {
+                        edv.eventId = event.event;
+                        return edv;
+                    }
                 });
-            }));
+            })));
+
             $scope.eventsMap = _.groupBy(allDataValues, "eventId");
 
             $scope.dataValues = _.groupBy(allDataValues, function(dv) {
@@ -145,14 +148,11 @@ define(["lodash", "moment"], function(_, moment) {
                 }
             });
 
-            $scope.dataValues._procedures = _.filter($scope.dataValues._procedures, function(dv) {
-                return !_.isEmpty(dv.value);
-            });
             groupedProcedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
             groupedDataValues = _.groupBy(allDataValues, "value");
 
-            $scope.genderOptions = $scope.optionSetMapping[$scope.dataValues._sex[0].optionSet.id];
-            $scope.procedureOptions = $scope.optionSetMapping[$scope.dataValues._procedures[0].optionSet.id];
+            $scope.genderOptions = _.isUndefined($scope.dataValues._sex) ? [] : $scope.optionSetMapping[$scope.dataValues._sex[0].optionSet.id];
+            $scope.procedureOptions = _.isUndefined($scope.dataValues._procedures) ? [] : $scope.optionSetMapping[$scope.dataValues._procedures[0].optionSet.id];
 
             $scope.procedureDataValueIds = _.keys(groupedProcedureDataValues);
             $scope.procedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
