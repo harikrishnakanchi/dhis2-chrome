@@ -7,9 +7,11 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 scope = $rootScope.$new();
                 q = $q;
                 origins = [{
-                    'id': 'origin1'
+                    'id': 'origin1',
+                    'name': 'Origin 1'
                 }, {
-                    'id': 'origin2'
+                    'id': 'origin2',
+                    'name': 'Origin 2'
                 }];
                 program = {
                     "id": "Emergency Department"
@@ -37,6 +39,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 events = [{
                     "event": "event1",
+                    'orgUnit': 'origin1',
+                    'orgUnitName': 'Origin 1',
                     "dataValues": [{
                         "code": "_showInOfflineSummary",
                         "value": "Green",
@@ -74,6 +78,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     }]
                 }, {
                     "event": "event2",
+                    'orgUnit': 'origin2',
+                    'orgUnitName': 'Origin 2',
                     "dataValues": [{
                         "code": "_showInOfflineSummary",
                         "value": "Green",
@@ -248,6 +254,10 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     }]
                 });
                 expect(scope.showFilters).toEqual(true);
+                expect(scope.originsMap).toEqual({
+                    "Origin 1": [events[0]],
+                    "Origin 2": [events[1]]
+                });
             });
 
             it("should get count when no filters are applied", function() {

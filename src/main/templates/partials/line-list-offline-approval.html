@@ -262,6 +262,28 @@
             </div>
         </div>
         <div>
+            <accordion close-others="false">
+                <accordion-group is-open="status.open">
+                    <accordion-heading>
+                        <span>Origins</span>
+                        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                    </accordion-heading>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th> Origin Name </th>
+                                <th> Count </th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="(origin, events) in originsMap">
+                            <td>{{origin}}</td>
+                            <td>{{events.length}}</td>
+                        </tr>
+                    </table>
+                </accordion-group>
+            </accordion>
+        </div>
+        <div>
             <input type="button" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="isCompleted" ng-if="hasRoles(['Project Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
             <input type="button" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="isApproved" ng-if="hasRoles(['Coordination Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
         </div>

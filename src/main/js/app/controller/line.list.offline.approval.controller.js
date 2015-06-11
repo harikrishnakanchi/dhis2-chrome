@@ -148,6 +148,8 @@ define(["lodash", "moment"], function(_, moment) {
                 }
             });
 
+            $scope.originsMap = _.groupBy(events, "orgUnitName");
+
             groupedProcedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
             groupedDataValues = _.groupBy(allDataValues, "value");
 
