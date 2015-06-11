@@ -5,7 +5,7 @@ define(["lodash", "moment"], function(_, moment) {
         $scope.isAgeFilterApplied = false;
         var groupedProcedureDataValues, groupedDataValues;
 
-        $scope.getCount = function(optionId, genderFilterId, ageFilter) {
+        $scope.getCount = function(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
             var count;
             var applyGenderFilter = function() {
                 return _.intersection(_.pluck(groupedDataValues[optionId], "eventId"), _.pluck(groupedDataValues[genderFilterId], "eventId"));
@@ -25,17 +25,17 @@ define(["lodash", "moment"], function(_, moment) {
                 return count;
             };
 
-            if ($scope.isGenderFilterApplied && !$scope.isAgeFilterApplied) {
+            if (isGenderFilterApplied && !isAgeFilterApplied) {
                 filteredEventIds = applyGenderFilter();
                 count = _.isEmpty(filteredEventIds) ? 0 : filteredEventIds.length;
                 return count;
             }
-            if ($scope.isAgeFilterApplied && !$scope.isGenderFilterApplied) {
+            if (isAgeFilterApplied && !isGenderFilterApplied) {
                 filteredEventIds = _.pluck(groupedDataValues[optionId], "eventId");
                 return applyAgeFilter(filteredEventIds);
             }
 
-            if ($scope.isAgeFilterApplied && $scope.isGenderFilterApplied) {
+            if (isAgeFilterApplied && isGenderFilterApplied) {
                 filteredEventIds = applyGenderFilter();
                 return applyAgeFilter(filteredEventIds);
             }
@@ -44,7 +44,7 @@ define(["lodash", "moment"], function(_, moment) {
             return count;
         };
 
-        $scope.getProcedureCount = function(optionId, genderFilterId, ageFilter) {
+        $scope.getProcedureCount = function(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
             var count = 0;
             var eventIds;
 
@@ -71,16 +71,16 @@ define(["lodash", "moment"], function(_, moment) {
                 return count;
             };
 
-            if ($scope.isGenderFilterApplied && !$scope.isAgeFilterApplied) {
+            if (isGenderFilterApplied && !isAgeFilterApplied) {
                 return applyGenderFilter().length;
             }
 
-            if ($scope.isAgeFilterApplied && !$scope.isGenderFilterApplied) {
+            if (isAgeFilterApplied && !isGenderFilterApplied) {
                 eventIds = _.pluck(groupedProcedureDataValues[optionId], "eventId");
                 return applyAgeFilter(eventIds);
             }
 
-            if ($scope.isAgeFilterApplied && $scope.isGenderFilterApplied) {
+            if (isAgeFilterApplied && isGenderFilterApplied) {
                 eventIds = applyGenderFilter();
                 return applyAgeFilter(eventIds);
             }
