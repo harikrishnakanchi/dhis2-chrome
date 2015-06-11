@@ -250,5 +250,8 @@
     "fiveToFourtenn": " 5 - 14 Years",
     "greaterThanFifteen": ">= 15 Years",
     "showFieldAppSummary": "Show Field App Summary",
-    "showDhisSummary": "Show DHIS Summary"
+    "showDhisSummary": "Show DHIS Summary",
+    "originsCountTitle": "Origins",
+    "originName": "Origin Name",
+    "originCount": "Count"
 }

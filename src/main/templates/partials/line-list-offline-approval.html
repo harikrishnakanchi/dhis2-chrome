@@ -265,14 +265,14 @@
             <accordion close-others="false">
                 <accordion-group is-open="status.open">
                     <accordion-heading>
-                        <span>Origins</span>
+                        <span>{{resourceBundle.originsCountTitle}}</span>
                         <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                     </accordion-heading>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th> Origin Name </th>
-                                <th> Count </th>
+                                <th> {{resourceBundle.originName}} </th>
+                                <th> {{resourceBundle.originCount}} </th>
                             </tr>
                         </thead>
                         <tr ng-repeat="(origin, events) in originsMap">
