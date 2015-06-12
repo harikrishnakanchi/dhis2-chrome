@@ -249,8 +249,8 @@
     "lessThanFive": "< 5 Years",
     "fiveToFourtenn": " 5 - 14 Years",
     "greaterThanFifteen": ">= 15 Years",
-    "showFieldAppSummary": "Show Field App Summary",
-    "showDhisSummary": "Show DHIS Summary",
+    "dhisSummary": "DHIS Summary",
+    "fieldAppSummary": "Field App Summary",
     "originsCountTitle": "Origins",
     "originName": "Origin Name",
     "originCount": "Count"

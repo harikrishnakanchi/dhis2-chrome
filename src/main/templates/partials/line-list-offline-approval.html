@@ -1,8 +1,14 @@
 <div ng-controller="lineListOfflineApprovalController">
     <div class="alert alert-danger" ng-if="!showFilters">{{resourceBundle.noDataForApproval}}</div>
     <div ng-if="showFilters">
-        <input type="checkbox" ng-model="isGenderFilterApplied" /> {{resourceBundle.filterByGender}}
-        <input type="checkbox" ng-model="isAgeFilterApplied" />{{resourceBundle.filterByAge}}
+        <div class="checkbox-inline">
+            <label>
+                <input type="checkbox" ng-model="isGenderFilterApplied" /> {{resourceBundle.filterByGender}}</label>
+        </div>
+        <div class="checkbox-inline">
+            <label>
+                <input type="checkbox" ng-model="isAgeFilterApplied" />{{resourceBundle.filterByAge}}</label>
+        </div>
         <div ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
             <div ng-repeat="programStage in program.programStages">
                 <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
