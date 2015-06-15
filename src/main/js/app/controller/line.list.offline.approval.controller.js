@@ -3,6 +3,9 @@ define(["lodash", "moment"], function(_, moment) {
 
         $scope.isGenderFilterApplied = false;
         $scope.isAgeFilterApplied = false;
+        $scope.origins = {
+            'open': true
+        };
         var groupedProcedureDataValues, groupedDataValues;
 
         $scope.getCount = function(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {

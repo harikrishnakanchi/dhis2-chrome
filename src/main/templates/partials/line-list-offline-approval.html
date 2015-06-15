@@ -1,6 +1,28 @@
 <div ng-controller="lineListOfflineApprovalController">
     <div class="alert alert-danger" ng-if="!showFilters">{{resourceBundle.noDataForApproval}}</div>
     <div ng-if="showFilters">
+        <div>
+            <accordion close-others="false">
+                <accordion-group is-open="origins.open">
+                    <accordion-heading>
+                        <span>{{resourceBundle.originsCountTitle}}</span>
+                        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': origins.open, 'glyphicon-chevron-right': !origins.open}"></i>
+                    </accordion-heading>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th> {{resourceBundle.originName}} </th>
+                                <th> {{resourceBundle.originCount}} </th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="(origin, events) in originsMap">
+                            <td>{{origin}}</td>
+                            <td>{{events.length}}</td>
+                        </tr>
+                    </table>
+                </accordion-group>
+            </accordion>
+        </div>
         <div class="filter">
             <label>{{resourceBundle.filterBy}}</label>
             <div class="checkbox-inline">
@@ -269,28 +291,6 @@
                     </accordion-group>
                 </accordion>
             </div>
-        </div>
-        <div>
-            <accordion close-others="false">
-                <accordion-group is-open="status.open">
-                    <accordion-heading>
-                        <span>{{resourceBundle.originsCountTitle}}</span>
-                        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                    </accordion-heading>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th> {{resourceBundle.originName}} </th>
-                                <th> {{resourceBundle.originCount}} </th>
-                            </tr>
-                        </thead>
-                        <tr ng-repeat="(origin, events) in originsMap">
-                            <td>{{origin}}</td>
-                            <td>{{events.length}}</td>
-                        </tr>
-                    </table>
-                </accordion-group>
-            </accordion>
         </div>
         <div>
             <input type="button" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="isCompleted" ng-if="hasRoles(['Project Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
