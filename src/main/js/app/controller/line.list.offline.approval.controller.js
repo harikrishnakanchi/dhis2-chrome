@@ -168,13 +168,14 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var init = function() {
-            var events;
+            var submittedEvents = [];
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping()]).then(function() {
                 return programEventRepository.getEventsFor($scope.associatedProgramId, getPeriod(), _.pluck($scope.originOrgUnits, "id")).then(function(events) {
-                    events = _.filter(events, {
-                        "localStatus": "READY_FOR_DHIS"
+                    _.forEach(events, function(event) {
+                        if (event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined)
+                            submittedEvents.push(event);
                     });
-                    loadGroupedDataValues(events);
+                    loadGroupedDataValues(submittedEvents);
                     setShowFilterFlag();
                 });
             });
