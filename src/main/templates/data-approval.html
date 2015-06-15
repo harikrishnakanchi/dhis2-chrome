@@ -10,7 +10,7 @@
                     <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
                     <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
                     <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-                    <div class="alert alert-danger" ng-if="(!isApproved || !isCompleted) &amp;&amp; dataValues !== undefined &amp;&amp; (!isSubmitted || hasRoles(['Coordination Level Approver']) &amp;&amp;!isCompleted) &amp;&amp; hasRoles(['Project Level Approver', 'Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
+                    <div class="alert alert-danger" ng-if="!isApproved &amp;&amp; !isCompleted &amp;&amp; dataValues !== undefined &amp;&amp; (!isSubmitted || hasRoles(['Coordination Level Approver']) &amp;&amp;!isCompleted) &amp;&amp; hasRoles(['Project Level Approver', 'Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
                     <form name="dataentryForm" id="dataentry" ng-if="showForm()">
                         <accordion close-others="false">
                             <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false }" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
