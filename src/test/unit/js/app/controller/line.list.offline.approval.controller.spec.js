@@ -41,6 +41,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     "event": "event1",
                     'orgUnit': 'origin1',
                     'orgUnitName': 'Origin 1',
+                    'localStatus': 'READY_FOR_DHIS',
                     "dataValues": [{
                         "code": "_showInOfflineSummary",
                         "value": "Green",
@@ -80,6 +81,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     "event": "event2",
                     'orgUnit': 'origin2',
                     'orgUnitName': 'Origin 2',
+                    'localStatus': 'READY_FOR_DHIS',
                     "dataValues": [{
                         "code": "_showInOfflineSummary",
                         "value": "Green",

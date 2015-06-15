@@ -168,8 +168,12 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var init = function() {
+            var events;
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping()]).then(function() {
                 return programEventRepository.getEventsFor($scope.associatedProgramId, getPeriod(), _.pluck($scope.originOrgUnits, "id")).then(function(events) {
+                    events = _.filter(events, {
+                        "localStatus": "READY_FOR_DHIS"
+                    });
                     loadGroupedDataValues(events);
                     setShowFilterFlag();
                 });

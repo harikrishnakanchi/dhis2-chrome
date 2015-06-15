@@ -1,5 +1,8 @@
 <div ng-controller="lineListOfflineApprovalController">
     <div class="alert alert-danger" ng-if="!showFilters">{{resourceBundle.noDataForApproval}}</div>
+    <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
+    <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
+    <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
     <div ng-if="showFilters">
         <div>
             <accordion close-others="false">
