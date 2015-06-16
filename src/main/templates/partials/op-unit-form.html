@@ -17,19 +17,19 @@
                 <form name="form" class="form-horizontal" role="form" ng-submit="save(opUnit)" novalidate>
                     <ul>
                         <li class="form-group">
-                            <label for="opUnitType" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.operationUnitTypeLabel }}</label>
-                            <div class="col-sm-4">
-                                <div angucomplete-alt="" name="opUnitType" form-name="form" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="opUnit.type" local-data="opUnitTypes" search-fields="name" title-field="name" initial-value="{{opUnit.type.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
-                                </div>
-                            </div>
-                        </li>
-                        <li class="form-group">
                             <label for="opUnitName" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.nameOfTheUnitLabel }}</label>
                             <div class="col-sm-4">
                                 <input type="text" class="form-control" name="opUnitName{{$index}}" id="opUnitName{{$index}}" placeholder="{{ resourceBundle.operationUnitNameLabel }}" ng-model="opUnit.name" not-in="allOpunitNames" ng-disabled="isDisabled" required />
                                 <div ng-show="form.opUnitName{{$index}}.$dirty &amp;&amp; form.opUnitName{{$index}}.$invalid">
                                     <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.required">{{resourceBundle.nameValidation}}</span>
                                     <span class="errortxt" ng-show="form.opUnitName{{$index}}.$error.isWithin">{{resourceBundle.alreadyExists}}</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="form-group">
+                            <label for="opUnitType" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.operationUnitTypeLabel }}</label>
+                            <div class="col-sm-4">
+                                <div angucomplete-alt="" name="opUnitType" form-name="form" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="opUnit.type" local-data="opUnitTypes" search-fields="name" title-field="name" initial-value="{{opUnit.type.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">
                                 </div>
                             </div>
                         </li>
