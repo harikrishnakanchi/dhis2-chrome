@@ -104,8 +104,11 @@ define(["lodash", "moment"], function(_, moment) {
             return count;
         };
 
-        $scope.shouldShowInOfflineSummary = function(dataElementId) {
-            var dataElementIds = _.pluck($scope.dataValues._showInOfflineSummary, 'dataElement');
+        $scope.shouldShowInOfflineSummary = function(dataElementId, allDataElements) {
+            allDataElements = _.filter(allDataElements, function(de) {
+                return _.endsWith(de.dataElement.code, "_showInOfflineSummary");
+            });
+            var dataElementIds = _.pluck(_.pluck(allDataElements, 'dataElement'), 'id');
             return _.contains(dataElementIds, dataElementId);
         };
 

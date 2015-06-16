@@ -41,7 +41,7 @@
             <div ng-repeat="programStage in program.programStages">
                 <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                     <div ng-repeat="psde in section.programStageDataElements">
-                        <div ng-if="shouldShowInOfflineSummary(psde.dataElement.id)">
+                        <div ng-if="shouldShowInOfflineSummary(psde.dataElement.id,section.programStageDataElements)">
                             <accordion close-others="false">
                                 <accordion-group is-open="status.open">
                                     <accordion-heading>

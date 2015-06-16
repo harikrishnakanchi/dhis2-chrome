@@ -362,7 +362,14 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
             });
 
             it("should return true if it should be shown in offline summary", function() {
-                expect(scope.shouldShowInOfflineSummary("Triage Status")).toEqual(true);
+                var allDataElements = [{
+                    "name": "test",
+                    "dataElement": {
+                        "id": "Triage Status",
+                        "code": "_showInOfflineSummary"
+                    }
+                }];
+                expect(scope.shouldShowInOfflineSummary("Triage Status", allDataElements)).toEqual(true);
             });
 
             it("should return false if it should not be shown in offline summary", function() {
