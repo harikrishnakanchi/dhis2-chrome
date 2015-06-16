@@ -57,7 +57,7 @@
                                         </thead>
                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
                                             <td>{{option.displayName}}</td>
-                                            <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.id)}}</td>
+                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id)}}</td>
                                         </tr>
                                     </table>
                                 </accordion-group>
@@ -110,7 +110,7 @@
                                         </thead>
                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
                                             <td>{{option.displayName}}</td>
-                                            <td ng-repeat="genderOption in genderOptions">{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.id, genderOption.id)}}</td>
+                                            <td ng-repeat="genderOption in genderOptions">{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id, genderOption.id)}}</td>
                                         </tr>
                                     </table>
                                 </accordion-group>
@@ -165,9 +165,9 @@
                                             <thead>
                                                 <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
                                                     <td>{{option.displayName}}</td>
-                                                    <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [0,5])}}</td>
-                                                    <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [4,15])}}</td>
-                                                    <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [14, 9999])}}</td>
+                                                    <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [0,5])}}</td>
+                                                    <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [4,15])}}</td>
+                                                    <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [14, 9999])}}</td>
                                                 </tr>
                                     </table>
                                 </accordion-group>
@@ -235,15 +235,15 @@
                                         </thead>
                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
                                             <td>{{option.displayName}}</td>
-                                            <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [0,5])}}</td>
-                                            <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [4,15])}}</td>
-                                            <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [14, 9999])}}</td>
-                                            <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [0,5])}}</td>
-                                            <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [4,15])}}</td>
-                                            <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [14, 9999])}}</td>
-                                            <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [0,5])}}</td>
-                                            <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [4,15])}}</td>
-                                            <td>{{getCount(isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [14, 9999])}}</td>
+                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [0,5])}}</td>
+                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [4,15])}}</td>
+                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [14, 9999])}}</td>
+                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [0,5])}}</td>
+                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [4,15])}}</td>
+                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[1].id, [14, 9999])}}</td>
+                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [0,5])}}</td>
+                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [4,15])}}</td>
+                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[2].id, [14, 9999])}}</td>
                                         </tr>
                                     </table>
                                 </accordion-group>

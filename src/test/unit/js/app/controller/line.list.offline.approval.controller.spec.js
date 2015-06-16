@@ -283,7 +283,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
             });
 
             it("should get count when no filters are applied", function() {
-                expect(scope.getCount(false, false, "Green")).toEqual(2);
+                expect(scope.getCount("Triage Status", false, false, "Green")).toEqual(2);
             });
 
             it("should get count when gender filter is applied", function() {
@@ -293,7 +293,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 scope.$apply();
 
-                expect(scope.getCount(true, false, "Green", "Male_er")).toEqual(1);
+                expect(scope.getCount("Triage Status", true, false, "Green", "Male_er")).toEqual(1);
             });
 
             it("should get count when age filter is applied", function() {
@@ -303,7 +303,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 scope.$apply();
 
-                expect(scope.getCount(false, true, "Green", "Triage Status", [0, 5])).toEqual(1);
+                expect(scope.getCount("Triage Status", false, true, "Green", "Triage Status", [0, 5])).toEqual(1);
             });
 
             it("should get count when age and gender filter is applied", function() {
@@ -313,8 +313,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 scope.$apply();
 
-                expect(scope.getCount(true, true, "Green", "Female_er", [0, 5])).toEqual(1);
-                expect(scope.getCount(true, true, "Green", "Male_er", [4, 15])).toEqual(1);
+                expect(scope.getCount("Triage Status", true, true, "Green", "Female_er", [0, 5])).toEqual(1);
+                expect(scope.getCount("Triage Status", true, true, "Green", "Male_er", [4, 15])).toEqual(1);
             });
 
             it("should get procedure count when no filters are applied", function() {
@@ -341,7 +341,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 scope.$apply();
 
-                expect(scope.getCount(false, true, "procedure 1", "", [0, 5])).toEqual(1);
+                expect(scope.getProcedureCount(false, true, "procedure 1", "", [0, 5])).toEqual(1);
             });
 
             it("should get procedure count when age and gender filter is applied", function() {
@@ -351,8 +351,8 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 scope.$apply();
 
-                expect(scope.getCount(true, true, "procedure 1", "Female_er", [0, 5])).toEqual(1);
-                expect(scope.getCount(true, true, "procedure 1", "Male_er", [4, 15])).toEqual(1);
+                expect(scope.getProcedureCount(true, true, "procedure 1", "Female_er", [0, 5])).toEqual(1);
+                expect(scope.getProcedureCount(true, true, "procedure 1", "Male_er", [4, 15])).toEqual(2);
             });
 
             it("should return true if it should be shown in offline summary", function() {

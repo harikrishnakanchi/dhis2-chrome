@@ -8,10 +8,18 @@ define(["lodash", "moment"], function(_, moment) {
         };
         var groupedProcedureDataValues, groupedDataValues;
 
-        $scope.getCount = function(isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
+        $scope.getCount = function(dataElementId, isGenderFilterApplied, isAgeFilterApplied, optionId, genderFilterId, ageFilter) {
             var count;
+
+            if (_.isUndefined(groupedDataValues[optionId]))
+                return 0;
+
             var applyGenderFilter = function() {
-                return _.intersection(_.pluck(groupedDataValues[optionId], "eventId"), _.pluck(groupedDataValues[genderFilterId], "eventId"));
+                if (_.isUndefined(groupedDataValues[genderFilterId]))
+                    return [];
+                var genderDataElement = _.keys(groupedDataValues[genderFilterId]);
+
+                return _.intersection(_.pluck(groupedDataValues[optionId][dataElementId], "eventId"), _.pluck(groupedDataValues[genderFilterId][genderDataElement[0]], "eventId"));
             };
 
             var applyAgeFilter = function(eventIds) {
@@ -34,7 +42,7 @@ define(["lodash", "moment"], function(_, moment) {
                 return count;
             }
             if (isAgeFilterApplied && !isGenderFilterApplied) {
-                filteredEventIds = _.pluck(groupedDataValues[optionId], "eventId");
+                filteredEventIds = _.pluck(groupedDataValues[optionId][dataElementId], "eventId");
                 return applyAgeFilter(filteredEventIds);
             }
 
@@ -43,7 +51,8 @@ define(["lodash", "moment"], function(_, moment) {
                 return applyAgeFilter(filteredEventIds);
             }
 
-            count = _.isEmpty(groupedDataValues[optionId]) ? 0 : groupedDataValues[optionId].length;
+            count = _.isEmpty(groupedDataValues[optionId][dataElementId]) ? 0 : groupedDataValues[optionId][dataElementId].length;
+
             return count;
         };
 
@@ -52,9 +61,12 @@ define(["lodash", "moment"], function(_, moment) {
             var eventIds;
 
             var applyGenderFilter = function() {
+                if (_.isUndefined(groupedDataValues[genderFilterId]) || _.isUndefined(groupedProcedureDataValues[optionId]))
+                    return [];
                 var filteredEventIds = [];
                 var eventIdsInOption = _.pluck(groupedProcedureDataValues[optionId], "eventId");
-                var eventIdsInFilter = _.pluck(groupedDataValues[genderFilterId], "eventId");
+                var genderDataElement = _.keys(groupedDataValues[genderFilterId]);
+                var eventIdsInFilter = _.pluck(groupedDataValues[genderFilterId][genderDataElement[0]], "eventId");
                 _.forEach(eventIdsInOption, function(eventId) {
                     if (_.contains(eventIdsInFilter, eventId))
                         filteredEventIds.push(eventId);
@@ -155,6 +167,12 @@ define(["lodash", "moment"], function(_, moment) {
 
             groupedProcedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
             groupedDataValues = _.groupBy(allDataValues, "value");
+
+            var keys = _.keys(groupedDataValues);
+            _.forEach(keys, function(key) {
+                var groupedByDataelements = _.groupBy(groupedDataValues[key], "dataElement");
+                groupedDataValues[key] = groupedByDataelements;
+            });
 
             $scope.genderOptions = _.isUndefined($scope.dataValues._sex) ? [] : $scope.optionSetMapping[$scope.dataValues._sex[0].optionSet.id];
             $scope.procedureOptions = _.isUndefined($scope.dataValues._procedures) ? [] : $scope.optionSetMapping[$scope.dataValues._procedures[0].optionSet.id];
