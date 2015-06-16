@@ -8,10 +8,12 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 q = $q;
                 origins = [{
                     'id': 'origin1',
-                    'name': 'Origin 1'
+                    'name': 'Origin 1',
+                    'displayName': 'Origin 1'
                 }, {
                     'id': 'origin2',
-                    'name': 'Origin 2'
+                    'name': 'Origin 2',
+                    'displayName': 'Origin 2'
                 }];
                 program = {
                     "id": "Emergency Department"
@@ -256,9 +258,13 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     }]
                 });
                 expect(scope.showFilters).toEqual(true);
-                expect(scope.originsMap).toEqual({
-                    "Origin 1": [events[0]],
-                    "Origin 2": [events[1]]
+                expect(scope.originMap).toEqual({
+                    'origin1': 'Origin 1',
+                    'origin2': 'Origin 2'
+                });
+                expect(scope.originEvents).toEqual({
+                    "origin1": [events[0]],
+                    "origin2": [events[1]]
                 });
             });
 

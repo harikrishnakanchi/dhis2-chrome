@@ -120,6 +120,10 @@ define(["lodash", "moment"], function(_, moment) {
         var loadOriginsOrgUnits = function() {
             return orgUnitRepository.findAllByParent($scope.selectedModule.id).then(function(data) {
                 $scope.originOrgUnits = data;
+                $scope.originMap = {};
+                _.forEach(data, function(origin) {
+                    $scope.originMap[origin.id] = origin.displayName;
+                });
             });
         };
 
@@ -163,7 +167,7 @@ define(["lodash", "moment"], function(_, moment) {
                 }
             });
 
-            $scope.originsMap = _.groupBy(events, "orgUnitName");
+            $scope.originEvents = _.groupBy(events, "orgUnit");
 
             groupedProcedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
             groupedDataValues = _.groupBy(allDataValues, "value");
