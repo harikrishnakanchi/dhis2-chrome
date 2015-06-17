@@ -1,20 +1,34 @@
 define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository"],
     function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository) {
         describe("lineListOfflineApprovalController", function() {
-            var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events;
+            var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4;
 
             beforeEach(mocks.inject(function($rootScope, $q) {
                 scope = $rootScope.$new();
                 q = $q;
-                origins = [{
-                    'id': 'origin1',
-                    'name': 'Origin 1',
-                    'displayName': 'Origin 1'
-                }, {
+                origin1 = {
                     'id': 'origin2',
                     'name': 'Origin 2',
                     'displayName': 'Origin 2'
-                }];
+                };
+                origin2 = {
+                    'id': 'origin1',
+                    'name': 'Not Specified',
+                    'displayName': 'Not Specified'
+                };
+                origin3 = {
+                    'id': 'origin3',
+                    'name': 'testOrigin',
+                    'displayName': 'testOrigin'
+                };
+
+                origin4 = {
+                    'id': 'origin4',
+                    'name': 'foo',
+                    'displayName': 'foo'
+                };
+
+                origins = [origin1, origin2, origin3, origin4];
                 program = {
                     "id": "Emergency Department"
                 };
@@ -141,7 +155,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
             }));
 
             it("should initialize", function() {
-                expect(scope.originOrgUnits).toEqual(origins);
+                expect(scope.originOrgUnits).toEqual([origin2, origin1, origin4, origin3]);
                 expect(scope.program).toEqual(program);
                 expect(scope.optionSetMapping).toEqual(optionSetMapping);
                 expect(scope.dataValues).toEqual({
@@ -259,8 +273,10 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 });
                 expect(scope.showFilters).toEqual(true);
                 expect(scope.originMap).toEqual({
-                    'origin1': 'Origin 1',
-                    'origin2': 'Origin 2'
+                    origin1: 'Not Specified',
+                    origin2: 'Origin 2',
+                    origin3: 'testOrigin',
+                    origin4: 'foo'
                 });
                 expect(scope.originEvents).toEqual({
                     "origin1": [events[0]],

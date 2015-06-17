@@ -122,6 +122,7 @@ define(["lodash", "moment"], function(_, moment) {
 
         var loadOriginsOrgUnits = function() {
             return orgUnitRepository.findAllByParent($scope.selectedModule.id).then(function(data) {
+                data = _.sortBy(data, "displayName");
                 $scope.originOrgUnits = data;
                 $scope.originMap = {};
                 _.forEach(data, function(origin) {
