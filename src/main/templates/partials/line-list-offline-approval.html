@@ -1,9 +1,9 @@
 <div ng-controller="lineListOfflineApprovalController">
-    <div class="alert alert-danger" ng-if="!showFilters">{{resourceBundle.noDataForApproval}}</div>
+    <div class="alert alert-danger" ng-hide="showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || (hasRoles(['Project Level Approver'])) )">{{resourceBundle.noDataForApproval}}</div>
     <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
     <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
     <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-    <div ng-if="showFilters">
+    <div ng-if="showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || (hasRoles(['Project Level Approver'])) )">
         <div>
             <accordion close-others="false">
                 <accordion-group is-open="origins.open">
