@@ -106,7 +106,7 @@ define(["lodash", "moment"], function(_, moment) {
 
         $scope.shouldShowInOfflineSummary = function(dataElementId, allDataElements) {
             allDataElements = _.filter(allDataElements, function(de) {
-                return _.endsWith(de.dataElement.code, "_showInOfflineSummary");
+                return _.endsWith(de.dataElement.code, "_showInOfflineSummary") && de.dataElement.optionSet;
             });
             var dataElementIds = _.pluck(_.pluck(allDataElements, 'dataElement'), 'id');
             return _.contains(dataElementIds, dataElementId);

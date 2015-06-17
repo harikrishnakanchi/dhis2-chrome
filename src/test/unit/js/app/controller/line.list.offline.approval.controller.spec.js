@@ -361,19 +361,27 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.getProcedureCount(true, true, "procedure 1", "Male_er", [4, 15])).toEqual(2);
             });
 
-            it("should return true if it should be shown in offline summary", function() {
+            it("should return true if it should be shown in offline summary else false", function() {
                 var allDataElements = [{
                     "name": "test",
                     "dataElement": {
                         "id": "Triage Status",
-                        "code": "_showInOfflineSummary"
+                        "code": "triage_status_showInOfflineSummary",
+                        "optionSet": {
+                            "id": "os1",
+                            "options": []
+                        }
+
+                    }
+                }, {
+                    "name": "de2",
+                    "dataElement": {
+                        "id": "Case Number",
+                        "code": "case_number_showInOfflineSummary"
                     }
                 }];
                 expect(scope.shouldShowInOfflineSummary("Triage Status", allDataElements)).toEqual(true);
-            });
-
-            it("should return false if it should not be shown in offline summary", function() {
-                expect(scope.shouldShowInOfflineSummary("gender")).toEqual(false);
+                expect(scope.shouldShowInOfflineSummary("Case Number", allDataElements)).toEqual(false);
             });
 
         });
