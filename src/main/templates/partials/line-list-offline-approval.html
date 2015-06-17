@@ -4,7 +4,7 @@
     <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
     <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
     <div ng-if="showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || (hasRoles(['Project Level Approver'])) )">
-        <div>
+        <div class="exp-coll-group panel-body">
             <accordion close-others="false">
                 <accordion-group is-open="origins.open">
                     <accordion-heading>
@@ -37,7 +37,7 @@
                     <input type="checkbox" ng-model="isAgeFilterApplied" />{{resourceBundle.age}}</label>
             </div>
         </div>
-        <div ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
+        <div class="exp-coll-group panel-body" ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
             <div ng-repeat="programStage in program.programStages">
                 <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                     <div ng-repeat="psde in section.programStageDataElements">
@@ -66,7 +66,7 @@
                     </div>
                 </div>
             </div>
-            <div ng-if="shouldShowProceduresInOfflineSummary()">
+            <div class="exp-coll-group panel-body" ng-if="shouldShowProceduresInOfflineSummary()">
                 <accordion close-others="false">
                     <accordion-group>
                         <accordion-heading>
@@ -89,7 +89,7 @@
                 </accordion>
             </div>
         </div>
-        <div ng-if="isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
+        <div class="exp-coll-group panel-body" ng-if="isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
             <div ng-repeat="programStage in program.programStages">
                 <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                     <div ng-repeat="psde in section.programStageDataElements">
@@ -119,7 +119,7 @@
                     </div>
                 </div>
             </div>
-            <div ng-if="shouldShowProceduresInOfflineSummary()">
+            <div class="exp-coll-group panel-body" ng-if="shouldShowProceduresInOfflineSummary()">
                 <accordion close-others="false">
                     <accordion-group is-open="status.open">
                         <accordion-heading>
@@ -143,7 +143,7 @@
                 </accordion>
             </div>
         </div>
-        <div ng-if="isAgeFilterApplied &amp;&amp; !isGenderFilterApplied">
+        <div class="exp-coll-group panel-body" ng-if="isAgeFilterApplied &amp;&amp; !isGenderFilterApplied">
             <div ng-repeat="programStage in program.programStages">
                 <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                     <div ng-repeat="psde in section.programStageDataElements">
@@ -176,7 +176,7 @@
                     </div>
                 </div>
             </div>
-            <div ng-if="shouldShowProceduresInOfflineSummary()">
+            <div class="exp-coll-group panel-body" ng-if="shouldShowProceduresInOfflineSummary()">
                 <accordion close-others="false">
                     <accordion-group is-open="status.open">
                         <accordion-heading>
@@ -203,7 +203,7 @@
                 </accordion>
             </div>
         </div>
-        <div ng-if="isAgeFilterApplied &amp;&amp; isGenderFilterApplied">
+        <div class="exp-coll-group panel-body" ng-if="isAgeFilterApplied &amp;&amp; isGenderFilterApplied">
             <div ng-repeat="programStage in program.programStages">
                 <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                     <div ng-repeat="psde in section.programStageDataElements">
@@ -252,7 +252,7 @@
                     </div>
                 </div>
             </div>
-            <div ng-if="shouldShowProceduresInOfflineSummary()">
+            <div class="exp-coll-group panel-body" ng-if="shouldShowProceduresInOfflineSummary()">
                 <accordion close-others="false">
                     <accordion-group is-open="status.open">
                         <accordion-heading>
