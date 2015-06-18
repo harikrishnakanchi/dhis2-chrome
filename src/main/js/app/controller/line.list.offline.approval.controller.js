@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository) {
+    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository) {
 
         $scope.isGenderFilterApplied = false;
         $scope.isAgeFilterApplied = false;
@@ -193,6 +193,12 @@ define(["lodash", "moment"], function(_, moment) {
             $scope.showFilters = !_.isEmpty($scope.procedureDataValueIds) || !_.isEmpty(_.compact(_.pluck($scope.dataValues._showInOfflineSummary, "value")));
         };
 
+        var getAssociatedDataSets = function() {
+            return datasetRepository.findAllForOrgUnits([$scope.originOrgUnits[0].id]).then(function(data) {
+                $scope.associatedDataSets = data;
+            });
+        };
+
         var init = function() {
             var submittedEvents = [];
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping()]).then(function() {
@@ -203,6 +209,7 @@ define(["lodash", "moment"], function(_, moment) {
                     });
                     loadGroupedDataValues(submittedEvents);
                     setShowFilterFlag();
+                    getAssociatedDataSets();
                 });
             });
         };
