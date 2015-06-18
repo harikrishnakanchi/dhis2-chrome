@@ -128,7 +128,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 }];
 
                 programEventRepository = new ProgramEventRepository();
-                spyOn(programEventRepository, "getEventsFor").and.returnValue(utils.getPromise(q, events));
+                spyOn(programEventRepository, "getEventsForPeriod").and.returnValue(utils.getPromise(q, events));
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, origins));
@@ -293,7 +293,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
             });
 
             it("should return set showFilters to false if there are no events", function() {
-                programEventRepository.getEventsFor.and.returnValue(utils.getPromise(q, []));
+                programEventRepository.getEventsForPeriod.and.returnValue(utils.getPromise(q, []));
                 lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository);
                 scope.$apply();
 
@@ -305,7 +305,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
             });
 
             it("should return false if there are no procedure data values", function() {
-                programEventRepository.getEventsFor.and.returnValue(utils.getPromise(q, []));
+                programEventRepository.getEventsForPeriod.and.returnValue(utils.getPromise(q, []));
                 lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository);
                 scope.$apply();
 

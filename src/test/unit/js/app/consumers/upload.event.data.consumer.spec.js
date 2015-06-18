@@ -44,14 +44,12 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
 
                 expect(eventService.upsertEvents).toHaveBeenCalledWith(dhisEventPayload);
 
-                var dbEventPayload = {
-                    'events': [{
-                        'event': 'e1',
-                        'eventDate': '2014-09-28'
-                    }]
-                };
-                expect(programEventRepository.upsert).toHaveBeenCalledWith(dbEventPayload);
+                var dbEventPayload = [{
+                    'event': 'e1',
+                    'eventDate': '2014-09-28'
+                }];
 
+                expect(programEventRepository.upsert).toHaveBeenCalledWith(dbEventPayload);
             });
         });
     });

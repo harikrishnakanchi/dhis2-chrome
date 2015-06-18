@@ -46,6 +46,10 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/line-list-summary.html',
                         controller: 'lineListSummaryController'
                     }).
+                    when('/line-list-data-entry/:module?/:eventId?', {
+                        templateUrl: 'templates/line-list-data-entry.html',
+                        controller: 'lineListDataEntryController'
+                    }).
                     when('/data-approval/:module?/:week?', {
                         templateUrl: 'templates/data-approval.html',
                         controller: 'dataApprovalController'

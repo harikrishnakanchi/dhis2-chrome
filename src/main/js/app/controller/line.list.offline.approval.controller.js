@@ -202,7 +202,7 @@ define(["lodash", "moment"], function(_, moment) {
         var init = function() {
             var submittedEvents = [];
             return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping()]).then(function() {
-                return programEventRepository.getEventsFor($scope.associatedProgramId, getPeriod(), _.pluck($scope.originOrgUnits, "id")).then(function(events) {
+                return programEventRepository.getEventsForPeriod($scope.associatedProgramId, _.pluck($scope.originOrgUnits, "id"), getPeriod()).then(function(events) {
                     _.forEach(events, function(event) {
                         if (event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined)
                             submittedEvents.push(event);

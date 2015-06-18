@@ -79,9 +79,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 }]
             };
 
-            var eventsPayload = {
-                "events": [event1ForP1, event2ForP1, event3ForP2]
-            };
+            var eventsPayload = [event1ForP1, event2ForP1, event3ForP2];
 
             var returnValue;
             programEventRepository.upsert(eventsPayload).then(function(data) {
@@ -101,24 +99,11 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             expectedEvent3ForP2.period = "2015W23";
             expectedEvent3ForP2.eventCode = "C3";
 
-            var expectedEventData = {
-                "events": [expectedEvent1ForP1, expectedEvent2ForP1, expectedEvent3ForP2]
-            };
+            var expectedEventData = [expectedEvent1ForP1, expectedEvent2ForP1, expectedEvent3ForP2];
 
             expect(mockStore.each.calls.argsFor(0)[0].inList).toEqual(["d1", "d2", "d3", "d4"]);
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedEventData.events);
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedEventData);
             expect(returnValue).toEqual(expectedEventData);
-        });
-
-        it("should get event by id", function() {
-            mockDB = utils.getMockDB(q);
-            mockStore = mockDB.objectStore;
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
-
-            programEventRepository.getEvent("ev1");
-            scope.$apply();
-
-            expect(mockStore.find).toHaveBeenCalledWith("ev1");
         });
 
         it("should delete events given ids", function() {
@@ -166,21 +151,24 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 'id': 'e1'
             }];
 
+            var startPeriod = '2014W4';
+
             mockDB = utils.getMockDB(q, [], [], listOfEvents);
             mockStore = mockDB.objectStore;
 
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
 
-
             var actualEvents;
-            programEventRepository.getEventsFromPeriod('2014W4').then(function(events) {
+            programEventRepository.getEventsFromPeriod(startPeriod).then(function(events) {
                 actualEvents = events;
             });
 
             scope.$apply();
 
-            expect(mockStore.each.calls.argsFor(0)[0].betweenX).toEqual("2014W04");
-            expect(mockStore.each.calls.argsFor(0)[0].betweenY).toEqual(moment().format("GGGG[W]W"));
+            var queryObject = mockStore.each.calls.argsFor(0)[0];
+            expect(queryObject.index).toEqual('by_event_date');
+            expect(queryObject.betweenX).toEqual('2014-01-20');
+            expect(queryObject.betweenY).toEqual(moment().format('YYYY-MM-DD'));
 
             expect(actualEvents).toEqual(listOfEvents);
         });
@@ -270,7 +258,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
 
             var enrichedEvents;
-            programEventRepository.getEventsFor("p1", "2014W1", "mod1").then(function(data) {
+            programEventRepository.getEventsForPeriod("p1", "mod1", "2014W1").then(function(data) {
                 enrichedEvents = data;
             });
             scope.$apply();
@@ -400,38 +388,38 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
 
             var enrichedEvents;
-            programEventRepository.getEventsFor("p1", "2014W1", ["ou1", "ou2"]).then(function(data) {
+            programEventRepository.getEventsForPeriod("p1", ["ou1", "ou2"], "2014W1").then(function(data) {
                 enrichedEvents = data;
             });
             scope.$apply();
 
             var expectedEvents = [{
-                event: 'event1',
-                eventDate: '2014-11-26T00:00:00',
-                orgUnit: "ou1",
-                dataValues: [{
-                    shortName: 'Age',
-                    showInEventSummary: true,
-                    dataElement: 'de1',
-                    value: '20',
+                'event': 'event1',
+                'eventDate': '2014-11-26T00:00:00',
+                'orgUnit': 'ou1',
+                'dataValues': [{
+                    'shortName': 'Age',
+                    'showInEventSummary': true,
+                    'dataElement': 'de1',
+                    'value': '20',
                 }, {
-                    shortName: 'PatientId',
-                    showInEventSummary: false,
-                    dataElement: 'de2'
+                    'shortName': 'PatientId',
+                    'showInEventSummary': false,
+                    'dataElement': 'de2'
                 }]
             }, {
-                event: 'event2',
-                eventDate: '2014-11-24T00:00:00',
-                orgUnit: "ou2",
-                dataValues: [{
-                    shortName: 'Age',
-                    showInEventSummary: true,
-                    dataElement: 'de1'
+                'event': 'event2',
+                'eventDate': '2014-11-24T00:00:00',
+                'orgUnit': 'ou2',
+                'dataValues': [{
+                    'shortName': 'Age',
+                    'showInEventSummary': true,
+                    'dataElement': 'de1'
                 }, {
-                    shortName: 'PatientId',
-                    showInEventSummary: false,
-                    dataElement: 'de2',
-                    value: 'ABC1',
+                    'shortName': 'PatientId',
+                    'showInEventSummary': false,
+                    'dataElement': 'de2',
+                    'value': 'ABC1',
                 }]
             }];
 
@@ -452,21 +440,6 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 }]
             }, {
                 'event': 'event2',
-                'eventDate': '2014-11-24T00:00:00',
-                'dataValues': [{
-                    'dataElement': 'de2',
-                    'value': 'ABC1'
-                }]
-            }, {
-                'event': 'event3',
-                'eventDate': '2014-11-23T00:00:00',
-                'localStatus': 'DELETED',
-                'dataValues': [{
-                    'dataElement': 'de1',
-                    'value': '20'
-                }]
-            }, {
-                'event': 'event4',
                 'eventDate': '2014-11-26T00:00:00',
                 'localStatus': 'UPDATED_DRAFT',
                 'dataValues': [{
@@ -478,7 +451,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
 
-            programEventRepository.markEventsAsSubmitted("programId", "2014W7", "orgId");
+            programEventRepository.markEventsAsSubmitted(["event1", "event2"]);
             scope.$apply();
 
             var expectedPayload = [{
@@ -490,7 +463,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                     value: '20'
                 }]
             }, {
-                event: 'event4',
+                event: 'event2',
                 eventDate: '2014-11-26T00:00:00',
                 localStatus: 'READY_FOR_DHIS',
                 dataValues: [{

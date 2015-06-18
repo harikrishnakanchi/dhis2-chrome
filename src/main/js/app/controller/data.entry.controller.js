@@ -44,15 +44,7 @@ define(["lodash", "moment"],
                 });
             };
 
-            var getLineListModules = function(modules) {
-                return _.filter(modules, function(module) {
-                    return isLineListService(module);
-                });
-            };
-
             var getFilteredModulesWithDisplayNames = function(modules) {
-                if ($scope.dataType === "linelist")
-                    modules = getLineListModules(modules);
                 if ($scope.dataType == "aggregate")
                     modules = getAggregateModules(modules);
 

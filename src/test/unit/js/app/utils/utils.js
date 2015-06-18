@@ -31,6 +31,7 @@ define([], function() {
 
     var getMockDB = function(q, findResult, allResult, eachResult, dbInfo) {
         var mockStore = getMockStore(q, findResult, allResult, eachResult);
+
         var queryBuilder = function() {
 
             this.$index = function(index) {
@@ -56,12 +57,16 @@ define([], function() {
             return this;
         };
 
+        var getQueryBuilder = function(){
+            return new queryBuilder();
+        };
+
         var db = {
             "objectStore": jasmine.createSpy("objectStore").and.callFake(function(storeName) {
                 mockStore.storeName = storeName;
                 return mockStore;
             }),
-            "queryBuilder": queryBuilder,
+            "queryBuilder": getQueryBuilder,
             "dbInfo": jasmine.createSpy("dbInfo").and.returnValue(getPromise(q, dbInfo)),
             "switchDB": jasmine.createSpy("switchDB").and.callFake(function() {
                 return;

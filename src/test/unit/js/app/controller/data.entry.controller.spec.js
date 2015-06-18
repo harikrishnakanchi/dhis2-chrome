@@ -83,32 +83,6 @@ define(["dataEntryController", "testData", "angularMocks", "lodash", "utils", "o
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, modules));
             }));
 
-            it("should initialize modules if dataType is set to linelist", function() {
-                scope.dataType = "linelist";
-                scope.$apply();
-
-                var expectedModules = [{
-                    'name': 'linelistMod',
-                    'id': 'llmod',
-                    'displayName': 'op1 - linelistMod',
-                    'parent': {
-                        'name': 'op1'
-                    },
-                    'attributeValues': [{
-                        'attribute': {
-                            'code': 'isLineListService'
-
-                        },
-                        'value': "true"
-                    }]
-                }];
-
-                dataEntryController = new DataEntryController(scope, routeParams, q, location, rootScope, orgUnitRepository);
-                scope.$apply();
-
-                expect(scope.modules).toEqual(expectedModules);
-            });
-
             it("should initialize modules if dataType is set to aggregate", function() {
                 scope.dataType = "aggregate";
                 scope.$apply();

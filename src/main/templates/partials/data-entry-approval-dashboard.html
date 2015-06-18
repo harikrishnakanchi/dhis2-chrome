@@ -22,7 +22,7 @@
                 <tr ng-repeat="(moduleId, items) in itemsAwaitingApprovalAtUserLevel | orderBy:'moduleName' | groupBy: 'moduleId'">
                     <td>{{items[0].moduleName}}</td>
                     <td>
-                        <ul>
+                        <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
                                 <input type="checkbox" class="dashboard-form-checkbox" ng-model="item.selectedForApproval" />
                                 <a ng-href="{{getTemplateUrl(item)}}">{{formatPeriods(item.period)}}</a>
@@ -52,7 +52,7 @@
                 <tr ng-repeat="(moduleId, items) in itemsAwaitingSubmission | orderBy:'moduleName' | groupBy: 'moduleId'">
                     <td>{{items[0].moduleName}}</td>
                     <td>
-                        <ul>
+                        <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
                                 <a ng-href="{{getTemplateUrl(item)}}" ng-if="hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</a>
                                 <span ng-if="!hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</span>
@@ -76,7 +76,7 @@
                 <tr ng-repeat="(moduleId, items) in itemsAwaitingApprovalAtOtherLevels | orderBy:'moduleName' | groupBy: 'moduleId'">
                     <td>{{items[0].moduleName}}</td>
                     <td>
-                        <ul>
+                        <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
                                 <a ng-href="{{getTemplateUrl(item)}}" ng-if="hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</a>
                                 <span ng-if="!hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</span>
@@ -84,7 +84,7 @@
                         </ul>
                     </td>
                     <td>
-                        <ul>
+                        <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
                                 <span ng-if="!item.isComplete">{{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
                                 <span ng-if="item.isComplete">{{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>

@@ -1,49 +1,53 @@
-define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository"],
-    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository) {
+define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timecop", "programEventRepository", "optionSetRepository", "orgUnitRepository", "systemSettingRepository", "programRepository"],
+    function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository, OrgUnitRepository, SystemSettingRepository, ProgramRepository) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, q, programRepository, db, mockStore, allEvents, optionSets, originOrgUnits, optionSetRepository, optionSetMapping;
+            var scope, q, routeparams, location, programEventRepository, mockStore, allEvents, optionSets, originOrgUnits, optionSetRepository, optionSetMapping, orgUnitRepository, systemSettingRepository, programRepository;
 
             beforeEach(module('hustle'));
-            beforeEach(mocks.inject(function($rootScope, $q) {
+            beforeEach(mocks.inject(function($rootScope, $q, $location) {
                 scope = $rootScope.$new();
                 q = $q;
-
-                optionSets = [{
-                    'id': 'os1',
-                    'options': [{
-                        'id': 'os1o1',
-                        'code': 'os1o1',
-                        'name': 'os1o1 name'
-                    }]
-                }, {
-                    'id': 'os2',
-                    'options': [{
-                        'id': 'os2o1',
-                        'code': 'os2o1',
-                        'name': 'os2o1 name'
-                    }]
-                }];
-
-                db = {
-                    "objectStore": jasmine.createSpy("objectStore").and.callFake(function(storeName) {
-                        return utils.getMockStore(q, [], optionSets);
-                    })
-                };
+                location = $location;
 
                 scope.resourceBundle = {};
-                scope.week = {
-                    "weekNumber": 44,
-                    "weekYear": 2014,
-                    "startOfWeek": "2014-10-27",
-                    "endOfWeek": "2014-11-02"
+
+                routeParams = {
+                    "eventId": "event1",
+                    'module': 'mod1'
                 };
 
-                scope.selectedModule = {
-                    'id': 'currentModuleId',
-                    'parent': {
-                        'id': 'par1'
-                    }
+
+                var ev = {
+                    "event": "event1",
+                    "dataValues": [{
+                        "name": "Case Number - Measles Outbreak",
+                        "type": "string",
+                        "value": "66",
+                        "dataElement": "de1"
+                    }]
+                };
+
+                spyOn(location, "path").and.returnValue(location);
+                spyOn(location, "search").and.returnValue("something");
+
+
+                programEventRepository = new ProgramEventRepository();
+                spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, []));
+                spyOn(programEventRepository, "findEventById").and.returnValue(utils.getPromise(q, [ev]));
+
+
+                var optionSetMapping = {
+                    "optionSetMap": {}
+                };
+
+                optionSetRepository = new OptionSetRepository();
+                spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, optionSetMapping));
+
+
+                var module = {
+                    "id": "mod1",
+                    "name": "Mod 1"
                 };
 
                 originOrgUnits = [{
@@ -54,57 +58,40 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "name": "o2"
                 }];
 
-                scope.originOrgUnits = originOrgUnits;
-                scope.showResultMessage = jasmine.createSpy("showResultMessage");
-                scope.originOrgUnitsById = {
-                    "o1": originOrgUnits[0],
-                    "o2": originOrgUnits[1]
-                };
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, module));
+                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
+                spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, {}));
 
-                programEventRepository = new ProgramEventRepository();
-                spyOn(programEventRepository, "upsert").and.returnValue(utils.getPromise(q, []));
 
-                optionSetRepository = new OptionSetRepository();
-                optionSetMapping = {
-                    "os1": [{
-                        "id": 'os1o1',
-                        "code": 'os1o1',
-                        "name": 'os1o1 name',
-                        "displayName": 'os1o1 name',
-                    }],
-                    "os2": [{
-                        "id": 'os2o1',
-                        "code": 'os2o1',
-                        "name": 'os2o1 name',
-                        "displayName": 'os2o1 translated name'
-                    }]
-                };
-                spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, {
-                    "optionSetMap": optionSetMapping
-                }));
+                systemSettingRepository = new SystemSettingRepository();
+                spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
-                Timecop.install();
-                Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
-            }));
-
-            afterEach(function() {
-                Timecop.returnToPresent();
-                Timecop.uninstall();
-            });
-
-            it("should load optionSetMapping and dataValues on init", function() {
-                scope.program = {
+                var program = {
+                    "id": "Prg1",
                     'programStages': [{
+                        'id': 'PrgStage1',
                         'programStageSections': [{
+                            'id': 'section1',
                             'programStageDataElements': [{
                                 "dataElement": {
-                                    "id": "de1"
+                                    "id": "de1",
+                                    'attributeValues': [{
+                                        'attribute': {
+                                            'code': 'useAsEventDate'
+                                        },
+                                        'value': 'true'
+                                    }]
                                 }
                             }, {
+                                "compulsory": true,
                                 "dataElement": {
                                     "id": "de2"
                                 }
-                            }, {
+                            }]
+                        }, {
+                            'id': 'section2',
+                            'programStageDataElements': [{
                                 "dataElement": {
                                     "id": "de3"
                                 }
@@ -120,8 +107,35 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     }]
                 };
 
-                scope.event = {
-                    "event": "a41bd7adefc",
+                programRepository = new ProgramRepository();
+                spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
+                spyOn(programRepository, "get").and.returnValue(utils.getPromise(q, program));
+
+
+                Timecop.install();
+                Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
+            }));
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
+            it("should set scope variables on init", function() {
+                var lineListDataEntryController = new LineListDataEntryController(scope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
+                scope.$apply();
+
+                expect(scope.selectedModuleId).toBeDefined();
+                expect(scope.selectedModuleName).toBeDefined();
+                expect(scope.originOrgUnits).toBeDefined();
+                expect(scope.program).toBeDefined();
+                expect(scope.optionSetMapping).toBeDefined();
+            });
+
+            it("should load dataValues on init", function() {
+
+                var ev = {
+                    "event": "event1",
                     "dataValues": [{
                         "name": "Case Number - Measles Outbreak",
                         "type": "string",
@@ -144,14 +158,30 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         "dataElement": "de4"
                     }]
                 };
+                programEventRepository.findEventById.and.returnValue(utils.getPromise(q, [ev]));
 
-                scope.resourceBundle = {
-                    'os2o1': 'os2o1 translated name'
+
+                var optionSetMapping = {
+                    "optionSetMap": {
+                        "os1": [{
+                            "id": 'os1o1',
+                            "code": 'os1o1',
+                            "name": 'os1o1 name',
+                            "displayName": 'os1o1 name',
+                        }],
+                        "os2": [{
+                            "id": 'os2o1',
+                            "code": 'os2o1',
+                            "name": 'os2o1 name',
+                            "displayName": 'os2o1 translated name'
+                        }]
+                    }
                 };
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
+                optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
+
+                var lineListDataEntryController = new LineListDataEntryController(scope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
-                expect(scope.optionSetMapping).toEqual(optionSetMapping);
                 expect(scope.dataValues).toEqual({
                     'de1': '66',
                     'de2': new Date("2015-04-15".replace(/-/g, ',')),
@@ -165,89 +195,38 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 });
             });
 
-            it("should set min and max date for selected period", function() {
-
-                scope.week = {
-                    "weekNumber": 46,
-                    "weekYear": 2014,
-                    "startOfWeek": "2014-11-10",
-                    "endOfWeek": "2014-11-16"
-                };
-
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
-                scope.$apply();
-
-                expect(moment(scope.minDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-10");
-                expect(moment(scope.maxDateInCurrentPeriod).format("YYYY-MM-DD")).toEqual("2014-11-16");
-            });
-
             it("should save event details as newDraft and show summary view", function() {
-                var program = {
-                    'id': 'Prg1',
-                };
 
-                var programStage = {
-                    'id': 'PrgStage1',
-                    'programStageSections': [{
-                        'id': 'section1',
-                        'programStageDataElements': [{
-                            "dataElement": {
-                                "id": "de1",
-                                'attributeValues': [{
-                                    'attribute': {
-                                        'code': 'useAsEventDate'
-                                    },
-                                    'value': 'true'
-                                }]
-                            }
-                        }, {
-                            "dataElement": {
-                                "id": "de2"
-                            }
-                        }]
-                    }, {
-                        'id': 'section2',
-                        'programStageDataElements': [{
-                            "dataElement": {
-                                "id": "de3"
-                            }
-                        }]
-                    }]
-                };
-
-
-                spyOn(location, "hash");
-
-                scope.program = program;
-                scope.loadEventsView = jasmine.createSpy("loadEventsView");
-                scope.resourceBundle = {
-                    'eventSaveSuccess': 'Event saved successfully'
-                };
-                scope.programId = "p2";
-
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
                 scope.dataValues = {
                     'de1': "2015-02-03",
                     'de2': "someValue",
-                    'de3': "blah"
+                    'de3': "blah",
+                    'de4': {
+                        'id': 'os1o1',
+                        'code': 'os1o1',
+                        'name': 'os1o1 name',
+                        'displayName': 'os1o1 name'
+                    }
                 };
 
                 scope.patientOrigin = {
                     "selected": originOrgUnits[0]
                 };
-                scope.save(programStage);
+
+                scope.save();
                 scope.$apply();
 
-                var actualPayloadInUpsertCall = programEventRepository.upsert.calls.first().args[0];
+                var actualUpsertedEvent = programEventRepository.upsert.calls.first().args[0];
 
-                expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
-                expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
-                expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("o1");
-                expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2015-02-03");
-                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW_DRAFT");
-                expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([{
+                expect(actualUpsertedEvent.program).toEqual("Prg1");
+                expect(actualUpsertedEvent.programStage).toEqual("PrgStage1");
+                expect(actualUpsertedEvent.orgUnit).toEqual(originOrgUnits[0].id);
+                expect(actualUpsertedEvent.eventDate).toEqual("2015-02-03");
+                expect(actualUpsertedEvent.localStatus).toEqual("NEW_DRAFT");
+                expect(actualUpsertedEvent.dataValues).toEqual([{
                     "dataElement": 'de1',
                     "value": '2015-02-03'
                 }, {
@@ -256,23 +235,19 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 }, {
                     "dataElement": 'de3',
                     "value": 'blah'
+                }, {
+                    "dataElement": 'de4',
+                    "value": 'os1o1'
                 }]);
-
-                expect(scope.loadEventsView).toHaveBeenCalled();
+                expect(location.path).toHaveBeenCalledWith("/line-list-summary/mod1");
+                expect(location.search).toHaveBeenCalledWith({
+                    "messageType": "success",
+                    "message": scope.resourceBundle.eventSaveSuccess
+                });
             });
 
             it("should save event details as newDraft and show data entry form again", function() {
-                scope.program = {
-                    'id': 'Prg1',
-                };
-
-                scope.loadEventsView = jasmine.createSpy("loadEventsView");
-
-                var programStage = {
-                    'id': 'PrgStage1',
-                };
-
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
                 scope.patientOrigin = {
@@ -284,171 +259,80 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     }
                 };
 
-                scope.save(programStage, true);
-                scope.$apply();
+                scope.save(true);
 
-                expect(scope.loadEventsView).not.toHaveBeenCalled();
+                expect(location.path).not.toHaveBeenCalledWith("/line-list-summary/mod1");
+                expect(location.search).not.toHaveBeenCalled();
+
+                scope.$apply();
             });
 
             it("should update event details", function() {
-                var programStage = {
-                    'id': 'PrgStage1',
-                    'programStageSections': [{
-                        'id': 'section1',
-                        'programStageDataElements': [{
-                            "dataElement": {
-                                "id": "de1",
-                                'attributeValues': [{
-                                    'attribute': {
-                                        'code': 'useAsEventDate'
-                                    },
-                                    'value': 'true'
-                                }]
-                            }
-                        }, {
-                            "dataElement": {
-                                "id": "de2"
-                            }
-                        }]
-                    }, {
-                        'id': 'section2',
-                        'programStageDataElements': [{
-                            "dataElement": {
-                                "id": "de3"
-                            }
-                        }]
-                    }]
-                };
-
-                spyOn(location, "hash");
-
-                scope.resourceBundle = {
-                    'eventSaveSuccess': 'Event updated successfully'
-                };
-
-                scope.event = {
-                    "event": "event1",
-                    "program": "Prg1",
-                    "programStage": "PrgStage1",
-                    "orgUnit": "Mod1",
-                    "eventDate": "2014-12-29",
-                    "dataValues": [{
-                        "dataElement": "de1",
-                        "value": "2014-12-31",
-                        "type": "date"
-                    }, {
-                        "dataElement": "de2",
-                        "value": "13",
-                        "type": "int"
-                    }, {
-                        "dataElement": "de3",
-                        "value": "14",
-                        "type": "int"
-                    }]
-                };
-
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
                 scope.patientOrigin = {
                     "selected": originOrgUnits[0]
                 };
-                scope.update(programStage);
-                scope.$apply();
 
-                var eventPayload = {
-                    "events": [{
-                        'event': "event1",
-                        'program': "Prg1",
-                        'programStage': "PrgStage1",
-                        'orgUnit': "o1",
-                        'eventDate': new Date("2014,12,31"),
-                        'dataValues': [{
-                            "dataElement": "de1",
-                            "value": new Date("2014,12,31")
-                        }, {
-                            "dataElement": "de2",
-                            "value": 13
-                        }, {
-                            "dataElement": "de3",
-                            "value": 14
-                        }],
-                        'localStatus': "UPDATED_DRAFT"
-                    }]
+                scope.dataValues = {
+                    'de1': "2015-04-15",
+                    'de2': "someValue",
+                    'de3': "blah",
+                    'de4': "blah-again"
                 };
 
-                expect(programEventRepository.upsert).toHaveBeenCalledWith(eventPayload);
+
+                scope.update();
+                scope.$apply();
+
+                var expectedEventPayload = {
+                    'event': "event1",
+                    'orgUnit': "o1",
+                    'eventDate': "2015-04-15",
+                    'dataValues': [{
+                        "dataElement": "de1",
+                        "value": "2015-04-15"
+                    }, {
+                        "dataElement": "de2",
+                        "value": "someValue"
+                    }, {
+                        "dataElement": "de3",
+                        "value": "blah"
+                    }, {
+                        "dataElement": "de4",
+                        "value": "blah-again"
+                    }],
+                    'localStatus': "UPDATED_DRAFT"
+                };
+
+                expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventPayload);
             });
 
             it("should save incomplete events", function() {
-                var program = {
-                    'id': 'Prg1',
-                };
-
-                var programStage = {
-                    'id': 'PrgStage1',
-                    'programStageSections': [{
-                        'id': 'section1',
-                        'programStageDataElements': [{
-                            "compulsory": true,
-                            "dataElement": {
-                                "id": "de1",
-                                'attributeValues': [{
-                                    'attribute': {
-                                        'code': 'useAsEventDate'
-                                    },
-                                    'value': 'true'
-                                }]
-                            }
-                        }, {
-                            "compulsory": true,
-                            "dataElement": {
-                                "id": "de2"
-                            }
-                        }]
-                    }, {
-                        'id': 'section2',
-                        'programStageDataElements': [{
-                            "dataElement": {
-                                "id": "de3"
-                            }
-                        }]
-                    }]
-                };
-
-
-                spyOn(location, "hash");
-
-                scope.program = program;
-                scope.loadEventsView = jasmine.createSpy("loadEventsView");
-                scope.resourceBundle = {
-                    'eventSaveSuccess': 'Event saved successfully'
-                };
-                scope.programId = "p2";
-
-                var lineListDataEntryController = new LineListDataEntryController(scope, db, programEventRepository, optionSetRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
                 scope.dataValues = {
                     'de1': "2015-02-03",
                     'de2': undefined,
-                    'de3': "blah"
+                    'de3': "blah",
+                    'de4': undefined
                 };
-
                 scope.patientOrigin = {
                     "selected": originOrgUnits[0]
                 };
-                scope.save(programStage);
+                scope.save();
                 scope.$apply();
 
-                var actualPayloadInUpsertCall = programEventRepository.upsert.calls.first().args[0];
+                var actualUpsertedEvent = programEventRepository.upsert.calls.first().args[0];
 
-                expect(actualPayloadInUpsertCall.events[0].program).toEqual("Prg1");
-                expect(actualPayloadInUpsertCall.events[0].programStage).toEqual("PrgStage1");
-                expect(actualPayloadInUpsertCall.events[0].orgUnit).toEqual("o1");
-                expect(actualPayloadInUpsertCall.events[0].eventDate).toEqual("2015-02-03");
-                expect(actualPayloadInUpsertCall.events[0].localStatus).toEqual("NEW_INCOMPLETE_DRAFT");
-                expect(actualPayloadInUpsertCall.events[0].dataValues).toEqual([{
+                expect(actualUpsertedEvent.program).toEqual("Prg1");
+                expect(actualUpsertedEvent.programStage).toEqual("PrgStage1");
+                expect(actualUpsertedEvent.orgUnit).toEqual("o1");
+                expect(actualUpsertedEvent.eventDate).toEqual("2015-02-03");
+                expect(actualUpsertedEvent.localStatus).toEqual("NEW_INCOMPLETE_DRAFT");
+                expect(actualUpsertedEvent.dataValues).toEqual([{
                     "dataElement": 'de1',
                     "value": '2015-02-03'
                 }, {
@@ -457,6 +341,9 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 }, {
                     "dataElement": 'de3',
                     "value": 'blah'
+                }, {
+                    "dataElement": 'de4',
+                    "value": undefined
                 }]);
             });
         });

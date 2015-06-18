@@ -5,9 +5,7 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
                 return _.omit(event, "localStatus");
             });
 
-            return programEventRepository.upsert({
-                "events": updatedEvents
-            });
+            return programEventRepository.upsert(updatedEvents);
         };
 
         var uploadEventData = function(orgUnitIds) {

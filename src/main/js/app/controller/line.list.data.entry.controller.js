@@ -1,24 +1,22 @@
-define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId, properties) {
-    return function($scope, db, programEventRepository, optionSetRepository) {
+define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
+    return function($scope, $routeParams, $location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository) {
+
         var resetForm = function() {
             $scope.form = $scope.form || {};
             $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.dataValues = {};
             $scope.patientOrigin = {};
-            $scope.minDateInCurrentPeriod = $scope.week.startOfWeek;
-            $scope.maxDateInCurrentPeriod = $scope.week.endOfWeek;
             $scope.isNewMode = true;
             if ($scope.form && $scope.form.eventDataEntryForm) {
                 $scope.form.eventDataEntryForm.$setPristine();
             }
+            $scope.minEventDate = dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync);
+            $scope.maxEventDate = moment().format("YYYY-MM-DD");
             $scope.$broadcast('angucomplete-alt:clearInput');
         };
 
-        var getPeriod = function() {
-            return moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
-        };
-
-        var getDataValuesAndEventDate = function(programStage) {
+        var getDataValuesAndEventDate = function() {
+            var programStage = $scope.program.programStages[0];
             var eventDate = null;
             var compulsoryFieldsPresent = true;
 
@@ -39,7 +37,6 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                     if ($scope.isEventDateSubstitute(psde.dataElement)) {
                         eventDate = value;
                     }
-
                     if (psde.compulsory) {
                         if (psde.dataElement.type === "int") {
                             compulsoryFieldsPresent = isNaN(value) || value === null ? false : compulsoryFieldsPresent;
@@ -53,6 +50,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
                     });
                 });
             }));
+
             return {
                 dataValues: dataValuesList,
                 eventDate: eventDate,
@@ -60,14 +58,9 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             };
         };
 
-        var upsertEvent = function() {
-            var payload = {
-                "events": [$scope.event]
-            };
-            return programEventRepository.upsert(payload).then(function() {
-                return $scope.showResultMessage("success", $scope.resourceBundle.eventSaveSuccess);
-            });
-        };
+        $scope.loadEventsView = function() {
+            $location.path("/line-list-summary/" + $scope.selectedModuleId);
+        }
 
         $scope.isEventDateSubstitute = function(dataElement) {
             var attr = _.find(dataElement.attributeValues, function(attributeValue) {
@@ -76,45 +69,82 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
             return attr && attr.value === "true";
         };
 
-        $scope.update = function(programStage) {
-            var buildPayloadFromView = function() {
-                var dataValuesAndEventDate = getDataValuesAndEventDate(programStage);
-                $scope.event.orgUnit = $scope.patientOrigin.selected.id;
-                $scope.event.eventDate = dataValuesAndEventDate.eventDate;
-                $scope.event.localStatus = dataValuesAndEventDate.compulsoryFieldsPresent ? "UPDATED_DRAFT" : "UPDATED_INCOMPLETE_DRAFT";
-                $scope.event.dataValues = dataValuesAndEventDate.dataValues;
-            };
+        $scope.update = function() {
+            var dataValuesAndEventDate = getDataValuesAndEventDate();
+            $scope.event.orgUnit = $scope.patientOrigin.selected.id;
+            $scope.event.eventDate = dataValuesAndEventDate.eventDate;
+            $scope.event.localStatus = dataValuesAndEventDate.compulsoryFieldsPresent ? "UPDATED_DRAFT" : "UPDATED_INCOMPLETE_DRAFT";
+            $scope.event.dataValues = dataValuesAndEventDate.dataValues;
 
-            buildPayloadFromView();
-            upsertEvent().then($scope.loadEventsView);
+            programEventRepository.upsert($scope.event).then(function() {
+                $location.path("/line-list-summary/" + $scope.selectedModuleId).search({
+                    'messageType': 'success',
+                    "message": $scope.resourceBundle.eventSaveSuccess
+                });
+
+            });
         };
 
-        $scope.save = function(programStage, addAnother) {
-            var buildPayloadFromView = function() {
-                var dataValuesAndEventDate = getDataValuesAndEventDate(programStage);
+        $scope.save = function(addAnother) {
 
-                $scope.event = {
-                    "event": dhisId.get($scope.program.id + programStage.id + $scope.selectedModule.id + moment().format()),
-                    "program": $scope.program.id,
-                    "programStage": programStage.id,
-                    "orgUnit": $scope.patientOrigin.selected.id,
-                    "eventDate": dataValuesAndEventDate.eventDate,
-                    "localStatus": dataValuesAndEventDate.compulsoryFieldsPresent ? "NEW_DRAFT" : "NEW_INCOMPLETE_DRAFT",
-                    "dataValues": dataValuesAndEventDate.dataValues
-                };
+            var dataValuesAndEventDate = getDataValuesAndEventDate();
+
+            $scope.event = {
+                "event": dhisId.get($scope.program.id + $scope.program.programStages[0].id + $scope.selectedModuleId + moment().format()),
+                "program": $scope.program.id,
+                "programStage": $scope.program.programStages[0].id,
+                "orgUnit": $scope.patientOrigin.selected.id,
+                "eventDate": dataValuesAndEventDate.eventDate,
+                "localStatus": dataValuesAndEventDate.compulsoryFieldsPresent ? "NEW_DRAFT" : "NEW_INCOMPLETE_DRAFT",
+                "dataValues": dataValuesAndEventDate.dataValues
             };
 
-            buildPayloadFromView();
-            upsertEvent().then(function() {
+            programEventRepository.upsert($scope.event).then(function() {
                 if (addAnother)
                     resetForm();
-                else
-                    $scope.loadEventsView();
+                else {
+                    $location.path("/line-list-summary/" + $scope.selectedModuleId).search({
+                        'messageType': 'success',
+                        "message": $scope.resourceBundle.eventSaveSuccess
+                    });
+
+                }
             });
         };
 
         var init = function() {
             var allDataElementsMap = {};
+            var loadModule = function() {
+                return orgUnitRepository.get($routeParams.module).then(function(module) {
+                    $scope.selectedModuleId = module.id;
+                    $scope.selectedModuleName = module.name;
+                });
+            };
+
+            var loadOriginOrgUnits = function() {
+                return orgUnitRepository.findAllByParent($scope.selectedModuleId).then(function(originOrgUnits) {
+                    $scope.originOrgUnits = originOrgUnits;
+                });
+            };
+
+            var loadPrograms = function() {
+                var getExcludedDataElementsForModule = function() {
+                    return systemSettingRepository.get($scope.selectedModuleId).then(function(data) {
+                        return data && data.value ? data.value.dataElements : [];
+                    });
+                };
+
+                var getProgram = function(excludedDataElements) {
+                    return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
+                        return programRepository.get(program.id, excludedDataElements).then(function(program) {
+                            $scope.program = program;
+                        });
+                    });
+                };
+
+                return getExcludedDataElementsForModule().then(getProgram);
+            };
+
             var loadAllDataElements = function() {
                 if ($scope.program && $scope.program.programStages)
                     allDataElementsMap = _.indexBy(_.pluck(_.flatten(_.pluck(_.flatten(_.pluck($scope.program.programStages, "programStageSections")), "programStageDataElements")), "dataElement"), "id");
@@ -128,6 +158,7 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
             var loadEvent = function() {
                 var formatValue = function(dv) {
+
                     var de = allDataElementsMap[dv.dataElement];
                     if (de && de.optionSet) {
                         return _.find($scope.optionSetMapping[de.optionSet.id], function(optionSet) {
@@ -147,21 +178,32 @@ define(["lodash", "moment", "dhisId", "properties"], function(_, moment, dhisId,
 
                     return dv.value;
                 };
-                if ($scope.event) {
-                    $scope.isNewMode = false;
-                    $scope.patientOrigin.selected = $scope.originOrgUnitsById[$scope.event.orgUnit];
-                    _.forEach($scope.event.dataValues, function(dv) {
-                        $scope.dataValues[dv.dataElement] = formatValue(dv);
+                if ($routeParams.eventId) {
+                    programEventRepository.findEventById($scope.program.id, $routeParams.eventId).then(function(events) {
+                        $scope.event = events[0];
+                        $scope.isNewMode = false;
+                        $scope.patientOrigin.selected = _.find($scope.originOrgUnits, function(originOrgUnit) {
+                            return originOrgUnit.id === $scope.event.orgUnit;
+                        });
+
+                        _.forEach($scope.event.dataValues, function(dv) {
+                            $scope.dataValues[dv.dataElement] = formatValue(dv);
+                        });
                     });
                 }
             };
 
             $scope.loading = true;
             resetForm();
-            loadAllDataElements();
-            loadOptionSets().then(loadEvent).finally(function() {
-                $scope.loading = false;
-            });
+            loadModule()
+                .then(loadOriginOrgUnits)
+                .then(loadPrograms)
+                .then(loadAllDataElements)
+                .then(loadOptionSets)
+                .then(loadEvent)
+                .finally(function() {
+                    $scope.loading = false;
+                });
         };
 
         init();

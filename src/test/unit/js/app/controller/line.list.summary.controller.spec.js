@@ -1,14 +1,12 @@
 define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop", "programRepository", "programEventRepository", "systemSettingRepository",
         "orgUnitRepository", "testData", "approvalDataRepository"
     ],
-    function(LineListSummaryController, mocks, utils, moment, timecop, ProgramRepository, ProgramEventRepository, SystemSettingRepository,
-        OrgUnitRepository, testData, ApprovalDataRepository) {
+    function(LineListSummaryController, mocks, utils, moment, timecop, ProgramRepository, ProgramEventRepository, SystemSettingRepository, OrgUnitRepository, testData, ApprovalDataRepository) {
 
         describe("lineListSummaryController ", function() {
 
             var scope, q, hustle, programRepository, mockStore, timeout, fakeModal, anchorScroll, location,
-                event1, event2, event3, event4, systemSettingRepository, systemSettings,
-                orgUnitRepository, optionSets, approvalDataRepository, originOrgUnits;
+                systemSettingRepository, systemSettings, orgUnitRepository, optionSets, approvalDataRepository, originOrgUnits, routeParams;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
@@ -18,6 +16,12 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 timeout = $timeout;
                 location = $location;
                 anchorScroll = jasmine.createSpy();
+
+                routeParams = {
+                    'module': 'ou1'
+                };
+
+
 
                 fakeModal = {
                     close: function() {
@@ -49,18 +53,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "eventSubmitAndApproveSuccess": " Event(s) submitted and auto-approved successfully.",
                     'eventSubmitSuccess': ' Event submitted succesfully'
                 };
-                scope.week = {
-                    "weekNumber": 44,
-                    "weekYear": 2014,
-                    "startOfWeek": "2014-10-27",
-                    "endOfWeek": "2014-11-02"
-                };
-                scope.selectedModule = {
-                    'id': 'currentModuleId',
-                    'parent': {
-                        'id': 'par1'
-                    }
-                };
+
+
                 scope.currentUser = {
                     "firstName": "foo",
                     "lastName": "bar",
@@ -71,6 +65,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                             "id": "hxNB8lleCsl",
                             "name": 'Data Entry User'
                         }]
+                    },
+                    "selectedProject": {
+                        "id": "AFGHANISTAN"
                     }
                 };
                 scope.currentUserProject = {
@@ -79,28 +76,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 var program = {
                     "id": "someProgram"
-                };
-
-                event1 = {
-                    event: 'event1',
-                    eventDate: '2014-12-29T05:06:30.950+0000',
-                    dataValues: [{
-                        dataElement: 'de1',
-                        value: 'a11',
-                        showInEventSummary: true,
-                        name: 'dataElement1',
-                    }]
-                };
-
-                event2 = {
-                    event: 'event2',
-                    eventDate: '2014-12-29T05:06:30.950+0000',
-                    dataValues: [{
-                        dataElement: 'de2',
-                        value: 'b22',
-                        showInEventSummary: false,
-                        name: 'dataElement2',
-                    }]
                 };
 
                 programRepository = new ProgramRepository();
@@ -115,8 +90,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 };
 
                 programEventRepository = {
-                    "getEvent": jasmine.createSpy("getEvent"),
-                    "getEventsFor": jasmine.createSpy("getEventsFor").and.returnValue(utils.getPromise(q, [])),
+                    "getSubmitableEventsFor": jasmine.createSpy("getSubmitableEventsFor").and.returnValue(utils.getPromise(q, [])),
+                    "getDraftEventsFor": jasmine.createSpy("getDraftEventsFor").and.returnValue(utils.getPromise(q, [])),
+                    "findEventsByCode": jasmine.createSpy("findEventsByCode").and.returnValue(utils.getPromise(q, [])),
+                    "findEventsByDateRange": jasmine.createSpy("findEventsByDateRange").and.returnValue(utils.getPromise(q, [])),
                     "upsert": jasmine.createSpy("upsert").and.returnValue(utils.getPromise(q, [])),
                     "delete": jasmine.createSpy("delete").and.returnValue(utils.getPromise(q, {})),
                     "markEventsAsSubmitted": jasmine.createSpy("markEventsAsSubmitted").and.callFake(function(data) {
@@ -125,7 +102,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 };
 
                 systemSettings = {
-                    "key": "currentModuleId",
+                    "key": "ou1",
                     "value": {
                         "clientLastUpdated": "2014-12-29T05:06:30.950+0000",
                         'dataElements': ['de1', 'de3']
@@ -135,14 +112,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 systemSettingRepository = {
                     "get": jasmine.createSpy("get").and.returnValue(utils.getPromise(q, systemSettings))
                 };
-
-                programEventRepository.getEventsFor.and.callFake(function(programId) {
-                    if (programId === "p1")
-                        return utils.getPromise(q, [event1, event2]);
-                    if (programId === "p2")
-                        return utils.getPromise(q, event1);
-                    return utils.getPromise(q, undefined);
-                });
 
                 var project = {
                     "id": "parentProjectId",
@@ -171,9 +140,57 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "name": "o2"
                 }];
 
+                var allModulesInAfghanistan = [{
+                    'id': 'mod1',
+                    'name': 'mod1',
+                    'parent': {
+                        'name': 'op1'
+                    }
+                }, {
+                    'name': 'linelistMod',
+                    'id': 'ou1',
+                    'parent': {
+                        'name': 'op1'
+                    },
+                    'attributeValues': [{
+                        'attribute': {
+                            'code': 'isLineListService'
+
+                        },
+                        'value': "true"
+                    }]
+                }, {
+                    'id': 'aggMod',
+                    'name': 'aggMod',
+                    'parent': {
+                        'name': 'op1'
+                    },
+                    'attributeValues': [{
+                        'attribute': {
+                            'code': 'isLineListService'
+
+                        },
+                        'value': "false"
+                    }]
+                }];
+
+                var currentModule = {
+                    'id': 'ou1',
+                    'name': 'Mod1'
+                };
+
+                spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, currentModule));
                 spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, project));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
-                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {}));
+
+                spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
+
+                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
+                spyOn(fakeModal, "open").and.returnValue({
+                    result: utils.getPromise(q, {})
+                });
+
             }));
 
             afterEach(function() {
@@ -182,26 +199,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
             });
 
             it("should set projectIsAutoApproved on scope on init", function() {
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 expect(scope.projectIsAutoApproved).toEqual(true);
-            });
-
-            it("should set isCompleted and isApproved on scope on init", function() {
-
-                approvalDataRepository = new ApprovalDataRepository();
-
-                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {
-                    'isComplete': true,
-                    'isApproved': true
-                }));
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
-                scope.$apply();
-                expect(scope.isCompleted).toEqual(true);
-                expect(scope.isApproved).toEqual(true);
             });
 
             it("should load programs into scope on init", function() {
@@ -215,8 +216,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 };
                 programRepository.get.and.returnValue(utils.getPromise(q, programAndStageData));
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 expect(programRepository.get).toHaveBeenCalledWith('someProgram', ['de1', 'de3']);
@@ -224,8 +224,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
             });
 
             it("should load patient origin org units on init", function() {
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 expect(scope.originOrgUnits).toEqual(originOrgUnits);
@@ -292,125 +291,107 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 };
 
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 expect(scope.program).toEqual(expectedProgram);
             });
 
             it("should submit event details", function() {
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
-                spyOn(location, "hash");
 
-
-                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
-                scope.$apply();
-                scope.year = "2014";
-                scope.selectedModule = {
-                    'id': 'currentModuleId',
-                    'name': 'Mod1'
+                var event1 = {
+                    'event': 'event1',
+                    'orgUnit': 'o1',
+                    'period': '2014W44',
+                    'eventDate': '2014-12-29T05:06:30.950+0000',
+                    'localStatus': 'NEW_DRAFT',
+                    'dataValues': [{
+                        'dataElement': 'de1',
+                        'value': 'a11',
+                        'showInEventSummary': true,
+                        'name': 'dataElement1',
+                    }]
                 };
 
-                scope.submit();
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
+
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
-                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("someProgram", "2014W44", ["o1", "o2"]);
-                expect(approvalDataRepository.clearApprovals).toHaveBeenCalledWith({
+                scope.submit();
+                scope.$apply();
+
+                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith(["event1"]);
+                expect(approvalDataRepository.clearApprovals).toHaveBeenCalledWith([{
                     "period": "2014W44",
-                    "orgUnit": "currentModuleId"
-                });
-                expect(hustle.publish).toHaveBeenCalledWith({
+                    "orgUnit": "ou1"
+                }]);
+
+                expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
                     type: 'uploadProgramEvents',
                     locale: 'en',
                     desc: 'submit cases for 2014W44, Module: Mod1'
                 }, 'dataValues');
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": {
+
+                expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
+                    "data": [{
                         "period": "2014W44",
-                        "orgUnit": "currentModuleId"
-                    },
+                        "orgUnit": "ou1"
+                    }],
                     "type": "deleteApprovals",
                     "locale": "en",
                     "desc": "restart approval process for 2014W44, Module: Mod1"
                 }, "dataValues");
+
                 expect(scope.resultMessageType).toEqual("success");
-                expect(scope.resultMessage).toEqual("11 Event submitted succesfully");
-                expect(location.hash).toHaveBeenCalled();
-            });
+                expect(scope.resultMessage).toEqual("1 Event submitted succesfully");
 
-            it("should warn the user when data will have to be reapproved", function() {
-                approvalDataRepository = new ApprovalDataRepository();
-                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {
-                    'isComplete': true,
-                    'isApproved': true
-                }));
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
-
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
-                spyOn(location, "hash");
-
-                scope.resourceBundle = {
-                    'eventSubmitSuccess': 'Event submitted succesfully'
-                };
-
-                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
-                scope.$apply();
-                scope.year = "2014";
-
-                scope.submit();
-                scope.$apply();
-
-                expect(fakeModal.open).toHaveBeenCalled();
             });
 
             it("should submit and auto approve event details", function() {
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
-                spyOn(location, "hash");
+                var event1 = {
+                    'event': 'event1',
+                    'orgUnit': 'o1',
+                    'period': '2014W44',
+                    'eventDate': '2014-12-29T05:06:30.950+0000',
+                    'localStatus': 'NEW_DRAFT',
+                    'dataValues': [{
+                        'dataElement': 'de1',
+                        'value': 'a11',
+                        'showInEventSummary': true,
+                        'name': 'dataElement1',
+                    }]
+                };
 
-                spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
-
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
-                scope.year = "2014";
-                scope.selectedModule = {
-                    'id': 'currentModuleId',
-                    'name': 'Mod1'
-                };
                 scope.submitAndApprove();
                 scope.$apply();
 
-                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith("someProgram", "2014W44", ["o1", "o2"]);
-                expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith({
-                    'orgUnit': 'currentModuleId',
+                expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith(["event1"]);
+                expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith([{
+                    'orgUnit': 'ou1',
                     'period': '2014W44'
-                }, 'dataentryuser');
-                expect(hustle.publish).toHaveBeenCalledWith({
+                }], 'dataentryuser');
+                expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
                     type: 'uploadProgramEvents',
                     locale: 'en',
                     desc: 'submit cases for 2014W44, Module: Mod1'
                 }, 'dataValues');
-                expect(hustle.publish).toHaveBeenCalledWith({
+                expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
                     "data": [{
-                        'orgUnit': 'currentModuleId',
+                        'orgUnit': 'ou1',
                         'period': '2014W44'
                     }],
                     'locale': 'en',
                     'desc': 'approve data at project level for 2014W44, Module: Mod1',
                     "type": "uploadCompletionData"
                 }, "dataValues");
-                expect(hustle.publish).toHaveBeenCalledWith({
+                expect(hustle.publish.calls.argsFor(2)[0]).toEqual({
                     "data": [{
-                        'orgUnit': 'currentModuleId',
+                        'orgUnit': 'ou1',
                         'period': '2014W44'
                     }],
                     'locale': 'en',
@@ -419,58 +400,30 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 }, "dataValues");
 
                 expect(scope.resultMessageType).toEqual("success");
-                expect(scope.resultMessage).toEqual("11 Event(s) submitted and auto-approved successfully.");
-                expect(location.hash).toHaveBeenCalled();
-            });
-
-            it("should warn the user if data is to be re-approved automatically", function() {
-                approvalDataRepository = new ApprovalDataRepository();
-                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {
-                    'isComplete': true,
-                    'isApproved': true
-                }));
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
-
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
-                spyOn(location, "hash");
-
-                scope.resourceBundle = {
-                    "eventSubmitAndApproveSuccess": "Event(s) submitted and auto-approved successfully."
-                };
-
-                spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
-
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
-                scope.$apply();
-                scope.year = "2014";
-
-                scope.submitAndApprove();
-                scope.$apply();
-
-                expect(fakeModal.open).toHaveBeenCalled();
+                expect(scope.resultMessage).toEqual("1 Event(s) submitted and auto-approved successfully.");
             });
 
             it("should soft-delete event which is POSTed to DHIS", function() {
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
-                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                var event1 = {
+                    'event': 'event1',
+                    'eventDate': '2014-12-29T05:06:30.950+0000',
+                    'dataValues': [{
+                        'dataElement': 'de1',
+                        'value': 'a11',
+                        'showInEventSummary': true,
+                        'name': 'dataElement1',
+                    }]
+                };
+
+                programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
+
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 var eventToDelete = event1;
                 scope.deleteEvent(eventToDelete);
                 scope.$apply();
-
-                var softDeletedEventPayload = {
-                    "events": [eventToDelete]
-                };
 
                 expect(fakeModal.open).toHaveBeenCalled();
                 expect(hustle.publish).toHaveBeenCalledWith({
@@ -479,21 +432,28 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     locale: 'en',
                     desc: 'delete cases'
                 }, 'dataValues');
-                expect(programEventRepository.upsert).toHaveBeenCalledWith(softDeletedEventPayload);
+                expect(programEventRepository.upsert).toHaveBeenCalledWith(eventToDelete);
                 expect(eventToDelete.localStatus).toEqual("DELETED");
-                expect(programEventRepository.getEventsFor).toHaveBeenCalled();
+                expect(programEventRepository.getSubmitableEventsFor).toHaveBeenCalled();
                 expect(approvalDataRepository.clearApprovals).toHaveBeenCalled();
             });
 
             it("should hard delete a local event", function() {
-                event1.localStatus = "NEW_DRAFT";
-                spyOn(hustle, "publish");
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
+                var event1 = {
+                    'event': 'event1',
+                    'eventDate': '2014-12-29T05:06:30.950+0000',
+                    'localStatus': 'NEW_DRAFT',
+                    'dataValues': [{
+                        'dataElement': 'de1',
+                        'value': 'a11',
+                        'showInEventSummary': true,
+                        'name': 'dataElement1',
+                    }]
+                };
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
+
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 var eventToDelete = event1;
@@ -503,28 +463,30 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 expect(fakeModal.open).toHaveBeenCalled();
                 expect(programEventRepository.delete).toHaveBeenCalledWith('event1');
                 expect(hustle.publish).not.toHaveBeenCalled();
-                expect(programEventRepository.getEventsFor).toHaveBeenCalled();
+                expect(programEventRepository.getSubmitableEventsFor).toHaveBeenCalled();
             });
 
             it("should soft delete a locally updated event which is already submitted to DHIS", function() {
-                event1.localStatus = "UPDATED_DRAFT";
-                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, ""));
-                spyOn(approvalDataRepository, "clearApprovals").and.returnValue(utils.getPromise(q, {}));
-                spyOn(fakeModal, "open").and.returnValue({
-                    result: utils.getPromise(q, {})
-                });
+                var event1 = {
+                    'event': 'event1',
+                    'eventDate': '2014-12-29T05:06:30.950+0000',
+                    'localStatus': 'UPDATED_DRAFT',
+                    'dataValues': [{
+                        'dataElement': 'de1',
+                        'value': 'a11',
+                        'showInEventSummary': true,
+                        'name': 'dataElement1',
+                    }]
+                };
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
+
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 var eventToDelete = event1;
                 scope.deleteEvent(eventToDelete);
                 scope.$apply();
-
-                var softDeletedEventPayload = {
-                    "events": [eventToDelete]
-                };
 
                 expect(fakeModal.open).toHaveBeenCalled();
                 expect(hustle.publish).toHaveBeenCalledWith({
@@ -533,9 +495,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     locale: 'en',
                     desc: 'delete cases'
                 }, 'dataValues');
-                expect(programEventRepository.upsert).toHaveBeenCalledWith(softDeletedEventPayload);
+                expect(programEventRepository.upsert).toHaveBeenCalledWith(eventToDelete);
                 expect(eventToDelete.localStatus).toEqual("DELETED");
-                expect(programEventRepository.getEventsFor).toHaveBeenCalled();
+                expect(programEventRepository.getSubmitableEventsFor).toHaveBeenCalled();
                 expect(approvalDataRepository.clearApprovals).toHaveBeenCalled();
             });
 
@@ -544,7 +506,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "id": "dv1",
                     "value": "Case123"
                 };
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 var actualValue = scope.getDisplayValue(dataValue);
                 scope.$apply();
 
@@ -568,27 +530,48 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "value": "Code1"
                 };
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 var actualValue = scope.getDisplayValue(dataValue);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
                 expect(actualValue).toEqual("Male");
             });
 
-            it("should not allow event creation , edit or deleting if selected week is beyond configured week", function() {
-                scope.week = {
-                    "startOfWeek": "2014-02-02",
-                    "weekNumber": 05,
-                    "weekYear": 2014
+            it("should search events by case number", function() {
+                var event1 = {
+                    'event': 'event1'
                 };
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
-                scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
+                programEventRepository.findEventsByCode.and.returnValue(utils.getPromise(q, [event1]));
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
-                expect(scope.isDataEntryAllowed()).toBeFalsy();
+                scope.searchStr = "someCaseNumber";
+                scope.searchByCaseNumber();
                 scope.$apply();
+
+                expect(programEventRepository.findEventsByCode).toHaveBeenCalledWith("someProgram", ["o1", "o2"], "someCaseNumber");
+                expect(scope.eventForm.allEvents).toEqual([event1]);
             });
+
+            xit("should search events by date range", function() {
+                var event1 = {
+                    'event': 'event1'
+                };
+
+                programEventRepository.findEventsByDateRange.and.returnValue(utils.getPromise(q, [event1]));
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$apply();
+
+                scope.searchStartDate = new Date("2015", "10", "12");
+                scope.searchEndDate = new Date("2015", "11", "28");
+
+                scope.$apply();
+
+                scope.searchByCaseNumber();
+                expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith("someProgram", ["o1", "o2"], "2015-10-12", "2015-11-28");
+                expect(scope.eventForm.allEvents).toEqual([event1]);
+            });
+
         });
     });

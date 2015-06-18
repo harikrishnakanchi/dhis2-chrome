@@ -1,4 +1,4 @@
-<div ng-controller="lineListDataEntryController">
+<div>
     <div class="loading" ng-show="loading">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
@@ -40,7 +40,7 @@
                                                     <input type="text" class="form-control" ng-if="psde.dataElement.type === 'string' &amp;&amp; !psde.dataElement.optionSet" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" />
                                                     <input type="number" class="form-control" ng-if="psde.dataElement.type === 'int' &amp;&amp; !psde.dataElement.optionSet" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" ng-pattern="numberPattern" />
                                                     <input type="date" class="form-control" ng-if="psde.dataElement.type === 'date' &amp;&amp; !psde.dataElement.optionSet &amp;&amp; !isEventDateSubstitute(psde.dataElement)" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" max="9999-12-31" />
-                                                    <input type="date" class="form-control" ng-if="psde.dataElement.type === 'date' &amp;&amp; !psde.dataElement.optionSet &amp;&amp; isEventDateSubstitute(psde.dataElement)" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" min="{{ minDateInCurrentPeriod }}" max="{{ maxDateInCurrentPeriod }}" required />
+                                                    <input type="date" class="form-control" ng-if="psde.dataElement.type === 'date' &amp;&amp; !psde.dataElement.optionSet &amp;&amp; isEventDateSubstitute(psde.dataElement)" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" max="{{maxEventDate}}" min="{{minEventDate}}" required />
                                                     <div ng-if="psde.dataElement.type === 'bool' &amp;&amp; !psde.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
                                                         <div class="radio-inline">
                                                             <label for="Yes">
@@ -70,9 +70,9 @@
                             <ul>
                                 <li>
                                     <div class="text-center">
-                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.saveCaseBtnValue }}" ng-click="save(programStage)" ng-disabled="form.eventDataEntryForm.$invalid" ng-if="isNewMode" />
-                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.saveAndAddAnotherBtnValue }}" ng-click="save(programStage, true)" ng-disabled="form.eventDataEntryForm.$invalid" ng-if="isNewMode" />
-                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.updateBtnValue }}" ng-click="update(programStage)" ng-disabled="form.eventDataEntryForm.$invalid" ng-if="!isNewMode" />
+                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.saveCaseBtnValue }}" ng-click="save()" ng-disabled="form.eventDataEntryForm.$invalid" ng-if="isNewMode" />
+                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.saveAndAddAnotherBtnValue }}" ng-click="save(true)" ng-disabled="form.eventDataEntryForm.$invalid" ng-if="isNewMode" />
+                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.updateBtnValue }}" ng-click="update()" ng-disabled="form.eventDataEntryForm.$invalid" ng-if="!isNewMode" />
                                         <input type="button" class="btn btn-main" value="{{ resourceBundle.cancelBtnValue }}" ng-click="loadEventsView()" />
                                     </div>
                                 </li>

@@ -36,9 +36,7 @@ define(["moment", "properties", "dateUtils", "lodash"], function(moment, propert
             var newEvents = getNewEvents();
             eventsToUpsert = eventsToUpsert.concat(newEvents);
 
-            var upsertPromise = programEventRepository.upsert({
-                'events': eventsToUpsert
-            });
+            var upsertPromise = programEventRepository.upsert(eventsToUpsert);
 
             var deletePromise = programEventRepository.delete(_.pluck(eventsToDelete, 'event'));
 

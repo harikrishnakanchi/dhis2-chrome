@@ -36,12 +36,10 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 downloadEventDataConsumer.run(message);
                 scope.$apply();
 
-                var expectedEventPayload = {
-                    events: [{
-                        event: 'e1',
-                        eventDate: '2014-09-28'
-                    }]
-                };
+                var expectedEventPayload = [{
+                    'event': 'e1',
+                    'eventDate': '2014-09-28'
+                }];
 
                 expect(eventService.getRecentEvents).toHaveBeenCalled();
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventPayload);
@@ -84,9 +82,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 downloadEventDataConsumer.run(message);
                 scope.$apply();
 
-                var upsertPayload = {
-                    events: [dhisEventPresentInIndexedDB]
-                };
+                var upsertPayload = [dhisEventPresentInIndexedDB];
 
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(upsertPayload);
                 expect(programEventRepository.delete).toHaveBeenCalledWith([dbEventNotPresentInDHIS.event]);
