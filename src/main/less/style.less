@@ -77,13 +77,13 @@ body {
         }
     }
     .nav-tabs {
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid #a0a0a0;
         margin-top: 10px;
         li {
             a {
                 background: #fff;
                 border: 1px solid transparent;
-                border-bottom-color: #ddd;
+                border-bottom-color: #a0a0a0;
             }
             a:hover {
                 background: #ddd;
@@ -93,8 +93,8 @@ body {
         }
         li.active {
             a, a:focus, a:hover, a.line-list-selections:hover {
-                background: #ddd;
-                border: 1px solid #ddd;
+                background: #fff;
+                border: 1px solid #a0a0a0;
                 border-bottom-color: transparent;
                 color: black;
             }
@@ -194,8 +194,19 @@ body {
             }
         }
     }
+
+
     //data entry
     .dataentrypage {
+            
+        &.parent-margin{
+            margin-top: -10px;
+            border: 1px #a0a0a0 solid;
+                border-top: 0;    
+        }
+        &.child-margin{
+            padding: 20px 0;
+        }
         .panel-title {
             font-weight: 400;
             a {
@@ -211,6 +222,19 @@ body {
                     color: #000;
                 }
             }
+        }
+        .tab-padding{
+          padding: 0px 20px 0 20px;
+          margin-top: -10px;
+          .tab-content{
+            border: 1px #a0a0a0 solid;
+            border-top: 0;
+            margin-bottom: 20px;
+          }
+        }
+        .panel-group-custom-spacing{
+            margin: 0;
+            padding: 20px;
         }
     }
     .dataentrypage {
@@ -704,6 +728,7 @@ input[type="checkbox"].dashboard-form-checkbox {
 }
 
 .dataentrypage .module-select {
+    margin-top: 0;
     margin-bottom: 0;
 }
 
@@ -722,4 +747,15 @@ input[type="checkbox"].dashboard-form-checkbox {
 
 .panelWith-Overflow-Visible {
     overflow: visible;
+}
+
+.week-selector-gradient {
+    background: #ffffff; /* Old browsers */
+    background: -moz-linear-gradient(top,  #ffffff 0%, #dddddd 64%, #d3d3d3 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(64%,#dddddd), color-stop(100%,#d3d3d3)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #ffffff 0%,#dddddd 64%,#d3d3d3 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #ffffff 0%,#dddddd 64%,#d3d3d3 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #ffffff 0%,#dddddd 64%,#d3d3d3 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #ffffff 0%,#dddddd 64%,#d3d3d3 100%); /* W3C */
+
 }

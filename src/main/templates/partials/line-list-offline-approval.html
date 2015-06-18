@@ -3,7 +3,7 @@
     <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
     <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
     <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-    <div ng-if="showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || (hasRoles(['Project Level Approver'])) )">
+    <div ng-if="showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || (hasRoles(['Project Level Approver'])) )" class="panel-group-custom-spacing">
         <accordion close-others="false">
             <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" is-open="true">
                 <accordion-heading>
@@ -11,7 +11,7 @@
                     <span ng-if="resourceBundle[dataSet.id]">{{ resourceBundle[dataSet.id] }}</span>
                     <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
                 </accordion-heading>
-                <div class="exp-coll-group panel-body">
+                <div class="exp-coll-group">
                     <accordion close-others="false">
                         <accordion-group is-open="origins.open">
                             <accordion-heading>
@@ -51,7 +51,7 @@
                             <input type="checkbox" ng-model="isAgeFilterApplied" />{{resourceBundle.age}}</label>
                     </div>
                 </div>
-                <div class="exp-coll-group panel-body" ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
+                <div class="exp-coll-group" ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
                     <div ng-repeat="programStage in program.programStages">
                         <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                             <div ng-repeat="psde in section.programStageDataElements">
@@ -103,7 +103,7 @@
                         </accordion>
                     </div>
                 </div>
-                <div class="exp-coll-group panel-body" ng-if="isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
+                <div class="exp-coll-group" ng-if="isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
                     <div ng-repeat="programStage in program.programStages">
                         <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                             <div ng-repeat="psde in section.programStageDataElements">
@@ -157,7 +157,7 @@
                         </accordion>
                     </div>
                 </div>
-                <div class="exp-coll-group panel-body" ng-if="isAgeFilterApplied &amp;&amp; !isGenderFilterApplied">
+                <div class="exp-coll-group" ng-if="isAgeFilterApplied &amp;&amp; !isGenderFilterApplied">
                     <div ng-repeat="programStage in program.programStages">
                         <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                             <div ng-repeat="psde in section.programStageDataElements">
@@ -176,13 +176,13 @@
                                                         <th>{{resourceBundle.fiveToFourtenn}}</th>
                                                         <th>{{resourceBundle.greaterThanFifteen}}</th>
                                                     </tr>
-                                                    <thead>
-                                                        <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
-                                                            <td>{{option.displayName}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [0,5])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [4,15])}}</td>
-                                                            <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [14, 9999])}}</td>
-                                                        </tr>
+                                                </thead>
+                                                <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
+                                                    <td>{{option.displayName}}</td>
+                                                    <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [0,5])}}</td>
+                                                    <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [4,15])}}</td>
+                                                    <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [14, 9999])}}</td>
+                                                </tr>
                                             </table>
                                         </accordion-group>
                                     </accordion>
@@ -217,7 +217,7 @@
                         </accordion>
                     </div>
                 </div>
-                <div class="exp-coll-group panel-body" ng-if="isAgeFilterApplied &amp;&amp; isGenderFilterApplied">
+                <div class="exp-coll-group" ng-if="isAgeFilterApplied &amp;&amp; isGenderFilterApplied">
                     <div ng-repeat="programStage in program.programStages">
                         <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                             <div ng-repeat="psde in section.programStageDataElements">
@@ -310,9 +310,10 @@
                     </div>
                 </div>
             </accordion-group>
-            <div>
-                <input type="button" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="isCompleted" ng-if="hasRoles(['Project Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
-                <input type="button" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="isApproved" ng-if="hasRoles(['Coordination Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
-            </div>
+        </accordion>
+        <div>
+            <input type="button" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="isCompleted" ng-if="hasRoles(['Project Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
+            <input type="button" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="isApproved" ng-if="hasRoles(['Coordination Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
+        </div>
     </div>
 </div>
