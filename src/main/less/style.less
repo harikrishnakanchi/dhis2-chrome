@@ -87,7 +87,7 @@ body {
             }
             a:hover {
                 background: #ddd;
-                border: 1px solid transparent;
+                border: 1px solid #a0a0a0;
                 border-bottom-color: #ddd;
             }
         }
@@ -202,7 +202,7 @@ body {
         &.parent-margin{
             margin-top: -10px;
             border: 1px #a0a0a0 solid;
-                border-top: 0;    
+            border-top: 0; 
         }
         &.child-margin{
             padding: 20px 0;
@@ -234,7 +234,7 @@ body {
         }
         .panel-group-custom-spacing{
             margin: 0;
-            padding: 20px;
+            padding: 0 20px;
         }
     }
     .dataentrypage {
@@ -743,6 +743,7 @@ input[type="checkbox"].dashboard-form-checkbox {
 .angucomplete-dropdown {
     overflow-y: auto;
     max-height: 140px;
+    position: static;
 }
 
 .panelWith-Overflow-Visible {
@@ -758,4 +759,8 @@ input[type="checkbox"].dashboard-form-checkbox {
     background: -ms-linear-gradient(top,  #ffffff 0%,#dddddd 64%,#d3d3d3 100%); /* IE10+ */
     background: linear-gradient(to bottom,  #ffffff 0%,#dddddd 64%,#d3d3d3 100%); /* W3C */
 
+}
+
+.spacing-div-accordian {
+    margin-bottom: 5px;
 }
