@@ -21,7 +21,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     'module': 'ou1'
                 };
 
-
+                spyOn(location, "path").and.returnValue(location);
+                spyOn(location, "search").and.returnValue("something");
 
                 fakeModal = {
                     close: function() {
@@ -313,6 +314,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     }]
                 };
 
+                location.search.and.returnValue({
+                    "filterBy": "readyToSubmit"
+                });
+
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
@@ -362,6 +367,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                         'name': 'dataElement1',
                     }]
                 };
+
+                location.search.and.returnValue({
+                    "filterBy": "readyToSubmit"
+                });
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
@@ -416,6 +425,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     }]
                 };
 
+                location.search.and.returnValue({
+                    "filterBy": "readyToSubmit"
+                });
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
@@ -450,6 +462,9 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                         'name': 'dataElement1',
                     }]
                 };
+                location.search.and.returnValue({
+                    "filterBy": "readyToSubmit"
+                });
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
@@ -478,6 +493,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                         'name': 'dataElement1',
                     }]
                 };
+
+                location.search.and.returnValue({
+                    "filterBy": "readyToSubmit"
+                });
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
@@ -537,7 +556,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 expect(actualValue).toEqual("Male");
             });
 
-            it("should search events by case number", function() {
+            it("should filter events by case number", function() {
                 var event1 = {
                     'event': 'event1'
                 };
@@ -546,15 +565,15 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
-                scope.searchStr = "someCaseNumber";
-                scope.searchByCaseNumber();
+                scope.filterParams.caseNumber = "someCaseNumber";
+                scope.filterByCaseNumber();
                 scope.$apply();
 
                 expect(programEventRepository.findEventsByCode).toHaveBeenCalledWith("someProgram", ["o1", "o2"], "someCaseNumber");
-                expect(scope.eventForm.allEvents).toEqual([event1]);
+                expect(scope.events).toEqual([event1]);
             });
 
-            xit("should search events by date range", function() {
+            it("should filter events by date range", function() {
                 var event1 = {
                     'event': 'event1'
                 };
@@ -563,14 +582,12 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
-                scope.searchStartDate = new Date("2015", "10", "12");
-                scope.searchEndDate = new Date("2015", "11", "28");
-
+                scope.filterParams.startDate = new Date("2015", "10", "12");
+                scope.filterParams.endDate = new Date("2015", "11", "28");
+                scope.filterByDateRange();
                 scope.$apply();
-
-                scope.searchByCaseNumber();
-                expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith("someProgram", ["o1", "o2"], "2015-10-12", "2015-11-28");
-                expect(scope.eventForm.allEvents).toEqual([event1]);
+                expect(programEventRepository.findEventsByDateRange).toHaveBeenCalledWith("someProgram", ["o1", "o2"], "2015-11-12", "2015-12-28");
+                expect(scope.events).toEqual([event1]);
             });
 
         });

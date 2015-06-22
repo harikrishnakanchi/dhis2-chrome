@@ -114,7 +114,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             var getEvents = function() {
                 var store = db.objectStore('programEvents');
                 var queryPromises = _.transform(orgUnitIds, function(acc, orgUnitId) {
-                    var query = db.queryBuilder().$eq([programId, dateUtils.getFormattedPeriod(period), orgUnitId]).$index("by_program_orgunit_period").compile();
+                    var query = db.queryBuilder().$eq([programId, orgUnitId, dateUtils.getFormattedPeriod(period)]).$index("by_program_orgunit_period").compile();
                     acc.push(store.each(query));
                 }, []);
                 return $q.all(queryPromises).then(function(data) {
@@ -192,7 +192,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
                 });
             };
 
-            return getEvents().then(_.curry(enrichEvents)(programId));
+            return getEvents().then(filterEvents).then(_.curry(enrichEvents)(programId));
         };
 
         this.findEventsByDateRange = function(programId, orgUnitIds, fromDate, toDate) {
@@ -210,7 +210,7 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
                 });
             };
 
-            return getEvents().then(_.curry(enrichEvents)(programId));
+            return getEvents().then(filterEvents).then(_.curry(enrichEvents)(programId));
         };
 
         var enrichEvents = function(programId, events) {

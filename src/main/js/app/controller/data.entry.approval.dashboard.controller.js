@@ -259,7 +259,11 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
         $scope.getTemplateUrl = function(item) {
 
             if (item.isLineListService && $scope.hasRoles(['Data entry user'])) {
-                return "#/line-list-summary/" + item.moduleId + "/" + item.period;
+                m = moment(item.period, "GGGG[W]W");
+
+                var startOfWeek = m.startOf("isoWeek").format("YYYY-MM-DD");
+                var endOfWeek = m.endOf("isoWeek").format("YYYY-MM-DD");
+                return "#/line-list-summary/" + item.moduleId + "/?filterBy=dateRange&startDate=" + startOfWeek + "&endDate=" + endOfWeek;
             }
 
             if ($scope.hasRoles(['Project Level Approver', 'Coordination Level Approver'])) {

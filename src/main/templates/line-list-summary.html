@@ -12,53 +12,47 @@
                     <span ng-if="!resourceBundle[program.id]">{{ program.name }}</span>
                 </accordion-heading>
                 <div class="row sub-nav">
-                    <div class="col-md-12">
+                    <div class="col-md-8">
                         <ul class="list-inline">
-                            <li><a href="#" ng-click="">Find cases</a></li>
+                            <li><a href="#/line-list-summary/{{selectedModuleId}}?filterBy=caseNumber" ng-class="{'active': (filterBy === 'caseNumber' || filterBy === 'dateRange')}">{{resourceBundle.findCases}}</a></li>
                             <li>|</li>
-                            <li><a href="#" ng-click="">Incomplete cases</a></li>
+                            <li><a href="#/line-list-summary/{{selectedModuleId}}?filterBy=incomplete" ng-class="{'active': (filterBy === 'incomplete')}">{{resourceBundle.incompleteCases}}</a></li>
                             <li>|</li>
-                            <li><a href="#" ng-click="">Cases ready to submit</a></li>
-                            <li>|</li>
-                            <li><a ng-href="#/line-list-data-entry/{{selectedModuleId}}">New Case</a></li>
+                            <li><a href="#/line-list-summary/{{selectedModuleId}}?filterBy=readyToSubmit" ng-class="{'active': (filterBy === 'readyToSubmit')}">{{resourceBundle.casesReadyToSubmit}}</a></li>
                         </ul>
                     </div>
+                    <div class="col-md-4 text-right">
+                        <a ng-href="#/line-list-data-entry/{{selectedModuleId}}" class="btn btn-primary">{{resourceBundle.newCaseBtnValue}}</a>
+                    </div>
                 </div>
-                <div class="row form-inline event-search-form">
+                <div class="row form-inline event-search-form" ng-if="filterBy === 'caseNumber' || filterBy === 'dateRange'">
                     <div class="col-md-12">
-                        <form name="eventSearchForm" id="eventSearchForm">
+                        <form name="eventfilterForm" id="eventfilterForm">
                             <span>
-                                Find case by:
+                                {{resourceBundle.findCaseBy}}
                             </span>
                             <span>
-                                <select class="form-control" ng-model="searchBy" ng-options="option.name for option in searchByOptions"></select>
+                                <select class="form-control" ng-model="filterBy" ng-options="option.id as option.name for option in filterByOptions"></select>
                             </span>
-                            <span ng-if="searchBy.id === 'caseNumber'">
-                                <input type="text" class="form-control" ng-model="searchParams.caseNumber" />
-                                <input type="button" value="Search" class="btn btn-default" ng-click="searchByCaseNumber()"/>
+                            <span ng-if="filterBy === 'caseNumber'">
+                                <input type="text" class="form-control" ng-model="filterParams.caseNumber" />
+                                <input type="button" value="Search" class="btn btn-default" ng-click="filterByCaseNumber()"/>
                             </span>
-                            <span ng-if="searchBy.id === 'dateRange'">
-                                <input type="date" class="form-control" ng-model="searchParams.searchStartDate" /> and <input type="date" class="form-control" ng-model="searchParams.searchEndDate" />
-                                <input type="button" value="Search" class="btn btn-default" ng-click="searchByDateRange()"/>
+                            <span ng-if="filterBy === 'dateRange'">
+                                <input type="date" class="form-control" ng-model="filterParams.startDate" /> and <input type="date" class="form-control" ng-model="filterParams.endDate" />
+                                <input type="button" value="Search" class="btn btn-default" ng-click="filterByDateRange()"/>
                             </span>
                         </form>
                     </div>
                 </div>
-                <div ng-if="events.length === 0 " class="alert alert-danger ">
-                    No records found
-                </div>
-                <div ng-if="events.length &gt; 0 ">
-                    <!--  <ul class="list-unstyled ">
-                            <li>
-                                <div class="text-right ">
-                                    <a class="btn btn-main " ng-href="#/line-list-data-entry/{{selectedModuleId}} ">{{ resourceBundle.newCaseBtnValue }}</a>
-                                </div>
-                            </li>
-                        </ul> -->
-                    <div class="panel-heading ">
-                        <h3 class="panel-title "><a>{{ resourceBundle.eventListTitle }}</a></h3>
+                <div class="event-search-results">
+                    <div ng-if="events.length === 0 " class="alert alert-danger">
+                        {{noCasesMsg}}
                     </div>
-                    <accordion close-others="false ">
+                    <div ng-if="events.length &gt; 0 " class="panel-default">
+                        <div class="panel-heading ">
+                            <h3 class="panel-title "><a>{{ eventListTitle }}</a></h3>
+                        </div>
                         <table class="table table-bordered ">
                             <thead>
                                 <tr>
@@ -83,14 +77,14 @@
                                         <span ng-if="dataValue.type !=='date' &amp;&amp; dataValue.type !=='bool' ">{{ getDisplayValue(dataValue) }}</span>
                                     </td>
                                     <td>
-                                        <a href=" " id=" " title="Submitted " ng-if="!event.localStatus || event.localStatus==='READY_FOR_DHIS' " class="submitted ">
+                                        <a href=" " id=" " title="Submitted " ng-if="!event.localStatus || event.localStatus==='READY_FOR_DHIS' " class="submitted disabled-link">
                                             <span class="glyphicon glyphicon-ok glyphicon-green "></span>
                                         </a>
-                                        <a href=" " id=" " title="Incomplete " ng-if="event.localStatus==='NEW_INCOMPLETE_DRAFT' || event.localStatus==='UPDATED_INCOMPLETE_DRAFT' " class="submitted ">
+                                        <a href=" " id=" " title="Incomplete " ng-if="event.localStatus==='NEW_INCOMPLETE_DRAFT' || event.localStatus==='UPDATED_INCOMPLETE_DRAFT' " class="submitted disabled-link">
                                             <span class="glyphicon glyphicon-star-empty ">
                                                     </span>
                                         </a>
-                                        <a href=" " id=" " title="Complete " ng-if="event.localStatus==='NEW_DRAFT' || event.localStatus==='UPDATED_DRAFT' " class="submitted ">
+                                        <a href=" " id=" " title="Complete " ng-if="event.localStatus==='NEW_DRAFT' || event.localStatus==='UPDATED_DRAFT' " class="submitted disabled-link">
                                             <span class="glyphicon glyphicon-star ">
                                                     </span>
                                         </a>
@@ -101,7 +95,7 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <a href=" " id=" " ng-click="deleteEvent(event) " title="Delete " class="delete ">
+                                        <a href="" ng-click="deleteEvent(event) " title="Delete " class="delete ">
                                             <span class="glyphicon glyphicon-trash "></span>
                                         </a>
                                     </td>
@@ -112,13 +106,13 @@
                             <ul>
                                 <li>
                                     <div class="text-center ">
-                                        <input type="button " class="btn btn-main " value="{{ resourceBundle.submitBtnValue }} " ng-click="submit() " ng-if="!projectIsAutoApproved " />
-                                        <input type="button " class="btn btn-main " value="{{ resourceBundle.submitBtnValue }} " ng-click="submitAndApprove() " ng-if="projectIsAutoApproved " />
+                                        <input type="button " class="btn btn-main " value="{{ resourceBundle.submitBtnValue }} " ng-click="submit()" ng-if="!projectIsAutoApproved &amp;&amp; filterBy === 'readyToSubmit' " />
+                                        <input type="button " class="btn btn-main " value="{{ resourceBundle.submitBtnValue }} " ng-click="submitAndApprove()" ng-if="projectIsAutoApproved &amp;&amp; filterBy === 'readyToSubmit'" />
                                     </div>
                                 </li>
                             </ul>
                         </form>
-                    </accordion>
+                    </div>
                 </div>
             </accordion-group>
         </accordion>

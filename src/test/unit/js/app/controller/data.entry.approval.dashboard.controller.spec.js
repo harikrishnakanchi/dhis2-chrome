@@ -837,7 +837,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 expect(result).toEqual("#/aggregate-data-entry/mod1/2014W01");
             });
 
-            it("should return the list-list entry template url for a data entry user if current module contains line list porgrams", function() {
+            it("should return the list-list entry template url for a data entry user if current module contains line list programs", function() {
                 dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
                 rootScope.hasRoles.and.callFake(function(roles) {
                     if (_.contains(roles, 'Data entry user'))
@@ -861,7 +861,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 };
 
                 var result = scope.getTemplateUrl(item);
-                expect(result).toEqual("#/line-list-summary/mod1/2014W01");
+                expect(result).toEqual("#/line-list-summary/mod1/?filterBy=dateRange&startDate=2013-12-30&endDate=2014-01-05");
             });
 
             it("should return the approval template if user is a project level approver", function() {

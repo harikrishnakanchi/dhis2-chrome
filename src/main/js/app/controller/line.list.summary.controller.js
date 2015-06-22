@@ -2,7 +2,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
     return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, systemSettingRepository,
         orgUnitRepository, approvalDataRepository) {
 
-        $scope.searchParams = {};
+        $scope.filterParams = {};
 
         var scrollToTop = function() {
             $location.hash();
@@ -46,12 +46,39 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 allEvents: []
             };
 
-            var submitableEventsPromise = programEventRepository.getSubmitableEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id"));
-            var draftEventsPromise = programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id"));
+            if ($scope.filterBy === "incomplete") {
+                $scope.eventListTitle = $scope.resourceBundle.incompleteEventsTitle;
+                $scope.noCasesMsg = $scope.resourceBundle.noIncompleteEventsFound;
 
-            return $q.all([submitableEventsPromise, draftEventsPromise]).then(function(data) {
-                $scope.events = data[0].concat(data[1]);
-            });
+                return programEventRepository.getDraftEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(data) {
+                    $scope.events = data;
+                });
+            }
+            if ($scope.filterBy === "readyToSubmit") {
+                $scope.eventListTitle = $scope.resourceBundle.readyToSubmitEventsTitle;
+                $scope.noCasesMsg = $scope.resourceBundle.noReadyToSubmitEventsFound;
+                return programEventRepository.getSubmitableEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(data) {
+                    $scope.events = data;
+                });
+            }
+            if ($scope.filterBy === "dateRange") {
+                var startDate = $location.search().startDate;
+                var endDate = $location.search().endDate;
+                $scope.filterBy = $scope.filterByOptions[1].id;
+                $scope.filterParams.startDate = moment(startDate).toDate();
+                $scope.filterParams.endDate = moment(endDate).toDate();
+
+                return programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate).then(function(events) {
+                    $scope.events = events;
+                });
+            }
+
+            if ($scope.filterBy === "caseNumber") {
+                $scope.filterBy = $scope.filterByOptions[0].id;
+                $scope.filterParams.caseNumber = "";
+                $scope.events = undefined;
+            }
+
         };
 
         var getSubmitableEvents = function() {
@@ -232,17 +259,16 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             confirmAndProceed(deleteOnConfirm, modalMessages);
         };
 
-        $scope.searchByCaseNumber = function() {
-            programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.searchParams.caseNumber).then(function(events) {
-
+        $scope.filterByCaseNumber = function() {
+            programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber).then(function(events) {
                 $scope.events = events;
             });
 
         };
 
-        $scope.searchByDateRange = function() {
-            var startDate = moment($scope.searchParams.searchStartDate).format("YYYY-MM-DD");
-            var endDate = moment($scope.searchParams.searchEndDate).format("YYYY-MM-DD");
+        $scope.filterByDateRange = function() {
+            var startDate = moment($scope.filterParams.startDate).format("YYYY-MM-DD");
+            var endDate = moment($scope.filterParams.endDate).format("YYYY-MM-DD");
 
             programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate).then(function(events) {
                 $scope.events = events;
@@ -296,14 +322,19 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
             $scope.resultMessageType = $location.search().messageType;
             $scope.resultMessage = $location.search().message;
-            $scope.searchByOptions = [{
+            $scope.filterByOptions = [{
                 'id': 'caseNumber',
                 'name': 'Case Number'
             }, {
                 'id': 'dateRange',
                 'name': 'Date Range'
             }];
-            $scope.searchBy = $scope.searchByOptions[0];
+
+            $scope.filterBy = $location.search().filterBy;
+            if (!$scope.filterBy)
+                $scope.filterBy = 'caseNumber';
+            $scope.eventListTitle = $scope.resourceBundle.eventListTitle;
+            $scope.noCasesMsg = $scope.resourceBundle.noCasesFound;
             $scope.loading = true;
             return loadModule()
                 .then(loadOriginOrgUnits)

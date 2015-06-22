@@ -72,7 +72,11 @@
     "dataApproveFailure": "Error approving data. Please try again later.",
     "chooseWeek": "Please choose a week to enter data.",
     "lineListEventDate": "Event Date",
-    "eventListTitle": "List of Events",
+    "eventListTitle": "List of Cases",
+    "incompleteEventsTitle": "List of Incomplete Cases",
+    "readyToSubmitEventsTitle": "List of Cases Ready to Submit",
+    "noIncompleteEventsFound": "No Incomplete Cases Found",
+    "noReadyToSubmitEventsFound": "No Ready To Submit Cases Found",
     "syncRunning": "Data sync initiated. Please wait.",
     "syncScheduledHeader": "Download data from DHIS",
     "syncScheduled": "Data download scheduled successfully.",
@@ -222,7 +226,7 @@
     "uploadProgramDesc": "associate selected program to ",
     "uploadSystemSettingDesc": "sync excluded data elements for ",
     "patientOriginValidation": "Patient origin is required",
-    "invalidDateRangeMessage": "Date should be in selected week",
+    "invalidDateRangeMessage": "Date should be within the past 12 weeks",
     "productKeyExpiredMessage": "Your product key has expired. Please contact the admin.",
     "disableOriginConfirmationMessage": "Patient Origin will be disabled. Are you sure?",
     "enableOriginConfirmationMessage": "Patient Origin will be enabled. Are you sure?",
@@ -254,5 +258,10 @@
     "fieldAppSummary": "Local Event Summary",
     "originsCountTitle": "Origins",
     "originName": "Origin Name",
-    "originCount": "Count"
+    "originCount": "Count",
+    "findCases": "Find Cases",
+    "incompleteCases": "Incomplete Cases",
+    "casesReadyToSubmit": "Cases Ready To Submit",
+    "findCaseBy": "Find case by:",
+    "noCasesFound": "No Cases Found"
 }

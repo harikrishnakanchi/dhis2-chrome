@@ -378,9 +378,9 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             });
 
             mockStore.each.and.callFake(function(args) {
-                if (args.eq[2] === 'ou1') {
+                if (args.eq[1] === 'ou1') {
                     return utils.getPromise(q, [events[0]]);
-                } else if (args.eq[2] === 'ou2') {
+                } else if (args.eq[1] === 'ou2') {
                     return utils.getPromise(q, [events[1], events[2]]);
                 }
             });

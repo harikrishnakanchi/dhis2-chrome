@@ -60,7 +60,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
 
         $scope.loadEventsView = function() {
             $location.path("/line-list-summary/" + $scope.selectedModuleId);
-        }
+        };
 
         $scope.isEventDateSubstitute = function(dataElement) {
             var attr = _.find(dataElement.attributeValues, function(attributeValue) {
