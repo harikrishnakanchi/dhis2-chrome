@@ -1,5 +1,5 @@
 <div ng-controller="lineListOfflineApprovalController">
-<section class="panel tab-panel">
+    <section class="panel tab-panel">
         <div class="alert alert-danger" ng-hide="showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || (hasRoles(['Project Level Approver'])) )">{{resourceBundle.noDataForApproval}}</div>
         <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
         <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
@@ -26,7 +26,7 @@
                                             <th> {{resourceBundle.originCount}} </th>
                                         </tr>
                                     </thead>
-                                    <tr ng-repeat="(originId, originName) in originMap| toArray | orderBy:'originName'">
+                                    <tr ng-repeat="(originId, originName) in originMap">
                                         <td>{{originName}}</td>
                                         <td>{{originEvents[originId].length || 0}}</td>
                                     </tr>
