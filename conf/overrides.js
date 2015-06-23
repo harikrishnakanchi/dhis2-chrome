@@ -1,7 +1,10 @@
 define([], function() {
     var url = "/* @echo DHIS_URL */";
-    var auth_header = "/* @echo DHIS_AUTH */";
     var metdataSyncInterval = "/* @echo METADATA_SYNC_INTERVAL */";
+    var passphrase = "/* @echo PASSPHRASE */";
+    var iter = "/* @echo ITER */";
+    var ks = "/* @echo KS */";
+    var ts = "/* @echo TS */";
 
     return {
         "dhisPing": {
@@ -23,6 +26,12 @@ define([], function() {
                 3: 43200000,
                 4: 43200000
             }
+        },
+        "encryption": {
+            "passphrase": passphrase,
+            "iter": iter,
+            "ks": ks,
+            "ts": ts
         },
         "devMode": false
     };

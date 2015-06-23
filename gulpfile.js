@@ -24,6 +24,10 @@ var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
 var metadata_sync_interval = argv.metadataSyncInterval || "1";
 var auth = argv.auth || "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA==";
+var passphrase = argv.passphrase || "My Product Key";
+var iter = argv.iter || 1000;
+var ks = argv.ks || 128;
+var ts = argv.ts || 64;
 
 gulp.task('test', function() {
     return gulp.src('_')
@@ -165,8 +169,11 @@ gulp.task('config', function() {
         .pipe(preprocess({
             context: {
                 DHIS_URL: baseUrl,
-                DHIS_AUTH: auth,
-                METADATA_SYNC_INTERVAL: metadata_sync_interval
+                METADATA_SYNC_INTERVAL: metadata_sync_interval,
+                PASSPHRASE: passphrase,
+                ITER: iter,
+                KS: ks,
+                TS: ts
             }
         }))
         .pipe(gulp.dest('./src/main/js/app/conf'));
@@ -185,12 +192,10 @@ gulp.task('watch', function() {
     return gulp.watch('./src/main/less/main.less', ['less']);
 });
 
-
 gulp.task('download-systemSettings', function() {
     return download(baseIntUrl + "/api/systemSettings.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
 });
-
 
 gulp.task('download-metadata', function() {
     return download(baseIntUrl + "/api/metadata.json", auth)
