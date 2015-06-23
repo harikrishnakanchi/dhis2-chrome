@@ -204,7 +204,7 @@ gulp.task('pack', ['less', 'config', 'download-metadata', 'download-systemSettin
 });
 
 gulp.task('zip', ['less', 'config', 'download-metadata', 'download-systemSettings'], function() {
-    return gulp.src('./src/main/*')
+    return gulp.src('./src/main/**')
         .pipe(zip("dhis2_" + (argv.env || "dev") + ".zip"))
         .pipe(gulp.dest(''));
 });
