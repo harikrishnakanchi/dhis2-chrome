@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
-    return function($scope, $routeParams, $location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository) {
+    return function($scope, $rootScope, $routeParams, $location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository) {
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
@@ -59,7 +59,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         $scope.loadEventsView = function() {
-            $location.path("/line-list-summary/" + $scope.selectedModuleId);
+            $location.path($rootScope.historyOfRoutes[$rootScope.historyOfRoutes.length - 2]);
         };
 
         $scope.isEventDateSubstitute = function(dataElement) {
@@ -77,7 +77,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             $scope.event.dataValues = dataValuesAndEventDate.dataValues;
 
             programEventRepository.upsert($scope.event).then(function() {
-                $location.path("/line-list-summary/" + $scope.selectedModuleId).search({
+                $location.path($rootScope.historyOfRoutes[$rootScope.historyOfRoutes.length - 2]).search({
                     'messageType': 'success',
                     "message": $scope.resourceBundle.eventSaveSuccess
                 });
@@ -103,7 +103,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 if (addAnother)
                     resetForm();
                 else {
-                    $location.path("/line-list-summary/" + $scope.selectedModuleId).search({
+                    $location.path($rootScope.historyOfRoutes[$rootScope.historyOfRoutes.length - 2]).search({
                         'messageType': 'success',
                         "message": $scope.resourceBundle.eventSaveSuccess
                     });

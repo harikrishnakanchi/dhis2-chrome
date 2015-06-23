@@ -314,9 +314,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     }]
                 };
 
-                location.search.and.returnValue({
-                    "filterBy": "readyToSubmit"
-                });
+                routeParams.filterBy = 'readyToSubmit';
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
@@ -368,9 +366,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     }]
                 };
 
-                location.search.and.returnValue({
-                    "filterBy": "readyToSubmit"
-                });
+                routeParams.filterBy = 'readyToSubmit';
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
@@ -425,9 +421,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     }]
                 };
 
-                location.search.and.returnValue({
-                    "filterBy": "readyToSubmit"
-                });
+                routeParams.filterBy = 'readyToSubmit';
+
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
                 var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
@@ -462,9 +457,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                         'name': 'dataElement1',
                     }]
                 };
-                location.search.and.returnValue({
-                    "filterBy": "readyToSubmit"
-                });
+                routeParams.filterBy = 'readyToSubmit';
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
@@ -494,9 +487,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     }]
                 };
 
-                location.search.and.returnValue({
-                    "filterBy": "readyToSubmit"
-                });
+                routeParams.filterBy = 'readyToSubmit';
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 

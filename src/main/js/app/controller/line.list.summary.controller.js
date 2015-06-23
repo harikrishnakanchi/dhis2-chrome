@@ -330,7 +330,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 'name': 'Date Range'
             }];
 
-            $scope.filterBy = $location.search().filterBy;
+            $scope.filterBy = $routeParams.filterBy;
             if (!$scope.filterBy)
                 $scope.filterBy = 'caseNumber';
             $scope.eventListTitle = $scope.resourceBundle.eventListTitle;

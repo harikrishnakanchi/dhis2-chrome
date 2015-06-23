@@ -9,6 +9,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
                 "ui.multiselect", "ui.notIn", "ui.equals", "hustle", "angular.filter", "angucomplete-alt"
             ]);
+
             services.init(app);
             repositories.init(app);
             monitors.init(app);
@@ -42,7 +43,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/aggregate-data-entry.html',
                         controller: 'aggregateDataEntryController'
                     }).
-                    when('/line-list-summary/:module?', {
+                    when('/line-list-summary/:module/:filterBy?', {
                         templateUrl: 'templates/line-list-summary.html',
                         controller: 'lineListSummaryController'
                     }).
@@ -100,6 +101,15 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         if (!$rootScope.isLoggedIn && $rootScope.auth_header) {
                             $location.path("/login");
                         }
+                    });
+
+                    $rootScope.historyOfRoutes = [];
+
+                    $rootScope.$on('$routeChangeSuccess', function(e) {
+                        if ($rootScope.historyOfRoutes.length === 2) {
+                            $rootScope.historyOfRoutes = _.drop($rootScope.historyOfRoutes);
+                        }
+                        $rootScope.historyOfRoutes.push($location.$$url);
                     });
 
                     $rootScope.isDhisOnline = false;

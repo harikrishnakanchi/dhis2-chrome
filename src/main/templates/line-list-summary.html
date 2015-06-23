@@ -14,11 +14,11 @@
                 <div class="row sub-nav">
                     <div class="col-md-8">
                         <ul class="list-inline">
-                            <li><a href="#/line-list-summary/{{selectedModuleId}}?filterBy=caseNumber" ng-class="{'active': (filterBy === 'caseNumber' || filterBy === 'dateRange')}">{{resourceBundle.findCases}}</a></li>
+                            <li><a href="#/line-list-summary/{{selectedModuleId}}/caseNumber" ng-class="{'active': (filterBy === 'caseNumber' || filterBy === 'dateRange')}">{{resourceBundle.findCases}}</a></li>
                             <li>|</li>
-                            <li><a href="#/line-list-summary/{{selectedModuleId}}?filterBy=incomplete" ng-class="{'active': (filterBy === 'incomplete')}">{{resourceBundle.incompleteCases}}</a></li>
+                            <li><a href="#/line-list-summary/{{selectedModuleId}}/incomplete" ng-class="{'active': (filterBy === 'incomplete')}">{{resourceBundle.incompleteCases}}</a></li>
                             <li>|</li>
-                            <li><a href="#/line-list-summary/{{selectedModuleId}}?filterBy=readyToSubmit" ng-class="{'active': (filterBy === 'readyToSubmit')}">{{resourceBundle.casesReadyToSubmit}}</a></li>
+                            <li><a href="#/line-list-summary/{{selectedModuleId}}/readyToSubmit" ng-class="{'active': (filterBy === 'readyToSubmit')}">{{resourceBundle.casesReadyToSubmit}}</a></li>
                         </ul>
                     </div>
                     <div class="col-md-4 text-right">
