@@ -2,9 +2,9 @@ define([], function() {
     var url = "/* @echo DHIS_URL */";
     var metdataSyncInterval = "/* @echo METADATA_SYNC_INTERVAL */";
     var passphrase = "/* @echo PASSPHRASE */";
-    var iter = "/* @echo ITER */";
-    var ks = "/* @echo KS */";
-    var ts = "/* @echo TS */";
+    var iter = parseInt("/* @echo ITER */");
+    var ks = parseInt("/* @echo KS */");
+    var ts = parseInt("/* @echo TS */");
 
     return {
         "dhisPing": {
