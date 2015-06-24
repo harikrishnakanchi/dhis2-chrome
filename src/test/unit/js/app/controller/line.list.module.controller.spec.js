@@ -114,6 +114,23 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 Timecop.uninstall();
             });
 
+            it("should save sorted list of all programs", function() {
+                var program1 = {
+                    'id': 'prog1',
+                    'name': 'ER Linelist',
+                };
+                var program2 = {
+                    'id': 'prog1',
+                    'name': 'Burn Unit',
+                };
+
+                programsRepo.getAll.and.returnValue([program1, program2]);
+                spyOn(systemSettingRepo, "get").and.returnValue(utils.getPromise(q, {}));
+                scope.$apply();
+                expect(scope.allPrograms).toEqual([program2, program1]);
+
+            });
+
             it("should save excluded DataElement", function() {
 
                 spyOn(programsRepo, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, program));
