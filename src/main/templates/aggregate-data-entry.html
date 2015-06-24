@@ -61,7 +61,6 @@
                                                     <td ng-repeat="option in section.categoryOptionComboIds">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
                                                             <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, selectedModule.id)['value']" ng-focus="restoreExpression(selectedModule.id, dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(selectedModule.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed()" />
-                                                            <br/>
                                                         </ng-form>
                                                     </td>
                                                     <td class="last-column">{{sum(dataValues[selectedModule.id][dataElement.id])}}</td>
@@ -118,7 +117,6 @@
                                                     <td ng-repeat="option in section.categoryOptionComboIds">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
                                                             <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit.id)['value']" ng-focus="restoreExpression(orgUnit.id, dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(orgUnit.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed()" />
-                                                            <br/>
                                                         </ng-form>
                                                     </td>
                                                     <td class="last-column">{{sum(dataValues[orgUnit.id][dataElement.id])}}</td>

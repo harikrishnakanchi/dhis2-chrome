@@ -7,8 +7,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             $scope.dataValues = {};
             $scope.patientOrigin = {};
             $scope.isNewMode = true;
-            if ($scope.form && $scope.form.eventDataEntryForm) {
-                $scope.form.eventDataEntryForm.$setPristine();
+            if ($scope.eventDataEntryForm) {
+                $scope.eventDataEntryForm.$setPristine();
             }
             $scope.minEventDate = dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync);
             $scope.maxEventDate = moment().format("YYYY-MM-DD");

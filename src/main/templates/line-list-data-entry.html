@@ -4,7 +4,7 @@
     </div>
     <section class="panel tab-panel">
         <div>
-            <form name="form.eventDataEntryForm" id="form.eventDataEntryForm" class="form-horizontal">
+            <form name="eventDataEntryForm" id="eventDataEntryForm" class="form-horizontal">
                 <accordion close-others="false">
                     <accordion-group is-open="true">
                         <accordion-heading>
@@ -20,7 +20,7 @@
                                             <select ng-options="o.name for o in originOrgUnits | orderBy: 'name'" ng-model="patientOrigin.selected" name="patientOrigin" required>
                                                 <option value=""></option>
                                             </select>
-                                            <span class="errortxt" ng-show="form.eventDataEntryForm.patientOrigin.$error.required &amp;&amp; form.eventDataEntryForm.patientOrigin.$dirty">{{ resourceBundle.patientOriginValidation}}</span>
+                                            <span class="errortxt" ng-show="eventDataEntryForm.patientOrigin.$error.required &amp;&amp; eventDataEntryForm.patientOrigin.$dirty">{{ resourceBundle.patientOriginValidation}}</span>
                                         </div>
                                     </li>
                                 </ul>
@@ -55,11 +55,11 @@
                                                     </div>
                                                     <div angucomplete-alt="" ng-if="psde.dataElement.optionSet" name="{{psde.dataElement.id}}" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="dataValues[psde.dataElement.id]" local-data="optionSetMapping[psde.dataElement.optionSet.id]" search-fields="displayName" title-field="displayName" initial-value="{{dataValues[psde.dataElement.id].displayName}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" class="ng-isolate-scope">
                                                     </div>
-                                                    <div ng-show="form.eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$dirty &amp;&amp; form.eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$invalid">
-                                                        <span class="errortxt" ng-show="form.eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.required"> {{psde.dataElement.formName}} {{resourceBundle.required}}</span>
-                                                        <span class="errortxt" ng-show="form.eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.date"> {{resourceBundle.dateInvalid}}</span>
-                                                        <span class="errortxt" ng-show="form.eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.min || form.eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.max"> {{resourceBundle.invalidDateRangeMessage}}</span>
-                                                        <span class="errortxt" ng-show="form.eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.pattern"> {{de.dataElement.formName}} {{resourceBundle.invalidPattern}}</span>
+                                                    <div ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$dirty &amp;&amp; eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$invalid">
+                                                        <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.required"> {{psde.dataElement.formName}} {{resourceBundle.required}}</span>
+                                                        <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.date"> {{resourceBundle.dateInvalid}}</span>
+                                                        <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.min || eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.max"> {{resourceBundle.invalidDateRangeMessage}}</span>
+                                                        <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.pattern"> {{de.dataElement.formName}} {{resourceBundle.invalidPattern}}</span>
                                                     </div>
                                                 </div>
                                             </li>
@@ -70,9 +70,9 @@
                             <ul>
                                 <li>
                                     <div class="text-center">
-                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.saveCaseBtnValue }}" ng-click="save()" ng-disabled="form.eventDataEntryForm.$invalid" ng-if="isNewMode" />
-                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.saveAndAddAnotherBtnValue }}" ng-click="save(true)" ng-disabled="form.eventDataEntryForm.$invalid" ng-if="isNewMode" />
-                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.updateBtnValue }}" ng-click="update()" ng-disabled="form.eventDataEntryForm.$invalid" ng-if="!isNewMode" />
+                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.saveCaseBtnValue }}" ng-click="save()" ng-disabled="eventDataEntryForm.$invalid" ng-if="isNewMode" />
+                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.saveAndAddAnotherBtnValue }}" ng-click="save(true)" ng-disabled="eventDataEntryForm.$invalid" ng-if="isNewMode" />
+                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.updateBtnValue }}" ng-click="update()" ng-disabled="eventDataEntryForm.$invalid" ng-if="!isNewMode" />
                                         <input type="button" class="btn btn-main" value="{{ resourceBundle.cancelBtnValue }}" ng-click="loadEventsView()" />
                                     </div>
                                 </li>
