@@ -3,6 +3,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         orgUnitRepository, approvalDataRepository) {
 
         $scope.filterParams = {};
+        $scope.loadingResults = false;
 
         var scrollToTop = function() {
             $location.hash();
@@ -260,18 +261,22 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         $scope.filterByCaseNumber = function() {
+            $scope.loadingResults = true;
             programEventRepository.findEventsByCode($scope.program.id, _.pluck($scope.originOrgUnits, "id"), $scope.filterParams.caseNumber).then(function(events) {
                 $scope.events = events;
+                $scope.loadingResults = false;
             });
 
         };
 
         $scope.filterByDateRange = function() {
+            $scope.loadingResults = true;
             var startDate = moment($scope.filterParams.startDate).format("YYYY-MM-DD");
             var endDate = moment($scope.filterParams.endDate).format("YYYY-MM-DD");
 
             programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate).then(function(events) {
                 $scope.events = events;
+                $scope.loadingResults = false;
             });
 
         };
