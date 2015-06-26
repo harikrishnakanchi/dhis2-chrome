@@ -281,7 +281,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
         };
 
-        $scope.getOriginName = function(orgUnitId){
+        $scope.getOriginName = function(orgUnitId) {
             return _.find($scope.originOrgUnits, {
                 "id": orgUnitId
             }).name;
@@ -331,8 +331,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 });
             };
 
-            $scope.resultMessageType = $location.search().messageType;
-            $scope.resultMessage = $location.search().message;
+            showResultMessage($location.search().messageType, $location.search().message);
+
             $scope.filterByOptions = [{
                 'id': 'caseNumber',
                 'name': 'Case Number'
