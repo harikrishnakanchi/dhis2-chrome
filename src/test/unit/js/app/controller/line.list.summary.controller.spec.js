@@ -231,6 +231,13 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 expect(scope.originOrgUnits).toEqual(originOrgUnits);
             });
 
+            it("should get origin name given an id", function() {
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                scope.$apply();
+
+                expect(scope.getOriginName("o1")).toEqual("o1");
+            });
+
             it("should load all system settings on init", function() {
 
                 var program = {

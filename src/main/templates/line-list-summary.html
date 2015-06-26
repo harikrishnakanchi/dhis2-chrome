@@ -69,7 +69,7 @@
                             <tbody>
                                 <tr ng-repeat="event in events ">
                                     <td>{{ getFormattedDate(event.eventDate) }}</td>
-                                    <td ng-if="showPatientOriginInSummaryTable() ">{{ originOrgUnitsById[event.orgUnit].name }}</td>
+                                    <td ng-if="showPatientOriginInSummaryTable() ">{{ getOriginName(event.orgUnit)}}</td>
                                     <td ng-repeat="dataValue in event.dataValues " ng-if="dataValue.showInEventSummary ">
                                         <span ng-if="dataValue.type==='date' ">{{ getFormattedDate(dataValue.value) }}</span>
                                         <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='true' ">{{ resourceBundle.yes }}</span>

@@ -281,6 +281,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
         };
 
+        $scope.getOriginName = function(orgUnitId){
+            return _.find($scope.originOrgUnits, {
+                "id": orgUnitId
+            }).name;
+        };
+
         var init = function() {
 
             var loadModule = function() {
