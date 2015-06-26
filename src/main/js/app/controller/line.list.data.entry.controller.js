@@ -10,9 +10,12 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             if ($scope.eventDataEntryForm) {
                 $scope.eventDataEntryForm.$setPristine();
             }
-            $scope.minEventDate = dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync);
-            $scope.maxEventDate = moment().format("YYYY-MM-DD");
             $scope.$broadcast('angucomplete-alt:clearInput');
+        };
+
+        var setEventMinAndMaxDate = function(){
+            $scope.minEventDate = dateUtils.max([dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync), $scope.selectedModuleOpeningDate]).format("YYYY-MM-DD");
+            $scope.maxEventDate = moment().format("YYYY-MM-DD");
         };
 
         var getDataValuesAndEventDate = function() {
@@ -100,8 +103,10 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             };
 
             programEventRepository.upsert($scope.event).then(function() {
-                if (addAnother)
+                if (addAnother){
                     resetForm();
+                    setEventMinAndMaxDate();
+                }
                 else {
                     $location.path($rootScope.historyOfRoutes[$rootScope.historyOfRoutes.length - 2]).search({
                         'messageType': 'success',
@@ -116,6 +121,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             var allDataElementsMap = {};
             var loadModule = function() {
                 return orgUnitRepository.get($routeParams.module).then(function(module) {
+                    $scope.selectedModuleOpeningDate = module.openingDate;
                     $scope.selectedModuleId = module.id;
                     $scope.selectedModuleName = module.name;
                 });
@@ -179,7 +185,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                     return dv.value;
                 };
                 if ($routeParams.eventId) {
-                    programEventRepository.findEventById($scope.program.id, $routeParams.eventId).then(function(events) {
+                    return programEventRepository.findEventById($scope.program.id, $routeParams.eventId).then(function(events) {
                         $scope.event = events[0];
                         $scope.isNewMode = false;
                         $scope.patientOrigin.selected = _.find($scope.originOrgUnits, function(originOrgUnit) {
@@ -201,6 +207,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 .then(loadAllDataElements)
                 .then(loadOptionSets)
                 .then(loadEvent)
+                .then(setEventMinAndMaxDate)
                 .finally(function() {
                     $scope.loading = false;
                 });

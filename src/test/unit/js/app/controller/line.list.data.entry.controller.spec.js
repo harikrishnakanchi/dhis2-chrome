@@ -50,7 +50,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 var module = {
                     "id": "mod1",
-                    "name": "Mod 1"
+                    "name": "Mod 1",
+                    "openingDate": "2015-06-01"
                 };
 
                 originOrgUnits = [{
