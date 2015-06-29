@@ -3,7 +3,7 @@
         <div ng-hide="week" class="alert alert-info">{{resourceBundle.chooseWeek}}</div>
         <div class="module-select week-selector-gradient">
             <weekselector year="year" month="month" week="week" labels="resourceBundle" language="currentUser.locale" on-change="resetForm()" start-date="organisationUnit.openingDate"></weekselector>
-            <ul class="form">
+            <ul class="form" ng-hide="showOfflineSummaryForViewOnly">
                 <li class="form-group">
                     <label for="module">{{resourceBundle.moduleLabel}}</label>
                     <select name="module" id="module" class="input-sm" ng-model="currentModule" ng-options="module.displayName for module in modules | orderBy:'displayName'">

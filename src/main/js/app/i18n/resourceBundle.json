@@ -263,5 +263,6 @@
     "incompleteCases": "Incomplete Cases",
     "casesReadyToSubmit": "Cases Ready To Submit",
     "findCaseBy": "Find case by:",
-    "noCasesFound": "No Cases Found"
+    "noCasesFound": "No Cases Found",
+    "noCasesToSummarize": "No Submitted cases to Summarize"
 }

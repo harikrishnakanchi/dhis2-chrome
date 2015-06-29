@@ -4,6 +4,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
         $scope.filterParams = {};
         $scope.loadingResults = false;
+        $scope.showOfflineSummaryForViewOnly = true;
 
         var scrollToTop = function() {
             $location.hash();
@@ -287,6 +288,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             }).name;
         };
 
+        $scope.$on('moduleWeekInfo', function(event, data) {
+            $scope.selectedModule = data[0];
+            $scope.week = data[1];
+            init();
+        });
+
         var init = function() {
 
             var loadModule = function() {
@@ -313,6 +320,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
                             $scope.program = program;
+                            $scope.associatedProgramId = program.id;
                         });
                     });
                 };

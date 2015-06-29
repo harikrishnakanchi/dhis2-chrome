@@ -1,10 +1,11 @@
 <div ng-controller="lineListOfflineApprovalController">
     <section class="panel tab-panel">
-        <div class="alert alert-danger" ng-hide="showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || (hasRoles(['Project Level Approver'])) )">{{resourceBundle.noDataForApproval}}</div>
+        <div class="alert alert-danger" ng-hide="showOfflineSummaryForViewOnly || (showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || (hasRoles(['Project Level Approver'])) ))">{{resourceBundle.noDataForApproval}}</div>
+        <div class="alert alert-info" ng-show="showOfflineSummaryForViewOnly &amp;&amp; !showFilters"> {{ resourceBundle.noCasesToSummarize}}</div>
         <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
-        <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
-        <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-        <div ng-if="showFilters &amp;&amp; ((isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || (hasRoles(['Project Level Approver'])) )">
+        <div ng-show="!showOfflineSummaryForViewOnly &amp;&amp; isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
+        <div ng-show="!showOfflineSummaryForViewOnly &amp;&amp; approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
+        <div ng-if="showFilters &amp;&amp; (showOfflineSummaryForViewOnly || (isCompleted &amp;&amp; hasRoles(['Coordination Level Approver'])) || (hasRoles(['Project Level Approver'])) )">
             <accordion close-others="false">
                 <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: false }" is-open="true">
                     <accordion-heading>
