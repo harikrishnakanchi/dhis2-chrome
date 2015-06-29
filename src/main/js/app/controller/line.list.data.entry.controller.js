@@ -13,7 +13,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             $scope.$broadcast('angucomplete-alt:clearInput');
         };
 
-        var setEventMinAndMaxDate = function(){
+        var setEventMinAndMaxDate = function() {
             $scope.minEventDate = dateUtils.max([dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync), $scope.selectedModuleOpeningDate]).format("YYYY-MM-DD");
             $scope.maxEventDate = moment().format("YYYY-MM-DD");
         };
@@ -103,11 +103,10 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             };
 
             programEventRepository.upsert($scope.event).then(function() {
-                if (addAnother){
+                if (addAnother) {
                     resetForm();
                     setEventMinAndMaxDate();
-                }
-                else {
+                } else {
                     $location.path($rootScope.historyOfRoutes[$rootScope.historyOfRoutes.length - 2]).search({
                         'messageType': 'success',
                         "message": $scope.resourceBundle.eventSaveSuccess
