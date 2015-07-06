@@ -86,9 +86,10 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
         };
 
         this.getEventsFromPeriod = function(startPeriod, orgUnitIds) {
-            var endDate = moment().format('YYYY-MM-DD');
+            var startDate = moment(startPeriod, 'GGGG[W]W').startOf('day').toISOString();
+            var endDate = moment().endOf('day').toISOString();
+
             var store = db.objectStore('programEvents');
-            var startDate = moment(startPeriod, 'GGGG[W]W').format('YYYY-MM-DD');
             var query = db.queryBuilder().$between(startDate, endDate).$index("by_event_date").compile();
             return store.each(query).then(function(events) {
                 if (!orgUnitIds) {
@@ -196,6 +197,9 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
         };
 
         this.findEventsByDateRange = function(programId, orgUnitIds, fromDate, toDate) {
+            fromDate = moment(fromDate).startOf('day').toISOString();
+            toDate = moment(toDate).endOf('day').toISOString();
+
             orgUnitIds = _.flatten([orgUnitIds]);
 
             var getEvents = function() {

@@ -41,6 +41,13 @@
                                                     <input type="number" class="form-control" ng-if="psde.dataElement.type === 'int' &amp;&amp; !psde.dataElement.optionSet" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" ng-pattern="numberPattern" />
                                                     <input type="date" class="form-control" ng-if="psde.dataElement.type === 'date' &amp;&amp; !psde.dataElement.optionSet &amp;&amp; !isEventDateSubstitute(psde.dataElement)" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" max="9999-12-31" />
                                                     <input type="date" class="form-control" ng-if="psde.dataElement.type === 'date' &amp;&amp; !psde.dataElement.optionSet &amp;&amp; isEventDateSubstitute(psde.dataElement)" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" max="{{maxEventDate}}" min="{{minEventDate}}" required />
+                                                    <div ng-if="psde.dataElement.type === 'datetime'" class="date-time-form-control">
+                                                        <input type="datetime-local" class="form-control" ng-if="!isEventDateSubstitute(psde.dataElement)" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" max="9999-12-30T00:00:00.000Z" />
+                                                        <input type="datetime-local" class="form-control" ng-if="isEventDateSubstitute(psde.dataElement)" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" max="{{maxEventDate}}" min="{{minEventDate}}" required />
+                                                        <div class="current-date-time-button">
+                                                            <a ng-click="setCurrentDate(psde.dataElement.id)"><span class="glyphicon glyphicon-time"></span></a>
+                                                        </div>
+                                                    </div>
                                                     <div ng-if="psde.dataElement.type === 'bool' &amp;&amp; !psde.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
                                                         <div class="radio-inline">
                                                             <label for="Yes">

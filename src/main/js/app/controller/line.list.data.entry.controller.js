@@ -14,8 +14,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         var setEventMinAndMaxDate = function() {
-            $scope.minEventDate = dateUtils.max([dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync), $scope.selectedModuleOpeningDate]).format("YYYY-MM-DD");
-            $scope.maxEventDate = moment().format("YYYY-MM-DD");
+            $scope.minEventDate = dateUtils.max([dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync), $scope.selectedModuleOpeningDate]).startOf('day').toISOString();
+            $scope.maxEventDate = moment().endOf('day').toISOString();
         };
 
         var getDataValuesAndEventDate = function() {
@@ -29,7 +29,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 if (_.isObject(value) && value.code)
                     return value.code;
                 if (_.isDate(value))
-                    return moment(value).format("YYYY-MM-DD");
+                    return moment(value).toISOString();
                 return value;
             };
 
@@ -59,6 +59,10 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 eventDate: eventDate,
                 compulsoryFieldsPresent: compulsoryFieldsPresent
             };
+        };
+
+        $scope.setCurrentDate = function(dataElementId) {
+            $scope.dataValues[dataElementId] = moment().set('millisecond', 0).set('second', 0).toDate();
         };
 
         $scope.loadEventsView = function() {
@@ -177,9 +181,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                         });
                     }
 
-                    if (dv.type === "date") {
-                        if (dv.value)
-                            dv.value = dv.value.replace(/-/g, ',');
+                    if (dv.type === "date" || dv.type === "datetime") {
                         return new Date(dv.value);
                     }
 

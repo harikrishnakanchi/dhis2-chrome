@@ -27,7 +27,7 @@ define(["eventService", "angularMocks", "properties", "moment"], function(EventS
             };
 
             var orgUnitId = "ou1";
-            var endDate = moment().format("YYYY-MM-DD");
+            var endDate = moment().add(1, 'days').format("YYYY-MM-DD");
             var startDate = '2014-09-25';
             httpBackend.expectGET(properties.dhis.url + "/api/events?endDate=" + endDate + "&orgUnit=ou1&ouMode=DESCENDANTS&skipPaging=true&startDate=" + startDate).respond(200, expectedEvents);
 

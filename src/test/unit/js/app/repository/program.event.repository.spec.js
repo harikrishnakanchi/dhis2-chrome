@@ -7,8 +7,61 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             q = $q;
             scope = $rootScope;
 
+            var program = {
+                'id': 'p1',
+                'programStages': [{
+                    'id': 'p1s1'
+                }]
+            };
+
+            var programStage = {
+                'id': 'p1s1',
+                'programStageSections': [{
+                    'id': 'st1',
+                    'programStageDataElements': [{
+                        'dataElement': {
+                            'id': 'de1'
+                        }
+                    }, {
+                        'dataElement': {
+                            'id': 'de2'
+                        }
+                    }]
+                }]
+            };
+
+            var dataElements = [{
+                'id': 'de1',
+                'shortName': 'Age',
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "showInEventSummary",
+                    },
+                    "value": "true"
+                }]
+            }, {
+                'id': 'de2',
+                'shortName': 'PatientId',
+            }, {
+                'id': 'de3',
+                'shortName': 'SomeNonProgramDataElement',
+            }];
+
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
+
+            mockStore.find.and.callFake(function(id) {
+                if (id === "p1")
+                    return utils.getPromise(q, program);
+                if (id === "p1s1")
+                    return utils.getPromise(q, programStage);
+                if (id === "de1")
+                    return utils.getPromise(q, dataElements[0]);
+                if (id === "de2")
+                    return utils.getPromise(q, dataElements[1]);
+                return utils.getPromise(q, undefined);
+            });
+
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
         }));
 
@@ -118,6 +171,55 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             expect(mockStore.delete.calls.argsFor(1)).toEqual(["eventId2"]);
         });
 
+        it("should mark event as submitted", function() {
+            mockDB = utils.getMockDB(q, [], [], []);
+            mockStore = mockDB.objectStore;
+
+            var events = [{
+                'event': 'event1',
+                'eventDate': '2014-11-26T00:00:00',
+                'localStatus': 'NEW_DRAFT',
+                'dataValues': [{
+                    'dataElement': 'de1',
+                    'value': '20'
+                }]
+            }, {
+                'event': 'event2',
+                'eventDate': '2014-11-26T00:00:00',
+                'localStatus': 'UPDATED_DRAFT',
+                'dataValues': [{
+                    'dataElement': 'de1',
+                    'value': '20'
+                }]
+            }];
+            mockStore.each.and.returnValue(utils.getPromise(q, events));
+
+            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+
+            programEventRepository.markEventsAsSubmitted(["event1", "event2"]);
+            scope.$apply();
+
+            var expectedPayload = [{
+                'event': 'event1',
+                'eventDate': '2014-11-26T00:00:00',
+                'localStatus': 'READY_FOR_DHIS',
+                'dataValues': [{
+                    'dataElement': 'de1',
+                    'value': '20'
+                }]
+            }, {
+                'event': 'event2',
+                'eventDate': '2014-11-26T00:00:00',
+                'localStatus': 'READY_FOR_DHIS',
+                'dataValues': [{
+                    'dataElement': 'de1',
+                    'value': '20'
+                }]
+            }];
+
+            expect(mockStore.upsert).toHaveBeenCalledWith(expectedPayload);
+        });
+
         it("should return true if events are present for the given orgunitids", function() {
             mockDB = utils.getMockDB(q);
             mockStore = mockDB.objectStore;
@@ -167,52 +269,13 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             var queryObject = mockStore.each.calls.argsFor(0)[0];
             expect(queryObject.index).toEqual('by_event_date');
-            expect(queryObject.betweenX).toEqual('2014-01-20');
-            expect(queryObject.betweenY).toEqual(moment().format('YYYY-MM-DD'));
+            expect(queryObject.betweenX).toEqual(moment('2014-01-20').toISOString());
+            expect(queryObject.betweenY).toEqual(moment().endOf('day').toISOString());
 
             expect(actualEvents).toEqual(listOfEvents);
         });
 
         it("should get events for particular period and orgUnit", function() {
-            var program = {
-                'id': 'p1',
-                'programStages': [{
-                    'id': 'p1s1'
-                }]
-            };
-
-            var programStage = {
-                'id': 'p1s1',
-                'programStageSections': [{
-                    'id': 'st1',
-                    'programStageDataElements': [{
-                        'dataElement': {
-                            'id': 'de1'
-                        }
-                    }, {
-                        'dataElement': {
-                            'id': 'de2'
-                        }
-                    }]
-                }]
-            };
-
-            var dataElements = [{
-                'id': 'de1',
-                'shortName': 'Age',
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "showInEventSummary",
-                    },
-                    "value": "true"
-                }]
-            }, {
-                'id': 'de2',
-                'shortName': 'PatientId',
-            }, {
-                'id': 'de3',
-                'shortName': 'SomeNonProgramDataElement',
-            }];
 
             var events = [{
                 'event': 'event1',
@@ -238,21 +301,6 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 }]
             }];
 
-            mockDB = utils.getMockDB(q, "", dataElements);
-            mockStore = mockDB.objectStore;
-
-            mockStore.find.and.callFake(function(id) {
-                if (id === "p1")
-                    return utils.getPromise(q, program);
-                if (id === "p1s1")
-                    return utils.getPromise(q, programStage);
-                if (id === "de1")
-                    return utils.getPromise(q, dataElements[0]);
-                if (id === "de2")
-                    return utils.getPromise(q, dataElements[1]);
-                return utils.getPromise(q, undefined);
-            });
-
             mockStore.each.and.returnValue(utils.getPromise(q, events));
 
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
@@ -264,30 +312,30 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             scope.$apply();
 
             var expectedEvents = [{
-                event: 'event1',
-                eventDate: '2014-11-26T00:00:00',
-                dataValues: [{
-                    shortName: 'Age',
-                    showInEventSummary: true,
-                    dataElement: 'de1',
-                    value: '20',
+                'event': 'event1',
+                'eventDate': '2014-11-26T00:00:00',
+                'dataValues': [{
+                    'shortName': 'Age',
+                    'showInEventSummary': true,
+                    'dataElement': 'de1',
+                    'value': '20',
                 }, {
-                    shortName: 'PatientId',
-                    showInEventSummary: false,
-                    dataElement: 'de2'
+                    'shortName': 'PatientId',
+                    'showInEventSummary': false,
+                    'dataElement': 'de2'
                 }]
             }, {
-                event: 'event2',
-                eventDate: '2014-11-24T00:00:00',
-                dataValues: [{
-                    shortName: 'Age',
-                    showInEventSummary: true,
-                    dataElement: 'de1'
+                'event': 'event2',
+                'eventDate': '2014-11-24T00:00:00',
+                'dataValues': [{
+                    'shortName': 'Age',
+                    'showInEventSummary': true,
+                    'dataElement': 'de1'
                 }, {
-                    shortName: 'PatientId',
-                    showInEventSummary: false,
-                    dataElement: 'de2',
-                    value: 'ABC1',
+                    'shortName': 'PatientId',
+                    'showInEventSummary': false,
+                    'dataElement': 'de2',
+                    'value': 'ABC1',
                 }]
             }];
 
@@ -295,45 +343,6 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
         });
 
         it("should get events for particular period and multiple orgUnits", function() {
-            var program = {
-                'id': 'p1',
-                'programStages': [{
-                    'id': 'p1s1'
-                }]
-            };
-
-            var programStage = {
-                'id': 'p1s1',
-                'programStageSections': [{
-                    'id': 'st1',
-                    'programStageDataElements': [{
-                        'dataElement': {
-                            'id': 'de1'
-                        }
-                    }, {
-                        'dataElement': {
-                            'id': 'de2'
-                        }
-                    }]
-                }]
-            };
-
-            var dataElements = [{
-                'id': 'de1',
-                'shortName': 'Age',
-                "attributeValues": [{
-                    "attribute": {
-                        "code": "showInEventSummary",
-                    },
-                    "value": "true"
-                }]
-            }, {
-                'id': 'de2',
-                'shortName': 'PatientId',
-            }, {
-                'id': 'de3',
-                'shortName': 'SomeNonProgramDataElement',
-            }];
 
             var events = [{
                 'event': 'event1',
@@ -362,21 +371,6 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 }]
             }];
 
-            mockDB = utils.getMockDB(q, "", dataElements);
-            mockStore = mockDB.objectStore;
-
-            mockStore.find.and.callFake(function(id) {
-                if (id === "p1")
-                    return utils.getPromise(q, program);
-                if (id === "p1s1")
-                    return utils.getPromise(q, programStage);
-                if (id === "de1")
-                    return utils.getPromise(q, dataElements[0]);
-                if (id === "de2")
-                    return utils.getPromise(q, dataElements[1]);
-                return utils.getPromise(q, undefined);
-            });
-
             mockStore.each.and.callFake(function(args) {
                 if (args.eq[1] === 'ou1') {
                     return utils.getPromise(q, [events[0]]);
@@ -387,9 +381,9 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
 
-            var enrichedEvents;
+            var actualData;
             programEventRepository.getEventsForPeriod("p1", ["ou1", "ou2"], "2014W1").then(function(data) {
-                enrichedEvents = data;
+                actualData = data;
             });
             scope.$apply();
 
@@ -423,56 +417,62 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 }]
             }];
 
-            expect(enrichedEvents).toEqual(expectedEvents);
+            expect(actualData).toEqual(expectedEvents);
         });
 
-        it("should mark event as submitted", function() {
-            mockDB = utils.getMockDB(q, [], [], []);
-            mockStore = mockDB.objectStore;
-
+        it("should get Submitable Events", function() {
             var events = [{
                 'event': 'event1',
                 'eventDate': '2014-11-26T00:00:00',
-                'localStatus': 'NEW_DRAFT',
-                'dataValues': [{
-                    'dataElement': 'de1',
-                    'value': '20'
-                }]
-            }, {
-                'event': 'event2',
-                'eventDate': '2014-11-26T00:00:00',
-                'localStatus': 'UPDATED_DRAFT',
                 'dataValues': [{
                     'dataElement': 'de1',
                     'value': '20'
                 }]
             }];
+
             mockStore.each.and.returnValue(utils.getPromise(q, events));
 
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
 
-            programEventRepository.markEventsAsSubmitted(["event1", "event2"]);
+            var actualData;
+            programEventRepository.getSubmitableEventsFor('p1', ['ou1']).then(function(data) {
+                actualData = data;
+            });
             scope.$apply();
 
-            var expectedPayload = [{
-                event: 'event1',
-                eventDate: '2014-11-26T00:00:00',
-                localStatus: 'READY_FOR_DHIS',
-                dataValues: [{
-                    dataElement: 'de1',
-                    value: '20'
-                }]
-            }, {
-                event: 'event2',
-                eventDate: '2014-11-26T00:00:00',
-                localStatus: 'READY_FOR_DHIS',
-                dataValues: [{
-                    dataElement: 'de1',
-                    value: '20'
-                }]
+            var queryObject1 = mockStore.each.calls.argsFor(0)[0];
+            expect(queryObject1.index).toEqual('by_program_orgunit_status');
+            expect(queryObject1.eq).toEqual(['p1', 'ou1', 'NEW_DRAFT']);
+
+            var queryObject2 = mockStore.each.calls.argsFor(1)[0];
+            expect(queryObject2.index).toEqual('by_program_orgunit_status');
+            expect(queryObject2.eq).toEqual(['p1', 'ou1', 'UPDATED_DRAFT']);
+        });
+
+        it("should get Draft Events", function() {
+            var listOfEvents = [{
+                'id': 'e1'
             }];
 
-            expect(mockStore.upsert).toHaveBeenCalledWith(expectedPayload);
+            mockDB = utils.getMockDB(q, [], [], listOfEvents);
+            mockStore = mockDB.objectStore;
+
+            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+
+            var actualEvents;
+            programEventRepository.getDraftEventsFor('prg1', ['ou1']);
+
+            scope.$apply();
+
+            var queryObject1 = mockStore.each.calls.argsFor(0)[0];
+            expect(queryObject1.index).toEqual('by_program_orgunit_status');
+            expect(queryObject1.eq).toEqual(['prg1', 'ou1', 'NEW_INCOMPLETE_DRAFT']);
+
+            var queryObject2 = mockStore.each.calls.argsFor(1)[0];
+            expect(queryObject2.index).toEqual('by_program_orgunit_status');
+            expect(queryObject2.eq).toEqual(['prg1', 'ou1', 'UPDATED_INCOMPLETE_DRAFT']);
         });
+
+        it("should find events by id", function() {});
     });
 });

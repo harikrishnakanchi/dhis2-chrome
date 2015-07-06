@@ -67,8 +67,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var startDate = $location.search().startDate;
                 var endDate = $location.search().endDate;
                 $scope.filterBy = $scope.filterByOptions[1].id;
-                $scope.filterParams.startDate = moment(startDate).toDate();
-                $scope.filterParams.endDate = moment(endDate).toDate();
+                $scope.filterParams.startDate = moment(startDate).startOf('day').toDate();
+                $scope.filterParams.endDate = moment(endDate).endOf('day').toDate();
 
                 return programEventRepository.findEventsByDateRange($scope.program.id, _.pluck($scope.originOrgUnits, "id"), startDate, endDate).then(function(events) {
                     $scope.events = events;

@@ -38,7 +38,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
 
                 var expectedEventPayload = [{
                     'event': 'e1',
-                    'eventDate': '2015-06-29'
+                    'eventDate': '2015-06-28T18:30:00.000Z'
                 }];
 
                 expect(eventService.getRecentEvents).toHaveBeenCalled();

@@ -36,7 +36,7 @@ define(["moment", "properties", "dateUtils", "lodash"], function(moment, propert
             var newEvents = getNewEvents();
             eventsToUpsert = eventsToUpsert.concat(newEvents);
             _.map(eventsToUpsert, function(ev) {
-                ev.eventDate = moment(ev.eventDate).format("YYYY-MM-DD");
+                ev.eventDate = moment(ev.eventDate).toISOString();
             });
 
             var upsertPromise = programEventRepository.upsert(eventsToUpsert);

@@ -159,6 +159,22 @@ body {
     .info-error-section {
         padding-top: 15px;
     }
+    .date-time-form-control {
+        position: relative;
+        div.current-date-time-button {
+            position: absolute;
+            right: -30px;
+            top: 7px;
+            width: 20px;
+            height: 20px;
+            a {
+                cursor: pointer;
+                span {
+                    font-size: 20px;
+                }
+            }
+        }
+    }
     .exp-coll-group {
         .panel-default > .panel-heading {
             color: #000;
@@ -242,8 +258,10 @@ body {
     }
     .dataentrypage {
         input[type="text"] {
-            height: 25px;
             padding: 3px 6px;
+        }
+        .input-sm {
+            height: 25px !important;
         }
         .table {
             margin-bottom: 5px;

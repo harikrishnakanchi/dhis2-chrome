@@ -189,7 +189,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 expect(scope.dataValues).toEqual({
                     'de1': '66',
-                    'de2': new Date("2015-04-15".replace(/-/g, ',')),
+                    'de2': new Date("2015-04-15"),
                     'de3': 3,
                     'de4': {
                         'id': 'os1o1',
