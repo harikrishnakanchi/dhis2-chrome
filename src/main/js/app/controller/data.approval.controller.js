@@ -175,7 +175,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
-                    .then(function(datasets) {
+                    .then(function(data) {
+                        var datasets = data.enrichedDataSets;
                         var dataSetPromises = _.map(datasets, function(dataset) {
                             return findallOrgUnits(dataset.organisationUnits).then(function(orgunits) {
                                 dataset.organisationUnits = orgunits;

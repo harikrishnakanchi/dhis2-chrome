@@ -2,7 +2,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
         dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository) {
 
-        var currentPeriod, currentPeriodAndOrgUnit;
+        var currentPeriod, currentPeriodAndOrgUnit, catOptComboIdsToBeTotalled;
 
         var resetForm = function() {
             $scope.isopen = {};
@@ -99,9 +99,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         };
 
         $scope.sum = function(iterable) {
-            return _.reduce(iterable, function(sum, currentOption) {
-                exp = currentOption.value || "0";
-                return sum + calculateSum(exp);
+            return _.reduce(iterable, function(sum, currentOption, catOptComboId) {
+                if (_.contains(catOptComboIdsToBeTotalled, catOptComboId)) {
+                    exp = currentOption.value || "0";
+                    return sum + calculateSum(exp);
+                } else {
+                    return sum;
+                }
             }, 0);
         };
 
@@ -289,7 +293,9 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
-                    .then(function(datasets) {
+                    .then(function(data) {
+                        var datasets = data.enrichedDataSets;
+                        catOptComboIdsToBeTotalled = data.catOptComboIdsToBeTotalled;
                         var dataSetPromises = _.map(datasets, function(dataset) {
                             return findallOrgUnits(dataset.organisationUnits).then(function(orgunits) {
                                 dataset.organisationUnits = orgunits;

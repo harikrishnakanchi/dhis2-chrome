@@ -115,7 +115,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, {'enrichedDataSets': []}));
 
                 programRepository = new ProgramRepository();
                 spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, undefined));

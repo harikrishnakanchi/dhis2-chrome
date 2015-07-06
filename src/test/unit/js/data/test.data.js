@@ -95,6 +95,7 @@ define(["lodash"], function(_) {
             "id": "CC1"
         },
         "name": "(CO1, CO3)",
+        "code": "(CO1, CO3)_excludeFromTotal",
         "categoryOptions": [{
             "id": "CO1",
             "name": "Resident"

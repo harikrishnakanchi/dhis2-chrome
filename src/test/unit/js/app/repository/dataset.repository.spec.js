@@ -33,7 +33,7 @@ define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "
 
             mockStore.getAll.and.returnValue(utils.getPromise(q, allDataSets));
 
-            var actualDatasets;
+            var actualDatasets, actualCatOptCombos;
             datasetRepository.getAll().then(function(datasets) {
                 actualDatasets = datasets;
             });
@@ -183,7 +183,8 @@ define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "
             var actualDatasets;
 
             datasetRepository.includeCategoryOptionCombinations(dataSets).then(function(data) {
-                actualDatasets = data;
+                actualDatasets = data.enrichedDataSets;
+                actualCatOptCombos = data.catOptComboIdsToBeTotalled;
             });
 
             scope.$apply();
@@ -212,6 +213,7 @@ define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "
             ];
             expect(actualDatasets[0].sections[0].headers).toEqual(expectedSectionHeaders);
             expect(actualDatasets[0].sections[0].categoryOptionComboIds).toEqual(['1', '2', '3', '4']);
+            expect(actualCatOptCombos).toEqual(["2","3","4","5","6"]);
         });
 
         it("should upsert datasets downloaded from dhis", function() {

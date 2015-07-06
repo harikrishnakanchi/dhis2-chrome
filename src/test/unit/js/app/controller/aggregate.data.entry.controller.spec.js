@@ -143,7 +143,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, []));
+                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, {'enrichedDataSets': [], 'catOptComboIdsToBeTotalled': ['option1', 'option3', 'option4']}));
 
                 aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository);
 
@@ -156,6 +156,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should return the sum of the list ", function() {
+                scope.$apply();
                 var list = {
                     "option1": {
                         "value": "1"
@@ -171,10 +172,11 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     }
                 };
 
-                expect(scope.sum(list)).toBe(10);
+                expect(scope.sum(list)).toBe(8);
             });
 
             it("should return the sum of valid values ", function() {
+                scope.$apply();
                 var list = {
                     "option1": {
                         "value": "1"
@@ -190,10 +192,11 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     }
                 };
 
-                expect(scope.sum(list)).toBe(7);
+                expect(scope.sum(list)).toBe(5);
             });
 
             it("should return the sum of valid expressions ", function() {
+                scope.$apply();
                 var list = {
                     "option1": {
                         "formula": "1 + 3",
@@ -210,10 +213,11 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     }
                 };
 
-                expect(scope.sum(list)).toBe(13);
+                expect(scope.sum(list)).toBe(11);
             });
 
             it("should return the sum of the map ", function() {
+                scope.$apply();
                 var list = {
                     "option1": {
                         "value": "1"
@@ -228,7 +232,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         "value": "4"
                     }
                 };
-                expect(scope.sum(list)).toBe(10);
+                expect(scope.sum(list)).toBe(8);
             });
 
             it("should evaluate expression on blur and store as string", function() {
