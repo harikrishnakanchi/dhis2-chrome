@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
-    return function($scope, $rootScope, $routeParams, $location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository) {
+    return function($scope, $rootScope, $routeParams, $location,$anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository) {
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
@@ -88,12 +88,17 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             });
         };
 
+        var scrollToTop = function(eventId) {
+            $location.hash(eventId);
+            $anchorScroll();
+        };
+
         $scope.save = function(addAnother) {
 
             var dataValuesAndEventDate = getDataValuesAndEventDate();
-
+            var eventId = dhisId.get($scope.program.id + $scope.program.programStages[0].id + $scope.selectedModuleId + moment().format());
             $scope.event = {
-                "event": dhisId.get($scope.program.id + $scope.program.programStages[0].id + $scope.selectedModuleId + moment().format()),
+                "event": eventId,
                 "program": $scope.program.id,
                 "programStage": $scope.program.programStages[0].id,
                 "orgUnit": $scope.patientOrigin.selected.id,
@@ -106,6 +111,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 if (addAnother) {
                     resetForm();
                     setEventMinAndMaxDate();
+                    scrollToTop(eventId);
                 } else {
                     $location.path($rootScope.historyOfRoutes[$rootScope.historyOfRoutes.length - 2]).search({
                         'messageType': 'success',

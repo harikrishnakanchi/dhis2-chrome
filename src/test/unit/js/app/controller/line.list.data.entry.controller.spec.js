@@ -2,12 +2,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
     function(LineListDataEntryController, mocks, utils, moment, timecop, ProgramEventRepository, OptionSetRepository, OrgUnitRepository, SystemSettingRepository, ProgramRepository) {
         describe("lineListDataEntryController ", function() {
 
-            var scope, rootScope, q, routeparams, location, programEventRepository, mockStore, allEvents, optionSets, originOrgUnits, optionSetRepository, optionSetMapping, orgUnitRepository, systemSettingRepository, programRepository;
+            var scope, rootScope, q, routeparams, location, programEventRepository, mockStore, allEvents, optionSets, originOrgUnits, optionSetRepository, optionSetMapping, orgUnitRepository, systemSettingRepository, programRepository, anchorScroll;
 
             beforeEach(module('hustle'));
-            beforeEach(mocks.inject(function($rootScope, $q, $location) {
+            beforeEach(mocks.inject(function($rootScope, $q, $location, $anchorScroll) {
                 scope = $rootScope.$new();
                 rootScope = $rootScope;
+                anchorScroll = $anchorScroll;
                 q = $q;
                 location = $location;
 
@@ -126,7 +127,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should set scope variables on init", function() {
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
                 expect(scope.selectedModuleId).toBeDefined();
@@ -183,7 +184,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 };
                 optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
                 expect(scope.dataValues).toEqual({
@@ -203,7 +204,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 rootScope.historyOfRoutes = ['/line-list-summary/mod1', '/line-list-data-entry/mod1'];
 
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
                 scope.dataValues = {
@@ -253,7 +254,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should save event details as newDraft and show data entry form again", function() {
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
+                spyOn(location, "hash");
+                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
                 scope.patientOrigin = {
@@ -269,12 +271,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 expect(location.path).not.toHaveBeenCalledWith("/line-list-summary/mod1");
                 expect(location.search).not.toHaveBeenCalled();
+                expect(location.hash).toHaveBeenCalled();
 
                 scope.$apply();
             });
 
             it("should update event details", function() {
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
                 scope.patientOrigin = {
@@ -316,7 +319,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should save incomplete events", function() {
-                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
+                var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();
 
                 scope.dataValues = {
