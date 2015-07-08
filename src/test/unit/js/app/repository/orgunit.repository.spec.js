@@ -322,15 +322,45 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             expect(actualProject).toEqual(project);
         });
 
-        it("should get all modules in org units", function() {
+        it("should get all modules which are children of the given org units", function() {
             var actualModules;
-            orgUnitRepository.getAllModulesInOrgUnits(opUnit).then(function(data) {
+            module1 = {
+                "id": "module1",
+                "name": "module1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Module"
+                }],
+                "parent": {
+                    "id": "opUnit123"
+                },
+                "children": [{
+                    "id": "Unknown",
+                    "name": "Unknown"
+                }]
+            };
+
+            mockOrgStore.each.and.callFake(function(query) {
+                if (query.inList[0] === "opUnit" && query.inList[1] === "module1")
+                    return utils.getPromise(q, [opUnit, module1]);
+                if (query.inList.length === 1 && query.inList[0] === "opUnit")
+                    return utils.getPromise(q, [module]);
+            });
+
+            orgUnitRepository.getAllModulesInOrgUnits(["opUnit", "module1"]).then(function(data) {
                 actualModules = data;
             });
 
             scope.$apply();
 
-            expect(actualModules).toEqual([module]);
+            expect(actualModules).toEqual([module, module1]);
         });
 
         it("should get child org unit names", function() {

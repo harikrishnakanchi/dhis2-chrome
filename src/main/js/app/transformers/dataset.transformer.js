@@ -22,7 +22,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
     };
 
     this.mapDatasetForView = function(dataset) {
-        var resultDataset = _.pick(dataset, ["id", "name", "shortName", "organisationUnits", "sections"]);
+        var resultDataset = _.pick(dataset, ["id", "name", "shortName", "code", "organisationUnits", "sections"]);
         resultDataset.isAggregateService = !getBooleanAttributeValue(dataset.attributeValues, "isLineListService") && !getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset");
         resultDataset.isLineListService = getBooleanAttributeValue(dataset.attributeValues, "isLineListService");
         resultDataset.isOriginDataset = getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset");

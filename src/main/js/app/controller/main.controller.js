@@ -51,20 +51,18 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         var loadUserLineListModules = function() {
             if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
                 return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(modules) {
-                    $scope.allUserLineListModules = _.transform(modules, function(result, module) {
-                        var attr = _.find(module.attributeValues, {
-                            "attribute": {
-                                "code": "isLineListService"
-                            },
-                            "value": "true"
-                        });
-
-                        if (!attr)
-                            return;
-
-                        module.displayName = module.parent.name + ' - ' + module.name;
-                        result.push(module);
-                    }, []);
+                    $scope.allUserModules = _.map(modules, function(module) {
+                        return {
+                            "id": module.id,
+                            "displayName": module.parent.name + ' - ' + module.name,
+                            "isLineListService": _.any(module.attributeValues, {
+                                "attribute": {
+                                    "code": "isLineListService"
+                                },
+                                "value": "true"
+                            })
+                        };
+                    });
                 });
             }
         };

@@ -2,6 +2,9 @@ require.config({
     paths: {
         "angular": "lib/angular/angular",
         "Q": "lib/q/q",
+        "d3": "lib/d3/d3",
+        "d3-shim": "lib/custom/d3-shim/d3.shim",
+        "nvd3": "lib/nvd3/nv.d3",
         "lodash": "lib/lodash/lodash",
         "ng-i18n": "lib/ng-i18n/src/js/ng-i18n",
         "angular-route": "lib/angular-route/angular-route",
@@ -33,6 +36,7 @@ require.config({
         "angular-multiselect": "lib/angularjs-directives/src/multiselect/multiselect",
         "angular-filter": "lib/angular-filter/dist/angular-filter",
         "angucomplete-alt": "lib/angularjs-directives/src/angucomplete-alt/angucomplete-alt",
+        "angularjs-nvd3": "lib/angularjs-nvd3-directives/dist/angularjs-nvd3-directives",
         "md5": "lib/js-md5/js/md5",
 
         //Controllers
@@ -62,6 +66,7 @@ require.config({
         "appCloneController": "app/controller/app.clone.controller",
         "downloadDataController": "app/controller/download.data.controller",
         "selectLanguageController": "app/controller/select.language.controller",
+        "reportsController": "app/controller/reports.controller",
 
         //Services
         "services": "app/service/services",
@@ -76,6 +81,7 @@ require.config({
         "eventService": "app/service/event.service",
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "filesystemService": "app/service/filesystem.service",
+        "chartService": "app/service/chart.service",
 
         //Repositories
         "repositories": "app/repository/repositories",
@@ -191,6 +197,12 @@ require.config({
         },
         'angular-filter': {
             deps: ["angular"]
+        },
+        'nvd3': {
+            deps: ["d3-shim"]
+        },
+        'angularjs-nvd3': {
+            deps: ["nvd3", "angular"]
         }
     }
 });

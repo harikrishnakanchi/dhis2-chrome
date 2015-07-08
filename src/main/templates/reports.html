@@ -1,0 +1,18 @@
+<div ng-repeat="chart in chartData">
+    <h3>{{chart.title}}</h3>
+    <p ng-if="chart.type === 'line'">
+        <nvd3-line-chart id="chart-{{$index}}" data="chart.data" width="750" height="450" xAxisTickFormat="xAxisTickFormat(chart)" yAxisTickFormat="yAxisTickFormatForInteger()" showXAxis="true" showYAxis="true" forcex="[1428863400000, 1434911400000, 1428863400000, 1429468200000]" showLegend="true">
+            <svg></svg>
+        </nvd3-line-chart>
+    </p>
+    <p ng-if="chart.type === 'column'">
+        <nvd3-multi-bar-chart data="chart.data" id="chart-{{$index}}" width="750" height="450" rotateLabels="45" showXAxis="true" showYAxis="true" showValues="true" yAxisTickFormat="yAxisTickFormatForInteger()" xAxisTickFormat="xAxisTickFormat()" showLegend="true" showControls="true">
+            <svg></svg>
+        </nvd3-multi-bar-chart>
+    </p>
+    <p ng-if="chart.type === 'stackedcolumn'">
+        <nvd3-multi-bar-chart data="chart.data" id="chart-{{$index}}" width="750" height="450" rotateLabels="45" showXAxis="true" showYAxis="true" showValues="true" yAxisTickFormat="yAxisTickFormatForInteger()" xAxisTickFormat="xAxisTickFormat()" stacked="true" showLegend="true" showControls="true">
+            <svg></svg>
+        </nvd3-multi-bar-chart>
+    </p>
+</div>

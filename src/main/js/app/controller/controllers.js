@@ -1,15 +1,16 @@
-define(['dashboardController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'aggregateModuleController',
+define(['dashboardController', 'reportsController', 'dataEntryController', 'mainController', 'orgUnitContoller', 'loginController', 'opUnitController', 'aggregateModuleController',
         'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController',
         'aggregateDataEntryController', 'lineListDataEntryController', 'patientOriginController', 'productKeyController',
         'lineListSummaryController', 'dataApprovalController', 'dataEntryApprovalDashboardController', 'lineListOfflineApprovalController', 'appCloneController', 'downloadDataController', 'notificationDialogController', 'selectLanguageController'
     ],
-    function(dashboardController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, aggregateModuleController,
+    function(dashboardController, reportsController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, aggregateModuleController,
         lineListModuleController, projectController, countryController, confirmDialogController, projectUserController,
         aggregateDataEntryController, lineListDataEntryController, patientOriginController, productKeyController,
         lineListSummaryController, dataApprovalController, dataEntryApprovalDashboardController, lineListOfflineApprovalController, appCloneController, downloadDataController, notificationDialogController, selectLanguageController) {
 
         var init = function(app) {
             app.controller('dashboardController', ['$scope', '$hustle', '$q', '$rootScope', '$timeout', dashboardController]);
+            app.controller('reportsController', ['$scope', '$q', '$routeParams', 'datasetRepository', 'orgUnitRepository', 'chartService', reportsController]);
             app.controller('dataEntryApprovalDashboardController', ['$scope', '$hustle', '$q', '$rootScope', '$modal', '$timeout', '$location', 'orgUnitRepository', 'approvalDataRepository', 'dataRepository', 'programEventRepository', dataEntryApprovalDashboardController]);
             app.controller('dataEntryController', ['$scope', '$routeParams', '$q', '$location', '$rootScope', 'orgUnitRepository', dataEntryController]);
             app.controller('aggregateDataEntryController', ['$scope', '$routeParams', '$q', '$hustle', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', '$timeout', 'dataRepository', 'systemSettingRepository', 'approvalDataRepository', 'orgUnitRepository', 'datasetRepository', 'programRepository', aggregateDataEntryController]);

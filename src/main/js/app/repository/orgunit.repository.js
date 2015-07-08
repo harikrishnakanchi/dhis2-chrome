@@ -132,31 +132,41 @@ define(["moment", "lodashUtils"], function(moment, _) {
         };
 
         var getAllModulesInOrgUnits = function(orgUnitIds) {
-            var getChildModules = function(orgUnitIds) {
-                return findAllByParent(orgUnitIds).then(function(children) {
-                    var moduleOrgUnits = [];
-                    var nonModuleOrgUnits = [];
 
-                    _.forEach(children, function(ou) {
-                        if (isOfType(ou, 'Module')) {
-                            moduleOrgUnits.push(ou);
-                        } else {
-                            nonModuleOrgUnits.push(ou);
-                        }
-                    });
+            orgUnitIds = _.flatten([orgUnitIds]);
+
+            var partitionModules = function(orgunits) {
+                return _.partition(orgunits, function(ou) {
+                    return isOfType(ou, 'Module');
+                });
+            };
+
+            var getChildModules = function(orgUnits) {
+
+                return findAllByParent(_.pluck(orgUnits, "id")).then(function(children) {
+                    var partitionedOrgUnits = partitionModules(children);
+                    var moduleOrgUnits = partitionedOrgUnits[0];
+                    var nonModuleOrgUnits = partitionedOrgUnits[1];
 
                     if (_.isEmpty(nonModuleOrgUnits)) {
                         return moduleOrgUnits;
                     }
 
-                    return getChildModules(_.pluck(nonModuleOrgUnits, "id")).then(function(data) {
+                    return getChildModules(nonModuleOrgUnits).then(function(data) {
                         return moduleOrgUnits.concat(data);
                     });
                 });
             };
 
-            orgUnitIds = _.isArray(orgUnitIds) ? orgUnitIds : [orgUnitIds];
-            return getChildModules(orgUnitIds);
+            return findAll(orgUnitIds).then(function(orgUnits) {
+                var partitionedOrgUnits = partitionModules(orgUnits);
+                var moduleOrgUnits = partitionedOrgUnits[0];
+                var nonModuleOrgUnits = partitionedOrgUnits[1];
+
+                return getChildModules(nonModuleOrgUnits).then(function(childrenModules) {
+                    return childrenModules.concat(moduleOrgUnits);
+                });
+            });
         };
 
         var getChildOrgUnitNames = function(parentIds) {
