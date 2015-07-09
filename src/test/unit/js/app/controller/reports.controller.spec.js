@@ -94,19 +94,16 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                     "meta": false
                 }],
                 "metaData": {
-                    "pe": ["2015W17", "2015W18", "2015W19", "2015W20", "2015W21", "2015W22", "2015W23", "2015W24", "2015W25", "2015W26", "2015W27", "2015W28"],
+                    "pe": ["2015W25", "2015W26", "2015W27"],
                     "co": ["a5b4bc9fb13", "a356292c764", "a384d7501c2", "a44ec0d6da3", "a0a3ead9cab", "ad3a550cc4c", "a268522c516", "aa96411bdb6"],
                     "ou": ["a2cf79e8f13"],
                     "names": {
                         "a5b4bc9fb13": "(5-14 years, Male)",
                         "ac2f8253ff7": "New Admission - Out-Patient Department - Admission - Pediatric IPD Ward",
-                        "2015W18": "2015W18",
-                        "2015W19": "2015W19",
                         "dx": "Data",
                         "a0b89770007": "5-14 years",
                         "a1948a9c6f4": "Pediatric Age Group",
                         "afca0bdf0f1": "<1 month",
-                        "2015W17": "2015W17",
                         "a2cf79e8f13": "MSF",
                         "a3267f05ab8": "New Admission - Emergency Department - Admission - Pediatric IPD Ward",
                         "a0a3ead9cab": "(24-59 months, Female)",
@@ -116,13 +113,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                         "2015W25": "2015W25",
                         "2015W26": "2015W26",
                         "2015W27": "2015W27",
-                        "2015W28": "2015W28",
                         "abf819dca06": "24-59 months",
-                        "2015W21": "2015W21",
-                        "2015W22": "2015W22",
-                        "2015W23": "2015W23",
-                        "2015W24": "2015W24",
-                        "2015W20": "2015W20",
                         "pe": "Period",
                         "ab3a614eed1": "1-23 months",
                         "a356292c764": "(<1 month, Male)",
@@ -166,7 +157,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                     "meta": false
                 }],
                 "metaData": {
-                    "pe": ["2015W17", "2015W18", "2015W19", "2015W20", "2015W21", "2015W22", "2015W23", "2015W24", "2015W25", "2015W26", "2015W27", "2015W28"],
+                    "pe": ["2015W21", "2015W22", "2015W23", "2015W24", "2015W25", "2015W26", "2015W27"],
                     "co": [],
                     "ou": ["a510de00b66"],
                     "names": {
@@ -176,11 +167,8 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                         "2015W19": "2015W19",
                         "dx": "Data",
                         "2015W25": "2015W25",
-                        "2015W16": "2015W16",
                         "2015W26": "2015W26",
-                        "2015W17": "2015W17",
                         "2015W27": "2015W27",
-                        "2015W28": "2015W28",
                         "2015W21": "2015W21",
                         "2015W22": "2015W22",
                         "2015W23": "2015W23",
@@ -226,22 +214,30 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                 "data": [{
                     "key": "5-14 years",
                     "values": [
-                        [1434911400000, 48]
+                        [1434306600000, 0],
+                        [1434911400000, 48],
+                        [1435516200000, 0]
                     ]
                 }, {
                     "key": "24-59 months",
                     "values": [
-                        [1434911400000, 36]
+                        [1434306600000, 0],
+                        [1434911400000, 36],
+                        [1435516200000, 0]
                     ]
                 }, {
                     "key": "<1 month",
                     "values": [
-                        [1434911400000, 12]
+                        [1434306600000, 0],
+                        [1434911400000, 12],
+                        [1435516200000, 0]
                     ]
                 }, {
                     "key": "1-23 months",
                     "values": [
-                        [1434911400000, 24]
+                        [1434306600000, 0],
+                        [1434911400000, 24],
+                        [1435516200000, 0]
                     ]
                 }]
             }, {
@@ -251,10 +247,13 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                 "data": [{
                     "key": "Total Consultations 1-23 months Pediatric OPD",
                     "values": [
+                        [1431887400000, 0],
+                        [1432492200000, 0],
                         [1433097000000, 260],
                         [1433701800000, 168],
                         [1434306600000, 168],
-                        [1434911400000, 200]
+                        [1434911400000, 200],
+                        [1435516200000, 0]
                     ]
                 }]
             }];

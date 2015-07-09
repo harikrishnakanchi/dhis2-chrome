@@ -20,6 +20,25 @@ define(["d3", "lodash", "moment"], function(d3, _, moment) {
 
         var loadChartData = function() {
 
+            var insertMissingPeriods = function(chartData, periodsForXAxis) {
+                _.each(chartData, function(chartDataForKey) {
+                    var periodsWithData = _.reduce(chartDataForKey.values, function(result, data) {
+                        result.push(data[0]);
+                        return result;
+                    }, []);
+
+                    var missingPeriods = _.difference(periodsForXAxis, periodsWithData);
+                    _.each(missingPeriods, function(period) {
+                        chartDataForKey.values.push([period, 0]);
+                    });
+                    chartDataForKey.values = _.sortBy(chartDataForKey.values, function(value) {
+                        return value[0];
+                    });
+                });
+
+                return chartData;
+            };
+
             var getChartData = function(charts) {
 
                 var transform = function(chart, chartData) {
@@ -27,6 +46,11 @@ define(["d3", "lodash", "moment"], function(d3, _, moment) {
                     var getName = function(id) {
                         return chartData.metaData.names[id];
                     };
+
+                    var periodsForXAxis = _.reduce(chartData.metaData.pe, function(result, period) {
+                        result.push(moment(period, 'GGGG[W]W').valueOf());
+                        return result;
+                    }, []);
 
                     var transformedChartData = _.transform(chartData.rows, function(result, row) {
 
@@ -46,6 +70,8 @@ define(["d3", "lodash", "moment"], function(d3, _, moment) {
                             ]
                         });
                     });
+
+                    transformedChartData = insertMissingPeriods(transformedChartData, periodsForXAxis);
 
                     return {
                         "title": chart.title,
