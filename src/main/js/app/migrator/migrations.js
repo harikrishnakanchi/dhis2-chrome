@@ -108,6 +108,7 @@ define([], function() {
         create_index(programEventsStore, "by_event_code", "eventCode", false);
         create_index(programEventsStore, "by_event_date", "eventDate", false);
         create_index(programEventsStore, "by_organisationUnit", "orgUnit", false);
+        create_index(programEventsStore, "by_period", "period", false);
     };
 
     var add_org_unit_group_store = function(db, tx) {
