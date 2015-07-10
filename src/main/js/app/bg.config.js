@@ -80,7 +80,6 @@ require.config({
         "uploadSystemSettingConsumer": "app/consumer/upload.system.setting.consumer",
         "downloadPatientOriginConsumer": "app/consumer/download.patient.origin.consumer",
         "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
-        "downloadChartsConsumer": "app/consumer/download.charts.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",
