@@ -15,7 +15,7 @@
                 </div>
                 <accordion close-others="false">
                     <div ng-class="'dataset-acc-wrapper'">
-                        <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false } | orderBy: 'name' track by dataSet.id" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
+                        <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false } | orderBy: 'name'" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
                             <accordion-heading>
                                 <span ng-if="!resourceBundle[dataSet.id]">{{ dataSet.name }}</span>
                                 <span ng-if="resourceBundle[dataSet.id]">{{ resourceBundle[dataSet.id] }}</span>
@@ -23,7 +23,7 @@
                             </accordion-heading>
                             <div class="exp-coll-group">
                                 <accordion close-others="false">
-                                    <accordion-group ng-repeat="section in dataSet.sections | filter:{ isIncluded: true } | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
+                                    <accordion-group ng-repeat="section in dataSet.sections | filter:{ isIncluded: true } | orderBy: 'sortOrder'" is-open="isopen[section.id]" ng-form="sectionForm">
                                         <div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
                                             <p>{{resourceBundle.invalidExpression}}</p>
                                         </div>
@@ -34,7 +34,7 @@
                                         </accordion-heading>
                                         <table class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                             <thead>
-                                                <tr ng-repeat="category in section.headers track by category.id">
+                                                <tr ng-repeat="category in section.headers">
                                                     <th class="display-print" ng-if="$index===0">
                                                         <span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span>
                                                         <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
@@ -53,12 +53,12 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } | orderBy: 'name' track by dataElement.id" ng-form="dataElementForm">
+                                                <tr ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } | orderBy: 'name'" ng-form="dataElementForm">
                                                     <td>
                                                         <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
                                                         <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}</span>
                                                     </td>
-                                                    <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
+                                                    <td ng-repeat="option in section.categoryOptionComboIds">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
                                                             <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, selectedModule.id)['value']" ng-focus="restoreExpression(selectedModule.id, dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(selectedModule.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
@@ -71,7 +71,7 @@
                                 </accordion>
                             </div>
                         </accordion-group>
-                        <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: true }  track by dataSet.id" is-open="getDatasetState(dataSet.id, false)[dataSet.id]">
+                        <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: true }" is-open="getDatasetState(dataSet.id, false)[dataSet.id]">
                             <accordion-heading>
                                 <span ng-if="!resourceBundle[dataSet.id]">{{ dataSet.name }}</span>
                                 <span ng-if="resourceBundle[dataSet.id]">{{ resourceBundle[dataSet.id] }}</span>
@@ -79,7 +79,7 @@
                             </accordion-heading>
                             <div class="exp-coll-group">
                                 <accordion close-others="false">
-                                    <accordion-group ng-repeat="section in dataSet.sections | filter:{ isIncluded: true } | orderBy: 'sortOrder' track by section.id" is-open="isopen[section.id]" ng-form="sectionForm">
+                                    <accordion-group ng-repeat="section in dataSet.sections | filter:{ isIncluded: true } | orderBy: 'sortOrder'" is-open="isopen[section.id]" ng-form="sectionForm">
                                         <div class='alert alert-danger' ng-show='sectionForm.$error.pattern'>
                                             <p>{{resourceBundle.invalidExpression}}</p>
                                         </div>
@@ -90,7 +90,7 @@
                                         </accordion-heading>
                                         <table class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                             <thead>
-                                                <tr ng-repeat="category in section.headers track by category.id">
+                                                <tr ng-repeat="category in section.headers">
                                                     <th class="display-print" ng-if="$index===0">
                                                         <span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span>
                                                         <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
@@ -108,13 +108,13 @@
                                                     </th>
                                                 </tr>
                                             </thead>
-                                            <tbody ng-repeat="orgUnit in dataSet.organisationUnits | orderBy: 'name'  track by orgUnit.id" ng-if="moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) &gt;= 0">
-                                                <tr ng-repeat="dataElement in section.dataElements track by dataElement.id" ng-if="dataElement.associatedProgramId === associatedProgramId" ng-form="dataElementForm">
+                                            <tbody ng-repeat="orgUnit in dataSet.organisationUnits | orderBy: 'name'" ng-if="moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) &gt;= 0">
+                                                <tr ng-repeat="dataElement in section.dataElements" ng-if="dataElement.associatedProgramId === associatedProgramId" ng-form="dataElementForm">
                                                     <td>
                                                         <span ng-if="resourceBundle[orgUnit.id]"> {{ orgUnit[dataElement.id] }}</span>
                                                         <span ng-if="!resourceBundle[orgUnit.id]">{{ orgUnit.name }}</span>
                                                     </td>
-                                                    <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
+                                                    <td ng-repeat="option in section.categoryOptionComboIds">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
                                                             <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit.id)['value']" ng-focus="restoreExpression(orgUnit.id, dataElement.id, option)" class="form-control" ng-blur="evaluateExpression(orgUnit.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
