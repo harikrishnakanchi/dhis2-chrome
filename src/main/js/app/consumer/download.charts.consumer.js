@@ -4,7 +4,7 @@ define([], function() {
             var saveCharts = function(response) {
             	chartRepository.upsert(response.data.charts);
             };
-            chartService.fetchAllFieldAppCharts().then(saveCharts);
+            chartService.getAllFieldAppCharts().then(saveCharts);
         };
     };
 });

@@ -42,7 +42,6 @@ define(["d3", "lodash", "moment"], function(d3, _, moment) {
             var getChartData = function(charts) {
 
                 var transform = function(chart, chartData) {
-
                     var getName = function(id) {
                         return chartData.metaData.names[id];
                     };
@@ -89,7 +88,7 @@ define(["d3", "lodash", "moment"], function(d3, _, moment) {
                 return $q.all(getChartDataPromises);
             };
 
-            return chartService.getAllFieldAppCharts($scope.datasets)
+            return chartService.getAllFieldAppChartsForDataset($scope.datasets)
                 .then(getChartData)
                 .then(function(chartData) {
                     $scope.chartData = chartData;

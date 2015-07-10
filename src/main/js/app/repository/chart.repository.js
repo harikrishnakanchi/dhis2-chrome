@@ -6,5 +6,9 @@ define([], function() {
                 return charts;
             });
         };
+        this.getAll = function(charts) {
+            var store = db.objectStore("charts");
+            return store.getAll();
+        };
     };
 });

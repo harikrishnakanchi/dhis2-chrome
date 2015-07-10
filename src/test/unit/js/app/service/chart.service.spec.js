@@ -1,12 +1,14 @@
 define(["chartService", "angularMocks", "properties", "utils", "lodash"], function(ChartService, mocks, properties, utils, _) {
     describe("chart service", function() {
-        var http, httpBackend, chartService;
+        var http, httpBackend, chartService, q, mockChartRepository, scope;
 
-        beforeEach(mocks.inject(function($injector) {
+        beforeEach(mocks.inject(function($injector, $q, $rootScope) {
             http = $injector.get('$http');
+            q = $q;
+            scope = $rootScope;
             httpBackend = $injector.get('$httpBackend');
-
-            chartService = new ChartService(http);
+            mockChartRepository = jasmine.createSpyObj('chartRepository', ['getAll']);
+            chartService = new ChartService(http, mockChartRepository);
         }));
 
         afterEach(function() {
@@ -52,7 +54,7 @@ define(["chartService", "angularMocks", "properties", "utils", "lodash"], functi
 
         });
 
-        it("should get all field app charts", function() {
+        it("should get all field app charts for the dataset", function() {
             var charts = [{
                 "name": "[FieldApp - Funky Dataset]",
                 "someAttribute": "someValue"
@@ -63,6 +65,9 @@ define(["chartService", "angularMocks", "properties", "utils", "lodash"], functi
                 "name": "[FieldApp - Not needed Dataset]",
                 "someAttribute": "someValue"
             }];
+            var getAllDeferred = q.defer();
+            mockChartRepository.getAll.and.returnValue(getAllDeferred.promise)
+            getAllDeferred.resolve(charts);
 
             var datasets = [{
                 "id": "ds1",
@@ -72,16 +77,13 @@ define(["chartService", "angularMocks", "properties", "utils", "lodash"], functi
                 "code": "CoolDataset"
             }];
 
-            httpBackend.expectGET(properties.dhis.url + "/api/charts.json?fields=name,id,type,organisationUnits,relativePeriods,dataElements,indicators,title&filter=name:like:%5BFieldApp+-+&paging=false").respond(200, {
-                "charts": charts
-            });
-
             var actualData;
-            chartService.getAllFieldAppCharts(datasets).then(function(data) {
+
+            chartService.getAllFieldAppChartsForDataset(datasets).then(function(data) {
                 actualData = data;
             });
 
-            httpBackend.flush();
+            scope.$apply();
 
             expect(actualData).toEqual([{
                 "name": "[FieldApp - Funky Dataset]",
@@ -92,6 +94,20 @@ define(["chartService", "angularMocks", "properties", "utils", "lodash"], functi
                 'dataset': 'ds2',
                 "someAttribute": "someValue"
             }]);
+        });
+
+
+        it('should get all field charts from the api', function() {
+            var charts = [{
+                "name": "[FieldApp - Funky Dataset]",
+                "someAttribute": "someValue"
+            }];
+            httpBackend.expectGET(properties.dhis.url + "/api/charts.json?fields=name,id,type,organisationUnits,relativePeriods,dataElements,indicators,title&filter=name:like:%5BFieldApp+-+&paging=false").respond(200, {
+                "charts": charts
+            });
+
+            chartService.getAllFieldAppCharts();
+            httpBackend.flush();
         });
 
     });
