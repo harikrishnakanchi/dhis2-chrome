@@ -1,5 +1,5 @@
 define(["dhisUrl", "lodash"], function(dhisUrl, _) {
-    return function($http, chartRepository) {
+    return function($http) {
         var self = this;
         this.getChartDataForOrgUnit = function(chart, orgUnit) {
             var indicatorIds = _.pluck(chart.indicators, "id");
@@ -24,7 +24,7 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
 
         };
 
-        this.getAllFieldAppCharts = function() {
+        this.fetchAllFieldAppCharts = function() {
             var url = dhisUrl.charts + ".json";
             var config = {
                 params: {
@@ -37,7 +37,7 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
             return $http.get(url, config);
         };
 
-        this.getAllFieldAppChartsForDataset = function(datasets) {
+        this.getAllFieldAppCharts = function(datasets) {
             var re = /\[FieldApp - (.*)\]/;
 
             var getDatasetCode = function(chartName) {
@@ -47,7 +47,8 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
                 return undefined;
             };
 
-            var transform = function(charts) {
+            var transform = function(response) {
+                var charts = response.data.charts;
                 return _.transform(charts, function(result, chart) {
 
                     var datasetForChart = _.find(datasets, {
@@ -62,7 +63,7 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
                 }, []);
             };
 
-            return chartRepository.getAll().then(transform);
+            return self.fetchAllFieldAppCharts().then(transform);
         };
 
     };
