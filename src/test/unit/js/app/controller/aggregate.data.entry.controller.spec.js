@@ -143,7 +143,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, {'enrichedDataSets': [], 'catOptComboIdsToBeTotalled': ['option1', 'option3', 'option4']}));
+                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, {
+                    'enrichedDataSets': [],
+                    'catOptComboIdsToBeTotalled': ['option1', 'option3', 'option4']
+                }));
 
                 aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository);
 
@@ -673,17 +676,6 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "locale": "en",
                     "desc": "restart approval process for 2014W14, Mod1"
                 }, "dataValues");
-            });
-
-            it("should not allow data entry if selected week is beyond configured week", function() {
-                scope.week = {
-                    "startOfWeek": "2014-02-02",
-                    "weekNumber": 05,
-                    "weekYear": 2014
-                };
-
-                expect(scope.isDataEntryAllowed()).toBeFalsy();
-                scope.$apply();
             });
         });
     });

@@ -144,7 +144,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             }
         };
 
-
         $scope.saveAsDraft = function() {
             var successPromise = function() {
                 $scope.saveSuccess = true;
@@ -251,10 +250,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             }
         });
 
-        $scope.isDataEntryAllowed = function() {
-            return moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
-        };
-
         var deregisterErrorInfoListener = $scope.$on('errorInfo', function(event, errorMessage) {
             $scope.errorMessage = errorMessage;
         });
@@ -262,6 +257,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         var initializeForm = function() {
             $scope.loading = true;
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
+            $scope.isDataEntryAllowed = moment($scope.week.startOfWeek).isAfter(moment().subtract(properties.projectDataSync.numWeeksToSync, 'week'));
             currentPeriodAndOrgUnit = {
                 "period": currentPeriod,
                 "orgUnit": $scope.selectedModule.id
@@ -287,7 +283,6 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 var orgUnitIds = _.pluck(orgUnits, "id");
                 return orgUnitRepository.findAll(orgUnitIds);
             };
-
 
             return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements()]).then(function() {
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
