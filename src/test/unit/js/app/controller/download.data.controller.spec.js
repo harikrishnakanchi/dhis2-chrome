@@ -36,7 +36,7 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 timeout.flush();
 
                 var syncableTypes = ["downloadMetadata", "downloadSystemSetting", "downloadPatientOriginDetails", "downloadOrgUnit", "downloadOrgUnitGroups",
-                    "downloadProgram", "downloadData", "downloadEventData", "downloadDatasets", "downloadCharts"
+                    "downloadProgram", "downloadData", "downloadEventData", "downloadDatasets"
                 ];
 
                 var expectedHustleArgs = _.map(syncableTypes, function(type) {

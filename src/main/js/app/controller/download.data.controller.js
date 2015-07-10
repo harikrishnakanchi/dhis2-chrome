@@ -51,13 +51,8 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
                 "data": []
             }, "dataValues");
 
-            var downloadCharts = $hustle.publish({
-                "type": "downloadCharts",
-                "data": []
-            }, "dataValues");
-
             return $q.all([downloadMetadata, downloadSystemSetting, downloadPatientOriginDetails, downloadOrgUnit, downloadOrgUnitGroups,
-                    downloadProgram, downloadData, downloadEvents, downloadDatasets, downloadCharts
+                    downloadProgram, downloadData, downloadEvents, downloadDatasets
                 ])
                 .then(onSuccess);
         };
