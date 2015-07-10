@@ -102,7 +102,6 @@ require.config({
         "patientOriginRepository": "app/repository/patient.origin.repository",
         "orgUnitGroupSetRepository": "app/repository/org.unit.group.set.repository",
         "optionSetRepository": "app/repository/option.set.repository",
-        "chartRepository": "app/repository/chart.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
