@@ -3,8 +3,8 @@ define(["d3", "lodash", "moment"], function(d3, _, moment) {
 
         $scope.margin = {
             "left": 20,
-            "top": 50,
-            "bottom": 100,
+            "top": 20,
+            "bottom": 20,
             "right": 20
         };
 
@@ -82,7 +82,7 @@ define(["d3", "lodash", "moment"], function(d3, _, moment) {
                 };
 
                 var getChartDataPromises = _.map(charts, function(chart) {
-                    return chartService.getChartDataForOrgUnit(chart, $scope.orgUnit)
+                    return chartService.getChartDataForOrgUnit(chart, $scope.orgUnit.id)
                         .then(_.curry(transform)(chart));
                 });
 
@@ -101,18 +101,42 @@ define(["d3", "lodash", "moment"], function(d3, _, moment) {
             var loadDatasetsForModules = function(orgUnits) {
                 return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(datasets) {
                     $scope.datasets = datasets;
+                    if (!_.isEmpty(datasets))
+                        $scope.selectedDatasetId = datasets[0].id;
                 });
             };
 
-            return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit).then(loadDatasetsForModules);
+            return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id)
+                .then(loadDatasetsForModules);
         };
 
+        var loadOrgUnit = function() {
+            var orgUnitId = $routeParams.orgUnit;
+
+            var isOfType = function(orgUnit, type) {
+                return _.any(orgUnit.attributeValues, {
+                    attribute: {
+                        "code": "Type"
+                    },
+                    value: type
+                });
+            };
+
+            return orgUnitRepository.get(orgUnitId).then(function(ou) {
+                if (isOfType(ou, 'Module'))
+                    ou.displayName = ou.parent.name + ' - ' + ou.name;
+                $scope.orgUnit = ou;
+            });
+        };
 
         var init = function() {
-            $scope.orgUnit = $routeParams.orgUnit;
-
-            loadRelevantDatasets()
-                .then(loadChartData);
+            $scope.loading = true;
+            loadOrgUnit()
+                .then(loadRelevantDatasets)
+                .then(loadChartData)
+                .finally(function() {
+                    $scope.loading = false;
+                });
         };
 
         init();

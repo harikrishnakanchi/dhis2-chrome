@@ -7,14 +7,11 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             scope = $rootScope.$new();
             q = $q;
 
-            routeParams = {
-                'orgUnit': 'mod1'
-            };
-
             datasetRepository = new DatasetRepository();
             spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
 
             orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
 
             chartService = new ChartService();
@@ -22,9 +19,64 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             spyOn(chartService, "getChartDataForOrgUnit").and.returnValue(utils.getPromise(q, []));
         }));
 
+        it("should set the orgunit display name for modules", function() {
+            routeParams = {
+                'orgUnit': 'mod1'
+            };
+
+            var mod1 = {
+                "id": "mod1",
+                "name": "module 1",
+                "displayName": "module 1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Module"
+                }],
+                "parent": {
+                    "name": "op unit",
+                }
+            };
+
+            orgUnitRepository.get.and.returnValue(utils.getPromise(q, mod1));
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartService);
+            scope.$apply();
+
+            expect(scope.orgUnit.displayName).toEqual('op unit - module 1');
+        });
+
+        it("should set the orgunit display name for project", function() {
+            routeParams = {
+                'orgUnit': 'prj1'
+            };
+
+            var prj1 = {
+                "id": "prj1",
+                "name": "project 1",
+                "displayName": "project 1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Project"
+                }]
+            };
+
+            orgUnitRepository.get.and.returnValue(utils.getPromise(q, prj1));
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartService);
+            scope.$apply();
+
+            expect(scope.orgUnit.displayName).toEqual('project 1');
+        });
+
         it("should load datasets into scope", function() {
             routeParams = {
                 'orgUnit': 'prj1'
+            };
+
+            var prj1 = {
+                'id': 'prj1'
             };
 
             var mod1 = {
@@ -37,6 +89,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                 "id": "ds2"
             }];
 
+            orgUnitRepository.get.and.returnValue(utils.getPromise(q, prj1));
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
 
@@ -49,6 +102,10 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
         });
 
         it("should load Chart data", function() {
+            routeParams = {
+                'orgUnit': 'mod1'
+            };
+
             var mod1 = {
                 "id": "mod1"
             };
@@ -190,6 +247,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                 "width": 3
             };
 
+            orgUnitRepository.get.and.returnValue(utils.getPromise(q, mod1));
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
             chartService.getAllFieldAppCharts.and.returnValue(utils.getPromise(q, charts));
