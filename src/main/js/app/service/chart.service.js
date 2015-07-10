@@ -1,6 +1,6 @@
 define(["dhisUrl", "lodash"], function(dhisUrl, _) {
     return function($http) {
-
+        var self = this;
         this.getChartDataForOrgUnit = function(chart, orgUnit) {
             var indicatorIds = _.pluck(chart.indicators, "id");
             var dataElementIds = _.pluck(chart.dataElements, "id");
@@ -22,6 +22,19 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
                 return response.data;
             });
 
+        };
+
+        this.fetchAllFieldAppCharts = function() {
+            var url = dhisUrl.charts + ".json";
+            var config = {
+                params: {
+                    "fields": "name,id,type,organisationUnits,relativePeriods,dataElements,indicators,title",
+                    "filter": "name:like:[FieldApp - ",
+                    "paging": false,
+                }
+            };
+
+            return $http.get(url, config);
         };
 
         this.getAllFieldAppCharts = function(datasets) {
@@ -50,16 +63,7 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
                 }, []);
             };
 
-            var url = dhisUrl.charts + ".json";
-            var config = {
-                params: {
-                    "fields": "name,id,type,organisationUnits,relativePeriods,dataElements,indicators,title",
-                    "filter": "name:like:[FieldApp - ",
-                    "paging": false,
-                }
-            };
-
-            return $http.get(url, config).then(transform);
+            return self.fetchAllFieldAppCharts().then(transform);
         };
 
     };

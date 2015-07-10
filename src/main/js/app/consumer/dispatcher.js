@@ -2,7 +2,7 @@ define(["lodash"], function(_) {
     return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
         createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
-        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartsConsumer) {
+        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " +  message.data.type, message.data);
@@ -90,7 +90,7 @@ define(["lodash"], function(_) {
                         .then(_.partial(uploadPatientOriginConsumer.run, message));
 
                 case "downloadCharts":
-                    return downloadChartsConsumer.run(message);
+                    return downloadChartConsumer.run(message);
 
                 default:
                     return $q.reject();

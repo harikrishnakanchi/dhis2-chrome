@@ -1,7 +1,10 @@
 define([], function() {
-    return function(chartsService) {
+    return function(chartService, chartRepository) {
         this.run = function(message) {
-            console.log('ITS RUNNING');
+            var saveCharts = function(response) {
+            	chartRepository.upsert(response.data.charts);
+            };
+            chartService.fetchAllFieldAppCharts().then(saveCharts);
         };
     };
 });
