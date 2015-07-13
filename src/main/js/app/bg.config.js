@@ -26,6 +26,7 @@ require.config({
         "services": "app/service/bg.services",
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "patientOriginService": "app/service/patient.origin.service",
+        "chartService": "app/service/chart.service",
 
         //Repositories
         "repositories": "app/repository/bg.repositories",
@@ -41,6 +42,7 @@ require.config({
         "systemSettingRepository": "app/repository/system.setting.repository",
         "patientOriginRepository": "app/repository/patient.origin.repository",
         "metadataRepository": "app/repository/metadata.repository",
+        "chartRepository": "app/repository/chart.repository",
 
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",
@@ -80,6 +82,7 @@ require.config({
         "uploadSystemSettingConsumer": "app/consumer/upload.system.setting.consumer",
         "downloadPatientOriginConsumer": "app/consumer/download.patient.origin.consumer",
         "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
+        "downloadChartConsumer": "app/consumer/download.charts.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",

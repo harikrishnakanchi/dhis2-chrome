@@ -1,5 +1,5 @@
 define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
-    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartService) {
+    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartService, chartRepository) {
 
         $scope.margin = {
             "left": 20,
@@ -47,7 +47,6 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             var getChartData = function(charts) {
 
                 var transform = function(chart, chartData) {
-
                     var getName = function(id) {
                         return chartData.metaData.names[id];
                     };
@@ -87,14 +86,14 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 };
 
                 var getChartDataPromises = _.map(charts, function(chart) {
-                    return chartService.getChartDataForOrgUnit(chart, $scope.orgUnit.id)
+                    return chartRepository.getDataForChart(chart, $scope.orgUnit.id)
                         .then(_.curry(transform)(chart));
                 });
 
                 return $q.all(getChartDataPromises);
             };
 
-            return chartService.getAllFieldAppCharts($scope.datasets)
+            return chartService.getAllFieldAppChartsForDataset($scope.datasets)
                 .then(getChartData)
                 .then(function(chartData) {
                     $scope.chartData = chartData;

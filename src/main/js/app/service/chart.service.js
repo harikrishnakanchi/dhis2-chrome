@@ -1,6 +1,6 @@
 define(["dhisUrl", "lodash"], function(dhisUrl, _) {
-    return function($http) {
-
+    return function($http, chartRepository) {
+        var self = this;
         this.getChartDataForOrgUnit = function(chart, orgUnit) {
             var indicatorIds = _.pluck(chart.indicators, "id");
             var dataElementIds = _.pluck(chart.dataElements, "id");
@@ -40,7 +40,7 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
 
         };
 
-        this.getAllFieldAppCharts = function(datasets) {
+        this.getAllFieldAppChartsForDataset = function(datasets) {
             var re = /\[FieldApp - (.*)\]/;
 
             var getDatasetCode = function(chartName) {
