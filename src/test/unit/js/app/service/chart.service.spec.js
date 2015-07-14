@@ -182,7 +182,6 @@ define(["chartService", "angularMocks", "properties", "utils", "lodash"], functi
                         "someAttribute": "someValue"
                     }]);
                 });
-
             });
         });
     });
