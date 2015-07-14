@@ -37,7 +37,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("deleteApprovalConsumer", ["approvalService", "approvalDataRepository", "datasetRepository", "$q", deleteApprovalConsumer]);
             app.service("downloadPatientOriginConsumer", ["patientOriginService", "patientOriginRepository", "mergeBy", downloadPatientOriginConsumer]);
             app.service("uploadPatientOriginConsumer", ["patientOriginService", "patientOriginRepository", uploadPatientOriginConsumer]);
-            app.service("downloadChartConsumer", ["chartService", "chartRepository", "orgUnitRepository", "$q", downloadChartConsumer]);
+            app.service("downloadChartConsumer", ["chartService", "chartRepository", "userPreferenceRepository", "datasetRepository", "$q", downloadChartConsumer]);
             app.service("dispatcher", ["$q", "$log", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDatasetConsumer", "uploadDatasetConsumer", "createUserConsumer", "updateUserConsumer",
                 "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "uploadApprovalDataConsumer", "uploadProgramConsumer", "downloadProgramConsumer", "downloadEventDataConsumer",
                 "uploadEventDataConsumer", "deleteEventConsumer", "downloadApprovalConsumer", "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer",

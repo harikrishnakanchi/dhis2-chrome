@@ -1,6 +1,5 @@
 define(["dhisUrl", "lodash"], function(dhisUrl, _) {
-    return function($http, chartRepository) {
-        var self = this;
+    return function($http) {
         this.getChartDataForOrgUnit = function(chart, orgUnit) {
             var indicatorIds = _.pluck(chart.indicators, "id");
             var dataElementIds = _.pluck(chart.dataElements, "id");

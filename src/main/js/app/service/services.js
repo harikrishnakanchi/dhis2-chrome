@@ -3,7 +3,7 @@ define(["metadataService", "filesystemService", "systemSettingService", "chartSe
         app.service('metadataService', ['$http', metadataService]);
         app.service('systemSettingService', ['$http', systemSettingService]);
         app.service('filesystemService', ['$q', filesystemService]);
-        app.service('chartService', ['$http', 'chartRepository', chartService]);
+        app.service('chartService', ['$http', chartService]);
     };
     return {
         init: init
