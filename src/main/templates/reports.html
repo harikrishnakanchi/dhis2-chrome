@@ -5,10 +5,10 @@
                 <h4>{{ orgUnit.displayName }}</h4>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-4">
-                <select ng-model="selectedDatasetId" ng-options="dataset.id as dataset.name for dataset in datasets">
-                </select>
+        <div class="row form-inline">
+            <div class="col-md-4 form-group">
+                Select service name:
+                <select id="selectDataset" class="form-control" ng-model="selectedDatasetId" ng-options="dataset.id as dataset.name for dataset in datasets"></select>
             </div>
         </div>
         <div class="text-center" ng-repeat="chart in chartData | filter: {dataset:selectedDatasetId}">

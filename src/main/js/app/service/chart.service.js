@@ -12,11 +12,27 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
                 }
             });
 
+            var buildDimension = function() {
+                var categoryDimensionIds = chart.categoryDimensions.length > 0 ? _.pluck(chart.categoryDimensions[0].categoryOptions, "id") : [];
+                var dimensionIds = categoryDimensionIds.length > 0 ? categoryDimensionIds.join(";") : indicatorIds.concat(dataElementIds).join(";");
+                return [chart.series + ":" + dimensionIds, "pe:" + periods.join(";")];
+            };
+            var buildFilters = function() {
+                return _.map(chart.filterDimensions, function(dimension) {
+                    switch (dimension) {
+                        case "ou":
+                            return dimension + ":" + orgUnit;
+                        case "dx":
+                            return dimension + ":" + dataElementIds.join(";");
+                    }
+                });
+            };
             return $http.get(dhisUrl.analytics, {
                 params: {
-                    "dimension": ["dx:" + indicatorIds.concat(dataElementIds).join(";"), "pe:" + periods.join(";")],
-                    "filter": "ou:" + orgUnit,
-                    "displayProperty": "NAME"
+                    "dimension": buildDimension(),
+                    "filter": buildFilters(),
+                    "displayProperty": "NAME",
+                    "chartTitle": chart.title
                 }
             }).then(function(response) {
                 return response.data;
@@ -53,7 +69,7 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
             var url = dhisUrl.charts + ".json";
             var config = {
                 params: {
-                    "fields": "name,id,type,organisationUnits,relativePeriods,dataElements,indicators,title",
+                    "fields": ":all",
                     "filter": "name:like:[FieldApp - ",
                     "paging": false,
                 }
