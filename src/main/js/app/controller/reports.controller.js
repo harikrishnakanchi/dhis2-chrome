@@ -1,6 +1,7 @@
 define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
     return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartService, chartRepository) {
 
+        
         $scope.margin = {
             "left": 20,
             "top": 20,
