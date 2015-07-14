@@ -1,4 +1,4 @@
-define(["d3", "lodash", "moment"], function(d3, _, moment) {
+define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
     return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartService) {
 
         $scope.margin = {
@@ -17,6 +17,11 @@ define(["d3", "lodash", "moment"], function(d3, _, moment) {
                 return moment(d).format('GGGG[W]WW');
             };
         };
+
+        $scope.downloadChartAsPng = function(event) {
+            saveSvgAsPng(event.currentTarget.parentElement.getElementsByTagName("svg")[0], "chart.png");
+        };
+
 
         var loadChartData = function() {
 

@@ -118,6 +118,7 @@
     "userEnableSuccess": "User enabled successfully.",
     "reapprovalConfirmationMessage": "Data will be resent for approval. Are you sure?",
     "noDataForApproval": "No data available for approval.",
+    "noDataAvailable": "No data available",
     "yesLabel": "Yes",
     "noLabel": "No",
     "cancelLabel": "Cancel",

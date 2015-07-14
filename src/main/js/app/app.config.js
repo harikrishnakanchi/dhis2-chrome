@@ -20,6 +20,7 @@ require.config({
         "indexedDBLogger": "app/utils/indexeddb.logger",
         "JSZip": "lib/jszip/dist/jszip",
         "sjcl": "lib/sjcl/sjcl",
+        "saveSvgAsPng": "lib/save-svg-as-png/saveSvgAsPng",
 
         //3rd party angular modules
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
