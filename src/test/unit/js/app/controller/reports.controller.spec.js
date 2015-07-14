@@ -253,10 +253,10 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
             chartService.getAllFieldAppChartsForDataset.and.returnValue(utils.getPromise(q, charts));
-            chartRepository.getDataForChart.and.callFake(function(chart, orgUnit) {
-                if (chart.name === 'chart1')
+            chartRepository.getDataForChart.and.callFake(function(chartName, orgUnit) {
+                if (chartName === 'chart1')
                     return utils.getPromise(q, chartData1);
-                if (chart.name === 'chart2')
+                if (chartName === 'chart2')
                     return utils.getPromise(q, chartData2);
             });
 
@@ -264,8 +264,8 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             scope.$apply();
 
             expect(chartService.getAllFieldAppChartsForDataset).toHaveBeenCalledWith(datasets);
-            expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[0], 'mod1');
-            expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[1], 'mod1');
+            expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[0].name, 'mod1');
+            expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[1].name, 'mod1');
 
             var expectedChartData = [{
                 "title": "Title1",

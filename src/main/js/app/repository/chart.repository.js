@@ -5,11 +5,11 @@ define(["lodash"], function(_) {
             return store.upsert(charts);
         };
 
-        this.upsertChartData = function(chart, orgUnit, data) {
+        this.upsertChartData = function(chartName, moduleId, data) {
             var store = db.objectStore("chartData");
             var chartDataItem = {
-                chart: chart.id,
-                orgUnit: orgUnit.id,
+                chart: chartName,
+                orgUnit: moduleId,
                 data: data
             };
             return store.upsert(chartDataItem);
@@ -20,8 +20,8 @@ define(["lodash"], function(_) {
             return store.getAll();
         };
 
-        this.getDataForChart = function(chart, orgUnitId) {
-            var query = db.queryBuilder().$eq(chart.id).$index("by_chart").compile();
+        this.getDataForChart = function(chartName, orgUnitId) {
+            var query = db.queryBuilder().$eq(chartName).$index("by_chart").compile();
             var store = db.objectStore('chartData');
 
             return store.each(query).then(function(data) {

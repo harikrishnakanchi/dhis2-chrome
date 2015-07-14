@@ -31,7 +31,8 @@ define(['downloadChartConsumer', 'angularMocks', 'utils'], function(DownloadChar
 
         it('should get data for each of the charts', function() {
             var chart1 = {
-                id: 'Chart 1'
+                id: 'chart_1',
+                name: 'Chart 1'
             };
             var orgUnit1 = {
                 id: 'unit 1'
@@ -52,7 +53,7 @@ define(['downloadChartConsumer', 'angularMocks', 'utils'], function(DownloadChar
             downloadChartConsumer.run();
             scope.$apply();
             expect(chartService.getChartDataForOrgUnit).toHaveBeenCalledWith(chart1, orgUnit1.id);
-            expect(chartRepository.upsertChartData).toHaveBeenCalledWith(chart1, orgUnit1, chartData);
+            expect(chartRepository.upsertChartData).toHaveBeenCalledWith("Chart 1", "unit 1", chartData);
         });
     });
 });

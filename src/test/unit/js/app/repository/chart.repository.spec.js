@@ -21,7 +21,7 @@ define(["chartRepository", "angularMocks", "utils"], function(ChartRepository, m
         it('should save chart data', function() {
             var chart = {
                 'id': 'new chart id',
-                'title': 'The chart'
+                'name': 'The chart'
             };
 
             var orgUnit = {
@@ -32,10 +32,10 @@ define(["chartRepository", "angularMocks", "utils"], function(ChartRepository, m
                 'metaData': 'chartId'
             };
 
-            chartRepository.upsertChartData(chart, orgUnit, data);
+            chartRepository.upsertChartData('The chart', 'orgUnitId', data);
 
             expect(mockStore.upsert).toHaveBeenCalledWith({
-                chart: 'new chart id',
+                chart: 'The chart',
                 orgUnit: 'orgUnitId',
                 data: data
             });

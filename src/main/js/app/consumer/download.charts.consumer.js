@@ -14,7 +14,7 @@ define([], function() {
                     return function(chart) {
                         modules.forEach(function(module) {
                             chartService.getChartDataForOrgUnit(chart, module.id).then(function(data) {
-                                chartRepository.upsertChartData(chart, module, data);
+                                chartRepository.upsertChartData(chart.name, module.id, data);
                             });
                         });
                     };

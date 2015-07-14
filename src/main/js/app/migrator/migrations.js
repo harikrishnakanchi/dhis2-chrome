@@ -125,7 +125,7 @@ define([], function() {
     };
 
     var add_chart_store = function(db, txt){
-        create_store_with_key("charts", "id", db);
+        create_store_with_key("charts", "name", db);
     };
 
     var add_chart_data_store = function(db, txt) {
