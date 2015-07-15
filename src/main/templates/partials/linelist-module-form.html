@@ -69,7 +69,7 @@
             <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-6 button-group">
                 <input type="button" class="btn btn-main" ng-click="save(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton()" value="{{ resourceBundle.saveBtnValue }}" ng-if="isNewMode" />
                 <input type="button" class="btn btn-main" ng-click="update(module)" ng-disabled="form.$invalid || shouldDisableSaveOrUpdateButton() || isDisabled==true || !form.$dirty" value="{{ resourceBundle.updateBtnValue }}" ng-if="!isNewMode &amp;&amp; !(isDisabled==true)" />
-                <input type="button" class="btn btn-main" ng-click="disable(module)" value="{{ resourceBundle.disableBtnValue }}" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !(isDisabled==true)" />
+                <input type="button" class="btn" ng-click="disable(module)" value="{{ resourceBundle.disableBtnValue }}" ng-if="!isNewMode &amp;&amp; !updateDisabled &amp;&amp; !(isDisabled==true)" />
                 <input type="button" class="btn" ng-if="isNewMode" ng-click="closeForm()" value="{{ resourceBundle.backBtnValue }}" />
             </div>
         </form>
