@@ -152,6 +152,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                         if (program) {
                             $scope.associatedProgramId = program.id;
                             $scope.isLineListModule = true;
+                        } else {
+                            $scope.isLineListModule = false;
                         }
                     });
                 });
@@ -166,6 +168,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             var findallOrgUnits = function(orgUnits) {
                 var orgUnitIds = _.pluck(orgUnits, "id");
                 return orgUnitRepository.findAll(orgUnitIds);
+            };
+
+            var setTabHeadings = function() {
+                $scope.tabHeadings = $scope.isLineListModule ? [$scope.resourceBundle.dhisSummary, $scope.resourceBundle.fieldAppSummary] : [$scope.resourceBundle.dataForApproval];
             };
 
             if (_.isEmpty($scope.selectedModule))
@@ -205,7 +211,9 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 if ($scope.dataentryForm !== undefined)
                     $scope.dataentryForm.$setPristine();
 
+                setTabHeadings();
                 return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadApprovalDataPromise]);
+
             }).finally(function() {
                 $scope.loading = false;
             });

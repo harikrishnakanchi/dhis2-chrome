@@ -266,5 +266,6 @@
     "findCaseBy": "Find case by:",
     "noCasesFound": "No Cases Found",
     "noCasesToSummarize": "No Submitted cases to Summarize",
-    "reportsLabel": "Reports"
+    "reportsLabel": "Reports",
+    "dataForApproval": "Data for Approval"
 }
