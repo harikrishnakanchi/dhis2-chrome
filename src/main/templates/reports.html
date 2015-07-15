@@ -11,7 +11,7 @@
                 <select id="selectDataset" class="form-control" ng-model="selectedDatasetId" ng-options="dataset.id as dataset.name for dataset in datasets"></select>
             </div>
         </div>
-        <div class="text-center" ng-repeat="chart in chartData | filter: {dataset:selectedDatasetId}">
+        <div class="text-center" ng-repeat="chart in chartData | filter: {dataset:selectedDatasetId} | orderBy:'name'">
             <h3>{{chart.title}}</h3>
             <h4 class="mb50" ng-if="chart.data.length === 0">
                 {{resourceBundle.noDataAvailable}}
