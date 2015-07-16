@@ -28,7 +28,8 @@
         "karma-coverage": "0.2.7",
         "protractor": "2.0.0",
         "ecstatic": "0.7.1",
-        "gulp-zip": "3.0.2"
+        "gulp-zip": "3.0.2",
+        "karma": "~0.12.6"
     },
     "name": "DHIS2-Chrome-App",
     "version": "0.0.1"
