@@ -12,6 +12,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.nonAssociatedDataSets = [];
             $scope.associatedDatasets = [];
             $scope.selectedDataset = {};
+            $scope.enrichedDatasets = {};
             var excludedDataElements = [];
 
             var init = function() {
@@ -262,8 +263,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.selectDataSet = function(item) {
                 if (_.isEmpty(item))
                     return;
+                if ($scope.enrichedDatasets[item.id]) {
+                    $scope.selectedDataset = $scope.enrichedDatasets[item.id];
+                    return;
+                }
                 return datasetRepository.includeDataElements([item], excludedDataElements).then(function(datasets) {
                     $scope.selectedDataset = datasets[0];
+                    $scope.enrichedDatasets[$scope.selectedDataset.id] = $scope.selectedDataset;
                     _.each($scope.selectedDataset.sections, function(section) {
                         $scope.isExpanded[section.id] = false;
                     });
