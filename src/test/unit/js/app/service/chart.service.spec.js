@@ -1,4 +1,19 @@
 define(["chartService", "angularMocks", "properties", "utils", "lodash"], function(ChartService, mocks, properties, utils, _) {
+    describe("chart service", function() {
+        var http, httpBackend, chartService, q, scope;
+
+        beforeEach(mocks.inject(function($injector, $q, $rootScope) {
+            http = $injector.get('$http');
+            q = $q;
+            scope = $rootScope;
+            httpBackend = $injector.get('$httpBackend');
+            chartService = new ChartService(http);
+        }));
+
+        afterEach(function() {
+            httpBackend.verifyNoOutstandingExpectation();
+            httpBackend.verifyNoOutstandingRequest();
+        });
 
         describe("chart service", function() {
             var http, httpBackend, chartService, q, mockChartRepository, scope;
@@ -151,7 +166,7 @@ define(["chartService", "angularMocks", "properties", "utils", "lodash"], functi
 
                     var actualData;
 
-                    chartService.getAllFieldAppChartsForDataset(datasets).then(function(data){
+                    chartService.getAllFieldAppChartsForDataset(datasets).then(function(data) {
                         actualData = data;
                     });
 
@@ -170,4 +185,5 @@ define(["chartService", "angularMocks", "properties", "utils", "lodash"], functi
 
             });
         });
+    });
 });
