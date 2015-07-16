@@ -102,7 +102,7 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                     $hustle.registerInterceptor(queuePostProcessInterceptor);
 
                     $rootScope.$on('$locationChangeStart', function(e, newUrl, oldUrl) {
-                        if (!$rootScope.isLoggedIn && $rootScope.auth_header) {
+                        if (!$rootScope.isLoggedIn && $rootScope.authHeader) {
                             $location.path("/login");
                         }
                     });

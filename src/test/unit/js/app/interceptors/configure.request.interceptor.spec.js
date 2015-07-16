@@ -7,7 +7,7 @@ define(["configureRequestInterceptor", "angularMocks", "properties", "utils"], f
         }));
 
         it("should set authorization header and timeout for http request", function() {
-            rootScope.auth_header = "Basic Auth";
+            rootScope.authHeader = "Basic Auth";
 
             var config = {
                 'url': properties.dhis.url,

@@ -121,8 +121,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     };
 
                     var setAuthHeader = function(result) {
-                        if (!result || !result.auth_header) return;
-                        $rootScope.auth_header = result.auth_header;
+                        if (!result || !result.authHeader) return;
+                        $rootScope.authHeader = result.authHeader;
                         checkOnlineStatusAndSync();
                     };
 

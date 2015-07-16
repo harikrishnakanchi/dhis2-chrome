@@ -70,7 +70,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         var getAuthHeader = function() {
             var deferred = $q.defer();
             chromeUtils.getAuthHeader(function(result) {
-                deferred.resolve(result.auth_header);
+                deferred.resolve(result.authHeader);
             });
             return deferred.promise;
         };
@@ -91,7 +91,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         };
 
         var setAuthHeaderOnRootscope = function(result) {
-            $rootScope.auth_header = result;
+            $rootScope.authHeader = result;
             $location.path("/login");
             metadataImporter.run();
         };

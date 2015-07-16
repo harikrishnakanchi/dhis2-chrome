@@ -26,7 +26,7 @@ define(["productKeyController", "angularMocks", "metadataImporter", "utils", "ch
             scope.setAuthHeaderAndProceed();
             scope.$apply();
 
-            expect(rootscope.auth_header).toEqual("Test Message");
+            expect(rootscope.authHeader).toEqual("Test Message");
         });
 
         it("should logout the user if prooduct key is changed and user is logged in", function() {

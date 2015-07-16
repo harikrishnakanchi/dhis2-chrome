@@ -17,7 +17,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
 
                 spyOn(chromeUtils, "getAuthHeader").and.callFake(function(callBack) {
                     callBack({
-                        "auth_header": "Basic Auth"
+                        "authHeader": "Basic Auth"
                     });
                 });
 
@@ -114,7 +114,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
 
                 scope.$apply();
 
-                expect(rootScope.auth_header).toEqual("Basic Auth");
+                expect(rootScope.authHeader).toEqual("Basic Auth");
                 expect(location.path).toHaveBeenCalledWith("/login");
             });
 
