@@ -272,6 +272,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     $scope.enrichedDatasets[$scope.selectedDataset.id] = $scope.selectedDataset;
                     _.each($scope.selectedDataset.sections, function(section) {
                         $scope.isExpanded[section.id] = false;
+                        $scope.changeSectionSelection(section);
                     });
                     $scope.isExpanded[$scope.selectedDataset.sections[0].id] = true;
                 });
