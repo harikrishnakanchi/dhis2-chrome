@@ -82,9 +82,6 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                     $indexedDBProvider.connection('msf')
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
-                        }).dbReady(function(data) {
-                            if (chrome.runtime)
-                                chrome.runtime.sendMessage("migrationComplete");
                         });
 
                     $hustleProvider.init("hustle", 1, ["dataValues"]);

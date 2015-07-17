@@ -13,6 +13,8 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 sessionHelper = new SessionHelper();
                 orgUnitRepository = new OrgUnitRepository();
 
+                spyOn(chromeUtils, "sendMessage");
+
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
 
                 spyOn(chromeUtils, "getAuthHeader").and.callFake(function(callBack) {

@@ -112,6 +112,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
                 }
 
                 metadataImporter.run().then(function() {
+                    chromeUtils.sendMessage("dbReady");
                     $location.path("/login");
                 });
             });
