@@ -271,32 +271,53 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                 "type": "stackedcolumn",
                 "data": [{
                     "key": "5-14 years",
-                    "values": [
-                        [1434306600000, 0],
-                        [1434911400000, 48],
-                        [1435516200000, 0]
-                    ]
+                    "values": [{
+                        label: 201525,
+                        value: 0
+                    }, {
+                        label: 201526,
+                        value: 48
+                    }, {
+                        label: 201527,
+                        value: 0
+                    }]
+
                 }, {
                     "key": "24-59 months",
-                    "values": [
-                        [1434306600000, 0],
-                        [1434911400000, 36],
-                        [1435516200000, 0]
-                    ]
+                    "values": [{
+                        label: 201525,
+                        value: 0
+                    }, {
+                        label: 201526,
+                        value: 36
+                    }, {
+                        label: 201527,
+                        value: 0
+                    }]
                 }, {
                     "key": "<1 month",
-                    "values": [
-                        [1434306600000, 0],
-                        [1434911400000, 12],
-                        [1435516200000, 0]
-                    ]
+                    "values": [{
+                        label: 201525,
+                        value: 0
+                    }, {
+                        label: 201526,
+                        value: 12
+                    }, {
+                        label: 201527,
+                        value: 0
+                    }]
                 }, {
                     "key": "1-23 months",
-                    "values": [
-                        [1434306600000, 0],
-                        [1434911400000, 24],
-                        [1435516200000, 0]
-                    ]
+                    "values": [{
+                        label: 201525,
+                        value: 0
+                    }, {
+                        label: 201526,
+                        value: 24
+                    }, {
+                        label: 201527,
+                        value: 0
+                    }]
                 }]
             }, {
                 "title": "Title2",
@@ -304,16 +325,31 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                 "type": "line",
                 "data": [{
                     "key": "Total Consultations 1-23 months Pediatric OPD",
-                    "values": [
-                        [1431887400000, 0],
-                        [1432492200000, 0],
-                        [1433097000000, 260],
-                        [1433701800000, 168],
-                        [1434306600000, 168],
-                        [1434911400000, 200],
-                        [1435516200000, 0]
-                    ]
+                    "values": [{
+                        label: 201521,
+                        value: 0
+                    }, {
+                        label: 201522,
+                        value: 0
+                    }, {
+                        label: 201523,
+                        value: 260
+                    }, {
+                        label: 201524,
+                        value: 168
+                    }, {
+                        label: 201525,
+                        value: 168
+                    }, {
+                        label: 201526,
+                        value: 200
+                    }, {
+                        label: 201527,
+                        value: 0
+                    }]
+
                 }]
+
             }];
 
             expect(scope.chartData).toEqual(expectedChartData);

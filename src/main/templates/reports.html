@@ -11,27 +11,30 @@
                 <select id="selectDataset" class="form-control" ng-model="selectedDatasetId" ng-options="dataset.id as dataset.name for dataset in datasets"></select>
             </div>
         </div>
-        <div class="text-center" ng-repeat="chart in chartData | filter: {dataset:selectedDatasetId} | orderBy:'name'">
-            <h3>{{chart.title}}</h3>
-            <h4 class="mb50" ng-if="chart.data.length === 0">
-                {{resourceBundle.noDataAvailable}}
-            </h4>
-            <button ng-if="chart.data.length > 0" ng-click="downloadChartAsPng($event)">Download Chart</button>
-            <p ng-if="chart.type === 'line' &amp;&amp; chart.data.length > 0">
-                <nvd3-line-chart id="chart-{{$index}}" data="chart.data" width="750" height="400" xAxisTickFormat="xAxisTickFormat(chart)" yAxisTickFormat="yAxisTickFormatForInteger()" showXAxis="true" showYAxis="true" forcex="[1428863400000, 1434911400000, 1428863400000, 1429468200000]" showLegend="true">
-                    <svg></svg>
-                </nvd3-line-chart>
-            </p>
-            <p ng-if="chart.type === 'column' &amp;&amp; chart.data.length > 0">
-                <nvd3-multi-bar-chart data="chart.data" id="chart-{{$index}}" width="750" height="400" rotateLabels="45" showXAxis="true" showYAxis="true" showValues="true" yAxisTickFormat="yAxisTickFormatForInteger()" xAxisTickFormat="xAxisTickFormat()" showLegend="true" margin="{left:75,top:60,bottom:10,right:10}">
-                    <svg></svg>
-                </nvd3-multi-bar-chart>
-            </p>
-            <p ng-if="chart.type === 'stackedcolumn' &amp;&amp; chart.data.length > 0">
-                <nvd3-multi-bar-chart data="chart.data" id="chart-{{$index}}" width="750" height="400" rotateLabels="45" showXAxis="true" showYAxis="true" showValues="true" yAxisTickFormat="yAxisTickFormatForInteger()" xAxisTickFormat="xAxisTickFormat()" stacked="true" showLegend="true">
-                    <svg></svg>
-                </nvd3-multi-bar-chart>
-            </p>
+        <div ng-repeat="chart in chartData | filter: {dataset:selectedDatasetId}">
+            <div class="text-center" ng-if="chart.data.length === 0">
+                <h3>{{chart.title}}</h3>
+                <h4 class="mb50">
+                    {{resourceBundle.noDataAvailable}}
+                </h4>
+            </div>
+            <div ng-if="chart.data.length &gt; 0">
+                <div class="row chart-title">
+                    <span class="col-md-6 col-md-offset-3 text-center">{{chart.title}}</span>
+                    <a class="col-md-1 col-md-offset-2" href="" title="Download Chart" ng-click="downloadChartAsPng($event)">
+                        <span class="glyphicon glyphicon-download-alt"></span>
+                    </a>
+                </div>
+                <p ng-if="chart.type === 'line'">
+                    <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
+                </p>
+                <p ng-if="chart.type === 'column'">
+                    <nvd3 options="barChartOptions" data="chart.data"></nvd3>
+                </p>
+                <p ng-if="chart.type === 'stackedcolumn'">
+                    <nvd3 options="stackedBarChartOptions" data="chart.data"></nvd3>
+                </p>
+            </div>
         </div>
         <div class="loading" ng-show="loading">
             <img src="img/ajax-loader.gif" class="spinner" />
