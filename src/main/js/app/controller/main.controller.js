@@ -93,6 +93,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         var setAuthHeaderOnRootscope = function(result) {
             $rootScope.authHeader = result;
             $location.path("/login");
+            metadataImporter.run();
         };
 
         var deregisterUserPreferencesListener = $rootScope.$on('userPreferencesUpdated', function() {

@@ -1,4 +1,4 @@
-define(["lodash", "moment"], function(_, moment) {
+define(["lodash"], function(_) {
     return function($q, metadataService, systemSettingService, systemSettingRepository, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository) {
         this.run = function() {
             return verifyIsNewInstall().then(importData);
@@ -20,7 +20,6 @@ define(["lodash", "moment"], function(_, moment) {
                 var metadata = data[0];
                 if (!_.isObject(metadata))
                     return;
-                changeLogRepository.upsert("orgUnits", moment(metadata.created).toISOString());
                 return changeLogRepository.upsert("metaData", metadata.created);
             });
         };

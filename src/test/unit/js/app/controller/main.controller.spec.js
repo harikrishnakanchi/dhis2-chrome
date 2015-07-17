@@ -76,6 +76,13 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
             }));
 
+            it("should import metadata", function() {
+                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
+                scope.$apply();
+
+                expect(metadataImporter.run).toHaveBeenCalled();
+            });
+
             it("should logout user", function() {
                 scope.logout();
 

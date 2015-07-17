@@ -103,14 +103,7 @@ require.config({
         "dateUtils": "app/utils/date.utils",
         "lodashUtils": "app/utils/lodash.utils",
         "httpUtils": "app/utils/http.utils",
-        "dhisUrl": "app/utils/dhis.url",
-
-        "helpers": "app/helpers/helpers",
-        "orgUnitGroupHelper": "app/helpers/orgunit.group.helper",
-        "metadataImporter": "app/helpers/metadata.importer",
-        "sessionHelper": "app/helpers/session.helper",
-        "originOrgunitCreator": "app/helpers/origin.orgunit.creator",
-        "orgUnitMapper": "app/transformers/orgunit.mapper",
+        "dhisUrl": "app/utils/dhis.url"
     },
     shim: {
         'angular': {
