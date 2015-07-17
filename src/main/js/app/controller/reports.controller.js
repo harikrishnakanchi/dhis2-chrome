@@ -1,44 +1,131 @@
 define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
     return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartService, chartRepository) {
 
-        
-        $scope.margin = {
-            "left": 20,
-            "top": 20,
-            "bottom": 20,
-            "right": 20
+
+        $scope.barChartOptions = {
+            "chart": {
+                "type": "multiBarChart",
+                "height": 450,
+                "margin": {
+                    "top": 20,
+                    "right": 20,
+                    "bottom": 60,
+                    "left": 45
+                },
+
+                "clipEdge": true,
+                "staggerLabels": false,
+                "transitionDuration": 500,
+
+                "x": function(d) {
+                    return d.label;
+                },
+                "y": function(d) {
+                    return d.value;
+                },
+                "xAxis": {
+                    "axisLabel": "Period",
+                    "tickFormat": function(d) {
+                        return moment(d, 'GGGGWW').format('GGGG[W]W');
+                    }
+                },
+                "yAxis": {
+                    "tickFormat": function(d) {
+                        return d3.format('.0f')(d);
+                    }
+                }
+            }
+        };
+        $scope.stackedBarChartOptions = {
+            "chart": {
+                "type": "multiBarChart",
+                "height": 450,
+                "margin": {
+                    "top": 20,
+                    "right": 20,
+                    "bottom": 60,
+                    "left": 45
+                },
+                "stacked": true,
+                "clipEdge": true,
+                "staggerLabels": false,
+                "transitionDuration": 500,
+
+                "x": function(d) {
+                    return d.label;
+                },
+                "y": function(d) {
+                    return d.value;
+                },
+                "xAxis": {
+                    "axisLabel": "Period",
+                    "tickFormat": function(d) {
+                        return moment(d, 'GGGGWW').format('GGGG[W]W');
+                    }
+                },
+                "yAxis": {
+                    "tickFormat": function(d) {
+                        return d3.format('.0f')(d);
+                    }
+                }
+            }
         };
 
-        $scope.yAxisTickFormatForInteger = function(d) {
-            return d3.format(',f');
+        $scope.lineChartOptions = {
+            "chart": {
+                "type": "lineChart",
+                "height": 450,
+
+                "margin": {
+                    "top": 20,
+                    "right": 45,
+                    "bottom": 60,
+                    "left": 45
+                },
+                "useInteractiveGuideline": true,
+                "x": function(d) {
+                    return d.label;
+                },
+                "y": function(d) {
+                    return d.value;
+                },
+                "xAxis": {
+                    "axisLabel": "Period",
+                    "tickFormat": function(d) {
+                        return moment(d, 'GGGGWW').format('GGGG[W]W');
+                    }
+                },
+                "yAxis": {
+                    "tickFormat": function(d) {
+                        return d3.format('.0f')(d);
+                    }
+                }
+            }
         };
 
-        $scope.xAxisTickFormat = function(chart) {
-            return function(d) {
-                return moment(d).format('GGGG[W]WW');
-            };
-        };
 
         $scope.downloadChartAsPng = function(event) {
-            saveSvgAsPng(event.currentTarget.parentElement.getElementsByTagName("svg")[0], "chart.png");
+            saveSvgAsPng(event.currentTarget.parentElement.parentElement.getElementsByTagName("svg")[0], "chart.png");
         };
-
 
         var loadChartData = function() {
 
             var insertMissingPeriods = function(chartData, periodsForXAxis) {
                 _.each(chartData, function(chartDataForKey) {
                     var periodsWithData = _.reduce(chartDataForKey.values, function(result, data) {
-                        result.push(data[0]);
+                        result.push(data.label);
                         return result;
                     }, []);
 
                     var missingPeriods = _.difference(periodsForXAxis, periodsWithData);
                     _.each(missingPeriods, function(period) {
-                        chartDataForKey.values.push([period, 0]);
+                        chartDataForKey.values.push({
+                            "label": period,
+                            "value": 0
+                        });
                     });
                     chartDataForKey.values = _.sortBy(chartDataForKey.values, function(value) {
-                        return value[0];
+                        return value.label;
                     });
                 });
 
@@ -53,7 +140,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     };
 
                     var periodsForXAxis = _.reduce(chartData.metaData.pe, function(result, period) {
-                        result.push(moment(period, 'GGGG[W]W').valueOf());
+                        result.push(parseInt(moment(period, 'GGGG[W]W').format('GGGGWW')));
                         return result;
                     }, []);
 
@@ -64,15 +151,19 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         });
 
                         if (item !== undefined) {
-                            item.values.push([moment(row[1], 'GGGG[W]W').valueOf(), parseInt(row[2])]);
+                            item.values.push({
+                                "label": parseInt(moment(row[1], 'GGGG[W]W').format('GGGGWW')),
+                                "value": parseInt(row[2])
+                            });
                             return;
                         }
 
                         result.push({
                             "key": getName(row[0]),
-                            "values": [
-                                [moment(row[1], 'GGGG[W]W').valueOf(), parseInt(row[2])]
-                            ]
+                            "values": [{
+                                "label": parseInt(moment(row[1], 'GGGG[W]W').format('GGGGWW')),
+                                "value": parseInt(row[2])
+                            }]
                         });
                     });
 
@@ -87,8 +178,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 };
 
                 var getChartDataPromises = _.map(charts, function(chart) {
-                    return chartRepository.getDataForChart(chart.name, $scope.orgUnit.id).then(function(chartData){
-                        if(!_.isEmpty(chartData))
+                    return chartRepository.getDataForChart(chart.name, $scope.orgUnit.id).then(function(chartData) {
+                        if (!_.isEmpty(chartData))
                             return transform(chart, chartData);
                     });
                 });
