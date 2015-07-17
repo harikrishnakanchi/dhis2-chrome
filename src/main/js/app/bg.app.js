@@ -59,41 +59,37 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         if (!dhisMonitor.isOnline())
                             return;
 
-                        var syncRun = function() {
-                            $hustle.publish({
-                                "type": "downloadMetadata"
-                            }, "dataValues");
+                        $hustle.publish({
+                            "type": "downloadMetadata"
+                        }, "dataValues");
 
-                            $hustle.publish({
-                                "type": "downloadSystemSetting"
-                            }, "dataValues");
+                        $hustle.publish({
+                            "type": "downloadSystemSetting"
+                        }, "dataValues");
 
-                            $hustle.publish({
-                                "type": "downloadPatientOriginDetails"
-                            }, "dataValues");
+                        $hustle.publish({
+                            "type": "downloadPatientOriginDetails"
+                        }, "dataValues");
 
-                            $hustle.publish({
-                                "type": "downloadOrgUnit",
-                                "data": []
-                            }, "dataValues");
+                        $hustle.publish({
+                            "type": "downloadOrgUnit",
+                            "data": []
+                        }, "dataValues");
 
-                            $hustle.publish({
-                                "type": "downloadOrgUnitGroups",
-                                "data": []
-                            }, "dataValues");
+                        $hustle.publish({
+                            "type": "downloadOrgUnitGroups",
+                            "data": []
+                        }, "dataValues");
 
-                            $hustle.publish({
-                                "type": "downloadProgram",
-                                "data": []
-                            }, "dataValues");
+                        $hustle.publish({
+                            "type": "downloadProgram",
+                            "data": []
+                        }, "dataValues");
 
-                            $hustle.publish({
-                                "type": "downloadDatasets",
-                                "data": []
-                            }, "dataValues");
-                        };
-
-                        metadataImporter.run().then(syncRun);
+                        $hustle.publish({
+                            "type": "downloadDatasets",
+                            "data": []
+                        }, "dataValues");
                     };
 
                     var projectDataSync = function() {
@@ -108,11 +104,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             "type": "downloadEventData"
                         }, "dataValues");
                     };
-
+                    
                     var importLocalMetaData = function() {
                         return metadataImporter.run();
                     };
-
+                    
                     var checkOnlineStatusAndSync = function() {
                         dhisMonitor.online(function() {
                             $log.info("Starting all hustle consumers");
@@ -132,7 +128,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     var setAuthHeader = function(result) {
                         if (!result || !result.authHeader) return;
                         $rootScope.authHeader = result.authHeader;
-                        checkOnlineStatusAndSync();
+                         importLocalMetaData().then(checkOnlineStatusAndSync);
+
                     };
 
                     hustleMonitor.start();

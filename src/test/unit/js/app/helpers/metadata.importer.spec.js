@@ -81,10 +81,6 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programs);
                 expect(systemSettingRepository.upsert).toHaveBeenCalledWith(systemSettings);
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith("metaData", metadataCreateDate);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnits", metadataCreateDate);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnitGroups", metadataCreateDate);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith("datasets", metadataCreateDate);
-                expect(changeLogRepository.upsert).toHaveBeenCalledWith("programs", metadataCreateDate);
             });
 
             it("should not run import if run once before", function() {
