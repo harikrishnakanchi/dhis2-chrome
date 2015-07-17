@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define(["lodash", "moment"], function(_, moment) {
     return function($q, metadataService, systemSettingService, systemSettingRepository, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository) {
         this.run = function() {
             return verifyIsNewInstall().then(importData);
@@ -20,7 +20,15 @@ define(["lodash"], function(_) {
                 var metadata = data[0];
                 if (!_.isObject(metadata))
                     return;
-                return changeLogRepository.upsert("metaData", metadata.created);
+
+                var created = moment(metadata.created).toISOString();
+                var promises = [];
+                promises.push(changeLogRepository.upsert("metaData", created));
+                promises.push(changeLogRepository.upsert("orgUnits", created));
+                promises.push(changeLogRepository.upsert("orgUnitGroups", created));
+                promises.push(changeLogRepository.upsert("datasets", created));
+                promises.push(changeLogRepository.upsert("programs", created));
+                return $q.all(promises);
             });
         };
 

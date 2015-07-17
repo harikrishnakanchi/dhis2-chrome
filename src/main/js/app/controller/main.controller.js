@@ -86,14 +86,10 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             $location.path("/dashboard");
         };
 
-        var showProductKeyPage = function() {
-            $location.path("/productKeyPage");
-        };
-
-        var setAuthHeaderOnRootscope = function(result) {
-            $rootScope.authHeader = result;
-            $location.path("/login");
-            metadataImporter.run();
+        var loadAuthHeader = function() {
+            return getAuthHeader().then(function(result) {
+                $rootScope.authHeader = result;
+            });
         };
 
         var deregisterUserPreferencesListener = $rootScope.$on('userPreferencesUpdated', function() {
@@ -108,13 +104,18 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         var init = function() {
             $scope.allUserLineListModules = [];
-            getAuthHeader().then(function(result) {
-                if (_.isEmpty(result)) {
-                    return showProductKeyPage();
+
+            loadAuthHeader().then(function() {
+                if (_.isEmpty($rootScope.authHeader)) {
+                    $location.path("/productKeyPage");
+                    return;
                 }
 
-                setAuthHeaderOnRootscope(result);
+                metadataImporter.run().then(function() {
+                    $location.path("/login");
+                });
             });
+
         };
 
         init();

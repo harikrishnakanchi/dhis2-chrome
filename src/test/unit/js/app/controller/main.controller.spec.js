@@ -76,7 +76,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
             }));
 
-            it("should import metadata", function() {
+            it("should import metadata triggering db migrations in the process", function() {
                 mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
                 scope.$apply();
 
