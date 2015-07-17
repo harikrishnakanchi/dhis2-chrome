@@ -51,7 +51,11 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/line-list-summary.html',
                         controller: 'lineListSummaryController'
                     }).
-                    when('/line-list-data-entry/:module?/:eventId?', {
+                    when('/line-list-data-entry/:module/new', {
+                        templateUrl: 'templates/line-list-data-entry.html',
+                        controller: 'lineListDataEntryController'
+                    }).
+                    when('/line-list-data-entry/:module/:eventId?', {
                         templateUrl: 'templates/line-list-data-entry.html',
                         controller: 'lineListDataEntryController'
                     }).
@@ -105,15 +109,6 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         if (!$rootScope.isLoggedIn && $rootScope.authHeader) {
                             $location.path("/login");
                         }
-                    });
-
-                    $rootScope.historyOfRoutes = [];
-
-                    $rootScope.$on('$routeChangeSuccess', function(e) {
-                        if ($rootScope.historyOfRoutes.length === 2) {
-                            $rootScope.historyOfRoutes = _.drop($rootScope.historyOfRoutes);
-                        }
-                        $rootScope.historyOfRoutes.push($location.$$url);
                     });
 
                     $rootScope.isDhisOnline = false;
