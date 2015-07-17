@@ -1,9 +1,10 @@
-define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "chromeUtils", "angular-indexedDB", "ng-i18n"],
-    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, chromeUtils) {
+define(["angular", "Q", "services", "repositories", "consumers", "hustleModule", "configureRequestInterceptor", "cleanupPayloadInterceptor", "handleTimeoutInterceptor", "properties", "queuePostProcessInterceptor", "monitors", "logRequestReponseInterceptor", "indexedDBLogger", "chromeUtils", "helpers", "angular-indexedDB", "ng-i18n"],
+    function(angular, Q, services, repositories, consumers, hustleModule, configureRequestInterceptor, cleanupPayloadInterceptor, handleTimeoutInterceptor, properties, queuePostProcessInterceptor, monitors, logRequestReponseInterceptor, indexedDBLogger, chromeUtils, helpers) {
         var init = function() {
             var app = angular.module('DHIS2', ["xc.indexedDB", "hustle", "ngI18n"]);
             services.init(app);
             consumers.init(app);
+            helpers.init(app);
             repositories.init(app);
             monitors.init(app);
 
@@ -42,8 +43,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$hustle', '$log', '$rootScope',
-                function(consumerRegistry, dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $hustle, $log, $rootScope) {
+            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$hustle', '$log', '$rootScope', 'metadataImporter',
+                function(consumerRegistry, dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $hustle, $log, $rootScope, metadataImporter) {
 
                     $hustle.registerInterceptor(queuePostProcessInterceptor);
 
@@ -103,7 +104,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             "type": "downloadEventData"
                         }, "dataValues");
                     };
-
+                    
+                    var importLocalMetaData = function() {
+                        return metadataImporter.run();
+                    };
+                    
                     var checkOnlineStatusAndSync = function() {
                         dhisMonitor.online(function() {
                             $log.info("Starting all hustle consumers");
@@ -123,7 +128,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     var setAuthHeader = function(result) {
                         if (!result || !result.authHeader) return;
                         $rootScope.authHeader = result.authHeader;
-                        checkOnlineStatusAndSync();
+                         importLocalMetaData().then(checkOnlineStatusAndSync);
+
                     };
 
                     hustleMonitor.start();
