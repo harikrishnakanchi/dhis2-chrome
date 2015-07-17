@@ -90,10 +90,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             "data": []
                         }, "dataValues");
 
-                        $hustle.publish({
-                            "type": "downloadCharts",
-                            "data": []
-                        }, "dataValues");
                     };
 
                     var projectDataSync = function() {
@@ -106,6 +102,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                         $hustle.publish({
                             "type": "downloadEventData"
+                        }, "dataValues");
+
+                        $hustle.publish({
+                            "type": "downloadCharts",
+                            "data": []
                         }, "dataValues");
                     };
 

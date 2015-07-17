@@ -1,5 +1,5 @@
 define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, ngI18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository) {
+    return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
@@ -96,9 +96,17 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             metadataImporter.run();
         };
 
+        var loadCharts = function(){
+            return $hustle.publish({
+                "type": "downloadCharts",
+                "data": []
+            }, "dataValues");
+        };
+
         var deregisterUserPreferencesListener = $rootScope.$on('userPreferencesUpdated', function() {
             loadProjects();
             loadUserLineListModules();
+            loadCharts();
         });
 
         $scope.$on('$destroy', function() {

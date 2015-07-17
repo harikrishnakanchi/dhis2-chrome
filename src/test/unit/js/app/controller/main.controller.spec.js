@@ -2,12 +2,14 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
     function(MainController, mocks, utils, MetadataImporter, SessionHelper, chromeUtils, OrgUnitRepository) {
         describe("main controller", function() {
             var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, db, frenchResourceBundle,
-                translationStore, location, metadataImporter, sessionHelper, orgUnitRepository;
+                translationStore, location, metadataImporter, sessionHelper, orgUnitRepository, hustle;
 
-            beforeEach(mocks.inject(function($rootScope, $q, $location) {
+            beforeEach(module('hustle'));
+            beforeEach(mocks.inject(function($rootScope, $q, $location, $hustle) {
                 scope = $rootScope.$new();
                 q = $q;
                 rootScope = $rootScope;
+                hustle = $hustle;
 
                 metadataImporter = new MetadataImporter();
                 sessionHelper = new SessionHelper();
@@ -72,12 +74,13 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 });
 
                 spyOn(metadataImporter, "run").and.returnValue(utils.getPromise(q, {}));
+                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
+                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
             }));
 
             it("should import metadata", function() {
-                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
+                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
                 scope.$apply();
 
                 expect(metadataImporter.run).toHaveBeenCalled();
@@ -102,7 +105,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                     callBack({});
                 });
 
-                mainController = new MainController(q, scope, location, rootScope, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
+                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
 
                 scope.$apply();
 
@@ -140,6 +143,27 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 expect(rootScope.currentUser.selectedProject).toEqual({
                     "id": "prj1"
                 });
+            });
+
+            it("should reset charts on current user's org units changes", function() {
+                rootScope.currentUser = {
+                    "userCredentials": {
+                        "username": "username"
+                    },
+                    "organisationUnits": [{
+                        "id": "prj1"
+                    }],
+                    "selectedProject": {
+                        "id": "prj1"
+                    }
+                };
+
+                rootScope.$broadcast('userPreferencesUpdated');
+
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    "data": [],
+                    "type": "downloadCharts",
+                }, 'dataValues');
             });
 
             it("should save session state and redirect user to dashboard when project selection changes", function() {
