@@ -20,8 +20,15 @@ define(["lodash", "moment"], function(_, moment) {
                 var metadata = data[0];
                 if (!_.isObject(metadata))
                     return;
-                changeLogRepository.upsert("orgUnits", moment(metadata.created).toISOString());
-                return changeLogRepository.upsert("metaData", metadata.created);
+
+                var created = moment(metadata.created).toISOString();
+                var promises = [];
+                promises.push(changeLogRepository.upsert("metaData", created));
+                promises.push(changeLogRepository.upsert("orgUnits", created));
+                promises.push(changeLogRepository.upsert("orgUnitGroups", created));
+                promises.push(changeLogRepository.upsert("datasets", created));
+                promises.push(changeLogRepository.upsert("programs", created));
+                return $q.all(promises);
             });
         };
 
