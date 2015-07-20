@@ -37,7 +37,8 @@ define(["lodash", "dhisId", "moment", "orgUnitMapper"], function(_, dhisId, mome
         };
 
         var getAttributeValues = function(opUnitType, hospitalUnitCode) {
-            hospitalUnitCode = opUnitType.title === "Hospital" ? hospitalUnitCode : {
+            var type = opUnitType.name || opUnitType.title;
+            hospitalUnitCode = type === "Hospital" ? hospitalUnitCode : {
                 "name": ""
             };
             return [{
