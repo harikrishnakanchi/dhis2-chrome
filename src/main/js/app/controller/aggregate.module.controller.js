@@ -65,8 +65,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
+                var getEnrichedDataSets = function(datasets) {
+                    return datasetRepository.includeDataElements(datasets, excludedDataElements);
+                };
+
                 var getDatasets = function() {
-                    return getAllAggregateDatasets().then(function(datasets) {
+                    return getAllAggregateDatasets().then(getEnrichedDataSets).then(function(datasets) {
                         $scope.originalDatasets = datasets;
 
                         var partitionedDatasets = _.partition(datasets, function(ds) {
