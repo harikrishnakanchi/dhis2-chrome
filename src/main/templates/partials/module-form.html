@@ -54,7 +54,7 @@
                                         </div>
                                         <div collapse="!isExpanded[section.id]" class="collapse-body">
                                             <ul>
-                                                <li ng-repeat="element in section.dataElements">
+                                                <li ng-repeat="element in section.dataElements | orderBy : 'formName'">
                                                     <label>
                                                         <input type="checkbox" ng-disabled="isDisabled==true" ng-model="getDataElement(section, element.id)['isIncluded']" ng-change="changeSectionSelection(section)">{{element.formName}}
                                                     </label>
