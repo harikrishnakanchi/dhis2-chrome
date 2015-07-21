@@ -26,7 +26,7 @@ define(["productKeyController", "angularMocks", "metadataImporter", "utils", "ch
             scope.setAuthHeaderAndProceed();
             scope.$apply();
 
-            expect(rootscope.auth_header).toEqual("Test Message");
+            expect(rootscope.authHeader).toEqual("Test Message");
         });
 
         it("should logout the user if prooduct key is changed and user is logged in", function() {
@@ -45,6 +45,16 @@ define(["productKeyController", "angularMocks", "metadataImporter", "utils", "ch
             scope.$apply();
 
             expect(sessionHelper.logout).not.toHaveBeenCalled();
+        });
+
+        it("should send a db ready message after metadata is imported", function() {
+            scope.productKey = "eyJpdiI6IldrbWRjaERvR0RhYmRWVmozbFVHeXc9PSIsInNhbHQiOiJGYU90RkVlM1E1dz0iLCJjdCI6ImpUQVJ0UWxXOE96TlltTFNsWCtCNzlDY2l1ST0ifQ==";
+
+            scope.$apply();
+            scope.setAuthHeaderAndProceed();
+            scope.$apply();
+            expect(chromeUtils.sendMessage.calls.argsFor(1)).toEqual(["dbReady"]);
+            expect(chromeUtils.sendMessage.calls.argsFor(0)).toEqual(["productKeyDecrypted"]);
         });
     });
 });

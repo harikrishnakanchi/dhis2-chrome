@@ -15,10 +15,10 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.resourceBundle = {};
 
                 routeParams = {
-                    "eventId": "event1",
-                    'module': 'mod1'
+                    'eventId': 'event1',
+                    'module': 'mod1',
+                    'returnTo': '/line-list-summary/mod1'
                 };
-
 
                 var ev = {
                     "event": "event1",
@@ -29,8 +29,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         "dataElement": "de1"
                     }]
                 };
-
-                rootScope.historyOfRoutes = [];
 
                 spyOn(location, "path").and.returnValue(location);
                 spyOn(location, "search").and.returnValue("something");
@@ -201,8 +199,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should save event details as newDraft and show summary view", function() {
-
-                rootScope.historyOfRoutes = ['/line-list-summary/mod1', '/line-list-data-entry/mod1'];
 
                 var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository);
                 scope.$apply();

@@ -24,7 +24,7 @@
                         </ul>
                     </div>
                     <div class="col-md-4 text-right">
-                        <a ng-href="#/line-list-data-entry/{{selectedModuleId}}" class="btn btn-primary">{{resourceBundle.newCaseBtnValue}}</a>
+                        <a ng-href="#/line-list-data-entry/{{selectedModuleId}}/new?returnTo={{currentUrl}}" class="btn btn-primary">{{resourceBundle.newCaseBtnValue}}</a>
                     </div>
                 </div>
                 <div>
@@ -49,19 +49,19 @@
                         </div>
                     </div>
                     <div class="event-search-results">
-                        <div ng-if="events.length === 0 " class="alert alert-danger">
+                        <div ng-if="events.length === 0" class="alert alert-danger">
                             {{noCasesMsg}}
                         </div>
-                        <div ng-if="events.length &gt; 0 " class="panel-default">
-                            <div class="panel-heading ">
-                                <h3 class="panel-title "><a>{{ eventListTitle }}</a></h3>
+                        <div ng-if="events.length &gt; 0" class="panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><a>{{ eventListTitle }}</a></h3>
                             </div>
-                            <table class="table table-bordered ">
+                            <table class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>{{ resourceBundle.eventDateLabel }}</th>
-                                        <th ng-if="showPatientOriginInSummaryTable() ">{{ resourceBundle.patientOriginLabel }}</th>
-                                        <th ng-repeat="dataValue in events[0].dataValues " ng-if="dataValue.showInEventSummary ">
+                                        <th ng-if="showPatientOriginInSummaryTable()">{{ resourceBundle.patientOriginLabel }}</th>
+                                        <th ng-repeat="dataValue in events[0].dataValues" ng-if="dataValue.showInEventSummary">
                                             {{ dataValue.formName }}
                                         </th>
                                         <th></th>
@@ -70,48 +70,35 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="event in events ">
+                                    <tr ng-repeat="event in events">
                                         <td>{{ getFormattedDate(event.eventDate) }}</td>
-                                        <td ng-if="showPatientOriginInSummaryTable() ">{{ getOriginName(event.orgUnit)}}</td>
-                                        <td ng-repeat="dataValue in event.dataValues " ng-if="dataValue.showInEventSummary ">
-                                            <span ng-if="dataValue.type==='date' ">{{ getFormattedDate(dataValue.value) }}</span>
-                                            <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='true' ">{{ resourceBundle.yes }}</span>
-                                            <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='false' ">{{ resourceBundle.no }}</span>
-                                            <span ng-if="dataValue.type !=='date' &amp;&amp; dataValue.type !=='bool' ">{{ getDisplayValue(dataValue) }}</span>
+                                        <td ng-if="showPatientOriginInSummaryTable()">{{ getOriginName(event.orgUnit)}}</td>
+                                        <td ng-repeat="dataValue in event.dataValues" ng-if="dataValue.showInEventSummary">
+                                            <span ng-if="dataValue.type==='date'">{{ getFormattedDate(dataValue.value) }}</span>
+                                            <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='true'">{{ resourceBundle.yes }}</span>
+                                            <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='false'">{{ resourceBundle.no }}</span>
+                                            <span ng-if="dataValue.type !=='date' &amp;&amp; dataValue.type !=='bool'">{{ getDisplayValue(dataValue) }}</span>
                                         </td>
                                         <td>
-                                            <a href=" " id=" " title="Submitted " ng-if="!event.localStatus || event.localStatus==='READY_FOR_DHIS' " class="submitted disabled-link">
-                                                <span class="glyphicon glyphicon-ok glyphicon-green "></span>
-                                            </a>
-                                            <a href=" " id=" " title="Incomplete " ng-if="event.localStatus==='NEW_INCOMPLETE_DRAFT' || event.localStatus==='UPDATED_INCOMPLETE_DRAFT' " class="submitted disabled-link">
-                                                <span class="glyphicon glyphicon-star-empty ">
-
-                                                    </span>
-                                            </a>
-                                            <a href=" " id=" " title="Complete " ng-if="event.localStatus==='NEW_DRAFT' || event.localStatus==='UPDATED_DRAFT' " class="submitted disabled-link">
-                                                <span class="glyphicon glyphicon-star ">
-                                                    </span>
-                                            </a>
+                                            <a href title="Submitted" ng-if="!event.localStatus || event.localStatus==='READY_FOR_DHIS'" class="submitted disabled-link"><span class="glyphicon glyphicon-ok glyphicon-green"></span></a>
+                                            <a href title="Incomplete" ng-if="event.localStatus==='NEW_INCOMPLETE_DRAFT' || event.localStatus==='UPDATED_INCOMPLETE_DRAFT'" class="submitted disabled-link"><span class="glyphicon glyphicon-star-empty"></span></a>
+                                            <a href title="Complete" ng-if="event.localStatus==='NEW_DRAFT' || event.localStatus==='UPDATED_DRAFT'" class="submitted disabled-link"><span class="glyphicon glyphicon-star"></span></a>
                                         </td>
                                         <td>
-                                            <a title="Edit " href=" " ng-href="#/line-list-data-entry/{{selectedModuleId}}/{{event.event}} " class="edit ">
-                                                <span class="glyphicon glyphicon-edit "></span>
-                                            </a>
+                                            <a href title="Edit" ng-href="#/line-list-data-entry/{{selectedModuleId}}/{{event.event}}?returnTo={{currentUrl}}" class="edit"><span class="glyphicon glyphicon-edit"></span></a>
                                         </td>
                                         <td>
-                                            <a href="" ng-click="deleteEvent(event) " title="Delete " class="delete ">
-                                                <span class="glyphicon glyphicon-trash "></span>
-                                            </a>
+                                            <a href title="Delete" ng-click="deleteEvent(event)" title="Delete" class="delete"><span class="glyphicon glyphicon-trash"></span></a>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-                            <form name="eventSummaryForm " id="eventSummaryForm " class="form-horizontal ">
+                            <form name="eventSummaryForm" id="eventSummaryForm" class="form-horizontal">
                                 <ul>
                                     <li>
-                                        <div class="text-center ">
-                                            <input type="button " class="btn btn-main " value="{{ resourceBundle.submitBtnValue }} " ng-click="submit()" ng-if="!projectIsAutoApproved &amp;&amp; filterBy === 'readyToSubmit' " />
-                                            <input type="button " class="btn btn-main " value="{{ resourceBundle.submitBtnValue }} " ng-click="submitAndApprove()" ng-if="projectIsAutoApproved &amp;&amp; filterBy === 'readyToSubmit'" />
+                                        <div class="text-center">
+                                            <input type="button" class="btn btn-main" value="{{ resourceBundle.submitBtnValue }}" ng-click="submit()" ng-if="!projectIsAutoApproved &amp;&amp; filterBy === 'readyToSubmit'" />
+                                            <input type="button" class="btn btn-main" value="{{ resourceBundle.submitBtnValue }}" ng-click="submitAndApprove()" ng-if="projectIsAutoApproved &amp;&amp; filterBy === 'readyToSubmit'" />
                                         </div>
                                     </li>
                                 </ul>

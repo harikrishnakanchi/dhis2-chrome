@@ -1,7 +1,9 @@
 define(["chromeUtils", "cipherUtils"], function(chromeUtils, cipherUtils) {
     return function($scope, $location, $rootScope, metadataImporter, sessionHelper) {
         var triggerImportAndSync = function() {
-            metadataImporter.run();
+            metadataImporter.run().then(function(){
+                chromeUtils.sendMessage("dbReady");
+            });
             chromeUtils.sendMessage("productKeyDecrypted");
         };
 
@@ -10,7 +12,7 @@ define(["chromeUtils", "cipherUtils"], function(chromeUtils, cipherUtils) {
                 var decryptedProductKey = cipherUtils.decrypt($scope.productKey);
 
                 chromeUtils.setAuthHeader(decryptedProductKey);
-                $rootScope.auth_header = decryptedProductKey;
+                $rootScope.authHeader = decryptedProductKey;
 
                 triggerImportAndSync();
                 if ($rootScope.currentUser)

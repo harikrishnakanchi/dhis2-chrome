@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
-    return function($scope, $rootScope, $routeParams, $location,$anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository) {
+    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository) {
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
@@ -66,7 +66,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         $scope.loadEventsView = function() {
-            $location.path($rootScope.historyOfRoutes[$rootScope.historyOfRoutes.length - 2]);
+            $location.path($routeParams.returnTo);
         };
 
         $scope.isEventDateSubstitute = function(dataElement) {
@@ -84,7 +84,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             $scope.event.dataValues = dataValuesAndEventDate.dataValues;
 
             programEventRepository.upsert($scope.event).then(function() {
-                $location.path($rootScope.historyOfRoutes[$rootScope.historyOfRoutes.length - 2]).search({
+                $location.path($routeParams.returnTo).search({
                     'messageType': 'success',
                     "message": $scope.resourceBundle.eventSaveSuccess
                 });
@@ -93,7 +93,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         };
 
         var scrollToTop = function(eventId) {
-            $location.hash(eventId);
+            $location.hash('top');
             $anchorScroll();
         };
 
@@ -117,7 +117,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                     setEventMinAndMaxDate();
                     scrollToTop(eventId);
                 } else {
-                    $location.path($rootScope.historyOfRoutes[$rootScope.historyOfRoutes.length - 2]).search({
+                    $location.path($routeParams.returnTo).search({
                         'messageType': 'success',
                         "message": $scope.resourceBundle.eventSaveSuccess
                     });

@@ -15,11 +15,13 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 sessionHelper = new SessionHelper();
                 orgUnitRepository = new OrgUnitRepository();
 
+                spyOn(chromeUtils, "sendMessage");
+
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
 
                 spyOn(chromeUtils, "getAuthHeader").and.callFake(function(callBack) {
                     callBack({
-                        "auth_header": "Basic Auth"
+                        "authHeader": "Basic Auth"
                     });
                 });
 
@@ -79,7 +81,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
             }));
 
-            it("should import metadata", function() {
+            it("should import metadata triggering db migrations in the process", function() {
                 mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
                 scope.$apply();
 
@@ -117,7 +119,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
 
                 scope.$apply();
 
-                expect(rootScope.auth_header).toEqual("Basic Auth");
+                expect(rootScope.authHeader).toEqual("Basic Auth");
                 expect(location.path).toHaveBeenCalledWith("/login");
             });
 

@@ -29,11 +29,11 @@ def upload_file(auth_token, app_id, file_name):
 
 
 def main():
-    refresh_token = sys.argv(1)
-    client_id = sys.argv(2)
-    client_secret = sys.argv(3)
-    app_id = sys.argv(4)
-    file_name = sys.argv(5)
+    refresh_token = sys.argv[1]
+    client_id = sys.argv[2]
+    client_secret = sys.argv[3]
+    app_id = sys.argv[4]
+    file_name = sys.argv[5]
     
     auth_token = get_auth_token(refresh_token, client_id, client_secret)
     upload_file(auth_token, app_id, file_name)

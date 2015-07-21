@@ -6,16 +6,16 @@ require(["app/bg.config"], function(config) {
     require(["app"], function(app) {
         require(["properties"], function(properties) {
             var bootstrapData;
-            var onMigrationComplete = function(request, sender, sendResponse) {
-                if (!bootstrapData && request === "migrationComplete") {
-                    console.log("dB migration complete");
+            var onDbReady = function(request, sender, sendResponse) {
+                if (!bootstrapData && request === "dbReady") {
+                    console.log("dB ready");
                     app.bootstrap(app.init()).then(function(data) {
                         bootstrapData = data;
                     });
                 }
             };
 
-            chrome.runtime.onMessage.addListener(onMigrationComplete);
+            chrome.runtime.onMessage.addListener(onDbReady);
             chrome.app.runtime.onLaunched.addListener(function(launchData) {
                 chrome.app.window.create('../../index.html', {
                     id: 'DHIS2',

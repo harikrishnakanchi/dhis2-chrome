@@ -51,7 +51,11 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/line-list-summary.html',
                         controller: 'lineListSummaryController'
                     }).
-                    when('/line-list-data-entry/:module?/:eventId?', {
+                    when('/line-list-data-entry/:module/new', {
+                        templateUrl: 'templates/line-list-data-entry.html',
+                        controller: 'lineListDataEntryController'
+                    }).
+                    when('/line-list-data-entry/:module/:eventId?', {
                         templateUrl: 'templates/line-list-data-entry.html',
                         controller: 'lineListDataEntryController'
                     }).
@@ -78,9 +82,6 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                     $indexedDBProvider.connection('msf')
                         .upgradeDatabase(migrations.length, function(event, db, tx) {
                             migrator.run(event.oldVersion, db, tx, migrations);
-                        }).dbReady(function(data) {
-                            if (chrome.runtime)
-                                chrome.runtime.sendMessage("migrationComplete");
                         });
 
                     $hustleProvider.init("hustle", 1, ["dataValues"]);
@@ -102,18 +103,9 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                     $hustle.registerInterceptor(queuePostProcessInterceptor);
 
                     $rootScope.$on('$locationChangeStart', function(e, newUrl, oldUrl) {
-                        if (!$rootScope.isLoggedIn && $rootScope.auth_header) {
+                        if (!$rootScope.isLoggedIn && $rootScope.authHeader) {
                             $location.path("/login");
                         }
-                    });
-
-                    $rootScope.historyOfRoutes = [];
-
-                    $rootScope.$on('$routeChangeSuccess', function(e) {
-                        if ($rootScope.historyOfRoutes.length === 2) {
-                            $rootScope.historyOfRoutes = _.drop($rootScope.historyOfRoutes);
-                        }
-                        $rootScope.historyOfRoutes.push($location.$$url);
                     });
 
                     $rootScope.isDhisOnline = false;

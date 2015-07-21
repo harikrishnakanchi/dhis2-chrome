@@ -3,6 +3,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         orgUnitRepository, approvalDataRepository) {
 
         $scope.filterParams = {};
+        $scope.currentUrl = $location.path();
         $scope.loadingResults = false;
         $scope.showOfflineSummaryForViewOnly = true;
 
