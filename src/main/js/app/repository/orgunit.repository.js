@@ -189,6 +189,13 @@ define(["moment", "lodashUtils"], function(moment, _) {
             });
         };
 
+        var getAllOrigins = function(modules) {
+            var moduleIds = _.pluck(modules, "id");
+            return findAllByParent(moduleIds, true).then(function(origins){
+                return origins;
+            });
+        };
+
         return {
             "upsert": upsert,
             "upsertDhisDownloadedData": upsertDhisDownloadedData,
@@ -201,7 +208,8 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getParentProject": getParentProject,
             "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
             "getChildOrgUnitNames": getChildOrgUnitNames,
-            "getAllOriginsByName": getAllOriginsByName
+            "getAllOriginsByName": getAllOriginsByName,
+            "getAllOrigins": getAllOrigins
         };
     };
 });

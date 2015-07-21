@@ -13,6 +13,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, "getAllOrigins").and.returnValue(utils.getPromise(q, []));
 
             chartService = new ChartService();
             spyOn(chartService, "getAllFieldAppCharts").and.returnValue(utils.getPromise(q, []));
@@ -84,9 +85,16 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             };
 
             var datasets = [{
-                "id": "ds1"
+                "id": "ds1",
+                "isOriginDataset": false
             }, {
-                "id": "ds2"
+                "id": "ds2",
+                "isOriginDataset": true
+            }];
+
+            var expectedDatasets = [{
+                "id": "ds1",
+                "isOriginDataset": false
             }];
 
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, prj1));
@@ -98,7 +106,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
 
             expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("prj1");
             expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(["mod1"]);
-            expect(scope.datasets).toEqual(datasets);
+            expect(scope.datasets).toEqual(expectedDatasets);
         });
 
         it("should load Chart data", function() {
@@ -111,11 +119,14 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             };
 
             var datasets = [{
-                "id": "ds1"
+                "id": "ds1",
+                "isOriginDataset" : false
             }, {
-                "id": "ds2"
+                "id": "ds2",
+                "isOriginDataset" : false
             }, {
-                "id": "ds3"
+                "id": "ds3",
+                "isOriginDataset" : false
             }];
 
             var charts = [{
