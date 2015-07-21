@@ -70,7 +70,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         var getAuthHeader = function() {
             var deferred = $q.defer();
             chromeUtils.getAuthHeader(function(result) {
-                deferred.resolve(result.authHeader);
+                deferred.resolve(result);
             });
             return deferred.promise;
         };
@@ -88,7 +88,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         var loadAuthHeader = function() {
             return getAuthHeader().then(function(result) {
-                $rootScope.authHeader = result;
+                $rootScope.authHeader = result ? result.authHeader : null;
             });
         };
 

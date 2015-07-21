@@ -1,8 +1,9 @@
-define(["lodash", "properties"], function(_, properties) {
+define(["lodash", "properties", "appSettingsUtils"], function(_, properties, appSettingsUtils) {
     var registerMessageCallback = function(messageName, callback) {
         return function(request, sender, sendResponse) {
             if (request === messageName)
                 callback();
+
         };
     };
 
@@ -15,22 +16,27 @@ define(["lodash", "properties"], function(_, properties) {
     };
 
     var setAuthHeader = function(value) {
-        return chrome.storage.local.set({
+        return appSettingsUtils.upsert("authHeader", {
             "authHeader": value
         });
     };
 
     var getAuthHeader = function(callback) {
         var doCallback = function(storedObject) {
-            if (storedObject.authHeader === undefined && properties.devMode) {
+            console.log(storedObject, "storedObject");
+            if (storedObject === null && properties.devMode) {
+                console.log("not here");
                 callback({
                     "authHeader": "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA=="
                 });
                 return;
             }
-            callback(storedObject);
+            if (storedObject === null)
+                callback();
+            else
+                callback(storedObject.value.value);
         };
-        chrome.storage.local.get("authHeader", doCallback);
+        appSettingsUtils.get("authHeader").then(doCallback);
     };
 
     var createNotification = function(title, message) {

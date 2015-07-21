@@ -106,7 +106,8 @@ require.config({
         "dateUtils": "app/utils/date.utils",
         "lodashUtils": "app/utils/lodash.utils",
         "httpUtils": "app/utils/http.utils",
-        "dhisUrl": "app/utils/dhis.url"
+        "dhisUrl": "app/utils/dhis.url",
+        "appSettingsUtils": "app/utils/app.settings.utils"
     },
     shim: {
         'angular': {
