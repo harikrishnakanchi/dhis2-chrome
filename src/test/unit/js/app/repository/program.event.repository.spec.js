@@ -248,33 +248,6 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             scope.$apply();
         });
 
-        it("should get all events from given period", function() {
-            var listOfEvents = [{
-                'id': 'e1'
-            }];
-
-            var startPeriod = '2014W4';
-
-            mockDB = utils.getMockDB(q, [], [], listOfEvents);
-            mockStore = mockDB.objectStore;
-
-            programEventRepository = new ProgramEventRepository(mockDB.db, q);
-
-            var actualEvents;
-            programEventRepository.getEventsFromPeriod(startPeriod).then(function(events) {
-                actualEvents = events;
-            });
-
-            scope.$apply();
-
-            var queryObject = mockStore.each.calls.argsFor(0)[0];
-            expect(queryObject.index).toEqual('by_event_date');
-            expect(queryObject.betweenX).toEqual(moment('2014-01-20').toISOString());
-            expect(queryObject.betweenY).toEqual(moment().endOf('day').toISOString());
-
-            expect(actualEvents).toEqual(listOfEvents);
-        });
-
         it("should get events for particular period and orgUnit", function() {
 
             var events = [{

@@ -18,7 +18,6 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
                     });
                 });
             };
-
             return getEvents().then(function(events) {
                 eventService.upsertEvents({
                     'events': events

@@ -92,9 +92,6 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             var store = db.objectStore('programEvents');
             var query = db.queryBuilder().$between(startDate, endDate).$index("by_event_date").compile();
             return store.each(query).then(function(events) {
-                if (!orgUnitIds) {
-                    return events;
-                }
                 return _.filter(events, function(e) {
                     return _.contains(orgUnitIds, e.orgUnit);
                 });
