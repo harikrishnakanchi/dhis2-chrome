@@ -85,6 +85,12 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             }));
         };
 
+        this.getEventsForUpload = function(eventIds) {
+            var store = db.objectStore("programEvents");
+            var query = db.queryBuilder().$in(eventIds).compile();
+            return store.each(query);
+        };
+
         this.getEventsFromPeriod = function(startPeriod, orgUnitIds) {
             var startDate = moment(startPeriod, 'GGGG[W]W').startOf('day').toISOString();
             var endDate = moment().endOf('day').toISOString();

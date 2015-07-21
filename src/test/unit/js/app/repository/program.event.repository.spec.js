@@ -432,7 +432,6 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
 
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
 
-            var actualEvents;
             programEventRepository.getDraftEventsFor('prg1', ['ou1']);
 
             scope.$apply();
@@ -446,6 +445,37 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             expect(queryObject2.eq).toEqual(['prg1', 'ou1', 'UPDATED_INCOMPLETE_DRAFT']);
         });
 
-        it("should find events by id", function() {});
+        it("should find events by id", function() {
+            var listOfEvents = [{
+                'id': 'e1'
+            }];
+
+            mockDB = utils.getMockDB(q, [], [], listOfEvents);
+            mockStore = mockDB.objectStore;
+
+            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+
+            var actualEvents;
+            programEventRepository.findEventById('prg1', 'e1');
+
+            expect(mockStore.find).toHaveBeenCalledWith('e1');
+        });
+
+        it("should get events for upload", function() {
+            var listOfEvents = [{
+                'id': 'e1'
+            }];
+
+            mockDB = utils.getMockDB(q, [], [], listOfEvents);
+            mockStore = mockDB.objectStore;
+
+            programEventRepository = new ProgramEventRepository(mockDB.db, q);
+
+            programEventRepository.getEventsForUpload(['e1']);
+
+            var queryObject = mockStore.each.calls.argsFor(0)[0];
+            expect(queryObject.index).toBeUndefined();
+            expect(queryObject.inList).toEqual(['e1']);
+        });
     });
 });
