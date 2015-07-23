@@ -15,9 +15,6 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 datasetRepository = {
                     "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [{
                         "id": "DS_OPD"
-                    }])),
-                    "findAllForOrgUnits": jasmine.createSpy("findAllForOrgUnits").and.returnValue(utils.getPromise(q, [{
-                        "id": "DS_OPD"
                     }]))
                 };
 
@@ -41,6 +38,10 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
             it("should download approval data from dhis based on user module ids and dataset", function() {
                 userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
 
+                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
+                    "id": "ds1"
+                }]));
+
                 var originOrgUnits = [{
                     "id": "org1"
                 }];
@@ -59,10 +60,8 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
                 expect(datasetRepository.getAll).toHaveBeenCalled();
 
-                expect(approvalService.getCompletionData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], originOrgUnits, ["DS_OPD"]);
-                expect(approvalService.getApprovalData).toHaveBeenCalledWith("mod1", ["DS_OPD"]);
-                expect(approvalService.getApprovalData).toHaveBeenCalledWith("mod2", ["DS_OPD"]);
-                expect(approvalService.getApprovalData).toHaveBeenCalledWith("mod3", ["DS_OPD"]);
+                expect(approvalService.getCompletionData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], originOrgUnits, ["ds1"]);
+                expect(approvalService.getApprovalData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], ["ds1"]);
             });
 
             it("should not download approval data from dhis if the user does not have any preferred moduleids", function() {
