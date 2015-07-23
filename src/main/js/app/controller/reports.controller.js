@@ -197,13 +197,20 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
             var loadDatasetsForModules = function(orgUnits) {
                 return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(datasets) {
+                    datasets = _.filter(datasets, {"isOriginDataset":false});
                     $scope.datasets = datasets;
                     if (!_.isEmpty(datasets))
                         $scope.selectedDatasetId = datasets[0].id;
                 });
             };
 
-            return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id)
+            var getOrigins = function(modules) {
+                return orgUnitRepository.getAllOrigins(modules).then(function(origins){
+                    return modules.concat(origins);
+                });
+            };
+
+            return orgUnitRepository.getAllModulesInOrgUnits($scope.orgUnit.id).then(getOrigins)
                 .then(loadDatasetsForModules);
         };
 

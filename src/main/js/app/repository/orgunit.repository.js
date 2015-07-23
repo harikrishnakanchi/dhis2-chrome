@@ -189,14 +189,11 @@ define(["moment", "lodashUtils"], function(moment, _) {
             });
         };
 
-        var getAllModules = function() {
-            var filterModules = function(orgUnits) {
-                return _.filter(orgUnits, function(orgUnit) {
-                    return isOfType(orgUnit, "Module");
-                });
-            };
-
-            return getAll().then(filterModules);
+        var getAllOrigins = function(modules) {
+            var moduleIds = _.pluck(modules, "id");
+            return findAllByParent(moduleIds, true).then(function(origins) {
+                return origins;
+            });
         };
 
         return {
@@ -212,7 +209,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getAllModulesInOrgUnits": getAllModulesInOrgUnits,
             "getChildOrgUnitNames": getChildOrgUnitNames,
             "getAllOriginsByName": getAllOriginsByName,
-            "getAllModules": getAllModules
+            "getAllOrigins": getAllOrigins
         };
     };
 });
