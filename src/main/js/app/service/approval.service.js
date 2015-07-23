@@ -81,7 +81,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                 }
             };
 
-            var markAsUnapprovedPromises = _.map(periodsAndOrgUnits, function(periodAndOrgUnit){
+            var markAsUnapprovedPromises = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
                 return doGet(periodAndOrgUnit).then(_.curry(doDelete)(periodAndOrgUnit));
             });
 
@@ -103,9 +103,9 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                         orgUnit = indexedOriginOrgUnits[orgUnit].parent.id;
 
                     if (!_.any(results, {
-                        "period": period,
-                        "orgUnit": orgUnit
-                    })) {
+                            "period": period,
+                            "orgUnit": orgUnit
+                        })) {
                         results.push({
                             'period': period,
                             'orgUnit': orgUnit,
@@ -131,7 +131,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             }).then(transform);
         };
 
-        this.getApprovalData = function(orgUnits, dataSets) {
+        this.getApprovalData = function(orgUnit, dataSets) {
 
             var transform = function(response) {
                 if (!response.data.dataApprovalStateResponses)
@@ -182,7 +182,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                     "ds": dataSets,
                     "startDate": startDate,
                     "endDate": endDate,
-                    "ou": orgUnits,
+                    "ou": orgUnit,
                     "pe": "Weekly"
                 }
             }).then(transform);
