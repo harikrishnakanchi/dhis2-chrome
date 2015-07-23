@@ -112,6 +112,10 @@ define(["lodash", "moment"], function(_, moment) {
             return _.contains(dataElementIds, dataElementId);
         };
 
+        $scope.showSummary = function() {
+            return $scope.showFilters && ($scope.showOfflineSummaryForViewOnly || ($scope.isCompleted && hasRoles(['Coordination Level Approver', 'Observer'])) || (hasRoles(['Project Level Approver', 'Observer'])));
+        };
+
         $scope.shouldShowProceduresInOfflineSummary = function() {
             return !_.isEmpty($scope.procedureDataValueIds);
         };

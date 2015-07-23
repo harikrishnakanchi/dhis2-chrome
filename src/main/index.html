@@ -63,6 +63,7 @@
                 </li>
                 <li role="presentation" ng-class="{ active: isActive('\/aggregate-data-entry')}" ng-if="hasRoles(['Data entry user'])"><a href="#/aggregate-data-entry">{{ resourceBundle.dataEntryLabel }}</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/data-approval')}" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])"><a href="#/data-approval">{{ resourceBundle.approveDataLabel }}</a></li>
+                <li role="presentation" ng-class="{ active: isActive('\/data-approval')}" ng-if="hasRoles(['Observer'])"><a href="#/data-approval">{{resourceBundle.observerDataLabel}}</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/projects$')}" ng-if="hasRoles(['Superuser'])"><a href="#/projects">{{ resourceBundle.projectsLabel }}</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/line-list')}" class="dropdown" ng-if="hasRoles(['Data entry user']) &amp;&amp; (allUserModules | filter: {isLineListService:true}).length > 0" dropdown>
                     <a class="dropdown-toggle" dropdown-toggle href="" role="button">{{ resourceBundle.lineListDataEntryMenuLabel }} <span class="caret"></span></a>

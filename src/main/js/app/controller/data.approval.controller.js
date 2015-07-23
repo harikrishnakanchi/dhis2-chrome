@@ -24,7 +24,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             if (_.isEmpty($scope.dataValues))
                 return false;
 
-            return ($scope.isSubmitted && $rootScope.hasRoles(['Project Level Approver'])) || ($scope.isCompleted && $rootScope.hasRoles(['Coordination Level Approver']));
+            return ($scope.isSubmitted && $rootScope.hasRoles(['Project Level Approver', 'Observer'])) || ($scope.isCompleted && $rootScope.hasRoles(['Coordination Level Approver', 'Observer']));
         };
 
         $scope.getDatasetState = function(id, isFirst) {
@@ -171,7 +171,11 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             };
 
             var setTabHeadings = function() {
-                $scope.tabHeadings = $scope.isLineListModule ? [$scope.resourceBundle.dhisSummary, $scope.resourceBundle.fieldAppSummary] : [$scope.resourceBundle.dataForApproval];
+                if ($rootScope.hasRoles(['Observer'])) {
+                    $scope.tabHeadings = [$scope.resourceBundle.dataForObserver];
+                } else {
+                    $scope.tabHeadings = $scope.isLineListModule ? [$scope.resourceBundle.dhisSummary, $scope.resourceBundle.fieldAppSummary] : [$scope.resourceBundle.dataForApproval];
+                }
             };
 
             if (_.isEmpty($scope.selectedModule))

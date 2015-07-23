@@ -266,7 +266,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                 return "#/line-list-summary/" + item.moduleId + "/?filterBy=dateRange&startDate=" + startOfWeek + "&endDate=" + endOfWeek;
             }
 
-            if ($scope.hasRoles(['Project Level Approver', 'Coordination Level Approver'])) {
+            if ($scope.hasRoles(['Project Level Approver', 'Coordination Level Approver','Observer'])) {
                 return "#/data-approval/" + item.moduleId + "/" + item.period;
             }
 

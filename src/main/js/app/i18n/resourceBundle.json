@@ -10,6 +10,7 @@
     "newCaseBtnValue": "New Case",
     "dataEntryUserLabel": "Data Entry User",
     "projectLevelUserLabel": "Project Level Approver",
+    "observerUserLabel": "Observer",
     "coordinationLevelUserLabel": "Coordination Level Approver",
     "createCountryLabel": "Create Country",
     "countryDetailsLabel": "Country Details",
@@ -267,5 +268,7 @@
     "noCasesFound": "No Cases Found",
     "noCasesToSummarize": "No Submitted cases to Summarize",
     "reportsLabel": "Reports",
-    "dataForApproval": "Data for Approval"
+    "dataForApproval": "Data for Approval",
+    "dataForObserver": "Data",
+    "observerDataLabel": "Aggregated Data"
 }
