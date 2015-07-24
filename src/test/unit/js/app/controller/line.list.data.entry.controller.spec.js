@@ -96,7 +96,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                             'id': 'section2',
                             'programStageDataElements': [{
                                 "dataElement": {
-                                    "id": "de3"
+                                    "id": "de3",
+                                    "type": "date"
                                 }
                             }, {
                                 "dataElement": {
@@ -104,6 +105,11 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                                     "optionSet": {
                                         "id": "os1"
                                     }
+                                }
+                            }, {
+                                "dataElement": {
+                                    "id": "de5",
+                                    "type": "datetime"
                                 }
                             }]
                         }]
@@ -206,13 +212,14 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.dataValues = {
                     'de1': "2015-02-03",
                     'de2': "someValue",
-                    'de3': "blah",
+                    'de3': moment('2015-02-04').toDate(),
                     'de4': {
                         'id': 'os1o1',
                         'code': 'os1o1',
                         'name': 'os1o1 name',
                         'displayName': 'os1o1 name'
-                    }
+                    },
+                    'de5': moment('2015-02-05 20:00:00').toDate()
                 };
 
                 scope.patientOrigin = {
@@ -237,10 +244,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "value": 'someValue'
                 }, {
                     "dataElement": 'de3',
-                    "value": 'blah'
+                    "value": '2015-02-04'
                 }, {
                     "dataElement": 'de4',
                     "value": 'os1o1'
+                }, {
+                    "dataElement": 'de5',
+                    "value": moment('2015-02-05 20:00:00').toISOString()
                 }]);
                 expect(location.path).toHaveBeenCalledWith("/line-list-summary/mod1");
                 expect(location.search).toHaveBeenCalledWith({
@@ -283,7 +293,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.dataValues = {
                     'de1': "2015-04-15",
                     'de2': "someValue",
-                    'de3': "blah",
+                    'de3': moment('2015-04-16').toDate(),
                     'de4': "blah-again"
                 };
 
@@ -303,10 +313,13 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                         "value": "someValue"
                     }, {
                         "dataElement": "de3",
-                        "value": "blah"
+                        "value": "2015-04-16"
                     }, {
                         "dataElement": "de4",
                         "value": "blah-again"
+                    }, {
+                        "dataElement": "de5",
+                        "value": undefined
                     }],
                     'localStatus': "UPDATED_DRAFT"
                 };
@@ -321,7 +334,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                 scope.dataValues = {
                     'de1': "2015-02-03",
                     'de2': undefined,
-                    'de3': "blah",
+                    'de3': moment('2015-04-16').toDate(),
                     'de4': undefined
                 };
                 scope.patientOrigin = {
@@ -345,9 +358,12 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "value": undefined
                 }, {
                     "dataElement": 'de3',
-                    "value": 'blah'
+                    "value": '2015-04-16'
                 }, {
                     "dataElement": 'de4',
+                    "value": undefined
+                }, {
+                    "dataElement": 'de5',
                     "value": undefined
                 }]);
             });

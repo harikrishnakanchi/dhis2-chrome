@@ -23,19 +23,21 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             var eventDate = null;
             var compulsoryFieldsPresent = true;
 
-            var formatValue = function(value) {
+            var formatValue = function(value, type) {
                 if (_.isObject(value) && value.originalObject)
                     return value.originalObject.code;
                 if (_.isObject(value) && value.code)
                     return value.code;
-                if (_.isDate(value))
+                if (value && type === "date")
+                    return moment(value).format("YYYY-MM-DD");
+                if (value && type === "datetime")
                     return moment(value).toISOString();
                 return value;
             };
 
             var dataValuesList = _.flatten(_.map(programStage.programStageSections, function(sections) {
                 return _.map(sections.programStageDataElements, function(psde) {
-                    var value = formatValue($scope.dataValues[psde.dataElement.id]);
+                    var value = formatValue($scope.dataValues[psde.dataElement.id], psde.dataElement.type);
 
                     if ($scope.isEventDateSubstitute(psde.dataElement)) {
                         eventDate = value;
