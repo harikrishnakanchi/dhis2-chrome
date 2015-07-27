@@ -8,8 +8,14 @@ define(['moment', 'lodashUtils'], function(moment, _) {
             return systemSettingService.getAll();
         };
 
+        var filterOutModuleTemplates = function(settings) {
+            return _.filter(settings, function(setting) {
+                return setting.key !== "moduleTemplates";
+            });
+        };
+
         var mergeAndSave = function(remoteSettings) {
-            var moduleIds = _.map(remoteSettings, function(remoteSetting) {
+            var remoteSettingKeys = _.map(remoteSettings, function(remoteSetting) {
                 return remoteSetting.key;
             });
             var eq = function(item1, item2) {
@@ -21,9 +27,17 @@ define(['moment', 'lodashUtils'], function(moment, _) {
                 remoteTimeField: "value.clientLastUpdated",
                 localTimeField: "value.clientLastUpdated"
             };
-            return systemSettingRepository.findAll(moduleIds)
-                .then(_.curry(mergeBy.lastUpdated)(mergeOpts, remoteSettings))
-                .then(systemSettingRepository.upsert);
+
+            return systemSettingRepository.findAll(remoteSettingKeys).then(function(localSettings) {
+                var remoteSettingsToBeMerged = filterOutModuleTemplates(remoteSettings);
+                var localSettingsToBeMerged = filterOutModuleTemplates(localSettings);
+
+                var mergedSettings = mergeBy.lastUpdated(mergeOpts, remoteSettingsToBeMerged, localSettingsToBeMerged);
+                return systemSettingRepository.upsert(mergedSettings.concat(_.find(remoteSettings, {
+                    "key": "moduleTemplates"
+                })));
+            });
+
         };
 
         return {

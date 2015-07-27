@@ -18,6 +18,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             var init = function() {
                 var initModule = function() {
                     if ($scope.isNewMode) {
+                        $scope.selectedTemplate = "Default";
                         $scope.module = {
                             'openingDate': moment().toDate(),
                             'timestamp': new Date().getTime(),
@@ -25,6 +26,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                             "parent": $scope.orgUnit
                         };
                     } else {
+                        $scope.selectedTemplate = undefined;
                         $scope.module = {
                             'id': $scope.orgUnit.id,
                             'name': $scope.orgUnit.name,
@@ -35,6 +37,21 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         };
                     }
                     return $q.when([]);
+                };
+
+                var isDataElementExcluded = function(dataElement) {
+                    return _.indexOf($scope.allTemplates[$scope.selectedDataset.id][$scope.selectedTemplate], dataElement.id) === -1;
+                };
+
+                $scope.onTemplateSelect = function() {
+                    _.each($scope.selectedDataset.sections, function(section) {
+                        _.each(section.dataElements, function(de) {
+                            de.isIncluded = isDataElementExcluded(de);
+                        });
+                        section.isIncluded = !_.any(section.dataElements, {
+                            "isIncluded": false
+                        });
+                    });
                 };
 
                 var getAllModules = function() {
@@ -91,7 +108,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
-                return initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModules).then(setDisabled).then(getOriginDatasets);
+                var getTemplates = function() {
+                    return systemSettingRepository.get("moduleTemplates").then(function(data) {
+                        $scope.allTemplates = data.value;
+                    });
+                };
+
+                return initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModules).then(setDisabled).then(getOriginDatasets).then(getTemplates);
             };
 
             $scope.changeCollapsed = function(sectionId) {

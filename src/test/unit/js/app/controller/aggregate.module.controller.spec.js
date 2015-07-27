@@ -1023,6 +1023,85 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(dataSetRepo.associateOrgUnits.calls.argsFor(1)[1]).toEqual(originOrgUnit);
             });
 
+            it("should apply module templates", function() {
+                scope.selectedTemplate = "War";
+
+                scope.selectedDataset = {
+                    "id": "a4808d65f51",
+                    "sections": [{
+                        "name": "section1",
+                        "id": "section_1",
+                        "isIncluded": true,
+                        "dataElements": [{
+                            "id": "de1",
+                            "isIncluded": true
+                        }, {
+                            "id": "de2",
+                            "isIncluded": true
+                        }]
+                    }, {
+                        "name": "section2",
+                        "id": "section_2",
+                        "dataElements": [{
+                            "id": "de3",
+                            "isIncluded": false
+                        }]
+                    }]
+                };
+
+                scope.allTemplates = {
+                    "a4808d65f51": {
+                        "War": [
+                            "de1",
+                            "de2"
+                        ],
+                        "Emergency": [
+                            "blah1",
+                            "blah2"
+                        ],
+                        "Default": []
+                    },
+                    "a4808d65f52": {
+                        "War": [
+                            "a7d1f604051",
+                            "a6cb451f706"
+                        ],
+                        "Emergency": [
+                            3,
+                            4
+                        ],
+                        "Default": []
+                    }
+                };
+
+                var expectedDataset = {
+                    "id": "a4808d65f51",
+                    "sections": [{
+                        "name": "section1",
+                        "id": "section_1",
+                        "isIncluded": false,
+                        "dataElements": [{
+                            "id": "de1",
+                            "isIncluded": false
+                        }, {
+                            "id": "de2",
+                            "isIncluded": false
+                        }]
+                    }, {
+                        "name": "section2",
+                        "id": "section_2",
+                        "isIncluded": true,
+                        "dataElements": [{
+                            "id": "de3",
+                            "isIncluded": true
+                        }]
+                    }]
+                };
+
+                scope.onTemplateSelect();
+                expect(scope.selectedDataset).toEqual(expectedDataset);
+            });
+
             it("should take the user to the view page of the parent opUnit on clicking cancel", function() {
                 scope.orgUnit = {
                     "id": "parent",

@@ -99,7 +99,10 @@ body {
             }
         }
         li.active {
-            a, a:focus, a:hover, a.submenu-item:hover {
+            a,
+            a:focus,
+            a:hover,
+            a.submenu-item:hover {
                 background: #fff;
                 border: 1px solid #a0a0a0;
                 border-bottom-color: transparent;
@@ -162,6 +165,12 @@ body {
     }
     .info-error-section {
         padding-top: 15px;
+    }
+    .template-selection {
+        margin: 10px;
+        label {
+            padding-right: 5px;
+        }
     }
     .date-time-form-control {
         position: relative;
@@ -373,7 +382,6 @@ body {
         float: right;
     }
     */
-    
     .checkbox + .checkbox {
         margin-left: 10px !important;
     }
@@ -819,22 +827,16 @@ input[type="checkbox"].dashboard-form-checkbox {
 .week-selector-gradient {
     background: #ffffff;
     /* Old browsers */
-    
     background: -moz-linear-gradient(top, #ffffff 0%, #dddddd 64%, #d3d3d3 100%);
     /* FF3.6+ */
-    
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(64%, #dddddd), color-stop(100%, #d3d3d3));
     /* Chrome,Safari4+ */
-    
     background: -webkit-linear-gradient(top, #ffffff 0%, #dddddd 64%, #d3d3d3 100%);
     /* Chrome10+,Safari5.1+ */
-    
     background: -o-linear-gradient(top, #ffffff 0%, #dddddd 64%, #d3d3d3 100%);
     /* Opera 11.10+ */
-    
     background: -ms-linear-gradient(top, #ffffff 0%, #dddddd 64%, #d3d3d3 100%);
     /* IE10+ */
-    
     background: linear-gradient(to bottom, #ffffff 0%, #dddddd 64%, #d3d3d3 100%);
     /* W3C */
 }

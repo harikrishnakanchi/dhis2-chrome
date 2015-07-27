@@ -47,6 +47,17 @@
                                 <div class="details" ng-show="selectedDataset.sections.length > 0">
                                     <span ng-hide="areDataElementsSelectedForSection()">{{resourceBundle.selectDatasetSection}}</span>
                                     <h4 ng-class="{cur: true}">{{selectedDataset.name}}</h4>
+                                    <div class="template-selection">
+                                        <label>
+                                            <input type="radio" ng-model="selectedTemplate" value="{{resourceBundle.defaultTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.defaultTemplateLabel}}
+                                        </label>
+                                        <label>
+                                            <input type="radio" ng-model="selectedTemplate" value="{{resourceBundle.warTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.warTemplateLabel}}
+                                        </label>
+                                        <label>
+                                            <input type="radio" ng-model="selectedTemplate" value="{{resourceBundle.emergencyTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.emergencyTemplateLabel}}
+                                        </label>
+                                    </div>
                                     <div ng-repeat="section in selectedDataset.sections">
                                         <div class="collapse-head">
                                             <h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">{{section.name}}</h5>
@@ -56,7 +67,7 @@
                                             <ul>
                                                 <li ng-repeat="element in section.dataElements | orderBy : 'formName'">
                                                     <label>
-                                                        <input type="checkbox" ng-disabled="isDisabled==true" ng-model="getDataElement(section, element.id)['isIncluded']" ng-change="changeSectionSelection(section)">{{element.formName}}
+                                                        <input type="checkbox" ng-disabled="isDisabled==true" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">{{element.formName}}
                                                     </label>
                                                 </li>
                                             </ul>

@@ -270,5 +270,8 @@
     "reportsLabel": "Reports",
     "dataForApproval": "Data for Approval",
     "dataForObserver": "Data",
-    "observerDataLabel": "Aggregated Data"
+    "observerDataLabel": "Aggregated Data",
+    "warTemplateLabel": "War",
+    "emergencyTemplateLabel": "Emergency",
+    "defaultTemplateLabel": "Default"
 }

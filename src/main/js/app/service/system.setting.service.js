@@ -21,6 +21,12 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
                         "value": JSON.parse(value)
                     });
                 }
+                if (key === "moduleTemplates") {
+                    result.push({
+                        "key": key,
+                        "value": value
+                    });
+                }
             });
             return result;
         };

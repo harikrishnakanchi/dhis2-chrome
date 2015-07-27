@@ -36,12 +36,23 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
             var setting1 = "{\"clientLastUpdated\":\"2015-02-16T09:55:28.681Z\",\"dataElements\":[\"a3e1a48467b\",\"a8a704935cb\"]}";
             var setting2 = "{\"clientLastUpdated\":\"2015-02-16T09:34:08.656Z\",\"dataElements\":[\"a21ac2e69d4\",\"acaeb258531\",\"a1cd332c676\"]}";
             var actualSystemSettings = {};
+            var moduleTemplates = {
+                "ds1": {
+                    "temp1": [1, 2],
+                    "temp2": [3, 4]
+                },
+                "ds2": {
+                    "temp1": [1, 5],
+                    "temp2": [8, 9]
+                }
+            };
 
             var systemSettingsInInFile = {
                 "keyAccountRecovery": true,
                 "keyHideUnapprovedDataInAnalytics": true,
                 "exclude_ab5e8d18bd6": setting1,
-                "exclude_a2e4d473823": setting2
+                "exclude_a2e4d473823": setting2,
+                "moduleTemplates": moduleTemplates
             };
 
             var expectedSystemSettings = [{
@@ -50,6 +61,9 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
             }, {
                 key: "a2e4d473823",
                 value: JSON.parse(setting2)
+            }, {
+                key: "moduleTemplates",
+                value: moduleTemplates
             }];
 
             httpBackend.expectGET("/data/systemSettings.json").respond(200, systemSettingsInInFile);
@@ -77,6 +91,51 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
                     value: {
                         clientLastUpdated: "2014-05-30T12:43:54.972Z",
                         dataElements: ["de3", "de1"]
+                    }
+                }]);
+            });
+            httpBackend.flush();
+        });
+
+        it("should get moduleTemplates from systemSettings", function() {
+            allSystemSettings.moduleTemplates = {
+                "ds1": {
+                    "temp1": [1, 2],
+                    "temp2": [3, 4]
+                },
+                "ds2": {
+                    "temp1": [1, 5],
+                    "temp2": [8, 9]
+                }
+            };
+
+            var result = {};
+            httpBackend.expectGET(properties.dhis.url + "/api/systemSettings").respond(200, allSystemSettings);
+            service.getAll().then(function(data) {
+                result = data;
+                expect(result).toEqual([{
+                    key: "a467559322b",
+                    value: {
+                        clientLastUpdated: "2014-05-30T12:43:54.972Z",
+                        dataElements: ["de1", "de2"]
+                    }
+                }, {
+                    key: "b567559322c",
+                    value: {
+                        clientLastUpdated: "2014-05-30T12:43:54.972Z",
+                        dataElements: ["de3", "de1"]
+                    }
+                }, {
+                    key: "moduleTemplates",
+                    value: {
+                        "ds1": {
+                            "temp1": [1, 2],
+                            "temp2": [3, 4]
+                        },
+                        "ds2": {
+                            "temp1": [1, 5],
+                            "temp2": [8, 9]
+                        }
                     }
                 }]);
             });
