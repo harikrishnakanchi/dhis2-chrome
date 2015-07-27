@@ -49,13 +49,13 @@
                                     <h4 ng-class="{cur: true}">{{selectedDataset.name}}</h4>
                                     <div class="template-selection">
                                         <label>
-                                            <input type="radio" ng-model="selectedTemplate" value="{{resourceBundle.defaultTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.defaultTemplateLabel}}
+                                            <input type="radio" ng-model="selectedTemplate[selectedDataset.id]" value="{{resourceBundle.defaultTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.defaultTemplateLabel}}
                                         </label>
                                         <label>
-                                            <input type="radio" ng-model="selectedTemplate" value="{{resourceBundle.warTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.warTemplateLabel}}
+                                            <input type="radio" ng-model="selectedTemplate[selectedDataset.id]" value="{{resourceBundle.warTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.warTemplateLabel}}
                                         </label>
                                         <label>
-                                            <input type="radio" ng-model="selectedTemplate" value="{{resourceBundle.emergencyTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.emergencyTemplateLabel}}
+                                            <input type="radio" ng-model="selectedTemplate[selectedDataset.id]" value="{{resourceBundle.emergencyTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.emergencyTemplateLabel}}
                                         </label>
                                     </div>
                                     <div ng-repeat="section in selectedDataset.sections">

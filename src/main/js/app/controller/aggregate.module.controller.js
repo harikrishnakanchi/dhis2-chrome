@@ -8,6 +8,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.isDisabled = false;
             $scope.module = {};
             $scope.allModules = [];
+            $scope.selectedDataset = {};
+            $scope.selectedTemplate = {};
 
             $scope.nonAssociatedDataSets = [];
             $scope.associatedDatasets = [];
@@ -18,7 +20,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             var init = function() {
                 var initModule = function() {
                     if ($scope.isNewMode) {
-                        $scope.selectedTemplate = "Default";
                         $scope.module = {
                             'openingDate': moment().toDate(),
                             'timestamp': new Date().getTime(),
@@ -26,7 +27,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                             "parent": $scope.orgUnit
                         };
                     } else {
-                        $scope.selectedTemplate = undefined;
                         $scope.module = {
                             'id': $scope.orgUnit.id,
                             'name': $scope.orgUnit.name,
@@ -40,7 +40,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var isDataElementExcluded = function(dataElement) {
-                    return _.indexOf($scope.allTemplates[$scope.selectedDataset.id][$scope.selectedTemplate], dataElement.id) === -1;
+                    var datasetId = $scope.selectedDataset.id;
+                    return _.indexOf($scope.allTemplates[datasetId][$scope.selectedTemplate[datasetId]], dataElement.id) === -1;
                 };
 
                 $scope.onTemplateSelect = function() {
@@ -287,15 +288,22 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 });
             };
 
+            var setSelectedTemplate = function(datasetId) {
+                if (!$scope.selectedTemplate[datasetId] && $scope.isNewMode)
+                    $scope.selectedTemplate[datasetId] = "Default";
+            }
+
             $scope.selectDataSet = function(item) {
                 if (_.isEmpty(item))
                     return;
                 if ($scope.enrichedDatasets[item.id]) {
                     $scope.selectedDataset = $scope.enrichedDatasets[item.id];
+                    setSelectedTemplate($scope.selectedDataset.id);
                     return;
                 }
                 return datasetRepository.includeDataElements([item], excludedDataElements).then(function(datasets) {
                     $scope.selectedDataset = datasets[0];
+                    setSelectedTemplate($scope.selectedDataset.id);
                     $scope.enrichedDatasets[$scope.selectedDataset.id] = $scope.selectedDataset;
                     _.each($scope.selectedDataset.sections, function(section) {
                         $scope.isExpanded[section.id] = false;
