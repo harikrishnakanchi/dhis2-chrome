@@ -291,7 +291,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             var setSelectedTemplate = function(datasetId) {
                 if (!$scope.selectedTemplate[datasetId] && $scope.isNewMode)
                     $scope.selectedTemplate[datasetId] = "Default";
-            }
+            };
 
             $scope.selectDataSet = function(item) {
                 if (_.isEmpty(item))

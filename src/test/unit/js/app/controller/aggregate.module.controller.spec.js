@@ -1024,7 +1024,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should apply module templates", function() {
-                scope.selectedTemplate["a4808d65f51"] = "War";
+                var datasetId = "a4808d65f51";
+                scope.selectedTemplate[datasetId] = "War";
 
                 scope.selectedDataset = {
                     "id": "a4808d65f51",
