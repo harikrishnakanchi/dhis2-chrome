@@ -38,9 +38,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
 
             return modalInstance.result
                 .then(function() {
+                    $scope.cancelSubmit = false;
                     return okCallback();
                 }, function() {
-                    //burp on cancel
+                    $scope.cancelSubmit = true;
                 });
         };
 
@@ -166,7 +167,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             var successPromise = function() {
                 $scope.saveSuccess = false;
                 $scope.submitSuccess = true;
-                initializeForm();
+                if (!$scope.cancelSubmit)
+                    initializeForm();
                 scrollToTop();
             };
 
@@ -192,7 +194,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             var successPromise = function() {
                 $scope.saveSuccess = false;
                 $scope.submitAndApprovalSuccess = true;
-                initializeForm();
+                if (!$scope.cancelSubmit)
+                    initializeForm();
                 scrollToTop();
             };
 
