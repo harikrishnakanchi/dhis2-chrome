@@ -23,9 +23,7 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
 
     var getAuthHeader = function(callback) {
         var doCallback = function(storedObject) {
-            console.log(storedObject, "storedObject");
             if (storedObject === null && properties.devMode) {
-                console.log("not here");
                 callback({
                     "authHeader": "Basic c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA=="
                 });
