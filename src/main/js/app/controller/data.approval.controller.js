@@ -171,10 +171,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             };
 
             var setTabHeadings = function() {
-                if ($rootScope.hasRoles(['Observer'])) {
-                    $scope.tabHeadings = [$scope.resourceBundle.dataForObserver];
+                if ($scope.isLineListModule) {
+                    $scope.tabHeadings = [$scope.resourceBundle.dhisSummary, $scope.resourceBundle.fieldAppSummary];
                 } else {
-                    $scope.tabHeadings = $scope.isLineListModule ? [$scope.resourceBundle.dhisSummary, $scope.resourceBundle.fieldAppSummary] : [$scope.resourceBundle.dataForApproval];
+                    $scope.tabHeadings = $rootScope.hasRoles(['Observer']) ? [$scope.resourceBundle.dataForObserver] : [$scope.resourceBundle.dataForApproval];
                 }
             };
 
