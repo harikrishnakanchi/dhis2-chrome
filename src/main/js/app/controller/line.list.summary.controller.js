@@ -1,11 +1,12 @@
 define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, properties, orgUnitMapper) {
-    return function($scope, $q, $hustle, $modal, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, systemSettingRepository,
+    return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, systemSettingRepository,
         orgUnitRepository, approvalDataRepository) {
 
         $scope.filterParams = {};
         $scope.currentUrl = $location.path();
         $scope.loadingResults = false;
         $scope.showOfflineSummaryForViewOnly = true;
+        $scope.viewRegistrationBook = false;
 
         var scrollToTop = function() {
             $location.hash();
@@ -98,6 +99,21 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     "orgUnit": $scope.selectedModuleId
                 };
             });
+        };
+
+        $scope.back = function() {
+            $scope.viewRegistrationBook = false;
+        };
+
+        $scope.printWindow = function() {
+            $scope.printingTallySheet = true;
+            $timeout(function() {
+                $window.print();
+            }, 0);
+        };
+
+        $scope.showRegistrationBook = function() {
+            $scope.viewRegistrationBook = true;
         };
 
         $scope.showPatientOriginInSummaryTable = function() {

@@ -2,7 +2,34 @@
     <div class="loading" ng-show="loading || loadingResults">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
-    <section class="panel tab-panel">
+    <div class="text-right" ng-if="!viewRegistrationBook">
+        <input type="button" class="printRegistrationBookBtn" ng-click="showRegistrationBook()" value="{{resourceBundle.viewRegistrationBook}}"></input>
+    </div>
+    <div ng-if="viewRegistrationBook">
+        <section class="panel panel-default">
+            <div id="forPrinting" name="forPrinting" ng-repeat="programStage in program.programStages">
+                <div class="registrationBook" ng-repeat="section in programStage.programStageSections">
+                    <div>
+                        <table class="table">
+                            <tr>
+                                <th>
+                                    {{section.name}}
+                                </th>
+                            </tr>
+                            <tr ng-repeat="psde in section.programStageDataElements">
+                                <td ng-if="psde.dataElement.isIncluded">{{psde.dataElement.formName}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div>
+            <input type="button" class="printRegistrationBookBtn" ng-click="printWindow()" value="{{resourceBundle.printRegistrationBook}}"></input>
+            <input type="button" class="printRegistrationBookBtn" ng-click="back()" value="{{resourceBundle.backBtnValue}}"></input>
+        </div>
+    </div>
+    <section ng-if="!viewRegistrationBook" class="panel tab-panel">
         <div ng-show="resultMessageType === 'success'" class="alert alert-success">{{ resultMessage }}</div>
         <div ng-show="resultMessageType === 'failure'" class="alert alert-danger">{{ resultMessage }}</div>
         <accordion close-others="false">

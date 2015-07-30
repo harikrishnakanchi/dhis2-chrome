@@ -273,5 +273,7 @@
     "observerDataLabel": "Aggregated Data",
     "warTemplateLabel": "War",
     "emergencyTemplateLabel": "Emergency",
-    "defaultTemplateLabel": "Default"
+    "defaultTemplateLabel": "Default",
+    "printRegistrationBook": "Print Registration Book",
+    "viewRegistrationBook": "View Registration Book"
 }

@@ -6,16 +6,17 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
         describe("lineListSummaryController ", function() {
 
             var scope, q, hustle, programRepository, mockStore, timeout, fakeModal, anchorScroll, location,
-                systemSettingRepository, systemSettings, orgUnitRepository, optionSets, approvalDataRepository, originOrgUnits, routeParams;
+                systemSettingRepository, systemSettings, orgUnitRepository, optionSets, approvalDataRepository, originOrgUnits, routeParams, window;
 
             beforeEach(module('hustle'));
-            beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
+            beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location, $window) {
                 scope = $rootScope.$new();
                 q = $q;
                 hustle = $hustle;
                 timeout = $timeout;
                 location = $location;
                 anchorScroll = jasmine.createSpy();
+                window = $window;
 
                 routeParams = {
                     'module': 'ou1'
@@ -200,7 +201,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
             });
 
             it("should set projectIsAutoApproved on scope on init", function() {
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 expect(scope.projectIsAutoApproved).toEqual(true);
@@ -217,7 +218,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 };
                 programRepository.get.and.returnValue(utils.getPromise(q, programAndStageData));
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 expect(programRepository.get).toHaveBeenCalledWith('someProgram', ['de1', 'de3']);
@@ -226,14 +227,14 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
             });
 
             it("should load patient origin org units on init", function() {
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 expect(scope.originOrgUnits).toEqual(originOrgUnits);
             });
 
             it("should get origin name given an id", function() {
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 expect(scope.getOriginName("o1")).toEqual("o1");
@@ -300,7 +301,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 };
 
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 expect(scope.program).toEqual(expectedProgram);
@@ -326,7 +327,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 scope.submit();
@@ -378,7 +379,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 routeParams.filterBy = 'readyToSubmit';
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 scope.submitAndApprove();
@@ -434,7 +435,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 var eventToDelete = event1;
@@ -470,7 +471,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 var eventToDelete = event1;
@@ -500,7 +501,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 programEventRepository.getSubmitableEventsFor.and.returnValue(utils.getPromise(q, [event1]));
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 var eventToDelete = event1;
@@ -525,7 +526,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "id": "dv1",
                     "value": "Case123"
                 };
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 var actualValue = scope.getDisplayValue(dataValue);
                 scope.$apply();
 
@@ -549,7 +550,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "value": "Code1"
                 };
 
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 var actualValue = scope.getDisplayValue(dataValue);
                 scope.$apply();
 
@@ -562,7 +563,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 };
 
                 programEventRepository.findEventsByCode.and.returnValue(utils.getPromise(q, [event1]));
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 scope.filterParams.caseNumber = "someCaseNumber";
@@ -579,7 +580,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 };
 
                 programEventRepository.findEventsByDateRange.and.returnValue(utils.getPromise(q, [event1]));
-                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
+                var lineListSummaryController = new LineListSummaryController(scope, q, hustle, fakeModal, window, timeout, location, anchorScroll, routeParams, programRepository, programEventRepository, systemSettingRepository, orgUnitRepository, approvalDataRepository);
                 scope.$apply();
 
                 scope.filterParams.startDate = new Date("2015", "10", "12");
