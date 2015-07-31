@@ -81,6 +81,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         $scope.setSelectedProject = function(selectedProject) {
             $rootScope.currentUser.selectedProject = selectedProject;
+            loadUserLineListModules();
             $rootScope.$emit('selectedProjectUpdated');
             sessionHelper.saveSessionState();
             $location.path("/dashboard");
