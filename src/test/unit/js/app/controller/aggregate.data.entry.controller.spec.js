@@ -138,7 +138,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 getDataValuesSpy = spyOn(dataRepository, "getDataValues");
                 getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
 
-                spyOn(hustle, "publish");
+                spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));

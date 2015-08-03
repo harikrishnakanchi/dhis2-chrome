@@ -145,21 +145,26 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var publishToDhis = function() {
-                var uploadEventsPromise = $hustle.publish({
-                    "type": "uploadProgramEvents",
-                    "eventIds": _.pluck(submitableEvents, 'event'),
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                }, "dataValues");
+                var uploadEvents = function() {
+                    return $hustle.publish({
+                        "type": "uploadProgramEvents",
+                        "eventIds": _.pluck(submitableEvents, 'event'),
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
+                    }, "dataValues");
+                };
 
-                var deleteApprovalsPromise = $hustle.publish({
-                    "data": periodsAndOrgUnits,
-                    "type": "deleteApprovals",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                }, "dataValues");
+                var deleteApprovals = function() {
+                    return $hustle.publish({
+                        "data": periodsAndOrgUnits,
+                        "type": "deleteApprovals",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
+                    }, "dataValues");
+                };
 
-                return $q.all([uploadEventsPromise, deleteApprovalsPromise]);
+                return deleteApprovals()
+                    .then(uploadEvents);
             };
 
             var updateView = function() {
@@ -188,27 +193,46 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             var publishToDhis = function() {
-                var uploadProgramPromise = $hustle.publish({
-                    "type": "uploadProgramEvents",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                }, "dataValues");
 
-                var uploadCompletionPromise = $hustle.publish({
-                    "data": periodsAndOrgUnits,
-                    "type": "uploadCompletionData",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                }, "dataValues");
+                var deleteApprovals = function() {
+                    return $hustle.publish({
+                        "data": periodsAndOrgUnits,
+                        "type": "deleteApprovals",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
+                    }, "dataValues");
+                };
 
-                var uploadApprovalPromise = $hustle.publish({
-                    "data": periodsAndOrgUnits,
-                    "type": "uploadApprovalData",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
-                }, "dataValues");
+                var uploadEvents = function() {
+                    return $hustle.publish({
+                        "type": "uploadProgramEvents",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
+                    }, "dataValues");
+                };
 
-                return $q.all([uploadProgramPromise, uploadCompletionPromise, uploadApprovalPromise]);
+                var uploadCompletion = function() {
+                    return $hustle.publish({
+                        "data": periodsAndOrgUnits,
+                        "type": "uploadCompletionData",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
+                    }, "dataValues");
+                };
+
+                var uploadApproval = function() {
+                    return $hustle.publish({
+                        "data": periodsAndOrgUnits,
+                        "type": "uploadApprovalData",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
+                    }, "dataValues");
+                };
+
+                return deleteApprovals()
+                    .then(uploadEvents)
+                    .then(uploadCompletion)
+                    .then(uploadApproval);
             };
 
             var updateView = function() {

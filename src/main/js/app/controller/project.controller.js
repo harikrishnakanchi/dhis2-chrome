@@ -118,21 +118,36 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
 
                 var publishApprovalsToDhis = function(periodAndOrgUnits) {
 
-                    var uploadCompletionPromise = $hustle.publish({
-                        "data": periodAndOrgUnits,
-                        "type": "uploadCompletionData",
-                        "locale": $scope.currentUser.locale,
-                        "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
-                    }, "dataValues");
+                    var deleteApprovals = function() {
+                        return $hustle.publish({
+                            "data": periodAndOrgUnits,
+                            "type": "deleteApprovals",
+                            "locale": $scope.currentUser.locale,
+                            "desc": $scope.resourceBundle.deleteApprovalsDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
+                        }, "dataValues");
+                    };
 
-                    var uploadApprovalPromise = $hustle.publish({
-                        "data": periodAndOrgUnits,
-                        "type": "uploadApprovalData",
-                        "locale": $scope.currentUser.locale,
-                        "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
-                    }, "dataValues");
+                    var uploadCompletions = function() {
+                        return $hustle.publish({
+                            "data": periodAndOrgUnits,
+                            "type": "uploadCompletionData",
+                            "locale": $scope.currentUser.locale,
+                            "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
+                        }, "dataValues");
+                    };
 
-                    return $q.all([uploadCompletionPromise, uploadApprovalPromise]);
+                    var uploadApprovals = function() {
+                        return $hustle.publish({
+                            "data": periodAndOrgUnits,
+                            "type": "uploadApprovalData",
+                            "locale": $scope.currentUser.locale,
+                            "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.uniq(_.pluck(periodAndOrgUnits, "period"))
+                        }, "dataValues");
+                    };
+
+                    return deleteApprovals()
+                        .then(uploadCompletions)
+                        .then(uploadApprovals);
                 };
 
                 var periodAndOrgUnits = getPeriodsAndOrgUnitsForAutoApprove(modules);

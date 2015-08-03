@@ -167,21 +167,27 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, currentPeriod, $scope.currentUser.userCredentials.username);
 
             var publishToDhis = function() {
-                var uploadDataValuesPromise = $hustle.publish({
-                    "data": payload,
-                    "type": "uploadDataValues",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadDataValuesDesc + currentPeriod + ", " + $scope.selectedModule.name
-                }, "dataValues");
 
-                var deleteApprovalsPromise = $hustle.publish({
-                    "data": currentPeriodAndOrgUnit,
-                    "type": "deleteApprovals",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.deleteApprovalsDesc + currentPeriod + ", " + $scope.selectedModule.name
-                }, "dataValues");
+                var deleteApprovals = function() {
+                    return $hustle.publish({
+                        "data": currentPeriodAndOrgUnit,
+                        "type": "deleteApprovals",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.deleteApprovalsDesc + currentPeriod + ", " + $scope.selectedModule.name
+                    }, "dataValues");
+                };
 
-                return $q.all([uploadDataValuesPromise, deleteApprovalsPromise]);
+                var uploadDataValues = function() {
+                    return $hustle.publish({
+                        "data": payload,
+                        "type": "uploadDataValues",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.uploadDataValuesDesc + currentPeriod + ", " + $scope.selectedModule.name
+                    }, "dataValues");
+                };
+
+                return deleteApprovals()
+                    .then(uploadDataValues);
             };
 
             if (asDraft) {
@@ -255,21 +261,26 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             };
 
             var publishToDhis = function() {
-                var uploadCompletionPromise = $hustle.publish({
-                    "data": [currentPeriodAndOrgUnit],
-                    "type": "uploadCompletionData",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriod + ", " + $scope.selectedModule.name
-                }, "dataValues");
+                var uploadCompletion = function() {
+                    return $hustle.publish({
+                        "data": [currentPeriodAndOrgUnit],
+                        "type": "uploadCompletionData",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriod + ", " + $scope.selectedModule.name
+                    }, "dataValues");
+                };
 
-                var uploadApprovalPromise = $hustle.publish({
-                    "data": [currentPeriodAndOrgUnit],
-                    "type": "uploadApprovalData",
-                    "locale": $scope.currentUser.locale,
-                    "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriod + ", " + $scope.selectedModule.name
-                }, "dataValues");
+                var uploadApproval = function() {
+                    return $hustle.publish({
+                        "data": [currentPeriodAndOrgUnit],
+                        "type": "uploadApprovalData",
+                        "locale": $scope.currentUser.locale,
+                        "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriod + ", " + $scope.selectedModule.name
+                    }, "dataValues");
+                };
 
-                return $q.all([uploadCompletionPromise, uploadApprovalPromise]);
+                return uploadCompletion()
+                    .then(uploadApproval);
             };
 
             var upsertAndPushToDhis = function() {

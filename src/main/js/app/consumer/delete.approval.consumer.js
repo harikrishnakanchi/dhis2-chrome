@@ -16,7 +16,9 @@ define(["lodash"], function(_) {
             };
 
             var markAsIncomplete = function(allDatasetIds) {
-                return approvalService.markAsIncomplete(allDatasetIds, periodsAndOrgUnits);
+                return approvalService.markAsIncomplete(allDatasetIds, periodsAndOrgUnits).then(function(data) {
+                    return allDatasetIds;
+                });
             };
 
             var markAsUnapproved = function(allDatasetIds) {
@@ -25,10 +27,16 @@ define(["lodash"], function(_) {
                 });
             };
 
-            return datasetRepository.getAll().then(function(allDatasets) {
-                var allDatasetIds = _.pluck(allDatasets, "id");
-                return markAsUnapproved(allDatasetIds).then(markAsIncomplete).then(invalidateApproval);
-            });
+            var getDatasets = function() {
+                return datasetRepository.getAll().then(function(allDatasets) {
+                    return _.pluck(allDatasets, "id");
+                });
+            };
+
+            return getDatasets()
+                .then(markAsUnapproved)
+                .then(markAsIncomplete)
+                .then(invalidateApproval);
         };
     };
 });

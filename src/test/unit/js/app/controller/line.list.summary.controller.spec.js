@@ -340,13 +340,6 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 }]);
 
                 expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
-                    type: 'uploadProgramEvents',
-                    eventIds: ['event1'],
-                    locale: 'en',
-                    desc: 'submit cases for 2014W44, Module: Mod1'
-                }, 'dataValues');
-
-                expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
                     "data": [{
                         "period": "2014W44",
                         "orgUnit": "ou1"
@@ -355,6 +348,13 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     "locale": "en",
                     "desc": "restart approval process for 2014W44, Module: Mod1"
                 }, "dataValues");
+
+                expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
+                    type: 'uploadProgramEvents',
+                    eventIds: ['event1'],
+                    locale: 'en',
+                    desc: 'submit cases for 2014W44, Module: Mod1'
+                }, 'dataValues');
 
                 expect(scope.resultMessageType).toEqual("success");
                 expect(scope.resultMessage).toEqual("1 Event submitted succesfully");
@@ -386,16 +386,29 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 scope.$apply();
 
                 expect(programEventRepository.markEventsAsSubmitted).toHaveBeenCalledWith(["event1"]);
+
                 expect(approvalDataRepository.markAsApproved).toHaveBeenCalledWith([{
                     'orgUnit': 'ou1',
                     'period': '2014W44'
                 }], 'dataentryuser');
+
                 expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
+                    "data": [{
+                        "period": "2014W44",
+                        "orgUnit": "ou1"
+                    }],
+                    "type": "deleteApprovals",
+                    "locale": "en",
+                    "desc": "restart approval process for 2014W44, Module: Mod1"
+                }, "dataValues");
+
+                expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
                     type: 'uploadProgramEvents',
                     locale: 'en',
                     desc: 'submit cases for 2014W44, Module: Mod1'
                 }, 'dataValues');
-                expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
+
+                expect(hustle.publish.calls.argsFor(2)[0]).toEqual({
                     "data": [{
                         'orgUnit': 'ou1',
                         'period': '2014W44'
@@ -404,7 +417,8 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     'desc': 'approve data at project level for 2014W44, Module: Mod1',
                     "type": "uploadCompletionData"
                 }, "dataValues");
-                expect(hustle.publish.calls.argsFor(2)[0]).toEqual({
+
+                expect(hustle.publish.calls.argsFor(3)[0]).toEqual({
                     "data": [{
                         'orgUnit': 'ou1',
                         'period': '2014W44'
