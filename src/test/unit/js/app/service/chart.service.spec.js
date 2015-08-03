@@ -1,11 +1,14 @@
-define(["chartService", "angularMocks", "properties", "utils", "lodash"], function(ChartService, mocks, properties, utils, _) {
-
+define(["chartService", "angularMocks", "properties", "utils", "lodash", "timecop"], function(ChartService, mocks, properties, utils, _, timecop) {
     describe("chart service", function() {
-        var http, httpBackend, chartService;
+        var http, httpBackend, chartService, lastUpdatedAt;
 
         beforeEach(mocks.inject(function($injector) {
             http = $injector.get('$http');
             httpBackend = $injector.get('$httpBackend');
+            thisMoment = moment("2014-01-01T");
+            lastUpdatedAt = thisMoment.toISOString();
+            Timecop.install();
+            Timecop.freeze(thisMoment.toDate());
 
             chartService = new ChartService(http);
         }));
@@ -62,7 +65,7 @@ define(["chartService", "angularMocks", "properties", "utils", "lodash"], functi
                     "indicators": []
                 };
 
-                httpBackend.expectGET(properties.dhis.url + "/api/analytics.json?dimension=a425c1a4618:a0b89770007;abacfb5842a;af973e20283&dimension=pe:LAST_12_WEEKS&displayProperty=NAME&filter=ou:orgUnitId&filter=dx:a0523c1e0d7;a405970844a").respond(200, chartDefinition);
+                httpBackend.expectGET(properties.dhis.url + "/api/analytics.json?dimension=a425c1a4618:a0b89770007;abacfb5842a;af973e20283&dimension=pe:LAST_12_WEEKS&displayProperty=NAME&filter=ou:orgUnitId&filter=dx:a0523c1e0d7;a405970844a&lastUpdatedAt=" + lastUpdatedAt).respond(200, chartDefinition);
                 var actualData;
                 chartService.getChartDataForOrgUnit(chartDefinition, "orgUnitId").then(function(data) {
                     actualData = data;
@@ -107,7 +110,7 @@ define(["chartService", "angularMocks", "properties", "utils", "lodash"], functi
 
                 };
 
-                httpBackend.expectGET(properties.dhis.url + "/api/analytics.json?dimension=dx:indicator1;indicator2;a6c05884686&dimension=pe:LAST_12_MONTHS;LAST_3_MONTHS&displayProperty=NAME&filter=ou:orgUnitId").respond(200, chart);
+                httpBackend.expectGET(properties.dhis.url + "/api/analytics.json?dimension=dx:indicator1;indicator2;a6c05884686&dimension=pe:LAST_12_MONTHS;LAST_3_MONTHS&displayProperty=NAME&filter=ou:orgUnitId&lastUpdatedAt=" + lastUpdatedAt).respond(200, chart);
                 var actualData;
                 chartService.getChartDataForOrgUnit(chart, "orgUnitId").then(function(data) {
                     actualData = data;
