@@ -31,7 +31,8 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
                     "dimension": buildDimension(),
                     "filter": buildFilters(),
                     "displayProperty": "NAME",
-                    "chartTitle": chart.title
+                    "chartTitle": chart.title,
+                    "lastUpdatedAt": moment().toISOString() //required for cache-busting purposes
                 }
             }).then(function(response) {
                 return response.data;
