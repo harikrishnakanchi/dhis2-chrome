@@ -34,7 +34,9 @@
                                             <li class="form-group" ng-if="psde.dataElement.isIncluded">
                                                 <div ng-if="psde.dataElement.isIncluded">
                                                     <label for="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="resourceBundle[psde.dataElement.id]">{{ resourceBundle[psde.dataElement.id] }}</label>
-                                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': psde.compulsory }" ng-if="!resourceBundle[psde.dataElement.id]"> {{ psde.dataElement.formName }}</label>
+                                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': psde.compulsory }" ng-if="!resourceBundle[psde.dataElement.id]"> {{ psde.dataElement.formName }}
+                                                        <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{dataElement.description}}" />
+                                                    </label>
                                                 </div>
                                                 <div class="col-sm-6 col-md-6" ng-if="psde.dataElement.isIncluded">
                                                     <input type="text" class="form-control" ng-if="psde.dataElement.type === 'string' &amp;&amp; !psde.dataElement.optionSet" ng-model="dataValues[psde.dataElement.id]" name="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" />

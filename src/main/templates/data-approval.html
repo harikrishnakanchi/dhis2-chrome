@@ -55,7 +55,9 @@
                                                     <tr ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } | orderBy : 'formName'" ng-form="dataElementForm">
                                                         <td>
                                                             <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
-                                                            <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}</span>
+                                                            <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}
+                                                                 <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{dataElement.description}}"/>
+                                                            </span>
                                                         </td>
                                                         <td ng-repeat="option in section.categoryOptionComboIds">
                                                             <ng-form name="datavalueForm">
@@ -64,6 +66,16 @@
                                                             </ng-form>
                                                         </td>
                                                         <td class="last-column">{{sum(dataValues, dataSet.organisationUnits, dataElement.id)}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <span> {{ resourceBundle.totalLabel }}</span>
+                                                        </td>
+                                                        <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
+                                                            {{columnSum(dataValues, dataSet.organisationUnits, section.dataElements, option)}}
+                                                        </td>
+                                                        <td class="last-column"> {{totalSum(dataValues, section.dataElements)}}
+                                                        </td>
                                                     </tr>
                                                 </tbody>
                                             </table>

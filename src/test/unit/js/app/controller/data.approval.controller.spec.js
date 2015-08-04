@@ -388,5 +388,123 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
                 expect(scope.sum(dataValues, orgUnits, "de1")).toBe(6);
             });
+            it("should return the sum of column for given option ", function() {
+                var sectionDataElements = [{
+                    "id": "de1"
+                }, {
+                    "id": "de2"
+                }];
+                var dataValues = {
+                    "ou1": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c2": {
+                                "value": "2"
+                            }
+                        },
+                        "de2": {
+                            "c1": {
+                                "value": "10"
+                            },
+                            "c2": {
+                                "value": "20"
+                            }
+                        }
+                    },
+                    "ou2": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c2": {
+                                "value": "2"
+                            }
+                        },
+                        "de3": {
+                            "c1": {
+                                "value": "10"
+                            }
+                        }
+                    },
+                    "ou3": undefined
+                };
+
+                var orgUnits = [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }, {
+                    "id": "ou2",
+                    "name": "ou2"
+                }, {
+                    "id": "ou3",
+                    "name": "ou3"
+                }];
+
+                expect(scope.columnSum(dataValues, orgUnits, sectionDataElements, "c1")).toBe(12);
+            });
+            it("should return the total sum for all rows ", function() {
+                var sectionDataElements = [{
+                    "id": "de1"
+                }, {
+                    "id": "de2"
+                }];
+                var dataValues = {
+                    "ou1": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c2": {
+                                "value": "2"
+                            }
+                        },
+                        "de2": {
+                            "c1": {
+                                "value": "10"
+                            },
+                            "c2": {
+                                "value": "20"
+                            }
+                        }
+                    },
+                    "ou2": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c2": {
+                                "value": "2"
+                            }
+                        },
+                        "de3": {
+                            "c1": {
+                                "value": "10"
+                            }
+                        }
+                    },
+                    "ou3": undefined
+                };
+
+                var orgUnits = [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }, {
+                    "id": "ou2",
+                    "name": "ou2"
+                }, {
+                    "id": "ou3",
+                    "name": "ou3"
+                }];
+
+                scope.sum(dataValues, orgUnits, "de1");
+                scope.sum(dataValues, orgUnits, "de2");
+                expect(scope.rowTotal).toEqual({
+                    "de1": 6,
+                    "de2": 30
+                });
+                expect(scope.totalSum(dataValues, sectionDataElements)).toEqual(36);
+            });
         });
     });

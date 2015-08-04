@@ -30,6 +30,9 @@ require.config({
         "angular-ui-transition": "lib/custom/angular-ui-transition/transition",
         "angular-ui-modal": "lib/custom/angular-ui-modal/modal",
         "angular-ui-dropdown": "lib/custom/angular-ui-dropdown/dropdown",
+        "angular-ui-tooltip": "lib/custom/angular-ui-tooltip/tooltip",
+        "angular-ui-bindHtml": "lib/custom/angular-ui-bindHtml/bindHtml",
+        "angular-ui-position": "lib/custom/angular-ui-position/position",
         "angular-ui-weekselector": "lib/angularjs-directives/src/weekselector/week.selector",
         "angular-ui-notin": "lib/angularjs-directives/src/notIn/notIn",
         "angular-ui-equals": "lib/angularjs-directives/src/equals/equals",
@@ -193,6 +196,15 @@ require.config({
             deps: ["angular"]
         },
         'angular-ui-notin': {
+            deps: ["angular"]
+        },
+        'angular-ui-tooltip': {
+            deps: ["angular"]
+        },
+        'angular-ui-position': {
+            deps: ["angular"]
+        },
+        'angular-ui-bindHtml': {
             deps: ["angular"]
         },
         'hustleModule': {

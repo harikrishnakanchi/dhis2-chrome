@@ -169,6 +169,7 @@ define(["lodash"], function(_) {
         "name": "DE1 - ITFC",
         "shortName": "DE1 - ITFC",
         "formName": "DE1",
+        "description": "some desc1",
         "categoryCombo": {
             "id": categoryCombos[0].id,
             "name": categoryCombos[0].name
@@ -178,6 +179,7 @@ define(["lodash"], function(_) {
         "name": "DE2 - ITFC",
         "shortName": "DE2 - ITFC",
         "formName": "DE2",
+        "description": "some desc2",
         "categoryCombo": {
             "id": categoryCombos[1].id,
             "name": categoryCombos[1].name
@@ -187,6 +189,7 @@ define(["lodash"], function(_) {
         "name": "DE3 - ITFC",
         "shortName": "DE3 - ITFC",
         "formName": "DE3",
+        "description": "some desc3",
         "categoryCombo": {
             "id": categoryCombos[1].id,
             "name": categoryCombos[1].name

@@ -56,14 +56,26 @@
                                                 <tr ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } | orderBy: 'name' track by dataElement.id" ng-form="dataElementForm">
                                                     <td>
                                                         <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
-                                                        <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}</span>
+                                                        <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}
+                                                            <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{dataElement.description}}"/>
+                                                        </span>
                                                     </td>
                                                     <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
                                                             <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, selectedModule.id)['value']" ng-focus="restoreExpression(selectedModule.id, dataElement.id, option)" class="form-control input-sm" ng-blur="evaluateExpression(selectedModule.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
                                                     </td>
-                                                    <td class="last-column">{{sum(dataValues[selectedModule.id][dataElement.id])}}</td>
+                                                    <td class="last-column">{{sum(dataValues[selectedModule.id][dataElement.id], dataElement.id)}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <span> {{ resourceBundle.totalLabel }}</span>
+                                                    </td>
+                                                    <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
+                                                        {{columnSum(dataValues[selectedModule.id], section , option)}}
+                                                    </td>
+                                                    <td class="last-column"> {{totalSum(section)}}
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>

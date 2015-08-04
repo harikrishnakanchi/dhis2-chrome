@@ -192,6 +192,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "name": "DE1 - ITFC",
                     "isIncluded": true,
                     "formName": "DE1",
+                    "description": "some desc1",
                     "categoryCombo": {
                         "id": "CC1",
                         "name": "CatCombo1"
@@ -201,6 +202,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "name": "DE2 - ITFC",
                     "isIncluded": true,
                     "formName": "DE2",
+                    "description": "some desc2",
                     "categoryCombo": {
                         "id": "CC2",
                         "name": "CatCombo2"
@@ -225,6 +227,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "name": "DE1 - ITFC",
                     "isIncluded": true,
                     "formName": "DE1",
+                    "description": "some desc1",
                     "categoryCombo": {
                         "id": "CC1",
                         "name": "CatCombo1"
@@ -242,6 +245,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "name": "DE3 - ITFC",
                     "isIncluded": false,
                     "formName": "DE3",
+                    "description": "some desc3",
                     "categoryCombo": {
                         "id": "CC2",
                         "name": "CatCombo2"

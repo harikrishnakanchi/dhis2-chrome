@@ -175,10 +175,11 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     }
                 };
 
-                expect(scope.sum(list)).toBe(8);
+                expect(scope.sum(list, "de1")).toBe(8);
             });
 
             it("should return the sum of valid values ", function() {
+
                 scope.$apply();
                 var list = {
                     "option1": {
@@ -195,7 +196,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     }
                 };
 
-                expect(scope.sum(list)).toBe(5);
+                expect(scope.sum(list, "de1")).toBe(5);
             });
 
             it("should return the sum of valid expressions ", function() {
@@ -216,11 +217,12 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     }
                 };
 
-                expect(scope.sum(list)).toBe(11);
+                expect(scope.sum(list, "de1")).toBe(11);
             });
 
             it("should return the sum of the map ", function() {
                 scope.$apply();
+
                 var list = {
                     "option1": {
                         "value": "1"
@@ -235,7 +237,84 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         "value": "4"
                     }
                 };
-                expect(scope.sum(list)).toBe(8);
+                expect(scope.sum(list, "de1")).toBe(8);
+            });
+
+
+            it("should return the sum of the same option for all data elements in a section ", function() {
+                scope.$apply();
+                var section = {
+                    "dataElements": [{
+                        "id": "de1"
+                    }, {
+                        "id": "de2"
+                    }]
+                };
+
+                var option = "option1";
+                var list = {
+                    "de1": {
+                        "option1": {
+                            "value": "5"
+                        },
+                        "option3": {
+                            "value": "10"
+                        }
+                    },
+                    "de2": {
+                        "option1": {
+                            "value": "1"
+                        },
+                        "option3": {
+                            "value": "2"
+                        }
+                    },
+                    "de3": {
+                        "option1": {
+                            "value": "10"
+                        },
+                        "option2": {
+                            "value": "20"
+                        }
+                    }
+                };
+
+                expect(scope.columnSum(list, section, option)).toBe(6);
+            });
+
+            it("should return the sum of all the rows for a given section", function() {
+                scope.$apply();
+                var section = {
+                    "dataElements": [{
+                        "id": "de1"
+                    }, {
+                        "id": "de2"
+                    }]
+                };
+                var forDataElement1 = {
+                    "option1": {
+                        "value": "1"
+                    },
+                    "option3": {
+                        "value": "2"
+                    }
+                };
+                var forDataElement2 = {
+                    "option1": {
+                        "value": "10"
+                    },
+                    "option3": {
+                        "value": "20"
+                    }
+                };
+                scope.sum(forDataElement1, "de1");
+                scope.sum(forDataElement2, "de2");
+
+                expect(scope.totalSum(section)).toEqual(33);
+                expect(scope.rowTotal).toEqual({
+                    "de1": 3,
+                    "de2": 30
+                });
             });
 
             it("should evaluate expression on blur and store as string", function() {

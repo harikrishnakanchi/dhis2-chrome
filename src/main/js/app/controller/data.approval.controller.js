@@ -3,6 +3,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
         $timeout, orgUnitRepository, datasetRepository, programRepository) {
 
         var currentPeriod, currentPeriodAndOrgUnit;
+        $scope.rowTotal = {};
 
         var resetForm = function() {
             $scope.isopen = {};
@@ -13,6 +14,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             $scope.approveError = false;
             $scope.excludedDataElements = {};
             $scope.associatedProgramId = undefined;
+            $scope.rowTotal = {};
         };
 
         var scrollToTop = function() {
@@ -73,7 +75,37 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     allValues.push(dataValues[orgUnit.id][dataElementId][option].value);
                 });
             });
+            var sum = _.sum(allValues);
+            $scope.rowTotal[dataElementId] = sum;
+            return sum;
+        };
+
+        $scope.columnSum = function(dataValues, orgUnits, sectionDataElements, optionId) {
+            orgUnits = _.isArray(orgUnits) ? orgUnits : [orgUnits];
+            var dataElementIds = _.pluck(sectionDataElements, "id");
+            var allValues = [];
+            _.forEach(orgUnits, function(orgUnit) {
+                dataValues[orgUnit.id] = dataValues[orgUnit.id] || {};
+                _.forEach(dataValues[orgUnit.id], function(value, key) {
+                    if (_.includes(dataElementIds, key)) {
+                        allValues.push(parseInt(value[optionId].value));
+                    }
+                });
+            });
             return _.sum(allValues);
+        };
+
+        $scope.totalSum = function(dataValues, sectionDataElements) {
+            var dataElementsIds = _.pluck(sectionDataElements, "id");
+
+            return _.reduce($scope.rowTotal, function(sum, value, key) {
+                if (_.includes(dataElementsIds, key)) {
+                    return sum + value;
+                } else {
+                    return sum;
+                }
+            }, 0);
+
         };
 
         $scope.firstLevelApproval = function() {

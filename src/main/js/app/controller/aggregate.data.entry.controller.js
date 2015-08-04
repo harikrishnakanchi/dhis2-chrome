@@ -3,6 +3,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository) {
 
         var currentPeriod, currentPeriodAndOrgUnit, catOptComboIdsToBeTotalled;
+        $scope.rowTotal = {};
 
         var resetForm = function() {
             $scope.isopen = {};
@@ -16,6 +17,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             $scope.projectIsAutoApproved = false;
             $scope.excludedDataElements = {};
             $scope.associatedProgramId = undefined;
+            $scope.rowTotal = {};
         };
 
         $scope.printWindow = function() {
@@ -99,11 +101,36 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             return $scope.isDatasetOpen;
         };
 
-        $scope.sum = function(iterable) {
-            return _.reduce(iterable, function(sum, currentOption, catOptComboId) {
+        $scope.sum = function(iterable, dataElementId) {
+            var sum = _.reduce(iterable, function(sum, currentOption, catOptComboId) {
                 if (_.contains(catOptComboIdsToBeTotalled, catOptComboId)) {
                     exp = currentOption.value || "0";
                     return sum + calculateSum(exp);
+                } else {
+                    return sum;
+                }
+            }, 0);
+            $scope.rowTotal[dataElementId] = sum;
+            return sum;
+        };
+
+        $scope.columnSum = function(iterable, section, option) {
+            var dataElementsIds = _.pluck(section.dataElements, "id");
+            return _.reduce(iterable, function(sum, value, key) {
+                if (_.includes(dataElementsIds, key)) {
+                    exp = value[option].value || "0";
+                    return sum + calculateSum(exp);
+                } else {
+                    return sum;
+                }
+            }, 0);
+        };
+
+        $scope.totalSum = function(section) {
+            var dataElementsIds = _.pluck(section.dataElements, "id");
+            return _.reduce($scope.rowTotal, function(sum, value, key) {
+                if (_.includes(dataElementsIds, key)) {
+                    return sum + value;
                 } else {
                     return sum;
                 }
