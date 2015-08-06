@@ -22,18 +22,31 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             });
         };
 
+        var getDataElementGroups = function() {
+            var groupStore = db.objectStore("dataElementGroups");
+            return groupStore.getAll().then(function(dataElementGroups) {
+                return _.filter(dataElementGroups, function(group) {
+                    return _.endsWith(group.name, "module_creation");
+                });
+            });
+        };
+
         this.includeDataElements = function(datasets, excludedDataElements) {
             var sectionIds = _.pluck(_.flatten(_.pluck(datasets, "sections")), "id");
             var store = db.objectStore("sections");
             var query = db.queryBuilder().$in(sectionIds).compile();
-            return store.each(query).then(function(sections) {
+            var setupSections = function(dataElementGroups, sections) {
                 var dataElementIds = _.pluck(_.flatten(_.pluck(sections, "dataElements")), "id");
                 var store = db.objectStore("dataElements");
                 var query = db.queryBuilder().$in(dataElementIds).compile();
                 return store.each(query).then(function(dataElements) {
-                    return datasetTransformer.enrichWithSectionsAndDataElements(datasets, sections, dataElements, excludedDataElements);
+                    return datasetTransformer.enrichWithSectionsAndDataElements(datasets, sections, dataElements, excludedDataElements, dataElementGroups);
                 });
+            };
+            return getDataElementGroups().then(function(dataElementGroups) {
+                return store.each(query).then(_.curry(setupSections)(dataElementGroups));
             });
+
         };
 
         this.includeCategoryOptionCombinations = function(datasets) {

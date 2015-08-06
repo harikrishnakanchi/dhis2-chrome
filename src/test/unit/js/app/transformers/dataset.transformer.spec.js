@@ -190,6 +190,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "dataElements": [{
                     "id": "DE1",
                     "name": "DE1 - ITFC",
+                    "subSection": "Default",
                     "isIncluded": true,
                     "formName": "DE1",
                     "description": "some desc1",
@@ -201,6 +202,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "id": "DE2",
                     "name": "DE2 - ITFC",
                     "isIncluded": true,
+                    "subSection": "Default",
                     "formName": "DE2",
                     "description": "some desc2",
                     "categoryCombo": {
@@ -211,6 +213,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "id": "DE4",
                     "name": "DE4 - ITFC",
                     "isIncluded": true,
+                    "subSection": "Default",
                     "formName": "DE4",
                     "categoryCombo": {
                         "id": "CC2",
@@ -225,6 +228,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "dataElements": [{
                     "id": "DE1",
                     "name": "DE1 - ITFC",
+                    "subSection": "Default",
                     "isIncluded": true,
                     "formName": "DE1",
                     "description": "some desc1",
@@ -242,6 +246,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isIncluded": false,
                 "dataElements": [{
                     "id": "DE3",
+                    "subSection": "Default",
                     "name": "DE3 - ITFC",
                     "isIncluded": false,
                     "formName": "DE3",
@@ -392,5 +397,91 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
             expect(enrichedDatasets[0].sections[0].categoryOptionComboIds).toEqual(['1', '2', '3', '4']);
         });
 
+        it("should enrich data elements with the dataElement Group", function() {
+
+            var datasets, sections, dataelements;
+            var allDataSetsFromTestData = testData.get("dataSets");
+            datasets = [allDataSetsFromTestData[0], allDataSetsFromTestData[1]];
+            sections = testData.get("sections");
+            dataelements = testData.get("dataElements");
+            var dataElementGroups = [{
+                'name': 'Group 1 module_creation',
+                'dataElements': [{
+                    'id': "DE1"
+                }]
+            }];
+            var expectedSectionsForOpd = [{
+                "id": "Sec1",
+                "name": "Section 1",
+                "sortOrder": 0,
+                "isIncluded": true,
+                "dataElements": [{
+                    "id": "DE1",
+                    "name": "DE1 - ITFC",
+                    "isIncluded": true,
+                    "formName": "DE1",
+                    "categoryCombo": {
+                        "id": "CC1",
+                        "name": "CatCombo1"
+                    }
+                }, {
+                    "id": "DE2",
+                    "name": "DE2 - ITFC",
+                    "isIncluded": true,
+                    "formName": "DE2",
+                    "categoryCombo": {
+                        "id": "CC2",
+                        "name": "CatCombo2"
+                    }
+                }, {
+                    "id": "DE4",
+                    "name": "DE4 - ITFC",
+                    "isIncluded": true,
+                    "formName": "DE4",
+                    "categoryCombo": {
+                        "id": "CC2",
+                        "name": "CatCombo2"
+                    }
+                }]
+            }, {
+                "id": "Sec2",
+                "name": "Section 2",
+                "sortOrder": 1,
+                "isIncluded": true,
+                "dataElements": [{
+                    "id": "DE1",
+                    "name": "DE1 - ITFC",
+                    "isIncluded": true,
+                    "formName": "DE1",
+                    "categoryCombo": {
+                        "id": "CC1",
+                        "name": "CatCombo1"
+                    }
+                }]
+            }];
+
+            var expectedSectionsForVacc = [{
+                "id": "Sec3",
+                "name": "Section 3",
+                "sortOrder": 0,
+                "isIncluded": false,
+                "dataElements": [{
+                    "id": "DE3",
+                    "name": "DE3 - ITFC",
+                    "isIncluded": false,
+                    "formName": "DE3",
+                    "categoryCombo": {
+                        "id": "CC2",
+                        "name": "CatCombo2"
+                    }
+                }]
+            }];
+
+            var actualEnrichedDatasets = datasetTransformer.enrichWithSectionsAndDataElements(datasets, sections, dataelements, ['DE3'], dataElementGroups);
+            expect(actualEnrichedDatasets.length).toBe(2);
+            expect(actualEnrichedDatasets[0].sections[0].dataElements[0].subSection).toBe('Group 1');
+            expect(actualEnrichedDatasets[0].sections[0].dataElements[1].subSection).toBe('Default');
+
+        });
     });
 });

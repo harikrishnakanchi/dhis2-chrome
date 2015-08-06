@@ -5,6 +5,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
             $scope.originalDatasets = [];
             $scope.isExpanded = {};
+            $scope.isSubSectionExpanded = {};
             $scope.isDisabled = false;
             $scope.module = {};
             $scope.allModules = [];
@@ -16,6 +17,48 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.selectedDataset = {};
             $scope.enrichedDatasets = {};
             var excludedDataElements = [];
+
+            var enrichSection = function(section) {
+                var unGroupedElements = _(section.dataElements)
+                    .filter({
+                        'subSection': 'Default'
+                    })
+                    .sortBy('formName')
+                    .value();
+
+                var subSections = _(section.dataElements)
+                    .reject({
+                        'subSection': 'Default'
+                    })
+                    .sortBy('formName')
+                    .groupBy('subSection')
+                    .each(function(elements, subSectionName) {
+                        if (!$scope.isSubSectionExpanded[section.id]) {
+                            $scope.isSubSectionExpanded[section.id] = {};
+                        }
+                        $scope.isSubSectionExpanded[section.id][subSectionName] = true;
+                    }).transform(function(accumulator, value, key) {
+                        accumulator.push({
+                            "name": key,
+                            "dataElements": value
+                        });
+                    }, [])
+                    .value();
+                section.subSections = subSections;
+                section.unGroupedDataElements = unGroupedElements;
+                return section;
+            };
+
+            var dataSetWithEnrichedSections = function(dataset) {
+                _.each(dataset.sections, function(section) {
+                    enrichSection(section);
+                });
+                return dataset;
+            };
+
+            var getEnrichedDataSets = function(datasets) {
+                return datasetRepository.includeDataElements(datasets, excludedDataElements);
+            };
 
             var init = function() {
                 var initModule = function() {
@@ -81,10 +124,6 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     return datasetRepository.getAll().then(function(datasets) {
                         return _.filter(datasets, "isAggregateService");
                     });
-                };
-
-                var getEnrichedDataSets = function(datasets) {
-                    return datasetRepository.includeDataElements(datasets, excludedDataElements);
                 };
 
                 var getDatasets = function() {
@@ -280,12 +319,29 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 _.each(section.dataElements, function(dataElement) {
                     dataElement.isIncluded = section.isIncluded;
                 });
+                _.each(section.subSections, function(subSection) {
+                    subSection.isIncluded = section.isIncluded;
+                });
+            };
+
+            $scope.changeDataElementSelectionInSubSection = function(subSection, section) {
+                _.each(subSection.dataElements, function(dataElement) {
+                    dataElement.isIncluded = subSection.isIncluded;
+                });
+                $scope.changeSectionSelection(section);
             };
 
             $scope.changeSectionSelection = function(section) {
                 section.isIncluded = !_.any(section.dataElements, {
                     "isIncluded": false
                 });
+            };
+
+            $scope.changeSubSectionSelection = function(subSection, section) {
+                subSection.isIncluded = !_.any(subSection.dataElements, {
+                    "isIncluded": false
+                });
+                section.isIncluded = subSection.isIncluded;
             };
 
             var setSelectedTemplate = function(datasetId) {
@@ -301,13 +357,16 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     setSelectedTemplate($scope.selectedDataset.id);
                     return;
                 }
-                return datasetRepository.includeDataElements([item], excludedDataElements).then(function(datasets) {
-                    $scope.selectedDataset = datasets[0];
+                return getEnrichedDataSets([item]).then(function(datasets) {
+                    $scope.selectedDataset = dataSetWithEnrichedSections(datasets[0]);
                     setSelectedTemplate($scope.selectedDataset.id);
                     $scope.enrichedDatasets[$scope.selectedDataset.id] = $scope.selectedDataset;
                     _.each($scope.selectedDataset.sections, function(section) {
                         $scope.isExpanded[section.id] = false;
                         $scope.changeSectionSelection(section);
+                        _.each(section.subSections, function(subSection) {
+                            $scope.changeSubSectionSelection(subSection, section);
+                        });
                     });
                     $scope.isExpanded[$scope.selectedDataset.sections[0].id] = true;
                 });

@@ -1121,5 +1121,129 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
             });
+
+            describe('enrich sections of the data sets', function() {
+                var datasets;
+                beforeEach(function() {
+                    datasets = [{
+                        "id": "ds1",
+                        "organisationUnits": [{
+                            "id": "mod1"
+                        }],
+                        "isAggregateService": true,
+                        "sections": [{
+                            "name": "section 1",
+                            "id": "SEC1",
+                            "dataElements": [{
+                                "name": "DE1",
+                                "id": "DE1",
+                                "subSection": "Food"
+                            }, {
+                                "name": "DE2",
+                                "id": "DE2",
+                                "subSection": "Drinks"
+                            }, {
+                                "name": "DE3",
+                                "id": "DE3",
+                                "subSection": "Default"
+                            }]
+                        }]
+                    }];
+
+                    scope.orgUnit = {
+                        "id": "mod2",
+                        "parent": {
+                            "id": "par1"
+                        }
+                    };
+
+                    scope.isNewMode = true;
+
+                    dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
+                    dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
+                    dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, datasets));
+                    aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+                    scope.$apply();
+                    scope.selectDataSet(datasets[0]);
+                    scope.$apply();
+
+                });
+
+                it("should setup the dataSet correctly", function() {
+                    expect(scope.selectedDataset.sections.length).toEqual(1);
+                    expect(scope.selectedDataset.sections[0].dataElements.length).toEqual(3);
+                });
+
+                it("should enrich the sections with the unGrouped Data Elements", function() {
+                    expect(scope.selectedDataset.sections[0].unGroupedDataElements.length).toEqual(1);
+                    expect(scope.selectedDataset.sections[0].unGroupedDataElements[0].id).toEqual('DE3');
+                });
+
+                it("should enrich the sections with the subSections Elements", function() {
+                    expect(scope.selectedDataset.sections[0].subSections.length).toEqual(2);
+                    expect(scope.selectedDataset.sections[0].subSections[0].name).toEqual("Food");
+                    expect(scope.selectedDataset.sections[0].subSections[0].dataElements.length).toEqual(1);
+                    expect(scope.selectedDataset.sections[0].subSections[0].dataElements[0].id).toEqual('DE1');
+                    expect(scope.selectedDataset.sections[0].subSections[1].name).toEqual("Drinks");
+                    expect(scope.selectedDataset.sections[0].subSections[1].dataElements.length).toEqual(1);
+                    expect(scope.selectedDataset.sections[0].subSections[1].dataElements[0].id).toEqual('DE2');
+                });
+
+                it('should expand the subsections by default', function() {
+                    expect(Object.keys(scope.isSubSectionExpanded)).toEqual(["SEC1"]);
+                    expect(Object.keys(scope.isSubSectionExpanded.SEC1)).toEqual(["Food", "Drinks"]);
+                    expect(scope.isSubSectionExpanded.SEC1.Food).toBe(true);
+                });
+            });
+
+            it('should not include section when the subSection is not included', function() {
+                var dataElements = [{
+                    'isIncluded': true,
+                }];
+                var subSection = {
+                    'isIncluded': false,
+                    'dataElements': dataElements
+                };
+                var section = {
+                    'isIncluded': true,
+                    'dataElements': dataElements
+                };
+
+                scope.changeDataElementSelectionInSubSection(subSection, section);
+                expect(subSection.dataElements[0].isIncluded).toBe(false);
+                expect(section.isIncluded).toBe(false);
+            });
+
+            it("should de-select all subSections if the section containing it is de-selected", function() {
+                var section = {
+                    'id': "sec1",
+                    "subSections": [{
+                        'name': "test1"
+                    }, {
+                        'name': "test2"
+                    }, {
+                        'name': "test3"
+                    }],
+                    isIncluded: false
+                };
+
+                var expectedSection = {
+                    id: 'sec1',
+                    subSections: [{
+                        name: 'test1',
+                        isIncluded: false
+                    }, {
+                        name: 'test2',
+                        isIncluded: false
+                    }, {
+                        name: 'test3',
+                        isIncluded: false
+                    }],
+                    isIncluded: false
+                };
+
+                scope.changeDataElementSelection(section);
+                expect(section).toEqual(expectedSection);
+            });
         });
     });

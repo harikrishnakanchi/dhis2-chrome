@@ -30,7 +30,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
         return resultDataset;
     };
 
-    this.enrichWithSectionsAndDataElements = function(allDatasets, allSections, allDataElements, excludedDataElements) {
+    this.enrichWithSectionsAndDataElements = function(allDatasets, allSections, allDataElements, excludedDataElements, dataElementGroups) {
         var indexedSections = _.indexBy(allSections, "id");
         var indexedDataElements = _.indexBy(allDataElements, "id");
 
@@ -45,6 +45,14 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
             });
         };
 
+        var getSubSection = function(dataElement) {
+            return _.filter(dataElementGroups, function(group) {
+                return _.any(group.dataElements, {
+                    "id": dataElement.id
+                });
+            });
+        };
+
         var enrichDataElements = function(dataElements) {
             return _.map(dataElements, function(dataElement) {
                 var enrichedDataElement = _.pick(indexedDataElements[dataElement.id], "id", "name", "formName", "categoryCombo", "description");
@@ -52,6 +60,10 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 if (!_.isEmpty(associatedProgram))
                     enrichedDataElement.associatedProgramId = associatedProgram;
                 enrichedDataElement.isIncluded = _.isEmpty(excludedDataElements) ? true : !_.contains(excludedDataElements, dataElement.id);
+                var subSection = getSubSection(enrichedDataElement)[0] || {
+                    "name": "Default"
+                };
+                enrichedDataElement.subSection = subSection.name.replace("module_creation", "").trim();
                 return enrichedDataElement;
             });
         };

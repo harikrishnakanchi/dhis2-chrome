@@ -124,13 +124,17 @@ define([], function() {
         create_store_with_key("organisationUnitGroupSets", "id", db);
     };
 
-    var add_chart_store = function(db, txt){
+    var add_chart_store = function(db, txt) {
         create_store_with_key("charts", "name", db);
     };
 
     var add_chart_data_store = function(db, txt) {
         var chartDataStore = create_store_with_key("chartData", ["chart", "orgUnit"], db);
         create_index(chartDataStore, "by_chart", "chart", false);
+    };
+
+    var add_dataElementGroup_store = function(db, txt) {
+        create_store_with_key("dataElementGroups", "id", db);
     };
 
     return [add_object_stores,
@@ -152,6 +156,7 @@ define([], function() {
         add_patient_origin_store,
         add_organisation_unit_group_sets_store,
         add_chart_store,
-        add_chart_data_store
+        add_chart_data_store,
+        add_dataElementGroup_store
     ];
 });

@@ -60,12 +60,31 @@
                                     </div>
                                     <div ng-repeat="section in selectedDataset.sections">
                                         <div class="collapse-head">
-                                            <h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">{{section.name}}</h5>
+                                            <h5 ng-click="isExpanded[section.id] = !isExpanded[section.id]">
+                                            <span class="glyphicon"
+                                                        ng-class="{'glyphicon-chevron-right':!isExpanded[section.id], 'glyphicon-chevron-down':isExpanded[section.id]}" aria-hidden="true"></span>  {{section.name}}</h5>
                                             <input type="checkbox" ng-disabled="isDisabled==true" ng-change="changeDataElementSelection(section)" ng-model="getSection(selectedDataset, section.id)['isIncluded']">
                                         </div>
                                         <div collapse="!isExpanded[section.id]" class="collapse-body">
                                             <ul>
-                                                <li ng-repeat="element in section.dataElements | orderBy : 'formName'">
+                                                <li ng-repeat="subSection in section.subSections | orderBy : 'name'">
+                                                    <div class="collapse-head">
+                                                        <h5 ng-click="isSubSectionExpanded[section.id][subSection.name] = !isSubSectionExpanded[section.id][subSection.name]"> 
+                                                        <span class="glyphicon"
+                                                        ng-class="{'glyphicon-chevron-right':!isSubSectionExpanded[section.id][subSection.name], 'glyphicon-chevron-down':isSubSectionExpanded[section.id][subSection.name]}" aria-hidden="true"></span>  {{subSection.name}}</h5>
+                                                        <input type="checkbox" ng-disabled="isDisabled==true" ng-change="changeDataElementSelectionInSubSection(subSection, section)" ng-model="subSection.isIncluded">
+                                                    </div>
+                                                    <div collapse="!isSubSectionExpanded[section.id][subSection.name]" class="collapse-body">
+                                                        <ul>
+                                                            <li ng-repeat="element in subSection.dataElements | orderBy : 'formName'">
+                                                                <label>
+                                                                    <input type="checkbox" ng-disabled="isDisabled==true" ng-model="element.isIncluded" ng-change="changeSubSectionSelection(subSection, section)">{{element.formName}}
+                                                                </label>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                                <li ng-repeat="element in section.unGroupedDataElements | orderBy : 'formName'">
                                                     <label>
                                                         <input type="checkbox" ng-disabled="isDisabled==true" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">{{element.formName}}
                                                     </label>
