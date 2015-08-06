@@ -137,6 +137,18 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             }, 0);
         };
 
+        $scope.originSum = function(dataValues, dataSet, section) {
+            var sum = 0;
+            _.forEach(dataSet.organisationUnits, function(orgUnit) {
+                values = dataValues[orgUnit.id];
+                if (values) {
+                    var value = values[section.dataElements[0].id][section.categoryOptionComboIds[0]].value || "0";
+                    sum += parseInt(value);
+                }
+            });
+            return sum;
+        };
+
         $scope.maxcolumns = function(headers) {
             return _.last(headers).length;
         };

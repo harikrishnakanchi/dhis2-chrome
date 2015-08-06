@@ -135,6 +135,18 @@
                                                         <td class="last-column">{{sum(dataValues, orgUnit ,dataElement.id)}}</td>
                                                     </tr>
                                                 </tbody>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <span> {{ resourceBundle.totalLabel }}</span>
+                                                        </td>
+                                                        <td>
+                                                            {{originSum(dataValues, dataSet, section)}}
+                                                        </td>
+                                                        <td class="last-column"> {{originSum(dataValues, dataSet,section)}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
                                             </table>
                                         </accordion-group>
                                     </accordion>
