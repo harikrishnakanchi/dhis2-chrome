@@ -14,8 +14,9 @@ define(["dhisUrl"], function(dhisUrl) {
             return saveToDhis(payload);
         };
 
-        this.getAll = function() {
+        this.getAll = function(lastUpdatedTime) {
             var url = dhisUrl.dataSets + '?fields=:all&paging=false';
+            url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
             return $http.get(url).then(function(response) {
                 return response.data.dataSets;
             });
