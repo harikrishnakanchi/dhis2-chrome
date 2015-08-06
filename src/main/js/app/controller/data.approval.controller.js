@@ -2,7 +2,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
     return function($scope, $routeParams, $q, $hustle, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, datasetRepository, programRepository) {
 
-        var currentPeriod, currentPeriodAndOrgUnit;
+        var currentPeriod, currentPeriodAndOrgUnit, catOptComboIdsToBeTotalled;
 
         var resetForm = function() {
             $scope.isopen = {};
@@ -68,7 +68,10 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 dataValues[orgUnit.id][dataElementId] = dataValues[orgUnit.id][dataElementId] || {};
 
                 var allOptions = _.keys(dataValues[orgUnit.id][dataElementId]);
-                _.forEach(allOptions, function(option) {
+                var optionsThatCanBeTotalled = _.filter(allOptions, function(option) {
+                    return _.contains(catOptComboIdsToBeTotalled, option);
+                });
+                _.forEach(optionsThatCanBeTotalled, function(option) {
                     dataValues[orgUnit.id][dataElementId][option] = dataValues[orgUnit.id][dataElementId][option] || {};
                     allValues.push(dataValues[orgUnit.id][dataElementId][option].value);
                 });
@@ -183,6 +186,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     .then(datasetRepository.includeCategoryOptionCombinations)
                     .then(function(data) {
                         var datasets = data.enrichedDataSets;
+                        catOptComboIdsToBeTotalled = data.catOptComboIdsToBeTotalled;
                         var dataSetPromises = _.map(datasets, function(dataset) {
                             return findallOrgUnits(dataset.organisationUnits).then(function(orgunits) {
                                 dataset.organisationUnits = orgunits;
