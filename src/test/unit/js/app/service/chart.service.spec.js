@@ -1,12 +1,18 @@
 define(["chartService", "angularMocks", "properties", "utils", "lodash", "timecop"], function(ChartService, mocks, properties, utils, _, timecop) {
     describe("chart service", function() {
-        var http, httpBackend, chartService, q, scope;
+        var http, httpBackend, chartService, q, scope, lastUpdatedAt;
 
         beforeEach(mocks.inject(function($injector, $q, $rootScope) {
             http = $injector.get('$http');
             q = $q;
             scope = $rootScope;
             httpBackend = $injector.get('$httpBackend');
+
+            thisMoment = moment("2014-01-01T");
+            lastUpdatedAt = thisMoment.toISOString();
+            Timecop.install();
+            Timecop.freeze(thisMoment.toDate());
+
             chartService = new ChartService(http);
         }));
 
