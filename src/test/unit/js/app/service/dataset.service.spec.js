@@ -51,5 +51,16 @@ define(["datasetService", "angularMocks", "properties"], function(DatasetService
 
             expect(actualDataSets).toEqual(responsePayload.dataSets);
         });
+
+        it("should download all datasets since lastUpdated", function() {
+            var lastUpdatedTime = "2015-08-06T17:51:47.000Z";
+            var responsePayload = { 'dataSets': [] };
+
+            datasetService.getAll(lastUpdatedTime);
+
+            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all&paging=false&filter=lastUpdated:gte:" + lastUpdatedTime).respond(200, responsePayload);
+            httpBackend.flush();
+        });
+
     });
 });
