@@ -116,7 +116,8 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, {
-                    'enrichedDataSets': []
+                    'enrichedDataSets': [],
+                    'catOptComboIdsToBeTotalled': ['c1', 'c2']
                 }));
 
                 programRepository = new ProgramRepository();
@@ -385,7 +386,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "id": "ou3",
                     "name": "ou3"
                 }];
-
+                scope.$apply();
                 expect(scope.sum(dataValues, orgUnits, "de1")).toBe(6);
             });
             it("should return the sum of column for given option ", function() {
@@ -497,7 +498,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "id": "ou3",
                     "name": "ou3"
                 }];
-
+                scope.$apply();
                 scope.sum(dataValues, orgUnits, "de1");
                 scope.sum(dataValues, orgUnits, "de2");
                 expect(scope.rowTotal).toEqual({
@@ -505,6 +506,51 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "de2": 30
                 });
                 expect(scope.totalSum(dataValues, sectionDataElements)).toEqual(36);
+            });
+            it("should not sum up options that are not in the catOptComboIdsToBeTotalled ", function() {
+                var dataValues = {
+                    "ou1": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c3": {
+                                "value": "2"
+                            }
+                        }
+                    },
+                    "ou2": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c3": {
+                                "value": "2"
+                            }
+                        },
+                        "de2": {
+                            "c3": {
+                                "value": "10"
+                            }
+                        }
+                    },
+                    "ou3": undefined
+                };
+
+
+
+                var orgUnits = [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }, {
+                    "id": "ou2",
+                    "name": "ou2"
+                }, {
+                    "id": "ou3",
+                    "name": "ou3"
+                }];
+                scope.$apply();
+                expect(scope.sum(dataValues, orgUnits, "de1")).toBe(2);
             });
         });
     });
