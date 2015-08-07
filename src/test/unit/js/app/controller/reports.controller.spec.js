@@ -1,7 +1,7 @@
-define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgUnitRepository", "chartService", "chartRepository"], function(mocks, utils, ReportsController, DatasetRepository, OrgUnitRepository, ChartService, ChartRepository) {
+define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository"], function(mocks, utils, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository) {
     describe("reportsControllerspec", function() {
 
-        var reportsController, datasetRepository, orgUnitRepository, chartService, chartRepository;
+        var reportsController, datasetRepository, orgUnitRepository, chartRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             scope = $rootScope.$new();
@@ -12,14 +12,14 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             
             chartRepository = new ChartRepository();
             spyOn(chartRepository, "getDataForChart").and.returnValue(utils.getPromise(q, []));
+            spyOn(chartRepository, "getAll").and.returnValue(utils.getPromise(q, []));
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
             spyOn(orgUnitRepository, "getAllOrigins").and.returnValue(utils.getPromise(q, []));
 
-            chartService = new ChartService();
-            spyOn(chartService, "getAllFieldAppChartsForDataset").and.returnValue(utils.getPromise(q, []));
+            
         }));
 
         it("should set the orgunit display name for modules", function() {
@@ -43,7 +43,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             };
 
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, mod1));
-            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartService);
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository);
             scope.$apply();
 
             expect(scope.orgUnit.displayName).toEqual('op unit - module 1');
@@ -67,7 +67,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             };
 
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, prj1));
-            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartService);
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository);
             scope.$apply();
 
             expect(scope.orgUnit.displayName).toEqual('project 1');
@@ -103,7 +103,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
 
-            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartService);
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository);
             scope.$apply();
 
             expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("prj1");
@@ -263,7 +263,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, mod1));
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
-            chartService.getAllFieldAppChartsForDataset.and.returnValue(utils.getPromise(q, charts));
+            chartRepository.getAll.and.returnValue(utils.getPromise(q, charts));
             chartRepository.getDataForChart.and.callFake(function(chartName, orgUnit) {
                 if (chartName === 'chart1')
                     return utils.getPromise(q, chartData1);
@@ -271,10 +271,10 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                     return utils.getPromise(q, chartData2);
             });
 
-            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartService, chartRepository);
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository);
             scope.$apply();
 
-            expect(chartService.getAllFieldAppChartsForDataset).toHaveBeenCalledWith(datasets);
+            // expect(chartService.getAllFieldAppChartsForDataset).toHaveBeenCalledWith(datasets);
             expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[0].name, 'mod1');
             expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[1].name, 'mod1');
 

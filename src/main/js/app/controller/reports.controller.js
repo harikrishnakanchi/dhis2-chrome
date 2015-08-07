@@ -1,5 +1,5 @@
 define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
-    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartService, chartRepository) {
+    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository) {
 
         $scope.barChartOptions = {
             "chart": {
@@ -186,8 +186,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 return $q.all(getChartDataPromises);
             };
 
-            return chartService.getAllFieldAppChartsForDataset($scope.datasets)
-                .then(getChartData)
+            chartRepository.getAll().then(getChartData)
                 .then(function(chartData) {
                     $scope.chartData = chartData;
                 });
