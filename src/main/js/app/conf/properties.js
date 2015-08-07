@@ -10,7 +10,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
             ]
         },
         "http": {
-            "timeout": 60000
+            "timeout": 120000
         },
         "projectDataSync": {
             "intervalInMinutes": 720,
