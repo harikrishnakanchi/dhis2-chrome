@@ -71,6 +71,7 @@ require.config({
         "downloadDataController": "app/controller/download.data.controller",
         "selectLanguageController": "app/controller/select.language.controller",
         "reportsController": "app/controller/reports.controller",
+        "referralLocationsController": "app/controller/referral.locations.controller",
 
         //Services
         "services": "app/service/services",

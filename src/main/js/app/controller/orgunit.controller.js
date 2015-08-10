@@ -9,7 +9,8 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             'LineListModule': 'templates/partials/linelist-module-form.html',
             'Operation Unit': 'templates/partials/op-unit-form.html',
             'User': 'templates/partials/project-user-form.html',
-            'Patient Origin': 'templates/partials/patient-origin-form.html'
+            'Patient Origin': 'templates/partials/patient-origin-form.html',
+            'Referral Locations': 'templates/partials/referral-locations-form.html'
         };
 
         $scope.organisationUnits = [];

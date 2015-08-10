@@ -1,0 +1,26 @@
+<div ng-controller="referralLocationsController">
+    <div class="loading" ng-show="loading">
+        <img src="img/ajax-loader.gif" class="spinner" />
+    </div>
+    <div class="panel panel-default panelWith-Overflow-Visible">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ resourceBundle.referralLocationsLabel }}</h3>
+        </div>
+        <div class="panel-body">
+            <form name="form" class="form-horizontal" role="form" ng-submit="save()" novalidate>
+                <ul>
+                    <li class="form-group" ng-repeat="referralLocation in referralLocations">
+                        <label for="referralLocationName{{$index}}" class="col-sm-4 col-md-4 control-label">{{ referralLocation.genericName }}</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="referralLocationName{{$index}}" id="referralLocationName{{$index}}" placeholder="{{ resourceBundle.referralLocationNamePlaceholder }}" ng-model="referralLocation.aliasName" />
+                        </div>
+                    </li>
+                </ul>
+                 <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-4 button-group">
+                        <input type="submit" class="btn btn-main" value="{{ resourceBundle.saveBtnValue }}" />
+                        <input type="button" class="btn" ng-click="closeForm()" value="{{ resourceBundle.backBtnValue }}" />
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>
