@@ -9,7 +9,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
 
             datasetRepository = new DatasetRepository();
             spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
-            
+
             chartRepository = new ChartRepository();
             spyOn(chartRepository, "getDataForChart").and.returnValue(utils.getPromise(q, []));
             spyOn(chartRepository, "getAll").and.returnValue(utils.getPromise(q, []));
@@ -17,9 +17,8 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
-            spyOn(orgUnitRepository, "getAllOrigins").and.returnValue(utils.getPromise(q, []));
+            spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
 
-            
         }));
 
         it("should set the orgunit display name for modules", function() {
@@ -122,13 +121,13 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
 
             var datasets = [{
                 "id": "ds1",
-                "isOriginDataset" : false
+                "isOriginDataset": false
             }, {
                 "id": "ds2",
-                "isOriginDataset" : false
+                "isOriginDataset": false
             }, {
                 "id": "ds3",
-                "isOriginDataset" : false
+                "isOriginDataset": false
             }];
 
             var charts = [{

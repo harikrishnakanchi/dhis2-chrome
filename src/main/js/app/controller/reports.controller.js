@@ -196,7 +196,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
             var loadDatasetsForModules = function(orgUnits) {
                 return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(datasets) {
-                    datasets = _.filter(datasets, {"isOriginDataset":false});
+                    datasets = _.filter(datasets, {
+                        "isOriginDataset": false
+                    });
                     $scope.datasets = datasets;
                     if (!_.isEmpty(datasets))
                         $scope.selectedDatasetId = datasets[0].id;
@@ -204,7 +206,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             };
 
             var getOrigins = function(modules) {
-                return orgUnitRepository.getAllOrigins(modules).then(function(origins){
+                var moduleIds = _.pluck(modules, "id");
+                return orgUnitRepository.findAllByParent(moduleIds, true).then(function(origins) {
                     return modules.concat(origins);
                 });
             };

@@ -393,22 +393,5 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
 
             expect(origins).toEqual([originOU]);
         });
-
-        it("should get all origins by moduleId", function() {
-            var origins;
-
-            mockOrgStore.each.and.callFake(function(query) {
-                return utils.getPromise(q, [originOU]);
-            });
-
-            orgUnitRepository.getAllOrigins([module]).then(function(data) {
-                origins = data;
-            });
-
-            scope.$apply();
-
-            expect(origins).toEqual([originOU]);
-
-        });
     });
 });
