@@ -137,6 +137,10 @@ define([], function() {
         create_store_with_key("dataElementGroups", "id", db);
     };
 
+    var add_referral_locations_store = function(db, txt) {
+        create_store_with_key("referralLocations", "id", db);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -157,6 +161,7 @@ define([], function() {
         add_organisation_unit_group_sets_store,
         add_chart_store,
         add_chart_data_store,
-        add_dataElementGroup_store
+        add_dataElementGroup_store,
+        add_referral_locations_store
     ];
 });

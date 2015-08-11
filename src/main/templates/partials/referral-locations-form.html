@@ -9,8 +9,8 @@
         <div class="panel-body">
             <form name="form" class="form-horizontal" role="form" ng-submit="save()" novalidate>
                 <ul>
-                    <li class="form-group" ng-repeat="referralLocation in referralLocations">
-                        <label for="referralLocationName{{$index}}" class="col-sm-4 col-md-4 control-label">{{ referralLocation.genericName }}</label>
+                    <li class="form-group" ng-repeat="referralLocation in referralLocations | orderBy : displayOrder">
+                        <label for="referralLocationName{{$index}}" class="col-sm-4 col-md-4 control-label">{{ resourceBundle["referralLocation_" + referralLocation.genericName] }}</label>
                         <div class="col-sm-4">
                             <input type="text" class="form-control" name="referralLocationName{{$index}}" id="referralLocationName{{$index}}" placeholder="{{ resourceBundle.referralLocationNamePlaceholder }}" ng-model="referralLocation.aliasName" />
                         </div>
