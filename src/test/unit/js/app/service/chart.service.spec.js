@@ -1,4 +1,4 @@
-define(["chartService", "angularMocks", "properties", "utils", "lodash", "timecop"], function(ChartService, mocks, properties, utils, _, timecop) {
+define(["chartService", "angularMocks", "properties", "utils", "lodash", "timecop", "moment"], function(ChartService, mocks, properties, utils, _, timecop, moment) {
     describe("chart service", function() {
         var http, httpBackend, chartService, q, scope, lastUpdatedAt;
 

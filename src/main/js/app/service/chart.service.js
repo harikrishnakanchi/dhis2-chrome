@@ -1,4 +1,4 @@
-define(["dhisUrl", "lodash"], function(dhisUrl, _) {
+define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
     return function($http) {
         this.getChartDataForOrgUnit = function(chart, orgUnit) {
             var indicatorIds = _.pluck(chart.indicators, "id");
