@@ -149,6 +149,7 @@
     "userEnableConfMessage": "Are you sure you want to enable ",
     "printTallySheetBtnValue": "Print Tally Sheet",
     "weekLabel": "Week",
+    "weekLabelForApproval": "Select all weeks for approval",
     "yearLabel": "Year",
     "monthLabel": "Month",
     "errorProject": "Error saving the preferences. Please try again later.",

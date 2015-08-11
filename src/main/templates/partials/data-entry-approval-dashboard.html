@@ -14,7 +14,7 @@
                 <tr>
                     <th>{{resourceBundle.moduleLabel}}</th>
                     <th ng-model="weeks">
-                        <input type="checkbox" class="dashboard-form-checkbox" ng-change="toggleSelectAll(selectedAllItemsForApproval)" ng-model="selectedAllItemsForApproval" ng-checked="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === itemsAwaitingApprovalAtUserLevel.length">{{resourceBundle.weekLabel}}
+                        <input type="checkbox" class="dashboard-form-checkbox" ng-change="toggleSelectAll(selectedAllItemsForApproval)" ng-model="selectedAllItemsForApproval" ng-checked="(itemsAwaitingApprovalAtUserLevel | filter : { 'selectedForApproval': true}).length === itemsAwaitingApprovalAtUserLevel.length">{{resourceBundle.weekLabelForApproval}}
                     </th>
                 </tr>
             </thead>
