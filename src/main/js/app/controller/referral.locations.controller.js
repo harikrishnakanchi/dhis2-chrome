@@ -12,7 +12,7 @@ define([], function(){
 		];
 
 		$scope.save = function() {
-			$scope.$parent.closeNewForm($scope.orgUnit, "savedReferralLocations")
+			$scope.$parent.closeNewForm($scope.orgUnit, "savedReferralLocations");
 		};
 
 		$scope.closeForm = function() {
