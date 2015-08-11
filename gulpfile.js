@@ -204,13 +204,13 @@ gulp.task('download-metadata', function() {
 });
 
 gulp.task('pack', ['less', 'config', 'download-metadata', 'download-systemSettings'], function() {
-    var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "dhis2_" + (argv.env || "dev")]);
+    var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "praxis_" + (argv.env || "dev")]);
     stream.write(process.stdout);
     return stream;
 });
 
 gulp.task('zip', ['less', 'config', 'download-metadata', 'download-systemSettings'], function() {
     return gulp.src('./src/main/**')
-        .pipe(zip("dhis2_" + (argv.env || "dev") + ".zip"))
+        .pipe(zip("praxis_" + (argv.env || "dev") + ".zip"))
         .pipe(gulp.dest(''));
 });
