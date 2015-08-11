@@ -6,7 +6,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 "code": attributeCode
             }
         });
-        return attr && attr.value === "true";
+        return !_.isUndefined(attr) && attr.value === "true";
     };
 
     var getAttributeValue = function(attributes, attributeCode) {
@@ -23,10 +23,13 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
 
     this.mapDatasetForView = function(dataset) {
         var resultDataset = _.pick(dataset, ["id", "name", "shortName", "code", "organisationUnits", "sections"]);
-        resultDataset.isAggregateService = !getBooleanAttributeValue(dataset.attributeValues, "isLineListService") && !getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset");
+        resultDataset.isAggregateService = !getBooleanAttributeValue(dataset.attributeValues, "isLineListService") &&
+                                           !getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset") &&
+                                           !getBooleanAttributeValue(dataset.attributeValues, "isReferralDataset");
         resultDataset.isLineListService = getBooleanAttributeValue(dataset.attributeValues, "isLineListService");
         resultDataset.isOriginDataset = getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset");
         resultDataset.isNewDataModel = getBooleanAttributeValue(dataset.attributeValues, "isNewDataModel");
+        resultDataset.isReferralDataset = getBooleanAttributeValue(dataset.attributeValues, "isReferralDataset");
         return resultDataset;
     };
 

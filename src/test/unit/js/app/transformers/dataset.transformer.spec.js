@@ -37,7 +37,8 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isAggregateService": true,
                 "isLineListService": false,
                 "isOriginDataset": false,
-                "isNewDataModel": true
+                "isNewDataModel": true,
+                "isReferralDataset": false
             };
 
             expect(aggregateDatasetForView).toEqual(expectedDataset);
@@ -79,7 +80,8 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isAggregateService": false,
                 "isLineListService": true,
                 "isOriginDataset": false,
-                "isNewDataModel": true
+                "isNewDataModel": true,
+                "isReferralDataset": false
             };
 
             expect(linelistDatasetForView).toEqual(expectedDataset);
@@ -125,7 +127,8 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isAggregateService": false,
                 "isLineListService": false,
                 "isOriginDataset": true,
-                "isNewDataModel": true
+                "isNewDataModel": true,
+                "isReferralDataset": false
             };
 
             expect(originDatasetForView).toEqual(expectedDataset);
@@ -168,10 +171,59 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isAggregateService": true,
                 "isLineListService": false,
                 "isOriginDataset": false,
-                "isNewDataModel": false
+                "isNewDataModel": false,
+                "isReferralDataset": false
             };
 
             expect(currentDatasetForView).toEqual(expectedDataset);
+        });
+
+        it("should map referral locations dataset for view", function() {
+            var referralLocationsDataset = {
+                "id": "ds1",
+                "name": "Referral Locations Dataset",
+                "organisationUnits": [{
+                    "id": "ou1"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isOriginDataset"
+                    },
+                    "value": "false"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    },
+                    "value": "false"
+                }, {
+                    "attribute": {
+                        "code": "isReferralDataset"
+                    },
+                    "value": "true"
+                }]
+            };
+
+            var referralDatasetForView = datasetTransformer.mapDatasetForView(referralLocationsDataset);
+
+            var expectedDataset = {
+                "id": "ds1",
+                "name": "Referral Locations Dataset",
+                "organisationUnits": [{
+                    "id": "ou1"
+                }],
+                "isAggregateService": false,
+                "isLineListService": false,
+                "isOriginDataset": false,
+                "isNewDataModel": true,
+                "isReferralDataset": true
+            };
+
+            expect(referralDatasetForView).toEqual(expectedDataset);
         });
 
         it("should enrich datasets with sections and dataelements", function() {
