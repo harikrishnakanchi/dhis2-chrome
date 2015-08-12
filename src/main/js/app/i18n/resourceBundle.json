@@ -67,6 +67,7 @@
     "referralLocation_Private Facility 2": "Private Facility 2",
     "referralLocation_Other Facility": "Other Facility",
     "savedReferralLocations": "Referral Location names saved successfully",
+    "uploadReferralLocationsDesc": "upsert referral Locations for op unit",
     "createOperationUnitBtnLabel": "Create Operation Unit",
     "dataEntryLabel": "Aggregate Data Entry",
     "approveDataLabel": "APPROVE DATA",

@@ -1,5 +1,5 @@
 define([], function(){
-	return function($scope, referralLocationsRepository){
+	return function($scope, $hustle, referralLocationsRepository){
 		var orderedReferralLocationNames = [
 			"MSF Facility 1",
 			"MSF Facility 2",
@@ -34,9 +34,18 @@ define([], function(){
 			}, { "id": $scope.orgUnit.id });
 		};
 
+		var saveToDhis = function() {
+            return $hustle.publish({
+                "data": $scope.orgUnit.id,
+                "type": "uploadReferralLocations",
+                "locale": $scope.currentUser.locale,
+                "desc": $scope.resourceBundle.uploadReferralLocationsDesc + " " + $scope.orgUnit.name
+            }, "dataValues");
+		};
+
 		$scope.save = function() {
 			var payload = transformReferralLocationsForDb();
-			referralLocationsRepository.upsert(payload).then(function(){
+			referralLocationsRepository.upsert(payload).then(saveToDhis).then(function(){
 				$scope.$parent.closeNewForm($scope.orgUnit, "savedReferralLocations");
 			});
 		};

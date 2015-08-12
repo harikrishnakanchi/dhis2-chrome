@@ -39,10 +39,24 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             return $http.get("/data/systemSettings.json").then(transform);
         };
 
+        var upsertReferralLocations = function(args) {
+            var key = "referralLocations_" + args.id;
+            var payload = JSON.stringify(_.omit(args, "id"));
+            return $http({
+                "method": "POST",
+                "url": dhisUrl.systemSettings + "/" + key,
+                "data": payload,
+                "headers": {
+                    "Content-Type": "text/plain"
+                }
+            });
+        };
+
         return {
             "upsert": upsert,
             "getAll": getAll,
-            "loadFromFile": loadFromFile
+            "loadFromFile": loadFromFile,
+            "upsertReferralLocations": upsertReferralLocations
         };
     };
 });

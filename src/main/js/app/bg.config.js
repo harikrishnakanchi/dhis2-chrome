@@ -43,6 +43,7 @@ require.config({
         "patientOriginRepository": "app/repository/patient.origin.repository",
         "metadataRepository": "app/repository/metadata.repository",
         "chartRepository": "app/repository/chart.repository",
+        "referralLocationsRepository": "app/repository/referral.locations.repository",
 
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",
@@ -83,6 +84,7 @@ require.config({
         "downloadPatientOriginConsumer": "app/consumer/download.patient.origin.consumer",
         "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
         "downloadChartConsumer": "app/consumer/download.charts.consumer",
+        "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",

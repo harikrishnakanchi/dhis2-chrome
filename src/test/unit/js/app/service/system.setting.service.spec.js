@@ -1,4 +1,4 @@
-define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "timecop"], function(SystemSettingService, mocks, properties, utils, md5, timecop) {
+define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "timecop", "lodash"], function(SystemSettingService, mocks, properties, utils, md5, timecop, _) {
     describe("systemSettingService", function() {
 
         var http, httpBackend, service, allSystemSettings, q;
@@ -161,6 +161,23 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
             };
             httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/" + key, expectedPayload).respond(200, "ok");
             httpBackend.flush();
+        });
+
+        describe("upsertReferralLocations", function() {
+            it("should post referral locations for an op unit", function() {
+                var opUnitId = "opUnit1";
+                var args = {
+                    "id": opUnitId,
+                    "Location 1": "Some alias"
+                };
+
+                var expectedKey = "referralLocations_" + opUnitId;
+                var expectedPayload = _.omit(args, "id");
+                service.upsertReferralLocations(args);
+
+                httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/" + expectedKey, expectedPayload).respond(200, "ok");
+                httpBackend.flush();
+            });
         });
     });
 });

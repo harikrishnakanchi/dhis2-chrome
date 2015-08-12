@@ -3,7 +3,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, log, scope,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
-            downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer;
+            downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
+            uploadReferralLocationsConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -81,6 +82,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadChartConsumer = {
                 'run': jasmine.createSpy("downloadChartConsumer")
             };
+            uploadReferralLocationsConsumer = {
+                'run': jasmine.createSpy("uploadReferralLocationsConsumer")
+            };
             message = {};
             q = $q;
             log = $log;
@@ -100,7 +104,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer,
-                uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer);
+                uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer, uploadReferralLocationsConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -375,5 +379,16 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
             expect(downloadChartConsumer.run).toHaveBeenCalledWith(message);
         });
+        it("should call upload referral locations", function() {
+            message.data = {
+                "data": {},
+                "type": "uploadReferralLocations"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(uploadReferralLocationsConsumer.run).toHaveBeenCalledWith(message);
+        });        
     });
 });
