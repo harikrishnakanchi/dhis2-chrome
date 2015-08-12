@@ -26,7 +26,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
             var groupStore = db.objectStore("dataElementGroups");
             return groupStore.getAll().then(function(dataElementGroups) {
                 return _.filter(dataElementGroups, function(group) {
-                    return _.endsWith(group.name, "module_creation");
+                    return _.endsWith(group.code, "module_creation");
                 });
             });
         };
