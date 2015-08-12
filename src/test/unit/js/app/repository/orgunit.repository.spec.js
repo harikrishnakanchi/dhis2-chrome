@@ -393,5 +393,23 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
 
             expect(origins).toEqual([originOU]);
         });
+
+        describe("getAllOperationUnits", function() {
+            it("should find all operation units using level", function() {
+                var mockStore = mockDb.objectStore;
+                var orgUnitlevels = [{ "name": "Operation Unit" }, { "name": "Module" }];
+                var operationUnits = [opUnit];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, orgUnitlevels));
+                mockStore.each.and.returnValue(utils.getPromise(q, operationUnits));
+
+                var actualOpUnits;
+                orgUnitRepository.getAllOperationUnits().then(function(dbResult) {
+                    actualOpUnits = dbResult;
+                });
+
+                scope.$apply();
+                expect(actualOpUnits).toEqual(operationUnits);
+            });
+        });
     });
 });

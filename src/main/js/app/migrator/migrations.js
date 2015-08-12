@@ -13,6 +13,10 @@ define([], function() {
         });
     };
 
+    var get_data_store = function(storeName, transaction) {
+        return transaction.objectStore(storeName);
+    };
+
     var create_index = function(store, indexName, key, isUnique, multiEntry) {
         store.createIndex(indexName, key, {
             "unique": isUnique,
@@ -141,6 +145,11 @@ define([], function() {
         create_store_with_key("referralLocations", "id", db);
     };
 
+    var add_organisation_unit_index_by_level = function(db, txt) {
+        var orgUnitStore = get_data_store("organisationUnits", txt);
+        create_index(orgUnitStore, "by_level", "level", false);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -162,6 +171,7 @@ define([], function() {
         add_chart_store,
         add_chart_data_store,
         add_dataElementGroup_store,
-        add_referral_locations_store
+        add_referral_locations_store,
+        add_organisation_unit_index_by_level
     ];
 });
