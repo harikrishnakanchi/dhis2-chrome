@@ -56,8 +56,17 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
                 "data": []
             }, "dataValues");
 
-            return $q.all([downloadMetadata, downloadSystemSetting, downloadPatientOriginDetails, downloadOrgUnit, downloadOrgUnitGroups,
-                    downloadProgram, downloadData, downloadEvents, downloadDatasets, downloadCharts
+            return $q.all([
+                    downloadMetadata,
+                    downloadSystemSetting,
+                    downloadPatientOriginDetails,
+                    downloadOrgUnit,
+                    downloadOrgUnitGroups,
+                    downloadProgram,
+                    downloadData,
+                    downloadEvents,
+                    downloadDatasets,
+                    downloadCharts
                 ])
                 .then(onSuccess);
         };

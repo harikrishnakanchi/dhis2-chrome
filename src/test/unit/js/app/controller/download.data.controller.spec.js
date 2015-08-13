@@ -1,6 +1,6 @@
 define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtils"],
     function(DownloadDataController, mocks, utils, _, chromeUtils) {
-        describe("dashboard controller", function() {
+        describe("downloadDataController", function() {
             var q, rootScope, hustle, downloadDataController, timeout;
 
             beforeEach(module("hustle"));
@@ -29,14 +29,23 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 downloadDataController = new DownloadDataController(scope, hustle, q, rootScope, timeout);
             }));
 
-            it("should fetch and display all organisation units", function() {
+            it("should fetch data from DHIS", function() {
                 scope.syncNow();
 
                 scope.$apply();
                 timeout.flush();
 
-                var syncableTypes = ["downloadMetadata", "downloadSystemSetting", "downloadPatientOriginDetails", "downloadOrgUnit", "downloadOrgUnitGroups",
-                    "downloadProgram", "downloadData", "downloadEventData", "downloadDatasets", "downloadCharts"
+                var syncableTypes = [
+                    "downloadMetadata",
+                    "downloadSystemSetting",
+                    "downloadPatientOriginDetails",
+                    "downloadOrgUnit",
+                    "downloadOrgUnitGroups",
+                    "downloadProgram",
+                    "downloadData",
+                    "downloadEventData",
+                    "downloadDatasets",
+                    "downloadCharts"
                 ];
 
                 var expectedHustleArgs = _.map(syncableTypes, function(type) {
