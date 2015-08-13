@@ -85,6 +85,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             uploadReferralLocationsConsumer = {
                 'run': jasmine.createSpy("uploadReferralLocationsConsumer")
             };
+            downloadReferralLocationsConsumer = {
+                'run': jasmine.createSpy("downloadReferralLocationsConsumer")
+            };
             message = {};
             q = $q;
             log = $log;
@@ -100,11 +103,13 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadSystemSettingConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadPatientOriginConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadChartConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadReferralLocationsConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer,
-                uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer, uploadReferralLocationsConsumer);
+                uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
+                uploadReferralLocationsConsumer, downloadReferralLocationsConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -379,6 +384,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
 
             expect(downloadChartConsumer.run).toHaveBeenCalledWith(message);
         });
+
         it("should call upload referral locations", function() {
             message.data = {
                 "data": {},
@@ -389,6 +395,18 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(uploadReferralLocationsConsumer.run).toHaveBeenCalledWith(message);
-        });        
+        });
+
+        it("should call download referral locations", function() {
+            message.data = {
+                "data": {},
+                "type": "downloadReferralLocations"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(downloadReferralLocationsConsumer.run).toHaveBeenCalledWith(message);
+        });
     });
 });

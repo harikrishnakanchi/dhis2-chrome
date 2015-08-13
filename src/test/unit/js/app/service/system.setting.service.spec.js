@@ -166,16 +166,42 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
         describe("upsertReferralLocations", function() {
             it("should post referral locations for an op unit", function() {
                 var opUnitId = "opUnit1";
-                var args = {
+                var payload = {
                     "id": opUnitId,
                     "Location 1": "Some alias"
                 };
 
                 var expectedKey = "referralLocations_" + opUnitId;
-                var expectedPayload = _.omit(args, "id");
-                service.upsertReferralLocations(args);
+                service.upsertReferralLocations(payload);
 
-                httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/" + expectedKey, expectedPayload).respond(200, "ok");
+                httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/" + expectedKey, payload).respond(200, "ok");
+                httpBackend.flush();
+            });
+        });
+
+        describe("getReferralLocations", function() {
+            it("should download referral locations for the specified op units", function() {
+                var opUnitIds = ['opUnit1', 'opUnit2'];
+                var queryParams = "?key=referralLocations_opUnit1&key=referralLocations_opUnit2"
+                var remoteReferralLocations = {
+                    "referralLocations_opUnit1": JSON.stringify({
+                        "id": "opUnit1",
+                        "facility 1": "some alias"
+                    }),
+                    "referralLocations_opUnit2": JSON.stringify({
+                        "id": "opUnit2",
+                        "facility 2": "some alias1"
+                    })
+                };
+                var expectedResult = _.map(remoteReferralLocations, function(value) {
+                    return JSON.parse(value);
+                });
+
+                httpBackend.expectGET(properties.dhis.url + "/api/systemSettings" + queryParams).respond(200, remoteReferralLocations);
+                service.getReferralLocations(opUnitIds).then(function(result) {
+                    expect(result).toEqual(expectedResult);
+                });
+
                 httpBackend.flush();
             });
         });

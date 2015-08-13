@@ -56,6 +56,11 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
                 "data": []
             }, "dataValues");
 
+            var downloadReferralLocations = $hustle.publish({
+                "type": "downloadReferralLocations",
+                "data": []
+            }, "dataValues");
+
             return $q.all([
                     downloadMetadata,
                     downloadSystemSetting,
@@ -66,7 +71,8 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
                     downloadData,
                     downloadEvents,
                     downloadDatasets,
-                    downloadCharts
+                    downloadCharts,
+                    downloadReferralLocations
                 ])
                 .then(onSuccess);
         };

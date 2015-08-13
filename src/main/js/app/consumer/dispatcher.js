@@ -3,7 +3,7 @@ define(["lodash"], function(_) {
         createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
-        uploadReferralLocationsConsumer) {
+        uploadReferralLocationsConsumer, downloadReferralLocationsConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " +  message.data.type, message.data);
@@ -95,6 +95,9 @@ define(["lodash"], function(_) {
 
                 case "uploadReferralLocations":
                     return uploadReferralLocationsConsumer.run(message);
+
+                case "downloadReferralLocations":
+                    return downloadReferralLocationsConsumer.run(message);
 
                 default:
                     return $q.reject();

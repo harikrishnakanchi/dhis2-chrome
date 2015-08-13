@@ -45,7 +45,8 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                     "downloadData",
                     "downloadEventData",
                     "downloadDatasets",
-                    "downloadCharts"
+                    "downloadCharts",
+                    "downloadReferralLocations"
                 ];
 
                 var expectedHustleArgs = _.map(syncableTypes, function(type) {

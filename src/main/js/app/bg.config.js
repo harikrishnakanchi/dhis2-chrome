@@ -85,6 +85,7 @@ require.config({
         "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
         "downloadChartConsumer": "app/consumer/download.charts.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
+        "downloadReferralLocationsConsumer": "app/consumer/download.referral.locations.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",

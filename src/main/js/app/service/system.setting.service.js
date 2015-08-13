@@ -39,16 +39,31 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             return $http.get("/data/systemSettings.json").then(transform);
         };
 
-        var upsertReferralLocations = function(args) {
-            var key = "referralLocations_" + args.id;
-            var payload = JSON.stringify(_.omit(args, "id"));
+        var referralLocationKey = function(opUnitId) {
+            return "referralLocations_" + opUnitId;
+        };
+
+        var upsertReferralLocations = function(payload) {
+            var key = referralLocationKey(payload.id);
             return $http({
                 "method": "POST",
                 "url": dhisUrl.systemSettings + "/" + key,
-                "data": payload,
+                "data": JSON.stringify(payload),
                 "headers": {
                     "Content-Type": "text/plain"
                 }
+            });
+        };
+
+        var getReferralLocations = function(opUnitIds) {
+            var queryParameters = _.map(opUnitIds, function(opUnitId) {
+                return "key=" + referralLocationKey(opUnitId);
+            });
+            var queryString = "?" + queryParameters.join("&");
+            return $http.get(dhisUrl.systemSettings + queryString).then(function(response){
+                return _.map(response.data, function(value) {
+                    return JSON.parse(value);
+                });
             });
         };
 
@@ -56,7 +71,8 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             "upsert": upsert,
             "getAll": getAll,
             "loadFromFile": loadFromFile,
-            "upsertReferralLocations": upsertReferralLocations
+            "upsertReferralLocations": upsertReferralLocations,
+            "getReferralLocations": getReferralLocations
         };
     };
 });
