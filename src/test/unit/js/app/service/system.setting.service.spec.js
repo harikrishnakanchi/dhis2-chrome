@@ -182,7 +182,7 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
         describe("getReferralLocations", function() {
             it("should download referral locations for the specified op units", function() {
                 var opUnitIds = ['opUnit1', 'opUnit2'];
-                var queryParams = "?key=referralLocations_opUnit1&key=referralLocations_opUnit2"
+                var queryParams = "?key=referralLocations_opUnit1&key=referralLocations_opUnit2";
                 var remoteReferralLocations = {
                     "referralLocations_opUnit1": JSON.stringify({
                         "id": "opUnit1",

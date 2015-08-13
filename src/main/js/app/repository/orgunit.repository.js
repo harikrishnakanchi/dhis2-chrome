@@ -129,7 +129,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
                 });
                 return orgUnitLevel && orgUnitLevel.level;
             });
-        }
+        };
 
         var getAllOperationUnits = function() {
             return getOrgUnitLevel("Operation Unit").then(function(level){
