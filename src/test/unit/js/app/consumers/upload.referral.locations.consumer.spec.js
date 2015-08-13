@@ -12,7 +12,7 @@ define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "systemSetti
 
             }));
 
-            it("should save datasets to dhis", function() {
+            it("should save referral locations to dhis", function() {
                 var referralLocations = { "Facility 1" : "abc" };
                 var message = {
                     "data": {
