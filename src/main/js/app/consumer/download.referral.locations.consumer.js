@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function(systemSettingService, orgUnitRepository, referralLocationsRepository, $q) {
+    return function(systemSettingService, orgUnitRepository, referralLocationsRepository, mergeBy, $q) {
     	var BATCH_SIZE = 20;
 
         this.run = function(message) {
@@ -21,7 +21,18 @@ define(["lodash"], function(_) {
 
     	var mergeAndSave = function(remoteReferralLocations) {
     		if(remoteReferralLocations.length === 0) return;
-    		return referralLocationsRepository.upsert(remoteReferralLocations);
+
+            var remoteIds = _.pluck(remoteReferralLocations, "id");
+
+            var mergeOpts = {
+                remoteTimeField: "clientLastUpdated",
+                localTimeField: "clientLastUpdated"
+            };
+
+            return referralLocationsRepository.findAll(remoteIds).then(function(localReferralLocations) {
+                var mergedReferralLocations = mergeBy.lastUpdated(mergeOpts, remoteReferralLocations, localReferralLocations);
+                return referralLocationsRepository.upsert(mergedReferralLocations);
+            });
     	};
 
         var downloadReferralLocations = function(opUnitIds){

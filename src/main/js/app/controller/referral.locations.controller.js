@@ -1,4 +1,4 @@
-define([], function(){
+define(["moment"], function(moment){
 	return function($scope, $hustle, referralLocationsRepository){
 		var orderedReferralLocationNames = [
 			"MSF Facility 1",
@@ -27,11 +27,15 @@ define([], function(){
 		};
 
 		var transformReferralLocationsForDb = function() {
+			var defaultPayload = {
+				"id": $scope.orgUnit.id,
+				"clientLastUpdated": moment().toISOString()
+			};
 			return _.transform($scope.referralLocations, function(result, referralLocation) {
 				if(!_.isEmpty(referralLocation.aliasName)) {
 					result[referralLocation.genericName] = referralLocation.aliasName;
 				}
-			}, { "id": $scope.orgUnit.id });
+			}, defaultPayload);
 		};
 
 		var saveToDhis = function() {
