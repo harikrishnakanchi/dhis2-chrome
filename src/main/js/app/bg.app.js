@@ -67,6 +67,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         }, "dataValues");
 
                         $hustle.publish({
+                            "type": "downloadReferralLocations"
+                        }, "dataValues");
+
+                        $hustle.publish({
                             "type": "downloadPatientOriginDetails"
                         }, "dataValues");
 
