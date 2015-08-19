@@ -6,7 +6,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
 
         var downloadDataValues = function() {
             var getAllDataValues = function(vals) {
-                var orgUnitIds = vals[0];
+                var orgUnitIds = _.pluck(vals[0], "id");
                 var allDataSetIds = _.pluck(vals[1], "id");
 
                 if (orgUnitIds.length === 0 || allDataSetIds.length === 0)
@@ -24,7 +24,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                 });
             };
 
-            return $q.all([userPreferenceRepository.getUserModuleIds(), datasetRepository.getAll()])
+            return $q.all([userPreferenceRepository.getUserModules(), datasetRepository.getAll()])
                 .then(getAllDataValues);
         };
 

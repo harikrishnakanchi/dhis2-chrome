@@ -57,7 +57,7 @@ define([], function() {
             return this;
         };
 
-        var getQueryBuilder = function(){
+        var getQueryBuilder = function() {
             return new queryBuilder();
         };
 

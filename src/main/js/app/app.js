@@ -39,6 +39,10 @@ define(["angular", "Q", "services", "dbutils", "controllers", "repositories", "m
                         templateUrl: 'templates/orgunits.html',
                         controller: 'orgUnitContoller'
                     }).
+                    when('/notifications', {
+                        templateUrl: 'templates/notifications.html',
+                        controller: 'notificationsController'
+                    }).
                     when('/productKeyPage', {
                         templateUrl: 'templates/product-key.html',
                         controller: 'productKeyController'

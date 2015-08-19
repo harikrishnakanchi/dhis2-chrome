@@ -1,0 +1,22 @@
+<div ng-controller="notificationsController">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Module name</th>
+                <th>Data Element Name</th>
+                <th ng-repeat="week in weeks">
+                    {{week}}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="dataElementValue in allDataElementValues">
+                <td>{{dataElementValue.moduleName}}</td>
+                <td>{{dataElementValue.dataElementName}}</td>
+                <td ng-repeat="week in weeks ">
+                    {{dataElementValue.weeklyData[week]}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

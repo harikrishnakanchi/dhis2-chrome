@@ -72,6 +72,7 @@ require.config({
         "selectLanguageController": "app/controller/select.language.controller",
         "reportsController": "app/controller/reports.controller",
         "referralLocationsController": "app/controller/referral.locations.controller",
+        "notificationsController": "app/controller/notifications.controller",
 
         //Services
         "services": "app/service/services",

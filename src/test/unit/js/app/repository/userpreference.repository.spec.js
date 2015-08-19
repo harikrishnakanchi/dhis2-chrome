@@ -82,13 +82,19 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
             mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
 
             var actualUserModules;
-            userPreferenceRepository.getUserModuleIds().then(function(data) {
+            userPreferenceRepository.getUserModules().then(function(data) {
                 actualUserModules = data;
             });
 
             scope.$apply();
             expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1', 'proj2']);
-            expect(actualUserModules).toEqual(["mod1", "mod2", "mod3"]);
+            expect(actualUserModules).toEqual([{
+                "id": "mod1"
+            }, {
+                "id": "mod2"
+            }, {
+                "id": "mod3"
+            }]);
         });
 
         it("should get all patient origin org units for user's modules", function() {
@@ -100,7 +106,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
                 "name": "o2"
             }];
 
-            spyOn(userPreferenceRepository, "getUserModuleIds").and.returnValue(utils.getPromise(q, []));
+            spyOn(userPreferenceRepository, "getUserModules").and.returnValue(utils.getPromise(q, []));
             orgUnitRepository.findAllByParent = jasmine.createSpy("findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
 
             var expectedResults = ["o1", "o2"];

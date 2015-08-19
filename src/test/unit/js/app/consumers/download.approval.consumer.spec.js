@@ -1,6 +1,6 @@
 define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "datasetRepository", "orgUnitRepository", "userPreferenceRepository", "approvalService", "moment"],
     function(DownloadApprovalConsumer, mocks, properties, utils, DatasetRepository, OrgUnitRepository, UserPreferenceRepository, ApprovalService, moment) {
-        describe("download data consumer", function() {
+        describe("download approval consumer", function() {
 
             var approvalDataRepository, datasetRepository, userPreferenceRepository, orgUnitRepository, q, scope, downloadApprovalConsumer, message, approvalService;
 
@@ -9,7 +9,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 scope = $rootScope.$new();
 
                 userPreferenceRepository = {
-                    "getUserModuleIds": jasmine.createSpy("getUserModuleIds").and.returnValue(utils.getPromise(q, ["org_0"]))
+                    "getUserModules": jasmine.createSpy("getUserModules").and.returnValue(utils.getPromise(q, ["org_0"]))
                 };
 
                 datasetRepository = {
@@ -39,7 +39,16 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
             }));
 
             it("should download approval data from dhis based on user module ids and dataset", function() {
-                userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, ["mod1", "mod2", "mod3"]));
+                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, [{
+                    "name": "mod1",
+                    "id": "mod1"
+                }, {
+                    "name": "mod2",
+                    "id": "mod2"
+                }, {
+                    "name": "mod3",
+                    "id": "mod3"
+                }]));
 
                 var originOrgUnits = [{
                     "id": "org1"
@@ -56,7 +65,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 downloadApprovalConsumer.run(message);
                 scope.$apply();
 
-                expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
+                expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
                 expect(datasetRepository.getAll).toHaveBeenCalled();
 
                 expect(approvalService.getCompletionData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], originOrgUnits, ["DS_OPD"]);
@@ -66,7 +75,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
             });
 
             it("should not download approval data from dhis if the user does not have any preferred moduleids", function() {
-                userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, []));
+                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, []));
 
                 datasetRepository.getAll.and.returnValue(utils.getPromise(q, ["ds1"]));
 

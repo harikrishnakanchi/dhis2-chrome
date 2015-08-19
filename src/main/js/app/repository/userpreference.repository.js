@@ -15,7 +15,7 @@ define(["lodash"], function(_) {
             return store.upsert(userPreferences);
         };
 
-        var getUserModuleIds = function() {
+        var getUserModules = function() {
             return getAll().then(function(userPreferences) {
                 userPreferences = userPreferences || [];
                 var userOrgUnitIds = _.uniq(_.pluck(_.flatten(_.pluck(userPreferences, "organisationUnits")), "id"));
@@ -24,13 +24,14 @@ define(["lodash"], function(_) {
                     return [];
 
                 return orgUnitRepository.getAllModulesInOrgUnits(userOrgUnitIds).then(function(userModules) {
-                    return _.pluck(userModules, "id");
+                    return userModules;
                 });
             });
         };
 
         var getOriginOrgUnitIds = function() {
-            return getUserModuleIds().then(function(moduleIds) {
+            return getUserModules().then(function(modules) {
+                var moduleIds = _.pluck(modules, "id");
                 return orgUnitRepository.findAllByParent(moduleIds).then(function(originOrgUnits) {
                     return _.pluck(originOrgUnits, "id");
                 });
@@ -41,7 +42,7 @@ define(["lodash"], function(_) {
             "get": get,
             "getAll": getAll,
             "save": save,
-            "getUserModuleIds": getUserModuleIds,
+            "getUserModules": getUserModules,
             "getOriginOrgUnitIds": getOriginOrgUnitIds
         };
     };

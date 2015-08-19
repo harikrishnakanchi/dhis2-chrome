@@ -290,5 +290,6 @@
     "emergencyTemplateLabel": "Emergency",
     "defaultTemplateLabel": "Default",
     "printRegistrationBook": "Print Registration Book",
-    "viewRegistrationBook": "View Registration Book"
+    "viewRegistrationBook": "View Registration Book",
+    "notificationsLabel": "Notifications"
 }

@@ -6,14 +6,14 @@ define(['downloadChartConsumer', 'angularMocks', 'utils'], function(DownloadChar
             q = $q;
             chartService = jasmine.createSpyObj('chartService', ['getChartDataForOrgUnit', 'getAllFieldAppChartsForDataset', 'getChartDataForOrgUnit']);
             chartRepository = {
-                'upsertChartData':  jasmine.createSpy("upsertChartData").and.returnValue(utils.getPromise(q, {})),
+                'upsertChartData': jasmine.createSpy("upsertChartData").and.returnValue(utils.getPromise(q, {})),
                 'upsert': jasmine.createSpy("upsert").and.returnValue(utils.getPromise(q, {})),
             };
             chartService = {
-                'getAllFieldAppChartsForDataset':  jasmine.createSpy("upsertChartData").and.returnValue(utils.getPromise(q, {})),
-                'getChartDataForOrgUnit': function(){},
+                'getAllFieldAppChartsForDataset': jasmine.createSpy("upsertChartData").and.returnValue(utils.getPromise(q, {})),
+                'getChartDataForOrgUnit': function() {},
             };
-            userPreferenceRepository = jasmine.createSpyObj('userPreferenceRepository', ['getUserModuleIds']);
+            userPreferenceRepository = jasmine.createSpyObj('userPreferenceRepository', ['getUserModules']);
             datasetRepository = jasmine.createSpyObj('datasetRepository', ['findAllForOrgUnits']);
 
             downloadChartConsumer = new DownloadChartConsumer(chartService, chartRepository, userPreferenceRepository, datasetRepository, $q);
@@ -60,18 +60,26 @@ define(['downloadChartConsumer', 'angularMocks', 'utils'], function(DownloadChar
                     "code": "de2",
                 }]
             }];
-            userPreferenceRepository.getUserModuleIds.and.returnValue(utils.getPromise(q, ['Mod1', 'Mod2']));
+
+            var userModules = [{
+                "name": "Mod1",
+                "id": "Mod1"
+            }, {
+                "name": "Mod2",
+                "id": "Mod2"
+            }];
+            userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, userModules));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
             chartService.getAllFieldAppChartsForDataset.and.returnValue(utils.getPromise(q, fieldAppCharts));
             chartRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppCharts));
             spyOn(chartService, 'getChartDataForOrgUnit').and.callFake(function(chart, modId) {
-                if(chart===fieldAppCharts[0] && modId==="Mod1")
+                if (chart === fieldAppCharts[0] && modId === "Mod1")
                     return utils.getPromise(q, "data1");
-                if(chart===fieldAppCharts[0] && modId==="Mod2")
+                if (chart === fieldAppCharts[0] && modId === "Mod2")
                     return utils.getPromise(q, "data2");
-                if(chart===fieldAppCharts[1] && modId==="Mod1")
+                if (chart === fieldAppCharts[1] && modId === "Mod1")
                     return utils.getPromise(q, "data3");
-                if(chart===fieldAppCharts[1] && modId==="Mod2")
+                if (chart === fieldAppCharts[1] && modId === "Mod2")
                     return utils.getPromise(q, "data4");
             });
             chartRepository.upsertChartData.and.returnValue(utils.getPromise(q, []));
@@ -79,7 +87,7 @@ define(['downloadChartConsumer', 'angularMocks', 'utils'], function(DownloadChar
             downloadChartConsumer.run();
             scope.$apply();
 
-            expect(userPreferenceRepository.getUserModuleIds).toHaveBeenCalled();
+            expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
             expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod1', 'Mod2']);
             expect(chartService.getAllFieldAppChartsForDataset).toHaveBeenCalledWith(datasetsAssociatedWithUserModules);
             expect(chartRepository.upsert).toHaveBeenCalledWith(fieldAppCharts);

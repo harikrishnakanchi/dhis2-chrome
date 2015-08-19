@@ -14,7 +14,16 @@ define(["lodash"], function(_) {
             };
             return store.upsert(chartDataItem);
         };
-        
+
+        this.getAllChartsForNotifications = function() {
+            var store = db.objectStore("charts");
+            return store.getAll().then(function(charts) {
+                return _.filter(charts, function(chart) {
+                    return _.endsWith(chart.name, "Notifications");
+                });
+            });
+        };
+
         this.getAll = function(charts) {
             var store = db.objectStore("charts");
             return store.getAll();

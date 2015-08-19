@@ -1,11 +1,13 @@
 define(["chartRepository", "angularMocks", "utils"], function(ChartRepository, mocks, utils) {
     describe('Chart Repository', function() {
-        var mockStore, chartRepository, q;
+        var mockStore, chartRepository, q, mockDB;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
-            var mockDB = utils.getMockDB($q);
+            mockDB = utils.getMockDB($q);
             q = $q;
+            scope = $rootScope.$new();
             mockStore = mockDB.objectStore;
+
             chartRepository = new ChartRepository(mockDB.db);
         }));
 
@@ -42,10 +44,18 @@ define(["chartRepository", "angularMocks", "utils"], function(ChartRepository, m
         });
 
         it('should transform the chartData', function() {
-            var data = [{"metaData": "some"}];
-            var chartData = [{'orgUnit': 'orgUnitId', 'chart': 'chart id', data: data}];
+            var data = [{
+                "metaData": "some"
+            }];
+            var chartData = [{
+                'orgUnit': 'orgUnitId',
+                'chart': 'chart id',
+                data: data
+            }];
             mockStore.each.and.returnValue(utils.getPromise(q, chartData));
-            var result = chartRepository.getDataForChart({'id': 'chart id'}, 'orgUnitId').then(function(result){
+            var result = chartRepository.getDataForChart({
+                'id': 'chart id'
+            }, 'orgUnitId').then(function(result) {
                 expect(result).toEqual(data);
             });
         });
@@ -53,6 +63,29 @@ define(["chartRepository", "angularMocks", "utils"], function(ChartRepository, m
         it('should get All the charts', function() {
             chartRepository.getAll();
             expect(mockStore.getAll).toHaveBeenCalled();
+        });
+
+        it('should get All notification charts', function() {
+            var allCharts = [{
+                "name": "chart 1",
+                "id": "1"
+            }, {
+                "name": "chart 2 Notifications",
+                "id": "1"
+            }, {
+                "name": "chart 3 Notifications",
+                "id": "1"
+            }];
+
+            mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
+
+            chartRepository.getAllChartsForNotifications().then(function(result) {
+                expect(result).toEqual([allCharts[1], allCharts[2]]);
+            });
+            scope.$apply();
+            expect(mockStore.getAll).toHaveBeenCalled();
+
+
         });
     });
 });
