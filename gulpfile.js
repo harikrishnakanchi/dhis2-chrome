@@ -9,7 +9,6 @@ var protractor = require('gulp-protractor').protractor;
 var download = require('gulp-download');
 var argv = require('yargs').argv;
 var karmaConf = 'src/test/unit/conf/karma.conf.js';
-var karmaIntConf = 'src/test/integration/conf/karma.conf.js';
 var webserver;
 var fs = require('fs');
 var rename = require('gulp-rename');
@@ -40,65 +39,6 @@ gulp.task('test', function() {
         });
 });
 
-gulp.task('check-jetty-home', function() {
-    if (!process.env.JETTY_HOME) {
-        console.error("Tell us where to find jetty (start.jar) by setting JETTY_HOME");
-        process.exit(-1);
-    }
-});
-
-gulp.task('check-war-path', function() {
-    if (!process.env.DHIS_WAR_PATH) {
-        console.error("Tell us where to find dhis by setting DHIS_WAR_PATH");
-        process.exit(-1);
-    }
-
-    if (!fs.existsSync(path.join(process.env.DHIS_WAR_PATH, 'dhis.war'))) {
-        console.error("Dhis war not preset at DHIS_WAR_PATH");
-        process.exit(-1);
-    }
-});
-
-gulp.task('deploy-war', function() {
-    var dhis_path = path.join(process.env.DHIS_WAR_PATH, 'dhis.war');
-    var jety_webapps = path.join(process.env.JETTY_HOME, 'webapps/dhis.war');
-    if (fs.existsSync(jety_webapps)) {
-        fs.unlinkSync(jety_webapps);
-    }
-    return fs.symlinkSync(dhis_path, jety_webapps);
-});
-
-gulp.task('update-webdriver', shell.task([
-    './node_modules/protractor/bin/webdriver-manager update'
-]));
-
-gulp.task('reset-db', shell.task(['dropdb dhis_test  --if-exists && createdb dhis_test -O dhis && psql dhis_test < src/test/integration/db/dhis2.backup'], {
-    quiet: true
-}));
-
-gulp.task('start-dhis', ['check-jetty-home', 'check-war-path', 'deploy-war', 'reset-db'], function() {
-    process.env.DHIS2_HOME = path.join(__dirname, 'src/test/integration/conf');
-    var deferred = Q.defer();
-    var stream = shell(['java -Xms1024m -Xmx4g -XX:NewSize=256m -XX:MaxNewSize=356m -XX:PermSize=512m -XX:MaxPermSize=1024m -jar ' + process.env.JETTY_HOME + '/start.jar etc/jetty-logging.xml -Djetty.port=8888 -DSTOP.PORT=8889 -DSTOP.KEY=booyakasha'], {
-        cwd: process.env.JETTY_HOME
-    });
-
-    stream.write("logs/jetty.log");
-
-    var checkForDhis = function() {
-        rest.get('http://localhost:8888/dhis').on('complete', function(result) {
-            if (result instanceof Error) {
-                console.log('Waiting for dhis to boot');
-                this.retry(10000);
-            } else {
-                deferred.resolve();
-            }
-        });
-    };
-    checkForDhis();
-    return deferred.promise;
-});
-
 gulp.task('devtest', function() {
     return gulp.src('_')
         .pipe(karma({
@@ -108,35 +48,9 @@ gulp.task('devtest', function() {
         }));
 });
 
-var stopDhis = function() {
-    var stream = shell(['java -jar ' + process.env.JETTY_HOME + '/start.jar --stop -DSTOP.PORT=8889 -DSTOP.KEY=booyakasha']);
-    stream.write(process.stdout);
-    return stream;
-};
-
-gulp.task('it', ["check-jetty-home", "check-war-path", 'start-dhis'], function() {
-    return gulp.src('_')
-        .pipe(karma({
-            configFile: karmaIntConf,
-            action: 'run',
-            preprocessors: {}
-        })).on('error', function(err) {
-            stopDhis();
-            throw err;
-        })
-        .on('end', function(err) {
-            stopDhis();
-        });
-});
-
-gulp.task('itest', function() {
-    return gulp.src('_')
-        .pipe(karma({
-            configFile: karmaIntConf,
-            action: 'watch',
-            preprocessors: {}
-        }));
-});
+gulp.task('update-webdriver', shell.task([
+    './node_modules/protractor/bin/webdriver-manager update'
+]));
 
 gulp.task('start-http', function() {
     webserver = http.createServer(
