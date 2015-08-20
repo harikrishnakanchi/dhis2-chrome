@@ -1,9 +1,10 @@
 define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties) {
     return function($scope, $routeParams, $q, $hustle, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
-        $timeout, orgUnitRepository, datasetRepository, programRepository) {
+        $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository) {
 
         $scope.rowTotal = {};
         var currentPeriod, currentPeriodAndOrgUnit, catOptComboIdsToBeTotalled;
+        var removeReferral = false;
 
         var resetForm = function() {
             $scope.isopen = {};
@@ -83,9 +84,18 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             return sum;
         };
 
-        $scope.columnSum = function(dataValues, orgUnits, sectionDataElements, optionId) {
+        var getReferralDataElementIds = function(dataElements) {
+            var dataElementsForReferral = _.filter(dataElements, function(de) {
+                return $scope.referralLocations[de.formName] !== undefined;
+            });
+
+            return _.pluck(dataElementsForReferral, "id");
+        };
+
+        $scope.columnSum = function(dataValues, orgUnits, sectionDataElements, optionId, isReferralDataset) {
             orgUnits = _.isArray(orgUnits) ? orgUnits : [orgUnits];
-            var dataElementIds = _.pluck(sectionDataElements, "id");
+            var dataElementIds = isReferralDataset ? getReferralDataElementIds(sectionDataElements) : _.pluck(sectionDataElements, "id");
+
             var allValues = [];
             _.forEach(orgUnits, function(orgUnit) {
                 dataValues[orgUnit.id] = dataValues[orgUnit.id] || {};
@@ -212,6 +222,16 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 });
             };
 
+            var loadRefferalLocations = function() {
+                return referralLocationsRepository.get($scope.selectedModule.parent.id).then(function(data) {
+                    if (_.isUndefined(data)) {
+                        removeReferral = true;
+                        return;
+                    }
+                    $scope.referralLocations = data;
+                });
+            };
+
             var findallOrgUnits = function(orgUnits) {
                 var orgUnitIds = _.pluck(orgUnits, "id");
                 return orgUnitRepository.findAll(orgUnitIds);
@@ -227,7 +247,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
 
             if (_.isEmpty($scope.selectedModule))
                 return;
-            return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements()]).then(function() {
+            return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements(), loadRefferalLocations()]).then(function() {
 
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
@@ -242,7 +262,12 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                             });
                         });
                         return $q.all(dataSetPromises).then(function(datasets) {
-                            $scope.dataSets = datasets;
+                            if (removeReferral)
+                                $scope.dataSets = _.filter(datasets, {
+                                    "isReferralDataset": false
+                                });
+                            else
+                                $scope.dataSets = datasets;
                         });
                     });
 

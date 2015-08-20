@@ -1,6 +1,6 @@
 /*global Date:true*/
-define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository", "datasetRepository", "programRepository"],
-    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository, DatasetRepository, ProgramRepository) {
+define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository", "datasetRepository", "programRepository", "referralLocationsRepository"],
+    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository) {
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, db, q, location, anchorScroll, aggregateDataEntryController, rootScope,
                 saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getDataValuesSpy,
@@ -148,7 +148,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     'catOptComboIdsToBeTotalled': ['option1', 'option3', 'option4']
                 }));
 
-                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository);
+                referralLocationsRepository = new ReferralLocationsRepository();
+                spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, []));
+
+                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository);
 
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
@@ -280,6 +283,47 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 };
 
                 expect(scope.columnSum(list, section, option)).toBe(6);
+            });
+
+            it("should return the column sum in a section for configured data elements in referral dataset", function() {
+                var section = {
+                    "dataElements": [{
+                        "id": "de1",
+                        "formName": "DE 1"
+                    }, {
+                        "id": "de2",
+                        "formName": "DE 2"
+                    }, {
+                        "id": "de3",
+                        "formName": "DE 3"
+                    }]
+                };
+
+                var option = "option1";
+                var list = {
+                    "de1": {
+                        "option1": {
+                            "value": "5"
+                        }
+                    },
+                    "de2": {
+                        "option1": {
+                            "value": "1"
+                        }
+                    },
+                    "de3": {
+                        "option1": {
+                            "value": "10"
+                        }
+                    }
+                };
+                scope.$apply();
+                scope.referralLocations = {
+                    "DE 1": "Awesome Name",
+                    "DE 3": "Another awesome name"
+                };
+
+                expect(scope.columnSum(list, section, option, true)).toBe(15);
             });
 
             it("should return the sum of all the rows for a given section", function() {

@@ -1,6 +1,6 @@
 /*global Date:true*/
-define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository", "datasetRepository", "programRepository"],
-    function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository, DatasetRepository, ProgramRepository) {
+define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository", "datasetRepository", "programRepository", "referralLocationsRepository"],
+    function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository) {
         describe("dataApprovalController ", function() {
             var scope, routeParams, q, location, anchorScroll, dataApprovalController, rootScope, approvalStore,
                 saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getApprovalDataSpy, getDataValuesSpy,
@@ -151,8 +151,11 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 getDataValuesSpy = spyOn(dataRepository, "getDataValues");
                 getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
 
+                referralLocationsRepository = new ReferralLocationsRepository();
+                spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, []));
+
                 spyOn(hustle, "publish");
-                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository);
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository);
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));
 
@@ -193,7 +196,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     }
                 };
 
-                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository);
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository);
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
@@ -328,7 +331,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     }
                 };
 
-                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository);
+                dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, systemSettingRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository);
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
                 scope.$apply();
 
@@ -444,6 +447,52 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 }];
 
                 expect(scope.columnSum(dataValues, orgUnits, sectionDataElements, "c1")).toBe(12);
+            });
+
+            it("should return the column sum in a section for configured data elements in referral dataset", function() {
+                var sectionDataElements = [{
+                    "id": "de1",
+                    "formName": "DE 1"
+                }, {
+                    "id": "de2",
+                    "formName": "DE 2"
+                }, {
+                    "id": "de3",
+                    "formName": "DE 3"
+                }];
+
+                var dataValues = {
+                    "ou1": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            }
+                        },
+                        "de2": {
+                            "c1": {
+                                "value": "10"
+                            }
+                        },
+                        "de3": {
+                            "c1": {
+                                "value": "3"
+                            }
+                        }
+                    }
+                };
+
+                var orgUnits = [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }];
+
+                scope.$apply();
+                scope.referralLocations = {
+                    "DE 1": "Awesome Name",
+                    "DE 3": "Another awesome name"
+                };
+
+                expect(scope.columnSum(dataValues, orgUnits, sectionDataElements, "c1", true)).toBe(4);
             });
             it("should return the total sum for all rows ", function() {
                 var sectionDataElements = [{

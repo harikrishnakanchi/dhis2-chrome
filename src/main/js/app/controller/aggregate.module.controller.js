@@ -17,6 +17,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.selectedDataset = {};
             $scope.enrichedDatasets = {};
             var excludedDataElements = [];
+            var referralDataset;
 
             var enrichSection = function(section) {
                 var unGroupedElements = _(section.dataElements)
@@ -142,9 +143,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
-                var getOriginDatasets = function() {
+                var getOriginAndReferralDatasets = function() {
                     return datasetRepository.getAll().then(function(datasets) {
                         $scope.originDatasets = _.filter(datasets, "isOriginDataset");
+                        referralDataset = _.find(datasets, "isReferralDataset");
                     });
                 };
 
@@ -154,7 +156,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
-                return initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModules).then(setDisabled).then(getOriginDatasets).then(getTemplates);
+                return initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModules).then(setDisabled).then(getOriginAndReferralDatasets).then(getTemplates);
             };
 
             $scope.changeCollapsed = function(sectionId) {
@@ -276,10 +278,14 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
+                var datasetsToAssociate = _.cloneDeep($scope.associatedDatasets);
+                if (!_.isEmpty(referralDataset))
+                    datasetsToAssociate.push(referralDataset);
+
                 $scope.loading = true;
                 return getEnrichedModule($scope.module)
                     .then(createModules)
-                    .then(_.partial(associateToDatasets, $scope.associatedDatasets, [enrichedModule]))
+                    .then(_.partial(associateToDatasets, datasetsToAssociate, [enrichedModule]))
                     .then(_.partial(saveExcludedDataElements, enrichedModule))
                     .then(createOrgUnitGroups)
                     .then(createOriginOrgUnits)

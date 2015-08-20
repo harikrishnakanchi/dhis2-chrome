@@ -53,12 +53,20 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } | orderBy: 'name' track by dataElement.id" ng-form="dataElementForm">
+                                                <tr ng-if="!dataSet.isReferralDataset || (dataSet.isReferralDataset &amp;&amp; referralLocations[dataElement.formName] !== undefined)" ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } | orderBy: 'name' track by dataElement.id" ng-form="dataElementForm">
                                                     <td>
-                                                        <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
-                                                        <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}
+                                                        <div ng-if="!dataSet.isReferralDataset">
+                                                            <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
+                                                            <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}
                                                             <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{dataElement.description}}"/>
                                                         </span>
+                                                        </div>
+                                                        <div ng-if="dataSet.isReferralDataset">
+                                                            <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
+                                                            <span ng-if="!resourceBundle[dataElement.id]"> {{ referralLocations[dataElement.formName] }}
+                                                            <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{dataElement.description}}"/>
+                                                        </span>
+                                                        </div>
                                                     </td>
                                                     <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
@@ -72,7 +80,7 @@
                                                         <span> {{ resourceBundle.totalLabel }}</span>
                                                     </td>
                                                     <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
-                                                        {{columnSum(dataValues[selectedModule.id], section , option)}}
+                                                        {{columnSum(dataValues[selectedModule.id], section , option, dataSet.isReferralDataset)}}
                                                     </td>
                                                     <td class="last-column"> {{totalSum(section)}}
                                                     </td>

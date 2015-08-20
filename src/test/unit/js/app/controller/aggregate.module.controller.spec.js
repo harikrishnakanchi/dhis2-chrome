@@ -1245,5 +1245,70 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.changeDataElementSelection(section);
                 expect(section).toEqual(expectedSection);
             });
+
+            it("should associate all the necessary datasets", function() {
+
+                var datasets = [{
+                    "id": "ds1",
+                    "name": "Aggregate Dataset",
+                    "organisationUnits": [{
+                        "id": "ou1"
+                    }],
+                    "isAggregateService": true,
+                    "isLineListService": false,
+                    "isOriginDataset": false,
+                    "isNewDataModel": true,
+                    "isReferralDataset": false
+                }, {
+                    "id": "ds2",
+                    "name": "Referral Dataset",
+                    "organisationUnits": [{
+                        "id": "ou1"
+                    }],
+                    "isAggregateService": true,
+                    "isLineListService": false,
+                    "isOriginDataset": false,
+                    "isNewDataModel": true,
+                    "isReferralDataset": true
+                }, {
+                    "id": "ds3",
+                    "name": "Aggregate Dataset",
+                    "organisationUnits": [{
+                        "id": "ou1"
+                    }],
+                    "isAggregateService": false,
+                    "isLineListService": true,
+                    "isOriginDataset": false,
+                    "isNewDataModel": true,
+                    "isReferralDataset": false
+                }];
+
+                dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
+
+                scope.module = {
+                    "id": "mod1",
+                    "name": "mod1",
+                    "openingDate": "2014-04-01",
+                    "parent": {
+                        "id": "pid",
+                        "name": "parent",
+                        "level": 5
+                    }
+                };
+
+                spyOn(dhisId, "get").and.callFake(function(name) {
+                    return name;
+                });
+
+                scope.$apply();
+
+                scope.associatedDatasets = [datasets[0]];
+                scope.save();
+                scope.$apply();
+
+                expect(dataSetRepo.associateOrgUnits).toHaveBeenCalledWith(["ds1", "ds2"], jasmine.any(Object));
+
+            });
+
         });
     });
