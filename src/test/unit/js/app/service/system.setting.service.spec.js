@@ -32,49 +32,6 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
             Timecop.uninstall();
         });
 
-        it("should get all sysettings from local file if syncing for the first time", function() {
-            var setting1 = "{\"clientLastUpdated\":\"2015-02-16T09:55:28.681Z\",\"dataElements\":[\"a3e1a48467b\",\"a8a704935cb\"]}";
-            var setting2 = "{\"clientLastUpdated\":\"2015-02-16T09:34:08.656Z\",\"dataElements\":[\"a21ac2e69d4\",\"acaeb258531\",\"a1cd332c676\"]}";
-            var actualSystemSettings = {};
-            var moduleTemplates = {
-                "ds1": {
-                    "temp1": [1, 2],
-                    "temp2": [3, 4]
-                },
-                "ds2": {
-                    "temp1": [1, 5],
-                    "temp2": [8, 9]
-                }
-            };
-
-            var systemSettingsInInFile = {
-                "keyAccountRecovery": true,
-                "keyHideUnapprovedDataInAnalytics": true,
-                "exclude_ab5e8d18bd6": setting1,
-                "exclude_a2e4d473823": setting2,
-                "moduleTemplates": moduleTemplates
-            };
-
-            var expectedSystemSettings = [{
-                key: "ab5e8d18bd6",
-                value: JSON.parse(setting1)
-            }, {
-                key: "a2e4d473823",
-                value: JSON.parse(setting2)
-            }, {
-                key: "moduleTemplates",
-                value: moduleTemplates
-            }];
-
-            httpBackend.expectGET("/data/systemSettings.json").respond(200, systemSettingsInInFile);
-            service.loadFromFile().then(function(data) {
-                actualSystemSettings = data;
-            });
-
-            httpBackend.flush();
-            expect(actualSystemSettings).toEqual(expectedSystemSettings);
-        });
-
         it("should get all excluded data elements", function() {
             var result = {};
             httpBackend.expectGET(properties.dhis.url + "/api/systemSettings").respond(200, allSystemSettings);

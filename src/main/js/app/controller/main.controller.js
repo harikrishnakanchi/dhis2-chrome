@@ -112,20 +112,20 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         });
 
         var init = function() {
-            $scope.allUserLineListModules = [];
 
-            loadAuthHeader().then(function() {
+            var validateAndContinue = function() {
                 if (_.isEmpty($rootScope.authHeader)) {
                     $location.path("/productKeyPage");
-                    return;
-                }
-
-                metadataImporter.run().then(function() {
+                } else {
                     chromeUtils.sendMessage("dbReady");
                     $location.path("/login");
-                });
-            });
+                }
+            };
 
+            $scope.allUserLineListModules = [];
+            metadataImporter.run()
+                .then(loadAuthHeader)
+                .then(validateAndContinue);
         };
 
         init();

@@ -193,23 +193,18 @@ gulp.task('watch', function() {
     return gulp.watch('./src/main/less/main.less', ['less']);
 });
 
-gulp.task('download-systemSettings', function() {
-    return download(baseIntUrl + "/api/systemSettings.json", auth)
-        .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
-});
-
 gulp.task('download-metadata', function() {
     return download(baseIntUrl + "/api/metadata.json", auth)
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });
 
-gulp.task('pack', ['less', 'config', 'download-metadata', 'download-systemSettings'], function() {
+gulp.task('pack', ['less', 'config', 'download-metadata'], function() {
     var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "praxis_" + (argv.env || "dev")]);
     stream.write(process.stdout);
     return stream;
 });
 
-gulp.task('zip', ['less', 'config', 'download-metadata', 'download-systemSettings'], function() {
+gulp.task('zip', ['less', 'config', 'download-metadata'], function() {
     return gulp.src('./src/main/**')
         .pipe(zip("praxis_" + (argv.env || "dev") + ".zip"))
         .pipe(gulp.dest(''));

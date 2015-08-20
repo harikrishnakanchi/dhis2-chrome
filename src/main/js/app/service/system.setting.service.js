@@ -35,10 +35,6 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             return $http.get(dhisUrl.systemSettings).then(transform);
         };
 
-        var loadFromFile = function() {
-            return $http.get("/data/systemSettings.json").then(transform);
-        };
-
         var referralLocationKey = function(opUnitId) {
             return "referralLocations_" + opUnitId;
         };
@@ -70,7 +66,6 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         return {
             "upsert": upsert,
             "getAll": getAll,
-            "loadFromFile": loadFromFile,
             "upsertReferralLocations": upsertReferralLocations,
             "getReferralLocations": getReferralLocations
         };

@@ -1,7 +1,7 @@
-define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService", "systemSettingService", "systemSettingRepository", "changeLogRepository", "metadataRepository", "orgUnitRepository", "orgUnitGroupRepository", "datasetRepository", "programRepository"],
-    function(mocks, utils, moment, MetadataImporter, MetadataService, SystemSettingService, SystemSettingRepository, ChangeLogRepository, MetadataRepository, OrgUnitRepository, OrgUnitGroupRepository, DatasetRepository, ProgramRepository) {
+define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService", "changeLogRepository", "metadataRepository", "orgUnitRepository", "orgUnitGroupRepository", "datasetRepository", "programRepository"],
+    function(mocks, utils, moment, MetadataImporter, MetadataService, ChangeLogRepository, MetadataRepository, OrgUnitRepository, OrgUnitGroupRepository, DatasetRepository, ProgramRepository) {
         describe("metadataImporter", function() {
-            var q, scope, metadataImporter, metadataService, systemSettingService, systemSettingRepository, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository;
+            var q, scope, metadataImporter, metadataService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
@@ -18,17 +18,14 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 orgUnitGroupRepository = new OrgUnitGroupRepository();
                 programRepository = new ProgramRepository();
                 datasetRepository = new ProgramRepository();
-                systemSettingService = new SystemSettingService();
-                systemSettingRepository = new SystemSettingRepository();
 
                 spyOn(metadataRepository, "upsertMetadata");
                 spyOn(orgUnitRepository, "upsertDhisDownloadedData");
                 spyOn(orgUnitGroupRepository, "upsertDhisDownloadedData");
                 spyOn(datasetRepository, "upsertDhisDownloadedData");
                 spyOn(programRepository, "upsertDhisDownloadedData");
-                spyOn(systemSettingRepository, "upsert");
 
-                metadataImporter = new MetadataImporter(q, metadataService, systemSettingService, systemSettingRepository, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository);
+                metadataImporter = new MetadataImporter(q, metadataService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository);
             }));
 
             it("should import metadata for fresh installations", function() {
@@ -57,18 +54,7 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                     'sections': sections
                 };
 
-                var setting1 = "{\"clientLastUpdated\":\"2015-02-16T09:55:28.681Z\",\"dataElements\":[\"a3e1a48467b\",\"a8a704935cb\"]}";
-                var setting2 = "{\"clientLastUpdated\":\"2015-02-16T09:34:08.656Z\",\"dataElements\":[\"a21ac2e69d4\",\"acaeb258531\",\"a1cd332c676\"]}";
-
-                var systemSettings = {
-                    "keyAccountRecovery": true,
-                    "keyHideUnapprovedDataInAnalytics": true,
-                    "ab5e8d18bd6": JSON.parse(setting1),
-                    "a2e4d473823": JSON.parse(setting2)
-                };
-
                 spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, dhisMetadata));
-                spyOn(systemSettingService, "loadFromFile").and.returnValue(utils.getPromise(q, systemSettings));
 
                 metadataImporter.run();
                 scope.$apply();
@@ -79,7 +65,6 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitGroups);
                 expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(dataSets, sections);
                 expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programs);
-                expect(systemSettingRepository.upsert).toHaveBeenCalledWith(systemSettings);
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith("metaData", metadataCreateDate);
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnits", metadataCreateDate);
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnitGroups", metadataCreateDate);
@@ -99,13 +84,11 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 expect(orgUnitGroupRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(datasetRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(programRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
-                expect(systemSettingRepository.upsert).not.toHaveBeenCalled();
                 expect(changeLogRepository.upsert).not.toHaveBeenCalled();
             });
 
-            it("should not do anything if metadata and system settings are not valid", function() {
+            it("should not do anything if metadata is not valid", function() {
                 spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, "<html><body>Error!</body></html>"));
-                spyOn(systemSettingService, "loadFromFile").and.returnValue(utils.getPromise(q, "<html><body>Error!</body></html>"));
 
                 metadataImporter.run();
                 scope.$apply();
@@ -115,7 +98,6 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 expect(orgUnitGroupRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(datasetRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(programRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
-                expect(systemSettingRepository.upsert).not.toHaveBeenCalled();
                 expect(changeLogRepository.upsert).not.toHaveBeenCalled();
             });
         });
