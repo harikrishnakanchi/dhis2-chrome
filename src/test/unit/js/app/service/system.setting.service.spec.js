@@ -1,4 +1,4 @@
-define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "timecop", "lodash"], function(SystemSettingService, mocks, properties, utils, md5, timecop, _) {
+define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "timecop", "lodash"], function(SystemSettingService, mocks, dhisUrl, utils, md5, timecop, _) {
     describe("systemSettingService", function() {
 
         var http, httpBackend, service, allSystemSettings, q;
@@ -34,7 +34,7 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
 
         it("should get all excluded data elements", function() {
             var result = {};
-            httpBackend.expectGET(properties.dhis.url + "/api/systemSettings").respond(200, allSystemSettings);
+            httpBackend.expectGET(dhisUrl.systemSettings).respond(200, allSystemSettings);
             service.getAll().then(function(data) {
                 result = data;
                 expect(result).toEqual([{
@@ -67,7 +67,7 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
             };
 
             var result = {};
-            httpBackend.expectGET(properties.dhis.url + "/api/systemSettings").respond(200, allSystemSettings);
+            httpBackend.expectGET(dhisUrl.systemSettings).respond(200, allSystemSettings);
             service.getAll().then(function(data) {
                 result = data;
                 expect(result).toEqual([{
@@ -116,7 +116,7 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
                 clientLastUpdated: "2014-05-30T12:43:54.972Z",
                 dataElements: ["de1", "de2"]
             };
-            httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/" + key, expectedPayload).respond(200, "ok");
+            httpBackend.expectPOST(dhisUrl.systemSettings + "/" + key, expectedPayload).respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -131,7 +131,7 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
                 var expectedKey = "referralLocations_" + opUnitId;
                 service.upsertReferralLocations(payload);
 
-                httpBackend.expectPOST(properties.dhis.url + "/api/systemSettings/" + expectedKey, payload).respond(200, "ok");
+                httpBackend.expectPOST(dhisUrl.systemSettings + "/" + expectedKey, payload).respond(200, "ok");
                 httpBackend.flush();
             });
         });
@@ -154,7 +154,7 @@ define(["systemSettingService", "angularMocks", "properties", "utils", "md5", "t
                     return JSON.parse(value);
                 });
 
-                httpBackend.expectGET(properties.dhis.url + "/api/systemSettings" + queryParams).respond(200, remoteReferralLocations);
+                httpBackend.expectGET(dhisUrl.systemSettings + queryParams).respond(200, remoteReferralLocations);
                 service.getReferralLocations(opUnitIds).then(function(result) {
                     expect(result).toEqual(expectedResult);
                 });
