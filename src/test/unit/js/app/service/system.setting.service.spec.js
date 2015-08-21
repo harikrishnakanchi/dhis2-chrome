@@ -129,9 +129,12 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 };
 
                 var expectedKey = "referralLocations_" + opUnitId;
+                var expectedPayload = {};
+                expectedPayload[expectedKey] = payload;
+
                 service.upsertReferralLocations(payload);
 
-                httpBackend.expectPOST(dhisUrl.systemSettings + "/" + expectedKey, payload).respond(200, "ok");
+                httpBackend.expectPOST(dhisUrl.systemSettings, expectedPayload).respond(200, "ok");
                 httpBackend.flush();
             });
         });
@@ -141,18 +144,22 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var opUnitIds = ['opUnit1', 'opUnit2'];
                 var queryParams = "?key=referralLocations_opUnit1&key=referralLocations_opUnit2";
                 var remoteReferralLocations = {
-                    "referralLocations_opUnit1": JSON.stringify({
+                    "referralLocations_opUnit1": {
                         "id": "opUnit1",
                         "facility 1": "some alias"
-                    }),
-                    "referralLocations_opUnit2": JSON.stringify({
+                    },
+                    "referralLocations_opUnit2": {
                         "id": "opUnit2",
                         "facility 2": "some alias1"
-                    })
+                    }
                 };
-                var expectedResult = _.map(remoteReferralLocations, function(value) {
-                    return JSON.parse(value);
-                });
+                var expectedResult = [{
+                    "id": "opUnit1",
+                    "facility 1": "some alias"
+                }, {
+                    "id": "opUnit2",
+                    "facility 2": "some alias1"
+                }];
 
                 httpBackend.expectGET(dhisUrl.systemSettings + queryParams).respond(200, remoteReferralLocations);
                 service.getReferralLocations(opUnitIds).then(function(result) {

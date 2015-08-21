@@ -39,16 +39,18 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             return "referralLocations_" + opUnitId;
         };
 
-        var upsertReferralLocations = function(payload) {
-            var key = referralLocationKey(payload.id);
-            return $http({
+        var upsertReferralLocations = function(data) {
+            var request = {
                 "method": "POST",
-                "url": dhisUrl.systemSettings + "/" + key,
-                "data": JSON.stringify(payload),
+                "url": dhisUrl.systemSettings,
+                "data": {},
                 "headers": {
-                    "Content-Type": "text/plain"
+                    "Content-Type": "application/json"
                 }
-            });
+            };
+            request.data[referralLocationKey(data.id)] = data;
+
+            return $http(request);
         };
 
         var getReferralLocations = function(opUnitIds) {
@@ -57,9 +59,7 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             });
             var queryString = "?" + queryParameters.join("&");
             return $http.get(dhisUrl.systemSettings + queryString).then(function(response){
-                return _.map(response.data, function(value) {
-                    return JSON.parse(value);
-                });
+                return _.values(response.data);
             });
         };
 
