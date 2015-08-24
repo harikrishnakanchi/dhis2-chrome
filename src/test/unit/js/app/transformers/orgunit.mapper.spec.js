@@ -168,10 +168,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "id": "a11a7a5d55a",
                     "name": "Collaboration"
                 },
-                "population": "1000",
-                "proportionChildrenLessThanOneYear": "11",
-                "proportionChildrenLessThanFiveYears": "12",
-                "proportionWomenOfChildBearingAge": "13",
+                "population": 1000,
+                "proportionChildrenLessThanOneYear": 11,
+                "proportionChildrenLessThanFiveYears": 12,
+                "proportionWomenOfChildBearingAge": 13,
                 "autoApprove": "true"
             };
 
@@ -212,10 +212,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "reasonForIntervention": undefined,
                 "modeOfOperation": undefined,
                 "modelOfManagement": undefined,
-                "population": undefined,
-                "proportionChildrenLessThanOneYear": undefined,
-                "proportionChildrenLessThanFiveYears": undefined,
-                "proportionWomenOfChildBearingAge": undefined,
+                "population": NaN,
+                "proportionChildrenLessThanOneYear": NaN,
+                "proportionChildrenLessThanFiveYears": NaN,
+                "proportionWomenOfChildBearingAge": NaN,
                 "autoApprove": "false"
             };
 

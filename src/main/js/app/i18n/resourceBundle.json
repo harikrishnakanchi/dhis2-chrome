@@ -26,9 +26,9 @@
     "modeOfOperationLabel": "Mode of Operation",
     "modelOfManagementLabel": "Model of Management",
     "populationLabel": "Population",
-    "proportionChildrenLessThanFiveYearsLabel": "Proportion of children < 5 years old",
-    "proportionChildrenLessThanOneYearLabel": "Proportion of children < 1 year old",
-    "proportionWomenOfChildBearingAgeLabel": "Proportion of women of child bearing age",
+    "proportionChildrenLessThanFiveYearsLabel": "Proportion of children < 5 years old (in percentage)",
+    "proportionChildrenLessThanOneYearLabel": "Proportion of children < 1 year old (in percentage)",
+    "proportionWomenOfChildBearingAgeLabel": "Proportion of women of child bearing age (in percentage)",
     "endDateLabel": "End Date",
     "autoApproveLabel": "Auto Approve?",
     "createUserBtnLabel": "Create User",
@@ -295,5 +295,8 @@
     "defaultTemplateLabel": "Default",
     "printRegistrationBook": "Print Registration Book",
     "viewRegistrationBook": "View Registration Book",
-    "notificationsLabel": "Notifications"
+    "notificationsLabel": "Notifications",
+    "notAValidNumber": "Not a valid number.",
+    "within100": "Should a number within 100.",
+    "greaterThan0": "Should be a number greater than 0."
 }

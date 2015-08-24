@@ -219,10 +219,10 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             'modelOfManagement': _.find(modelOfManagement, {
                 "name": self.getAttributeValue(dhisProject, "modelOfManagement")
             }),
-            'population': self.getAttributeValue(dhisProject, "population"),
-            'proportionChildrenLessThanOneYear': self.getAttributeValue(dhisProject, "proportionOfChildrenLessThanOneYearOld"),
-            'proportionChildrenLessThanFiveYears': self.getAttributeValue(dhisProject, "proportionOfChildrenLessThatFiveYearsOld"),
-            'proportionWomenOfChildBearingAge': self.getAttributeValue(dhisProject, "proportionOfWomenOfChildBearingAge"),
+            'population': parseInt(self.getAttributeValue(dhisProject, "population")),
+            'proportionChildrenLessThanOneYear': parseInt(self.getAttributeValue(dhisProject, "proportionOfChildrenLessThanOneYearOld")),
+            'proportionChildrenLessThanFiveYears': parseInt(self.getAttributeValue(dhisProject, "proportionOfChildrenLessThatFiveYearsOld")),
+            'proportionWomenOfChildBearingAge': parseInt(self.getAttributeValue(dhisProject, "proportionOfWomenOfChildBearingAge")),
             'autoApprove': autoApprove === undefined ? "false" : autoApprove
         };
     };

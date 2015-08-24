@@ -382,10 +382,10 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 'projectType': {
                     'name': 'Some Type'
                 },
-                "population": "1000",
-                "proportionChildrenLessThanOneYear": "11",
-                "proportionChildrenLessThanFiveYears": "12",
-                "proportionWomenOfChildBearingAge": "13",
+                "population": 1000,
+                "proportionChildrenLessThanOneYear": 11,
+                "proportionChildrenLessThanFiveYears": 12,
+                "proportionWomenOfChildBearingAge": 13,
                 'autoApprove': 'true'
             };
 
