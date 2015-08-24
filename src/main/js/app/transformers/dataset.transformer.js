@@ -24,12 +24,14 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
     this.mapDatasetForView = function(dataset) {
         var resultDataset = _.pick(dataset, ["id", "name", "shortName", "code", "organisationUnits", "sections"]);
         resultDataset.isAggregateService = !getBooleanAttributeValue(dataset.attributeValues, "isLineListService") &&
-                                           !getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset") &&
-                                           !getBooleanAttributeValue(dataset.attributeValues, "isReferralDataset");
+            !getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset") &&
+            !getBooleanAttributeValue(dataset.attributeValues, "isReferralDataset") &&
+            !getBooleanAttributeValue(dataset.attributeValues, "isPopulationDataset");
         resultDataset.isLineListService = getBooleanAttributeValue(dataset.attributeValues, "isLineListService");
         resultDataset.isOriginDataset = getBooleanAttributeValue(dataset.attributeValues, "isOriginDataset");
         resultDataset.isNewDataModel = getBooleanAttributeValue(dataset.attributeValues, "isNewDataModel");
         resultDataset.isReferralDataset = getBooleanAttributeValue(dataset.attributeValues, "isReferralDataset");
+        resultDataset.isPopulationDataset = getBooleanAttributeValue(dataset.attributeValues, "isPopulationDataset");
         return resultDataset;
     };
 

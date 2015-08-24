@@ -38,7 +38,8 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isLineListService": false,
                 "isOriginDataset": false,
                 "isNewDataModel": true,
-                "isReferralDataset": false
+                "isReferralDataset": false,
+                "isPopulationDataset": false
             };
 
             expect(aggregateDatasetForView).toEqual(expectedDataset);
@@ -81,7 +82,8 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isLineListService": true,
                 "isOriginDataset": false,
                 "isNewDataModel": true,
-                "isReferralDataset": false
+                "isReferralDataset": false,
+                "isPopulationDataset": false
             };
 
             expect(linelistDatasetForView).toEqual(expectedDataset);
@@ -128,7 +130,8 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isLineListService": false,
                 "isOriginDataset": true,
                 "isNewDataModel": true,
-                "isReferralDataset": false
+                "isReferralDataset": false,
+                "isPopulationDataset": false
             };
 
             expect(originDatasetForView).toEqual(expectedDataset);
@@ -172,14 +175,15 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isLineListService": false,
                 "isOriginDataset": false,
                 "isNewDataModel": false,
-                "isReferralDataset": false
+                "isReferralDataset": false,
+                "isPopulationDataset": false
             };
 
             expect(currentDatasetForView).toEqual(expectedDataset);
         });
 
         it("should map referral locations dataset for view", function() {
-            var referralLocationsDataset = {
+            var populationDataDataset = {
                 "id": "ds1",
                 "name": "Referral Locations Dataset",
                 "organisationUnits": [{
@@ -208,7 +212,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 }]
             };
 
-            var referralDatasetForView = datasetTransformer.mapDatasetForView(referralLocationsDataset);
+            var populationDatasetForView = datasetTransformer.mapDatasetForView(populationDataDataset);
 
             var expectedDataset = {
                 "id": "ds1",
@@ -220,7 +224,57 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isLineListService": false,
                 "isOriginDataset": false,
                 "isNewDataModel": true,
-                "isReferralDataset": true
+                "isReferralDataset": true,
+                "isPopulationDataset": false
+            };
+
+            expect(populationDatasetForView).toEqual(expectedDataset);
+        });
+
+        it("should map population dataset for view", function() {
+            var referralLocationsDataset = {
+                "id": "ds1",
+                "name": "Population Data Dataset",
+                "organisationUnits": [{
+                    "id": "ou1"
+                }],
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "isOriginDataset"
+                    },
+                    "value": "false"
+                }, {
+                    "attribute": {
+                        "code": "isLineListService"
+                    },
+                    "value": "false"
+                }, {
+                    "attribute": {
+                        "code": "isPopulationDataset"
+                    },
+                    "value": "true"
+                }]
+            };
+
+            var referralDatasetForView = datasetTransformer.mapDatasetForView(referralLocationsDataset);
+
+            var expectedDataset = {
+                "id": "ds1",
+                "name": "Population Data Dataset",
+                "organisationUnits": [{
+                    "id": "ou1"
+                }],
+                "isAggregateService": false,
+                "isLineListService": false,
+                "isOriginDataset": false,
+                "isNewDataModel": true,
+                "isReferralDataset": false,
+                "isPopulationDataset": true
             };
 
             expect(referralDatasetForView).toEqual(expectedDataset);
