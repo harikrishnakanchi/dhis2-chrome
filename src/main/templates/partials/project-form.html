@@ -63,6 +63,30 @@
                         </div>
                     </li>
                     <li class="form-group">
+                        <label for="newPopulation" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.populationLabel }}</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="text" class="form-control" name="newPopulation" id="newPopulation" ng-model="newOrgUnit.population" />
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newProportionChildrenLessThanOneYear" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.proportionChildrenLessThanOneYearLabel }}</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="text" class="form-control" name="newProportionChildrenLessThanOneYear" id="newProportionChildrenLessThanOneYear" ng-model="newOrgUnit.proportionChildrenLessThanOneYear" />
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newProportionChildrenLessThanFiveYears" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.proportionChildrenLessThanFiveYearsLabel }}</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="text" class="form-control" name="newProportionChildrenLessThanFiveYears" id="newProportionChildrenLessThanFiveYears" ng-model="newOrgUnit.proportionChildrenLessThanFiveYears" />
+                        </div>
+                    </li>
+                    <li class="form-group">
+                        <label for="newProportionWomenOfChildBearingAge" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.proportionWomenOfChildBearingAgeLabel }}</label>
+                        <div class="col-sm-6 col-md-6">
+                            <input type="text" class="form-control" name="newProportionWomenOfChildBearingAge" id="newProportionWomenOfChildBearingAge" ng-model="newOrgUnit.proportionWomenOfChildBearingAge" />
+                        </div>
+                    </li>
+                    <li class="form-group">
                         <label for="newOrgUnitReasonForIntervention" class="col-sm-4 col-md-4 control-label required">{{ resourceBundle.reasonForInterventionLabel }}</label>
                         <div class="col-sm-6 col-md-6">
                             <div angucomplete-alt="" name="newOrgUnitReasonForIntervention" form-name="createForm" placeholder="{{ resourceBundle.startTypingLabel }}" pause="100" selected-object="newOrgUnit.reasonForIntervention" local-data="reasonForIntervention" search-fields="name" title-field="name" initial-value="{{newOrgUnit.reasonForIntervention.name}}" minlength="0" input-class="form-control form-control-small" match-class="highlight" field-required="true" class="ng-isolate-scope">

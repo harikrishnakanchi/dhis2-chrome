@@ -89,6 +89,38 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "name": "Project Type"
             },
             "value": orgUnit.projectType ? orgUnit.projectType.title || orgUnit.projectType.name : orgUnit.projectType
+        }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
+            "attribute": {
+                "code": "population",
+                "name": "Population"
+            },
+            "value": orgUnit.population
+        }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
+            "attribute": {
+                "code": "proportionOfChildrenLessThanOneYearOld",
+                "name": "Proportion of children < 1 year old"
+            },
+            "value": orgUnit.proportionChildrenLessThanOneYear
+        }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
+            "attribute": {
+                "code": "proportionOfChildrenLessThatFiveYearsOld",
+                "name": "Proportion of children < 5 years old"
+            },
+            "value": orgUnit.proportionChildrenLessThanFiveYears
+        }, {
+            "created": moment().toISOString(),
+            "lastUpdated": moment().toISOString(),
+            "attribute": {
+                "code": "proportionOfWomenOfChildBearingAge",
+                "name": "Proportion of women of child bearing age"
+            },
+            "value": orgUnit.proportionWomenOfChildBearingAge
         });
 
         if (orgUnit.endDate)
@@ -187,6 +219,10 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             'modelOfManagement': _.find(modelOfManagement, {
                 "name": self.getAttributeValue(dhisProject, "modelOfManagement")
             }),
+            'population': self.getAttributeValue(dhisProject, "population"),
+            'proportionChildrenLessThanOneYear': self.getAttributeValue(dhisProject, "proportionOfChildrenLessThanOneYearOld"),
+            'proportionChildrenLessThanFiveYears': self.getAttributeValue(dhisProject, "proportionOfChildrenLessThatFiveYearsOld"),
+            'proportionWomenOfChildBearingAge': self.getAttributeValue(dhisProject, "proportionOfWomenOfChildBearingAge"),
             'autoApprove': autoApprove === undefined ? "false" : autoApprove
         };
     };

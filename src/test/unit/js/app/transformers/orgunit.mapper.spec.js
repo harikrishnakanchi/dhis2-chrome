@@ -81,6 +81,30 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Project Type"
                     },
                     "value": "Some Type"
+                }, {
+                    "attribute": {
+                        "code": "population",
+                        "name": "Population"
+                    },
+                    "value": "1000"
+                }, {
+                    "attribute": {
+                        "code": "proportionOfChildrenLessThanOneYearOld",
+                        "name": "Proportion of children < 1 year old",
+                    },
+                    "value": "11"
+                }, {
+                    "attribute": {
+                        "code": "proportionOfChildrenLessThatFiveYearsOld",
+                        "name": "Proportion of children < 5 years old"
+                    },
+                    "value": "12"
+                }, {
+                    "attribute": {
+                        "code": "proportionOfWomenOfChildBearingAge",
+                        "name": "Proportion of women of child bearing age"
+                    },
+                    "value": "13"
                 }]
             };
 
@@ -144,6 +168,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "id": "a11a7a5d55a",
                     "name": "Collaboration"
                 },
+                "population": "1000",
+                "proportionChildrenLessThanOneYear": "11",
+                "proportionChildrenLessThanFiveYears": "12",
+                "proportionWomenOfChildBearingAge": "13",
                 "autoApprove": "true"
             };
 
@@ -184,6 +212,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "reasonForIntervention": undefined,
                 "modeOfOperation": undefined,
                 "modelOfManagement": undefined,
+                "population": undefined,
+                "proportionChildrenLessThanOneYear": undefined,
+                "proportionChildrenLessThanFiveYears": undefined,
+                "proportionWomenOfChildBearingAge": undefined,
                 "autoApprove": "false"
             };
 
@@ -215,6 +247,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "modelOfManagement": {
                     "title": "Collaboration"
                 },
+                "population": "1000",
+                "proportionChildrenLessThanOneYear": "11",
+                "proportionChildrenLessThanFiveYears": "12",
+                "proportionWomenOfChildBearingAge": "13",
                 "autoApprove": "true"
             };
 
@@ -328,6 +364,38 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Project Type"
                     },
                     "value": "Some Type"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "population",
+                        "name": "Population"
+                    },
+                    "value": "1000"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "proportionOfChildrenLessThanOneYearOld",
+                        "name": "Proportion of children < 1 year old",
+                    },
+                    "value": "11"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "proportionOfChildrenLessThatFiveYearsOld",
+                        "name": "Proportion of children < 5 years old"
+                    },
+                    "value": "12"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "proportionOfWomenOfChildBearingAge",
+                        "name": "Proportion of women of child bearing age"
+                    },
+                    "value": "13"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
@@ -639,7 +707,11 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "modelOfManagement": {
                     "name": "Collaboration"
                 },
-                "autoApprove": "true"
+                "autoApprove": "true",
+                "population": "1000",
+                "proportionChildrenLessThanOneYear": "11",
+                "proportionChildrenLessThanFiveYears": "12",
+                "proportionWomenOfChildBearingAge": "13"
             };
 
             var expectedSavedProject = {
@@ -737,6 +809,38 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                         "name": "Project Type"
                     },
                     "value": "Some Type"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "population",
+                        "name": "Population"
+                    },
+                    "value": "1000"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "proportionOfChildrenLessThanOneYearOld",
+                        "name": "Proportion of children < 1 year old",
+                    },
+                    "value": "11"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "proportionOfChildrenLessThatFiveYearsOld",
+                        "name": "Proportion of children < 5 years old"
+                    },
+                    "value": "12"
+                }, {
+                    "created": "2014-10-29T12:43:54.972Z",
+                    "lastUpdated": "2014-10-29T12:43:54.972Z",
+                    "attribute": {
+                        "code": "proportionOfWomenOfChildBearingAge",
+                        "name": "Proportion of women of child bearing age"
+                    },
+                    "value": "13"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",

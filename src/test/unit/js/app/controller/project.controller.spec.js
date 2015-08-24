@@ -327,6 +327,30 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                         "name": "Project Type",
                     },
                     "value": "Some Type"
+                }, {
+                    "attribute": {
+                        "code": "population",
+                        "name": "Population"
+                    },
+                    "value": "1000"
+                }, {
+                    "attribute": {
+                        "code": "proportionOfChildrenLessThanOneYearOld",
+                        "name": "Proportion of children < 1 year old",
+                    },
+                    "value": "11"
+                }, {
+                    "attribute": {
+                        "code": "proportionOfChildrenLessThatFiveYearsOld",
+                        "name": "Proportion of children < 5 years old"
+                    },
+                    "value": "12"
+                }, {
+                    "attribute": {
+                        "code": "proportionOfWomenOfChildBearingAge",
+                        "name": "Proportion of women of child bearing age"
+                    },
+                    "value": "13"
                 }]
             };
             var expectedNewOrgUnit = {
@@ -358,6 +382,10 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 'projectType': {
                     'name': 'Some Type'
                 },
+                "population": "1000",
+                "proportionChildrenLessThanOneYear": "11",
+                "proportionChildrenLessThanFiveYears": "12",
+                "proportionWomenOfChildBearingAge": "13",
                 'autoApprove': 'true'
             };
 
