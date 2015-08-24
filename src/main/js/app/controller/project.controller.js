@@ -114,7 +114,7 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
 
             return saveToDbAndPublishMessage(dhisProject)
                 .then(getModulesInProject)
-                .then(createOrgUnitGroups)
+                .then(createOrgUnitGroups);
         };
 
         $scope.save = function(newOrgUnit, parentOrgUnit) {
