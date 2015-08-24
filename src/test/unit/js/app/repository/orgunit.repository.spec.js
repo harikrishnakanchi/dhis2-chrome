@@ -348,19 +348,61 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             };
 
             mockOrgStore.each.and.callFake(function(query) {
-                if (query.inList[0] === "opUnit" && query.inList[1] === "module1")
+                if (query.inList[0] === opUnit.id && query.inList[1] === module1.id)
                     return utils.getPromise(q, [opUnit, module1]);
-                if (query.inList.length === 1 && query.inList[0] === "opUnit")
+                if (query.inList.length === 1 && query.inList[0] === opUnit.id)
                     return utils.getPromise(q, [module]);
             });
 
-            orgUnitRepository.getAllModulesInOrgUnits(["opUnit", "module1"]).then(function(data) {
+            orgUnitRepository.getAllModulesInOrgUnits([opUnit.id, module1.id]).then(function(data) {
                 actualModules = data;
             });
 
             scope.$apply();
 
-            expect(actualModules).toEqual([module, module1]);
+            expect(actualModules).toEqual([module1, module]);
+        });
+
+        it("should get all op units which are children of the given org units", function() {
+            var anotherOpUnit = {
+                "id": "opUnit2",
+                "name": "opUnit",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "isNewDataModel"
+                    },
+                    "value": "true"
+                }, {
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Operation Unit"
+                }],
+                "children": [{
+                    "id": "module",
+                    "name": "module"
+                }]
+            };
+
+
+            mockOrgStore.each.and.callFake(function(query) {
+                if (query.inList[0] === project.id && query.inList[1] === opUnit.id) {
+                    return utils.getPromise(q, [project, opUnit]);
+                } else if (query.inList.length === 1 && query.inList[0] === project.id) {
+                    return utils.getPromise(q, [anotherOpUnit]);
+                } else {
+                    return utils.getPromise(q, []);
+                }
+            });
+
+            var actualOpUnits;
+            orgUnitRepository.getAllOpUnitsInOrgUnits([project.id, opUnit.id]).then(function(data) {
+                actualOpUnits = data;
+            });
+
+            scope.$apply();
+
+            expect(actualOpUnits).toEqual([opUnit, anotherOpUnit]);
         });
 
         it("should get child org unit names", function() {

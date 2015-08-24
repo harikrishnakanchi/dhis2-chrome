@@ -1,7 +1,8 @@
-define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository"],
-    function(SessionHelper, mocks, utils, UserPreferenceRepository, OrgUnitRepository) {
+define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "orgUnitRepository", "moment", "timecop"],
+    function(SessionHelper, mocks, utils, UserPreferenceRepository, OrgUnitRepository, moment, timecop) {
         describe("session helper", function() {
-            var rootScope, q, userPreferenceRepository, user, orgUnitRepository;
+            var rootScope, q, userPreferenceRepository, user, orgUnitRepository,
+                currentTime;
 
             beforeEach(mocks.inject(function($rootScope, $q) {
                 rootScope = $rootScope;
@@ -32,7 +33,16 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
                 };
 
                 sessionHelper = new SessionHelper(rootScope, q, userPreferenceRepository, orgUnitRepository);
+
+                currentTime = moment().toISOString();
+                Timecop.install();
+                Timecop.freeze(currentTime);
             }));
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
 
             it("should logout user, save user preferences and invalidate session", function() {
                 rootScope.currentUser = {
@@ -135,7 +145,8 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
                         "id": 123,
                         "name": "Some Country"
                     }],
-                    "selectedProject": undefined
+                    "selectedProject": undefined,
+                    "lastUpdated": currentTime
                 };
 
                 expect(userPreferenceRepository.save).toHaveBeenCalledWith(expectedState);

@@ -1,4 +1,4 @@
-define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"], function(UserPreferenceRepository, mocks, utils, OrgUnitRepository) {
+define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitRepository"], function(UserPreferenceRepository, mocks, utils, moment, OrgUnitRepository) {
     describe("User Preference repository", function() {
         var db, mockStore, q, scope, orgUnitRepository;
 
@@ -10,6 +10,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, ["mod1"]));
+            spyOn(orgUnitRepository, "getAllOpUnitsInOrgUnits");
 
             userPreferenceRepository = new UserPreferenceRepository(mockDB.db, orgUnitRepository);
         }));
@@ -118,6 +119,42 @@ define(["userPreferenceRepository", "angularMocks", "utils", "orgUnitRepository"
 
             scope.$apply();
             expect(actualResult).toEqual(expectedResults);
+        });
+
+        describe("getCurrentUserOperationalUnits", function() {
+            it("should get operational units for current user", function() {
+                var userPrefs = [{
+                    "username": "msfadmin",
+                    "lastUpdated": "",
+                    "organisationUnits": []
+                }, {
+                    "username": "new_user",
+                    "lastUpdated": moment("2015-08-24").toISOString(),
+                    "organisationUnits": [{ "id": "proj1" }]
+                }, {
+                    "username": "new2_user",
+                    "lastUpdated": moment("2015-08-23").toISOString(),
+                    "organisationUnits": [{ "id": "proj2" }]
+                }];
+
+                var opUnits = [{
+                    "id": "opUnit1"
+                }, {
+                    "id": "opUnit2"
+                }];
+                orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, opUnits));
+
+                mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
+
+                var actualOpUnits;
+                userPreferenceRepository.getCurrentUserOperationalUnits().then(function(data) {
+                    actualOpUnits = data;
+                });
+
+                scope.$apply();
+                expect(orgUnitRepository.getAllOpUnitsInOrgUnits).toHaveBeenCalledWith(['proj1']);
+                expect(actualOpUnits).toEqual(opUnits);
+            });
         });
     });
 });

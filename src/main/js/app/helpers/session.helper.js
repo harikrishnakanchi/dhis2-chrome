@@ -1,11 +1,12 @@
-define([], function() {
+define(["moment"], function(moment) {
     return function($rootScope, $q, userPreferenceRepository, orgUnitRepository) {
         var saveSessionState = function() {
             var userPreferences = {
                 "username": $rootScope.currentUser.userCredentials.username,
                 "locale": $rootScope.currentUser.locale,
                 "organisationUnits": $rootScope.currentUser.organisationUnits,
-                "selectedProject": $rootScope.currentUser.selectedProject
+                "selectedProject": $rootScope.currentUser.selectedProject,
+                "lastUpdated": moment().toISOString()
             };
             return userPreferenceRepository.save(userPreferences);
         };
@@ -47,11 +48,11 @@ define([], function() {
             };
             var loadSession = function(userPreferences) {
                 if (userPreferences) {
-                    return setUserPreferences(userPreferences);
+                    setUserPreferences(userPreferences);
                 } else {
                     setDefaultPreferences();
-                    return saveSessionState();
                 }
+                return saveSessionState();
             };
 
             $rootScope.isLoggedIn = true;

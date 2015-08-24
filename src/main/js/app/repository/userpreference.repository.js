@@ -29,6 +29,18 @@ define(["lodash"], function(_) {
             });
         };
 
+        var getCurrentUserOperationalUnits = function() {
+            return getAll().then(function(userPreferences) {
+                var currentUserPreferences = _.last(_.sortBy(userPreferences, "lastUpdated"));
+                var orgUnitIds = _.pluck(currentUserPreferences.organisationUnits, "id");
+
+                if (_.isEmpty(orgUnitIds))
+                    return [];
+
+                return orgUnitRepository.getAllOpUnitsInOrgUnits(orgUnitIds);
+            });
+        };
+
         var getOriginOrgUnitIds = function() {
             return getUserModules().then(function(modules) {
                 var moduleIds = _.pluck(modules, "id");
@@ -43,7 +55,8 @@ define(["lodash"], function(_) {
             "getAll": getAll,
             "save": save,
             "getUserModules": getUserModules,
-            "getOriginOrgUnitIds": getOriginOrgUnitIds
+            "getOriginOrgUnitIds": getOriginOrgUnitIds,
+            "getCurrentUserOperationalUnits": getCurrentUserOperationalUnits
         };
     };
 });
