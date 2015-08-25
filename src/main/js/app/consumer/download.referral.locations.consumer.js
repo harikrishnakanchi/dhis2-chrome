@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function(systemSettingService, orgUnitRepository, referralLocationsRepository, mergeBy, $q) {
+    return function(systemSettingService, orgUnitRepository, referralLocationsRepository, userPreferenceRepository, mergeBy, $q) {
     	var BATCH_SIZE = 20;
 
         this.run = function(message) {
@@ -14,8 +14,14 @@ define(["lodash"], function(_) {
         };
 
         var getOpUnitIds = function() {
-            return orgUnitRepository.getAllOperationUnits().then(function(opUnits){
-                return _.pluck(opUnits, "id");
+            return userPreferenceRepository.getCurrentUserOperationalUnits().then(function(opUnits) {
+                if(_.isEmpty(opUnits)) {
+                    return orgUnitRepository.getAllOperationUnits().then(function(opUnits){
+                        return _.pluck(opUnits, "id");
+                    });
+                } else {
+                    return _.pluck(opUnits, "id");
+                }
             });
         };
 

@@ -1,10 +1,11 @@
-define(["downloadReferralLocationsConsumer", "systemSettingService", "referralLocationsRepository", "orgUnitRepository", "mergeBy", "utils", "angularMocks", "lodash"],
-    function(DownloadReferralLocationsConsumer, SystemSettingService, ReferralLocationsRepository, OrgUnitRepository, MergeBy, utils, mocks, _) {
+define(["downloadReferralLocationsConsumer", "systemSettingService", "referralLocationsRepository", "orgUnitRepository", "userPreferenceRepository", "mergeBy", "utils", "angularMocks", "lodash"],
+    function(DownloadReferralLocationsConsumer, SystemSettingService, ReferralLocationsRepository, OrgUnitRepository, UserPreferenceRepository, MergeBy, utils, mocks, _) {
         describe("downloadReferralLocationsConsumer", function() {
             var consumer,
                 systemSettingService,
                 referralLocationsRepository,
                 orgUnitRepository,
+                userPreferenceRepository,
                 mergeBy,
                 q,
                 scope;
@@ -17,6 +18,7 @@ define(["downloadReferralLocationsConsumer", "systemSettingService", "referralLo
                 systemSettingService = new SystemSettingService();
                 referralLocationsRepository = new ReferralLocationsRepository();
                 orgUnitRepository = new OrgUnitRepository();
+                userPreferenceRepository = new UserPreferenceRepository();
 
                 var mockOpUnits = [
                     { "id": "someOpUnitId" }
@@ -28,12 +30,13 @@ define(["downloadReferralLocationsConsumer", "systemSettingService", "referralLo
                     }
                 ];
 
+                spyOn(userPreferenceRepository, "getCurrentUserOperationalUnits").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepository, "getAllOperationUnits").and.returnValue(utils.getPromise(q, mockOpUnits));
                 spyOn(systemSettingService, "getReferralLocations").and.returnValue(utils.getPromise(q, mockDhisReferralLocations));
                 spyOn(referralLocationsRepository, "findAll").and.returnValue(utils.getPromise(q, []));
                 spyOn(referralLocationsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
-                consumer = new DownloadReferralLocationsConsumer(systemSettingService, orgUnitRepository, referralLocationsRepository, mergeBy, q);
+                consumer = new DownloadReferralLocationsConsumer(systemSettingService, orgUnitRepository, referralLocationsRepository, userPreferenceRepository, mergeBy, q);
             }));
 
             it("should download referral locations from dhis", function() {
@@ -55,6 +58,19 @@ define(["downloadReferralLocationsConsumer", "systemSettingService", "referralLo
 
                 expect(systemSettingService.getReferralLocations).toHaveBeenCalledWith(["opUnit1", "opUnit2"]);
                 expect(referralLocationsRepository.upsert).toHaveBeenCalledWith(dhisReferralLocations);
+            });
+
+            it("should only download referral locations for current user's operational units", function() {
+                var currentUsersOpUnits = [
+                    { "id": "myOpUnit1" },
+                    { "id": "myOpUnit2" }
+                ];
+                userPreferenceRepository.getCurrentUserOperationalUnits.and.returnValue(utils.getPromise(q, currentUsersOpUnits));
+
+                consumer.run();
+                scope.$apply();
+
+                expect(systemSettingService.getReferralLocations).toHaveBeenCalledWith(["myOpUnit1", "myOpUnit2"]);
             });
 
             it("should not call upsert on the referralLocationsRepository if there is nothing to save", function() {
