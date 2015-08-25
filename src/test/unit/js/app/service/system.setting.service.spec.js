@@ -169,5 +169,422 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 httpBackend.flush();
             });
         });
+
+        xit("should get system settings", function() {
+            var systemSettingsFromDhis = {
+                "moduleTemplates": {
+                    "ds1": {}
+                },
+                "anotherSetting": "foo"
+            };
+
+            httpBackend.expectGET(dhisUrl.systemSettings + "?key=fieldAppSettings").respond(200, systemSettingsFromDhis);
+
+            var actualResult;
+            service.getSystemSettings().then(function(result) {
+                actualResult = result;
+            });
+            httpBackend.flush();
+
+            expect(actualResult).toEqual(systemSettingsFromDhis);
+        });
+
+        xit("should get project settings", function() {
+            var projectSettingsFromDhis = {
+                "projectSettings_prj1": {
+                    "excludedDataElements": [{
+                        "id": "mod1",
+                        "dataElements": ["de1", "de2"],
+                        "clientLastUpdated": "2014-05-30T12:43:54.972Z"
+                    }],
+                    "patientOriginDetails": [{
+                        "id": "opUnit1",
+                        "origins": [{
+                            "id": "origin1",
+                            "name": "Origin 1",
+                            "isDisabled": false
+                        }],
+                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                    }],
+                    "referralLocations": [{
+                        "id": "opUnit1",
+                        "facility 1": "some alias",
+                        "facility 2": "some other alias",
+                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                    }]
+                },
+                "projectSettings_prj2": {
+                    "excludedDataElements": [],
+                    "referralLocations": [{
+                        "id": "opUnit1",
+                        "facility 1": "some alias",
+                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                    }]
+                }
+            };
+
+            var expectedResult = {
+                "prj1": {
+                    "excludedDataElements": [{
+                        "id": "mod1",
+                        "dataElements": ["de1", "de2"],
+                        "clientLastUpdated": "2014-05-30T12:43:54.972Z"
+                    }],
+                    "patientOriginDetails": [{
+                        "id": "opUnit1",
+                        "origins": [{
+                            "id": "origin1",
+                            "name": "Origin 1",
+                            "isDisabled": false
+                        }],
+                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                    }],
+                    "referralLocations": [{
+                        "id": "opUnit1",
+                        "facility 1": "some alias",
+                        "facility 2": "some other alias",
+                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                    }]
+                },
+                "prj2": {
+                    "excludedDataElements": [],
+                    "referralLocations": [{
+                        "id": "opUnit1",
+                        "facility 1": "some alias",
+                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                    }]
+                }
+            };
+
+            httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1&key=projectSettings_prj2").respond(200, projectSettingsFromDhis);
+
+            var actualResult;
+            service.getProjectSettings(["prj1", "prj2"]).then(function(result) {
+                actualResult = result;
+            });
+            httpBackend.flush();
+
+            expect(actualResult).toEqual(expectedResult);
+        });
+
+        describe("upsertExcludedDataElements", function() {
+            xit("should insert excludedDataElements when upserting", function() {
+                var projectSettingsFromDhis = {};
+
+                var excludedDataElementsToUpsert = {
+                    "id": "mod1",
+                    "dataElements": ["de1", "de2"],
+                    "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                };
+
+                var expectedPayload = {
+                    "excludedDataElements": [{
+                        "id": "mod1",
+                        "dataElements": ["de1", "de2"],
+                        "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                    }]
+                };
+
+                httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
+                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+
+                service.upsertExcludedDataElements("prj1", excludedDataElementsToUpsert);
+                httpBackend.flush();
+            });
+
+            xit("should append excludedDataElements when upserting", function() {
+                var projectSettingsFromDhis = {
+                    "projectSettings_prj1": {
+                        "excludedDataElements": [{
+                            "id": "mod1",
+                            "dataElements": ["de1", "de2"],
+                            "clientLastUpdated": "2014-01-01T12:00:00.000Z"
+                        }]
+                    }
+                };
+
+                var excludedDataElementsToUpsert = {
+                    "id": "mod2",
+                    "dataElements": ["de3", "de4"],
+                    "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                };
+
+                var expectedPayload = {
+                    "excludedDataElements": [{
+                        "id": "mod1",
+                        "dataElements": ["de1", "de2"],
+                        "clientLastUpdated": "2014-01-01T12:00:00.000Z"
+                    }, {
+                        "id": "mod2",
+                        "dataElements": ["de3", "de4"],
+                        "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                    }]
+                };
+
+                httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
+                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+
+                service.upsertExcludedDataElements("prj1", excludedDataElementsToUpsert);
+                httpBackend.flush();
+            });
+
+            xit("should update excludedDataElements when upserting", function() {
+                var projectSettingsFromDhis = {
+                    "projectSettings_prj1": {
+                        "excludedDataElements": [{
+                            "id": "mod1",
+                            "dataElements": ["de1", "de2"],
+                            "clientLastUpdated": "2014-01-01T12:00:00.000Z"
+                        }]
+                    }
+                };
+
+                var excludedDataElementsToUpsert = {
+                    "id": "mod1",
+                    "dataElements": ["de1", "de2", "de3", "de4"],
+                    "clientLastUpdated": "2015-01-10T12:00:00.000Z"
+                };
+
+                var expectedPayload = {
+                    "excludedDataElements": [{
+                        "id": "mod1",
+                        "dataElements": ["de1", "de2", "de3", "de4"],
+                        "clientLastUpdated": "2015-01-10T12:00:00.000Z"
+                    }]
+                };
+
+                httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
+                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+
+                service.upsertExcludedDataElements("prj1", excludedDataElementsToUpsert);
+                httpBackend.flush();
+            });
+        });
+
+        describe("upsertPatientOriginDetails", function() {
+            xit("should insert patientOriginDetails when upserting", function() {
+                var projectSettingsFromDhis = {};
+
+                var patientOriginDetailsToUpsert = {
+                    "id": "opUnit1",
+                    "origins": [{
+                        "id": "origin1",
+                        "name": "Origin 1",
+                        "isDisabled": false
+                    }],
+                    "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                };
+
+                var expectedPayload = {
+                    "patientOriginDetails": [{
+                        "id": "opUnit1",
+                        "origins": [{
+                            "id": "origin1",
+                            "name": "Origin 1",
+                            "isDisabled": false
+                        }],
+                        "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                    }]
+                };
+
+                httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
+                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+
+                service.upsertPatientOriginDetails("prj1", patientOriginDetailsToUpsert);
+                httpBackend.flush();
+            });
+
+            xit("should append patientOriginDetails when upserting", function() {
+                var projectSettingsFromDhis = {
+                    "projectSettings_prj1": {
+                        "patientOriginDetails": [{
+                            "id": "opUnit1",
+                            "origins": [{
+                                "id": "origin1",
+                                "name": "Origin 1",
+                                "isDisabled": false
+                            }],
+                            "clientLastUpdated": "2014-01-01T12:00:00.000Z"
+                        }]
+                    }
+                };
+
+                var patientOriginDetailsToUpsert = {
+                    "id": "opUnit2",
+                    "origins": [{
+                        "id": "origin2",
+                        "name": "Origin 2",
+                        "isDisabled": false
+                    }],
+                    "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                };
+
+                var expectedPayload = {
+                    "patientOriginDetails": [{
+                        "id": "opUnit1",
+                        "origins": [{
+                            "id": "origin1",
+                            "name": "Origin 1",
+                            "isDisabled": false
+                        }],
+                        "clientLastUpdated": "2014-01-01T12:00:00.000Z"
+                    }, {
+                        "id": "opUnit2",
+                        "origins": [{
+                            "id": "origin2",
+                            "name": "Origin 2",
+                            "isDisabled": false
+                        }],
+                        "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                    }]
+                };
+
+                httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
+                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+
+                service.upsertPatientOriginDetails("prj1", patientOriginDetailsToUpsert);
+                httpBackend.flush();
+            });
+
+            xit("should update patientOriginDetails when upserting", function() {
+                var projectSettingsFromDhis = {
+                    "projectSettings_prj1": {
+                        "patientOriginDetails": [{
+                            "id": "opUnit1",
+                            "origins": [{
+                                "id": "origin1",
+                                "name": "Origin 1",
+                                "isDisabled": false
+                            }],
+                            "clientLastUpdated": "2014-01-01T12:00:00.000Z"
+                        }]
+                    }
+                };
+
+                var patientOriginDetailsToUpsert = {
+                    "id": "opUnit1",
+                    "origins": [{
+                        "id": "origin2",
+                        "name": "Origin 2",
+                        "isDisabled": false
+                    }],
+                    "clientLastUpdated": "2014-01-10T12:00:00.000Z"
+                };
+
+                var expectedPayload = {
+                    "patientOriginDetails": [{
+                        "id": "opUnit1",
+                        "origins": [{
+                            "id": "origin2",
+                            "name": "Origin 2",
+                            "isDisabled": false
+                        }],
+                        "clientLastUpdated": "2014-01-10T12:00:00.000Z"
+                    }]
+                };
+
+                httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
+                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+
+                service.upsertPatientOriginDetails("prj1", patientOriginDetailsToUpsert);
+                httpBackend.flush();
+            });
+        });
+
+        describe("upsertReferralLocations", function() {
+            xit("should insert referralLocations when upserting", function() {
+                var projectSettingsFromDhis = {};
+
+                var referralLocationsToUpsert = {
+                    "id": "opUnit1",
+                    "facility 1": "some alias",
+                    "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                };
+
+                var expectedPayload = {
+                    "referralLocations": [{
+                        "id": "opUnit1",
+                        "facility 1": "some alias",
+                        "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                    }]
+                };
+
+                httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
+                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+
+                service.upsertReferralLocations("prj1", referralLocationsToUpsert);
+                httpBackend.flush();
+            });
+
+            xit("should append referralLocations when upserting", function() {
+                var projectSettingsFromDhis = {
+                    "projectSettings_prj1": {
+                        "referralLocations": [{
+                            "id": "opUnit1",
+                            "facility 1": "some alias",
+                            "clientLastUpdated": "2014-01-01T12:00:00.000Z"
+                        }]
+                    }
+                };
+
+                var referralLocationsToUpsert = {
+                    "id": "opUnit2",
+                    "facility 1": "some other alias",
+                    "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                };
+
+                var expectedPayload = {
+                    "referralLocations": [{
+                        "id": "opUnit1",
+                        "facility 1": "some alias",
+                        "clientLastUpdated": "2014-01-01T12:00:00.000Z"
+                    }, {
+                        "id": "opUnit2",
+                        "facility 1": "some other alias",
+                        "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                    }]
+                };
+
+                httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
+                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+
+                service.upsertReferralLocations("prj1", referralLocationsToUpsert);
+                httpBackend.flush();
+            });
+
+            xit("should update referralLocations when upserting", function() {
+                var projectSettingsFromDhis = {
+                    "projectSettings_prj1": {
+                        "referralLocations": [{
+                            "id": "opUnit1",
+                            "facility 1": "some alias",
+                            "clientLastUpdated": "2014-01-01T12:00:00.000Z"
+                        }]
+                    }
+                };
+
+                var referralLocationsToUpsert = {
+                    "id": "opUnit1",
+                    "facility 1": "some other alias",
+                    "clientLastUpdated": "2014-01-10T12:00:00.000Z"
+                };
+
+                var expectedPayload = {
+                    "referralLocations": [{
+                        "id": "opUnit1",
+                        "facility 1": "some other alias",
+                        "clientLastUpdated": "2014-01-10T12:00:00.000Z"
+                    }]
+                };
+
+                httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
+                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+
+                service.upsertReferralLocations("prj1", referralLocationsToUpsert);
+                httpBackend.flush();
+            });
+        });
+
+
     });
 });
