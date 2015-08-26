@@ -30,7 +30,13 @@ module.exports = function(config) {
         preprocessors: {
             'main/js/app/**/*.js': 'coverage'
         },
-        browsers: ['Chrome'],
+        browsers: ['ChromeTop'],
+        customLaunchers: {
+            ChromeTop: {
+                base: 'Chrome',
+                flags: ['--window-size=720,300', '--window-position=2880,0']
+            }
+        },
         logLevel: config.LOG_ERROR,
         junitReporter: {
             outputFile: 'test/unit/coverage/test-results.xml'
