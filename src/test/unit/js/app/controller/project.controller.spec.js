@@ -335,13 +335,13 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                     "value": "1000"
                 }, {
                     "attribute": {
-                        "code": "proportionOfChildrenLessThanOneYearOld",
+                        "code": "proportionOfChildrenLessThan1YearOld",
                         "name": "Proportion of children < 1 year old",
                     },
                     "value": "11"
                 }, {
                     "attribute": {
-                        "code": "proportionOfChildrenLessThatFiveYearsOld",
+                        "code": "proportionOfChildrenLessThan5YearsOld",
                         "name": "Proportion of children < 5 years old"
                     },
                     "value": "12"
@@ -383,9 +383,9 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                     'name': 'Some Type'
                 },
                 "population": 1000,
-                "proportionChildrenLessThanOneYear": 11,
-                "proportionChildrenLessThanFiveYears": 12,
-                "proportionWomenOfChildBearingAge": 13,
+                "proportionOfChildrenLessThan1YearOld": 11,
+                "proportionOfChildrenLessThan5YearsOld": 12,
+                "proportionOfWomenOfChildBearingAge": 13,
                 'autoApprove': 'true'
             };
 

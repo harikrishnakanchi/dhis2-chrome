@@ -60,7 +60,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
 
         var enrichDataElements = function(dataElements) {
             return _.map(dataElements, function(dataElement) {
-                var enrichedDataElement = _.pick(indexedDataElements[dataElement.id], "id", "name", "formName", "categoryCombo", "description");
+                var enrichedDataElement = _.pick(indexedDataElements[dataElement.id], "id", "name", "formName", "categoryCombo", "description", "code");
                 var associatedProgram = getAttributeValue(indexedDataElements[dataElement.id].attributeValues, "associatedProgram");
                 if (!_.isEmpty(associatedProgram))
                     enrichedDataElement.associatedProgramId = associatedProgram;

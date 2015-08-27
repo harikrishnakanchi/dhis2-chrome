@@ -73,7 +73,7 @@
                     <li class="form-group">
                         <label for="newProportionChildrenLessThanOneYear" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.proportionChildrenLessThanOneYearLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="number" class="form-control" name="newProportionChildrenLessThanOneYear" id="newProportionChildrenLessThanOneYear" ng-model="newOrgUnit.proportionChildrenLessThanOneYear" min="1" max="100" />
+                            <input type="number" class="form-control" name="newProportionChildrenLessThanOneYear" id="newProportionChildrenLessThanOneYear" ng-model="newOrgUnit.proportionOfChildrenLessThan1YearOld" min="1" max="100" />
                             <span ng-show="createForm.newProportionChildrenLessThanOneYear.$error.number" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
                             <span ng-show="createForm.newProportionChildrenLessThanOneYear.$error.max" class="errortxt">{{ resourceBundle.within100 }}</span>
                             <span ng-show="createForm.newProportionChildrenLessThanOneYear.$error.min" class="errortxt">{{ resourceBundle.greaterThan0 }}</span>
@@ -82,7 +82,7 @@
                     <li class="form-group">
                         <label for="newProportionChildrenLessThanFiveYears" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.proportionChildrenLessThanFiveYearsLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="number" class="form-control" name="newProportionChildrenLessThanFiveYears" id="newProportionChildrenLessThanFiveYears" ng-model="newOrgUnit.proportionChildrenLessThanFiveYears" min="1" max="100" />
+                            <input type="number" class="form-control" name="newProportionChildrenLessThanFiveYears" id="newProportionChildrenLessThanFiveYears" ng-model="newOrgUnit.proportionOfChildrenLessThan5YearsOld" min="1" max="100" />
                             <span ng-show="createForm.newProportionChildrenLessThanFiveYears.$error.number" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
                             <span ng-show="createForm.newProportionChildrenLessThanFiveYears.$error.max" class="errortxt">{{ resourceBundle.within100 }}</span>
                             <span ng-show="createForm.newProportionChildrenLessThanFiveYears.$error.min" class="errortxt">{{ resourceBundle.greaterThan0 }}</span>
@@ -91,7 +91,7 @@
                     <li class="form-group">
                         <label for="newProportionWomenOfChildBearingAge" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.proportionWomenOfChildBearingAgeLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="number" class="form-control" name="newProportionWomenOfChildBearingAge" id="newProportionWomenOfChildBearingAge" ng-model="newOrgUnit.proportionWomenOfChildBearingAge" min="1" max="100" />
+                            <input type="number" class="form-control" name="newProportionWomenOfChildBearingAge" id="newProportionWomenOfChildBearingAge" ng-model="newOrgUnit.proportionOfWomenOfChildBearingAge" min="1" max="100" />
                             <span ng-show="createForm.newProportionWomenOfChildBearingAge.$error.number" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
                             <span ng-show="createForm.newProportionWomenOfChildBearingAge.$error.max" class="errortxt">{{ resourceBundle.within100 }}</span>
                             <span ng-show="createForm.newProportionWomenOfChildBearingAge.$error.min" class="errortxt">{{ resourceBundle.greaterThan0 }}</span>

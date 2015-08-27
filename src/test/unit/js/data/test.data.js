@@ -166,6 +166,7 @@ define(["lodash"], function(_) {
 
     var dataElements = [{
         "id": "DE1",
+        "code": "DE1_code",
         "name": "DE1 - ITFC",
         "shortName": "DE1 - ITFC",
         "formName": "DE1",
@@ -176,6 +177,7 @@ define(["lodash"], function(_) {
         }
     }, {
         "id": "DE2",
+        "code": "DE2_code",
         "name": "DE2 - ITFC",
         "shortName": "DE2 - ITFC",
         "formName": "DE2",
@@ -186,6 +188,7 @@ define(["lodash"], function(_) {
         }
     }, {
         "id": "DE3",
+        "code": "DE3_code",
         "name": "DE3 - ITFC",
         "shortName": "DE3 - ITFC",
         "formName": "DE3",
@@ -196,6 +199,7 @@ define(["lodash"], function(_) {
         }
     }, {
         "id": "DE4",
+        "code": "DE4_code",
         "name": "DE4 - ITFC",
         "shortName": "DE4 - ITFC",
         "formName": "DE4",

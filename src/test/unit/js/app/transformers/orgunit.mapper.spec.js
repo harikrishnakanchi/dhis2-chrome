@@ -89,13 +89,13 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "value": "1000"
                 }, {
                     "attribute": {
-                        "code": "proportionOfChildrenLessThanOneYearOld",
+                        "code": "proportionOfChildrenLessThan1YearOld",
                         "name": "Proportion of children < 1 year old",
                     },
                     "value": "11"
                 }, {
                     "attribute": {
-                        "code": "proportionOfChildrenLessThatFiveYearsOld",
+                        "code": "proportionOfChildrenLessThan5YearsOld",
                         "name": "Proportion of children < 5 years old"
                     },
                     "value": "12"
@@ -169,9 +169,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "name": "Collaboration"
                 },
                 "population": 1000,
-                "proportionChildrenLessThanOneYear": 11,
-                "proportionChildrenLessThanFiveYears": 12,
-                "proportionWomenOfChildBearingAge": 13,
+                "proportionOfChildrenLessThan1YearOld": 11,
+                "proportionOfChildrenLessThan5YearsOld": 12,
+                "proportionOfWomenOfChildBearingAge": 13,
                 "autoApprove": "true"
             };
 
@@ -213,9 +213,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "modeOfOperation": undefined,
                 "modelOfManagement": undefined,
                 "population": NaN,
-                "proportionChildrenLessThanOneYear": NaN,
-                "proportionChildrenLessThanFiveYears": NaN,
-                "proportionWomenOfChildBearingAge": NaN,
+                "proportionOfChildrenLessThan1YearOld": NaN,
+                "proportionOfChildrenLessThan5YearsOld": NaN,
+                "proportionOfWomenOfChildBearingAge": NaN,
                 "autoApprove": "false"
             };
 
@@ -248,9 +248,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "title": "Collaboration"
                 },
                 "population": "1000",
-                "proportionChildrenLessThanOneYear": "11",
-                "proportionChildrenLessThanFiveYears": "12",
-                "proportionWomenOfChildBearingAge": "13",
+                "proportionOfChildrenLessThan1YearOld": 11,
+                "proportionOfChildrenLessThan5YearsOld": 12,
+                "proportionOfWomenOfChildBearingAge": 13,
                 "autoApprove": "true"
             };
 
@@ -376,7 +376,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "proportionOfChildrenLessThanOneYearOld",
+                        "code": "proportionOfChildrenLessThan1YearOld",
                         "name": "Proportion of children < 1 year old",
                     },
                     "value": "11"
@@ -384,7 +384,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "proportionOfChildrenLessThatFiveYearsOld",
+                        "code": "proportionOfChildrenLessThan5YearsOld",
                         "name": "Proportion of children < 5 years old"
                     },
                     "value": "12"
@@ -709,9 +709,9 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 },
                 "autoApprove": "true",
                 "population": "1000",
-                "proportionChildrenLessThanOneYear": "11",
-                "proportionChildrenLessThanFiveYears": "12",
-                "proportionWomenOfChildBearingAge": "13"
+                "proportionOfChildrenLessThan1YearOld": "11",
+                "proportionOfChildrenLessThan5YearsOld": "12",
+                "proportionOfWomenOfChildBearingAge": "13"
             };
 
             var expectedSavedProject = {
@@ -821,7 +821,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "proportionOfChildrenLessThanOneYearOld",
+                        "code": "proportionOfChildrenLessThan1YearOld",
                         "name": "Proportion of children < 1 year old",
                     },
                     "value": "11"
@@ -829,7 +829,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "proportionOfChildrenLessThatFiveYearsOld",
+                        "code": "proportionOfChildrenLessThan5YearsOld",
                         "name": "Proportion of children < 5 years old"
                     },
                     "value": "12"

@@ -14,7 +14,7 @@
                     <div class="alert alert-info" ng-if="!isApproved  &amp;&amp; !isCompleted  &amp;&amp; !isSubmitted &amp;&amp; hasRoles(['Observer'])">{{resourceBundle.noDataAvailable}}</div>
                     <form name="dataentryForm" id="dataentry" ng-if="showForm()">
                         <accordion close-others="false">
-                            <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false }" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
+                            <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false, isPopulationDataset: false }" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
                                 <accordion-heading>
                                     <span ng-if="!resourceBundle[dataSet.id]">{{ dataSet.name }}</span>
                                     <span ng-if="resourceBundle[dataSet.id]">{{ resourceBundle[dataSet.id] }}</span>

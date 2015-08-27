@@ -15,7 +15,7 @@
                 </div>
                 <accordion close-others="false">
                     <div ng-class="'dataset-acc-wrapper'">
-                        <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false } | orderBy: 'name' track by dataSet.id" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
+                        <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: false, isPopulationDataset: false } | orderBy: 'name' track by dataSet.id" is-open="getDatasetState(dataSet.id, $first)[dataSet.id]">
                             <accordion-heading>
                                 <span ng-if="!resourceBundle[dataSet.id]">{{ dataSet.name }}</span>
                                 <span ng-if="resourceBundle[dataSet.id]">{{ resourceBundle[dataSet.id] }}</span>

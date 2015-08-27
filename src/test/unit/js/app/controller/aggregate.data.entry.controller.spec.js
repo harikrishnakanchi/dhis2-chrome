@@ -581,6 +581,59 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.projectIsAutoApproved).toBeTruthy();
             });
 
+            it("should populate list of projectPopulation attributes", function() {
+
+                orgUnitRepository.getParentProject.and.returnValue(utils.getPromise(q, {
+                    "id": "proj1",
+                    "attributeValues": [{
+                        'attribute': {
+                            'code': 'population',
+                            'name': 'Population',
+                            'id': 'p1'
+                        },
+                        'value': '1000'
+                    }, {
+                        'attribute': {
+                            'code': 'proportionOfChildrenLessThan1YearOld',
+                            'name': 'Proportion of children < 1 year old',
+                        },
+                        'value': '12'
+                    }, {
+                        'attribute': {
+                            'code': 'proportionOfChildrenLessThan5YearsOld',
+                            'name': 'Proportion of children < 5 years old',
+                        },
+                        'value': '20'
+                    }, {
+                        'attribute': {
+                            'code': 'proportionOfWomenOfChildBearingAge',
+                            'name': 'Proportion of women of child bearing age',
+                        },
+                        'value': '30'
+                    }]
+                }));
+
+                scope.week = {
+                    "weekNumber": 14,
+                    "weekYear": 2014
+                };
+                scope.currentModule = {
+                    'id': 'mod1',
+                    parent: {
+                        id: 'parent'
+                    }
+                };
+
+                scope.$apply();
+
+                expect(scope.projectPopulationDetails).toEqual({
+                    "population": '1000',
+                    "proportionOfChildrenLessThan1YearOld": '12',
+                    "proportionOfChildrenLessThan5YearsOld": '20',
+                    "proportionOfWomenOfChildBearingAge": '30'
+                });
+            });
+
             it('should prevent navigation if data entry form is dirty', function() {
                 scope.dataentryForm.$dirty = false;
                 scope.dataentryForm.$dirty = true;

@@ -295,6 +295,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isIncluded": true,
                 "dataElements": [{
                     "id": "DE1",
+                    "code": "DE1_code",
                     "name": "DE1 - ITFC",
                     "subSection": "Default",
                     "isIncluded": true,
@@ -306,6 +307,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     }
                 }, {
                     "id": "DE2",
+                    "code": "DE2_code",
                     "name": "DE2 - ITFC",
                     "isIncluded": true,
                     "subSection": "Default",
@@ -317,6 +319,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     }
                 }, {
                     "id": "DE4",
+                    "code": "DE4_code",
                     "name": "DE4 - ITFC",
                     "isIncluded": true,
                     "subSection": "Default",
@@ -333,6 +336,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isIncluded": true,
                 "dataElements": [{
                     "id": "DE1",
+                    "code": "DE1_code",
                     "name": "DE1 - ITFC",
                     "subSection": "Default",
                     "isIncluded": true,
@@ -352,6 +356,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isIncluded": false,
                 "dataElements": [{
                     "id": "DE3",
+                    "code": "DE3_code",
                     "subSection": "Default",
                     "name": "DE3 - ITFC",
                     "isIncluded": false,
@@ -419,6 +424,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
 
             var dataElements = [{
                 "id": "DE1",
+                "code": "DE1_code",
                 "name": "Number of Patients - Origin - Origin Dataset",
                 "shortName": "NumPatients",
                 "formName": "Number of Patients",
@@ -435,6 +441,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 }]
             }, {
                 "id": "DE2",
+                "code": "DE2_code",
                 "name": "Number of Patients (Burn Unit) - Origin - Origin Dataset",
                 "shortName": "NumPatients",
                 "formName": "Number of Patients (Burn Unit)",
@@ -523,6 +530,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isIncluded": true,
                 "dataElements": [{
                     "id": "DE1",
+                    "code": "DE1_code",
                     "name": "DE1 - ITFC",
                     "isIncluded": true,
                     "formName": "DE1",
@@ -532,6 +540,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     }
                 }, {
                     "id": "DE2",
+                    "code": "DE2_code",
                     "name": "DE2 - ITFC",
                     "isIncluded": true,
                     "formName": "DE2",
@@ -541,6 +550,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     }
                 }, {
                     "id": "DE4",
+                    "code": "DE4_code",
                     "name": "DE4 - ITFC",
                     "isIncluded": true,
                     "formName": "DE4",
@@ -556,6 +566,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isIncluded": true,
                 "dataElements": [{
                     "id": "DE1",
+                    "code": "DE1_code",
                     "name": "DE1 - ITFC",
                     "isIncluded": true,
                     "formName": "DE1",
@@ -573,6 +584,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                 "isIncluded": false,
                 "dataElements": [{
                     "id": "DE3",
+                    "code": "DE3_code",
                     "name": "DE3 - ITFC",
                     "isIncluded": false,
                     "formName": "DE3",

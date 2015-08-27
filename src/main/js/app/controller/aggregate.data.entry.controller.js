@@ -163,7 +163,27 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         };
 
         var save = function(asDraft) {
+            var updateDataValuesWithPopulationData = function() {
+                var currentModuleId = $scope.selectedModule.id;
+                var populationDataset = _.find($scope.dataSets, {
+                    "isPopulationDataset": true
+                });
+                if (populationDataset) {
+                    var categoryOptionComboId = populationDataset.sections[0].categoryOptionComboIds[0];
+                    _.forEach(populationDataset.sections[0].dataElements, function(dataElement) {
+                        $scope.dataValues[currentModuleId][dataElement.id] = !$scope.dataValues[currentModuleId][dataElement.id] ? {} : $scope.dataValues[currentModuleId][dataElement.id];
+                        var code = dataElement.code.split("_")[1];
+                        var value = _.isEmpty($scope.projectPopulationDetails[code]) ? "0" : $scope.projectPopulationDetails[code];
+                        $scope.dataValues[currentModuleId][dataElement.id][categoryOptionComboId] = {
+                            "formula": value,
+                            "value": value
+                        };
+                    });
+                }
 
+            };
+
+            updateDataValuesWithPopulationData();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, currentPeriod, $scope.currentUser.userCredentials.username);
 
             var publishToDhis = function() {
@@ -356,6 +376,17 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                 return orgUnitRepository.findAll(orgUnitIds);
             };
 
+            var extractPopulationDetails = function(orgUnitAttrs) {
+                var populationDataCodes = ["population", "proportionOfChildrenLessThan1YearOld", "proportionOfChildrenLessThan5YearsOld", "proportionOfWomenOfChildBearingAge"];
+                var populationDetails = {};
+                _.forEach(orgUnitAttrs, function(attr) {
+                    if (_.includes(populationDataCodes, attr.attribute.code)) {
+                        populationDetails[attr.attribute.code] = attr.value;
+                    }
+                });
+                return populationDetails;
+            };
+
             return $q.all([loadAssociatedOrgUnitsAndPrograms(), loadExcludedDataElements(), loadRefferalLocations()]).then(function() {
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
@@ -395,6 +426,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                         },
                         "value": "true"
                     });
+                    $scope.projectPopulationDetails = extractPopulationDetails(orgUnit.attributeValues);
                 });
 
                 var loadApprovalDataPromise = approvalDataRepository.getApprovalData(currentPeriodAndOrgUnit).then(function(data) {

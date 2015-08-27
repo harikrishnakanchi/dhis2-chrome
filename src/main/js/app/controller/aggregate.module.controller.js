@@ -18,6 +18,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             $scope.enrichedDatasets = {};
             var excludedDataElements = [];
             var referralDataset;
+            var populationDataset;
 
             var enrichSection = function(section) {
                 var unGroupedElements = _(section.dataElements)
@@ -143,10 +144,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
-                var getOriginAndReferralDatasets = function() {
+                var getMandatoryDatasetsToBeAssociated = function() {
                     return datasetRepository.getAll().then(function(datasets) {
                         $scope.originDatasets = _.filter(datasets, "isOriginDataset");
                         referralDataset = _.find(datasets, "isReferralDataset");
+                        populationDataset = _.find(datasets, "isPopulationDataset");
                     });
                 };
 
@@ -156,7 +158,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
-                return initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModules).then(setDisabled).then(getOriginAndReferralDatasets).then(getTemplates);
+                return initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModules).then(setDisabled).then(getMandatoryDatasetsToBeAssociated).then(getTemplates);
             };
 
             $scope.changeCollapsed = function(sectionId) {
@@ -246,6 +248,21 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             };
 
             $scope.save = function() {
+
+                var getDatasetsToAssociate = function() {
+                    var datasets = _.cloneDeep($scope.associatedDatasets);
+
+                    var addDataSet = function(dataset) {
+                        if (!_.isEmpty(dataset))
+                            datasets.push(dataset);
+                    };
+
+                    addDataSet(referralDataset);
+                    addDataSet(populationDataset);
+
+                    return datasets;
+                };
+
                 var enrichedModule = {};
 
                 var associateToDatasets = function(datasets, orgUnits) {
@@ -278,9 +295,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
-                var datasetsToAssociate = _.cloneDeep($scope.associatedDatasets);
-                if (!_.isEmpty(referralDataset))
-                    datasetsToAssociate.push(referralDataset);
+                var datasetsToAssociate = getDatasetsToAssociate();
 
                 $scope.loading = true;
                 return getEnrichedModule($scope.module)

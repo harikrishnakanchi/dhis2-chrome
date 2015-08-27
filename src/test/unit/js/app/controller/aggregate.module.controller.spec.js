@@ -1258,21 +1258,23 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "isLineListService": false,
                     "isOriginDataset": false,
                     "isNewDataModel": true,
-                    "isReferralDataset": false
+                    "isReferralDataset": false,
+                    "isPopulationDataset": false
                 }, {
                     "id": "ds2",
                     "name": "Referral Dataset",
                     "organisationUnits": [{
                         "id": "ou1"
                     }],
-                    "isAggregateService": true,
+                    "isAggregateService": false,
                     "isLineListService": false,
                     "isOriginDataset": false,
                     "isNewDataModel": true,
-                    "isReferralDataset": true
+                    "isReferralDataset": true,
+                    "isPopulationDataset": false
                 }, {
                     "id": "ds3",
-                    "name": "Aggregate Dataset",
+                    "name": "Linelist Dataset",
                     "organisationUnits": [{
                         "id": "ou1"
                     }],
@@ -1280,7 +1282,20 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     "isLineListService": true,
                     "isOriginDataset": false,
                     "isNewDataModel": true,
-                    "isReferralDataset": false
+                    "isReferralDataset": false,
+                    "isPopulationDataset": false
+                }, {
+                    "id": "ds4",
+                    "name": "population Dataset",
+                    "organisationUnits": [{
+                        "id": "ou1"
+                    }],
+                    "isAggregateService": false,
+                    "isLineListService": false,
+                    "isOriginDataset": false,
+                    "isNewDataModel": true,
+                    "isReferralDataset": false,
+                    "isPopulationDataset": true
                 }];
 
                 dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
@@ -1306,7 +1321,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.save();
                 scope.$apply();
 
-                expect(dataSetRepo.associateOrgUnits).toHaveBeenCalledWith(["ds1", "ds2"], jasmine.any(Object));
+                expect(dataSetRepo.associateOrgUnits).toHaveBeenCalledWith(["ds1", "ds2", "ds4"], jasmine.any(Object));
 
             });
 
