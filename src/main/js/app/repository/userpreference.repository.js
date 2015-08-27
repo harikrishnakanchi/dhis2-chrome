@@ -15,29 +15,24 @@ define(["lodash"], function(_) {
             return store.upsert(userPreferences);
         };
 
-        var getUserModules = function() {
+        var getCurrentProjects = function() {
             return getAll().then(function(userPreferences) {
-                userPreferences = userPreferences || [];
-                var userOrgUnitIds = _.uniq(_.pluck(_.flatten(_.pluck(userPreferences, "organisationUnits")), "id"));
-
-                if (_.isEmpty(userOrgUnitIds))
-                    return [];
-
-                return orgUnitRepository.getAllModulesInOrgUnits(userOrgUnitIds).then(function(userModules) {
-                    return userModules;
-                });
+                var currentUserPreferences = _.last(_.sortBy(userPreferences, "lastUpdated")) || {};
+                return _.pluck(currentUserPreferences.organisationUnits, "id");
             });
         };
 
         var getCurrentUserOperationalUnits = function() {
-            return getAll().then(function(userPreferences) {
-                var currentUserPreferences = _.last(_.sortBy(userPreferences, "lastUpdated"));
-                var orgUnitIds = _.pluck(currentUserPreferences.organisationUnits, "id");
+            return getCurrentProjects().then(function(currentProjectIds) {
+                return orgUnitRepository.getAllOpUnitsInOrgUnits(currentProjectIds);
+            });
+        };
 
-                if (_.isEmpty(orgUnitIds))
-                    return [];
-
-                return orgUnitRepository.getAllOpUnitsInOrgUnits(orgUnitIds);
+        var getUserModules = function() {
+            return getCurrentProjects().then(function(currentProjectIds) {
+                return orgUnitRepository.getAllModulesInOrgUnits(currentProjectIds).then(function(userModules) {
+                    return userModules;
+                });
             });
         };
 
@@ -52,11 +47,11 @@ define(["lodash"], function(_) {
 
         return {
             "get": get,
-            "getAll": getAll,
             "save": save,
+            "getCurrentProjects": getCurrentProjects,
+            "getCurrentUserOperationalUnits": getCurrentUserOperationalUnits,
             "getUserModules": getUserModules,
-            "getOriginOrgUnitIds": getOriginOrgUnitIds,
-            "getCurrentUserOperationalUnits": getCurrentUserOperationalUnits
+            "getOriginOrgUnitIds": getOriginOrgUnitIds
         };
     };
 });

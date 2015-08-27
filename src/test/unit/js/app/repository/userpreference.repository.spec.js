@@ -9,8 +9,29 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
             q = $q;
 
             orgUnitRepository = new OrgUnitRepository();
-            spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, ["mod1"]));
+            spyOn(orgUnitRepository, "getAllModulesInOrgUnits");
             spyOn(orgUnitRepository, "getAllOpUnitsInOrgUnits");
+            spyOn(orgUnitRepository, "findAllByParent");
+
+            var userPrefs = [{
+                "username": "msfadmin",
+                "lastUpdated": "",
+                "organisationUnits": []
+            }, {
+                "username": "new_user",
+                "lastUpdated": moment("2015-08-24").toISOString(),
+                "organisationUnits": [{
+                    "id": "proj1"
+                }]
+            }, {
+                "username": "new2_user",
+                "lastUpdated": moment("2015-08-23").toISOString(),
+                "organisationUnits": [{
+                    "id": "proj2"
+                }]
+            }];
+
+            mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
 
             userPreferenceRepository = new UserPreferenceRepository(mockDB.db, orgUnitRepository);
         }));
@@ -25,6 +46,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
                 expect(data).toEqual(pref);
             });
             scope.$apply();
+
             expect(mockStore.find).toHaveBeenCalledWith("blah");
         });
 
@@ -41,64 +63,33 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
             expect(mockStore.upsert).toHaveBeenCalledWith(userPreference);
         });
 
-        it("should get all user preferences", function() {
-            var allPrefs = [{
-                "username": "blah"
-            }];
-            mockStore.getAll.and.returnValue(utils.getPromise(q, allPrefs));
-            userPreferenceRepository.getAll().then(function(data) {
-                expect(data).toEqual(allPrefs);
-            });
-            scope.$apply();
-            expect(mockStore.getAll).toHaveBeenCalled();
-        });
-
         it("should get all modules id", function() {
-            var userPrefs = [{
-                "username": "msfadmin",
-                "locale": "en",
-                "organisationUnits": []
-            }, {
-                "username": "new_user",
-                "locale": "en",
-                "organisationUnits": [{
-                    "id": "proj1"
-                }]
-            }, {
-                "username": "new2_user",
-                "locale": "en",
-                "organisationUnits": [{
-                    "id": "proj2"
-                }]
-            }];
-
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [{
+            var userModulesInRepo = [{
                 "id": "mod1"
             }, {
                 "id": "mod2"
             }, {
                 "id": "mod3"
-            }]));
-
-            mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
+            }];
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModulesInRepo));
 
             var actualUserModules;
             userPreferenceRepository.getUserModules().then(function(data) {
                 actualUserModules = data;
             });
-
             scope.$apply();
-            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1', 'proj2']);
-            expect(actualUserModules).toEqual([{
-                "id": "mod1"
-            }, {
-                "id": "mod2"
-            }, {
-                "id": "mod3"
-            }]);
+
+            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1']);
+            expect(actualUserModules).toEqual(userModulesInRepo);
         });
 
         it("should get all patient origin org units for user's modules", function() {
+            var userModules = [{
+                "id": "mod1"
+            }, {
+                "id": "mod2"
+            }];
+
             var originOrgUnits = [{
                 "id": "o1",
                 "name": "o1"
@@ -107,44 +98,29 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
                 "name": "o2"
             }];
 
-            spyOn(userPreferenceRepository, "getUserModules").and.returnValue(utils.getPromise(q, []));
-            orgUnitRepository.findAllByParent = jasmine.createSpy("findAllByParent").and.returnValue(utils.getPromise(q, originOrgUnits));
+            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModules));
+            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
-            var expectedResults = ["o1", "o2"];
             var actualResult;
-
             userPreferenceRepository.getOriginOrgUnitIds().then(function(data) {
                 actualResult = data;
             });
-
             scope.$apply();
-            expect(actualResult).toEqual(expectedResults);
+
+            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1']);
+            expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(['mod1', 'mod2']);
+            expect(actualResult).toEqual(["o1", "o2"]);
         });
 
         describe("getCurrentUserOperationalUnits", function() {
             it("should get operational units for current user", function() {
-                var userPrefs = [{
-                    "username": "msfadmin",
-                    "lastUpdated": "",
-                    "organisationUnits": []
-                }, {
-                    "username": "new_user",
-                    "lastUpdated": moment("2015-08-24").toISOString(),
-                    "organisationUnits": [{ "id": "proj1" }]
-                }, {
-                    "username": "new2_user",
-                    "lastUpdated": moment("2015-08-23").toISOString(),
-                    "organisationUnits": [{ "id": "proj2" }]
-                }];
-
                 var opUnits = [{
                     "id": "opUnit1"
                 }, {
                     "id": "opUnit2"
                 }];
-                orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, opUnits));
 
-                mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
+                orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, opUnits));
 
                 var actualOpUnits;
                 userPreferenceRepository.getCurrentUserOperationalUnits().then(function(data) {
