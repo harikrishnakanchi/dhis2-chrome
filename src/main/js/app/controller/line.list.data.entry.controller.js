@@ -135,6 +135,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                     $scope.selectedModuleOpeningDate = module.openingDate;
                     $scope.selectedModuleId = module.id;
                     $scope.selectedModuleName = module.name;
+                    $scope.opUnitId = module.parent.id;
                 });
             };
 
@@ -168,7 +169,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             };
 
             var loadOptionSets = function() {
-                return optionSetRepository.getOptionSetMapping($scope.resourceBundle).then(function(data) {
+                var isNewCase = $routeParams.eventId ? false : true;
+                return optionSetRepository.getOptionSetMapping($scope.resourceBundle, $scope.opUnitId, isNewCase).then(function(data) {
                     $scope.optionSetMapping = data.optionSetMap;
                 });
             };
@@ -176,9 +178,20 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             var loadEvent = function() {
                 var formatValue = function(dv) {
 
+                    var filterOptions = function() {
+                        $scope.optionSetMapping[de.optionSet.id] = _.filter($scope.optionSetMapping[de.optionSet.id], {
+                            "isDisabled": false
+                        });
+                    };
+
                     var de = allDataElementsMap[dv.dataElement];
                     if (de && de.optionSet) {
                         return _.find($scope.optionSetMapping[de.optionSet.id], function(optionSet) {
+                            if (_.endsWith(de.optionSet.code, "_referralLocations")) {
+                                filterOptions();
+                                if (!_.contains($scope.optionSetMapping[de.optionSet.id], optionSet))
+                                    $scope.optionSetMapping[de.optionSet.id].push(optionSet);
+                            }
                             return optionSet.code === dv.value;
                         });
                     }

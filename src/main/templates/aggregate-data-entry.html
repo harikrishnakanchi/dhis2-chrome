@@ -63,7 +63,7 @@
                                                         </div>
                                                         <div ng-if="dataSet.isReferralDataset">
                                                             <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
-                                                            <span ng-if="!resourceBundle[dataElement.id]"> {{ referralLocations[dataElement.formName] }}
+                                                            <span ng-if="!resourceBundle[dataElement.id]"> {{ referralLocations[dataElement.formName].name }}
                                                             <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{dataElement.description}}"/>
                                                         </span>
                                                         </div>

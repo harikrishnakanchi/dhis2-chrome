@@ -313,6 +313,28 @@
                     </div>
                 </accordion-group>
             </accordion>
+            <div class="offlineProcedure" ng-if="shouldShowReferrals">
+                <accordion close-others="false">
+                    <accordion-group is-open="status.open">
+                        <accordion-heading>
+                            <span>Referral Location</span>
+                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                        </accordion-heading>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Location</th>
+                                    <th>Count</th>
+                                </tr>
+                            </thead>
+                            <tr ng-repeat="name in locationNames">
+                                <td>{{referralMap[name].name}}</td>
+                                <td>{{getReferralCount(name)}}</td>
+                            </tr>
+                        </table>
+                    </accordion-group>
+                </accordion>
+            </div>
             <div>
                 <input type="button" class="btn btn-primary" ng-click="firstLevelApproval()" ng-disabled="isCompleted" ng-if="hasRoles(['Project Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />
                 <input type="button" class="btn btn-primary" ng-click="secondLevelApproval()" ng-disabled="isApproved" ng-if="hasRoles(['Coordination Level Approver'])" value="{{resourceBundle.approveBtnValue}}" />

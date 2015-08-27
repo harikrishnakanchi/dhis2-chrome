@@ -363,11 +363,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
 
             var loadRefferalLocations = function() {
                 return referralLocationsRepository.get($scope.selectedModule.parent.id).then(function(data) {
-                    if (_.isUndefined(data)) {
-                        removeReferral = true;
+                    if (!_.isUndefined(data)) {
+                        data = _.omit(data, function(o) {
+                            return o.isDisabled !== false;
+                        });
+                        removeReferral = _.keys(data).length === 0 ? true : false;
+                        $scope.referralLocations = data;
                         return;
                     }
-                    $scope.referralLocations = data;
+                    removeReferral = true;
                 });
             };
 

@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository) {
+    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository) {
 
         $scope.isGenderFilterApplied = false;
         $scope.isAgeFilterApplied = false;
@@ -104,6 +104,12 @@ define(["lodash", "moment"], function(_, moment) {
             return count;
         };
 
+        $scope.getReferralCount = function(locationName) {
+            return _.filter($scope.dataValues._referralLocations, {
+                "value": locationName
+            }).length;
+        };
+
         $scope.shouldShowInOfflineSummary = function(dataElementId, allDataElements) {
             allDataElements = _.filter(allDataElements, function(de) {
                 return _.endsWith(de.dataElement.code, "_showInOfflineSummary") && de.dataElement.optionSet;
@@ -173,6 +179,9 @@ define(["lodash", "moment"], function(_, moment) {
                 if (_.endsWith(dv.code, "_procedures")) {
                     return "_procedures";
                 }
+                if (_.endsWith(dv.code, "_referralLocations")) {
+                    return "_referralLocations";
+                }
             });
 
             $scope.originEvents = _.groupBy(events, "orgUnit");
@@ -203,9 +212,20 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
+        var getReferralLocations = function() {
+            return referralLocationsRepository.get($scope.selectedModule.parent.id).then(function(locations) {
+                if (_.isUndefined(locations))
+                    $scope.shouldShowReferrals = false;
+
+                $scope.shouldShowReferrals = true;
+                $scope.referralMap = _.omit(locations, ["id", "clientLastUpdated"]);
+                $scope.locationNames = _.keys($scope.referralMap);
+            });
+        };
+
         var init = function() {
             var submittedEvents = [];
-            return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping()]).then(function() {
+            return $q.all([loadOriginsOrgUnits(), loadProgram(), getOptionSetMapping(), getReferralLocations()]).then(function() {
                 return programEventRepository.getEventsForPeriod($scope.associatedProgramId, _.pluck($scope.originOrgUnits, "id"), getPeriod()).then(function(events) {
                     _.forEach(events, function(event) {
                         if (event.localStatus === "READY_FOR_DHIS" || event.localStatus === undefined)

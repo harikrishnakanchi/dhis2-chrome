@@ -1,6 +1,6 @@
-define(["optionSetRepository", "angularMocks", "utils"], function(OptionSetRepository, mocks, utils) {
+define(["optionSetRepository", "angularMocks", "utils", "referralLocationsRepository"], function(OptionSetRepository, mocks, utils, ReferralLocationsRepository) {
     describe("optionSet repository", function() {
-        var optionSetRepository, db, mockStore, q, scope;
+        var optionSetRepository, db, mockStore, q, scope, referralLocations;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -8,7 +8,19 @@ define(["optionSetRepository", "angularMocks", "utils"], function(OptionSetRepos
             mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
 
-            optionSetRepository = new OptionSetRepository(mockDB.db);
+            referralLocations = {
+                "id": "some id",
+                "clientLastUpdated": "some time",
+                "MSF Facility 1": {
+                    "name": "Referral 1",
+                    "isDisabled": false
+                }
+            };
+
+            referralLocationsRepository = new ReferralLocationsRepository();
+            spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, referralLocations));
+
+            optionSetRepository = new OptionSetRepository(mockDB.db, referralLocationsRepository);
         }));
 
         it("should get all option sets", function() {
@@ -40,6 +52,13 @@ define(["optionSetRepository", "angularMocks", "utils"], function(OptionSetRepos
                     'id': 'os2o1',
                     'name': 'os2o1 name'
                 }]
+            }, {
+                'id': 'os3',
+                'code': '_referralLocations',
+                'options': [{
+                    'id': 'os3o1',
+                    'name': 'MSF Facility 1'
+                }]
             }];
 
             mockStore.getAll.and.returnValue(utils.getPromise(q, allOptionSets));
@@ -65,11 +84,18 @@ define(["optionSetRepository", "angularMocks", "utils"], function(OptionSetRepos
                     "id": 'os2o1',
                     "name": 'os2o1 name',
                     "displayName": 'os2o1 translated name'
+                }],
+                "os3": [{
+                    "id": 'os3o1',
+                    "name": 'Referral 1',
+                    "displayName": 'Referral 1',
+                    "isDisabled": false
                 }]
             });
             expect(optionMap).toEqual({
                 "os1o1": "os1o1 name",
-                "os2o1": "os2o1 translated name"
+                "os2o1": "os2o1 translated name",
+                "os3o1": "Referral 1"
             });
 
 

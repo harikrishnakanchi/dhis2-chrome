@@ -1,6 +1,6 @@
 define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, properties, orgUnitMapper) {
     return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, systemSettingRepository,
-        orgUnitRepository, approvalDataRepository) {
+        orgUnitRepository, approvalDataRepository, referralLocationsRepository) {
 
         $scope.filterParams = {};
         $scope.currentUrl = $location.path();
@@ -122,6 +122,10 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
         $scope.getDisplayValue = function(dataValue) {
             if (!dataValue.value) return "";
+
+            if (_.endsWith(dataValue.code, "_referralLocations"))
+                return $scope.referralLocations[dataValue.value].name;
+
             if (dataValue.optionSet && dataValue.optionSet.options.length > 0) {
                 return _.find(dataValue.optionSet.options, function(o) {
                     return o.code === dataValue.value;
@@ -342,6 +346,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 return orgUnitRepository.get($routeParams.module).then(function(data) {
                     $scope.selectedModuleId = data.id;
                     $scope.selectedModuleName = data.name;
+                    $scope.opUnitId = data.parent.id;
                 });
             };
 
@@ -381,6 +386,12 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 });
             };
 
+            var getreferralLocations = function() {
+                referralLocationsRepository.get($scope.opUnitId).then(function(referralLocations) {
+                    $scope.referralLocations = referralLocations;
+                });
+            };
+
             showResultMessage($location.search().messageType, $location.search().message);
 
             $scope.filterByOptions = [{
@@ -398,6 +409,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             $scope.noCasesMsg = $scope.resourceBundle.noCasesFound;
             $scope.loading = true;
             return loadModule()
+                .then(getreferralLocations)
                 .then(loadOriginOrgUnits)
                 .then(loadPrograms)
                 .then(setUpProjectAutoApprovedFlag)
