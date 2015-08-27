@@ -14,20 +14,10 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
             spyOn(orgUnitRepository, "findAllByParent");
 
             var userPrefs = [{
-                "username": "msfadmin",
-                "lastUpdated": "",
-                "organisationUnits": []
-            }, {
                 "username": "new_user",
                 "lastUpdated": moment("2015-08-24").toISOString(),
                 "organisationUnits": [{
                     "id": "proj1"
-                }]
-            }, {
-                "username": "new2_user",
-                "lastUpdated": moment("2015-08-23").toISOString(),
-                "organisationUnits": [{
-                    "id": "proj2"
                 }]
             }];
 
@@ -130,6 +120,37 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
                 scope.$apply();
                 expect(orgUnitRepository.getAllOpUnitsInOrgUnits).toHaveBeenCalledWith(['proj1']);
                 expect(actualOpUnits).toEqual(opUnits);
+            });
+        });
+
+        describe("getCurrentProjects", function() {
+            it("should get current user projects", function() {
+                var userPrefs = [{
+                    "username": "msfadmin",
+                    "lastUpdated": "",
+                    "organisationUnits": []
+                }, {
+                    "username": "new_user",
+                    "lastUpdated": moment("2015-08-24").toISOString(),
+                    "organisationUnits": [{
+                        "id": "proj1"
+                    }]
+                }, {
+                    "username": "new2_user",
+                    "lastUpdated": moment("2015-08-23").toISOString(),
+                    "organisationUnits": [{
+                        "id": "proj2"
+                    }]
+                }];
+
+                mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
+                var actualUserProjects;
+                userPreferenceRepository.getCurrentProjects().then(function(data) {
+                    actualUserProjects = data;
+                });
+                scope.$apply();
+
+                expect(actualUserProjects).toEqual(["proj1"]);
             });
         });
     });

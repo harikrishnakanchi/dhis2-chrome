@@ -35,34 +35,6 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             return $http.get(dhisUrl.systemSettings).then(transform);
         };
 
-        var referralLocationKey = function(opUnitId) {
-            return "referralLocations_" + opUnitId;
-        };
-
-        var upsertReferralLocations = function(data) {
-            var request = {
-                "method": "POST",
-                "url": dhisUrl.systemSettings,
-                "data": {},
-                "headers": {
-                    "Content-Type": "application/json"
-                }
-            };
-            request.data[referralLocationKey(data.id)] = data;
-
-            return $http(request);
-        };
-
-        var getReferralLocations = function(opUnitIds) {
-            var queryParameters = _.map(opUnitIds, function(opUnitId) {
-                return "key=" + referralLocationKey(opUnitId);
-            });
-            var queryString = "?" + queryParameters.join("&");
-            return $http.get(dhisUrl.systemSettings + queryString).then(function(response) {
-                return _.values(response.data);
-            });
-        };
-
         var projectSettingsPrefix = "projectSettings_";
 
         var getSettings = function(keys) {
@@ -158,10 +130,25 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
                 .then(upsert);
         };
 
+        var upsertReferralLocations = function(projectId, updatedReferralLocations) {
+            var update = function(data) {
+                data[projectId] = data[projectId] || {};
+                data[projectId].referralLocations = merge(data[projectId].referralLocations, updatedReferralLocations);
+                return data[projectId];
+            };
+
+            var upsert = function(payload) {
+                return upsertProjectSettings(projectId, payload);
+            };
+
+            return getProjectSettings(projectId)
+                .then(update)
+                .then(upsert);
+        };
+
         return {
             "upsert": upsert,
             "getAll": getAll,
-            "getReferralLocations": getReferralLocations,
             "getSystemSettings": getSystemSettings,
             "getProjectSettings": getProjectSettings,
             "upsertExcludedDataElements": upsertExcludedDataElements,

@@ -10,7 +10,7 @@ define(["dhisId", "properties"], function(dhisId, properties) {
             }, {
                 "name": "Project Level Approver",
                 "displayName": $scope.resourceBundle.projectLevelUserLabel
-            },{
+            }, {
                 "name": "Observer",
                 "displayName": $scope.resourceBundle.observerUserLabel
             }],

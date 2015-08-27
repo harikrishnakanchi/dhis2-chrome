@@ -120,56 +120,6 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
             httpBackend.flush();
         });
 
-        describe("upsertReferralLocations", function() {
-            it("should post referral locations for an op unit", function() {
-                var opUnitId = "opUnit1";
-                var payload = {
-                    "id": opUnitId,
-                    "Location 1": "Some alias"
-                };
-
-                var expectedKey = "referralLocations_" + opUnitId;
-                var expectedPayload = {};
-                expectedPayload[expectedKey] = payload;
-
-                service.upsertReferralLocations(payload);
-
-                httpBackend.expectPOST(dhisUrl.systemSettings, expectedPayload).respond(200, "ok");
-                httpBackend.flush();
-            });
-        });
-
-        describe("getReferralLocations", function() {
-            it("should download referral locations for the specified op units", function() {
-                var opUnitIds = ['opUnit1', 'opUnit2'];
-                var queryParams = "?key=referralLocations_opUnit1&key=referralLocations_opUnit2";
-                var remoteReferralLocations = {
-                    "referralLocations_opUnit1": {
-                        "id": "opUnit1",
-                        "facility 1": "some alias"
-                    },
-                    "referralLocations_opUnit2": {
-                        "id": "opUnit2",
-                        "facility 2": "some alias1"
-                    }
-                };
-                var expectedResult = [{
-                    "id": "opUnit1",
-                    "facility 1": "some alias"
-                }, {
-                    "id": "opUnit2",
-                    "facility 2": "some alias1"
-                }];
-
-                httpBackend.expectGET(dhisUrl.systemSettings + queryParams).respond(200, remoteReferralLocations);
-                service.getReferralLocations(opUnitIds).then(function(result) {
-                    expect(result).toEqual(expectedResult);
-                });
-
-                httpBackend.flush();
-            });
-        });
-
         it("should get system settings", function() {
             var systemSettingsFromDhis = {
                 "moduleTemplates": {
@@ -208,8 +158,13 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                     }],
                     "referralLocations": [{
                         "id": "opUnit1",
-                        "facility 1": "some alias",
-                        "facility 2": "some other alias",
+                        "facility 1": {
+                            "value": "some alias",
+                            "isDisabled": true
+                        },
+                        "facility 2": {
+                            "value": "some other alias"
+                        },
                         "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                     }]
                 },
@@ -217,7 +172,10 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                     "excludedDataElements": [],
                     "referralLocations": [{
                         "id": "opUnit1",
-                        "facility 1": "some alias",
+                        "facility 1": {
+                            "value": "some alias",
+                            "isDisabled": true
+                        },
                         "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                     }]
                 }
@@ -241,8 +199,13 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                     }],
                     "referralLocations": [{
                         "id": "opUnit1",
-                        "facility 1": "some alias",
-                        "facility 2": "some other alias",
+                        "facility 1": {
+                            "value": "some alias",
+                            "isDisabled": true
+                        },
+                        "facility 2": {
+                            "value": "some other alias"
+                        },
                         "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                     }]
                 },
@@ -250,7 +213,10 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                     "excludedDataElements": [],
                     "referralLocations": [{
                         "id": "opUnit1",
-                        "facility 1": "some alias",
+                        "facility 1": {
+                            "value": "some alias",
+                            "isDisabled": true
+                        },
                         "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                     }]
                 }
@@ -512,36 +478,47 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
         });
 
         describe("upsertReferralLocations", function() {
-            xit("should insert referralLocations when upserting", function() {
+            it("should insert referralLocations when upserting", function() {
                 var projectSettingsFromDhis = {};
 
                 var referralLocationsToUpsert = {
                     "id": "opUnit1",
-                    "facility 1": "some alias",
+                    "facility 1": {
+                        "value": "some alias",
+                        "isDisabled": true
+                    },
                     "clientLastUpdated": "2014-05-30T12:00:00.000Z"
                 };
 
                 var expectedPayload = {
-                    "referralLocations": [{
-                        "id": "opUnit1",
-                        "facility 1": "some alias",
-                        "clientLastUpdated": "2014-05-30T12:00:00.000Z"
-                    }]
+                    "projectSettings_prj1": {
+                        "referralLocations": [{
+                            "id": "opUnit1",
+                            "facility 1": {
+                                "value": "some alias",
+                                "isDisabled": true
+                            },
+                            "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                        }]
+                    }
                 };
 
                 httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
-                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+                httpBackend.expectPOST(dhisUrl.systemSettings, expectedPayload).respond(200, "ok");
 
                 service.upsertReferralLocations("prj1", referralLocationsToUpsert);
                 httpBackend.flush();
             });
 
-            xit("should append referralLocations when upserting", function() {
+            it("should append referralLocations when upserting", function() {
                 var projectSettingsFromDhis = {
                     "projectSettings_prj1": {
                         "referralLocations": [{
                             "id": "opUnit1",
-                            "facility 1": "some alias",
+                            "facility 1": {
+                                "value": "some alias",
+                                "isDisabled": true
+                            },
                             "clientLastUpdated": "2014-01-01T12:00:00.000Z"
                         }]
                     }
@@ -549,35 +526,47 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
 
                 var referralLocationsToUpsert = {
                     "id": "opUnit2",
-                    "facility 1": "some other alias",
+                    "facility 1": {
+                        "value": "some other alias"
+                    },
                     "clientLastUpdated": "2014-05-30T12:00:00.000Z"
                 };
 
                 var expectedPayload = {
-                    "referralLocations": [{
-                        "id": "opUnit1",
-                        "facility 1": "some alias",
-                        "clientLastUpdated": "2014-01-01T12:00:00.000Z"
-                    }, {
-                        "id": "opUnit2",
-                        "facility 1": "some other alias",
-                        "clientLastUpdated": "2014-05-30T12:00:00.000Z"
-                    }]
+                    "projectSettings_prj1": {
+                        "referralLocations": [{
+                            "id": "opUnit1",
+                            "facility 1": {
+                                "value": "some alias",
+                                "isDisabled": true
+                            },
+                            "clientLastUpdated": "2014-01-01T12:00:00.000Z"
+                        }, {
+                            "id": "opUnit2",
+                            "facility 1": {
+                                "value": "some other alias"
+                            },
+                            "clientLastUpdated": "2014-05-30T12:00:00.000Z"
+                        }]
+                    }
                 };
 
                 httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
-                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+                httpBackend.expectPOST(dhisUrl.systemSettings, expectedPayload).respond(200, "ok");
 
                 service.upsertReferralLocations("prj1", referralLocationsToUpsert);
                 httpBackend.flush();
             });
 
-            xit("should update referralLocations when upserting", function() {
+            it("should update referralLocations when upserting", function() {
                 var projectSettingsFromDhis = {
                     "projectSettings_prj1": {
                         "referralLocations": [{
                             "id": "opUnit1",
-                            "facility 1": "some alias",
+                            "facility 1": {
+                                "value": "some alias",
+                                "isDisabled": true
+                            },
                             "clientLastUpdated": "2014-01-01T12:00:00.000Z"
                         }]
                     }
@@ -585,20 +574,26 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
 
                 var referralLocationsToUpsert = {
                     "id": "opUnit1",
-                    "facility 1": "some other alias",
+                    "facility 1": {
+                        "value": "some other alias"
+                    },
                     "clientLastUpdated": "2014-01-10T12:00:00.000Z"
                 };
 
                 var expectedPayload = {
-                    "referralLocations": [{
-                        "id": "opUnit1",
-                        "facility 1": "some other alias",
-                        "clientLastUpdated": "2014-01-10T12:00:00.000Z"
-                    }]
+                    "projectSettings_prj1": {
+                        "referralLocations": [{
+                            "id": "opUnit1",
+                            "facility 1": {
+                                "value": "some other alias"
+                            },
+                            "clientLastUpdated": "2014-01-10T12:00:00.000Z"
+                        }]
+                    }
                 };
 
                 httpBackend.expectGET(dhisUrl.systemSettings + "?key=projectSettings_prj1").respond(200, projectSettingsFromDhis);
-                httpBackend.expectPOST(dhisUrl.systemSettings + "/projectSettings_prj1", expectedPayload).respond(200, "ok");
+                httpBackend.expectPOST(dhisUrl.systemSettings, expectedPayload).respond(200, "ok");
 
                 service.upsertReferralLocations("prj1", referralLocationsToUpsert);
                 httpBackend.flush();

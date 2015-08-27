@@ -67,10 +67,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         }, "dataValues");
 
                         $hustle.publish({
-                            "type": "downloadReferralLocations"
-                        }, "dataValues");
-
-                        $hustle.publish({
                             "type": "downloadPatientOriginDetails"
                         }, "dataValues");
 
@@ -101,16 +97,21 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             return;
 
                         $hustle.publish({
-                            "type": "downloadData"
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadEventData"
+                            "type": "downloadProjectSettings",
+                            "data": []
                         }, "dataValues");
 
                         $hustle.publish({
                             "type": "downloadCharts",
                             "data": []
+                        }, "dataValues");
+
+                        $hustle.publish({
+                            "type": "downloadData"
+                        }, "dataValues");
+
+                        $hustle.publish({
+                            "type": "downloadEventData"
                         }, "dataValues");
 
                         $hustle.publish({

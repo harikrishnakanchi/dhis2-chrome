@@ -85,8 +85,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             uploadReferralLocationsConsumer = {
                 'run': jasmine.createSpy("uploadReferralLocationsConsumer")
             };
-            downloadReferralLocationsConsumer = {
-                'run': jasmine.createSpy("downloadReferralLocationsConsumer")
+            downloadProjectSettingsConsumer = {
+                'run': jasmine.createSpy("downloadProjectSettingsConsumer")
             };
             downloadPivotTableConsumer = {
                 'run': jasmine.createSpy("downloadPivotTableConsumer")
@@ -106,14 +106,14 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadSystemSettingConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadPatientOriginConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadChartConsumer.run.and.returnValue(utils.getPromise(q, {}));
-            downloadReferralLocationsConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadProjectSettingsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadPivotTableConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer,
                 uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
-                uploadReferralLocationsConsumer, downloadReferralLocationsConsumer, downloadPivotTableConsumer);
+                uploadReferralLocationsConsumer, downloadPivotTableConsumer, downloadProjectSettingsConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -401,16 +401,16 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(uploadReferralLocationsConsumer.run).toHaveBeenCalledWith(message);
         });
 
-        it("should call download referral locations", function() {
+        it("should call download project settings", function() {
             message.data = {
                 "data": {},
-                "type": "downloadReferralLocations"
+                "type": "downloadProjectSettings"
             };
 
             dispatcher.run(message);
             scope.$apply();
 
-            expect(downloadReferralLocationsConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should call download pivot tables", function() {

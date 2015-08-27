@@ -82,12 +82,12 @@ require.config({
         "downloadMetadataConsumer": "app/consumer/download.metadata.consumer",
         "deleteApprovalConsumer": "app/consumer/delete.approval.consumer",
         "downloadSystemSettingConsumer": "app/consumer/download.system.setting.consumer",
+        "downloadProjectSettingsConsumer": "app/consumer/download.project.settings.consumer",
         "uploadSystemSettingConsumer": "app/consumer/upload.system.setting.consumer",
         "downloadPatientOriginConsumer": "app/consumer/download.patient.origin.consumer",
         "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
         "downloadChartConsumer": "app/consumer/download.charts.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
-        "downloadReferralLocationsConsumer": "app/consumer/download.referral.locations.consumer",
         "downloadPivotTableConsumer": "app/consumer/download.pivot.table.consumer",
 
         //merge strategies
