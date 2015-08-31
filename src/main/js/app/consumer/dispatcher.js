@@ -3,10 +3,10 @@ define(["lodash"], function(_) {
         createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
-        uploadReferralLocationsConsumer, downloadReferralLocationsConsumer) {
+    uploadReferralLocationsConsumer, downloadReferralLocationsConsumer, downloadPivotTableConsumer) {
 
         this.run = function(message) {
-            $log.info("Processing message: " +  message.data.type, message.data);
+            $log.info("Processing message: " + message.data.type, message.data);
             switch (message.data.type) {
                 case "downloadMetadata":
                     return downloadMetadataConsumer.run(message);
@@ -98,6 +98,9 @@ define(["lodash"], function(_) {
 
                 case "downloadReferralLocations":
                     return downloadReferralLocationsConsumer.run(message);
+
+                case "downloadPivotTables":
+                    return downloadPivotTableConsumer.run(message);
 
                 default:
                     return $q.reject();

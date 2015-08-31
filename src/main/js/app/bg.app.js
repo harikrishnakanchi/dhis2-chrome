@@ -112,6 +112,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             "type": "downloadCharts",
                             "data": []
                         }, "dataValues");
+
+                        $hustle.publish({
+                            "type": "downloadPivotTables",
+                            "data": []
+                        }, "dataValues");
                     };
 
                     var checkOnlineStatusAndSync = function() {

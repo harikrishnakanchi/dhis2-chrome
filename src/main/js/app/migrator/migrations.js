@@ -150,6 +150,15 @@ define([], function() {
         create_index(orgUnitStore, "by_level", "level", false);
     };
 
+    var add_pivot_table_store = function(db, txt) {
+        create_store_with_key("pivotTables", "name", db);
+    };
+
+    var add_pivot_table_data_store = function(db, txt) {
+        var pivotTableDataStore = create_store_with_key("pivotTableData", ["pivotTable", "orgUnit"], db);
+        create_index(pivotTableDataStore, "by_pivot_table", "pivotTable", false);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -172,6 +181,8 @@ define([], function() {
         add_chart_data_store,
         add_dataElementGroup_store,
         add_referral_locations_store,
-        add_organisation_unit_index_by_level
+        add_organisation_unit_index_by_level,
+        add_pivot_table_store,
+        add_pivot_table_data_store
     ];
 });

@@ -38,6 +38,7 @@ define(["properties"], function(properties) {
         "programs": with_host("/api/programs.json"),
         "dataSets": with_host("/api/dataSets.json"),
         "charts": with_host("/api/charts"),
+        "pivotTables": with_host("/api/reportTables"),
         "analytics": with_host("/api/analytics.json")
     };
 });

@@ -110,6 +110,7 @@ require.config({
         "optionSetRepository": "app/repository/option.set.repository",
         "chartRepository": "app/repository/chart.repository",
         "referralLocationsRepository": "app/repository/referral.locations.repository",
+        "pivotTableRepository": "app/repository/pivot.table.repository",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
@@ -149,7 +150,11 @@ require.config({
         "orgUnitGroupHelper": "app/helpers/orgunit.group.helper",
         "metadataImporter": "app/helpers/metadata.importer",
         "sessionHelper": "app/helpers/session.helper",
-        "originOrgunitCreator": "app/helpers/origin.orgunit.creator"
+        "originOrgunitCreator": "app/helpers/origin.orgunit.creator",
+
+        //Directives
+        "directives": "app/directives/directives",
+        "pivotTable": "app/directives/pivot.table"
     },
     shim: {
         "ng-i18n": {

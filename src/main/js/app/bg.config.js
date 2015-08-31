@@ -27,6 +27,7 @@ require.config({
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "patientOriginService": "app/service/patient.origin.service",
         "chartService": "app/service/chart.service",
+        "pivotTableService": "app/service/pivot.table.service",
 
         //Repositories
         "repositories": "app/repository/bg.repositories",
@@ -44,6 +45,7 @@ require.config({
         "metadataRepository": "app/repository/metadata.repository",
         "chartRepository": "app/repository/chart.repository",
         "referralLocationsRepository": "app/repository/referral.locations.repository",
+        "pivotTableRepository": "app/repository/pivot.table.repository",
 
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",
@@ -86,6 +88,7 @@ require.config({
         "downloadChartConsumer": "app/consumer/download.charts.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
         "downloadReferralLocationsConsumer": "app/consumer/download.referral.locations.consumer",
+        "downloadPivotTableConsumer": "app/consumer/download.pivot.table.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",

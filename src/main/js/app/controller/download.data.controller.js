@@ -61,6 +61,11 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
                 "data": []
             }, "dataValues");
 
+            var downloadPivotTables = $hustle.publish({
+                "type": "downloadPivotTables",
+                "data": []
+            }, "dataValues");
+
             return $q.all([
                     downloadMetadata,
                     downloadSystemSetting,
@@ -72,7 +77,8 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
                     downloadEvents,
                     downloadDatasets,
                     downloadCharts,
-                    downloadReferralLocations
+                    downloadReferralLocations,
+                    downloadPivotTables
                 ])
                 .then(onSuccess);
         };
