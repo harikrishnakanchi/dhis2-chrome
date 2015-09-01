@@ -273,7 +273,6 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository);
             scope.$apply();
 
-            // expect(chartService.getAllFieldAppChartsForDataset).toHaveBeenCalledWith(datasets);
             expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[0].name, 'mod1');
             expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[1].name, 'mod1');
 
