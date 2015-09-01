@@ -1,6 +1,6 @@
-define(['downloadPivotTableConsumer', 'angularMocks', 'utils'], function(DownloadChartConsumer, mocks, utils) {
+define(['downloadPivotTableConsumer', 'angularMocks', 'utils'], function(DownloadPivotTableConsumer, mocks, utils) {
     describe('Download PivotTables Consumer', function() {
-        var downloadPivotTableConsumer, pivotTableService, pivotTableRepository, scope, q;
+        var downloadPivotTableConsumer, pivotTableService, pivotTableRepository, scope, q, userPreferenceRepository;
         beforeEach(mocks.inject(function($q, $rootScope) {
             scope = $rootScope;
             q = $q;
@@ -11,7 +11,9 @@ define(['downloadPivotTableConsumer', 'angularMocks', 'utils'], function(Downloa
             pivotTableService = {
                 'getAllPivotTables': jasmine.createSpy("getAllPivotTables").and.returnValue(utils.getPromise(q, {})),
             };
-            downloadPivotTableConsumer = new DownloadChartConsumer(pivotTableService, pivotTableRepository);
+            userPreferenceRepository = jasmine.createSpyObj('userPreferenceRepository', ['getUserModules']);
+            userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, {}));
+            downloadPivotTableConsumer = new DownloadPivotTableConsumer(pivotTableService, pivotTableRepository, userPreferenceRepository, q);
 
         }));
 
