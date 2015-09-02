@@ -30,7 +30,6 @@ define(["lodash"], function(_) {
 
         var getCurrentUserOperationalUnits = function() {
             return getCurrentProjects().then(function(currentProjectIds) {
-                console.log('user project ids', currentProjectIds);
                 return orgUnitRepository.getAllOpUnitsInOrgUnits(currentProjectIds);
             });
         };

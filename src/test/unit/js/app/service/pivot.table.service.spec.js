@@ -27,7 +27,7 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
                 "reportTables": [pivotTable]
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=:all&filter=name:like:Field+App&paging=false").respond(200, pivotTables);
+            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=:all&filter=name:like:%5BFieldApp&paging=false").respond(200, pivotTables);
             var actualData;
             pivotTableService.getAllPivotTables().then(function(data) {
                 actualData = data;
@@ -37,6 +37,48 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
             httpBackend.flush();
         });
 
+        it("should get all field app tables for specified datasets", function() {
+            var tables = [{
+                "name": "[FieldApp - Funky Dataset]",
+                "someAttribute": "someValue"
+            }, {
+                "name": "[FieldApp  - CoolDataset]",
+                "someAttribute": "someValue"
+            }, {
+                "name": "[FieldApp - Not needed Dataset]",
+                "someAttribute": "someValue"
+            }];
+
+            var datasets = [{
+                "id": "ds1",
+                "code": "Funky Dataset"
+            }, {
+                "id": "ds2",
+                "code": "CoolDataset"
+            }];
+
+            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=:all&filter=name:like:%5BFieldApp&paging=false").respond(200, {
+                "reportTables": tables
+            });
+
+            var actualData;
+
+            pivotTableService.getAllTablesForDataset(datasets).then(function(data) {
+                actualData = data;
+            });
+
+            httpBackend.flush();
+
+            expect(actualData).toEqual([{
+                "name": "[FieldApp - Funky Dataset]",
+                'dataset': 'ds1',
+                "someAttribute": "someValue"
+            }, {
+                "name": "[FieldApp  - CoolDataset]",
+                'dataset': 'ds2',
+                "someAttribute": "someValue"
+            }]);
+        });
         describe("getPivotTableDataForOrgUnit", function() {
             it("should build the correct url for the monthly morbidity chart", function() {
                 var tableDefinition = {

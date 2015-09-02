@@ -1,7 +1,7 @@
-define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository"], function(mocks, utils, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository) {
+define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository"], function(mocks, utils, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository) {
     describe("reportsControllerspec", function() {
 
-        var reportsController, datasetRepository, orgUnitRepository, chartRepository;
+        var reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             scope = $rootScope.$new();
@@ -13,6 +13,8 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             chartRepository = new ChartRepository();
             spyOn(chartRepository, "getDataForChart").and.returnValue(utils.getPromise(q, []));
             spyOn(chartRepository, "getAll").and.returnValue(utils.getPromise(q, []));
+            pivotTableRepository = new PivotTableRepository();
+            spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise(q, []));
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
@@ -42,7 +44,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             };
 
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, mod1));
-            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository);
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository);
             scope.$apply();
 
             expect(scope.orgUnit.displayName).toEqual('op unit - module 1');
@@ -66,7 +68,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             };
 
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, prj1));
-            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository);
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository);
             scope.$apply();
 
             expect(scope.orgUnit.displayName).toEqual('project 1');
@@ -102,7 +104,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
 
-            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository);
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository);
             scope.$apply();
 
             expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("prj1");
@@ -270,7 +272,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                     return utils.getPromise(q, chartData2);
             });
 
-            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository);
+            reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository);
             scope.$apply();
 
             expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[0].name, 'mod1');

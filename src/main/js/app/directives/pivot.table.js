@@ -2,7 +2,8 @@ define([], function() {
     return function() {
         return {
             scope: {
-                data: '='
+                data: '=',
+                table: '='
             },
             controller: ['$scope',
                 function($scope) {

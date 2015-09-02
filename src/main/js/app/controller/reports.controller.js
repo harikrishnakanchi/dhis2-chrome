@@ -1,5 +1,5 @@
 define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
-    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository) {
+    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository) {
 
         $scope.barChartOptions = {
             "chart": {
@@ -235,11 +235,19 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             });
         };
 
+        var loadPivotTables = function() {
+            pivotTableRepository.getAll()
+                .then(function(pivotTables) {
+                    $scope.pivotTables = pivotTables;
+                });
+        };
+
         var init = function() {
             $scope.loading = true;
             loadOrgUnit()
                 .then(loadRelevantDatasets)
                 .then(loadChartData)
+                .then(loadPivotTables)
                 .finally(function() {
                     $scope.loading = false;
                 });

@@ -1,11 +1,12 @@
 define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
     return function($http) {
+        var self = this;
         this.getAllPivotTables = function() {
             var url = dhisUrl.pivotTables + ".json";
             var config = {
                 params: {
                     "fields": ":all",
-                    "filter": "name:like:Field App",
+                    "filter": "name:like:[FieldApp",
                     "paging": false,
                 }
             };
@@ -15,6 +16,34 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             return $http.get(url, config).then(transform);
         };
 
+        this.getAllTablesForDataset = function(datasets) {
+            var re = /\[FieldApp\s*- (.*)\]/;
+
+            var getDatasetCode = function(pivotTableName) {
+                var matches = re.exec(pivotTableName);
+                if (matches && matches.length > 1)
+                    return matches[1];
+                return undefined;
+            };
+
+            var transform = function(tables) {
+                return _.transform(tables, function(result, pivotTable) {
+
+                    var code = getDatasetCode(pivotTable.name);
+                    var dataSetForTable = _.find(datasets, {
+                        'code': code
+                    });
+
+                    if (dataSetForTable !== undefined)
+                        result.push(_.merge(pivotTable, {
+                            'dataset': dataSetForTable.id
+                        }));
+
+                }, []);
+            };
+
+            return self.getAllPivotTables().then(transform);
+        };
         this.getPivotTableDataForOrgUnit = function(table, orgUnit) {
             var indicatorIds = _.pluck(table.indicators, "id");
             var dataElementIds = _.pluck(table.dataElements, "id");

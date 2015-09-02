@@ -1,22 +1,30 @@
 define(["lodash"], function(_) {
-    return function(pivotTableService, pivotTableRepository, userPreferenceRepository, $q) {
+    return function(pivotTableService, pivotTableRepository, userPreferenceRepository, $q, datasetRepository) {
+        var userModuleIds;
         this.run = function(message) {
+
             var saveTables = function(tables) {
                 return pivotTableRepository.upsert(tables).then(function() {
                     return tables;
                 });
             };
+
             var loadUserModuleIds = function() {
                 return userPreferenceRepository.getUserModules().then(function(modules) {
-                    var userModuleIds = _.pluck(modules, "id");
+                    userModuleIds = _.pluck(modules, "id");
                     return userModuleIds;
                 });
             };
 
-            var saveTableData = function(data) {
-                var tables = data[0];
-                var userModuleIds = data[1];
-                console.log('data -------------', data, tables, userModuleIds);
+            var loadRelevantDatasets = function(moduleIds) {
+                return datasetRepository.findAllForOrgUnits(moduleIds);
+            };
+
+            var getTables = function(datasets) {
+                return pivotTableService.getAllTablesForDataset(datasets);
+            };
+
+            var saveTableData = function(tables) {
                 return _.forEach(userModuleIds, function(userModule) {
                     return _.forEach(tables, function(table) {
                         return pivotTableService.getPivotTableDataForOrgUnit(table, userModule).then(function(data) {
@@ -25,7 +33,8 @@ define(["lodash"], function(_) {
                     });
                 });
             };
-            return $q.all([pivotTableService.getAllPivotTables().then(saveTables), loadUserModuleIds()]).then(saveTableData);
+
+            return loadUserModuleIds().then(loadRelevantDatasets).then(getTables).then(saveTables).then(saveTableData);
         };
     };
 });

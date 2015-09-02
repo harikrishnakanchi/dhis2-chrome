@@ -4,16 +4,17 @@ define(['downloadPivotTableConsumer', 'angularMocks', 'utils'], function(Downloa
         beforeEach(mocks.inject(function($q, $rootScope) {
             scope = $rootScope;
             q = $q;
-            pivotTableService = jasmine.createSpyObj('pivotTableService', ['getAllPivotTables']);
+            pivotTableService = jasmine.createSpyObj('pivotTableService', ['getAllTablesForDataset']);
             pivotTableRepository = {
                 'upsert': jasmine.createSpy("upsert").and.returnValue(utils.getPromise(q, {})),
             };
             pivotTableService = {
-                'getAllPivotTables': jasmine.createSpy("getAllPivotTables").and.returnValue(utils.getPromise(q, {})),
+                'getAllTablesForDataset': jasmine.createSpy("getAllTablesForDataset").and.returnValue(utils.getPromise(q, {})),
             };
             userPreferenceRepository = jasmine.createSpyObj('userPreferenceRepository', ['getUserModules']);
             userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, {}));
-            downloadPivotTableConsumer = new DownloadPivotTableConsumer(pivotTableService, pivotTableRepository, userPreferenceRepository, q);
+            datasetRepository = jasmine.createSpyObj('datasetRepository', ['findAllForOrgUnits']);
+            downloadPivotTableConsumer = new DownloadPivotTableConsumer(pivotTableService, pivotTableRepository, userPreferenceRepository, q, datasetRepository);
 
         }));
 
@@ -49,13 +50,13 @@ define(['downloadPivotTableConsumer', 'angularMocks', 'utils'], function(Downloa
             }];
 
 
-            pivotTableService.getAllPivotTables.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
+            pivotTableService.getAllTablesForDataset.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
             pivotTableRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
 
             downloadPivotTableConsumer.run();
             scope.$apply();
 
-            expect(pivotTableService.getAllPivotTables).toHaveBeenCalled();
+            expect(pivotTableService.getAllTablesForDataset).toHaveBeenCalled();
             expect(pivotTableRepository.upsert).toHaveBeenCalledWith(fieldAppPivotTables);
         });
 
