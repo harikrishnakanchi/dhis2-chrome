@@ -68,26 +68,11 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             return getSettings(settingKeys).then(transform);
         };
 
-        var mergePatientOrigin = function(collection, item) {
-            collection = collection || [];
-
-            var existingItemIndex = _.findIndex(collection, {
-                "orgUnit": item.orgUnit
-            });
-
-            if (existingItemIndex >= 0)
-                collection[existingItemIndex] = item;
-            else
-                collection.push(item);
-
-            return collection;
-        };
-
         var merge = function(collection, item) {
             collection = collection || [];
 
             var existingItemIndex = _.findIndex(collection, {
-                "id": item.id
+                "orgUnit": item.orgUnit
             });
 
             if (existingItemIndex >= 0)
@@ -132,7 +117,7 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         var upsertPatientOriginDetails = function(projectId, updatedPatientOriginDetails) {
             var update = function(data) {
                 data[projectId] = data[projectId] || {};
-                data[projectId].patientOrigins = mergePatientOrigin(data[projectId].patientOrigins, updatedPatientOriginDetails);
+                data[projectId].patientOrigins = merge(data[projectId].patientOrigins, updatedPatientOriginDetails);
                 return data[projectId];
             };
 

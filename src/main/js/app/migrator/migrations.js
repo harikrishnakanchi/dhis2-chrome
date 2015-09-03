@@ -142,7 +142,7 @@ define([], function() {
     };
 
     var add_referral_locations_store = function(db, txt) {
-        create_store_with_key("referralLocations", "id", db);
+        create_store_with_key("referralLocations", "orgUnit", db);
     };
 
     var add_organisation_unit_index_by_level = function(db, txt) {

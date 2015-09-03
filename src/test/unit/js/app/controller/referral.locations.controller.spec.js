@@ -44,7 +44,7 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
 
             it("should load existing referral locations for given op unit", function() {
                 var existingReferralLocations = {
-                    "id": scope.orgUnit.id,
+                    "orgUnit": scope.orgUnit.id,
                     "MSF Facility 1": {
                         "name": "Some alias",
                         "isDisabled": false
@@ -99,7 +99,7 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 }];
 
                 var expectedPayload = {
-                    "id": scope.orgUnit.id,
+                    "orgUnit": scope.orgUnit.id,
                     "MSF Facility 1": {
                         "name": "Some alias",
                         "isDisabled": false

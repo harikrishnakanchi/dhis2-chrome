@@ -62,7 +62,7 @@ define(["moment"], function(moment) {
 
         var transformReferralLocationsForDb = function() {
             var defaultPayload = {
-                "id": $scope.orgUnit.id,
+                "orgUnit": $scope.orgUnit.id,
                 "clientLastUpdated": moment().toISOString()
             };
             return _.transform($scope.referralLocations, function(result, referralLocation) {

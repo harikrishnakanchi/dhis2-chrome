@@ -143,7 +143,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
             var projectSettingsFromDhis = {
                 "projectSettings_prj1": {
                     "excludedDataElements": [{
-                        "id": "mod1",
+                        "orgUnit": "mod1",
                         "dataElements": ["de1", "de2"],
                         "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                     }],
@@ -157,7 +157,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                         "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                     }],
                     "referralLocations": [{
-                        "id": "opUnit1",
+                        "orgUnit": "opUnit1",
                         "facility 1": {
                             "value": "some alias",
                             "isDisabled": true
@@ -171,7 +171,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 "projectSettings_prj2": {
                     "excludedDataElements": [],
                     "referralLocations": [{
-                        "id": "opUnit1",
+                        "orgUnit": "opUnit1",
                         "facility 1": {
                             "value": "some alias",
                             "isDisabled": true
@@ -184,7 +184,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
             var expectedResult = {
                 "prj1": {
                     "excludedDataElements": [{
-                        "id": "mod1",
+                        "orgUnit": "mod1",
                         "dataElements": ["de1", "de2"],
                         "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                     }],
@@ -198,7 +198,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                         "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                     }],
                     "referralLocations": [{
-                        "id": "opUnit1",
+                        "orgUnit": "opUnit1",
                         "facility 1": {
                             "value": "some alias",
                             "isDisabled": true
@@ -212,7 +212,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 "prj2": {
                     "excludedDataElements": [],
                     "referralLocations": [{
-                        "id": "opUnit1",
+                        "orgUnit": "opUnit1",
                         "facility 1": {
                             "value": "some alias",
                             "isDisabled": true
@@ -238,7 +238,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var projectSettingsFromDhis = {};
 
                 var excludedDataElementsToUpsert = {
-                    "id": "mod1",
+                    "orgUnit": "mod1",
                     "dataElements": ["de1", "de2"],
                     "clientLastUpdated": "2014-05-30T12:00:00.000Z"
                 };
@@ -246,7 +246,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var expectedPayload = {
                     "projectSettings_prj1": {
                         "excludedDataElements": [{
-                            "id": "mod1",
+                            "orgUnit": "mod1",
                             "dataElements": ["de1", "de2"],
                             "clientLastUpdated": "2014-05-30T12:00:00.000Z"
                         }]
@@ -264,7 +264,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var projectSettingsFromDhis = {
                     "projectSettings_prj1": {
                         "excludedDataElements": [{
-                            "id": "mod1",
+                            "orgUnit": "mod1",
                             "dataElements": ["de1", "de2"],
                             "clientLastUpdated": "2014-01-01T12:00:00.000Z"
                         }],
@@ -273,7 +273,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 };
 
                 var excludedDataElementsToUpsert = {
-                    "id": "mod2",
+                    "orgUnit": "mod2",
                     "dataElements": ["de3", "de4"],
                     "clientLastUpdated": "2014-05-30T12:00:00.000Z"
                 };
@@ -281,11 +281,11 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var expectedPayload = {
                     "projectSettings_prj1": {
                         "excludedDataElements": [{
-                            "id": "mod1",
+                            "orgUnit": "mod1",
                             "dataElements": ["de1", "de2"],
                             "clientLastUpdated": "2014-01-01T12:00:00.000Z"
                         }, {
-                            "id": "mod2",
+                            "orgUnit": "mod2",
                             "dataElements": ["de3", "de4"],
                             "clientLastUpdated": "2014-05-30T12:00:00.000Z"
                         }],
@@ -304,7 +304,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var projectSettingsFromDhis = {
                     "projectSettings_prj1": {
                         "excludedDataElements": [{
-                            "id": "mod1",
+                            "orgUnit": "mod1",
                             "dataElements": ["de1", "de2"],
                             "clientLastUpdated": "2014-01-01T12:00:00.000Z"
                         }],
@@ -313,7 +313,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 };
 
                 var excludedDataElementsToUpsert = {
-                    "id": "mod1",
+                    "orgUnit": "mod1",
                     "dataElements": ["de1", "de2", "de3", "de4"],
                     "clientLastUpdated": "2015-01-10T12:00:00.000Z"
                 };
@@ -321,7 +321,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var expectedPayload = {
                     "projectSettings_prj1": {
                         "excludedDataElements": [{
-                            "id": "mod1",
+                            "orgUnit": "mod1",
                             "dataElements": ["de1", "de2", "de3", "de4"],
                             "clientLastUpdated": "2015-01-10T12:00:00.000Z"
                         }],
@@ -482,7 +482,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var projectSettingsFromDhis = {};
 
                 var referralLocationsToUpsert = {
-                    "id": "opUnit1",
+                    "orgUnit": "opUnit1",
                     "facility 1": {
                         "value": "some alias",
                         "isDisabled": true
@@ -493,7 +493,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var expectedPayload = {
                     "projectSettings_prj1": {
                         "referralLocations": [{
-                            "id": "opUnit1",
+                            "orgUnit": "opUnit1",
                             "facility 1": {
                                 "value": "some alias",
                                 "isDisabled": true
@@ -514,7 +514,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var projectSettingsFromDhis = {
                     "projectSettings_prj1": {
                         "referralLocations": [{
-                            "id": "opUnit1",
+                            "orgUnit": "opUnit1",
                             "facility 1": {
                                 "value": "some alias",
                                 "isDisabled": true
@@ -525,7 +525,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 };
 
                 var referralLocationsToUpsert = {
-                    "id": "opUnit2",
+                    "orgUnit": "opUnit2",
                     "facility 1": {
                         "value": "some other alias"
                     },
@@ -535,14 +535,14 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var expectedPayload = {
                     "projectSettings_prj1": {
                         "referralLocations": [{
-                            "id": "opUnit1",
+                            "orgUnit": "opUnit1",
                             "facility 1": {
                                 "value": "some alias",
                                 "isDisabled": true
                             },
                             "clientLastUpdated": "2014-01-01T12:00:00.000Z"
                         }, {
-                            "id": "opUnit2",
+                            "orgUnit": "opUnit2",
                             "facility 1": {
                                 "value": "some other alias"
                             },
@@ -562,7 +562,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var projectSettingsFromDhis = {
                     "projectSettings_prj1": {
                         "referralLocations": [{
-                            "id": "opUnit1",
+                            "orgUnit": "opUnit1",
                             "facility 1": {
                                 "value": "some alias",
                                 "isDisabled": true
@@ -573,7 +573,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 };
 
                 var referralLocationsToUpsert = {
-                    "id": "opUnit1",
+                    "orgUnit": "opUnit1",
                     "facility 1": {
                         "value": "some other alias"
                     },
@@ -583,7 +583,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var expectedPayload = {
                     "projectSettings_prj1": {
                         "referralLocations": [{
-                            "id": "opUnit1",
+                            "orgUnit": "opUnit1",
                             "facility 1": {
                                 "value": "some other alias"
                             },
