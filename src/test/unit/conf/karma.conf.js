@@ -3,6 +3,7 @@ module.exports = function(config) {
     config.set({
         basePath: '../../../',
         files: [
+            'main/js/lib/angular/angular.js',
             'test/unit/test.main.js', {
                 pattern: 'test/unit/test.config.js',
                 included: false
@@ -18,17 +19,21 @@ module.exports = function(config) {
             }, {
                 pattern: 'test/unit/js/data/**/*.js',
                 included: false
-            }
+            }, 'main/**/*.html'
         ],
         exclude: [
             'main/js/lib/**/*spec.js',
             'main/js/app/bg.bootstrap.js'
         ],
+        ngHtml2JsPreprocessor: {
+            stripPrefix: 'main/'
+        },
         autoWatch: true,
         frameworks: ['jasmine', 'requirejs'],
         reporters: ['dots', 'coverage'],
         preprocessors: {
-            'main/js/app/**/*.js': 'coverage'
+            'main/js/app/**/*.js': 'coverage',
+            '**/*.html': ['ng-html2js']
         },
         browsers: ['ChromeTop'],
         customLaunchers: {

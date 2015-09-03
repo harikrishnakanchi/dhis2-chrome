@@ -29,7 +29,8 @@
         "protractor": "2.0.0",
         "ecstatic": "0.7.1",
         "gulp-zip": "3.0.2",
-        "karma": "~0.12.6"
+        "karma": "~0.12.6",
+        "karma-ng-html2js-preprocessor": "~0.1"
     },
     "name": "DHIS2-Chrome-App",
     "version": "0.0.1"
