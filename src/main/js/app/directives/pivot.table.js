@@ -1,16 +1,14 @@
-define([], function() {
+define(["lodash"], function(_) {
     return function() {
         return {
             scope: {
-                data: '=',
-                table: '='
+                data: "=",
+                table: "="
             },
-            controller: ['$scope',
-                function($scope) {
-
-                }
+            controller: ["$scope",
+                function($scope) {}
             ],
-            templateUrl: 'templates/pivot.table.html'
+            templateUrl: "templates/pivot.table.html"
         };
     };
 });
