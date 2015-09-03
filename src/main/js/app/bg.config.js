@@ -86,6 +86,7 @@ require.config({
         "downloadProjectSettingsConsumer": "app/consumer/download.project.settings.consumer",
         "uploadSystemSettingConsumer": "app/consumer/upload.system.setting.consumer",
         "downloadPatientOriginConsumer": "app/consumer/download.patient.origin.consumer",
+        "uploadExcludedDataElementsConsumer": "app/consumer/upload.excluded.dataelements.consumer",
         "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
         "downloadChartConsumer": "app/consumer/download.charts.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",

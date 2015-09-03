@@ -3,7 +3,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, log, scope,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
-            downloadSystemSettingConsumer, uploadSystemSettingConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
+            downloadSystemSettingConsumer, uploadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadChartConsumer,
             uploadReferralLocationsConsumer, downloadPivotTableConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
@@ -82,6 +82,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             uploadReferralLocationsConsumer = {
                 'run': jasmine.createSpy("uploadReferralLocationsConsumer")
             };
+            uploadExcludedDataElementsConsumer = {
+                'run': jasmine.createSpy("uploadExcludedDataElementsConsumer")
+            };
             downloadProjectSettingsConsumer = {
                 'run': jasmine.createSpy("downloadProjectSettingsConsumer")
             };
@@ -109,7 +112,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer,
                 uploadSystemSettingConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
-                uploadReferralLocationsConsumer, downloadPivotTableConsumer, downloadProjectSettingsConsumer);
+                uploadReferralLocationsConsumer, downloadPivotTableConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -383,6 +386,18 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(uploadReferralLocationsConsumer.run).toHaveBeenCalledWith(message);
+        });
+
+        it("should call upload excluded data elements", function() {
+            message.data = {
+                "data": {},
+                "type": "uploadExcludedDataElements"
+            };
+
+            dispatcher.run(message);
+            scope.$apply();
+
+            expect(uploadExcludedDataElementsConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should call download project settings", function() {
