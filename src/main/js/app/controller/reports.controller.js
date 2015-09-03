@@ -234,9 +234,23 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 $scope.orgUnit = ou;
             });
         };
-
+        var getDataForTableForOrgUnit = function(table, orgunit) {
+            return pivotTableRepository.getDataForPivotTable(table.name, orgunit);
+        };
+        var transformTables = function(tables) {
+            return $q.all(_.map(tables, function(table) {
+                return getDataForTableForOrgUnit(table, $routeParams.orgUnit).then(function(data) {
+                    return {
+                        'table': table,
+                        'data': data,
+                        'dataset': table.dataset
+                    };
+                });
+            }));
+        };
         var loadPivotTables = function() {
             pivotTableRepository.getAll()
+                .then(transformTables)
                 .then(function(pivotTables) {
                     $scope.pivotTables = pivotTables;
                 });
