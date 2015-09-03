@@ -1,6 +1,7 @@
-define(["pivotTable"], function(pivotTable) {
+define(["pivotTable"], function(pivotTable, pivotTableController) {
     var init = function(app) {
         app.directive('pivotTable', ['$http', pivotTable]);
+        app.controller('pivotTableController', ['$scope', pivotTableController]);
     };
     return {
         init: init

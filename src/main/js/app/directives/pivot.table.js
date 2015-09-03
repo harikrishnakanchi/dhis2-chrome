@@ -3,11 +3,9 @@ define(["lodash"], function(_) {
         return {
             scope: {
                 data: "=",
-                table: "="
+                definition: "="
             },
-            controller: ["$scope",
-                function($scope) {}
-            ],
+            controller: 'pivotTableController',
             templateUrl: "templates/pivot.table.html"
         };
     };

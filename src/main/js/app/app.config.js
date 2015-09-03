@@ -73,6 +73,7 @@ require.config({
         "reportsController": "app/controller/reports.controller",
         "referralLocationsController": "app/controller/referral.locations.controller",
         "notificationsController": "app/controller/notifications.controller",
+        "pivotTableController": "app/controller/pivot.table.controller",
 
         //Services
         "services": "app/service/services",
