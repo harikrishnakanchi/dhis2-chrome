@@ -1,17 +1,28 @@
 define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
-    return function($http) {
+    return function($http, $q) {
         var self = this;
         this.getAllPivotTables = function() {
             var url = dhisUrl.pivotTables + ".json";
             var config = {
                 params: {
-                    "fields": ":all",
+                    "fields": ":id",
                     "filter": "name:like:[FieldApp",
                     "paging": false,
                 }
             };
+            var getTableDetail = function(table) {
+                var tableUrl = dhisUrl.pivotTables + "/" + table.id + ".json";
+                var detail = {
+                    params: {
+                        "fields": "columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]],!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
+                    }
+                };
+                return $http.get(tableUrl, detail).then(function(response) {
+                    return response.data;
+                });
+            };
             var transform = function(response) {
-                return response.data.reportTables;
+                return $q.all(_.map(response.data.reportTables, getTableDetail));
             };
             return $http.get(url, config).then(transform);
         };

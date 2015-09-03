@@ -3,15 +3,15 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
         var http, httpBackend, pivotTableService, q, scope, lastUpdatedAt;
 
         beforeEach(mocks.inject(function($injector, $q, $rootScope) {
-            http = $injector.get('$http');
+            http = $injector.get("$http");
             q = $q;
             scope = $rootScope;
-            httpBackend = $injector.get('$httpBackend');
+            httpBackend = $injector.get("$httpBackend");
             thisMoment = moment("2014-01-01T");
             lastUpdatedAt = thisMoment.toISOString();
             Timecop.install();
             Timecop.freeze(thisMoment.toDate());
-            pivotTableService = new PivotTableService(http);
+            pivotTableService = new PivotTableService(http, q);
         }));
 
         afterEach(function() {
@@ -21,13 +21,17 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
 
         it("should get chart data when the dimensions are category options", function() {
             var pivotTable = {
-                "name": "some table"
+                "name": "some table",
+                "id": "tab1"
             };
             var pivotTables = {
                 "reportTables": [pivotTable]
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=:all&filter=name:like:%5BFieldApp&paging=false").respond(200, pivotTables);
+            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=:id&filter=name:like:%5BFieldApp&paging=false").respond(200, pivotTables);
+            httpBackend.expectGET(properties.dhis.url +
+                "/api/reportTables/tab1.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
+            ).respond(200, pivotTable);
             var actualData;
             pivotTableService.getAllPivotTables().then(function(data) {
                 actualData = data;
@@ -40,13 +44,16 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
         it("should get all field app tables for specified datasets", function() {
             var tables = [{
                 "name": "[FieldApp - Funky Dataset]",
-                "someAttribute": "someValue"
+                "someAttribute": "someValue",
+                "id": "tab1"
             }, {
                 "name": "[FieldApp  - CoolDataset]",
-                "someAttribute": "someValue"
+                "someAttribute": "someValue",
+                "id": "tab2"
             }, {
                 "name": "[FieldApp - Not needed Dataset]",
-                "someAttribute": "someValue"
+                "someAttribute": "someValue",
+                "id": "tab3"
             }];
 
             var datasets = [{
@@ -57,9 +64,21 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
                 "code": "CoolDataset"
             }];
 
-            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=:all&filter=name:like:%5BFieldApp&paging=false").respond(200, {
+            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=:id&filter=name:like:%5BFieldApp&paging=false").respond(200, {
                 "reportTables": tables
             });
+
+            httpBackend.expectGET(properties.dhis.url +
+                "/api/reportTables/tab1.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
+            ).respond(200, tables[0]);
+
+            httpBackend.expectGET(properties.dhis.url +
+                "/api/reportTables/tab2.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
+            ).respond(200, tables[1]);
+
+            httpBackend.expectGET(properties.dhis.url +
+                "/api/reportTables/tab3.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
+            ).respond(200, tables[2]);
 
             var actualData;
 
@@ -71,11 +90,13 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
 
             expect(actualData).toEqual([{
                 "name": "[FieldApp - Funky Dataset]",
-                'dataset': 'ds1',
+                "dataset": "ds1",
+                "id": "tab1",
                 "someAttribute": "someValue"
             }, {
                 "name": "[FieldApp  - CoolDataset]",
-                'dataset': 'ds2',
+                "dataset": "ds2",
+                "id": "tab2",
                 "someAttribute": "someValue"
             }]);
         });
@@ -262,7 +283,9 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
                     "columnDimensions": ["pe"],
                     "attributeDimensions": []
                 };
-                httpBackend.expectGET(properties.dhis.url + "/api/analytics.json?dimension=a1948a9c6f4:a0b89770007;ab3a614eed1;abf819dca06;afca0bdf0f1&dimension=dx:a0143e82873;a9b8943ccce&dimension=pe:LAST_12_MONTHS&displayProperty=NAME&filter=ou:orgUnitId&lastUpdatedAt=" + lastUpdatedAt).respond(200, tableDefinition);
+                httpBackend.expectGET(properties.dhis.url +
+                    "/api/analytics.json?dimension=a1948a9c6f4:a0b89770007;ab3a614eed1;abf819dca06;afca0bdf0f1&dimension=dx:a0143e82873;a9b8943ccce&dimension=pe:LAST_12_MONTHS&displayProperty=NAME&filter=ou:orgUnitId&lastUpdatedAt=" + lastUpdatedAt).respond(200,
+                    tableDefinition);
                 var actualData;
                 pivotTableService.getPivotTableDataForOrgUnit(tableDefinition, "orgUnitId").then(function(data) {
                     actualData = data;
