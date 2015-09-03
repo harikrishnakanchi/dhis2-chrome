@@ -1,19 +1,25 @@
-define(["uploadPatientOriginConsumer", "patientOriginService", "utils", "angularMocks", "patientOriginRepository"],
-    function(UploadPatientOriginConsumer, PatientOriginService, utils, mocks, PatientOriginRepository) {
-        var scope, patientOriginRepository, patientOriginService, q;
+define(["uploadPatientOriginConsumer", "angularMocks", "utils", "systemSettingService", "patientOriginRepository", "orgUnitRepository"],
+    function(UploadPatientOriginConsumer, mocks, utils, SystemSettingService, PatientOriginRepository, OrgUnitRepository) {
 
-        describe("upload system settings uploadPatientOriginConsumer", function() {
+        var scope, q, systemSettingService, patientOriginRepository, orgUnitRepository;
+
+        describe("uploadPatientOriginConsumer", function() {
             beforeEach(mocks.inject(function($q, $rootScope) {
                 scope = $rootScope.$new();
                 q = $q;
-                patientOriginService = new PatientOriginService();
+                systemSettingService = new SystemSettingService();
                 patientOriginRepository = new PatientOriginRepository();
+                orgUnitRepository = new OrgUnitRepository();
             }));
 
-            it("should upload system settings", function() {
-                var payload = {
-                    orgUnit: "prj1",
-                    origins: [{
+            it("should upload patient origin data to dhis", function() {
+                var project = {
+                    "id": "prj1"
+                };
+
+                var patientOriginDetails = {
+                    "orgUnit": "opUnit1",
+                    "origins": [{
                         "id": "origin1",
                         "originName": "origin1",
                         "longitude": 180,
@@ -23,20 +29,23 @@ define(["uploadPatientOriginConsumer", "patientOriginService", "utils", "angular
                 };
 
                 var message = {
-                    data: {
-                        data: payload,
-                        type: "uploadPatientOriginDetails"
+                    "data": {
+                        "data": "opUnit1",
+                        "type": "uploadPatientOriginDetails"
                     }
                 };
 
-                spyOn(patientOriginService, "upsert");
-                spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, payload));
-                var uploadPatientOriginConsumer = new UploadPatientOriginConsumer(patientOriginService, patientOriginRepository, q);
-                uploadPatientOriginConsumer.run(message);
+                spyOn(orgUnitRepository, "getParentProject").and.returnValue(utils.getPromise(q, project));
+                spyOn(patientOriginRepository, "get").and.returnValue(utils.getPromise(q, patientOriginDetails));
+                spyOn(systemSettingService, "upsertPatientOriginDetails").and.returnValue(utils.getPromise(q, {}));
+
+                var consumer = new UploadPatientOriginConsumer(q, systemSettingService, patientOriginRepository, orgUnitRepository);
+                consumer.run(message);
                 scope.$apply();
 
-                expect(patientOriginRepository.get).toHaveBeenCalledWith("prj1");
-                expect(patientOriginService.upsert).toHaveBeenCalledWith(payload);
+                expect(orgUnitRepository.getParentProject).toHaveBeenCalledWith("opUnit1");
+                expect(patientOriginRepository.get).toHaveBeenCalledWith("opUnit1");
+                expect(systemSettingService.upsertPatientOriginDetails).toHaveBeenCalledWith(project.id, patientOriginDetails);
             });
         });
     });

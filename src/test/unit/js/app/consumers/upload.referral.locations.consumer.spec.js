@@ -31,7 +31,8 @@ define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "systemSetti
 
                 var message = {
                     "data": {
-                        "data": "opUnitId"
+                        "data": "opUnit1",
+                        "type": "uploadReferralLocations"
                     }
                 };
 
@@ -43,8 +44,8 @@ define(["uploadReferralLocationsConsumer", "utils", "angularMocks", "systemSetti
                 uploadReferralLocationsConsumer.run(message);
                 scope.$apply();
 
-                expect(orgUnitRepository.getParentProject).toHaveBeenCalledWith("opUnitId");
-                expect(referralLocationsRepository.get).toHaveBeenCalledWith("opUnitId");
+                expect(orgUnitRepository.getParentProject).toHaveBeenCalledWith("opUnit1");
+                expect(referralLocationsRepository.get).toHaveBeenCalledWith("opUnit1");
                 expect(systemSettingService.upsertReferralLocations).toHaveBeenCalledWith(project.id, referralLocations);
             });
         });

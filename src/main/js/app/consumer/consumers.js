@@ -2,14 +2,14 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
         "createUserConsumer", "updateUserConsumer", "dispatcher", "consumerRegistry", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer",
         "orgUnitRepository", "programRepository", "uploadProgramConsumer", "downloadProgramConsumer", "downloadEventDataConsumer", "deleteEventConsumer", "eventService", "programEventRepository", "uploadEventDataConsumer",
         "downloadApprovalConsumer", "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer", "downloadSystemSettingConsumer", "uploadSystemSettingConsumer", "metadataService", "metadataRepository",
-        "downloadPatientOriginConsumer", "uploadPatientOriginConsumer", "mergeBy", "downloadChartConsumer",
+        "uploadPatientOriginConsumer", "mergeBy", "downloadChartConsumer",
         "uploadReferralLocationsConsumer", "referralLocationsRepository", "downloadPivotTableConsumer", "downloadProjectSettingsConsumer"
     ],
     function(uploadApprovalDataConsumer, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
         createUserConsumer, updateUserConsumer, dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer,
         orgUnitRepository, programRepository, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, deleteEventConsumer, eventService, programEventRepository, uploadEventDataConsumer,
         downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, metadataService, metadataRepository,
-        downloadPatientOriginConsumer, uploadPatientOriginConsumer, mergeBy, downloadChartConsumer,
+        uploadPatientOriginConsumer, mergeBy, downloadChartConsumer,
         uploadReferralLocationsConsumer, referralLocationsRepository, downloadPivotTableConsumer, downloadProjectSettingsConsumer) {
 
         var init = function(app) {
@@ -28,7 +28,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("createUserConsumer", ["userService", createUserConsumer]);
             app.service("updateUserConsumer", ["userService", updateUserConsumer]);
             app.service("downloadSystemSettingConsumer", ["systemSettingService", "systemSettingRepository", "mergeBy", downloadSystemSettingConsumer]);
-            app.service("downloadProjectSettingsConsumer", ["$q", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", downloadProjectSettingsConsumer]);
+            app.service("downloadProjectSettingsConsumer", ["$q", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", downloadProjectSettingsConsumer]);
             app.service("uploadSystemSettingConsumer", ["systemSettingService", "systemSettingRepository", "$q", uploadSystemSettingConsumer]);
             app.service("consumerRegistry", ["$hustle", "$q", "$log", "dispatcher", consumerRegistry]);
             app.service("uploadProgramConsumer", ["programService", "programRepository", "$q", uploadProgramConsumer]);
@@ -38,15 +38,14 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("deleteEventConsumer", ["eventService", "programEventRepository", "$q", deleteEventConsumer]);
             app.service("downloadMetadataConsumer", ["metadataService", "metadataRepository", "changeLogRepository", downloadMetadataConsumer]);
             app.service("deleteApprovalConsumer", ["approvalService", "approvalDataRepository", "datasetRepository", "$q", deleteApprovalConsumer]);
-            app.service("downloadPatientOriginConsumer", ["patientOriginService", "patientOriginRepository", "mergeBy", downloadPatientOriginConsumer]);
-            app.service("uploadPatientOriginConsumer", ["patientOriginService", "patientOriginRepository", uploadPatientOriginConsumer]);
+            app.service("uploadPatientOriginConsumer", ["$q", "systemSettingService", "patientOriginRepository", "orgUnitRepository", uploadPatientOriginConsumer]);
             app.service("downloadChartConsumer", ["chartService", "chartRepository", "userPreferenceRepository", "datasetRepository", "$q", downloadChartConsumer]);
             app.service("uploadReferralLocationsConsumer", ["$q", "systemSettingService", "referralLocationsRepository", "orgUnitRepository", uploadReferralLocationsConsumer]);
             app.service("downloadPivotTableConsumer", ["pivotTableService", "pivotTableRepository", "userPreferenceRepository", "$q", "datasetRepository", downloadPivotTableConsumer]);
             app.service("dispatcher", ["$q", "$log", "downloadOrgUnitConsumer", "uploadOrgUnitConsumer", "uploadOrgUnitGroupConsumer", "downloadDatasetConsumer", "uploadDatasetConsumer", "createUserConsumer", "updateUserConsumer",
                 "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer", "uploadApprovalDataConsumer", "uploadProgramConsumer", "downloadProgramConsumer", "downloadEventDataConsumer",
                 "uploadEventDataConsumer", "deleteEventConsumer", "downloadApprovalConsumer", "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer",
-                "downloadSystemSettingConsumer", "uploadSystemSettingConsumer", "downloadPatientOriginConsumer", "uploadPatientOriginConsumer", "downloadChartConsumer",
+                "downloadSystemSettingConsumer", "uploadSystemSettingConsumer", "uploadPatientOriginConsumer", "downloadChartConsumer",
                 "uploadReferralLocationsConsumer", "downloadPivotTableConsumer", "downloadProjectSettingsConsumer", dispatcher
             ]);
 

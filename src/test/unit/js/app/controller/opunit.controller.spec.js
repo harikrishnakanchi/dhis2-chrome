@@ -773,7 +773,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
 
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(payload);
             expect(hustle.publish).toHaveBeenCalledWith({
-                "data": payload,
+                "data": "OpUnit1ParentId",
                 "type": "uploadPatientOriginDetails",
                 "locale": "en",
                 "desc": "create patient origin Not Specified"
@@ -936,7 +936,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.$apply();
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPatientOriginUpsert);
             expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
-                "data": expectedPatientOriginUpsert,
+                "data": "opUnit1Id",
                 "type": "uploadPatientOriginDetails",
                 "locale": "en",
                 "desc": "create patient origin origin1"
@@ -1017,7 +1017,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
             scope.$apply();
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPatientOriginUpsert);
             expect(hustle.publish.calls.argsFor(0)[0]).toEqual({
-                "data": expectedPatientOriginUpsert,
+                "data": "opUnit1Id",
                 "type": "uploadPatientOriginDetails",
                 "locale": "en",
                 "desc": "create patient origin origin1"

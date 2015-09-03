@@ -118,7 +118,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
 
             $scope.loading = true;
             return patientOriginRepository.upsert(payload)
-                .then(_.partial(publishMessage, payload, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(payload.origins, "name")))
+                .then(_.partial(publishMessage, payload.orgUnit, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(payload.origins, "name")))
                 .then(createOrgUnitsAndGroups)
                 .then(onSuccess, onFailure)
                 .finally(function() {
@@ -176,7 +176,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
 
             var publishUpdateMessages = function() {
                 patientOriginRepository.upsert(updatedPatientOrigin).then(function() {
-                    publishMessage(updatedPatientOrigin, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(updatedPatientOrigin.origins, "name"));
+                    publishMessage(updatedPatientOrigin.orgUnit, "uploadPatientOriginDetails", $scope.resourceBundle.uploadPatientOriginDetailsDesc + _.pluck(updatedPatientOrigin.origins, "name"));
                 });
                 orgUnitRepository.upsert(originsToUpsert).then(function() {
                     publishMessage(originsToUpsert, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(originsToUpsert, "name")));

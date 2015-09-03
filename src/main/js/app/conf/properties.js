@@ -29,7 +29,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "maxretries": 5,
             "delay": 100,
             "skipRetryMessages": ["downloadMetadata", "downloadData", "downloadOrgUnit", "downloadOrgUnitGroups", "downloadDatasets",
-                "downloadProgram", "downloadEventData", "downloadSystemSetting", "downloadPatientOriginDetails"
+                "downloadProgram", "downloadEventData", "downloadSystemSetting", "downloadProjectSettings"
             ],
             "retryDelayConfig": {
                 0: 10000,

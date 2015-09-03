@@ -3,7 +3,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, log, scope,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
-            downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
+            downloadSystemSettingConsumer, uploadSystemSettingConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
             uploadReferralLocationsConsumer, downloadPivotTableConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
@@ -73,9 +73,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             uploadSystemSettingConsumer = {
                 'run': jasmine.createSpy("uploadSystemSettingConsumer")
             };
-            downloadPatientOriginConsumer = {
-                'run': jasmine.createSpy("downloadPatientOriginConsumer")
-            };
             uploadPatientOriginConsumer = {
                 'run': jasmine.createSpy("uploadPatientOriginConsumer")
             };
@@ -104,7 +101,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadProgramConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadDatasetConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadSystemSettingConsumer.run.and.returnValue(utils.getPromise(q, {}));
-            downloadPatientOriginConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadChartConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadProjectSettingsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadPivotTableConsumer.run.and.returnValue(utils.getPromise(q, {}));
@@ -112,7 +108,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer,
                 downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer,
-                uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
+                uploadSystemSettingConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
                 uploadReferralLocationsConsumer, downloadPivotTableConsumer, downloadProjectSettingsConsumer);
         }));
 
@@ -353,17 +349,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(uploadSystemSettingConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
-        it("should download  patient origin consumer", function() {
-            message.data = {
-                "data": {},
-                "type": "downloadPatientOriginDetails"
-            };
-
-            dispatcher.run(message);
-
-            expect(downloadPatientOriginConsumer.run).toHaveBeenCalledWith(message);
-        });
-
         it("should upload patient origin consumer", function() {
             message.data = {
                 "data": {},
@@ -373,8 +358,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
 
-            expect(downloadPatientOriginConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadPatientOriginConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(uploadPatientOriginConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should call download charts", function() {

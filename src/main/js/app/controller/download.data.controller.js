@@ -16,8 +16,8 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
                 "data": []
             }, "dataValues");
 
-            var downloadPatientOriginDetails = $hustle.publish({
-                "type": "downloadPatientOriginDetails",
+            var downloadProjectSettings = $hustle.publish({
+                "type": "downloadProjectSettings",
                 "data": []
             }, "dataValues");
 
@@ -69,7 +69,7 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
             return $q.all([
                     downloadMetadata,
                     downloadSystemSetting,
-                    downloadPatientOriginDetails,
+                    downloadProjectSettings,
                     downloadOrgUnit,
                     downloadOrgUnitGroups,
                     downloadProgram,

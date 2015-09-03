@@ -1,5 +1,5 @@
-define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "mergeBy", "downloadProjectSettingsConsumer"],
-    function(mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, MergeBy, DownloadProjectSettingsConsumer) {
+define(["angularMocks", "utils", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "mergeBy", "downloadProjectSettingsConsumer"],
+    function(mocks, utils, SystemSettingService, UserPreferenceRepository, ReferralLocationsRepository, PatientOriginRepository, MergeBy, DownloadProjectSettingsConsumer) {
         describe("downloadProjectSettingsConsumer", function() {
             var consumer,
                 systemSettingService,
@@ -19,8 +19,8 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                             "dataElements": ["de1", "de2"],
                             "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                         }],
-                        "patientOriginDetails": [{
-                            "id": "opUnit1",
+                        "patientOrigins": [{
+                            "orgUnit": "opUnit1",
                             "origins": [{
                                 "id": "origin1",
                                 "name": "Origin 1",
@@ -66,7 +66,10 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
-                consumer = new DownloadProjectSettingsConsumer(q, systemSettingService, userPreferenceRepository, referralLocationsRepository);
+                patientOriginRepository = new PatientOriginRepository();
+                spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+
+                consumer = new DownloadProjectSettingsConsumer(q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository);
             }));
 
             it("should download project settings for current user projects", function() {
@@ -87,6 +90,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                         "excludedDataElements": []
                     },
                     "prj": {
+                        "excludedDataElements": [],
                         "referralLocations": [{
                             "id": "opUnit1",
                             "facility 1": {
@@ -120,6 +124,45 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 expect(referralLocationsRepository.upsert).toHaveBeenCalledWith(expectedPayload);
             });
 
+            it("should download project settings and save patient origin details", function() {
+                var userCurrentProjects = ['prj', 'prjWithNoPatientOriginDetails'];
+                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userCurrentProjects));
+
+                var projectSettingsFromDhis = {
+                    "prjWithNoPatientOriginDetails": {
+                        "excludedDataElements": []
+                    },
+                    "prj": {
+                        "excludedDataElements": [],
+                        "patientOrigins": [{
+                            "orgUnit": "opUnit1",
+                            "origins": [{
+                                "id": "origin1",
+                                "name": "Origin 1",
+                                "isDisabled": false,
+                                "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                            }],
+                        }]
+                    }
+                };
+                systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
+
+                consumer.run();
+                scope.$apply();
+
+                var expectedPayload = [{
+                    "orgUnit": "opUnit1",
+                    "origins": [{
+                        "id": "origin1",
+                        "name": "Origin 1",
+                        "isDisabled": false,
+                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                    }],
+                }];
+
+                expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
+            });
+
             // it("should overwrite local referral locations with dhis copy only when referral locations are newer in dhis", function() {
             //     var localReferralLocations = [{
             //         'id': 'opUnit1',
@@ -151,6 +194,71 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             //     expect(referralLocationsRepository.upsert).toHaveBeenCalledWith(expectedMergedReferralLocations);
             // });
 
+            // it("should merge patient origin details", function() {
+            //     var localOriginDetails = [{
+            //             orgUnit: "prj1",
+            //             origins: [{
+            //                 'id': 'origin3',
+            //                 'name': 'origin3',
+            //                 'latitude': '80',
+            //                 'longitude': '180',
+            //                 'clientLastUpdated': "2014-06-01T12:50:54.972Z",
+            //             }]
+            //         }, {
+            //             orgUnit: "prj2",
+            //             origins: [{
+            //                 'id': 'origin4',
+            //                 'name': 'Neworigin4',
+            //                 'latitude': '10',
+            //                 'longitude': '5',
+            //                 'clientLastUpdated': "2014-05-31T12:43:54.972Z"
+            //             }]
+            //         }
+
+            //     ];
+
+            //     spyOn(patientOriginService, "getAll").and.returnValue(utils.getPromise(q, dhisPatientOriginDetails));
+            //     spyOn(patientOriginRepository, "upsert");
+            //     spyOn(patientOriginRepository, "findAll").and.returnValue(utils.getPromise(q, localOriginDetails));
+
+            //     downloadPatientOriginConsumer = new DownloadPatientOriginConsumer(patientOriginService, patientOriginRepository, mergeBy);
+            //     downloadPatientOriginConsumer.run();
+
+            //     scope.$apply();
+
+            //     expect(patientOriginService.getAll).toHaveBeenCalled();
+
+            //     var expectedUpserts = [{
+            //         orgUnit: "prj1",
+            //         origins: [{
+            //             'id': 'origin1',
+            //             'name': 'origin1',
+            //             'latitude': '80',
+            //             'longitude': '180',
+            //             'clientLastUpdated': "2014-05-30T12:43:54.972Z"
+
+            //         }, {
+            //             'id': 'origin3',
+            //             'name': 'origin3',
+            //             'latitude': '80',
+            //             'longitude': '180',
+            //             'clientLastUpdated': "2014-06-01T12:50:54.972Z",
+            //         }]
+            //     }, {
+            //         orgUnit: "prj2",
+            //         origins: [{
+            //             'id': 'origin4',
+            //             'name': 'Neworigin4',
+            //             'latitude': '10',
+            //             'longitude': '5',
+            //             'clientLastUpdated': "2014-05-31T12:43:54.972Z"
+            //         }]
+            //     }];
+
+            //     expect(patientOriginService.getAll).toHaveBeenCalled();
+            //     expect(patientOriginRepository.upsert.calls.argsFor(0)).toEqual([expectedUpserts[0]]);
+            //     expect(patientOriginRepository.upsert.calls.argsFor(1)).toEqual([expectedUpserts[1]]);
+            // });
 
             it("should not fail if current user projects are not available", function() {
                 userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, undefined));

@@ -147,8 +147,8 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                         "dataElements": ["de1", "de2"],
                         "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                     }],
-                    "patientOriginDetails": [{
-                        "id": "opUnit1",
+                    "patientOrigins": [{
+                        "orgUnit": "opUnit1",
                         "origins": [{
                             "id": "origin1",
                             "name": "Origin 1",
@@ -188,8 +188,8 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                         "dataElements": ["de1", "de2"],
                         "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                     }],
-                    "patientOriginDetails": [{
-                        "id": "opUnit1",
+                    "patientOrigins": [{
+                        "orgUnit": "opUnit1",
                         "origins": [{
                             "id": "origin1",
                             "name": "Origin 1",
@@ -342,7 +342,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 var projectSettingsFromDhis = {};
 
                 var patientOriginDetailsToUpsert = {
-                    "id": "opUnit1",
+                    "orgUnit": "opUnit1",
                     "origins": [{
                         "id": "origin1",
                         "name": "Origin 1",
@@ -353,8 +353,8 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
 
                 var expectedPayload = {
                     "projectSettings_prj1": {
-                        "patientOriginDetails": [{
-                            "id": "opUnit1",
+                        "patientOrigins": [{
+                            "orgUnit": "opUnit1",
                             "origins": [{
                                 "id": "origin1",
                                 "name": "Origin 1",
@@ -375,8 +375,8 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
             it("should append patientOriginDetails when upserting", function() {
                 var projectSettingsFromDhis = {
                     "projectSettings_prj1": {
-                        "patientOriginDetails": [{
-                            "id": "opUnit1",
+                        "patientOrigins": [{
+                            "orgUnit": "opUnit1",
                             "origins": [{
                                 "id": "origin1",
                                 "name": "Origin 1",
@@ -389,7 +389,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 };
 
                 var patientOriginDetailsToUpsert = {
-                    "id": "opUnit2",
+                    "orgUnit": "opUnit2",
                     "origins": [{
                         "id": "origin2",
                         "name": "Origin 2",
@@ -400,8 +400,8 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
 
                 var expectedPayload = {
                     "projectSettings_prj1": {
-                        "patientOriginDetails": [{
-                            "id": "opUnit1",
+                        "patientOrigins": [{
+                            "orgUnit": "opUnit1",
                             "origins": [{
                                 "id": "origin1",
                                 "name": "Origin 1",
@@ -409,7 +409,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                             }],
                             "clientLastUpdated": "2014-01-01T12:00:00.000Z"
                         }, {
-                            "id": "opUnit2",
+                            "orgUnit": "opUnit2",
                             "origins": [{
                                 "id": "origin2",
                                 "name": "Origin 2",
@@ -431,8 +431,8 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
             it("should update patientOriginDetails when upserting", function() {
                 var projectSettingsFromDhis = {
                     "projectSettings_prj1": {
-                        "patientOriginDetails": [{
-                            "id": "opUnit1",
+                        "patientOrigins": [{
+                            "orgUnit": "opUnit1",
                             "origins": [{
                                 "id": "origin1",
                                 "name": "Origin 1",
@@ -445,7 +445,7 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
                 };
 
                 var patientOriginDetailsToUpsert = {
-                    "id": "opUnit1",
+                    "orgUnit": "opUnit1",
                     "origins": [{
                         "id": "origin2",
                         "name": "Origin 2",
@@ -456,8 +456,8 @@ define(["systemSettingService", "angularMocks", "dhisUrl", "utils", "md5", "time
 
                 var expectedPayload = {
                     "projectSettings_prj1": {
-                        "patientOriginDetails": [{
-                            "id": "opUnit1",
+                        "patientOrigins": [{
+                            "orgUnit": "opUnit1",
                             "origins": [{
                                 "id": "origin2",
                                 "name": "Origin 2",

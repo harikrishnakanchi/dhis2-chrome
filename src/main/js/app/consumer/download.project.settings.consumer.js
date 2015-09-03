@@ -1,9 +1,11 @@
 define(["lodash"], function(_) {
-    return function($q, systemSettingService, userPreferenceRepository, referralLocationsRepository) {
+    return function($q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository) {
         this.run = function() {
             return getUserProjectIds()
                 .then(downloadedProjectSettings)
-                .then(saveReferrals);
+                .then(function(projectSettings) {
+                    return $q.all([saveReferrals(projectSettings), savePatientOriginDetails(projectSettings)]);
+                });
         };
 
         var getUserProjectIds = function() {
@@ -33,6 +35,26 @@ define(["lodash"], function(_) {
         //     });
         // };
 
+        // var mergeAndSave = function(remotePatientOrigins) {
+        //     var opUnitIds = _.pluck(remotePatientOrigins, "orgUnit");
+
+        //     return patientOriginRepository.findAll(opUnitIds).then(function(localPatientOrigins) {
+        //         return _.forEach(remotePatientOrigins, function(remotePatientOrigin) {
+        //             var originFoundLocally = _.find(localPatientOrigins, {
+        //                 "orgUnit": remotePatientOrigin.orgUnit
+        //             });
+
+        //             if (originFoundLocally) {
+        //                 var updatedOrigins = mergeBy.lastUpdated({}, remotePatientOrigin.origins, originFoundLocally.origins);
+        //                 remotePatientOrigin.origins = updatedOrigins;
+        //                 return patientOriginRepository.upsert(remotePatientOrigin);
+        //             } else {
+        //                 return patientOriginRepository.upsert(remotePatientOrigin);
+        //             }
+        //         });
+        //     });
+        // };
+
         var saveReferrals = function(projectSettings) {
             var referrals = _.transform(projectSettings, function(result, settings) {
                 _.each(settings.referralLocations, function(item) {
@@ -45,5 +67,19 @@ define(["lodash"], function(_) {
 
             return referralLocationsRepository.upsert(referrals);
         };
+
+        var savePatientOriginDetails = function(projectSettings) {
+            var patientOrigins = _.transform(projectSettings, function(result, settings) {
+                _.each(settings.patientOrigins, function(item) {
+                    result.push(item);
+                });
+            }, []);
+
+            if (_.isEmpty(patientOrigins))
+                return;
+
+            return patientOriginRepository.upsert(patientOrigins);
+        };
+
     };
 });

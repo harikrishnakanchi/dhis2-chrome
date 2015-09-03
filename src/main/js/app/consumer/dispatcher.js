@@ -2,7 +2,7 @@ define(["lodash"], function(_) {
     return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
         createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
-        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, downloadPatientOriginConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
+        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
         uploadReferralLocationsConsumer, downloadPivotTableConsumer, downloadProjectSettingsConsumer) {
 
         this.run = function(message) {
@@ -86,12 +86,8 @@ define(["lodash"], function(_) {
                     return downloadSystemSettingConsumer.run(message)
                         .then(_.partial(uploadSystemSettingConsumer.run, message));
 
-                case "downloadPatientOriginDetails":
-                    return downloadPatientOriginConsumer.run(message);
-
                 case "uploadPatientOriginDetails":
-                    return downloadPatientOriginConsumer.run(message)
-                        .then(_.partial(uploadPatientOriginConsumer.run, message));
+                    return uploadPatientOriginConsumer.run(message);
 
                 case "downloadCharts":
                     return downloadChartConsumer.run(message);

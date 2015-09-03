@@ -38,7 +38,7 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                 var syncableTypes = [
                     "downloadMetadata",
                     "downloadSystemSetting",
-                    "downloadPatientOriginDetails",
+                    "downloadProjectSettings",
                     "downloadOrgUnit",
                     "downloadOrgUnitGroups",
                     "downloadProgram",

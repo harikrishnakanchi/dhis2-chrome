@@ -13,8 +13,8 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 return name;
             });
             scope.orgUnit = {
-                "name": "Project1",
-                "id": "prj1"
+                "name": "o1",
+                "id": "ou1"
             };
 
             var modules = [{
@@ -84,16 +84,16 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
         it("should set patientOriginDetails on scope on initialization", function() {
             scope.orgUnit = {
-                "id": "prj1"
+                "id": "ou1"
             };
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, {
-                "orgUnit": "prj1",
+                "orgUnit": "ou1",
                 "origins": origins
             }));
             patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper);
             scope.$apply();
 
-            expect(patientOriginRepository.get).toHaveBeenCalledWith("prj1");
+            expect(patientOriginRepository.get).toHaveBeenCalledWith("ou1");
         });
 
         it("should add patient origin if no origins are present", function() {
@@ -110,7 +110,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             scope.$apply();
 
             var expectedPayload = {
-                orgUnit: "prj1",
+                orgUnit: "ou1",
                 origins: [{
                     "id": "Origin1",
                     "name": "Origin1",
@@ -122,7 +122,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             };
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
             expect(hustle.publish).toHaveBeenCalledWith({
-                data: expectedPayload,
+                data: "ou1",
                 type: "uploadPatientOriginDetails",
                 locale: "en",
                 desc: "create patient origin Origin1"
@@ -132,7 +132,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
         it("should add new patient origins to existing patient origins", function() {
             patientOriginRepository.get.and.returnValue(utils.getPromise(q, {
-                "orgUnit": "prj1",
+                "orgUnit": "ou1",
                 "origins": origins
             }));
             patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper);
@@ -147,7 +147,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             scope.$apply();
 
             var expectedPayload = {
-                orgUnit: "prj1",
+                orgUnit: "ou1",
                 origins: [{
                     "id": "origin1",
                     "name": "Origin1",
@@ -166,7 +166,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             };
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
             expect(hustle.publish.calls.argsFor(0)).toEqual([{
-                data: expectedPayload,
+                data: "ou1",
                 type: "uploadPatientOriginDetails",
                 locale: "en",
                 desc: "create patient origin Origin1,Origin2"
@@ -193,7 +193,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
 
             scope.patientOrigin = patientOrigin;
             scope.orgUnit = {
-                "id": "prj1"
+                "id": "ou1"
             };
 
             scope.$apply();
@@ -201,7 +201,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             scope.save();
             scope.$apply();
 
-            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("prj1");
+            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith("ou1");
             expect(originOrgunitCreator.create.calls.count()).toEqual(modules.length);
             expect(originOrgunitCreator.create).toHaveBeenCalledWith(modules[0], patientOrigin);
         });
@@ -254,7 +254,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "data": ["ds1"],
                 "type": "associateOrgUnitToDataset",
                 "locale": "en",
-                "desc": "associate selected services to origins of Op Unit Project1"
+                "desc": "associate selected services to origins of Op Unit o1"
             }, "dataValues"]);
 
             expect(hustle.publish.calls.argsFor(3)).toEqual([{
@@ -321,7 +321,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             };
 
             var patientOrigin = {
-                "orgUnit": "prj1",
+                "orgUnit": "ou1",
                 "origins": [{
                     "name": "Origin 1",
                     "id": "o1",
@@ -331,7 +331,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             };
 
             var newPatientOrigin = {
-                "orgUnit": "prj1",
+                "orgUnit": "ou1",
                 "origins": [{
                     "name": "New Origin 1",
                     "id": "o1",
@@ -354,7 +354,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             };
 
             scope.orgUnit = {
-                "id": "prj1"
+                "id": "ou1"
             };
 
             scope.$apply();
@@ -362,17 +362,17 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             scope.update();
             scope.$apply();
 
-            expect(patientOriginRepository.get).toHaveBeenCalledWith("prj1");
+            expect(patientOriginRepository.get).toHaveBeenCalledWith("ou1");
             expect(patientOriginRepository.upsert).toHaveBeenCalledWith(newPatientOrigin);
             expect(hustle.publish.calls.argsFor(0)).toEqual([{
-                "data": newPatientOrigin,
+                "data": "ou1",
                 "type": "uploadPatientOriginDetails",
                 "locale": "en",
                 "desc": "create patient origin New Origin 1"
             }, "dataValues"]);
 
             expect(orgUnitRepository.getAllOriginsByName).toHaveBeenCalledWith({
-                "id": "prj1"
+                "id": "ou1"
             }, "Origin 1", true);
             expect(orgUnitRepository.upsert).toHaveBeenCalledWith([newOrigin1]);
             expect(hustle.publish.calls.argsFor(1)).toEqual([{
