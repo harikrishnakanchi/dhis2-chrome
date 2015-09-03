@@ -110,6 +110,7 @@ require.config({
         "optionSetRepository": "app/repository/option.set.repository",
         "chartRepository": "app/repository/chart.repository",
         "referralLocationsRepository": "app/repository/referral.locations.repository",
+        "excludedDataElementsRepository": "app/repository/excluded.dataelements.repository",
         "pivotTableRepository": "app/repository/pivot.table.repository",
 
         //Transformers

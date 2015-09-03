@@ -37,6 +37,10 @@ define([], function() {
         create_store_with_key("patientOrigin", "orgUnit", db);
     };
 
+    var add_excluded_dataelements_store = function(db, tx) {
+        create_store_with_key("excludedDataElements", "orgUnit", db);
+    };
+
     var change_log_stores = function(db, tx) {
         create_store_with_key("changeLog", "type", db);
     };
@@ -183,6 +187,7 @@ define([], function() {
         add_referral_locations_store,
         add_organisation_unit_index_by_level,
         add_pivot_table_store,
-        add_pivot_table_data_store
+        add_pivot_table_data_store,
+        add_excluded_dataelements_store
     ];
 });

@@ -1,10 +1,10 @@
 define(["lodash"], function(_) {
-    return function($q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository) {
+    return function($q, systemSettingService, userPreferenceRepository, referralLocationsRepository, patientOriginRepository, excludedDataElementsRepository) {
         this.run = function() {
             return getUserProjectIds()
                 .then(downloadedProjectSettings)
                 .then(function(projectSettings) {
-                    return $q.all([saveReferrals(projectSettings), savePatientOriginDetails(projectSettings)]);
+                    return $q.all([saveReferrals(projectSettings), savePatientOriginDetails(projectSettings), saveExcludedDataElements(projectSettings)]);
                 });
         };
 
@@ -18,42 +18,6 @@ define(["lodash"], function(_) {
 
             return systemSettingService.getProjectSettings(projectIds);
         };
-
-        // var mergeAndSave = function(remoteReferralLocations) {
-        //     if (remoteReferralLocations.length === 0) return;
-
-        //     var remoteIds = _.pluck(remoteReferralLocations, "id");
-
-        //     var mergeOpts = {
-        //         remoteTimeField: "clientLastUpdated",
-        //         localTimeField: "clientLastUpdated"
-        //     };
-
-        //     return referralLocationsRepository.findAll(remoteIds).then(function(localReferralLocations) {
-        //         var mergedReferralLocations = mergeBy.lastUpdated(mergeOpts, remoteReferralLocations, localReferralLocations);
-        //         return referralLocationsRepository.upsert(mergedReferralLocations);
-        //     });
-        // };
-
-        // var mergeAndSave = function(remotePatientOrigins) {
-        //     var opUnitIds = _.pluck(remotePatientOrigins, "orgUnit");
-
-        //     return patientOriginRepository.findAll(opUnitIds).then(function(localPatientOrigins) {
-        //         return _.forEach(remotePatientOrigins, function(remotePatientOrigin) {
-        //             var originFoundLocally = _.find(localPatientOrigins, {
-        //                 "orgUnit": remotePatientOrigin.orgUnit
-        //             });
-
-        //             if (originFoundLocally) {
-        //                 var updatedOrigins = mergeBy.lastUpdated({}, remotePatientOrigin.origins, originFoundLocally.origins);
-        //                 remotePatientOrigin.origins = updatedOrigins;
-        //                 return patientOriginRepository.upsert(remotePatientOrigin);
-        //             } else {
-        //                 return patientOriginRepository.upsert(remotePatientOrigin);
-        //             }
-        //         });
-        //     });
-        // };
 
         var saveReferrals = function(projectSettings) {
             var referrals = _.transform(projectSettings, function(result, settings) {
@@ -79,6 +43,19 @@ define(["lodash"], function(_) {
                 return;
 
             return patientOriginRepository.upsert(patientOrigins);
+        };
+
+        var saveExcludedDataElements = function(projectSettings) {
+            var excludedDataElements = _.transform(projectSettings, function(result, settings) {
+                _.each(settings.excludedDataElements, function(item) {
+                    result.push(item);
+                });
+            }, []);
+
+            if (_.isEmpty(excludedDataElements))
+                return;
+
+            return excludedDataElementsRepository.upsert(excludedDataElements);
         };
 
     };

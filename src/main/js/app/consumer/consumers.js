@@ -2,15 +2,14 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
         "createUserConsumer", "updateUserConsumer", "dispatcher", "consumerRegistry", "downloadDataConsumer", "uploadDataConsumer", "uploadCompletionDataConsumer",
         "orgUnitRepository", "programRepository", "uploadProgramConsumer", "downloadProgramConsumer", "downloadEventDataConsumer", "deleteEventConsumer", "eventService", "programEventRepository", "uploadEventDataConsumer",
         "downloadApprovalConsumer", "downloadMetadataConsumer", "downloadOrgUnitGroupConsumer", "deleteApprovalConsumer", "downloadSystemSettingConsumer", "uploadSystemSettingConsumer", "metadataService", "metadataRepository",
-        "uploadPatientOriginConsumer", "mergeBy", "downloadChartConsumer",
+        "uploadPatientOriginConsumer", "mergeBy", "downloadChartConsumer", "excludedDataElementsRepository",
         "uploadReferralLocationsConsumer", "referralLocationsRepository", "downloadPivotTableConsumer", "downloadProjectSettingsConsumer"
     ],
     function(uploadApprovalDataConsumer, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
         createUserConsumer, updateUserConsumer, dispatcher, consumerRegistry, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer,
         orgUnitRepository, programRepository, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, deleteEventConsumer, eventService, programEventRepository, uploadEventDataConsumer,
         downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadSystemSettingConsumer, metadataService, metadataRepository,
-        uploadPatientOriginConsumer, mergeBy, downloadChartConsumer,
-        uploadReferralLocationsConsumer, referralLocationsRepository, downloadPivotTableConsumer, downloadProjectSettingsConsumer) {
+        uploadPatientOriginConsumer, mergeBy, downloadChartConsumer, excludedDataElementsRepository, uploadReferralLocationsConsumer, referralLocationsRepository, downloadPivotTableConsumer, downloadProjectSettingsConsumer) {
 
         var init = function(app) {
             app.service('mergeBy', ['$log', mergeBy]);
@@ -28,7 +27,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("createUserConsumer", ["userService", createUserConsumer]);
             app.service("updateUserConsumer", ["userService", updateUserConsumer]);
             app.service("downloadSystemSettingConsumer", ["systemSettingService", "systemSettingRepository", "mergeBy", downloadSystemSettingConsumer]);
-            app.service("downloadProjectSettingsConsumer", ["$q", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", downloadProjectSettingsConsumer]);
+            app.service("downloadProjectSettingsConsumer", ["$q", "systemSettingService", "userPreferenceRepository", "referralLocationsRepository", "patientOriginRepository", "excludedDataElementsRepository", downloadProjectSettingsConsumer]);
             app.service("uploadSystemSettingConsumer", ["systemSettingService", "systemSettingRepository", "$q", uploadSystemSettingConsumer]);
             app.service("consumerRegistry", ["$hustle", "$q", "$log", "dispatcher", consumerRegistry]);
             app.service("uploadProgramConsumer", ["programService", "programRepository", "$q", uploadProgramConsumer]);

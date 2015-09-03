@@ -42,6 +42,7 @@ require.config({
         "programRepository": "app/repository/program.repository",
         "systemSettingRepository": "app/repository/system.setting.repository",
         "patientOriginRepository": "app/repository/patient.origin.repository",
+        "excludedDataElementsRepository": "app/repository/excluded.dataelements.repository",
         "metadataRepository": "app/repository/metadata.repository",
         "chartRepository": "app/repository/chart.repository",
         "referralLocationsRepository": "app/repository/referral.locations.repository",
