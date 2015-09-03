@@ -1,22 +1,23 @@
 <div ng-controller="notificationsController">
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Module name</th>
-                <th>Data Element Name</th>
-                <th ng-repeat="week in weeks">
-                    {{week}}
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="dataElementValue in allDataElementValues">
-                <td>{{dataElementValue.moduleName}}</td>
-                <td>{{dataElementValue.dataElementName}}</td>
-                <td ng-repeat="week in weeks ">
-                    {{dataElementValue.weeklyData[week]}}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div ng-repeat="(moduleName, dataElementValues) in allDataElementValues | groupBy : 'moduleName'">
+        <h4 class="col-md-4 col-md-offset-4">{{moduleName}}</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Data Element Name</th>
+                    <th ng-repeat="week in weeks">
+                        {{week}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="dataElementValue.showInNotifications" ng-repeat="dataElementValue in dataElementValues">
+                    <td>{{dataElementValue.dataElementName}}</td>
+                    <td ng-class="{ 'red-cell' : (dataElementValue.weeklyData[week]['value'] < dataElementValue.weeklyData[week]['min']) || (dataElementValue.weeklyData[week]['value'] > dataElementValue.weeklyData[week]['max']) }" ng-repeat="week in weeks">
+                        {{dataElementValue.weeklyData[week]['value']}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
