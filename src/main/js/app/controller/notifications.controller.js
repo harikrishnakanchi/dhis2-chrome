@@ -83,15 +83,15 @@ define(["lodash"], function(_) {
                 }
 
                 var dataForCalculation = getDataForCalculation(week);
-                var standardDeviation = calculateStandardDeviation(dataForCalculation);
-                var mean = findAverage(dataForCalculation);
+                var standardDeviation = _.round(calculateStandardDeviation(dataForCalculation));
+                var mean = _.round(findAverage(dataForCalculation));
 
                 result[week] = {
                     "value": parseInt(dataForWeek[2]),
                     "standardDeviation": standardDeviation,
                     "mean": mean,
-                    "min": mean - standardDeviation,
-                    "max": mean + standardDeviation
+                    "min": _.round(mean - standardDeviation),
+                    "max": _.round(mean + standardDeviation)
                 };
 
                 return result;
