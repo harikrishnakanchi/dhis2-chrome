@@ -12,12 +12,39 @@ define(["moment"], function(moment) {
             "Other Facility"
         ];
 
+        var existingReferralLocations;
+        var shouldDisableSaveButton = false;
+
         $scope.closeForm = function() {
             $scope.$parent.closeNewForm($scope.orgUnit);
         };
 
         $scope.disableLocation = function(referralLocation) {
             referralLocation.isDisabled = true;
+        };
+
+        var hasExistingNameBeenRemoved = function(referralLocation) {
+            var hasExistingName = !_.isEmpty(_.find(existingReferralLocations, {
+                "genericName": referralLocation.genericName
+            }).aliasName);
+
+            if (hasExistingName && _.isEmpty(referralLocation.aliasName)) {
+                return true;
+            }
+
+            return false;
+        };
+
+        $scope.hasBeenEmptied = function(referralLocation) {
+            return hasExistingNameBeenRemoved(referralLocation);
+        };
+
+        $scope.shouldDisableSaveButton = function() {
+            shouldDisableSaveButton = false;
+            _.each($scope.referralLocations, function(referralLocation) {
+                shouldDisableSaveButton = shouldDisableSaveButton || hasExistingNameBeenRemoved(referralLocation);
+            });
+            return shouldDisableSaveButton;
         };
 
         var transformFromDb = function(data) {
@@ -67,9 +94,9 @@ define(["moment"], function(moment) {
         var init = function() {
             referralLocationsRepository.get($scope.orgUnit.id).then(function(data) {
                 $scope.referralLocations = transformFromDb(data);
+                existingReferralLocations = _.cloneDeep($scope.referralLocations);
             });
         };
         init();
     };
-
 });

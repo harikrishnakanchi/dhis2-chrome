@@ -16,12 +16,13 @@
                             <a ng-if="referralLocation.aliasName !== '' &amp;&amp; referralLocation.isDisabled !== true" href="" title="Disable" class="delete" ng-click="disableLocation(referralLocation)">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
+                            <span ng-show="hasBeenEmptied(referralLocation)" class="errortxt">{{resourceBundle.referralCannotBeEmpty}}</span>
                             </input>
                         </div>
                     </li>
                 </ul>
                 <div class="col-sm-offset-4 col-sm-6 col-md-offset-4 col-md-4 button-group">
-                    <input type="submit" class="btn btn-main" value="{{ resourceBundle.saveBtnValue }}" />
+                    <input ng-disabled="shouldDisableSaveButton()" type="submit" class="btn btn-main" value="{{ resourceBundle.saveBtnValue }}" />
                     <input type="button" class="btn" ng-click="closeForm()" value="{{ resourceBundle.backBtnValue }}" />
                 </div>
             </form>

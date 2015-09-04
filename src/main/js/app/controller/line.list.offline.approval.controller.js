@@ -105,8 +105,11 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.getReferralCount = function(locationName) {
+            var optionId = _.find($scope.referralOptions, {
+                "name": locationName
+            }).id;
             return _.filter($scope.dataValues._referralLocations, {
-                "value": locationName
+                "value": optionId
             }).length;
         };
 
@@ -148,7 +151,7 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var getOptionSetMapping = function() {
-            return optionSetRepository.getOptionSetMapping($scope.resourceBundle).then(function(data) {
+            return optionSetRepository.getOptionSetMapping($scope.resourceBundle, $scope.selectedModule.parent.id).then(function(data) {
                 $scope.optionSetMapping = data.optionSetMap;
                 $scope.optionMapping = data.optionMap;
             });
@@ -197,6 +200,7 @@ define(["lodash", "moment"], function(_, moment) {
 
             $scope.genderOptions = _.isUndefined($scope.dataValues._sex) ? [] : $scope.optionSetMapping[$scope.dataValues._sex[0].optionSet.id];
             $scope.procedureOptions = _.isUndefined($scope.dataValues._procedures) ? [] : $scope.optionSetMapping[$scope.dataValues._procedures[0].optionSet.id];
+            $scope.referralOptions = _.isUndefined($scope.dataValues._referralLocations) ? [] : $scope.optionSetMapping[$scope.dataValues._referralLocations[0].optionSet.id];
 
             $scope.procedureDataValueIds = _.keys(groupedProcedureDataValues);
             $scope.procedureDataValues = _.groupBy($scope.dataValues._procedures, "value");
@@ -219,7 +223,7 @@ define(["lodash", "moment"], function(_, moment) {
 
                 $scope.shouldShowReferrals = true;
                 $scope.referralMap = _.omit(locations, ["id", "clientLastUpdated"]);
-                $scope.locationNames = _.keys($scope.referralMap);
+                $scope.locationNames = _.pluck($scope.referralMap, "name");
             });
         };
 

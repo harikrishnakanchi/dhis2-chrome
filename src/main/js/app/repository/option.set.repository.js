@@ -6,12 +6,12 @@ define(['lodash'], function(_) {
             return store.getAll();
         };
 
-        this.getOptionSetMapping = function(resourceBundle, moduleId, isNewCase) {
+        this.getOptionSetMapping = function(resourceBundle, moduleId, rejectDisabled) {
             var referralLocations;
 
             var buildMapForReferralOptionSet = function(optionSet, optionMapping, optionSetMapping, options) {
                 options = _.filter(optionSet.options, function(ops) {
-                    if (!isNewCase)
+                    if (!rejectDisabled)
                         return !_.isUndefined(referralLocations[ops.name]);
                     else
                         return !_.isUndefined(referralLocations[ops.name]) && !referralLocations[ops.name].isDisabled;

@@ -51,6 +51,11 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "id": 'female_id',
                         "name": 'Female',
                         "displayName": 'Female'
+                    }],
+                    "ref_id": [{
+                        "id": 'ref_id',
+                        "name": 'ref 1',
+                        "displayName": 'ref 1'
                     }]
                 };
                 events = [{
@@ -94,8 +99,11 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "dataElement": "age",
                     }, {
                         "code": "_referralLocations",
-                        "value": "ref 1",
+                        "value": "ref_id",
                         "dataElement": "ref",
+                        "optionSet": {
+                            "id": "ref_id"
+                        }
                     }]
                 }, {
                     "event": "event2",
@@ -130,8 +138,11 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                         "dataElement": "age",
                     }, {
                         "code": "_referralLocations",
-                        "value": "ref 1",
+                        "value": "ref_id",
                         "dataElement": "ref",
+                        "optionSet": {
+                            "id": "ref_id"
+                        }
                     }]
                 }];
 
@@ -256,14 +267,21 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                     }],
                     "_referralLocations": [{
                         "code": '_referralLocations',
-                        "value": 'ref 1',
+                        "value": 'ref_id',
                         "dataElement": 'ref',
-                        "eventId": 'event1'
+                        "eventId": 'event1',
+                        "optionSet": {
+                            "id": "ref_id"
+                        }
+
                     }, {
                         "code": '_referralLocations',
-                        "value": 'ref 1',
+                        "value": 'ref_id',
                         "dataElement": 'ref',
-                        "eventId": 'event2'
+                        "eventId": 'event2',
+                        "optionSet": {
+                            "id": "ref_id"
+                        }
                     }]
                 });
                 expect(scope.procedureDataValueIds).toEqual(['procedure 1', 'procedure 2']);
