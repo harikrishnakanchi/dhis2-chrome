@@ -1,5 +1,5 @@
 define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, moment, dhisId, dateUtils, properties) {
-    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, systemSettingRepository, programRepository) {
+    return function($scope, $rootScope, $routeParams, $location, $anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository) {
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
@@ -147,8 +147,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
 
             var loadPrograms = function() {
                 var getExcludedDataElementsForModule = function() {
-                    return systemSettingRepository.get($scope.selectedModuleId).then(function(data) {
-                        return data && data.value ? data.value.dataElements : [];
+                    return excludedDataElementsRepository.get($scope.selectedModuleId).then(function(excludedDataElements) {
+                        return excludedDataElements ? _.pluck(excludedDataElements.dataElements, "id") : [];
                     });
                 };
 

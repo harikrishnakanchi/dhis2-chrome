@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, properties) {
     return function($scope, $routeParams, $q, $hustle, $anchorScroll, $location, $modal, $rootScope, $window, $timeout,
-        dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository) {
+        dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository) {
 
         var currentPeriod, currentPeriodAndOrgUnit, catOptComboIdsToBeTotalled;
         var removeReferral = false;
@@ -356,8 +356,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             };
 
             var loadExcludedDataElements = function() {
-                return systemSettingRepository.get($scope.selectedModule.id).then(function(systemSettings) {
-                    $scope.excludedDataElements = systemSettings && systemSettings.value ? systemSettings.value.dataElements : undefined;
+                return excludedDataElementsRepository.get($scope.selectedModule.id).then(function(excludedDataElements) {
+                    $scope.excludedDataElements = excludedDataElements ? _.pluck(excludedDataElements.dataElements, "id") : undefined;
                 });
             };
 

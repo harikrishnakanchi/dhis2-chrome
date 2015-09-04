@@ -1,5 +1,5 @@
 define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties) {
-    return function($scope, $routeParams, $q, $hustle, dataRepository, systemSettingRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
+    return function($scope, $routeParams, $q, $hustle, dataRepository, excludedDataElementsRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
         $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository) {
 
         $scope.rowTotal = {};
@@ -217,8 +217,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             };
 
             var loadExcludedDataElements = function() {
-                return systemSettingRepository.get($scope.selectedModule.id).then(function(systemSettings) {
-                    $scope.excludedDataElements = systemSettings && systemSettings.value ? systemSettings.value.dataElements : undefined;
+                return excludedDataElementsRepository.get($scope.selectedModule.id).then(function(excludedDataElements) {
+                    $scope.excludedDataElements = excludedDataElements ? _.pluck(excludedDataElements.dataElements, "id") : undefined;
                 });
             };
 

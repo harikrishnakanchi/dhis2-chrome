@@ -1,13 +1,13 @@
 /*global Date:true*/
 define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "datasetRepository",
-        "orgUnitRepository", "originOrgunitCreator"
+        "orgUnitRepository", "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository"
     ],
     function(AggregateModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, DatasetRepository,
-        OrgUnitRepository, OriginOrgunitCreator) {
+        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository) {
 
         describe("aggregate module controller", function() {
             var scope, aggregateModuleController, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
-                dataSetRepo, systemSettingRepo, fakeModal, allPrograms, originOrgunitCreator;
+                dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, allPrograms, originOrgunitCreator;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
@@ -35,9 +35,12 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(dataSetRepo, "associateOrgUnits").and.returnValue(utils.getPromise(q, undefined));
                 spyOn(dataSetRepo, "includeDataElements").and.returnValue(utils.getPromise(q, []));
 
+                systemSettingRepository = new SystemSettingRepository();
+                spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
-                systemSettingRepo = utils.getMockRepo(q);
-                systemSettingRepo.get = jasmine.createSpy("get").and.returnValue(utils.getPromise(q, {}));
+                excludedDataElementsRepository = new ExcludedDataElementsRepository();
+                spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, {}));
+                spyOn(excludedDataElementsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
                 spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
@@ -90,7 +93,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 Timecop.install();
                 Timecop.freeze(new Date("2014-04-01T00:00:00.000Z"));
 
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator);
             }));
 
             afterEach(function() {
@@ -164,7 +167,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.$apply();
                 expect(scope.saveFailure).toBe(false);
 
+                expect(excludedDataElementsRepository.get).not.toHaveBeenCalled();
                 expect(orgUnitRepo.upsert).toHaveBeenCalledWith(enrichedAggregateModule);
+
                 expect(hustle.publish).toHaveBeenCalledWith({
                     data: enrichedAggregateModule,
                     type: "upsertOrgUnit",
@@ -277,13 +282,13 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     }],
                     "sections": [{
                         "dataElements": [{
-                            "id": "1",
+                            "id": "de1",
                             "isIncluded": false
                         }, {
-                            "id": "2",
+                            "id": "de2",
                             "isIncluded": true
                         }, {
-                            "id": "3",
+                            "id": "de3",
                             "isIncluded": false
                         }]
                     }]
@@ -293,22 +298,24 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.save();
                 scope.$apply();
 
-                var expectedSystemSetting = {
-                    "key": "Module1someid",
-                    "value": {
-                        clientLastUpdated: "2014-04-01T00:00:00.000Z",
-                        dataElements: ["1", "3"]
-                    }
+                var expectedExcludedDataElements = {
+                    "orgUnit": "Module1someid",
+                    "clientLastUpdated": "2014-04-01T00:00:00.000Z",
+                    "dataElements": [{
+                        "id": "de1"
+                    }, {
+                        "id": "de3"
+                    }]
                 };
 
                 var expectedHustleMessage = {
-                    data: expectedSystemSetting,
-                    type: "uploadSystemSetting",
+                    data: "Module1someid",
+                    type: "uploadExcludedDataElements",
                     locale: "en",
                     desc: "upload sys settings for Module1"
                 };
 
-                expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSetting);
+                expect(excludedDataElementsRepository.upsert).toHaveBeenCalledWith(expectedExcludedDataElements);
                 expect(hustle.publish.calls.argsFor(2)).toEqual([expectedHustleMessage, 'dataValues']);
             });
 
@@ -371,7 +378,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 spyOn(dhisId, "get").and.callFake(function(name) {
                     return name;
                 });
-                systemSettingRepo.upsert.and.returnValue(utils.getPromise(q, {}));
 
                 scope.save();
                 scope.$apply();
@@ -408,7 +414,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
                 dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
                 dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, datasets));
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
                 scope.$apply();
 
                 expect(scope.isDisabled).toBeFalsy();
@@ -442,7 +448,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 };
                 scope.isNewMode = false;
 
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
 
                 scope.$apply();
 
@@ -450,11 +456,6 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             });
 
             it("should update system setting while updating module", function() {
-                systemSettingRepo.get.and.returnValue(utils.getPromise(q, {
-                    "key": 1,
-                    "value": {}
-                }));
-
                 var oldid = "oldid";
                 scope.orgUnit = {
                     "id": oldid,
@@ -464,19 +465,19 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 scope.isNewMode = false;
 
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
                 scope.$apply();
 
                 scope.associatedDatasets = [{
                     sections: [{
                         dataElements: [{
-                            "id": "1",
+                            "id": "de1",
                             "isIncluded": false
                         }, {
-                            "id": "2",
+                            "id": "de2",
                             "isIncluded": true
                         }, {
-                            "id": "3",
+                            "id": "de3",
                             "isIncluded": false
                         }]
                     }]
@@ -493,20 +494,22 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.update();
                 scope.$apply();
 
-                expect(systemSettingRepo.get).toHaveBeenCalledWith(oldid);
+                expect(excludedDataElementsRepository.get).toHaveBeenCalledWith(oldid);
 
-                var expectedSystemSetting = {
-                    "key": oldid,
-                    "value": {
-                        clientLastUpdated: "2014-04-01T00:00:00.000Z",
-                        dataElements: ["1", "3"]
-                    }
+                var expectedExcludedDataElementsSetting = {
+                    "orgUnit": oldid,
+                    "clientLastUpdated": "2014-04-01T00:00:00.000Z",
+                    "dataElements": [{
+                        "id": "de1"
+                    }, {
+                        "id": "de3"
+                    }]
                 };
 
-                expect(systemSettingRepo.upsert).toHaveBeenCalledWith(expectedSystemSetting);
+                expect(excludedDataElementsRepository.upsert).toHaveBeenCalledWith(expectedExcludedDataElementsSetting);
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    data: expectedSystemSetting,
-                    type: "uploadSystemSetting",
+                    data: oldid,
+                    type: "uploadExcludedDataElements",
                     locale: "en",
                     desc: "upload sys settings for module NEW name"
                 }, "dataValues");
@@ -533,7 +536,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 };
 
                 scope.isNewMode = false;
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
                 scope.$apply();
 
                 scope.module = updatedModule;
@@ -1162,7 +1165,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
                     dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
                     dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, datasets));
-                    aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepo, db, location, q, fakeModal);
+                    aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
                     scope.$apply();
                     scope.selectDataSet(datasets[0]);
                     scope.$apply();

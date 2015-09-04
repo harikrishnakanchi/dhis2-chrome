@@ -1,6 +1,6 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
     function(_, orgUnitMapper, moment, systemSettingsTransformer) {
-        return function($scope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, db, $location, $q, $modal,
+        return function($scope, $hustle, orgUnitRepository, datasetRepository, systemSettingRepository, excludedDataElementsRepository, db, $location, $q, $modal,
             orgUnitGroupHelper, originOrgunitCreator) {
 
             $scope.originalDatasets = [];
@@ -107,9 +107,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var getExcludedDataElements = function() {
-                    return systemSettingRepository.get($scope.module.id).then(function(systemSettings) {
-                        if (!_.isEmpty(systemSettings) && !_.isEmpty(systemSettings.value))
-                            excludedDataElements = systemSettings.value.dataElements;
+                    if (!$scope.module.id)
+                        return;
+                    return excludedDataElementsRepository.get($scope.module.id).then(function(data) {
+                        excludedDataElements = data ? _.pluck(data.dataElements, "id") : undefined;
                     });
                 };
 
@@ -158,7 +159,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     });
                 };
 
-                return initModule().then(getExcludedDataElements).then(getDatasets).then(getAllModules).then(setDisabled).then(getMandatoryDatasetsToBeAssociated).then(getTemplates);
+                return initModule()
+                    .then(getExcludedDataElements)
+                    .then(getDatasets)
+                    .then(getAllModules)
+                    .then(setDisabled)
+                    .then(getMandatoryDatasetsToBeAssociated)
+                    .then(getTemplates);
             };
 
             $scope.changeCollapsed = function(sectionId) {
@@ -236,14 +243,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
             var saveExcludedDataElements = function(enrichedModule) {
                 var excludedDataElements = systemSettingsTransformer.excludedDataElementsForAggregateModule($scope.associatedDatasets);
                 var systemSetting = {
-                    key: enrichedModule.id,
-                    value: {
-                        clientLastUpdated: moment().toISOString(),
-                        dataElements: excludedDataElements
-                    }
+                    'orgUnit': enrichedModule.id,
+                    'clientLastUpdated': moment().toISOString(),
+                    'dataElements': excludedDataElements
                 };
-                return systemSettingRepository.upsert(systemSetting).
-                then(_.partial(publishMessage, systemSetting, "uploadSystemSetting",
+                return excludedDataElementsRepository.upsert(systemSetting).
+                then(_.partial(publishMessage, enrichedModule.id, "uploadExcludedDataElements",
                     $scope.resourceBundle.uploadSystemSettingDesc + enrichedModule.name));
             };
 

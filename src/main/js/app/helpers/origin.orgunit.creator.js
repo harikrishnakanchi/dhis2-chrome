@@ -5,6 +5,8 @@ define(["lodash", "orgUnitMapper"], function(_, orgUnitMapper) {
             var getPatientOrigins = function() {
                 var getFromRepository = function() {
                     return patientOriginRepository.get(module.parent.id).then(function(patientOrigins) {
+                        if (!patientOrigins)
+                            return [];
                         return patientOrigins.origins;
                     });
                 };

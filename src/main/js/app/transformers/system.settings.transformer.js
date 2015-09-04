@@ -24,10 +24,10 @@ define(["lodash"], function(_) {
         var excludedDataElements = [];
         _.each(associatedDatasets, function(ds) {
             _.each(ds.sections, function(section) {
-                var filteredDataElements =
-                    _.pluck(_.filter(section.dataElements, {
-                        "isIncluded": false
-                    }), "id");
+                var filteredDataElements = _.transform(section.dataElements, function(result, de) {
+                    if (de.isIncluded === false)
+                        result.push(_.pick(de, "id"));
+                }, []);
                 excludedDataElements = excludedDataElements.concat(filteredDataElements);
             });
         });
@@ -39,14 +39,11 @@ define(["lodash"], function(_) {
         var excludedDataElements = [];
         _.each(enrichedProgram.programStages, function(programStage) {
             _.each(programStage.programStageSections, function(section) {
-                var filteredDataElements = _.filter(section.programStageDataElements, {
-                    "dataElement": {
-                        "isIncluded": false
-                    }
-                });
-                _.each(filteredDataElements, function(de) {
-                    excludedDataElements.push(de.dataElement.id);
-                });
+                var filteredDataElements = _.transform(section.programStageDataElements, function(result, psde) {
+                    if (psde.dataElement.isIncluded === false)
+                        result.push(_.pick(psde.dataElement, "id"));
+                }, []);
+                excludedDataElements = excludedDataElements.concat(filteredDataElements);
             });
         });
         return excludedDataElements;

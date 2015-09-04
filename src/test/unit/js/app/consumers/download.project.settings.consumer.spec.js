@@ -135,8 +135,12 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                     },
                     "prj": {
                         "excludedDataElements": [{
-                            "id": "mod1",
-                            "dataElements": ["de1", "de2"],
+                            "orgUnit": "mod1",
+                            "dataElements": [{
+                                "id": "de1"
+                            }, {
+                                "id": "de2"
+                            }],
                             "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                         }],
                         "patientOrigins": []
@@ -148,8 +152,12 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 scope.$apply();
 
                 var expectedPayload = [{
-                    "id": "mod1",
-                    "dataElements": ["de1", "de2"],
+                    "orgUnit": "mod1",
+                    "dataElements": [{
+                        "id": "de1"
+                    }, {
+                        "id": "de2"
+                    }],
                     "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                 }];
 

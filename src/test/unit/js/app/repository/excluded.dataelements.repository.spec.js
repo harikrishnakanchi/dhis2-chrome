@@ -10,8 +10,12 @@ define(["excludedDataElementsRepository", "angularMocks", "utils"], function(Exc
 
         it("should upsert exlcuded data elements", function() {
             var excludedDataElements = [{
-                "id": "mod1",
-                "dataElements": ["de1", "de2"],
+                "orgUnit": "mod1",
+                "dataElements": [{
+                    "id": "de1"
+                }, {
+                    "id": "de2"
+                }],
                 "clientLastUpdated": "2014-05-30T12:43:54.972Z"
             }];
 

@@ -19,7 +19,11 @@ define(["uploadExcludedDataElementsConsumer", "utils", "angularMocks", "systemSe
 
                 var excludedDataElements = {
                     "orgUnit": "mod1",
-                    "dataElements": ["de1", "de2"],
+                    "dataElements": [{
+                        "id": "de1"
+                    }, {
+                        "id": "de2"
+                    }],
                     "clientLastUpdated": "2014-05-30T12:43:54.972Z"
                 };
 

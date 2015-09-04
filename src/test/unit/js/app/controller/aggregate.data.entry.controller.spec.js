@@ -1,10 +1,10 @@
 /*global Date:true*/
-define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "systemSettingRepository", "datasetRepository", "programRepository", "referralLocationsRepository"],
-    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, SystemSettingRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository) {
+define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "utils", "orgUnitMapper", "moment", "timecop", "dataRepository", "approvalDataRepository", "orgUnitRepository", "excludedDataElementsRepository", "datasetRepository", "programRepository", "referralLocationsRepository"],
+    function(AggregateDataEntryController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository) {
         describe("aggregateDataEntryController ", function() {
             var scope, routeParams, db, q, location, anchorScroll, aggregateDataEntryController, rootScope,
                 saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getDataValuesSpy,
-                orgUnits, window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, systemSettingRepository, origin1, origin2;
+                orgUnits, window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $anchorScroll, $location, $window, $timeout) {
@@ -127,8 +127,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 programRepository = new ProgramRepository();
                 spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, undefined));
 
-                systemSettingRepository = new SystemSettingRepository();
-                spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, {}));
+                excludedDataElementsRepository = new ExcludedDataElementsRepository();
+                spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
                 approvalDataRepository = new ApprovalDataRepository();
                 spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, {}));
@@ -151,7 +151,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, []));
 
-                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, systemSettingRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository);
+                aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository);
 
                 scope.$emit("moduleWeekInfo", [scope.selectedModule, scope.week]);
             }));

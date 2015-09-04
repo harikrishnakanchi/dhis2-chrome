@@ -1,5 +1,5 @@
 define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, properties, orgUnitMapper) {
-    return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, systemSettingRepository,
+    return function($scope, $q, $hustle, $modal, $window, $timeout, $location, $anchorScroll, $routeParams, programRepository, programEventRepository, excludedDataElementsRepository,
         orgUnitRepository, approvalDataRepository, referralLocationsRepository) {
 
         $scope.filterParams = {};
@@ -358,8 +358,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
             var loadPrograms = function() {
                 var getExcludedDataElementsForModule = function() {
-                    return systemSettingRepository.get($scope.selectedModuleId).then(function(data) {
-                        return data && data.value ? data.value.dataElements : [];
+                    return excludedDataElementsRepository.get($scope.selectedModuleId).then(function(data) {
+                        return data ? _.pluck(data.dataElements, "id") : [];
                     });
                 };
 

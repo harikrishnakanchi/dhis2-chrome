@@ -28,6 +28,27 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
             });
         });
 
+        it("should give excluded data elements for aggregate module", function() {
+            var associatedDatasets = [{
+                sections: [{
+                    dataElements: [{
+                        "id": "1",
+                        "isIncluded": true
+                    }, {
+                        "id": "2",
+                        "isIncluded": false
+                    }, {
+                        "id": "3",
+                        "isIncluded": true
+                    }]
+                }]
+            }];
+
+            expect(systemSettingsTransformer.excludedDataElementsForAggregateModule(associatedDatasets)).toEqual([{
+                "id": "2"
+            }]);
+        });
+
         it("should give excluded data elements for line list module", function() {
             var enrichedProgram = {
                 programStages: [{
@@ -52,9 +73,9 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
                 }]
             };
 
-            expect(systemSettingsTransformer.excludedDataElementsForLinelistModule(enrichedProgram)).toEqual(
-                ["2"]
-            );
+            expect(systemSettingsTransformer.excludedDataElementsForLinelistModule(enrichedProgram)).toEqual([{
+                "id": "2"
+            }]);
         });
     });
 });

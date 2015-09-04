@@ -84,18 +84,9 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         };
 
         var upsertProjectSettings = function(projectId, payload) {
-            var request = {
-                "method": "POST",
-                "url": dhisUrl.systemSettings,
-                "data": {},
-                "headers": {
-                    "Content-Type": "application/json"
-                }
-            };
-
-            request.data[projectSettingsPrefix + projectId] = payload;
-
-            return $http(request);
+            var data = {};
+            data[projectSettingsPrefix + projectId] = payload;
+            return $http.post(dhisUrl.systemSettings, data);
         };
 
         var upsertExcludedDataElements = function(projectId, updatedDataElementsExclusions) {

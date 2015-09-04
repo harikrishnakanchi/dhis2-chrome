@@ -1,6 +1,6 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
     function(_, orgUnitMapper, moment, systemSettingsTransformer) {
-        return function($scope, $hustle, orgUnitRepository, systemSettingRepository, $q, $modal,
+        return function($scope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
             programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator) {
 
             $scope.module = {};
@@ -44,9 +44,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 };
 
                 var getExcludedDataElements = function() {
-                    return systemSettingRepository.get($scope.module.id).then(function(systemSettings) {
-                        if (!_.isEmpty(systemSettings) && !_.isEmpty(systemSettings.value))
-                            $scope.excludedDataElements = systemSettings.value.dataElements;
+                    if (!$scope.module.id)
+                        return;
+                    return excludedDataElementsRepository.get($scope.module.id).then(function(excludedDataElementsSetting) {
+                        $scope.excludedDataElements = excludedDataElementsSetting ? _.pluck(excludedDataElementsSetting.dataElements, "id") : undefined;
                     });
                 };
 
@@ -189,15 +190,13 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
             var saveExcludedDataElements = function(enrichedModule) {
                 var excludedDataElements = systemSettingsTransformer.excludedDataElementsForLinelistModule($scope.enrichedProgram);
-                var systemSetting = {
-                    key: enrichedModule.id,
-                    value: {
-                        clientLastUpdated: moment().toISOString(),
-                        dataElements: excludedDataElements
-                    }
+                var excludedDataElementSetting = {
+                    'orgUnit': enrichedModule.id,
+                    'clientLastUpdated': moment().toISOString(),
+                    'dataElements': excludedDataElements
                 };
-                return systemSettingRepository.upsert(systemSetting)
-                    .then(_.partial(publishMessage, systemSetting, "uploadSystemSetting",
+                return excludedDataElementsRepository.upsert(excludedDataElementSetting)
+                    .then(_.partial(publishMessage, enrichedModule.id, "uploadExcludedDataElements",
                         $scope.resourceBundle.uploadSystemSettingDesc + enrichedModule.name));
             };
 
