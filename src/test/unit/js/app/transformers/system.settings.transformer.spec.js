@@ -3,31 +3,6 @@ define(["systemSettingsTransformer"], function(systemSettingsTransformer) {
 
         var modules, parent, expectedSystemSettings;
 
-        it("should construct system settings for aggregate modules", function() {
-            modules = [{
-                name: "mod1 name",
-                id: "mod1",
-                associatedDatasets: [{
-                    sections: [{
-                        dataElements: [{
-                            "id": "1",
-                            "isIncluded": true
-                        }, {
-                            "id": "2",
-                            "isIncluded": false
-                        }, {
-                            "id": "3",
-                            "isIncluded": true
-                        }]
-                    }]
-                }]
-            }];
-
-            expect(systemSettingsTransformer.constructSystemSettings(modules)).toEqual({
-                "mod1": ["2"]
-            });
-        });
-
         it("should give excluded data elements for aggregate module", function() {
             var associatedDatasets = [{
                 sections: [{

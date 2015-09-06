@@ -49,12 +49,7 @@ define(["lodash"], function(_) {
         return excludedDataElements;
     };
 
-    var constructSystemSettings = function(modules, isLineList) {
-        return isLineList ? excludedDataElements(modules) : createAggregateModulesSystemSetting(modules);
-    };
-
     return {
-        "constructSystemSettings": constructSystemSettings,
         "excludedDataElementsForLinelistModule": excludedDataElementsForLinelistModule,
         "excludedDataElementsForAggregateModule": excludedDataElementsForAggregateModule
     };

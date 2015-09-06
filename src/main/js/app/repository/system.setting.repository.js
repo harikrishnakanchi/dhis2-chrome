@@ -7,22 +7,17 @@ define(["lodash"], function(_) {
             });
         };
 
-        var get = function(moduleId) {
-            if (!moduleId) return $q.when([]);
+        var get = function(key) {
             var store = db.objectStore("systemSettings");
-            return store.find(moduleId);
+            return store.find(key).then(function(setting) {
+                return setting.value;
+            });
         };
 
-        var findAll = function(orgUnitIds) {
-            var store = db.objectStore("systemSettings");
-            var query = db.queryBuilder().$in(orgUnitIds).compile();
-            return store.each(query);
-        };
 
         return {
             "upsert": upsert,
-            "get": get,
-            "findAll": findAll
+            "get": get
         };
     };
 });

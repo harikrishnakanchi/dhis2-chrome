@@ -1,39 +1,5 @@
 define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, moment, _) {
     return function($http) {
-        var upsert = function(args) {
-            var key = "exclude_" + args.key;
-            return $http({
-                "method": "POST",
-                "url": dhisUrl.systemSettings + "/" + key,
-                "data": JSON.stringify(args.value),
-                "headers": {
-                    "Content-Type": "text/plain"
-                }
-            });
-        };
-
-        var transform = function(response) {
-            var result = [];
-            _.transform(response.data, function(acc, value, key) {
-                if (_.startsWith(key, "exclude_")) {
-                    result.push({
-                        "key": key.replace("exclude_", ""),
-                        "value": JSON.parse(value)
-                    });
-                }
-                if (key === "moduleTemplates") {
-                    result.push({
-                        "key": key,
-                        "value": value
-                    });
-                }
-            });
-            return result;
-        };
-
-        var getAll = function() {
-            return $http.get(dhisUrl.systemSettings).then(transform);
-        };
 
         var projectSettingsPrefix = "projectSettings_";
 
@@ -46,26 +12,6 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             return $http.get(dhisUrl.systemSettings, config).then(function(response) {
                 return response.data;
             });
-        };
-
-        var getSystemSettings = function() {
-            return getSettings("fieldAppSettings");
-        };
-
-        var getProjectSettings = function(projectIds) {
-            projectIds = _.flatten([projectIds]);
-
-            var transform = function(data) {
-                return _.mapKeys(data, function(value, key) {
-                    return key.replace(projectSettingsPrefix, "");
-                });
-            };
-
-            var settingKeys = _.map(projectIds, function(projectId) {
-                return projectSettingsPrefix + projectId;
-            });
-
-            return getSettings(settingKeys).then(transform);
         };
 
         var merge = function(collection, item) {
@@ -89,7 +35,37 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             return $http.post(dhisUrl.systemSettings, data);
         };
 
-        var upsertExcludedDataElements = function(projectId, updatedDataElementsExclusions) {
+        this.getSystemSettings = function() {
+            var transform = function(data) {
+                var result = _.transform(data.fieldAppSettings, function(acc, value, key) {
+                    acc.push({
+                        "key": key,
+                        "value": value
+                    });
+                }, []);
+                return result;
+            };
+            return getSettings("fieldAppSettings").then(transform);
+        };
+
+        this.getProjectSettings = function(projectIds) {
+            projectIds = _.flatten([projectIds]);
+
+            var transform = function(data) {
+                return _.mapKeys(data, function(value, key) {
+                    return key.replace(projectSettingsPrefix, "");
+                });
+            };
+
+            var settingKeys = _.map(projectIds, function(projectId) {
+                return projectSettingsPrefix + projectId;
+            });
+
+            return getSettings(settingKeys).then(transform);
+        };
+
+
+        this.upsertExcludedDataElements = function(projectId, updatedDataElementsExclusions) {
             var update = function(data) {
                 data[projectId] = data[projectId] || {};
                 data[projectId].excludedDataElements = merge(data[projectId].excludedDataElements, updatedDataElementsExclusions);
@@ -100,12 +76,12 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
                 return upsertProjectSettings(projectId, payload);
             };
 
-            return getProjectSettings(projectId)
+            return this.getProjectSettings(projectId)
                 .then(update)
                 .then(upsert);
         };
 
-        var upsertPatientOriginDetails = function(projectId, updatedPatientOriginDetails) {
+        this.upsertPatientOriginDetails = function(projectId, updatedPatientOriginDetails) {
             var update = function(data) {
                 data[projectId] = data[projectId] || {};
                 data[projectId].patientOrigins = merge(data[projectId].patientOrigins, updatedPatientOriginDetails);
@@ -116,12 +92,12 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
                 return upsertProjectSettings(projectId, payload);
             };
 
-            return getProjectSettings(projectId)
+            return this.getProjectSettings(projectId)
                 .then(update)
                 .then(upsert);
         };
 
-        var upsertReferralLocations = function(projectId, updatedReferralLocations) {
+        this.upsertReferralLocations = function(projectId, updatedReferralLocations) {
             var update = function(data) {
                 data[projectId] = data[projectId] || {};
                 data[projectId].referralLocations = merge(data[projectId].referralLocations, updatedReferralLocations);
@@ -132,19 +108,9 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
                 return upsertProjectSettings(projectId, payload);
             };
 
-            return getProjectSettings(projectId)
+            return this.getProjectSettings(projectId)
                 .then(update)
                 .then(upsert);
-        };
-
-        return {
-            "upsert": upsert,
-            "getAll": getAll,
-            "getSystemSettings": getSystemSettings,
-            "getProjectSettings": getProjectSettings,
-            "upsertExcludedDataElements": upsertExcludedDataElements,
-            "upsertPatientOriginDetails": upsertPatientOriginDetails,
-            "upsertReferralLocations": upsertReferralLocations
         };
     };
 });

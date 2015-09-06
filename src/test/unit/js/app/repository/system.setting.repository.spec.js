@@ -1,42 +1,50 @@
 define(["systemSettingRepository", "angularMocks", "utils"], function(SystemSettingRepository, mocks, utils) {
     describe("systemSettingRepository", function() {
-        var repo, downloadedSettings, scope;
+        var repo, scope, q;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             scope = $rootScope.$new();
+            q = $q;
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
             repo = new SystemSettingRepository(mockDB.db);
-
         }));
 
         it("should upsert system settings", function() {
-            var systemSetting = {
-                "key": "12445",
+            var systemSettings = [{
+                "key": "moduleTemplates",
                 "value": {
-                    "clientLastUpdated": "2015-01-01T11:00:00.000Z",
-                    "dataElements": ["123452", "123457"]
+                    "ds1": {}
                 }
-            };
-            repo.upsert(systemSetting);
-            expect(mockStore.upsert).toHaveBeenCalledWith(systemSetting);
-        });
+            }, {
+                "key": "anotherSetting",
+                "value": "foo"
+            }];
 
-        it("should find all settings for modules", function() {
-            var moduleIds = ["mod1", "mod2", "mod3"];
-            var orgUnit = repo.findAll(moduleIds);
-            scope.$apply();
-
-            expect(mockStore.each).toHaveBeenCalled();
-            expect(mockStore.each.calls.argsFor(0)[0].inList).toEqual(moduleIds);
+            repo.upsert(systemSettings);
+            expect(mockStore.upsert).toHaveBeenCalledWith(systemSettings);
         });
 
         it("should find all system settings given a project id", function() {
-            var moduleId = "12445";
-            repo.get(moduleId).then(function(data) {
-                expect(data).toEqual({});
+            var key = "moduleTemplates";
+
+            mockStore.find.and.returnValue(utils.getPromise(q, {
+                "key": "moduleTemplates",
+                "value": {
+                    "ds1": {}
+                }
+            }));
+
+            var actualResult;
+            repo.get(key).then(function(data) {
+                actualResult = data;
             });
-            expect(mockStore.find).toHaveBeenCalledWith(moduleId);
+            scope.$apply();
+
+            expect(mockStore.find).toHaveBeenCalledWith(key);
+            expect(actualResult).toEqual({
+                "ds1": {}
+            });
         });
 
     });

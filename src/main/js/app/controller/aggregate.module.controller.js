@@ -155,7 +155,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getTemplates = function() {
                     return systemSettingRepository.get("moduleTemplates").then(function(data) {
-                        $scope.allTemplates = data.value;
+                        $scope.allTemplates = data;
                     });
                 };
 

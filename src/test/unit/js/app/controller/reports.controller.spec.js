@@ -1,7 +1,7 @@
 define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository"], function(mocks, utils, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository) {
     describe("reportsControllerspec", function() {
 
-        var reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository;
+        var scope, reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             scope = $rootScope.$new();
