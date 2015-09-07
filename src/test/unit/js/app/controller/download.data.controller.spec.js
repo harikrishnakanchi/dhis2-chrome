@@ -46,7 +46,6 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
                     "downloadEventData",
                     "downloadDatasets",
                     "downloadCharts",
-                    "downloadReferralLocations",
                     "downloadPivotTables"
                 ];
 

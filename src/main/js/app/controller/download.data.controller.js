@@ -56,11 +56,6 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
                 "data": []
             }, "dataValues");
 
-            var downloadReferralLocations = $hustle.publish({
-                "type": "downloadReferralLocations",
-                "data": []
-            }, "dataValues");
-
             var downloadPivotTables = $hustle.publish({
                 "type": "downloadPivotTables",
                 "data": []
@@ -77,7 +72,6 @@ define(["moment", "properties", "lodash", "chromeUtils"], function(moment, prope
                     downloadEvents,
                     downloadDatasets,
                     downloadCharts,
-                    downloadReferralLocations,
                     downloadPivotTables
                 ])
                 .then(onSuccess);
