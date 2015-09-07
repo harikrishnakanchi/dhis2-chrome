@@ -5,7 +5,7 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             var url = dhisUrl.pivotTables + ".json";
             var config = {
                 params: {
-                    "fields": ":id",
+                    "fields": "id",
                     "filter": "name:like:[FieldApp",
                     "paging": false,
                 }

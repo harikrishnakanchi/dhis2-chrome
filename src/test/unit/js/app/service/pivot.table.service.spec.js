@@ -28,7 +28,7 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
                 "reportTables": [pivotTable]
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=:id&filter=name:like:%5BFieldApp&paging=false").respond(200, pivotTables);
+            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=id&filter=name:like:%5BFieldApp&paging=false").respond(200, pivotTables);
             httpBackend.expectGET(properties.dhis.url +
                 "/api/reportTables/tab1.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
             ).respond(200, pivotTable);
@@ -64,7 +64,7 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
                 "code": "CoolDataset"
             }];
 
-            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=:id&filter=name:like:%5BFieldApp&paging=false").respond(200, {
+            httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=id&filter=name:like:%5BFieldApp&paging=false").respond(200, {
                 "reportTables": tables
             });
 
