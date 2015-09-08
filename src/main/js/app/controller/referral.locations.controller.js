@@ -1,5 +1,5 @@
 define(["moment"], function(moment) {
-    return function($scope, $hustle, referralLocationsRepository) {
+    return function($scope, $hustle, $modal, referralLocationsRepository) {
         var orderedReferralLocationNames = [
             "MSF Facility 1",
             "MSF Facility 2",
@@ -15,12 +15,27 @@ define(["moment"], function(moment) {
         var existingReferralLocations;
         var shouldDisableSaveButton = false;
 
-        $scope.closeForm = function() {
-            $scope.$parent.closeNewForm($scope.orgUnit);
+        var showModal = function(okCallback, message) {
+            $scope.modalMessages = message;
+            var modalInstance = $modal.open({
+                templateUrl: 'templates/confirm-dialog.html',
+                controller: 'confirmDialogController',
+                scope: $scope
+            });
+
+            modalInstance.result.then(okCallback);
         };
 
         $scope.disableLocation = function(referralLocation) {
-            referralLocation.isDisabled = true;
+            showModal(function() {
+                referralLocation.isDisabled = true;
+            }, {
+                "confirmationMessage": $scope.resourceBundle.disableReferralLocationConfirmationMessage
+            });
+        };
+
+        $scope.closeForm = function() {
+            $scope.$parent.closeNewForm($scope.orgUnit);
         };
 
         var hasExistingNameBeenRemoved = function(referralLocation) {

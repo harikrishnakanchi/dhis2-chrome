@@ -8,6 +8,7 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 referralLocationsRepository,
                 hustle,
                 moment,
+                fakeModal,
                 currentTime;
 
             beforeEach(module("hustle"));
@@ -32,6 +33,16 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 Timecop.install();
                 Timecop.freeze(new Date(currentTime));
 
+                fakeModal = {
+                    close: function() {
+                        this.result.confirmCallBack();
+                    },
+                    dismiss: function(type) {
+                        this.result.cancelCallback(type);
+                    },
+                    open: function(object) {}
+                };
+
                 q = $q;
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
@@ -52,7 +63,7 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 };
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, existingReferralLocations));
 
-                referralLocationsController = new ReferralLocationsController(scope, hustle, referralLocationsRepository);
+                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository);
                 scope.$apply();
 
                 var expectedReferralLocation = {
@@ -66,7 +77,7 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
             it("should initialize referral locations when there are no existing referral locations", function() {
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, undefined));
 
-                referralLocationsController = new ReferralLocationsController(scope, hustle, referralLocationsRepository);
+                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository);
                 scope.$apply();
 
                 expect(scope.referralLocations.length).toEqual(9);
@@ -78,7 +89,7 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 scope.$parent.closeNewForm = jasmine.createSpy();
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-                referralLocationsController = new ReferralLocationsController(scope, hustle, referralLocationsRepository);
+                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository);
                 scope.$apply();
 
                 scope.referralLocations = [{

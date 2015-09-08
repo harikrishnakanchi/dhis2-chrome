@@ -36,7 +36,7 @@ define(['dashboardController', 'reportsController', 'dataEntryController', 'main
             app.controller('appCloneController', ['$scope', '$modal', '$timeout', 'indexeddbUtils', 'filesystemService', 'sessionHelper', '$location', appCloneController]);
             app.controller('downloadDataController', ['$scope', '$hustle', '$q', '$rootScope', '$timeout', downloadDataController]);
             app.controller('selectLanguageController', ['$scope', '$rootScope', '$indexedDB', 'ngI18nResourceBundle', selectLanguageController]);
-            app.controller('referralLocationsController', ['$scope', '$hustle', 'referralLocationsRepository', referralLocationsController]);
+            app.controller('referralLocationsController', ['$scope', '$hustle', '$modal', 'referralLocationsRepository', referralLocationsController]);
             app.controller('notificationsController', ['$scope', '$q', 'userPreferenceRepository', 'chartRepository', notificationsController]);
         };
         return {

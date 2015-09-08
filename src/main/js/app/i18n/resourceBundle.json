@@ -72,6 +72,7 @@
     "referralLocation_Other Facility": "Other Facility",
     "savedReferralLocations": "Referral Location names saved successfully",
     "uploadReferralLocationsDesc": "upsert referral Locations for op unit",
+    "disableReferralLocationConfirmationMessage": "Referral Location will be disabled. Are you sure?",
     "createOperationUnitBtnLabel": "Create Operation Unit",
     "dataEntryLabel": "Aggregate Data Entry",
     "approveDataLabel": "APPROVE DATA",
