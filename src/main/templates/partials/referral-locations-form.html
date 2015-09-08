@@ -13,11 +13,13 @@
                         <label for="referralLocationName{{$index}}" class="col-sm-4 col-md-4 control-label">{{ resourceBundle["referralLocation_" + referralLocation.genericName] }}</label>
                         <div class="col-sm-4">
                             <input type="text" ng-disabled="referralLocation.isDisabled" class="form-control" name="referralLocationName{{$index}}" id="referralLocationName{{$index}}" placeholder="{{ resourceBundle.referralLocationNamePlaceholder }}" ng-model="referralLocation.aliasName">
-                            <a ng-if="referralLocation.aliasName !== '' &amp;&amp; referralLocation.isDisabled !== true" href="" title="Disable" class="delete" ng-click="disableLocation(referralLocation)">
-                                <span class="glyphicon glyphicon-remove"></span>
-                            </a>
                             <span ng-show="hasBeenEmptied(referralLocation)" class="errortxt">{{resourceBundle.referralCannotBeEmpty}}</span>
                             </input>
+                        </div>
+                        <div class="col-sm-1 disable-referral">
+                            <a ng-if="referralLocation.aliasName !== '' &amp;&amp; referralLocation.isDisabled !== true" href="" title="Disable" class="delete" ng-click="disableLocation(referralLocation)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </a>
                         </div>
                     </li>
                 </ul>
