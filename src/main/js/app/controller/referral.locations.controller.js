@@ -12,7 +12,6 @@ define(["moment"], function(moment) {
             "Other Facility"
         ];
 
-        var existingReferralLocations;
         var shouldDisableSaveButton = false;
 
         var showModal = function(okCallback, message) {
@@ -39,15 +38,7 @@ define(["moment"], function(moment) {
         };
 
         var hasExistingNameBeenRemoved = function(referralLocation) {
-            var hasExistingName = !_.isEmpty(_.find(existingReferralLocations, {
-                "genericName": referralLocation.genericName
-            }).aliasName);
-
-            if (hasExistingName && _.isEmpty(referralLocation.aliasName)) {
-                return true;
-            }
-
-            return false;
+            return referralLocation.hasExistingName && _.isEmpty(referralLocation.aliasName);
         };
 
         $scope.hasBeenEmptied = function(referralLocation) {
@@ -67,9 +58,11 @@ define(["moment"], function(moment) {
             return _.map(orderedReferralLocationNames, function(genericName, index) {
                 var aliasName = data[genericName] === undefined ? "" : data[genericName].name;
                 var isDisabled = data[genericName] === undefined ? false : data[genericName].isDisabled;
+                var hasExistingName = !_.isEmpty(aliasName);
                 return {
                     "genericName": genericName,
                     "aliasName": aliasName,
+                    "hasExistingName": hasExistingName,
                     "isDisabled": isDisabled
                 };
             });
@@ -109,7 +102,6 @@ define(["moment"], function(moment) {
         var init = function() {
             referralLocationsRepository.get($scope.orgUnit.id).then(function(data) {
                 $scope.referralLocations = transformFromDb(data);
-                existingReferralLocations = _.cloneDeep($scope.referralLocations);
             });
         };
         init();

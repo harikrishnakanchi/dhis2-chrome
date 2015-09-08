@@ -69,6 +69,7 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 var expectedReferralLocation = {
                     "genericName": "MSF Facility 1",
                     "aliasName": "Some alias",
+                    "hasExistingName": true,
                     "isDisabled": false
                 };
                 expect(scope.referralLocations[0]).toEqual(expectedReferralLocation);

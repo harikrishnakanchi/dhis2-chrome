@@ -17,7 +17,7 @@
                             </input>
                         </div>
                         <div class="col-xs-1 col-sm-1 disable-referral">
-                            <a ng-if="referralLocation.aliasName !== '' &amp;&amp; referralLocation.isDisabled !== true" href="" title="Disable" class="delete" ng-click="disableLocation(referralLocation)">
+                            <a ng-if="referralLocation.hasExistingName &amp;&amp; referralLocation.aliasName !== '' &amp;&amp; referralLocation.isDisabled !== true" href="" title="Disable" class="delete" ng-click="disableLocation(referralLocation)">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </a>
                         </div>
