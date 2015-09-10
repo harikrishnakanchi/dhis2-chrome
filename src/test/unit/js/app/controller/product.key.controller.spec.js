@@ -1,6 +1,6 @@
-define(["productKeyController", "angularMocks", "metadataImporter", "utils", "chromeUtils", "sessionHelper"], function(ProductKeyController, mocks, MetadataImporter, utils, chromeUtils, SessioHelper) {
+define(["productKeyController", "angularMocks", "packagedDataImporter", "utils", "chromeUtils", "sessionHelper"], function(ProductKeyController, mocks, PackagedDataImporter, utils, chromeUtils, SessioHelper) {
     describe("productKeyController", function() {
-        var scope, location, productKeyController, metadataImporter, rootscope, q, sessionHelper;
+        var scope, location, productKeyController, packagedDataImporter, rootscope, q, sessionHelper;
 
         beforeEach(mocks.inject(function($rootScope, $location, $q) {
             scope = $rootScope.$new();
@@ -12,11 +12,11 @@ define(["productKeyController", "angularMocks", "metadataImporter", "utils", "ch
             spyOn(chromeUtils, "sendMessage");
             spyOn(chromeUtils, "setAuthHeader").and.returnValue(utils.getPromise(q, {}));
 
-            metadataImporter = new MetadataImporter();
-            spyOn(metadataImporter, "run").and.returnValue(utils.getPromise(q, {}));
+            packagedDataImporter = new PackagedDataImporter();
+            spyOn(packagedDataImporter, "run").and.returnValue(utils.getPromise(q, {}));
             spyOn(sessionHelper, "logout");
 
-            productKeyController = new ProductKeyController(scope, location, rootscope, metadataImporter, sessionHelper);
+            productKeyController = new ProductKeyController(scope, location, rootscope, packagedDataImporter, sessionHelper);
         }));
 
         it("should set the product key on rootscope and trigger sync", function() {

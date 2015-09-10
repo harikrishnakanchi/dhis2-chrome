@@ -1,8 +1,8 @@
-define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionHelper", "chromeUtils", "orgUnitRepository"],
-    function(MainController, mocks, utils, MetadataImporter, SessionHelper, chromeUtils, OrgUnitRepository) {
+define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sessionHelper", "chromeUtils", "orgUnitRepository"],
+    function(MainController, mocks, utils, PackagedDataImporter, SessionHelper, chromeUtils, OrgUnitRepository) {
         describe("main controller", function() {
             var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, db, frenchResourceBundle,
-                translationStore, location, metadataImporter, sessionHelper, orgUnitRepository, hustle;
+                translationStore, location, packagedDataImporter, sessionHelper, orgUnitRepository, hustle;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $location, $hustle) {
@@ -11,7 +11,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                 rootScope = $rootScope;
                 hustle = $hustle;
 
-                metadataImporter = new MetadataImporter();
+                packagedDataImporter = new PackagedDataImporter();
                 sessionHelper = new SessionHelper();
                 orgUnitRepository = new OrgUnitRepository();
 
@@ -75,17 +75,17 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                     return translationStore;
                 });
 
-                spyOn(metadataImporter, "run").and.returnValue(utils.getPromise(q, {}));
+                spyOn(packagedDataImporter, "run").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
+                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository);
             }));
 
             it("should import metadata triggering db migrations in the process", function() {
-                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
+                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository);
                 scope.$apply();
 
-                expect(metadataImporter.run).toHaveBeenCalled();
+                expect(packagedDataImporter.run).toHaveBeenCalled();
             });
 
             it("should logout user", function() {
@@ -107,7 +107,7 @@ define(["mainController", "angularMocks", "utils", "metadataImporter", "sessionH
                     callBack({});
                 });
 
-                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository);
+                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository);
 
                 scope.$apply();
 

@@ -112,7 +112,13 @@ gulp.task('download-metadata', function() {
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });
 
-gulp.task('pack', ['less', 'config', 'download-metadata'], function() {
+gulp.task('download-fieldapp-settings', function() {
+    return download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings", auth)
+        .pipe(rename("systemSettings.json"))
+        .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
+});
+
+gulp.task('pack', ['less', 'config', 'download-metadata', 'download-fieldapp-settings'], function() {
     var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "praxis_" + (argv.env || "dev")]);
     stream.write(process.stdout);
     return stream;

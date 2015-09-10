@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($q, metadataService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository) {
+    return function($q, metadataService, systemSettingService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository) {
         this.run = function() {
             return verifyIsNewInstall().then(importData);
         };
@@ -12,7 +12,9 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
-        var updateChangeLog = function(metadata){
+        var updateChangeLog = function(data) {
+            var metadata = data[0];
+
             if (!_.isObject(metadata))
                 return;
 
@@ -30,7 +32,8 @@ define(["lodash", "moment"], function(_, moment) {
             if (!isNewInstall)
                 return;
 
-            return importMetadata().then(updateChangeLog);
+            return $q.all([importMetadata(), importSystemSettings()])
+                .then(updateChangeLog);
         };
 
         var importMetadata = function() {
@@ -47,6 +50,11 @@ define(["lodash", "moment"], function(_, moment) {
                     return metadata;
                 });
             });
+        };
+
+        var importSystemSettings = function() {
+            return systemSettingService.loadFromFile()
+                .then(systemSettingRepository.upsert);
         };
     };
 });

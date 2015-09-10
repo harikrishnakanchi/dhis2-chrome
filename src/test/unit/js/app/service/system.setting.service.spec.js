@@ -45,6 +45,37 @@ define(["systemSettingService", "angularMocks", "utils", "dhisUrl"], function(Sy
             expect(actualResult).toEqual(expectedSystemSettings);
         });
 
+        it("should load pre-packaged system settings", function() {
+            var systemSettingsFromFile = {
+                "fieldAppSettings": {
+                    "moduleTemplates": {
+                        "ds1": {}
+                    },
+                    "anotherSetting": "foo"
+                }
+            };
+
+            httpBackend.expectGET("/data/systemSettings.json").respond(200, systemSettingsFromFile);
+
+            var actualResult;
+            service.loadFromFile().then(function(result) {
+                actualResult = result;
+            });
+            httpBackend.flush();
+
+            expectedSystemSettings = [{
+                "key": "moduleTemplates",
+                "value": {
+                    "ds1": {}
+                }
+            }, {
+                "key": "anotherSetting",
+                "value": "foo"
+            }];
+
+            expect(actualResult).toEqual(expectedSystemSettings);
+        });
+
         it("should get project settings", function() {
             var projectSettingsFromDhis = {
                 "projectSettings_prj1": {

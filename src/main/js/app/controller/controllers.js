@@ -24,14 +24,14 @@ define(['dashboardController', 'reportsController', 'dataEntryController', 'main
             app.controller('aggregateModuleController', ['$scope', '$hustle', 'orgUnitRepository', 'datasetRepository', 'systemSettingRepository', 'excludedDataElementsRepository', '$indexedDB', '$location', '$q', '$modal', 'orgUnitGroupHelper', 'originOrgunitCreator', aggregateModuleController]);
             app.controller('lineListModuleController', ['$scope', '$hustle', 'orgUnitRepository', 'excludedDataElementsRepository', '$q', '$modal', 'programRepository', 'orgUnitGroupHelper', 'datasetRepository', 'originOrgunitCreator', lineListModuleController]);
             app.controller('projectController', ['$scope', '$rootScope', '$hustle', 'orgUnitRepository', '$q', 'orgUnitGroupHelper', 'approvalDataRepository', 'orgUnitGroupSetRepository', projectController]);
-            app.controller('mainController', ['$q', '$scope', '$location', '$rootScope', '$hustle', 'ngI18nResourceBundle', '$indexedDB', 'metadataImporter', 'sessionHelper', 'orgUnitRepository', mainController]);
+            app.controller('mainController', ['$q', '$scope', '$location', '$rootScope', '$hustle', 'ngI18nResourceBundle', '$indexedDB', 'packagedDataImporter', 'sessionHelper', 'orgUnitRepository', mainController]);
             app.controller('loginController', ['$rootScope', '$scope', '$location', '$indexedDB', '$q', '$hustle', 'sessionHelper', loginController]);
             app.controller('countryController', ['$scope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', countryController]);
             app.controller('confirmDialogController', ['$scope', '$modalInstance', confirmDialogController]);
             app.controller('notificationDialogController', ['$scope', '$modalInstance', notificationDialogController]);
             app.controller('projectUserController', ['$scope', '$hustle', '$timeout', '$modal', 'userRepository', projectUserController]);
             app.controller('patientOriginController', ['$scope', '$hustle', '$q', 'patientOriginRepository', 'orgUnitRepository', 'datasetRepository', 'programRepository', 'originOrgunitCreator', 'orgUnitGroupHelper', patientOriginController]);
-            app.controller('productKeyController', ['$scope', '$location', '$rootScope', 'metadataImporter', 'sessionHelper', productKeyController]);
+            app.controller('productKeyController', ['$scope', '$location', '$rootScope', 'packagedDataImporter', 'sessionHelper', productKeyController]);
             app.controller('lineListOfflineApprovalController', ['$scope', '$q', 'programEventRepository', 'orgUnitRepository', 'programRepository', 'optionSetRepository', 'datasetRepository', 'referralLocationsRepository', lineListOfflineApprovalController]);
             app.controller('appCloneController', ['$scope', '$modal', '$timeout', 'indexeddbUtils', 'filesystemService', 'sessionHelper', '$location', appCloneController]);
             app.controller('downloadDataController', ['$scope', '$hustle', '$q', '$rootScope', '$timeout', downloadDataController]);

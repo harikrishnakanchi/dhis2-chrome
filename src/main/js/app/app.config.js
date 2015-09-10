@@ -150,7 +150,7 @@ require.config({
         //Helpers
         "helpers": "app/helpers/helpers",
         "orgUnitGroupHelper": "app/helpers/orgunit.group.helper",
-        "metadataImporter": "app/helpers/metadata.importer",
+        "packagedDataImporter": "app/helpers/packaged.data.importer",
         "sessionHelper": "app/helpers/session.helper",
         "originOrgunitCreator": "app/helpers/origin.orgunit.creator",
 

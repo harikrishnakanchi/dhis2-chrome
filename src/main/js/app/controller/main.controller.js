@@ -1,5 +1,5 @@
 define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, metadataImporter, sessionHelper, orgUnitRepository) {
+    return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
@@ -93,7 +93,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             });
         };
 
-        var loadCharts = function(){
+        var loadCharts = function() {
             return $hustle.publish({
                 "type": "downloadCharts",
                 "data": []
@@ -123,7 +123,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             };
 
             $scope.allUserLineListModules = [];
-            metadataImporter.run()
+            packagedDataImporter.run()
                 .then(loadAuthHeader)
                 .then(validateAndContinue);
         };

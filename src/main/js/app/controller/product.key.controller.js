@@ -1,7 +1,7 @@
 define(["chromeUtils", "cipherUtils"], function(chromeUtils, cipherUtils) {
-    return function($scope, $location, $rootScope, metadataImporter, sessionHelper) {
+    return function($scope, $location, $rootScope, packagedDataImporter, sessionHelper) {
         var triggerImportAndSync = function() {
-            metadataImporter.run().then(function() {
+            packagedDataImporter.run().then(function() {
                 chromeUtils.sendMessage("dbReady");
             });
             chromeUtils.sendMessage("productKeyDecrypted");

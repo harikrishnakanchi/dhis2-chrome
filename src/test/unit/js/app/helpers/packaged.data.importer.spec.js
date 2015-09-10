@@ -1,7 +1,7 @@
-define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService", "changeLogRepository", "metadataRepository", "orgUnitRepository", "orgUnitGroupRepository", "datasetRepository", "programRepository"],
-    function(mocks, utils, moment, MetadataImporter, MetadataService, ChangeLogRepository, MetadataRepository, OrgUnitRepository, OrgUnitGroupRepository, DatasetRepository, ProgramRepository) {
-        describe("metadataImporter", function() {
-            var q, scope, metadataImporter, metadataService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository;
+define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataService", "systemSettingService", "changeLogRepository", "metadataRepository", "orgUnitRepository", "orgUnitGroupRepository", "datasetRepository", "programRepository", "systemSettingRepository"],
+    function(mocks, utils, moment, PackagedDataImporter, MetadataService, SystemSettingService, ChangeLogRepository, MetadataRepository, OrgUnitRepository, OrgUnitGroupRepository, DatasetRepository, ProgramRepository, SystemSettingRepository) {
+        describe("packagedDataImporter", function() {
+            var q, scope, packagedDataImporter, metadataService, systemSettingService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
@@ -13,20 +13,43 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 };
 
                 metadataService = new MetadataService();
+                systemSettingService = new SystemSettingService();
+
+                spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, {}));
+                spyOn(systemSettingService, "loadFromFile").and.returnValue(utils.getPromise(q, {}));
+
                 metadataRepository = new MetadataRepository();
                 orgUnitRepository = new OrgUnitRepository();
                 orgUnitGroupRepository = new OrgUnitGroupRepository();
                 programRepository = new ProgramRepository();
                 datasetRepository = new ProgramRepository();
+                systemSettingRepository = new SystemSettingRepository();
 
                 spyOn(metadataRepository, "upsertMetadata");
                 spyOn(orgUnitRepository, "upsertDhisDownloadedData");
                 spyOn(orgUnitGroupRepository, "upsertDhisDownloadedData");
                 spyOn(datasetRepository, "upsertDhisDownloadedData");
                 spyOn(programRepository, "upsertDhisDownloadedData");
+                spyOn(systemSettingRepository, "upsert");
 
-                metadataImporter = new MetadataImporter(q, metadataService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository);
+                packagedDataImporter = new PackagedDataImporter(q, metadataService, systemSettingService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository);
             }));
+
+            it("should not run import if run once before", function() {
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, moment().toISOString()));
+                packagedDataImporter.run();
+                scope.$apply();
+
+                expect(metadataService.loadMetadataFromFile).not.toHaveBeenCalled();
+                expect(systemSettingService.loadFromFile).not.toHaveBeenCalled();
+                expect(metadataRepository.upsertMetadata).not.toHaveBeenCalled();
+                expect(orgUnitRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
+                expect(orgUnitGroupRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
+                expect(datasetRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
+                expect(programRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
+                expect(systemSettingRepository.upsert).not.toHaveBeenCalled();
+                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
+            });
 
             it("should import metadata for fresh installations", function() {
                 var orgUnits = [{
@@ -54,9 +77,9 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                     'sections': sections
                 };
 
-                spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, dhisMetadata));
+                metadataService.loadMetadataFromFile.and.returnValue(utils.getPromise(q, dhisMetadata));
 
-                metadataImporter.run();
+                packagedDataImporter.run();
                 scope.$apply();
 
                 expect(metadataService.loadMetadataFromFile).toHaveBeenCalled();
@@ -72,25 +95,10 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith("programs", metadataCreateDate);
             });
 
-            it("should not run import if run once before", function() {
-                changeLogRepository.get.and.returnValue(utils.getPromise(q, moment().toISOString()));
-                spyOn(metadataService, "loadMetadataFromFile");
-                metadataImporter.run();
-                scope.$apply();
-
-                expect(metadataService.loadMetadataFromFile).not.toHaveBeenCalled();
-                expect(metadataRepository.upsertMetadata).not.toHaveBeenCalled();
-                expect(orgUnitRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
-                expect(orgUnitGroupRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
-                expect(datasetRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
-                expect(programRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
-                expect(changeLogRepository.upsert).not.toHaveBeenCalled();
-            });
-
             it("should not do anything if metadata is not valid", function() {
-                spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, "<html><body>Error!</body></html>"));
+                metadataService.loadMetadataFromFile.and.returnValue(utils.getPromise(q, "<html><body>Error!</body></html>"));
 
-                metadataImporter.run();
+                packagedDataImporter.run();
                 scope.$apply();
 
                 expect(metadataRepository.upsertMetadata).not.toHaveBeenCalled();
@@ -100,5 +108,19 @@ define(["angularMocks", "utils", "moment", "metadataImporter", "metadataService"
                 expect(programRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(changeLogRepository.upsert).not.toHaveBeenCalled();
             });
+
+            it("should import praxis settings for fresh installations", function() {
+                var systemSettings = {
+                    "someSetting": "blah"
+                };
+
+                systemSettingService.loadFromFile.and.returnValue(utils.getPromise(q, systemSettings));
+
+                packagedDataImporter.run();
+                scope.$apply();
+
+                expect(systemSettingRepository.upsert).toHaveBeenCalledWith(systemSettings);
+            });
+
         });
     });

@@ -1,5 +1,5 @@
 define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, moment, _) {
-    return function($http) {
+    return function($http, $q) {
 
         var projectSettingsPrefix = "projectSettings_";
 
@@ -14,7 +14,29 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             });
         };
 
-        var merge = function(collection, item) {
+        var loadSettingsFromFile = function() {
+            return $http.get("/data/systemSettings.json").then(function(response) {
+                return response.data;
+            });
+        };
+
+        var transformFieldAppSettings = function(data) {
+            var result = _.transform(data.fieldAppSettings, function(acc, value, key) {
+                acc.push({
+                    "key": key,
+                    "value": value
+                });
+            }, []);
+            return result;
+        };
+
+        var transformProjectSettings = function(data) {
+            return _.mapKeys(data, function(value, key) {
+                return key.replace(projectSettingsPrefix, "");
+            });
+        };
+
+        var mergeUpsertedData = function(collection, item) {
             collection = collection || [];
 
             var existingItemIndex = _.findIndex(collection, {
@@ -35,40 +57,30 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
             return $http.post(dhisUrl.systemSettings, data);
         };
 
+        this.loadFromFile = function() {
+            return loadSettingsFromFile()
+                .then(transformFieldAppSettings);
+        };
+
         this.getSystemSettings = function() {
-            var transform = function(data) {
-                var result = _.transform(data.fieldAppSettings, function(acc, value, key) {
-                    acc.push({
-                        "key": key,
-                        "value": value
-                    });
-                }, []);
-                return result;
-            };
-            return getSettings("fieldAppSettings").then(transform);
+            return getSettings("fieldAppSettings").then(transformFieldAppSettings);
         };
 
         this.getProjectSettings = function(projectIds) {
             projectIds = _.flatten([projectIds]);
 
-            var transform = function(data) {
-                return _.mapKeys(data, function(value, key) {
-                    return key.replace(projectSettingsPrefix, "");
-                });
-            };
-
             var settingKeys = _.map(projectIds, function(projectId) {
                 return projectSettingsPrefix + projectId;
             });
 
-            return getSettings(settingKeys).then(transform);
+            return getSettings(settingKeys).then(transformProjectSettings);
         };
 
 
         this.upsertExcludedDataElements = function(projectId, updatedDataElementsExclusions) {
             var update = function(data) {
                 data[projectId] = data[projectId] || {};
-                data[projectId].excludedDataElements = merge(data[projectId].excludedDataElements, updatedDataElementsExclusions);
+                data[projectId].excludedDataElements = mergeUpsertedData(data[projectId].excludedDataElements, updatedDataElementsExclusions);
                 return data[projectId];
             };
 
@@ -84,7 +96,7 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         this.upsertPatientOriginDetails = function(projectId, updatedPatientOriginDetails) {
             var update = function(data) {
                 data[projectId] = data[projectId] || {};
-                data[projectId].patientOrigins = merge(data[projectId].patientOrigins, updatedPatientOriginDetails);
+                data[projectId].patientOrigins = mergeUpsertedData(data[projectId].patientOrigins, updatedPatientOriginDetails);
                 return data[projectId];
             };
 
@@ -100,7 +112,7 @@ define(["dhisUrl", "md5", "moment", "lodashUtils"], function(dhisUrl, md5, momen
         this.upsertReferralLocations = function(projectId, updatedReferralLocations) {
             var update = function(data) {
                 data[projectId] = data[projectId] || {};
-                data[projectId].referralLocations = merge(data[projectId].referralLocations, updatedReferralLocations);
+                data[projectId].referralLocations = mergeUpsertedData(data[projectId].referralLocations, updatedReferralLocations);
                 return data[projectId];
             };
 
