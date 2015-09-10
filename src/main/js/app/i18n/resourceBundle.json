@@ -75,7 +75,7 @@
     "disableReferralLocationConfirmationMessage": "Referral Location will be disabled. Are you sure?",
     "createOperationUnitBtnLabel": "Create Operation Unit",
     "dataEntryLabel": "Aggregate Data Entry",
-    "approveDataLabel": "APPROVE DATA",
+    "approveDataLabel": "Approve Data",
     "projectsLabel": "PROJECT SETUP",
     "downloadDataLabel": "Download data from DHIS",
     "totalLabel": "Total",
