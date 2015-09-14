@@ -76,7 +76,6 @@ define(["lodash"], function(_) {
                         "value": "-",
                         "standardDeviation": undefined,
                         "mean": undefined,
-                        "min": undefined,
                         "max": undefined
                     };
                     return result;
@@ -90,7 +89,6 @@ define(["lodash"], function(_) {
                     "value": parseInt(dataForWeek[2]),
                     "standardDeviation": standardDeviation,
                     "mean": mean,
-                    "min": _.round(mean - standardDeviation),
                     "max": _.round(mean + standardDeviation)
                 };
 

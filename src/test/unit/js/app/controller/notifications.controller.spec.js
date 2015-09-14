@@ -67,28 +67,24 @@
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      },
                      "2015W26": {
                          "value": 48,
                          "standardDeviation": 0,
                          "mean": 48,
-                         "min": 48,
                          "max": 48
                      },
                      "2015W27": {
                          "value": 40,
                          "standardDeviation": 5,
                          "mean": 44,
-                         "min": 39,
                          "max": 49
                      },
                      "2015W28": {
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      }
                  },
@@ -102,28 +98,24 @@
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      },
                      "2015W26": {
                          "value": 36,
                          "standardDeviation": 0,
                          "mean": 36,
-                         "min": 36,
                          "max": 36
                      },
                      "2015W27": {
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      },
                      "2015W28": {
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      }
                  },
@@ -137,28 +129,24 @@
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      },
                      "2015W26": {
                          "value": 12,
                          "standardDeviation": 0,
                          "mean": 12,
-                         "min": 12,
                          "max": 12
                      },
                      "2015W27": {
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      },
                      "2015W28": {
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      }
                  },
@@ -172,28 +160,24 @@
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      },
                      "2015W26": {
                          "value": 24,
                          "standardDeviation": 0,
                          "mean": 24,
-                         "min": 24,
                          "max": 24
                      },
                      "2015W27": {
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      },
                      "2015W28": {
                          "value": '-',
                          "standardDeviation": undefined,
                          "mean": undefined,
-                         "min": undefined,
                          "max": undefined
                      }
                  },

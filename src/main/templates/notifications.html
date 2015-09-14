@@ -13,10 +13,8 @@
             <tbody>
                 <tr ng-if="dataElementValue.showInNotifications" ng-repeat="dataElementValue in dataElementValues">
                     <td>{{dataElementValue.dataElementName}}</td>
-                    <td ng-class="{ 'blue-cell' : (dataElementValue.weeklyData[week]['value'] < dataElementValue.weeklyData[week]['min']), 'red-cell': (dataElementValue.weeklyData[week]['value'] > dataElementValue.weeklyData[week]['max']) }" ng-repeat="week in weeks">
+                    <td ng-class="{'red-cell': (dataElementValue.weeklyData[week]['value'] > dataElementValue.weeklyData[week]['max']) }" ng-repeat="week in weeks">
                         {{dataElementValue.weeklyData[week]['value']}}
-                        <p class="glyphicon glyphicon-arrow-up" ng-if="dataElementValue.weeklyData[week]['value'] > dataElementValue.weeklyData[week]['max']"></p>
-                        <p class="glyphicon glyphicon-arrow-down" ng-if="dataElementValue.weeklyData[week]['value'] < dataElementValue.weeklyData[week]['min']"></p>
                     </td>
                 </tr>
             </tbody>
