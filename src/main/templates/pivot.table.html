@@ -1,4 +1,26 @@
-<h3>{{definition.name}}</h3>
-<table class='table'>
-    {{definition}}
-</table>
+<div ng-if="showTable">
+    <h3>{{getTableName(definition.name)}}</h3>
+    <div class="scroll-horizontal">
+        <table class='table table-bordered'>
+            <thead>
+                <tr>
+                    <th ng-if="isCategoryPresent">Category</th>
+                    <th>Data Element</th>
+                    <th ng-repeat="period in periods">
+                        <span>{{period}}</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="datum in dataMap | orderBy: 'category'">
+                    <td ng-if="isCategoryPresent">{{data.metaData.names[datum.category]}}</td>
+                    <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
+                    <td ng-repeat="period in periods">
+                        <span ng-if="period === datum.period"> {{datum.value}}</span>
+                        <span ng-if="period !== datum.period"> 0</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

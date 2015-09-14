@@ -30,7 +30,7 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
 
             httpBackend.expectGET(properties.dhis.url + "/api/reportTables.json?fields=id&filter=name:like:%5BFieldApp&paging=false").respond(200, pivotTables);
             httpBackend.expectGET(properties.dhis.url +
-                "/api/reportTables/tab1.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
+                "/api/reportTables/tab1.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,name,relativePeriods,indicators%5Bid%5D,dataElements%5Bid%5D,rowDimensions,filterDimensions,categoryDimensions"
             ).respond(200, pivotTable);
             var actualData;
             pivotTableService.getAllPivotTables().then(function(data) {
@@ -69,15 +69,15 @@ define(["pivotTableService", "angularMocks", "properties", "utils", "timecop", "
             });
 
             httpBackend.expectGET(properties.dhis.url +
-                "/api/reportTables/tab1.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
+                "/api/reportTables/tab1.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,name,relativePeriods,indicators%5Bid%5D,dataElements%5Bid%5D,rowDimensions,filterDimensions,categoryDimensions"
             ).respond(200, tables[0]);
 
             httpBackend.expectGET(properties.dhis.url +
-                "/api/reportTables/tab2.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
+                "/api/reportTables/tab2.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,name,relativePeriods,indicators%5Bid%5D,dataElements%5Bid%5D,rowDimensions,filterDimensions,categoryDimensions"
             ).respond(200, tables[1]);
 
             httpBackend.expectGET(properties.dhis.url +
-                "/api/reportTables/tab3.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
+                "/api/reportTables/tab3.json?fields=columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D,name,relativePeriods,indicators%5Bid%5D,dataElements%5Bid%5D,rowDimensions,filterDimensions,categoryDimensions"
             ).respond(200, tables[2]);
 
             var actualData;

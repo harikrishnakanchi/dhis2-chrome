@@ -300,5 +300,7 @@
     "notAValidNumber": "Not a valid number.",
     "within100": "Should a number within 100.",
     "greaterThan0": "Should be a number greater than 0.",
-    "referralCannotBeEmpty": "Referral location name cannot be empty"
+    "referralCannotBeEmpty": "Referral location name cannot be empty",
+    "dataElement": "Data Element",
+    "category": "Category"
 }

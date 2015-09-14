@@ -36,7 +36,6 @@
                 </p>
             </div>
         </div>
-
         <div ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
             <div>
                 <pivot-table definition="table.table" data="table.data"></pivot-table>

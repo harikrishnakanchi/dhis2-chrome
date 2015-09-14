@@ -14,7 +14,7 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
                 var tableUrl = dhisUrl.pivotTables + "/" + table.id + ".json";
                 var detail = {
                     params: {
-                        "fields": "columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]],!lastUpdated,!href,!created,!publicAccess,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!access,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!user,!organisationUnitGroups,!itemOrganisationUnitGroups,!userGroupAccesses,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits,!reportParams"
+                        "fields": "columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]],name,relativePeriods,indicators[id],dataElements[id],rowDimensions,filterDimensions,categoryDimensions"
                     }
                 };
                 return $http.get(tableUrl, detail).then(function(response) {

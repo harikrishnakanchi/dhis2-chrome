@@ -8,6 +8,7 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
             module("cc");
             module("templates/pivot.table.html");
             tableDefinition = {
+                "name": "[fieldApp] ABC",
                 "columns": [{
                     "dimension": "pe",
                     "items": [{
@@ -130,62 +131,74 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
                 "width": 4
             };
         });
-        it("should draw the correct html", mocks.inject(function($rootScope, $compile) {
-            $scope = $rootScope.$new();
-            var tableHtml =
-                '<pivot-table data="data" definition="table"></pivot-table>';
-            var htmlElement = angular.element(tableHtml);
-            $compile(htmlElement)($scope);
-            $scope.$digest();
-            var tables = htmlElement.find("table");
-            expect(tables.length).toBe(1);
-        }));
 
-        it("should get the correct columnHeaders", mocks.inject(function($rootScope, $controller) {
+        it("should transform the data to the correct form", mocks.inject(function($rootScope, $controller) {
             $scope = $rootScope.$new();
             $scope.data = tableData;
             $scope.definition = tableDefinition;
             var controller = PivotTableController($scope);
             $scope.$apply();
-            expect($scope.columnHeaders).toEqual([
-                [{
-                    text: 'October 2014',
-                    value: '201410'
-                }, {
-                    text: 'November 2014',
-                    value: '201411'
-                }, {
-                    text: 'December 2014',
-                    value: '201412'
-                }, {
-                    text: 'January 2015',
-                    value: '201501'
-                }, {
-                    text: 'February 2015',
-                    value: '201502'
-                }, {
-                    text: 'March 2015',
-                    value: '201503'
-                }, {
-                    text: 'April 2015',
-                    value: '201504'
-                }, {
-                    text: 'May 2015',
-                    value: '201505'
-                }, {
-                    text: 'June 2015',
-                    value: '201506'
-                }, {
-                    text: 'July 2015',
-                    value: '201507'
-                }, {
-                    text: 'August 2015',
-                    value: '201508'
-                }, {
-                    text: 'September 2015',
-                    value: '201509'
-                }]
-            ]);
+            expect($scope.dataMap).toEqual([{
+                category: 'a0b89770007',
+                dataElement: 'a0e7d3973e3',
+                period: '201508',
+                value: '249.0'
+            }, {
+                category: 'a0b89770007',
+                dataElement: 'a0e7d3973e3',
+                period: '201507',
+                value: '876854.0'
+            }, {
+                category: 'afca0bdf0f1',
+                dataElement: 'a0e7d3973e3',
+                period: '201508',
+                value: '52.0'
+            }, {
+                category: 'afca0bdf0f1',
+                dataElement: 'a0e7d3973e3',
+                period: '201507',
+                value: '1033.0'
+            }, {
+                category: 'ab3a614eed1',
+                dataElement: 'a0e7d3973e3',
+                period: '201508',
+                value: '215.0'
+            }, {
+                category: 'abf819dca06',
+                dataElement: 'a67aa742313',
+                period: '201507',
+                value: '6433.0'
+            }, {
+                category: 'ab3a614eed1',
+                dataElement: 'a67aa742313',
+                period: '201507',
+                value: '1772.0'
+            }, {
+                category: 'abf819dca06',
+                dataElement: 'a0e7d3973e3',
+                period: '201508',
+                value: '201.0'
+            }, {
+                category: 'ab3a614eed1',
+                dataElement: 'a0e7d3973e3',
+                period: '201507',
+                value: '1387.0'
+            }, {
+                category: 'abf819dca06',
+                dataElement: 'a0e7d3973e3',
+                period: '201507',
+                value: '264.0'
+            }, {
+                category: 'afca0bdf0f1',
+                dataElement: 'a67aa742313',
+                period: '201507',
+                value: '10386.0'
+            }, {
+                category: 'a0b89770007',
+                dataElement: 'a67aa742313',
+                period: '201507',
+                value: '1706.0'
+            }]);
 
 
         }));
