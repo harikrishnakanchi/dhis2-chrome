@@ -116,7 +116,7 @@ define(["lodash"], function(_) {
                 var showInNotifications = false;
 
                 _.each(weeklyData, function(dataForWeek) {
-                    if (dataForWeek.value < dataForWeek.min || dataForWeek.value > dataForWeek.max)
+                    if (dataForWeek.value > dataForWeek.max)
                         showInNotifications = showInNotifications || true;
                 });
 
