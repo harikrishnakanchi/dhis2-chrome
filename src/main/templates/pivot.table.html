@@ -12,12 +12,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="datum in dataMap | orderBy: 'category'">
+                <tr ng-repeat="datum in viewMap | orderBy: 'category'">
                     <td ng-if="isCategoryPresent">{{data.metaData.names[datum.category]}}</td>
                     <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
                     <td ng-repeat="period in periods">
-                        <span ng-if="period === datum.period"> {{datum.value}}</span>
-                        <span ng-if="period !== datum.period"> 0</span>
+                        <span> {{getValue(datum.category,datum.dataElement,period)}}</span>
                     </td>
                 </tr>
             </tbody>

@@ -142,65 +142,99 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
                 category: 'a0b89770007',
                 dataElement: 'a0e7d3973e3',
                 period: '201508',
-                value: '249.0'
+                value: 249
             }, {
                 category: 'a0b89770007',
                 dataElement: 'a0e7d3973e3',
                 period: '201507',
-                value: '876854.0'
+                value: 876854
             }, {
                 category: 'afca0bdf0f1',
                 dataElement: 'a0e7d3973e3',
                 period: '201508',
-                value: '52.0'
+                value: 52
             }, {
                 category: 'afca0bdf0f1',
                 dataElement: 'a0e7d3973e3',
                 period: '201507',
-                value: '1033.0'
+                value: 1033
             }, {
                 category: 'ab3a614eed1',
                 dataElement: 'a0e7d3973e3',
                 period: '201508',
-                value: '215.0'
+                value: 215
             }, {
                 category: 'abf819dca06',
                 dataElement: 'a67aa742313',
                 period: '201507',
-                value: '6433.0'
+                value: 6433
             }, {
                 category: 'ab3a614eed1',
                 dataElement: 'a67aa742313',
                 period: '201507',
-                value: '1772.0'
+                value: 1772
             }, {
                 category: 'abf819dca06',
                 dataElement: 'a0e7d3973e3',
                 period: '201508',
-                value: '201.0'
+                value: 201
             }, {
                 category: 'ab3a614eed1',
                 dataElement: 'a0e7d3973e3',
                 period: '201507',
-                value: '1387.0'
+                value: 1387
             }, {
                 category: 'abf819dca06',
                 dataElement: 'a0e7d3973e3',
                 period: '201507',
-                value: '264.0'
+                value: 264
             }, {
                 category: 'afca0bdf0f1',
                 dataElement: 'a67aa742313',
                 period: '201507',
-                value: '10386.0'
+                value: 10386
             }, {
                 category: 'a0b89770007',
                 dataElement: 'a67aa742313',
                 period: '201507',
-                value: '1706.0'
+                value: 1706
             }]);
 
+            expect($scope.viewMap).toEqual([{
+                category: 'a0b89770007',
+                dataElement: 'a0e7d3973e3'
+            }, {
+                category: 'a0b89770007',
+                dataElement: 'a67aa742313'
+            }, {
+                category: 'afca0bdf0f1',
+                dataElement: 'a0e7d3973e3'
+            }, {
+                category: 'afca0bdf0f1',
+                dataElement: 'a67aa742313'
+            }, {
+                category: 'ab3a614eed1',
+                dataElement: 'a0e7d3973e3'
+            }, {
+                category: 'ab3a614eed1',
+                dataElement: 'a67aa742313'
+            }, {
+                category: 'abf819dca06',
+                dataElement: 'a0e7d3973e3'
+            }, {
+                category: 'abf819dca06',
+                dataElement: 'a67aa742313'
+            }]);
+        }));
 
+        it("should get the correct value to be displayed", mocks.inject(function($rootScope, $controller) {
+            $scope = $rootScope.$new();
+            $scope.data = tableData;
+            $scope.definition = tableDefinition;
+            var controller = PivotTableController($scope);
+            $scope.$apply();
+
+            expect($scope.getValue('abf819dca06', 'a67aa742313', '201507')).toEqual(6433);
         }));
     });
 });
