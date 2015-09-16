@@ -13,6 +13,9 @@
         </div>
         <tabset>
             <tab heading="Weekly reports">
+                <div ng-show="!isReportsAvailable()">
+                    <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+                </div>
                 <div ng-repeat="chart in chartData | filter: {dataset:selectedDatasetId}">
                     <div class="text-center" ng-if="chart.data.length === 0">
                         <h3>{{chart.title}}</h3>
@@ -45,6 +48,9 @@
                 </div>
             </tab>
             <tab heading="Monthly reports">
+                <div ng-show="!isReportsAvailable() || !isPivotTablesAvailable">
+                    <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+                </div>
                 <div ng-if="isMonthlyReport(table.table)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
                     <div>
                         <pivot-table definition="table.table" data="table.data"></pivot-table>

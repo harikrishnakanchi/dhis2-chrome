@@ -101,6 +101,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 }
             }
         };
+        $scope.isPivotTablesAvailable = false;
 
 
         $scope.downloadChartAsPng = function(event) {
@@ -111,6 +112,26 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             return _.contains(_.findKey(definition.relativePeriods, function(obj) {
                 return obj;
             }), "Month");
+        };
+
+        $scope.isReportsAvailable = function() {
+            var filteredCharts = _.filter($scope.chartData, {
+                "dataset": $scope.selectedDatasetId
+            });
+
+            var filteredPivotTables = _.filter($scope.pivotTables, {
+                "dataset": $scope.selectedDatasetId
+            });
+
+            var isChartsAvailable = _.any(filteredCharts, function(chart) {
+                return chart.data.length !== 0;
+            });
+
+            $scope.isPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
+                return table.data.rows.length !== 0;
+            });
+
+            return isChartsAvailable && $scope.isPivotTablesAvailable;
         };
 
         var loadChartData = function() {
