@@ -11,36 +11,47 @@
                 <select id="selectDataset" class="form-control" ng-model="selectedDatasetId" ng-options="dataset.id as dataset.name for dataset in datasets"></select>
             </div>
         </div>
-        <div ng-repeat="chart in chartData | filter: {dataset:selectedDatasetId}">
-            <div class="text-center" ng-if="chart.data.length === 0">
-                <h3>{{chart.title}}</h3>
-                <h4 class="mb50">
+        <tabset>
+            <tab heading="Weekly reports">
+                <div ng-repeat="chart in chartData | filter: {dataset:selectedDatasetId}">
+                    <div class="text-center" ng-if="chart.data.length === 0">
+                        <h3>{{chart.title}}</h3>
+                        <h4 class="mb50">
                     {{resourceBundle.noDataAvailable}}
                 </h4>
-            </div>
-            <div ng-if="chart.data.length &gt; 0">
-                <div class="row chart-title">
-                    <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.title}}</h3>
-                    <a class="col-md-1 col-md-offset-2" href="" title="Download Chart" ng-click="downloadChartAsPng($event)">
-                        <span class="glyphicon glyphicon-download-alt"></span>
-                    </a>
+                    </div>
+                    <div ng-if="chart.data.length &gt; 0">
+                        <div class="row chart-title">
+                            <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.title}}</h3>
+                            <a class="col-md-1 col-md-offset-2" href="" title="Download Chart" ng-click="downloadChartAsPng($event)">
+                                <span class="glyphicon glyphicon-download-alt"></span>
+                            </a>
+                        </div>
+                        <p ng-if="chart.type === 'line'">
+                            <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
+                        </p>
+                        <p ng-if="chart.type === 'column'">
+                            <nvd3 options="barChartOptions" data="chart.data"></nvd3>
+                        </p>
+                        <p ng-if="chart.type === 'stackedcolumn'">
+                            <nvd3 options="stackedBarChartOptions" data="chart.data"></nvd3>
+                        </p>
+                    </div>
                 </div>
-                <p ng-if="chart.type === 'line'">
-                    <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
-                </p>
-                <p ng-if="chart.type === 'column'">
-                    <nvd3 options="barChartOptions" data="chart.data"></nvd3>
-                </p>
-                <p ng-if="chart.type === 'stackedcolumn'">
-                    <nvd3 options="stackedBarChartOptions" data="chart.data"></nvd3>
-                </p>
-            </div>
-        </div>
-        <div ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
-            <div>
-                <pivot-table definition="table.table" data="table.data"></pivot-table>
-            </div>
-        </div>
+                <div ng-if="!isMonthlyReport(table.table)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
+                    <div>
+                        <pivot-table definition="table.table" data="table.data"></pivot-table>
+                    </div>
+                </div>
+            </tab>
+            <tab heading="Monthly reports">
+                <div ng-if="isMonthlyReport(table.table)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
+                    <div>
+                        <pivot-table definition="table.table" data="table.data"></pivot-table>
+                    </div>
+                </div>
+            </tab>
+        </tabset>
         <div class="loading" ng-show="loading">
             <img src="img/ajax-loader.gif" class="spinner" />
         </div>

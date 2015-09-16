@@ -107,6 +107,12 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             saveSvgAsPng(event.currentTarget.parentElement.parentElement.getElementsByTagName("svg")[0], "chart.png");
         };
 
+        $scope.isMonthlyReport = function(definition) {
+            return _.contains(_.findKey(definition.relativePeriods, function(obj) {
+                return obj;
+            }), "Month");
+        };
+
         var loadChartData = function() {
 
             var insertMissingPeriods = function(chartData, periodsForXAxis) {
