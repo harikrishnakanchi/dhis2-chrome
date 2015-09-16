@@ -23,6 +23,7 @@ define(["lodash"], function(_) {
         };
 
         if ($scope.definition && $scope.data) {
+
             $scope.viewMap = [];
             $scope.periods = $scope.data.metaData.pe;
             $scope.isCategoryPresent = $scope.data.width === 4 ? true : false;
@@ -44,13 +45,11 @@ define(["lodash"], function(_) {
                 _.each(dataElements, function(dataElement) {
                     $scope.viewMap.push({
                         "category": category,
-                        "dataElement": dataElement
+                        "dataElement": dataElement,
+                        "dataElementName": $scope.data.metaData.names[dataElement]
                     });
                 });
             });
-
-
-            var groupedByCategory = _.groupBy($scope.data, "category");
         }
     };
 });

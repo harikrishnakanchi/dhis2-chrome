@@ -1,5 +1,5 @@
 <div ng-if="showTable">
-    <h3>{{getTableName(definition.name)}}</h3>
+    <h3 class="text-center">{{getTableName(definition.name)}}</h3>
     <div class="scroll-horizontal">
         <table class='table table-bordered'>
             <thead>
@@ -7,12 +7,12 @@
                     <th>Data Element</th>
                     <th ng-if="isCategoryPresent">Category</th>
                     <th ng-repeat="period in periods">
-                        <span>{{period}}</span>
+                        <span>{{data.metaData.names[period]}}</span>
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="datum in viewMap | orderBy: 'dataElement'">
+                <tr ng-repeat="datum in viewMap | orderBy: 'dataElementName'">
                     <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
                     <td ng-if="isCategoryPresent">{{data.metaData.names[datum.category]}}</td>
                     <td ng-repeat="period in periods">
