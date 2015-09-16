@@ -143,6 +143,11 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                 "title": "Title2",
                 "dataset": "ds2",
                 "type": "line"
+            }, {
+                "name": "chart3 Notifications",
+                "title": "Title1",
+                "dataset": "ds1",
+                "type": "stackedcolumn"
             }];
 
             var chartData1 = {

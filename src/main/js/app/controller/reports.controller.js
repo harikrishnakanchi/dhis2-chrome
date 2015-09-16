@@ -182,6 +182,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     };
                 };
 
+                charts = _.filter(charts, function(chart) {
+                    return !_.endsWith(chart.name, "Notifications");
+                });
+
                 var getChartDataPromises = _.map(charts, function(chart) {
                     return chartRepository.getDataForChart(chart.name, $scope.orgUnit.id).then(function(chartData) {
                         if (!_.isEmpty(chartData))

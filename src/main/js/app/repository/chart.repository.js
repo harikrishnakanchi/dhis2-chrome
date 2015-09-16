@@ -24,7 +24,7 @@ define(["lodash"], function(_) {
             });
         };
 
-        this.getAll = function(charts) {
+        this.getAll = function() {
             var store = db.objectStore("charts");
             return store.getAll();
         };
