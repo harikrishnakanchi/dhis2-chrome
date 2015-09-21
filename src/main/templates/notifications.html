@@ -1,5 +1,6 @@
 <div ng-controller="notificationsController">
-    <div ng-repeat="(moduleName, dataElementValues) in allDataElementValues | groupBy : 'moduleName'">
+    <div class="alert alert-info" ng-if="noNotificationsForAnyModule"> {{resourceBundle.noNotificationsForAnyModule}} </div>
+    <div ng-repeat="(moduleName, dataElementValues) in allDataElementValues | groupBy : 'moduleName'" ng-if="dataElementValues.length !== 0">
         <h4 class="col-md-4 col-md-offset-4">{{moduleName}}</h4>
         <table class="table table-bordered">
             <thead>

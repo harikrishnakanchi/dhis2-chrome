@@ -4,6 +4,7 @@ define(["lodash"], function(_) {
         var allCharts;
         $scope.allDataElementValues = [];
         $scope.weeks = [];
+        $scope.noNotificationsForAnyModule = true;
 
         var getUserModules = function() {
             return userPreferenceRepository.getUserModules().then(function(modules) {
@@ -116,8 +117,11 @@ define(["lodash"], function(_) {
                 var showInNotifications = false;
 
                 _.each(weeklyData, function(dataForWeek) {
-                    if (dataForWeek.value > dataForWeek.max)
+                    if (dataForWeek.value > dataForWeek.max) {
                         showInNotifications = showInNotifications || true;
+                        $scope.noNotificationsForAnyModule = false;
+                    }
+
                 });
 
                 $scope.allDataElementValues.push({

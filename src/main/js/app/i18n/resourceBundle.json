@@ -302,5 +302,6 @@
     "greaterThan0": "Should be a number greater than 0.",
     "referralCannotBeEmpty": "Referral location name cannot be empty",
     "dataElement": "Data Element",
-    "category": "Category"
+    "category": "Category",
+    "noNotificationsForAnyModule": "No Notifications to display"
 }
