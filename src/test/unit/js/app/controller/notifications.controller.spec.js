@@ -1,4 +1,4 @@
- define(["notificationsController", "angularMocks", "utils", "userPreferenceRepository", "chartRepository"], function(NotificationsController, mocks, utils, UserPreferenceRepository, ChartRepository) {
+ define(["notificationsController", "angularMocks", "utils", "userPreferenceRepository", "chartRepository", "orgUnitRepository"], function(NotificationsController, mocks, utils, UserPreferenceRepository, ChartRepository, OrgUnitRepository) {
 
      describe("notifications controller", function() {
 
@@ -43,8 +43,13 @@
                  ]
              };
 
+             $rootScope.hasRoles = jasmine.createSpy("hasRoles").and.returnValue(false);
+
              userPreferenceRepository = new UserPreferenceRepository();
              spyOn(userPreferenceRepository, "getUserModules").and.returnValue(utils.getPromise(q, userModules));
+
+             orgUnitRepository = new OrgUnitRepository();
+             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, userModules));
 
              chartRepository = new ChartRepository();
              spyOn(chartRepository, "getAllChartsForNotifications").and.returnValue(utils.getPromise(q, charts));
@@ -54,7 +59,7 @@
                      return utils.getPromise(q, chartData1);
              });
 
-             notificationsController = new NotificationsController(scope, q, userPreferenceRepository, chartRepository);
+             notificationsController = new NotificationsController(scope, q, $rootScope, userPreferenceRepository, chartRepository, orgUnitRepository);
          }));
 
          it("should get all charts and generate notifications", function() {

@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $q, userPreferenceRepository, chartRepository) {
+    return function($scope, $q, $rootScope, userPreferenceRepository, chartRepository, orgUnitRepository) {
 
         var allCharts;
         $scope.allDataElementValues = [];
@@ -13,6 +13,11 @@ define(["lodash"], function(_) {
         };
 
         var getUserModules = function() {
+            var isCoordinationLevelApprover = $rootScope.hasRoles(['Coordination Level Approver']);
+
+            if (isCoordinationLevelApprover)
+                return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject);
+
             return userPreferenceRepository.getUserModules().then(function(modules) {
                 return modules;
             });

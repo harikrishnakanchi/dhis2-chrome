@@ -37,7 +37,7 @@ define(['dashboardController', 'reportsController', 'dataEntryController', 'main
             app.controller('downloadDataController', ['$scope', '$hustle', '$q', '$rootScope', '$timeout', downloadDataController]);
             app.controller('selectLanguageController', ['$scope', '$rootScope', '$indexedDB', 'ngI18nResourceBundle', selectLanguageController]);
             app.controller('referralLocationsController', ['$scope', '$hustle', '$modal', 'referralLocationsRepository', referralLocationsController]);
-            app.controller('notificationsController', ['$scope', '$q', 'userPreferenceRepository', 'chartRepository', notificationsController]);
+            app.controller('notificationsController', ['$scope', '$q', '$rootScope', 'userPreferenceRepository', 'chartRepository', 'orgUnitRepository', notificationsController]);
         };
         return {
             init: init
