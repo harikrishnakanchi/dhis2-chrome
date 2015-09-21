@@ -16,7 +16,7 @@ define(["lodash"], function(_) {
             var isCoordinationLevelApprover = $rootScope.hasRoles(['Coordination Level Approver']);
 
             if (isCoordinationLevelApprover)
-                return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject);
+                return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id);
 
             return userPreferenceRepository.getUserModules().then(function(modules) {
                 return modules;
