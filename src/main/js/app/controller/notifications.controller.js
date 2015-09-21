@@ -6,6 +6,12 @@ define(["lodash"], function(_) {
         $scope.weeks = [];
         $scope.noNotificationsForAnyModule = true;
 
+        $scope.showTable = function(dataElementValues) {
+            return _.any(dataElementValues, {
+                "showInNotifications": true
+            });
+        };
+
         var getUserModules = function() {
             return userPreferenceRepository.getUserModules().then(function(modules) {
                 return modules;
