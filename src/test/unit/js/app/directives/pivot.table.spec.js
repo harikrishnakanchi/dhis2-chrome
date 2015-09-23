@@ -16,6 +16,28 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
                         "name": "LAST_12_MONTHS"
                     }]
                 }],
+                "categoryDimensions": [{
+                    "categoryOptions": [{
+                        "id": "ab3a614eed1",
+                        "name": "1-23 months"
+                    }, {
+                        "id": "abf819dca06",
+                        "name": "24-59 months"
+                    }, {
+                        "id": "a0b89770007",
+                        "name": "5-14 years"
+                    }, {
+                        "id": "afca0bdf0f1",
+                        "name": "<1 month"
+                    }]
+                }],
+                "dataElements": [{
+                    "id": "a0e7d3973e3",
+                    "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
+                }, {
+                    "id": "a67aa742313",
+                    "name": "Follow-up Consultations - Consultations - Out Patient Department - Pediatric"
+                }],
                 "rows": [{
                     "dimension": "a1948a9c6f4",
                     "items": [{
@@ -201,37 +223,45 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
             }]);
 
             expect($scope.viewMap).toEqual([{
-                category: 'a0b89770007',
-                dataElement: 'a0e7d3973e3',
-                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric'
-            }, {
-                category: 'a0b89770007',
-                dataElement: 'a67aa742313',
-                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric'
-            }, {
-                category: 'afca0bdf0f1',
-                dataElement: 'a0e7d3973e3',
-                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric'
-            }, {
-                category: 'afca0bdf0f1',
-                dataElement: 'a67aa742313',
-                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric'
-            }, {
                 category: 'ab3a614eed1',
                 dataElement: 'a0e7d3973e3',
-                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric'
+                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
+                sortOrder: 1
             }, {
                 category: 'ab3a614eed1',
                 dataElement: 'a67aa742313',
-                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric'
+                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
+                sortOrder: 2
             }, {
                 category: 'abf819dca06',
                 dataElement: 'a0e7d3973e3',
-                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric'
+                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
+                sortOrder: 1
             }, {
                 category: 'abf819dca06',
                 dataElement: 'a67aa742313',
-                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric'
+                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
+                sortOrder: 2
+            }, {
+                category: 'a0b89770007',
+                dataElement: 'a0e7d3973e3',
+                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
+                sortOrder: 1
+            }, {
+                category: 'a0b89770007',
+                dataElement: 'a67aa742313',
+                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
+                sortOrder: 2
+            }, {
+                category: 'afca0bdf0f1',
+                dataElement: 'a0e7d3973e3',
+                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
+                sortOrder: 1
+            }, {
+                category: 'afca0bdf0f1',
+                dataElement: 'a67aa742313',
+                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
+                sortOrder: 2
             }]);
         }));
 

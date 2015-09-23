@@ -37,19 +37,45 @@ define(["lodash"], function(_) {
                     "value": $scope.isCategoryPresent ? parseInt(row[3]) : parseInt(row[2])
                 };
             });
+            var dataElements = [];
+            var sortedCategories = [];
+            if ($scope.isCategoryPresent) {
+                var sortCategories = function(categories) {
+                    categoriesWithSortOrder = _.map(categories, function(category) {
+                        return {
+                            "sortOrder": _.indexOf(_.pluck($scope.definition.categoryDimensions[0].categoryOptions, "id"), category) + 1,
+                            "id": category
+                        };
+                    });
+                    return _.pluck(_.sortBy(categoriesWithSortOrder, "sortOrder"), "id");
+                };
 
-            var categories = _.uniq(_.pluck($scope.dataMap, "category"));
-            var dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
+                sortedCategories = sortCategories(_.uniq(_.pluck($scope.dataMap, "category")));
 
-            _.each(categories, function(category) {
-                _.each(dataElements, function(dataElement) {
-                    $scope.viewMap.push({
-                        "category": category,
-                        "dataElement": dataElement,
-                        "dataElementName": $scope.data.metaData.names[dataElement]
+                dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
+
+                _.each(sortedCategories, function(category) {
+                    _.each(dataElements, function(dataElement) {
+                        $scope.viewMap.push({
+                            "category": category,
+                            "dataElement": dataElement,
+                            "dataElementName": $scope.data.metaData.names[dataElement],
+                            "sortOrder": _.indexOf(_.pluck($scope.definition.dataElements, "id"), dataElement) + 1,
+                        });
                     });
                 });
-            });
+            } else {
+                dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
+
+                _.each(dataElements, function(dataElement) {
+                    $scope.viewMap.push({
+                        "dataElement": dataElement,
+                        "dataElementName": $scope.data.metaData.names[dataElement],
+                        "sortOrder": _.indexOf(_.pluck($scope.definition.dataElements, "id"), dataElement) + 1,
+                    });
+                });
+            }
+
         }
     };
 });
