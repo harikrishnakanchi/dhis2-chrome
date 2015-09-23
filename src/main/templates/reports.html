@@ -12,7 +12,7 @@
             </div>
         </div>
         <tabset>
-            <tab heading="Weekly reports">
+            <tab heading="Weekly reports" ng-click="resizeCharts()">
                 <div ng-show="!isReportsAvailable()">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>

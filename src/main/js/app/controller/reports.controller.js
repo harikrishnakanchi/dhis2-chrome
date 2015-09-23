@@ -103,6 +103,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
         };
         $scope.isPivotTablesAvailable = false;
 
+        $scope.resizeCharts = function() {
+            window.dispatchEvent(new Event('resize'));
+        };
 
         $scope.downloadChartAsPng = function(event) {
             saveSvgAsPng(event.currentTarget.parentElement.parentElement.getElementsByTagName("svg")[0], "chart.png");
