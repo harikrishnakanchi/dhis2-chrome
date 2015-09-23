@@ -2,7 +2,7 @@
 define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository) {
     describe("org unit controller", function() {
         var q, db, scope, mockOrgStore, mockOrgUnitLevelStore, allOrgUnits,
-            orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll, expectedOrgUnitTree, child, orgUnitRepository;
+            orgUnitContoller, parent, location, today, _Date, todayStr, timeout, anchorScroll, expectedOrgUnitTree, child, orgUnitRepository, rootScope;
         var getOrgUnit = function(id, name, level, parent) {
             return {
                 'id': id,
@@ -72,12 +72,12 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                     "value": "country"
                 }]
             }];
-
+            rootScope = $rootScope;
             q = $q;
             allOrgUnits = [getOrgUnit(1, 'msf', 1, null), getOrgUnit(2, 'ocp', 2, {
                 id: 1
             })];
-            scope = $rootScope.$new();
+            scope = rootScope.$new();
             location = $location;
             timeout = $timeout;
             mockOrgStore = {
@@ -99,6 +99,32 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                 }
             };
 
+            rootScope.currentUser = {
+                "firstName": "test1",
+                "lastName": "test1last",
+                "locale": "en",
+                "userCredentials": {
+                    "username": "dataentryuser",
+                    "userRoles": [{
+                        "id": "hxNB8lleCsl",
+                        "name": 'Superuser'
+                    }, {
+                        "id": "hxNB8lleCsl",
+                        "name": 'blah'
+                    }]
+                },
+                "organisationUnits": [{
+                    id: "proj_1",
+                    "name": "MISSIONS EXPLOS"
+                }, {
+                    id: "test1",
+                    "name": "MISSIONS EXPLOS123"
+                }, {
+                    id: "test2",
+                    "name": "MISSIONS EXPLOS345"
+                }]
+            };
+
             spyOn(mockOrgUnitLevelStore, 'getAll').and.returnValue(utils.getPromise(q, orgUnitLevels));
             _Date = Date;
             todayStr = "2014-04-01";
@@ -113,7 +139,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                 'id': 'Id1'
             };
             anchorScroll = jasmine.createSpy();
-            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll, orgUnitRepository);
+            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
         }));
 
         afterEach(function() {
@@ -132,7 +158,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
 
         it("should fetch and select the newly created organization unit", function() {
             spyOn(location, 'hash').and.returnValue([2, 1]);
-            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll, orgUnitRepository);
+            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
             spyOn(scope, 'onOrgUnitSelect');
             var child = {
                 id: 2,
@@ -163,7 +189,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
 
         it("should display a timed message after creating a organization unit", function() {
             spyOn(location, 'hash').and.returnValue([1, 2]);
-            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll, orgUnitRepository);
+            orgUnitContoller = new OrgUnitController(scope, db, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
             spyOn(scope, 'onOrgUnitSelect');
 
             scope.$apply();

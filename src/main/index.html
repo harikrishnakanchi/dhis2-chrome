@@ -34,9 +34,11 @@
                                         </button>
                                         <ul class="dropdown-menu" role="menu">
                                             <li ng-include="'templates/partials/download-data.html'"> </li>
+                                            <li><a href="#/selectProjectPreference" tabindex="-1">{{resourceBundle.changeProject}}</a></li>
+                                            <li class="divider"></li>
+                                            <li><a href="#/productKeyPage" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
                                             <li class="dropdown-submenu pull-left" ng-include="'templates/partials/clone.html'"></li>
                                             <li class="dropdown-submenu pull-left" ng-include="'templates/partials/select-language.html'"></li>
-                                            <li><a href="#/productKeyPage" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
                                             <li class="divider"></li>
                                             <li><a ng-click="logout()" href="#/login" id="linkToLogout" tabindex="-1">{{ resourceBundle.logoutLabel }}</a></li>
                                         </ul>

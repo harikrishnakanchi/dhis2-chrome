@@ -94,6 +94,23 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 expect(sessionHelper.logout).toHaveBeenCalled();
             });
 
+            it("should return true if user has selected project", function() {
+                rootScope.currentUser = {
+                    "userCredentials": {
+                        "username": "username"
+                    },
+                    "organisationUnits": [{
+                        "id": "prj1"
+                    }],
+                    "selectedProject": {
+                        "id": "prj1"
+                    }
+                };
+                var result = scope.hasSelectedProject();
+
+                expect(result).toEqual(true);
+            });
+
             it("should default locale to en", function() {
                 scope.$apply();
 

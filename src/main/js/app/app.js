@@ -28,6 +28,10 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         templateUrl: 'templates/dashboard.html',
                         controller: 'dashboardController'
                     }).
+                    when('/selectProjectPreference', {
+                        templateUrl: 'templates/selectProjectPreference.html',
+                        controller: 'selectProjectPreferenceController'
+                    }).
                     when('/reports/:orgUnit?', {
                         templateUrl: 'templates/reports.html',
                         controller: 'reportsController'

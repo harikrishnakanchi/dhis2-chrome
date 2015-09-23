@@ -1,7 +1,7 @@
 define(["lodash"], function(_) {
-    var expandParents = function(selectedNode, allOrgUnits) {
+    var expandParents = function(selectedNode, allOrgUnits, limitToProject) {
         var currentNode = selectedNode;
-        while (currentNode.parent) {
+        while ((currentNode.parent && !limitToProject) || (currentNode.parent && limitToProject && currentNode.level > 4)) {
             var parent = _.find(allOrgUnits, {
                 "id": currentNode.parent.id
             });
@@ -11,7 +11,7 @@ define(["lodash"], function(_) {
         currentNode.collapsed = false;
     };
 
-    return function(orgUnits, selectedNodeId) {
+    return function(orgUnits, selectedNodeId, limitToProject) {
         var groupedOrgUnits = _.groupBy(orgUnits, 'level');
         var sortedLevels = _.sortBy(_.keys(groupedOrgUnits));
         var selectedNode;
@@ -42,7 +42,7 @@ define(["lodash"], function(_) {
 
 
         if (selectedNode) {
-            expandParents(selectedNode, allOrgUnits);
+            expandParents(selectedNode, allOrgUnits, limitToProject);
         }
 
         var rootNodes = _.filter(allOrgUnits, function(u) {

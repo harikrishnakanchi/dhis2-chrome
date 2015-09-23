@@ -1,5 +1,5 @@
 define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository) {
+    return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, userPreferenceRepository) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
@@ -9,6 +9,13 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         $scope.isActive = function(viewLocationRegex) {
             var re = new RegExp(viewLocationRegex);
             return re.test($location.path());
+        };
+
+        $scope.hasSelectedProject = function() {
+            if (_.isUndefined($rootScope.currentUser.selectedProject))
+                return false;
+
+            return true;
         };
 
         var deregisterCurrentUserLocaleWatcher = $rootScope.$watch("currentUser.locale", function() {

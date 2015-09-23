@@ -2,7 +2,7 @@
     "loggedInLabel": "Logged in as",
     "logoutLabel": "Logout",
     "loginBtn": "Login",
-    "updateProductKeyMenuLabel": "Update Product Key",
+    "updateProductKeyMenuLabel": "Update product key",
     "homeMenuLabel": "HOME",
     "lineListDataEntryMenuLabel": "LineList Data Entry",
     "usernameLabel": "Username",
@@ -303,5 +303,7 @@
     "referralCannotBeEmpty": "Referral location name cannot be empty",
     "dataElement": "Data Element",
     "category": "Category",
-    "noNotificationsForAnyModule": "No Notifications to display"
+    "noNotificationsForAnyModule": "No Notifications to display",
+    "selectProjectLabel": "Select Project",
+    "changeProject": "Change project"
 }

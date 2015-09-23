@@ -363,6 +363,41 @@ define(["orgUnitRepository", "utils", "angularMocks", "timecop", "lodash"], func
             expect(actualModules).toEqual([module1, module]);
         });
 
+        it("should get all origins which are children of the given org units", function() {
+            var actualOrigins;
+            origin1 = {
+                "id": "origin1",
+                "name": "origin1",
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "Origin"
+                }],
+                "parent": {
+                    "id": "module1"
+                },
+                "children": [{
+                    "id": "Unknown",
+                    "name": "Unknown"
+                }]
+            };
+
+            mockOrgStore.each.and.callFake(function(query) {
+                if (query.inList[0] === module.id && query.inList[1] === origin1.id)
+                    return utils.getPromise(q, [module, origin1]);
+                if (query.inList.length === 1 && query.inList[0] === module.id)
+                    return utils.getPromise(q, [origin1]);
+            });
+
+            orgUnitRepository.getAllOriginsInOrgUnits([module.id]).then(function(data) {
+                actualOrigins = data;
+            });
+
+            scope.$apply();
+            expect(actualOrigins).toEqual([origin1]);
+        });
+
         it("should get all op units which are children of the given org units", function() {
             var anotherOpUnit = {
                 "id": "opUnit2",

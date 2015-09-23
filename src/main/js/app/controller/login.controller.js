@@ -23,6 +23,13 @@ define(["md5", "lodash"], function(md5, _) {
             return $q.all([downloadDataPromise, downloadEventDataPromise]);
         };
 
+        var selectPreferredProject = function() {
+            if (_.isUndefined($rootScope.currentUser.selectedProject))
+                $location.path("/selectProjectPreference");
+            else
+                $location.path("/projects");
+        };
+
         var authenticateOrPromptUserForPassword = function(data) {
             var user = data[0];
             var userCredentials = data[1];
@@ -39,7 +46,7 @@ define(["md5", "lodash"], function(md5, _) {
                     .then(downloadDataValues)
                     .then(function() {
                         if ($rootScope.hasRoles(['Superuser']))
-                            $location.path("/projects");
+                            selectPreferredProject();
                         else
                             $location.path("/dashboard");
                     });

@@ -18,13 +18,7 @@ define(["lodash"], function(_) {
         var getCurrentProjects = function() {
             return getAll().then(function(userPreferences) {
                 var currentUserPreferences = _.last(_.sortBy(userPreferences, "lastUpdated")) || {};
-                //TODO: Retain only else part after #1339
-                if (_.isEmpty(userPreferences) || currentUserPreferences.username === "msfadmin")
-                    return orgUnitRepository.getAllProjects().then(function(allProjects) {
-                        return _.pluck(allProjects, "id");
-                    });
-                else
-                    return _.pluck(currentUserPreferences.organisationUnits, "id");
+                return _.pluck(currentUserPreferences.organisationUnits, "id");
             });
         };
 

@@ -121,10 +121,10 @@ define(["moment", "lodashUtils"], function(moment, _) {
             return getAll().then(filterProjects);
         };
 
-        var getOrgUnitLevel = function(type){
+        var getOrgUnitLevel = function(type) {
             var store = db.objectStore("organisationUnitLevels");
-            return store.getAll().then(function(orgUnitLevels){
-                var orgUnitLevel = _.find(orgUnitLevels, function(level){
+            return store.getAll().then(function(orgUnitLevels) {
+                var orgUnitLevel = _.find(orgUnitLevels, function(level) {
                     return level.name === type;
                 });
                 return orgUnitLevel && orgUnitLevel.level;
@@ -132,7 +132,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
         };
 
         var getAllOperationUnits = function() {
-            return getOrgUnitLevel("Operation Unit").then(function(level){
+            return getOrgUnitLevel("Operation Unit").then(function(level) {
                 var store = db.objectStore("organisationUnits");
                 var query = db.queryBuilder().$eq(level).$index("by_level").compile();
                 return store.each(query);
@@ -155,6 +155,25 @@ define(["moment", "lodashUtils"], function(moment, _) {
 
         var getAllOpUnitsInOrgUnits = function(orgUnitIds) {
             return getChildrenOfTypeInOrgUnits(orgUnitIds, "Operation Unit");
+        };
+
+        var getAllOriginsInOrgUnits = function(orgUnitIds) {
+            return getChildrenOfTypeInOrgUnits(orgUnitIds, "Origin");
+        };
+
+        var getAllOrgUnitsUnderProject = function(project) {
+            var orgUnits = [];
+            orgUnits.push(project);
+            return getAllOpUnitsInOrgUnits([project.id]).then(function(opunits) {
+                orgUnits.push(opunits);
+                return getAllModulesInOrgUnits([project.id]).then(function(modules) {
+                    orgUnits.push(modules);
+                    return getAllOriginsInOrgUnits([project.id]).then(function(origins) {
+                        orgUnits.push(origins);
+                        return orgUnits;
+                    });
+                });
+            });
         };
 
         var getChildrenOfTypeInOrgUnits = function(orgUnitIds, requestedType) {
@@ -221,7 +240,9 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getAllOpUnitsInOrgUnits": getAllOpUnitsInOrgUnits,
             "getChildOrgUnitNames": getChildOrgUnitNames,
             "getAllOriginsByName": getAllOriginsByName,
-            "getAllOperationUnits": getAllOperationUnits
+            "getAllOperationUnits": getAllOperationUnits,
+            "getAllOriginsInOrgUnits": getAllOriginsInOrgUnits,
+            "getAllOrgUnitsUnderProject": getAllOrgUnitsUnderProject
         };
     };
 });

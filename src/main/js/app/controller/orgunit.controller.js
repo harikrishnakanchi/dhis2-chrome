@@ -1,5 +1,5 @@
 define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment, properties) {
-    return function($scope, db, $q, $location, $timeout, $anchorScroll, orgUnitRepository) {
+    return function($scope, db, $q, $location, $timeout, $anchorScroll, $rootScope, orgUnitRepository) {
         var templateUrlMap = {
             'Company': 'templates/partials/company-form.html',
             'Operational Center': 'templates/partials/oc-form.html',
@@ -12,6 +12,8 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             'Patient Origin': 'templates/partials/patient-origin-form.html',
             'Referral Locations': 'templates/partials/referral-locations-form.html'
         };
+
+        var isMsfAdmin = $rootScope.currentUser.userCredentials.username === "msfadmin";
 
         $scope.organisationUnits = [];
 
@@ -33,7 +35,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         var transformToTree = function(nodeToBeSelected, args) {
-            var orgUnits = args[0];
+            var orgUnits = _.flatten(args[0]);
             orgUnits = _.filter(orgUnits, function(ou) {
                 return ou.level < 7;
             });
@@ -42,15 +44,22 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
                 result[orgUnit.level] = orgUnit.name;
             }, {});
 
-            var transformedOrgUnits = toTree(orgUnits, nodeToBeSelected);
+            var transformedOrgUnits = isMsfAdmin ? toTree(orgUnits, nodeToBeSelected, true) : toTree(orgUnits, nodeToBeSelected, true);
             $scope.organisationUnits = transformedOrgUnits.rootNodes;
             selectCurrentNode(transformedOrgUnits);
+        };
+
+        var getOrgUnits = function() {
+            if (isMsfAdmin) {
+                return orgUnitRepository.getAllOrgUnitsUnderProject($rootScope.currentUser.selectedProject);
+            } else
+                return orgUnitRepository.getAll();
         };
 
         var init = function() {
             var selectedNodeId = $location.hash()[0];
             var message = $location.hash()[1];
-            $q.all([orgUnitRepository.getAll(), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
+            $q.all([getOrgUnits(), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNodeId));
         };
 
         $scope.closeNewForm = function(selectedNode, message) {
@@ -61,7 +70,7 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
                     $scope.showMessage = false;
                 }, properties.messageTimeout);
             }
-            $q.all([orgUnitRepository.getAll(), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNode.id));
+            $q.all([getOrgUnits(), getAll("organisationUnitLevels")]).then(_.curry(transformToTree)(selectedNode.id));
         };
 
         var scrollToTop = function() {
