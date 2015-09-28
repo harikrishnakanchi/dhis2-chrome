@@ -372,7 +372,7 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             }];
 
             expect(scope.chartData).toEqual(expectedChartData);
-            expect(scope.isReportsAvailable()).toEqual(false);
+            expect(scope.isReportsAvailable()).toEqual(true);
         });
 
         it("should load pivot tables into the scope", function() {

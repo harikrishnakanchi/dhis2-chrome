@@ -131,10 +131,12 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             });
 
             $scope.isPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                return table.data.rows.length !== 0;
+                if (table.data)
+                    return table.data.rows.length !== 0;
+                return false;
             });
 
-            return isChartsAvailable && $scope.isPivotTablesAvailable;
+            return isChartsAvailable || $scope.isPivotTablesAvailable;
         };
 
         var loadChartData = function() {
