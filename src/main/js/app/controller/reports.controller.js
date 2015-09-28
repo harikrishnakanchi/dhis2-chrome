@@ -233,7 +233,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     datasets = _.filter(datasets, {
                         "isOriginDataset": false
                     });
-                    $scope.datasets = datasets;
+                    $scope.datasets = _.sortBy(datasets, "name");
                     if (!_.isEmpty(datasets))
                         $scope.selectedDatasetId = datasets[0].id;
                 });
