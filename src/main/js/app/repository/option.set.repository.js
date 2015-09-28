@@ -35,7 +35,7 @@ define(['lodash'], function(_) {
                     var optionMapping = {};
                     _.forEach(optionSets, function(optionSet) {
                         var options;
-                        if (_.endsWith(optionSet.code, "_referralLocations")) {
+                        if (_.endsWith(optionSet.code, "_referralLocations") && !_.isUndefined(referralLocations)) {
                             buildMapForReferralOptionSet(optionSet, optionMapping, optionSetMapping, options);
                         } else {
                             options = _.compact(optionSet.options);

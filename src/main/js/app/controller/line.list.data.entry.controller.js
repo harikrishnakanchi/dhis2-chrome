@@ -152,6 +152,18 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                     });
                 };
 
+                var setIncludedSectionFlag = function() {
+                    _.each($scope.program.programStages, function(stage) {
+                        _.each(stage.programStageSections, function(section) {
+                            section.isIncluded = false;
+                            _.each(section.programStageDataElements, function(sde) {
+                                section.isIncluded = section.isIncluded || sde.dataElement.isIncluded;
+                            });
+                        });
+                    });
+
+                };
+
                 var getProgram = function(excludedDataElements) {
                     return programRepository.getProgramForOrgUnit($scope.originOrgUnits[0].id).then(function(program) {
                         return programRepository.get(program.id, excludedDataElements).then(function(program) {
@@ -160,7 +172,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                     });
                 };
 
-                return getExcludedDataElementsForModule().then(getProgram);
+                return getExcludedDataElementsForModule().then(getProgram).then(setIncludedSectionFlag);
             };
 
             var loadAllDataElements = function() {
