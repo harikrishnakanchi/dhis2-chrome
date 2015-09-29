@@ -5,10 +5,6 @@ define(["lodash"], function(_) {
             return dataElementName.split(" - ")[0];
         };
 
-        $scope.getTableName = function(tableName) {
-            return tableName.split("]")[1];
-        };
-
         $scope.getValue = function(category, dataElement, period) {
             var allValues = _.find($scope.dataMap, function(data) {
                 if (data.category === category && data.dataElement === dataElement && data.period === period)
@@ -27,7 +23,6 @@ define(["lodash"], function(_) {
             $scope.viewMap = [];
             $scope.periods = $scope.data.metaData.pe;
             $scope.isCategoryPresent = $scope.data.width === 4 ? true : false;
-            $scope.showTable = $scope.data.rows.length === 0 ? false : true;
 
             $scope.dataMap = _.map($scope.data.rows, function(row) {
                 return {

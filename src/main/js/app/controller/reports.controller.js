@@ -117,6 +117,15 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             }), "Month");
         };
 
+        $scope.getTableName = function(tableName) {
+            return tableName.split("]")[1];
+        };
+
+        $scope.showTable = function(data) {
+            var showTable = data.rows.length === 0 ? false : true;
+            return showTable;
+        };
+
         $scope.isReportsAvailable = function() {
             var filteredCharts = _.filter($scope.chartData, {
                 "dataset": $scope.selectedDatasetId

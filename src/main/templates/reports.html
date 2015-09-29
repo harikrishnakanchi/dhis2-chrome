@@ -41,20 +41,56 @@
                         </p>
                     </div>
                 </div>
-                <div ng-if="!isMonthlyReport(table.table)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
-                    <div>
-                        <pivot-table definition="table.table" data="table.data"></pivot-table>
-                    </div>
+                <div ng-if="isReportsAvailable()">
+                    <accordion is-open="true" close-others="false">
+                        <accordion-group>
+                            <accordion-heading>
+                                <span>{{resourceBundle.tabularReports}}</span>
+                            </accordion-heading>
+                            <div class="exp-coll-group">
+                                <div ng-if="!isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
+                                    <accordion close-others="false">
+                                        <accordion-group>
+                                            <accordion-heading>
+                                                <span>{{getTableName(table.table.name)}}</span>
+                                            </accordion-heading>
+                                            <div>
+                                                <pivot-table definition="table.table" data="table.data"></pivot-table>
+                                            </div>
+                                        </accordion-group>
+                                    </accordion>
+                                </div>
+                            </div>
+                        </accordion-group>
+                    </accordion>
                 </div>
             </tab>
             <tab heading="Monthly reports">
                 <div ng-show="!isReportsAvailable() || !isPivotTablesAvailable">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
-                <div ng-if="isMonthlyReport(table.table)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
-                    <div>
-                        <pivot-table definition="table.table" data="table.data"></pivot-table>
-                    </div>
+                <div class="margin-top" ng-if="isReportsAvailable()">
+                    <accordion is-open="true" close-others="false">
+                        <accordion-group>
+                            <accordion-heading>
+                                <span>{{resourceBundle.tabularReports}}</span>
+                            </accordion-heading>
+                            <div class="exp-coll-group">
+                                <div ng-if="isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
+                                    <accordion close-others="false">
+                                        <accordion-group>
+                                            <accordion-heading>
+                                                <span>{{getTableName(table.table.name)}}</span>
+                                            </accordion-heading>
+                                            <div>
+                                                <pivot-table definition="table.table" data="table.data"></pivot-table>
+                                            </div>
+                                        </accordion-group>
+                                    </accordion>
+                                </div>
+                            </div>
+                        </accordion-group>
+                    </accordion>
                 </div>
             </tab>
         </tabset>
