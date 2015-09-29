@@ -128,7 +128,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             var message = {};
             message.data = {
                 "data": {},
-                "type": "downloadData"
+                "type": "downloadProjectData"
             };
             var returnValue = dispatcher.run(message);
             scope.$apply();
@@ -180,7 +180,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should call download org units consumer", function() {
             message.data = {
                 "data": [],
-                "type": "downloadOrgUnit"
+                "type": "downloadMetadata"
             };
             dispatcher.run(message);
             scope.$apply();
@@ -244,7 +244,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should call download program consumer", function() {
             message.data = {
                 "data": {},
-                "type": "downloadProgram"
+                "type": "downloadMetadata"
             };
             dispatcher.run(message);
             scope.$apply();
@@ -304,7 +304,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should call downloadOrgUnitGroupConsumer", function() {
             message.data = {
                 "data": {},
-                "type": "downloadOrgUnitGroups"
+                "type": "downloadMetadata"
             };
 
             dispatcher.run(message);
@@ -327,7 +327,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should download  system setting consumer", function() {
             message.data = {
                 "data": {},
-                "type": "downloadSystemSetting"
+                "type": "downloadMetadata"
             };
 
             dispatcher.run(message);
@@ -350,7 +350,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should call download charts", function() {
             message.data = {
                 "data": {},
-                "type": "downloadCharts"
+                "type": "downloadProjectData"
             };
 
             dispatcher.run(message);
@@ -386,7 +386,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should call download project settings", function() {
             message.data = {
                 "data": {},
-                "type": "downloadProjectSettings"
+                "type": "downloadProjectData"
             };
 
             dispatcher.run(message);
@@ -398,7 +398,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         it("should call download pivot tables", function() {
             message.data = {
                 "data": {},
-                "type": "downloadPivotTables"
+                "type": "downloadProjectData"
             };
 
             dispatcher.run(message);

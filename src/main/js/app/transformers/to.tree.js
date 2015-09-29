@@ -1,17 +1,23 @@
 define(["lodash"], function(_) {
-    var expandParents = function(selectedNode, allOrgUnits, limitToProject) {
+    var expandParents = function(selectedNode, allOrgUnits) {
         var currentNode = selectedNode;
-        while ((currentNode.parent && !limitToProject) || (currentNode.parent && limitToProject && currentNode.level > 4)) {
-            var parent = _.find(allOrgUnits, {
+        var getParent = function(currentNode) {
+            if(!currentNode.parent)
+                return undefined;
+            return _.find(allOrgUnits, {
                 "id": currentNode.parent.id
             });
+        };
+
+        var parent;
+        while (parent = getParent(currentNode)) {
             parent.collapsed = false;
             currentNode = parent;
         }
         currentNode.collapsed = false;
     };
 
-    return function(orgUnits, selectedNodeId, limitToProject) {
+    return function(orgUnits, selectedNodeId) {
         var groupedOrgUnits = _.groupBy(orgUnits, 'level');
         var sortedLevels = _.sortBy(_.keys(groupedOrgUnits));
         var selectedNode;
@@ -42,7 +48,7 @@ define(["lodash"], function(_) {
 
 
         if (selectedNode) {
-            expandParents(selectedNode, allOrgUnits, limitToProject);
+            expandParents(selectedNode, allOrgUnits);
         }
 
         var rootNodes = _.filter(allOrgUnits, function(u) {

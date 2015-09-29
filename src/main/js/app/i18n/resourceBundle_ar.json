@@ -3,6 +3,7 @@
     "dataEntryLabel": "إدخال البيانات",
     "approveDataLabel": "الموافقة على البيانات",
     "projectsLabel": "مشاريع",
+    "countryLabel": "COUNTRY SETUP",
     "downloadDataLabel": "تحميل جميع البيانات",
     "totalLabel": "مجموع",
     "invalidExpression": "يجب أن يكون التعبير صالحة تحتوي على أرقام و'+'",

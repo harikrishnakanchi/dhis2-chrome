@@ -59,30 +59,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             return;
 
                         $hustle.publish({
-                            "type": "downloadMetadata"
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadSystemSetting"
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadOrgUnit",
-                            "data": []
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadOrgUnitGroups",
-                            "data": []
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadProgram",
-                            "data": []
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadDatasets",
+                            "type": "downloadMetadata",
                             "data": []
                         }, "dataValues");
 
@@ -93,25 +70,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             return;
 
                         $hustle.publish({
-                            "type": "downloadProjectSettings",
-                            "data": []
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadCharts",
-                            "data": []
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadData"
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadEventData"
-                        }, "dataValues");
-
-                        $hustle.publish({
-                            "type": "downloadPivotTables",
+                            "type": "downloadProjectData",
                             "data": []
                         }, "dataValues");
                     };
@@ -173,6 +132,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             deferred.resolve([injector, appInit]);
             return deferred.promise;
         };
+
 
         return {
             init: init,

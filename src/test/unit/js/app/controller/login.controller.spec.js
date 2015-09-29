@@ -1,9 +1,8 @@
 define(["loginController", "angularMocks", "utils", "sessionHelper"], function(LoginController, mocks, utils, SessionHelper) {
     describe("login controller", function() {
-        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, hustle, fakeUserStoreSpy, sessionHelper;
+        var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle;
 
-        beforeEach(module("hustle"));
-
+        beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $location, $q, $hustle) {
             scope = $rootScope.$new();
             rootScope = $rootScope;
@@ -54,33 +53,62 @@ define(["loginController", "angularMocks", "utils", "sessionHelper"], function(L
                         "username": "msfadmin",
                         "password": "5f4dcc3b5aa765d61d8327deb882cf99"
                     });
+                if (username === "superadmin")
+                    return utils.getPromise(q, {
+                        "username": "superadmin",
+                        "password": "7536ad6ce98b48f23a1bf8f74f53da83"
+                    });
                 return utils.getPromise(q, {
                     "username": "project_user",
                     "password": "caa63a86bbc63b2ae67ef0a069db7fb9"
                 });
             });
 
-            spyOn(hustle, "publish");
-
             sessionHelper = new SessionHelper();
             spyOn(sessionHelper, "login").and.returnValue(utils.getPromise(q, {}));
-            loginController = new LoginController(rootScope, scope, location, db, q, hustle, sessionHelper);
+            loginController = new LoginController(rootScope, scope, location, db, q, sessionHelper, hustle);
         }));
 
-        it("should login admin user with valid credentials and redirect to dashboard", function() {
+        it("should login super admin user with valid credentials and redirect to orgUnits", function() {
+            scope.username = "superadmin";
+            scope.password = "msfsuperadmin";
+
+            rootScope.hasRoles.and.returnValue(true);
+
+            scope.login();
+            scope.$apply();
+
+            expect(fakeUserStore.find).toHaveBeenCalledWith("superadmin");
+            expect(fakeUserCredentialsStore.find).toHaveBeenCalledWith("superadmin");
+            expect(location.path).toHaveBeenCalledWith("/orgUnits");
+            expect(scope.invalidCredentials).toEqual(false);
+        });
+
+        it("should not login super admin user with invalid password", function() {
+            scope.username = "superadmin";
+            scope.password = "password1234";
+
+            scope.login();
+            scope.$apply();
+
+            expect(rootScope.isLoggedIn).toEqual(undefined);
+            expect(location.path).not.toHaveBeenCalled();
+            expect(scope.invalidCredentials).toEqual(true);
+        });
+
+        it("should login admin user with valid credentials and redirect to orgunits", function() {
             scope.username = "MSFAdmin";
             scope.password = "password";
+
+            rootScope.hasRoles.and.returnValue(true);
 
             scope.login();
             scope.$apply();
 
             expect(fakeUserStore.find).toHaveBeenCalledWith("msfadmin");
             expect(fakeUserCredentialsStore.find).toHaveBeenCalledWith("msfadmin");
-            expect(location.path).toHaveBeenCalledWith("/dashboard");
+            expect(location.path).toHaveBeenCalledWith("/orgUnits");
             expect(scope.invalidCredentials).toEqual(false);
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "downloadData"
-            }, "dataValues");
         });
 
         it("should not login msfadmin user with invalid password", function() {
@@ -102,9 +130,6 @@ define(["loginController", "angularMocks", "utils", "sessionHelper"], function(L
             scope.login();
             scope.$apply();
 
-            expect(hustle.publish).toHaveBeenCalledWith({
-                "type": "downloadData"
-            }, "dataValues");
             expect(location.path).toHaveBeenCalledWith("/dashboard");
             expect(scope.invalidCredentials).toEqual(false);
         });

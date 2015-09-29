@@ -77,6 +77,7 @@
     "dataEntryLabel": "Aggregate Data Entry",
     "approveDataLabel": "Approve Data",
     "projectsLabel": "PROJECT SETUP",
+    "countryLabel": "COUNTRY SETUP",
     "downloadDataLabel": "Download data from DHIS",
     "totalLabel": "Total",
     "invalidExpression": "Must be a valid expression containing digits and '+'.",

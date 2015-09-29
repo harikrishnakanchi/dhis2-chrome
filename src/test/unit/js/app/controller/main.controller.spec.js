@@ -164,7 +164,7 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 });
             });
 
-            it("should reset charts on current user's org units changes", function() {
+            xit("should reset charts on current user's org units changes", function() {
                 rootScope.currentUser = {
                     "userCredentials": {
                         "username": "username"

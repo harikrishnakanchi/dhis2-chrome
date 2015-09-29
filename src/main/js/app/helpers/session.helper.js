@@ -1,5 +1,5 @@
 define(["moment"], function(moment) {
-    return function($rootScope, $q, userPreferenceRepository, orgUnitRepository) {
+    return function($rootScope, $q ,userPreferenceRepository, orgUnitRepository, $hustle) {
         var saveSessionState = function() {
             var userPreferences = {
                 "username": $rootScope.currentUser.userCredentials.username,

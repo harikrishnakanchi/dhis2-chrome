@@ -1,5 +1,5 @@
 define(["md5", "lodash"], function(md5, _) {
-    return function($rootScope, $scope, $location, db, $q, $hustle, sessionHelper) {
+    return function($rootScope, $scope, $location, db, $q, sessionHelper, $hustle) {
         var getUser = function() {
             var userStore = db.objectStore("users");
             return userStore.find($scope.username.toLowerCase());
@@ -7,30 +7,15 @@ define(["md5", "lodash"], function(md5, _) {
 
         var getUserCredentials = function() {
             var userCredentialsStore = db.objectStore("localUserCredentials");
-            var username = $scope.username.toLowerCase() === "msfadmin" ? "msfadmin" : "project_user";
+
+            var username = $scope.username.toLowerCase();
+            if(username !== "superadmin" && username !== "msfadmin")
+                username = "project_user";
+
             return userCredentialsStore.find(username);
         };
 
-        var downloadDataValues = function() {
-            var downloadDataPromise = $hustle.publish({
-                "type": "downloadData"
-            }, "dataValues");
-
-            var downloadEventDataPromise = $hustle.publish({
-                "type": "downloadEventData"
-            }, "dataValues");
-
-            return $q.all([downloadDataPromise, downloadEventDataPromise]);
-        };
-
-        var selectPreferredProject = function() {
-            if (_.isUndefined($rootScope.currentUser.selectedProject))
-                $location.path("/selectProjectPreference");
-            else
-                $location.path("/projects");
-        };
-
-        var authenticateOrPromptUserForPassword = function(data) {
+        var authenticate = function(data) {
             var user = data[0];
             var userCredentials = data[1];
 
@@ -42,19 +27,29 @@ define(["md5", "lodash"], function(md5, _) {
                 $scope.invalidCredentials = false;
             } else if (user && md5($scope.password) === userCredentials.password) {
                 $scope.invalidCredentials = false;
-                return sessionHelper.login(user)
-                    .then(downloadDataValues)
-                    .then(function() {
-                        if ($rootScope.hasRoles(['Superuser']))
-                            selectPreferredProject();
-                        else
-                            $location.path("/dashboard");
-                    });
+                return sessionHelper.login(user);
             }
         };
 
+        var redirect = function(){
+            if($scope.invalidCredentials || $scope.disabledCredentials)
+                return;
+
+            $hustle.publish({
+                "type": "downloadProjectData",
+                "data": []
+            }, "dataValues");
+
+            if ($rootScope.hasRoles(['Superadmin', 'Superuser']) )
+                $location.path("/orgUnits");
+            else
+                $location.path("/dashboard");
+        };
+
         $scope.login = function() {
-            $q.all([getUser(), getUserCredentials()]).then(authenticateOrPromptUserForPassword);
+            $q.all([getUser(), getUserCredentials()])
+                .then(authenticate)
+                .then(redirect);
         };
     };
 });

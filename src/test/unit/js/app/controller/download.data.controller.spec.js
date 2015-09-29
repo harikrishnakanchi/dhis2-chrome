@@ -37,16 +37,7 @@ define(["downloadDataController", "angularMocks", "utils", "lodash", "chromeUtil
 
                 var syncableTypes = [
                     "downloadMetadata",
-                    "downloadSystemSetting",
-                    "downloadProjectSettings",
-                    "downloadOrgUnit",
-                    "downloadOrgUnitGroups",
-                    "downloadProgram",
-                    "downloadData",
-                    "downloadEventData",
-                    "downloadDatasets",
-                    "downloadCharts",
-                    "downloadPivotTables"
+                    "downloadProjectData"
                 ];
 
                 var expectedHustleArgs = _.map(syncableTypes, function(type) {

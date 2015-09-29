@@ -59,6 +59,23 @@ define([], function() {
         create_store_with_key("localUserCredentials", "username", db);
     };
 
+    var add_super_admin_user_to_local_cred_store = function(db, tx) {
+        var credStore = tx.objectStore("localUserCredentials");
+        credStore.add({
+            "username": "superadmin",
+            "password": "f6b30a5547c4062f915aafd3e4e6453a"
+        });
+        var userStore = tx.objectStore("users");
+        userStore.add({
+            "userCredentials": {
+                "username": "superadmin",
+                "userRoles": [{
+                    "name": "Superadmin"
+                }],
+                "disabled": false
+            }
+        });
+    };
     var add_admin_user_to_local_cred_store = function(db, tx) {
         var credStore = tx.objectStore("localUserCredentials");
         credStore.add({
@@ -70,7 +87,7 @@ define([], function() {
             "userCredentials": {
                 "username": "msfadmin",
                 "userRoles": [{
-                    "name": "Superuser",
+                    "name": "Superuser"
                 }],
                 "disabled": false
             }
@@ -188,6 +205,7 @@ define([], function() {
         add_organisation_unit_index_by_level,
         add_pivot_table_store,
         add_pivot_table_data_store,
-        add_excluded_dataelements_store
+        add_excluded_dataelements_store,
+        add_super_admin_user_to_local_cred_store
     ];
 });

@@ -1,19 +1,46 @@
-define(["lodash"], function(_) {
-    return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
-        createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
-        downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
-        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
-        uploadReferralLocationsConsumer, downloadPivotTableConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer) {
+define(["lodash"], function (_) {
+    return function ($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
+                     createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
+                     downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
+                     downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
+                     uploadReferralLocationsConsumer, downloadPivotTableConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer) {
 
-        this.run = function(message) {
+        this.run = function (message) {
             $log.info("Processing message: " + message.data.type, message.data);
             switch (message.data.type) {
                 case "downloadMetadata":
-                    return downloadMetadataConsumer.run(message);
+                    var downloadMetadataPromise = downloadMetadataConsumer.run(message);
 
-                case "downloadData":
-                    return downloadDataConsumer.run(message)
+                    var downloadSystemSettingPromise = downloadSystemSettingConsumer.run(message);
+
+                    var downloadOrgUnitPromise = downloadOrgUnitConsumer.run(message);
+
+                    var downloadOrgUnitGroupsPromise = downloadOrgUnitGroupConsumer.run(message);
+
+                    var downloadProgramPromise = downloadProgramConsumer.run(message);
+
+                    var downloadDatasetsPromise = downloadDatasetConsumer.run(message);
+
+                    return $q.all([downloadMetadataPromise, downloadSystemSettingPromise, downloadOrgUnitPromise, downloadOrgUnitGroupsPromise, downloadProgramPromise, downloadDatasetsPromise]);
+
+
+                case "downloadProjectData":
+                    var downloadDataPromise = downloadDataConsumer.run(message)
                         .then(_.partial(downloadApprovalConsumer.run, message));
+
+                    var downloadPivotTablesPromise = downloadPivotTableConsumer.run(message);
+
+                    var downloadProjectSettingsPromise = downloadProjectSettingsConsumer.run(message);
+
+                    var downloadChartsPromise = downloadChartConsumer.run(message);
+
+                    var downloadEventDataPromise = downloadEventDataConsumer.run(message);
+
+                    return $q.all([downloadDataPromise, downloadPivotTablesPromise, downloadProjectSettingsPromise, downloadChartsPromise, downloadEventDataPromise]);
+
+
+                case "downloadProjectDataForAdmin":
+                    return downloadProjectSettingsConsumer.run(message);
 
                 case "uploadDataValues":
                     return downloadDataConsumer.run(message)
@@ -36,18 +63,9 @@ define(["lodash"], function(_) {
                     return downloadOrgUnitConsumer.run(message)
                         .then(_.partial(uploadOrgUnitConsumer.run, message));
 
-                case "downloadOrgUnit":
-                    return downloadOrgUnitConsumer.run(message);
-
                 case "upsertOrgUnitGroups":
                     return downloadOrgUnitGroupConsumer.run(message)
                         .then(_.partial(uploadOrgUnitGroupConsumer.run, message));
-
-                case "downloadOrgUnitGroups":
-                    return downloadOrgUnitGroupConsumer.run(message);
-
-                case "downloadDatasets":
-                    return downloadDatasetConsumer.run(message);
 
                 case "associateOrgUnitToDataset":
                     return downloadDatasetConsumer.run()
@@ -59,9 +77,6 @@ define(["lodash"], function(_) {
                 case "updateUser":
                     return updateUserConsumer.run(message);
 
-                case "downloadProgram":
-                    return downloadProgramConsumer.run(message);
-
                 case "uploadProgram":
                     return downloadProgramConsumer.run(message)
                         .then(_.partial(uploadProgramConsumer.run, message));
@@ -70,32 +85,17 @@ define(["lodash"], function(_) {
                     return downloadEventDataConsumer.run(message)
                         .then(_.partial(uploadEventDataConsumer.run, message));
 
-                case "downloadEventData":
-                    return downloadEventDataConsumer.run(message);
-
                 case "deleteEvent":
                     return deleteEventConsumer.run(message);
 
-                case "downloadSystemSetting":
-                    return downloadSystemSettingConsumer.run(message);
-
-                case "downloadProjectSettings":
-                    return downloadProjectSettingsConsumer.run(message);
-
                 case "uploadPatientOriginDetails":
                     return uploadPatientOriginConsumer.run(message);
-
-                case "downloadCharts":
-                    return downloadChartConsumer.run(message);
 
                 case "uploadReferralLocations":
                     return uploadReferralLocationsConsumer.run(message);
 
                 case "uploadExcludedDataElements":
                     return uploadExcludedDataElementsConsumer.run(message);
-
-                case "downloadPivotTables":
-                    return downloadPivotTableConsumer.run(message);
 
                 default:
                     return $q.reject();

@@ -3,6 +3,7 @@
     "dataEntryLabel": "Saisie de Données",
     "approveDataLabel": "Approuver Données",
     "projectsLabel": "Les projets",
+    "countryLabel": "COUNTRY SETUP",
     "downloadDataLabel": "Télécharger toutes les données",
     "totalLabel": "Totale",
     "invalidExpression": "Doit être une expression valide contenant des chiffres et des '+'",

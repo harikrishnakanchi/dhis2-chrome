@@ -176,6 +176,51 @@ define(["moment", "lodashUtils"], function(moment, _) {
             });
         };
 
+        var getOrgUnitAndDescendants = function(maxLevel, orgUnitId){
+
+            var getAllWithinMaxLevel = function(){
+                return getAll().then(function(allOrgUnits) {
+                    return _.filter(allOrgUnits, function(orgUnit){
+                        return orgUnit.level <= maxLevel;
+                    })
+                });
+            };
+
+            var groupByParentId = function(orgUnits){
+                return _.groupBy(orgUnits, "parent.id");
+            };
+
+            var getRootOrgUnit = function(orgUnits, orgUnitsGroupedByParentId){
+                return orgUnitId ? _.find(orgUnits, {'id': orgUnitId}) : _.first(orgUnitsGroupedByParentId[undefined]);
+            };
+
+            var getDescendantOrgUnits = function(orgUnits, orgUnitsGroupedByParentId) {
+                return _.compact(_.flatten(_.map(orgUnits, function (orgUnit) {
+                    return orgUnitsGroupedByParentId[orgUnit.id];
+                })));
+            };
+
+            var getAllOrgUnits = function(allOrgUnits) {
+                var orgUnitAndDescendants = [];
+                var orgUnitsGroupedByParentId = groupByParentId(allOrgUnits);
+
+                var rootOrgUnit = getRootOrgUnit(allOrgUnits, orgUnitsGroupedByParentId);
+                orgUnitAndDescendants = orgUnitAndDescendants.concat(rootOrgUnit);
+
+                var descendantOrgUnits = orgUnitsGroupedByParentId[rootOrgUnit.id];
+
+                while(descendantOrgUnits && descendantOrgUnits.length > 0){
+                    orgUnitAndDescendants = orgUnitAndDescendants.concat(descendantOrgUnits);
+                    descendantOrgUnits = getDescendantOrgUnits(descendantOrgUnits, orgUnitsGroupedByParentId);
+                }
+
+                return orgUnitAndDescendants;
+            };
+
+            return getAllWithinMaxLevel().then(getAllOrgUnits);
+
+        };
+
         var getChildrenOfTypeInOrgUnits = function(orgUnitIds, requestedType) {
             var partitionRequestedOrgUnits = function(orgunits) {
                 return _.partition(orgunits, function(orgUnit) {
@@ -203,7 +248,11 @@ define(["moment", "lodashUtils"], function(moment, _) {
             };
 
             var ids = _.flatten([orgUnitIds]);
-            return findAll(ids).then(partitionAndGetChildOrgUnits);
+            return findAll(ids)
+                .then(partitionAndGetChildOrgUnits)
+                .then(function(data){
+                    return _.uniq(data);
+                });
         };
 
         var getChildOrgUnitNames = function(parentIds) {
@@ -242,7 +291,8 @@ define(["moment", "lodashUtils"], function(moment, _) {
             "getAllOriginsByName": getAllOriginsByName,
             "getAllOperationUnits": getAllOperationUnits,
             "getAllOriginsInOrgUnits": getAllOriginsInOrgUnits,
-            "getAllOrgUnitsUnderProject": getAllOrgUnitsUnderProject
+            "getAllOrgUnitsUnderProject": getAllOrgUnitsUnderProject,
+            "getOrgUnitAndDescendants": getOrgUnitAndDescendants
         };
     };
 });

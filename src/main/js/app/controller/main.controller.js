@@ -100,17 +100,9 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             });
         };
 
-        var loadCharts = function() {
-            return $hustle.publish({
-                "type": "downloadCharts",
-                "data": []
-            }, "dataValues");
-        };
-
         var deregisterUserPreferencesListener = $rootScope.$on('userPreferencesUpdated', function() {
             loadProjects();
             loadUserLineListModules();
-            loadCharts();
         });
 
         $scope.$on('$destroy', function() {

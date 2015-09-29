@@ -1,6 +1,8 @@
 <div>
     <div class="loading" ng-show="loading">
-        <img src="img/ajax-loader.gif" class="spinner" />
+        <img src="img/ajax-loader.gif" class="spinner"/>
     </div>
-    <div class="dataentrypage parent-margin" ng-if="hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver','Observer'])" ng-include="'templates/partials/data-entry-approval-dashboard.html'"></div>
+    <div class="dataentrypage parent-margin"
+         ng-if="hasRoles(['Data entry user', 'Project Level Approver', 'Coordination Level Approver','Observer'])"
+         ng-include="'templates/partials/data-entry-approval-dashboard.html'"></div>
 </div>

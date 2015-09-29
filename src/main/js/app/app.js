@@ -40,7 +40,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         templateUrl: 'templates/login.html',
                         controller: 'loginController'
                     }).
-                    when('/projects', {
+                    when('/orgUnits', {
                         templateUrl: 'templates/orgunits.html',
                         controller: 'orgUnitContoller'
                     }).

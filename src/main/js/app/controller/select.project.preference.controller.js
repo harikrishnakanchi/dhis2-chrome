@@ -8,10 +8,10 @@ define(["lodash"], function(_) {
                 $rootScope.currentUser.selectedProject = $scope.selectedProject.originalObject;
                 return userPreferenceRepository.save(userPreference).then(function(data) {
                     $hustle.publish({
-                        "type": "downloadProjectSettings",
+                        "type": "downloadProjectDataForAdmin",
                         "data": []
                     }, "dataValues");
-                    $location.path("/projects");
+                    $location.path("/orgUnits");
                 });
             });
         };
