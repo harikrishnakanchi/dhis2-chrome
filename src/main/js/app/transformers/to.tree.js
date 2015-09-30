@@ -10,7 +10,7 @@ define(["lodash"], function(_) {
         };
 
         var parent;
-        while (parent = getParent(currentNode)) {
+        while ((parent = getParent(currentNode))) {
             parent.collapsed = false;
             currentNode = parent;
         }

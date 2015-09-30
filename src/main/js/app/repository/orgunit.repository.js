@@ -182,7 +182,7 @@ define(["moment", "lodashUtils"], function(moment, _) {
                 return getAll().then(function(allOrgUnits) {
                     return _.filter(allOrgUnits, function(orgUnit){
                         return orgUnit.level <= maxLevel;
-                    })
+                    });
                 });
             };
 
