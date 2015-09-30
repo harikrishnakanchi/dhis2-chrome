@@ -2,7 +2,7 @@ define(["lodash"], function(_) {
     var expandParents = function(selectedNode, allOrgUnits) {
         var currentNode = selectedNode;
         var getParent = function(currentNode) {
-            if(!currentNode.parent)
+            if (!currentNode.parent)
                 return undefined;
             return _.find(allOrgUnits, {
                 "id": currentNode.parent.id

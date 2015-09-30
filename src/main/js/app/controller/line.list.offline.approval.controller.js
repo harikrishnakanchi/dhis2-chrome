@@ -222,7 +222,7 @@ define(["lodash", "moment"], function(_, moment) {
                     $scope.shouldShowReferrals = false;
 
                 $scope.shouldShowReferrals = true;
-                $scope.referralMap = _.omit(locations, ["id", "clientLastUpdated"]);
+                $scope.referralMap = _.omit(locations, ["orgUnit", "clientLastUpdated"]);
                 $scope.locationNames = _.pluck($scope.referralMap, "name");
             });
         };
