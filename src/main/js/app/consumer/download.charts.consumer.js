@@ -1,12 +1,11 @@
 define(["lodash"], function(_) {
     return function(chartService, chartRepository, userPreferenceRepository, datasetRepository, $q) {
-        var userModuleIds;
+
         this.run = function(message) {
 
             var loadUserModuleIds = function() {
                 return userPreferenceRepository.getUserModules().then(function(modules) {
-                    userModuleIds = _.pluck(modules, "id");
-                    return userModuleIds;
+                    return _.pluck(modules, "id");
                 });
             };
 
@@ -24,7 +23,7 @@ define(["lodash"], function(_) {
                 });
             };
 
-            var saveChartData = function(charts) {
+            var saveChartData = function(userModuleIds, charts) {
                 return _.forEach(userModuleIds, function(userModule) {
                     return _.forEach(charts, function(chart) {
                         return chartService.getChartDataForOrgUnit(chart, userModule).then(function(data) {
@@ -34,7 +33,16 @@ define(["lodash"], function(_) {
                 });
             };
 
-            return loadUserModuleIds().then(loadRelevantDatasets).then(loadChartData).then(saveCharts).then(saveChartData);
+            return loadUserModuleIds().then(function(userModuleIds){
+                if(_.isEmpty(userModuleIds))
+                    return;
+
+                loadRelevantDatasets(userModuleIds)
+                    .then(loadChartData)
+                    .then(saveCharts)
+                    .then(_.partial(saveChartData, userModuleIds, _));
+            });
+
 
         };
     };

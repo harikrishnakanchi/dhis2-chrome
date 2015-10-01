@@ -1,26 +1,31 @@
-define(['downloadChartConsumer', 'angularMocks', 'utils'], function(DownloadChartConsumer, mocks, utils) {
-    describe('Download Charts Consumer', function() {
+define(['downloadChartConsumer', 'angularMocks', 'utils', 'chartService', 'chartRepository', 'userPreferenceRepository', 'datasetRepository'], function (DownloadChartConsumer, mocks, utils, ChartService, ChartRepository, UserPreferenceRepository, DatasetRepository) {
+
+    describe('Download Charts Consumer', function () {
         var downloadChartConsumer, chartService, chartRepository, userPreferenceRepository, datasetRepository, scope, q;
-        beforeEach(mocks.inject(function($q, $rootScope) {
+
+        beforeEach(mocks.inject(function ($q, $rootScope) {
+
             scope = $rootScope;
             q = $q;
-            chartService = jasmine.createSpyObj('chartService', ['getChartDataForOrgUnit', 'getAllFieldAppChartsForDataset', 'getChartDataForOrgUnit']);
-            chartRepository = {
-                'upsertChartData': jasmine.createSpy("upsertChartData").and.returnValue(utils.getPromise(q, {})),
-                'upsert': jasmine.createSpy("upsert").and.returnValue(utils.getPromise(q, {})),
-            };
-            chartService = {
-                'getAllFieldAppChartsForDataset': jasmine.createSpy("upsertChartData").and.returnValue(utils.getPromise(q, {})),
-                'getChartDataForOrgUnit': function() {},
-            };
-            userPreferenceRepository = jasmine.createSpyObj('userPreferenceRepository', ['getUserModules']);
-            datasetRepository = jasmine.createSpyObj('datasetRepository', ['findAllForOrgUnits']);
+
+            datasetRepository = new DatasetRepository();
+            spyOn(datasetRepository , 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, {}));
+
+            userPreferenceRepository = new UserPreferenceRepository();
+            spyOn(userPreferenceRepository, 'getUserModules').and.returnValue(utils.getPromise(q, {}));
+
+            chartService = new ChartService();
+            spyOn(chartService, 'getAllFieldAppChartsForDataset').and.returnValue(utils.getPromise(q, {}));
+            spyOn(chartService, 'getChartDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
+
+            chartRepository = new ChartRepository();
+            spyOn(chartRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
+            spyOn(chartRepository, 'upsertChartData').and.returnValue(utils.getPromise(q, {}));
 
             downloadChartConsumer = new DownloadChartConsumer(chartService, chartRepository, userPreferenceRepository, datasetRepository, $q);
-
         }));
 
-        it('should download all field app charts definitions for relevant datasets', function() {
+        it('should download all field app charts definitions for relevant datasets', function () {
             var datasetsAssociatedWithUserModules = [{
                 "id": "ds1",
                 "name": "Out Patient Department - General",
@@ -38,26 +43,26 @@ define(['downloadChartConsumer', 'angularMocks', 'utils'], function(DownloadChar
                 "name": "[FieldApp - GeneralIPDWard] Admission by Age Group",
                 "relativePeriods": {
                     "last12Months": false,
-                    "last12Weeks": true,
+                    "last12Weeks": true
                 },
                 "indicators": [],
                 "dataElements": [{
                     "id": "de1",
                     "name": "New Admission - Emergency Department - Admission - General IPD Ward",
-                    "code": "de1",
+                    "code": "de1"
                 }]
             }, {
                 "id": "chart2",
                 "name": "[FieldApp - OutPatientDepartmentGeneral] Total Consultations",
                 "relativePeriods": {
                     "last12Months": true,
-                    "last12Weeks": false,
+                    "last12Weeks": false
                 },
                 "indicators": [],
                 "dataElements": [{
                     "id": "de2",
                     "name": "New Consultations - Consultations - Out Patient Department - General",
-                    "code": "de2",
+                    "code": "de2"
                 }]
             }];
 
@@ -72,7 +77,7 @@ define(['downloadChartConsumer', 'angularMocks', 'utils'], function(DownloadChar
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
             chartService.getAllFieldAppChartsForDataset.and.returnValue(utils.getPromise(q, fieldAppCharts));
             chartRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppCharts));
-            spyOn(chartService, 'getChartDataForOrgUnit').and.callFake(function(chart, modId) {
+            chartService.getChartDataForOrgUnit.and.callFake(function (chart, modId) {
                 if (chart === fieldAppCharts[0] && modId === "Mod1")
                     return utils.getPromise(q, "data1");
                 if (chart === fieldAppCharts[0] && modId === "Mod2")
@@ -100,6 +105,18 @@ define(['downloadChartConsumer', 'angularMocks', 'utils'], function(DownloadChar
             expect(chartRepository.upsertChartData).toHaveBeenCalledWith("[FieldApp - GeneralIPDWard] Admission by Age Group", "Mod2", "data2");
             expect(chartRepository.upsertChartData).toHaveBeenCalledWith("[FieldApp - OutPatientDepartmentGeneral] Total Consultations", "Mod2", "data4");
 
+        });
+
+        it('should exit if user module is empty', function () {
+            downloadChartConsumer.run();
+            scope.$apply();
+
+            expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
+            expect(datasetRepository.findAllForOrgUnits).not.toHaveBeenCalled();
+            expect(chartService.getAllFieldAppChartsForDataset).not.toHaveBeenCalled();
+            expect(chartRepository.upsert).not.toHaveBeenCalled();
+            expect(chartService.getChartDataForOrgUnit).not.toHaveBeenCalled();
+            expect(chartRepository.upsertChartData).not.toHaveBeenCalled();
         });
 
     });

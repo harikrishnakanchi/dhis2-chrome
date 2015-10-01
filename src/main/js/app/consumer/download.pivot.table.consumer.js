@@ -1,6 +1,5 @@
 define(["lodash"], function(_) {
     return function(pivotTableService, pivotTableRepository, userPreferenceRepository, $q, datasetRepository) {
-        var userModuleIds;
         this.run = function(message) {
 
             var saveTables = function(tables) {
@@ -11,8 +10,7 @@ define(["lodash"], function(_) {
 
             var loadUserModuleIds = function() {
                 return userPreferenceRepository.getUserModules().then(function(modules) {
-                    userModuleIds = _.pluck(modules, "id");
-                    return userModuleIds;
+                    return _.pluck(modules, "id");
                 });
             };
 
@@ -24,7 +22,7 @@ define(["lodash"], function(_) {
                 return pivotTableService.getAllTablesForDataset(datasets);
             };
 
-            var saveTableData = function(tables) {
+            var saveTableData = function(userModuleIds, tables) {
                 return _.forEach(userModuleIds, function(userModule) {
                     return _.forEach(tables, function(table) {
                         return pivotTableService.getPivotTableDataForOrgUnit(table, userModule).then(function(data) {
@@ -34,7 +32,15 @@ define(["lodash"], function(_) {
                 });
             };
 
-            return loadUserModuleIds().then(loadRelevantDatasets).then(getTables).then(saveTables).then(saveTableData);
+            loadUserModuleIds().then(function(userModuleIds){
+                if(_.isEmpty(userModuleIds))
+                    return;
+
+                loadRelevantDatasets(userModuleIds)
+                    .then(getTables)
+                    .then(saveTables)
+                    .then(_.partial(saveTableData, userModuleIds, _));
+            });
         };
     };
 });

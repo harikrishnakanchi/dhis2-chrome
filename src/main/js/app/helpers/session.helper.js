@@ -61,7 +61,7 @@ define(["moment"], function(moment) {
             };
 
             var broadcast = function() {
-                $rootScope.$broadcast('userPreferencesUpdated');
+                return $rootScope.$broadcast('userPreferencesUpdated');
             };
 
             return setUserOrgUnits().then(loadUserPreferences).then(loadSession).then(broadcast);

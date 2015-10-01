@@ -25,7 +25,7 @@ define(['dashboardController', 'reportsController', 'dataEntryController', 'main
             app.controller('lineListModuleController', ['$scope', '$hustle', 'orgUnitRepository', 'excludedDataElementsRepository', '$q', '$modal', 'programRepository', 'orgUnitGroupHelper', 'datasetRepository', 'originOrgunitCreator', lineListModuleController]);
             app.controller('projectController', ['$scope', '$rootScope', '$hustle', 'orgUnitRepository', '$q', 'orgUnitGroupHelper', 'approvalDataRepository', 'orgUnitGroupSetRepository', projectController]);
             app.controller('mainController', ['$q', '$scope', '$location', '$rootScope', '$hustle', 'ngI18nResourceBundle', '$indexedDB', 'packagedDataImporter', 'sessionHelper', 'orgUnitRepository', mainController]);
-            app.controller('loginController', ['$rootScope', '$scope', '$location', '$indexedDB', '$q', 'sessionHelper', '$hustle', loginController]);
+            app.controller('loginController', ['$rootScope', '$scope', '$location', '$indexedDB', '$q', 'sessionHelper', '$hustle', 'userPreferenceRepository', loginController]);
             app.controller('countryController', ['$scope', '$hustle', 'orgUnitRepository', '$q', '$location', '$timeout', '$anchorScroll', countryController]);
             app.controller('confirmDialogController', ['$scope', '$modalInstance', confirmDialogController]);
             app.controller('notificationDialogController', ['$scope', '$modalInstance', notificationDialogController]);

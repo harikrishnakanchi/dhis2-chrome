@@ -1,54 +1,87 @@
-define(["md5", "lodash"], function(md5, _) {
-    return function($rootScope, $scope, $location, db, $q, sessionHelper, $hustle) {
-        var getUser = function() {
-            var userStore = db.objectStore("users");
-            return userStore.find($scope.username.toLowerCase());
+define(["md5", "lodash"], function (md5, _) {
+    return function ($rootScope, $scope, $location, db, $q, sessionHelper, $hustle, userPreferenceRepository) {
+        var loadUserData = function (loginUsername) {
+            var getUser = function (username) {
+                var userStore = db.objectStore("users");
+                return userStore.find(username);
+            };
+
+            var getUserCredentials = function (username) {
+                var userCredentialsStore = db.objectStore("localUserCredentials");
+
+                if (username === "superadmin" || username === "msfadmin")
+                    return userCredentialsStore.find(username);
+                else
+                    return userCredentialsStore.find("project_user");
+            };
+
+            var getExistingUserProjects = function () {
+                return userPreferenceRepository.getCurrentProjects();
+            };
+
+            return $q.all([getUser(loginUsername), getUserCredentials(loginUsername), getExistingUserProjects()]);
         };
 
-        var getUserCredentials = function() {
-            var userCredentialsStore = db.objectStore("localUserCredentials");
-
-            var username = $scope.username.toLowerCase();
-            if(username !== "superadmin" && username !== "msfadmin")
-                username = "project_user";
-
-            return userCredentialsStore.find(username);
-        };
-
-        var authenticate = function(data) {
+        var authenticate = function (data) {
             var user = data[0];
             var userCredentials = data[1];
 
-            $scope.invalidCredentials = true;
+            $scope.invalidCredentials = false;
             $scope.disabledCredentials = false;
 
-            if (user && user.userCredentials.disabled) {
-                $scope.disabledCredentials = true;
-                $scope.invalidCredentials = false;
-            } else if (user && md5($scope.password) === userCredentials.password) {
-                $scope.invalidCredentials = false;
-                return sessionHelper.login(user);
+            if (user === undefined) {
+                $scope.invalidCredentials = true;
+                return $q.reject("Invalid user");
             }
+
+            if (user.userCredentials.disabled) {
+                $scope.disabledCredentials = true;
+                return $q.reject("Disabled user");
+            }
+
+            if (md5($scope.password) !== userCredentials.password) {
+                $scope.invalidCredentials = true;
+                return $q.reject("Invalid credentials");
+            }
+
+            return data;
         };
 
-        var redirect = function(){
-            if($scope.invalidCredentials || $scope.disabledCredentials)
-                return;
+        var login = function (data) {
+            var user = data[0];
+            return sessionHelper.login(user).then(function () {
+                return data;
+            });
+        };
 
-            $hustle.publish({
-                "type": "downloadProjectData",
-                "data": []
-            }, "dataValues");
+        var startProjectDataSync = function (data) {
+            var previousUserProjects = data[2];
 
-            if ($rootScope.hasRoles(['Superadmin', 'Superuser']) )
+            userPreferenceRepository.getCurrentProjects().then(function(currentUserProjects) {
+                if (previousUserProjects !== currentUserProjects) {
+                    $hustle.publish({
+                        "type": "downloadProjectData",
+                        "data": []
+                    }, "dataValues");
+                }
+            });
+
+            return data;
+        };
+
+        var redirect = function () {
+            if ($rootScope.hasRoles(['Superadmin', 'Superuser']))
                 $location.path("/orgUnits");
             else
                 $location.path("/dashboard");
         };
 
-        $scope.login = function() {
-            $q.all([getUser(), getUserCredentials()])
+        $scope.login = function () {
+            var loginUsername = $scope.username.toLowerCase();
+            loadUserData(loginUsername)
                 .then(authenticate)
+                .then(login)
+                .then(startProjectDataSync)
                 .then(redirect);
         };
     };
