@@ -18,6 +18,11 @@ define(["lodash"], function(_) {
             return value;
         };
 
+        var getSortOrder = function(dataElement) {
+            var elementsToSort = $scope.definition.dataElements.length === 0 ? $scope.definition.indicators : $scope.definition.dataElements;
+            return _.indexOf(_.pluck(elementsToSort, "id"), dataElement) + 1;
+        };
+
         if ($scope.definition && $scope.data) {
 
             $scope.viewMap = [];
@@ -55,7 +60,7 @@ define(["lodash"], function(_) {
                             "category": category,
                             "dataElement": dataElement,
                             "dataElementName": $scope.data.metaData.names[dataElement],
-                            "sortOrder": _.indexOf(_.pluck($scope.definition.dataElements, "id"), dataElement) + 1,
+                            "sortOrder": getSortOrder(dataElement),
                         });
                     });
                 });
@@ -66,7 +71,7 @@ define(["lodash"], function(_) {
                     $scope.viewMap.push({
                         "dataElement": dataElement,
                         "dataElementName": $scope.data.metaData.names[dataElement],
-                        "sortOrder": _.indexOf(_.pluck($scope.definition.dataElements, "id"), dataElement) + 1,
+                        "sortOrder": getSortOrder(dataElement),
                     });
                 });
             }

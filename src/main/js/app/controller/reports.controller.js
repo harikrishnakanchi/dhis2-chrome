@@ -122,6 +122,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
         };
 
         $scope.showTable = function(data) {
+            if (_.isUndefined(data))
+                return false;
             var showTable = data.rows.length === 0 ? false : true;
             return showTable;
         };
