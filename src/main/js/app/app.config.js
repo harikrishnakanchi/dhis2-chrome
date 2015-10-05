@@ -21,6 +21,8 @@ require.config({
         "JSZip": "lib/jszip/dist/jszip",
         "sjcl": "lib/sjcl/sjcl",
         "saveSvgAsPng": "lib/save-svg-as-png/saveSvgAsPng",
+        "ng-csv": "lib/ng-csv/build/ng-csv",
+        "angular-sanitize": "lib/angular-sanitize/angular-sanitize",
 
         //3rd party angular modules
         "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
@@ -229,6 +231,12 @@ require.config({
         },
         'angular-nvd3': {
             deps: ["nvd3", "angular"]
+        },
+        'angular-sanitize': {
+            deps: ["angular"]
+        },
+        'ng-csv': {
+            deps: ["angular", "angular-sanitize"]
         }
     }
 });

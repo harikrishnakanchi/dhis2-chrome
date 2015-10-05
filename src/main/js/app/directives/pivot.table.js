@@ -3,7 +3,8 @@ define(["lodash"], function(_) {
         return {
             scope: {
                 data: "=",
-                definition: "="
+                definition: "=",
+                exportButtonName: "="
             },
             controller: 'pivotTableController',
             templateUrl: "templates/pivot.table.html"

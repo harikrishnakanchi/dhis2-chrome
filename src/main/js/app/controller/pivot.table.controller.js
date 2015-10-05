@@ -5,6 +5,34 @@ define(["lodash"], function(_) {
             return dataElementName.split(" - ")[0];
         };
 
+        $scope.getData = function() {
+            var sortedViewMap = _.sortBy($scope.viewMap, "sortOrder");
+            var dataValues = [];
+            _.each(sortedViewMap, function(datum) {
+                var value = {};
+                value["Data Element"] = $scope.getDataElementName($scope.data.metaData.names[datum.dataElement]);
+                if ($scope.isCategoryPresent) {
+                    value["Category"] = $scope.data.metaData.names[datum.category];
+                }
+                _.each($scope.periods, function(period) {
+                    value[$scope.data.metaData.names[period]] = $scope.getValue(datum.category, datum.dataElement, period);
+                });
+                dataValues.push(value);
+            });
+            return dataValues;
+
+        };
+
+        $scope.getHeaders = function() {
+            var headers = ["Data Element"];
+            if ($scope.isCategoryPresent)
+                headers.push("Category");
+            _.each($scope.periods, function(period) {
+                return headers.push($scope.data.metaData.names[period]);
+            });
+            return headers;
+        };
+
         $scope.getValue = function(category, dataElement, period) {
             var allValues = _.find($scope.dataMap, function(data) {
                 if (data.category === category && data.dataElement === dataElement && data.period === period)
@@ -23,41 +51,55 @@ define(["lodash"], function(_) {
             return _.indexOf(_.pluck(elementsToSort, "id"), dataElement) + 1;
         };
 
+        var getDataMap = function(categoryIds) {
+            return _.map($scope.data.rows, function(row) {
+                if (_.isUndefined(categoryIds)) {
+                    return {
+                        "dataElement": row[0],
+                        "period": row[1],
+                        "value": parseInt(row[2])
+                    };
+                } else {
+                    var category, dataElement;
+                    category = _.contains(categoryIds, row[0]) ? row[0] : row[1];
+                    dataElement = _.contains(categoryIds, row[0]) ? row[1] : row[0];
+
+                    return {
+                        "category": category,
+                        "dataElement": dataElement,
+                        "period": row[2],
+                        "value": parseInt(row[3])
+                    };
+                }
+            });
+        };
+
+
         if ($scope.definition && $scope.data) {
 
             $scope.viewMap = [];
             $scope.periods = $scope.data.metaData.pe;
             $scope.isCategoryPresent = $scope.data.width === 4 ? true : false;
+            var dataElements;
 
-            $scope.dataMap = _.map($scope.data.rows, function(row) {
-                return {
-                    "category": $scope.isCategoryPresent ? row[0] : undefined,
-                    "dataElement": $scope.isCategoryPresent ? row[1] : row[0],
-                    "period": $scope.isCategoryPresent ? row[2] : row[1],
-                    "value": $scope.isCategoryPresent ? parseInt(row[3]) : parseInt(row[2])
-                };
-            });
-            var dataElements = [];
-            var sortedCategories = [];
             if ($scope.isCategoryPresent) {
-                var sortCategories = function(categories) {
-                    categoriesWithSortOrder = _.map(categories, function(category) {
-                        return {
-                            "sortOrder": _.indexOf(_.pluck($scope.definition.categoryDimensions[0].categoryOptions, "id"), category) + 1,
-                            "id": category
-                        };
-                    });
-                    return _.pluck(_.sortBy(categoriesWithSortOrder, "sortOrder"), "id");
-                };
+                var sortedCategories = _.map($scope.definition.categoryDimensions[0].categoryOptions, function(categoryOption, index) {
+                    return {
+                        "sortOrder": index + 1,
+                        "id": categoryOption.id
+                    };
+                });
 
-                sortedCategories = sortCategories(_.uniq(_.pluck($scope.dataMap, "category")));
+                var sortedCategoriesIds = _.pluck(sortedCategories, "id");
+
+                $scope.dataMap = getDataMap(sortedCategoriesIds);
 
                 dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
 
-                _.each(sortedCategories, function(category) {
+                _.each(sortedCategoriesIds, function(categoryId) {
                     _.each(dataElements, function(dataElement) {
                         $scope.viewMap.push({
-                            "category": category,
+                            "category": categoryId,
                             "dataElement": dataElement,
                             "dataElementName": $scope.data.metaData.names[dataElement],
                             "sortOrder": getSortOrder(dataElement),
@@ -65,6 +107,8 @@ define(["lodash"], function(_) {
                     });
                 });
             } else {
+                $scope.dataMap = getDataMap();
+
                 dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
 
                 _.each(dataElements, function(dataElement) {

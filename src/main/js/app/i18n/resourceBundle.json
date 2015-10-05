@@ -307,5 +307,6 @@
     "noNotificationsForAnyModule": "No Notifications to display",
     "selectProjectLabel": "Select Project",
     "changeProject": "Change project",
-    "tabularReports": "Tabular Reports"
+    "tabularReports": "Tabular Reports",
+    "exportAsCsv": "Export as CSV"
 }
