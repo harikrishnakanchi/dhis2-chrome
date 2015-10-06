@@ -40,6 +40,7 @@
                         <accordion-group>
                             <accordion-heading>
                                 <span>{{resourceBundle.tabularReports}}</span>
+                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                             </accordion-heading>
                             <div class="exp-coll-group">
                                 <div ng-if="!isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
@@ -47,6 +48,7 @@
                                         <accordion-group>
                                             <accordion-heading>
                                                 <span>{{getTableName(table.table.name)}}</span>
+                                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                             </accordion-heading>
                                             <div>
                                                 <pivot-table definition="table.table" data="table.data"></pivot-table>
@@ -68,6 +70,7 @@
                         <accordion-group>
                             <accordion-heading>
                                 <span>{{resourceBundle.tabularReports}}</span>
+                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                             </accordion-heading>
                             <div class="exp-coll-group">
                                 <div ng-if="isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
@@ -75,6 +78,7 @@
                                         <accordion-group>
                                             <accordion-heading>
                                                 <span>{{getTableName(table.table.name)}}</span>
+                                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                             </accordion-heading>
                                             <div>
                                                 <pivot-table definition="table.table" data="table.data"></pivot-table>
