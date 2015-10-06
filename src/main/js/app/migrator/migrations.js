@@ -63,7 +63,7 @@ define([], function() {
         var credStore = tx.objectStore("localUserCredentials");
         credStore.add({
             "username": "superadmin",
-            "password": "f6b30a5547c4062f915aafd3e4e6453a"
+            "password": "ab68c10cba3dc84c263912bf350d4cb4"
         });
         var userStore = tx.objectStore("users");
         userStore.add({
