@@ -63,8 +63,7 @@
             </tbody>
         </table>
         <table class="table table-bordered msf-table" ng-if="itemsAwaitingApprovalAtOtherLevels.length > 0">
-            <caption class="msf-table-caption" ng-if="!
-            (['Data entry user'])">{{resourceBundle.itemsAwaitingApprovalAtOtherLevelLabel}}</caption>
+            <caption class="msf-table-caption" ng-if="!hasRoles(['Data entry user'])">{{resourceBundle.itemsAwaitingApprovalAtOtherLevelLabel}}</caption>
             <caption class="msf-table-caption" ng-if="hasRoles(['Data entry user'])">{{resourceBundle.itemsAwaitingApproval}}</caption>
             <thead>
                 <tr>
