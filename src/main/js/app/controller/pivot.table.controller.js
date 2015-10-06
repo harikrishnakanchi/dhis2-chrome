@@ -12,7 +12,7 @@ define(["lodash"], function(_) {
                 var value = {};
                 value["Data Element"] = $scope.getDataElementName($scope.data.metaData.names[datum.dataElement]);
                 if ($scope.isCategoryPresent) {
-                    value["Category"] = $scope.data.metaData.names[datum.category];
+                    value.Category = $scope.data.metaData.names[datum.category];
                 }
                 _.each($scope.periods, function(period) {
                     value[$scope.data.metaData.names[period]] = $scope.getValue(datum.category, datum.dataElement, period);
