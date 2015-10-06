@@ -43,7 +43,7 @@
                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                             </accordion-heading>
                             <div class="exp-coll-group">
-                                <div ng-if="!isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
+                                <div ng-if="!isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}" class="exportCSV-container">
                                     <accordion close-others="false">
                                         <accordion-group>
                                             <accordion-heading>
@@ -73,7 +73,7 @@
                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                             </accordion-heading>
                             <div class="exp-coll-group">
-                                <div ng-if="isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}">
+                                <div ng-if="isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId}" class="exportCSV-container">
                                     <accordion close-others="false">
                                         <accordion-group>
                                             <accordion-heading>

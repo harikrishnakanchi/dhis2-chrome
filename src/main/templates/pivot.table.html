@@ -1,9 +1,9 @@
 <div>
-    <h3 class="text-center">{{getTableName(definition.name)}}</h3>
-    <div class="scroll-horizontal">
-        <button class="col-md-2 col-md-offset-10" href="" ng-csv="getData()" csv-header="getHeaders()" filename="report.csv">
-            {{exportButtonName}}
-        </button>
+    <h3 class="text-center" ng-if="getTableName(definition.name)">{{getTableName(definition.name)}}</h3>
+    <button class="col-md-2 exportCSV-btn" href="" ng-csv="getData()" csv-header="getHeaders()" filename="report.csv">
+        {{exportButtonName}}
+    </button>
+    <div class="scroll-horizontal m-top-30">
         <table class='table table-bordered'>
             <thead>
                 <tr>
