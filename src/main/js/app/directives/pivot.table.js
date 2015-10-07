@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define(["lodash", "moment"], function(_, moment) {
     return function() {
         return {
             scope: {

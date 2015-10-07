@@ -1,6 +1,5 @@
 <div>
-    <h3 class="text-center" ng-if="getTableName(definition.name)">{{getTableName(definition.name)}}</h3>
-    <button class="col-md-2 exportCSV-btn" href="" ng-csv="getData()" csv-header="getHeaders()" filename="report.csv">
+    <button class="col-md-2 exportCSV-btn" href="" ng-csv="getData()" csv-header="getHeaders()" filename="{{getCsvFileName()}}">
         {{exportButtonName}}
     </button>
     <div class="scroll-horizontal m-top-30">

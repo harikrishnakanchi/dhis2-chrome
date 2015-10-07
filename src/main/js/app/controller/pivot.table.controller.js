@@ -1,5 +1,17 @@
-define(["lodash"], function(_) {
+define(["lodash", "moment"], function(_, moment) {
     return function($scope) {
+
+        $scope.getCsvFileName = function() {
+            var regex = /^\[FieldApp - ([a-zA-Z0-9><]+)\]\s([a-zA-Z0-9\s]+)/;
+            var match = regex.exec($scope.definition.name);
+            if (match) {
+                var serviceName = match[1];
+                var tableName = match[2];
+                return serviceName + "_" + tableName + "_" + moment().format("DD-MMM-YYYY") + ".csv";
+            } else {
+                return "";
+            }
+        };
 
         $scope.getDataElementName = function(dataElementName) {
             return dataElementName.split(" - ")[0];
