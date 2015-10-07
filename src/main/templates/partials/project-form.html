@@ -163,5 +163,5 @@
             </div>
         </div>
     </form>
-    <div ng-include="'templates/partials/project-user-form.html'" ng-if="!isNewMode"></div>
+    <div ng-include="'templates/partials/project-user-form.html'" ng-if="!isNewMode &amp;&amp; !hasRoles(['Superadmin'])"></div>
 </div>
