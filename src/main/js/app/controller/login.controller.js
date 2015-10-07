@@ -1,28 +1,28 @@
-define(["md5", "lodash"], function (md5, _) {
-    return function ($rootScope, $scope, $location, db, $q, sessionHelper, $hustle, userPreferenceRepository) {
-        var loadUserData = function (loginUsername) {
-            var getUser = function (username) {
+define(["md5", "lodash"], function(md5, _) {
+    return function($rootScope, $scope, $location, db, $q, sessionHelper, $hustle, userPreferenceRepository) {
+        var loadUserData = function(loginUsername) {
+            var getUser = function(username) {
                 var userStore = db.objectStore("users");
                 return userStore.find(username);
             };
 
-            var getUserCredentials = function (username) {
+            var getUserCredentials = function(username) {
                 var userCredentialsStore = db.objectStore("localUserCredentials");
 
-                if (username === "superadmin" || username === "msfadmin")
+                if (username === "superadmin" || username === "projectadmin")
                     return userCredentialsStore.find(username);
                 else
                     return userCredentialsStore.find("project_user");
             };
 
-            var getExistingUserProjects = function () {
+            var getExistingUserProjects = function() {
                 return userPreferenceRepository.getCurrentProjects();
             };
 
             return $q.all([getUser(loginUsername), getUserCredentials(loginUsername), getExistingUserProjects()]);
         };
 
-        var authenticate = function (data) {
+        var authenticate = function(data) {
             var user = data[0];
             var userCredentials = data[1];
 
@@ -47,14 +47,14 @@ define(["md5", "lodash"], function (md5, _) {
             return data;
         };
 
-        var login = function (data) {
+        var login = function(data) {
             var user = data[0];
-            return sessionHelper.login(user).then(function () {
+            return sessionHelper.login(user).then(function() {
                 return data;
             });
         };
 
-        var startProjectDataSync = function (data) {
+        var startProjectDataSync = function(data) {
             var previousUserProjects = data[2];
 
             userPreferenceRepository.getCurrentProjects().then(function(currentUserProjects) {
@@ -69,14 +69,14 @@ define(["md5", "lodash"], function (md5, _) {
             return data;
         };
 
-        var redirect = function () {
+        var redirect = function() {
             if ($rootScope.hasRoles(['Superadmin', 'Superuser']))
                 $location.path("/orgUnits");
             else
                 $location.path("/dashboard");
         };
 
-        $scope.login = function () {
+        $scope.login = function() {
             var loginUsername = $scope.username.toLowerCase();
             loadUserData(loginUsername)
                 .then(authenticate)

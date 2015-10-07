@@ -1,9 +1,9 @@
-define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository"], function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository) {
-    describe("login controller", function () {
+define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository"], function(LoginController, mocks, utils, SessionHelper, UserPreferenceRepository) {
+    describe("login controller", function() {
         var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository;
 
         beforeEach(module('hustle'));
-        beforeEach(mocks.inject(function ($rootScope, $location, $q, $hustle) {
+        beforeEach(mocks.inject(function($rootScope, $location, $q, $hustle) {
             scope = $rootScope.$new();
             rootScope = $rootScope;
             location = $location;
@@ -11,18 +11,15 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             q = $q;
 
             db = {
-                objectStore: function () {
-                }
+                objectStore: function() {}
             };
 
             fakeUserStore = {
-                "find": function () {
-                }
+                "find": function() {}
             };
 
             fakeUserCredentialsStore = {
-                "find": function () {
-                }
+                "find": function() {}
             };
 
             rootScope = {
@@ -30,7 +27,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             };
             spyOn(location, 'path');
 
-            spyOn(db, 'objectStore').and.callFake(function (storeName) {
+            spyOn(db, 'objectStore').and.callFake(function(storeName) {
                 if (storeName === "users")
                     return fakeUserStore;
                 if (storeName === "localUserCredentials")
@@ -38,7 +35,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             });
 
             fakeUserStoreSpy = spyOn(fakeUserStore, 'find');
-            fakeUserStoreSpy.and.callFake(function (username) {
+            fakeUserStoreSpy.and.callFake(function(username) {
                 return utils.getPromise(q, {
                     "id": "xYRvx4y7Gm9",
                     "userCredentials": {
@@ -50,10 +47,10 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 });
             });
 
-            spyOn(fakeUserCredentialsStore, 'find').and.callFake(function (username) {
-                if (username === "msfadmin")
+            spyOn(fakeUserCredentialsStore, 'find').and.callFake(function(username) {
+                if (username === "projectadmin")
                     return utils.getPromise(q, {
-                        "username": "msfadmin",
+                        "username": "projectadmin",
                         "password": "5f4dcc3b5aa765d61d8327deb882cf99"
                     });
                 if (username === "superadmin")
@@ -78,7 +75,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             loginController = new LoginController(rootScope, scope, location, db, q, sessionHelper, hustle, userPreferenceRepository);
         }));
 
-        it("should login super admin user with valid credentials and redirect to orgUnits", function () {
+        it("should login super admin user with valid credentials and redirect to orgUnits", function() {
             scope.username = "superadmin";
             scope.password = "msfsuperadmin";
 
@@ -93,7 +90,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             expect(scope.invalidCredentials).toEqual(false);
         });
 
-        it("should not login super admin user with invalid password", function () {
+        it("should not login super admin user with invalid password", function() {
             scope.username = "superadmin";
             scope.password = "password1234";
 
@@ -105,8 +102,8 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             expect(scope.invalidCredentials).toEqual(true);
         });
 
-        it("should login admin user with valid credentials and redirect to orgunits", function () {
-            scope.username = "MSFAdmin";
+        it("should login admin user with valid credentials and redirect to orgunits", function() {
+            scope.username = "projectadmin";
             scope.password = "password";
 
             rootScope.hasRoles.and.returnValue(true);
@@ -114,14 +111,14 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             scope.login();
             scope.$apply();
 
-            expect(fakeUserStore.find).toHaveBeenCalledWith("msfadmin");
-            expect(fakeUserCredentialsStore.find).toHaveBeenCalledWith("msfadmin");
+            expect(fakeUserStore.find).toHaveBeenCalledWith("projectadmin");
+            expect(fakeUserCredentialsStore.find).toHaveBeenCalledWith("projectadmin");
             expect(location.path).toHaveBeenCalledWith("/orgUnits");
             expect(scope.invalidCredentials).toEqual(false);
         });
 
-        it("should not login msfadmin user with invalid password", function () {
-            scope.username = "msfadmin";
+        it("should not login msfadmin user with invalid password", function() {
+            scope.username = "projectadmin";
             scope.password = "password1234";
 
             scope.login();
@@ -132,7 +129,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             expect(scope.invalidCredentials).toEqual(true);
         });
 
-        it("should login project user with valid credentials and redirect to dashboard", function () {
+        it("should login project user with valid credentials and redirect to dashboard", function() {
             scope.username = "someProjectUser";
             scope.password = "msfuser";
 
@@ -143,7 +140,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             expect(scope.invalidCredentials).toEqual(false);
         });
 
-        it("should not login project user with invalid password", function () {
+        it("should not login project user with invalid password", function() {
             scope.username = "someProjectUser";
             scope.password = "msfuser1234";
 
@@ -155,9 +152,9 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             expect(scope.invalidCredentials).toEqual(true);
         });
 
-        it("should not login user with invalid username", function () {
+        it("should not login user with invalid username", function() {
             fakeUserStore = {
-                "find": function () {
+                "find": function() {
                     return utils.getPromise(q, undefined);
                 }
             };
@@ -173,12 +170,12 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             expect(scope.invalidCredentials).toEqual(true);
         });
 
-        it("should start sync project data if the current user's projects are different from previous user's projects", function () {
+        it("should start sync project data if the current user's projects are different from previous user's projects", function() {
             var previousOrgUnits = ['id1', 'id2', 'id3', 'id4'];
             var currentOrgUnits = ['id5'];
 
             var callIndex = 0;
-            userPreferenceRepository.getCurrentProjects.and.callFake(function () {
+            userPreferenceRepository.getCurrentProjects.and.callFake(function() {
                 callIndex++;
                 if (callIndex == 1)
                     return utils.getPromise(q, previousOrgUnits);
@@ -189,7 +186,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 return utils.getPromise(q, []);
             });
 
-            scope.username = "MSFAdmin";
+            scope.username = "projectadmin";
             scope.password = "password";
 
             scope.login();

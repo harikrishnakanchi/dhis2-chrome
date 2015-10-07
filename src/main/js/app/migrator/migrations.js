@@ -94,6 +94,26 @@ define([], function() {
         });
     };
 
+    var change_msfadmin_to_projectadmin = function(db, tx) {
+        var credStore = tx.objectStore("localUserCredentials");
+        credStore.delete("msfadmin");
+        credStore.add({
+            "username": "projectadmin",
+            "password": "f6b30a5547c4062f915aafd3e4e6453a"
+        });
+        var userStore = tx.objectStore("users");
+        userStore.delete("projectadmin");
+        userStore.add({
+            "userCredentials": {
+                "username": "projectadmin",
+                "userRoles": [{
+                    "name": "Superuser"
+                }],
+                "disabled": false
+            }
+        });
+    };
+
     var add_project_user_to_local_cred_store = function(db, tx) {
         var userStore = tx.objectStore("localUserCredentials");
         userStore.add({
@@ -206,6 +226,7 @@ define([], function() {
         add_pivot_table_store,
         add_pivot_table_data_store,
         add_excluded_dataelements_store,
-        add_super_admin_user_to_local_cred_store
+        add_super_admin_user_to_local_cred_store,
+        change_msfadmin_to_projectadmin
     ];
 });

@@ -1,5 +1,5 @@
-define(["toTree", "lodash", "moment", "properties"], function (toTree, _, moment, properties) {
-    return function ($scope, $q, $location, $timeout, $anchorScroll, $rootScope, orgUnitRepository) {
+define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment, properties) {
+    return function($scope, $q, $location, $timeout, $anchorScroll, $rootScope, orgUnitRepository) {
 
         var templateUrlMap = {
             'Company': 'templates/partials/company-form.html',
@@ -17,15 +17,15 @@ define(["toTree", "lodash", "moment", "properties"], function (toTree, _, moment
         $scope.organisationUnits = [];
 
 
-        var isSuperAdmin = function(){
+        var isSuperAdmin = function() {
             return $rootScope.currentUser.userCredentials.username === "superadmin";
         };
 
-        var isMsfAdmin = function(){
-            return $rootScope.currentUser.userCredentials.username === "msfadmin";
+        var isProjectAdmin = function() {
+            return $rootScope.currentUser.userCredentials.username === "projectadmin";
         };
 
-        var selectCurrentNode = function (transformedOrgUnits) {
+        var selectCurrentNode = function(transformedOrgUnits) {
             if (!transformedOrgUnits.selectedNode) return;
 
             $scope.state = {
@@ -33,24 +33,24 @@ define(["toTree", "lodash", "moment", "properties"], function (toTree, _, moment
             };
             $scope.saveSuccess = true;
             $scope.onOrgUnitSelect(transformedOrgUnits.selectedNode);
-            $timeout(function () {
+            $timeout(function() {
                 $scope.saveSuccess = false;
             }, properties.messageTimeout);
         };
 
-        var reloadTree = function (selectedNodeId) {
+        var reloadTree = function(selectedNodeId) {
 
-            var transformToTree = function (orgUnits) {
+            var transformToTree = function(orgUnits) {
                 var transformedOrgUnits = toTree(orgUnits, selectedNodeId);
                 $scope.organisationUnits = transformedOrgUnits.rootNodes;
                 selectCurrentNode(transformedOrgUnits);
             };
 
-            var getOrgUnits = function () {
+            var getOrgUnits = function() {
                 if (isSuperAdmin())
                     return orgUnitRepository.getOrgUnitAndDescendants(4);
 
-                if (isMsfAdmin()) {
+                if (isProjectAdmin()) {
                     var orgUnitId = $rootScope.currentUser.selectedProject.id;
                     return orgUnitRepository.getOrgUnitAndDescendants(6, orgUnitId);
                 }
@@ -60,8 +60,8 @@ define(["toTree", "lodash", "moment", "properties"], function (toTree, _, moment
             return getOrgUnits().then(transformToTree);
         };
 
-        var init = function () {
-            if (isMsfAdmin() && _.isUndefined($rootScope.currentUser.selectedProject)) {
+        var init = function() {
+            if (isProjectAdmin() && _.isUndefined($rootScope.currentUser.selectedProject)) {
                 $location.path("/selectProjectPreference");
                 return;
             }
@@ -71,12 +71,12 @@ define(["toTree", "lodash", "moment", "properties"], function (toTree, _, moment
             reloadTree(selectedNodeId);
         };
 
-        $scope.closeNewForm = function (selectedNode, message) {
+        $scope.closeNewForm = function(selectedNode, message) {
 
             if (message) {
                 $scope.showMessage = true;
                 $scope.message = message;
-                $timeout(function () {
+                $timeout(function() {
                     $scope.showMessage = false;
                 }, properties.messageTimeout);
             }
@@ -84,13 +84,13 @@ define(["toTree", "lodash", "moment", "properties"], function (toTree, _, moment
             reloadTree(selectedNode.id);
         };
 
-        var scrollToTop = function () {
+        var scrollToTop = function() {
             $location.hash();
             $anchorScroll();
         };
 
-        $scope.getOrgUnitType = function (orgUnit) {
-            var isLineListService = function () {
+        $scope.getOrgUnitType = function(orgUnit) {
+            var isLineListService = function() {
                 var attr = _.find(orgUnit.attributeValues, {
                     "attribute": {
                         "code": "isLineListService"
@@ -113,18 +113,18 @@ define(["toTree", "lodash", "moment", "properties"], function (toTree, _, moment
             }
         };
 
-        $scope.onOrgUnitSelect = function (orgUnit) {
+        $scope.onOrgUnitSelect = function(orgUnit) {
             $scope.orgUnit = orgUnit;
             $scope.openInViewMode($scope.getOrgUnitType(orgUnit));
             scrollToTop();
         };
 
-        $scope.openInNewMode = function (type) {
+        $scope.openInNewMode = function(type) {
             $scope.templateUrl = templateUrlMap[type] + '?' + moment().format("X");
             $scope.isNewMode = true;
         };
 
-        $scope.openInViewMode = function (type) {
+        $scope.openInViewMode = function(type) {
             $scope.templateUrl = templateUrlMap[type] + '?' + moment().format("X");
             $scope.isNewMode = false;
         };

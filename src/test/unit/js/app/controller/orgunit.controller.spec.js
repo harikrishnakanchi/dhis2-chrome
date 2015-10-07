@@ -1,9 +1,9 @@
 /*global Date:true*/
-define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository"], function (OrgUnitController, mocks, utils, _, OrgUnitRepository) {
-    describe("org unit controller", function () {
+define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepository"], function(OrgUnitController, mocks, utils, _, OrgUnitRepository) {
+    describe("org unit controller", function() {
         var q, scope, orgUnitContoller, location, timeout, anchorScroll, orgUnitRepository, rootScope;
 
-        beforeEach(mocks.inject(function ($rootScope, $q, $location, $timeout, $anchorScroll) {
+        beforeEach(mocks.inject(function($rootScope, $q, $location, $timeout, $anchorScroll) {
             q = $q;
             rootScope = $rootScope;
 
@@ -24,7 +24,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             }, {
                 "id": "2",
                 "level": 2,
-                "parent": {"id": "1"}
+                "parent": {
+                    "id": "1"
+                }
             }];
 
             orgUnitRepository = new OrgUnitRepository();
@@ -33,7 +35,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             anchorScroll = jasmine.createSpy();
         }));
 
-        it("should fetch and display organisation units for superadmin", function () {
+        it("should fetch and display organisation units for superadmin", function() {
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             spyOn(scope, "onOrgUnitSelect");
@@ -45,7 +47,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                 "children": [{
                     "id": "2",
                     "level": 2,
-                    "parent": {"id": "1"},
+                    "parent": {
+                        "id": "1"
+                    },
                     "children": [],
                     "selected": false,
                     "collapsed": true
@@ -59,25 +63,31 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             expect(scope.state).toEqual(undefined);
         });
 
-        it("should fetch and display organisation units for msfadmin", function () {
+        it("should fetch and display organisation units for msfadmin", function() {
             var orgunits = [{
                 "id": "3",
                 "level": 3,
-                "parent": {"id": "2"}
+                "parent": {
+                    "id": "2"
+                }
             }, {
                 "id": "4",
                 "level": 4,
-                "parent": {"id": "3"}
+                "parent": {
+                    "id": "3"
+                }
             }, {
                 "id": "5",
                 "level": 5,
-                "parent": {"id": "4"}
+                "parent": {
+                    "id": "4"
+                }
             }];
             orgUnitRepository.getOrgUnitAndDescendants.and.returnValue(utils.getPromise(q, orgunits));
 
             rootScope.currentUser = {
                 "userCredentials": {
-                    "username": "msfadmin"
+                    "username": "projectadmin"
                 },
                 "selectedProject": {
                     "id": "3"
@@ -92,15 +102,21 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             var expectedOrgUnitTree = [{
                 "id": "3",
                 "level": 3,
-                "parent": {"id": "2"},
+                "parent": {
+                    "id": "2"
+                },
                 "children": [{
                     "id": "4",
                     "level": 4,
-                    "parent": {"id": "3"},
+                    "parent": {
+                        "id": "3"
+                    },
                     "children": [{
                         "id": "5",
                         "level": 5,
-                        "parent": {"id": "4"},
+                        "parent": {
+                            "id": "4"
+                        },
                         "children": [],
                         "selected": false,
                         "collapsed": true
@@ -117,7 +133,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             expect(scope.state).toEqual(undefined);
         });
 
-        it("should fetch and select the newly created organization unit", function () {
+        it("should fetch and select the newly created organization unit", function() {
             spyOn(location, 'hash').and.returnValue(["2", 1]);
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
             spyOn(scope, 'onOrgUnitSelect');
@@ -141,7 +157,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             expect(scope.saveSuccess).toEqual(true);
         });
 
-        it("should display a timed message after creating a organization unit", function () {
+        it("should display a timed message after creating a organization unit", function() {
             spyOn(location, 'hash').and.returnValue(["1", 2]);
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
             spyOn(scope, 'onOrgUnitSelect');
@@ -153,7 +169,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             expect(scope.saveSuccess).toEqual(false);
         });
 
-        it("should close new form and select the newly created orgunit", function () {
+        it("should close new form and select the newly created orgunit", function() {
             var successMessage = "saved successfully";
             var orgunits = [{
                 "id": "1",
@@ -167,7 +183,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                     },
                     "value": "something"
                 }],
-                "parent": {"id": "1"}
+                "parent": {
+                    "id": "1"
+                }
             }];
             orgUnitRepository.getOrgUnitAndDescendants.and.returnValue(utils.getPromise(q, orgunits));
 
@@ -181,8 +199,15 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             var expectedSelectedNode = {
                 "id": "2",
                 "level": 2,
-                "attributeValues": [{"attribute": {"code": "Type"}, "value": "something"}],
-                "parent": {"id": "1"},
+                "attributeValues": [{
+                    "attribute": {
+                        "code": "Type"
+                    },
+                    "value": "something"
+                }],
+                "parent": {
+                    "id": "1"
+                },
                 "children": [],
                 "selected": true,
                 "collapsed": false
@@ -192,7 +217,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             expect(scope.state.currentNode).toEqual(expectedSelectedNode);
         });
 
-        it("should show the selected organisation unit details", function () {
+        it("should show the selected organisation unit details", function() {
             var orgUnit = {
                 "id": "2",
                 "level": 2,
@@ -202,7 +227,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                     },
                     "value": "Module"
                 }],
-                "parent": {"id": "1"}
+                "parent": {
+                    "id": "1"
+                }
             };
 
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
@@ -213,7 +240,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             expect(scope.orgUnit).toEqual(orgUnit);
         });
 
-        it("should set the organization unit", function () {
+        it("should set the organization unit", function() {
             var orgUnit = {
                 "id": "2",
                 "level": 2,
@@ -223,7 +250,9 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                     },
                     "value": "Module"
                 }],
-                "parent": {"id": "1"}
+                "parent": {
+                    "id": "1"
+                }
             };
             orgUnitRepository.getOrgUnitAndDescendants.and.returnValue(utils.getPromise(q, orgUnit));
 
@@ -240,7 +269,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             expect(anchorScroll).toHaveBeenCalled();
         });
 
-        it("should set the template url to be displayed for New mode", function () {
+        it("should set the template url to be displayed for New mode", function() {
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.openInNewMode('Country');
@@ -249,7 +278,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             expect(scope.isNewMode).toEqual(true);
         });
 
-        it("should set the template url for view mode", function () {
+        it("should set the template url for view mode", function() {
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             scope.openInViewMode('Module');
