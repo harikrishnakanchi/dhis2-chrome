@@ -163,28 +163,7 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                     "id": "prj1"
                 });
             });
-
-            xit("should reset charts on current user's org units changes", function() {
-                rootScope.currentUser = {
-                    "userCredentials": {
-                        "username": "username"
-                    },
-                    "organisationUnits": [{
-                        "id": "prj1"
-                    }],
-                    "selectedProject": {
-                        "id": "prj1"
-                    }
-                };
-
-                rootScope.$broadcast('userPreferencesUpdated');
-
-                expect(hustle.publish).toHaveBeenCalledWith({
-                    "data": [],
-                    "type": "downloadCharts",
-                }, 'dataValues');
-            });
-
+            
             it("should save session state and redirect user to dashboard when project selection changes", function() {
                 var selectedProject = {
                     "id": "p1"
