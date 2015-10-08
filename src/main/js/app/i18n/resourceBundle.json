@@ -308,5 +308,5 @@
     "selectProjectLabel": "Select Project",
     "changeProject": "Change project",
     "tabularReports": "Tabular Reports",
-    "exportAsCsv": "Export as CSV"
+    "exportAsCsv": "Download report"
 }
