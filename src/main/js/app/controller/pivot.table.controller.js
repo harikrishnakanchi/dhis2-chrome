@@ -102,6 +102,7 @@ define(["lodash", "moment"], function(_, moment) {
                     };
                 });
 
+                $scope.hasOnlyOneCategory = sortedCategories.length === 1;
                 var sortedCategoriesIds = _.pluck(sortedCategories, "id");
 
                 $scope.dataMap = getDataMap(sortedCategoriesIds);

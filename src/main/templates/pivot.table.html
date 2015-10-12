@@ -7,7 +7,7 @@
             <thead>
                 <tr>
                     <th>Data Element</th>
-                    <th ng-if="isCategoryPresent">Category</th>
+                    <th ng-if="isCategoryPresent &amp;&amp; !hasOnlyOneCategory">Category</th>
                     <th ng-repeat="period in periods">
                         <span>{{data.metaData.names[period]}}</span>
                     </th>
@@ -16,7 +16,7 @@
             <tbody>
                 <tr ng-repeat="datum in viewMap | orderBy: 'sortOrder'">
                     <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
-                    <td ng-if="isCategoryPresent">{{data.metaData.names[datum.category]}}</td>
+                    <td ng-if="isCategoryPresent &amp;&amp; !hasOnlyOneCategory">{{data.metaData.names[datum.category]}}</td>
                     <td ng-repeat="period in periods">
                         <span> {{getValue(datum.category,datum.dataElement,period)}}</span>
                     </td>
