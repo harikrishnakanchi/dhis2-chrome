@@ -1,7 +1,15 @@
-define(["lodash"], function(_) {
-    return function(reportService, chartRepository, pivotTableRepository, userPreferenceRepository, datasetRepository, $q) {
+define(["lodash", "moment"], function(_, moment) {
+    return function(reportService, chartRepository, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, $q) {
 
         this.run = function(message) {
+
+            var getLastDownloadedTime = function() {
+                return changeLogRepository.get("reports");
+            };
+
+            var updateChangeLog = function() {
+                return changeLogRepository.upsert("reports", moment().toISOString());
+            };
 
             var loadUserModuleIds = function() {
                 return userPreferenceRepository.getUserModules().then(function(modules) {
@@ -13,7 +21,7 @@ define(["lodash"], function(_) {
                 return datasetRepository.findAllForOrgUnits(userModuleIds);
             };
 
-            var loadChartData = function(userModuleIds, datasets) {
+            var downloadAndSaveChartData = function(userModuleIds, datasets) {
 
                 var saveCharts = function(charts) {
                     return chartRepository.upsert(charts).then(function(data) {
@@ -36,7 +44,7 @@ define(["lodash"], function(_) {
                     .then(saveChartData);
             };
 
-            var loadPivotTableData = function(userModuleIds, datasets) {
+            var downloadAndSavePivotTableData = function(userModuleIds, datasets) {
 
                 var savePivotTables = function(pivotTables) {
                     return pivotTableRepository.upsert(pivotTables).then(function(data) {
@@ -59,12 +67,18 @@ define(["lodash"], function(_) {
                     .then(savePivotTableData);
             };
 
-            return loadUserModuleIds().then(function(userModuleIds) {
+            return $q.all([getLastDownloadedTime(), loadUserModuleIds()]).then(function(data) {
+                var lastDownloadedTime = data[0];
+                var userModuleIds = data[1];
+
+                if (lastDownloadedTime && !moment().isAfter(lastDownloadedTime, 'day'))
+                    return;
+
                 if (_.isEmpty(userModuleIds))
                     return;
 
                 return loadRelevantDatasets(userModuleIds).then(function(datasets) {
-                    return $q.all([loadChartData(userModuleIds, datasets), loadPivotTableData(userModuleIds, datasets)]);
+                    return $q.all([downloadAndSaveChartData(userModuleIds, datasets), downloadAndSavePivotTableData(userModuleIds, datasets)]).then(updateChangeLog);
                 });
             });
 
