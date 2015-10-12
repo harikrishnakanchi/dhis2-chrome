@@ -91,7 +91,6 @@ require.config({
         "eventService": "app/service/event.service",
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "filesystemService": "app/service/filesystem.service",
-        "chartService": "app/service/chart.service",
 
         //Repositories
         "repositories": "app/repository/repositories",
