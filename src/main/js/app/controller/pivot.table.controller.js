@@ -40,7 +40,7 @@ define(["lodash", "moment"], function(_, moment) {
             if ($scope.isCategoryPresent)
                 headers.push("Category");
             _.each($scope.periods, function(period) {
-                return headers.push($scope.data.metaData.names[period]);
+                headers.push($scope.data.metaData.names[period]);
             });
             return headers;
         };
