@@ -70,6 +70,7 @@
     "userEnableConfMessage": "Etes-vous sûr que vous voulez activer ",
     "printTallySheetBtnValue": "Imprimer la feuille de pointage",
     "weekLabel": "Semaine",
+    "weekLabelForApproval": "Select all weeks for approval",
     "yearLabel": "Année",
     "monthLabel": "Mois",
     "disableOrgUnitConfirmationMessage": "Organisation unit will be disabled. Are you sure?",

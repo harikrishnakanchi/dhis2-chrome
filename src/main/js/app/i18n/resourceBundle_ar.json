@@ -70,6 +70,7 @@
     "userEnableConfMessage": "هل أنت متأكد أنك تريد تمكين ",
     "printTallySheetBtnValue": "ورقة الطباعة تالي",
     "weekLabel": "أسبوع",
+    "weekLabelForApproval": "Select all weeks for approval",
     "yearLabel": "عام",
     "monthLabel": "شهر",
     "disableOrgUnitConfirmationMessage": "Organisation unit will be disabled. Are you sure?",
