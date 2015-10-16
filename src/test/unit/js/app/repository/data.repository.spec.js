@@ -47,7 +47,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             Timecop.uninstall();
         });
 
-        it("should save data values sent from client", function() {
+        xit("should save data values sent from client", function() {
             dataRepository.save(dataValuesFromClient);
 
             expect(mockStore.upsert).toHaveBeenCalledWith([{
@@ -99,7 +99,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             scope.$apply();
         });
 
-        it("should save data values sent from client as draft", function() {
+        xit("should save data values sent from client as draft", function() {
             dataRepository.saveAsDraft(dataValuesFromClient);
 
             expect(mockStore.upsert).toHaveBeenCalledWith([{

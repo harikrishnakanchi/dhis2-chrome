@@ -75,7 +75,7 @@
                                                     </td>
                                                     <td class="last-column">{{sum(dataValues[selectedModule.id][dataElement.id], dataElement.id)}}</td>
                                                 </tr>
-                                                <tr>
+                                                <tr class="hide-from-print">
                                                     <td>
                                                         <span> {{ resourceBundle.totalLabel }}</span>
                                                     </td>
@@ -143,7 +143,7 @@
                                                 </tr>
                                             </tbody>
                                             <tbody>
-                                                <tr>
+                                                <tr class="hide-from-print">
                                                     <td>
                                                         <span> {{ resourceBundle.totalLabel }}</span>
                                                     </td>
@@ -162,9 +162,9 @@
                     </div>
                 </accordion>
                 <div>
-                    <input type="button" class="btn btn-main" id="dataEntrySave" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}" />
-                    <input type="button" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; !projectIsAutoApproved" value="{{resourceBundle.submitBtnValue}}" />
-                    <input type="button" class="btn btn-main" id="dataEntrySubmitAndApprove" ng-click="submitAndApprove()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; projectIsAutoApproved" value="{{resourceBundle.submitBtnValue}}" />
+                    <input type="submit" class="btn btn-main" id="dataEntrySave" ng-click="saveAsDraft()" ng-disabled="dataentryForm.$invalid" ng-if="hasRoles(['Data entry user'])" ng-hide="isSubmitted" value="{{resourceBundle.saveBtnValue}}" />
+                    <input type="submit" class="btn btn-main" id="dataEntrySubmit" ng-click="submit()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; !projectIsAutoApproved" value="{{resourceBundle.submitBtnValue}}" />
+                    <input type="submit" class="btn btn-main" id="dataEntrySubmitAndApprove" ng-click="submitAndApprove()" ng-disabled="isCurrentWeekSelected(week) || dataentryForm.$invalid || !isDataEntryAllowed" ng-if="hasRoles(['Data entry user']) &amp;&amp; projectIsAutoApproved" value="{{resourceBundle.submitBtnValue}}" />
                 </div>
             </form>
         </section>

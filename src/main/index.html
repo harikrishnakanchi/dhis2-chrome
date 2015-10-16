@@ -50,7 +50,7 @@
                 </nav>
             </div>
         </header>
-        <div class="container" style="padding-top:10px;" ng-if="isLoggedIn">
+        <div class="container hide-from-print" style="padding-top:10px;" ng-if="isLoggedIn">
             <ul class="nav nav-tabs">
                 <li role="presentation" ng-class="{ active: isActive('\/dashboard$')}" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user'])">
                     <a href="#/dashboard">{{ resourceBundle.homeMenuLabel }}</a>
