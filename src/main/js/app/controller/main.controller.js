@@ -18,6 +18,10 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return true;
         };
 
+        $scope.getAllowedOrgUnits = function() {
+            return _.pluck($rootScope.allowedOrgUnits, "name").toString();
+        };
+
         var deregisterCurrentUserLocaleWatcher = $rootScope.$watch("currentUser.locale", function() {
             var getResourceBundle = function(locale, shouldFetchTranslations) {
                 var fetchResourceBundleFromDb = function() {

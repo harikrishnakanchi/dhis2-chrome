@@ -12,6 +12,8 @@ define(["chromeUtils", "cipherUtils"], function(chromeUtils, cipherUtils) {
                 var decryptedProductKey = cipherUtils.decrypt($scope.productKey);
                 chromeUtils.setAuthHeader(JSON.parse(decryptedProductKey).authHeader);
                 $rootScope.authHeader = JSON.parse(decryptedProductKey).authHeader;
+                $rootScope.dhisUrl = JSON.parse(decryptedProductKey).dhisUrl;
+                $rootScope.allowedOrgUnits = JSON.parse(decryptedProductKey).allowedOrgUnits;
 
                 triggerImportAndSync();
                 if ($rootScope.currentUser)
