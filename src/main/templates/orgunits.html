@@ -2,6 +2,7 @@
     <div class="treeview-col">
         <div class="treeview-cont">
             <div class="content">
+                <div class="country-name">{{ organisationUnits[0].parent.name }}</div>
                 <treeview tree-model="organisationUnits" node-id="id" node-label="name" node-children="children" on-node-select="onOrgUnitSelect" state="state" allow-multi-selection=false />
             </div>
         </div>
