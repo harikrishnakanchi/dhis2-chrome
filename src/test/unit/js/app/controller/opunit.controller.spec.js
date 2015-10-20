@@ -238,7 +238,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "value": 'true'
                 }],
                 "coordinates": "[25,50]",
-                "featureType": "Point"
+                "featureType": "POINT"
             };
 
             spyOn(location, "hash");
@@ -682,7 +682,7 @@ define(["opUnitController", "angularMocks", "utils", "orgUnitGroupHelper", "time
                     "value": 'true'
                 }],
                 "coordinates": "[25,50]",
-                "featureType": "Point"
+                "featureType": "POINT"
             };
 
             var orgunitsToAssociate = [{

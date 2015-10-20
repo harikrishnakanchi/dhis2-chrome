@@ -908,7 +908,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "id": "p1"
                 },
                 "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
-                "featureType": "Point"
+                "featureType": "POINT"
             }, {
                 "name": patientOrigins[0].name,
                 "shortName": patientOrigins[0].name,
@@ -933,7 +933,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "id": "p2"
                 },
                 "coordinates": "[" + patientOrigins[0].longitude + "," + patientOrigins[0].latitude + "]",
-                "featureType": "Point"
+                "featureType": "POINT"
             }, {
                 "name": patientOrigins[1].name,
                 "shortName": patientOrigins[1].name,
@@ -958,7 +958,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "id": "p1"
                 },
                 "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
-                "featureType": "Point"
+                "featureType": "POINT"
             }, {
                 "name": patientOrigins[1].name,
                 "shortName": patientOrigins[1].name,
@@ -983,7 +983,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "id": "p2"
                 },
                 "coordinates": "[" + patientOrigins[1].longitude + "," + patientOrigins[1].latitude + "]",
-                "featureType": "Point"
+                "featureType": "POINT"
             }, {
                 "name": patientOrigins[2].name,
                 "shortName": patientOrigins[2].name,
