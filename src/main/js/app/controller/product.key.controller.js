@@ -10,8 +10,8 @@ define(["chromeUtils", "cipherUtils"], function(chromeUtils, cipherUtils) {
         $scope.setAuthHeaderAndProceed = function() {
             try {
                 var decryptedProductKey = cipherUtils.decrypt($scope.productKey);
-                chromeUtils.setAuthHeader(decryptedProductKey);
-                $rootScope.authHeader = decryptedProductKey;
+                chromeUtils.setAuthHeader(JSON.parse(decryptedProductKey).authHeader);
+                $rootScope.authHeader = JSON.parse(decryptedProductKey).authHeader;
 
                 triggerImportAndSync();
                 if ($rootScope.currentUser)

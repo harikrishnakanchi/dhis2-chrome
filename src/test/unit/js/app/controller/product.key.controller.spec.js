@@ -20,17 +20,17 @@ define(["productKeyController", "angularMocks", "packagedDataImporter", "utils",
         }));
 
         it("should set the product key on rootscope and trigger sync", function() {
-            scope.productKey = "eyJpdiI6IldrbWRjaERvR0RhYmRWVmozbFVHeXc9PSIsInNhbHQiOiJGYU90RkVlM1E1dz0iLCJjdCI6ImpUQVJ0UWxXOE96TlltTFNsWCtCNzlDY2l1ST0ifQ==";
+            scope.productKey = "eyJpdiI6IkZlTlZqYTZxUWRtUjRwTHVybEs2cmc9PSIsInNhbHQiOiJxa045eUIxNS90bz0iLCJjdCI6ImxpR2VTV3Nvb0s2eFdtRTk1WGlGMFFYOFVrbXVTdWJaOGRiYndDTkg3ZjVKdTZWMDNJczR1SGpaV0VWU29CZz0ifQ==";
 
             scope.$apply();
             scope.setAuthHeaderAndProceed();
             scope.$apply();
 
-            expect(rootscope.authHeader).toEqual("Test Message");
+            expect(rootscope.authHeader).toEqual("Basic VGV4dCBNZXNzYWdl");
         });
 
         it("should logout the user if prooduct key is changed and user is logged in", function() {
-            scope.productKey = "eyJpdiI6IldrbWRjaERvR0RhYmRWVmozbFVHeXc9PSIsInNhbHQiOiJGYU90RkVlM1E1dz0iLCJjdCI6ImpUQVJ0UWxXOE96TlltTFNsWCtCNzlDY2l1ST0ifQ==";
+            scope.productKey = "eyJpdiI6IkZlTlZqYTZxUWRtUjRwTHVybEs2cmc9PSIsInNhbHQiOiJxa045eUIxNS90bz0iLCJjdCI6ImxpR2VTV3Nvb0s2eFdtRTk1WGlGMFFYOFVrbXVTdWJaOGRiYndDTkg3ZjVKdTZWMDNJczR1SGpaV0VWU29CZz0ifQ==";
             rootscope.currentUser = "someUser";
 
             scope.$apply();
@@ -48,7 +48,7 @@ define(["productKeyController", "angularMocks", "packagedDataImporter", "utils",
         });
 
         it("should send a db ready message after metadata is imported", function() {
-            scope.productKey = "eyJpdiI6IldrbWRjaERvR0RhYmRWVmozbFVHeXc9PSIsInNhbHQiOiJGYU90RkVlM1E1dz0iLCJjdCI6ImpUQVJ0UWxXOE96TlltTFNsWCtCNzlDY2l1ST0ifQ==";
+            scope.productKey = "eyJpdiI6IkZlTlZqYTZxUWRtUjRwTHVybEs2cmc9PSIsInNhbHQiOiJxa045eUIxNS90bz0iLCJjdCI6ImxpR2VTV3Nvb0s2eFdtRTk1WGlGMFFYOFVrbXVTdWJaOGRiYndDTkg3ZjVKdTZWMDNJczR1SGpaV0VWU29CZz0ifQ==";
 
             scope.$apply();
             scope.setAuthHeaderAndProceed();
