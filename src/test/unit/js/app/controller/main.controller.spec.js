@@ -163,7 +163,7 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                     "id": "prj1"
                 });
             });
-
+            
             it("should save session state and redirect user to dashboard when project selection changes", function() {
                 var selectedProject = {
                     "id": "p1"

@@ -26,7 +26,8 @@ require.config({
         "services": "app/service/bg.services",
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "patientOriginService": "app/service/patient.origin.service",
-        "reportService": "app/service/report.service",
+        "chartService": "app/service/chart.service",
+        "pivotTableService": "app/service/pivot.table.service",
 
         //Repositories
         "repositories": "app/repository/bg.repositories",
@@ -86,8 +87,9 @@ require.config({
         "downloadPatientOriginConsumer": "app/consumer/download.patient.origin.consumer",
         "uploadExcludedDataElementsConsumer": "app/consumer/upload.excluded.dataelements.consumer",
         "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
-        "downloadReportsConsumer": "app/consumer/download.reports.consumer",
+        "downloadChartConsumer": "app/consumer/download.charts.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
+        "downloadPivotTableConsumer": "app/consumer/download.pivot.table.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",
