@@ -108,8 +108,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document',
-                function(dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document) {
+            app.run(['dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document', 'systemSettingRepository',
+                function(dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document, systemSettingRepository) {
 
                     $document.on('keydown', function(e) {
                         disableBackspaceKey(e);
@@ -148,6 +148,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                             $rootScope.msgInQueue = false;
                         });
                     });
+
+                    systemSettingRepository.loadProductKey();
 
                     $rootScope.hasRoles = function(allowedRoles) {
                         if ($rootScope.currentUser === undefined)

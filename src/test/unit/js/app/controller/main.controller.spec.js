@@ -1,8 +1,8 @@
-define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sessionHelper", "chromeUtils", "orgUnitRepository"],
-    function(MainController, mocks, utils, PackagedDataImporter, SessionHelper, chromeUtils, OrgUnitRepository) {
+define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sessionHelper", "chromeUtils", "orgUnitRepository", "systemSettingRepository"],
+    function(MainController, mocks, utils, PackagedDataImporter, SessionHelper, chromeUtils, OrgUnitRepository, SystemSettingRepository) {
         describe("main controller", function() {
             var rootScope, mainController, scope, httpResponse, q, i18nResourceBundle, getResourceBundleSpy, db, frenchResourceBundle,
-                translationStore, location, packagedDataImporter, sessionHelper, orgUnitRepository, hustle;
+                translationStore, location, packagedDataImporter, sessionHelper, orgUnitRepository, hustle, systemSettingRepository;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $location, $hustle) {
@@ -14,16 +14,13 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 packagedDataImporter = new PackagedDataImporter();
                 sessionHelper = new SessionHelper();
                 orgUnitRepository = new OrgUnitRepository();
+                systemSettingRepository = new SystemSettingRepository();
 
                 spyOn(chromeUtils, "sendMessage");
 
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
 
-                spyOn(chromeUtils, "getAuthHeader").and.callFake(function(callBack) {
-                    callBack({
-                        "authHeader": "Basic Auth"
-                    });
-                });
+                spyOn(systemSettingRepository, "isProductKeySet").and.returnValue(utils.getPromise(q, true));
 
                 i18nResourceBundle = {
                     get: function() {}
@@ -78,11 +75,11 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 spyOn(packagedDataImporter, "run").and.returnValue(utils.getPromise(q, {}));
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository);
+                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository);
             }));
 
             it("should import metadata triggering db migrations in the process", function() {
-                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository);
+                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository);
                 scope.$apply();
 
                 expect(packagedDataImporter.run).toHaveBeenCalled();
@@ -117,26 +114,11 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 expect(rootScope.resourceBundle).toEqual({});
             });
 
-            it("should redirect to product key page", function() {
-                spyOn(location, "path");
-
-                chromeUtils.getAuthHeader.and.callFake(function(callBack) {
-                    callBack({});
-                });
-
-                mainController = new MainController(q, scope, location, rootScope, hustle, i18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository);
-
-                scope.$apply();
-
-                expect(location.path).toHaveBeenCalledWith("/productKeyPage");
-            });
-
-            it("should set auth header on local storage", function() {
+            it("should redirect to login page", function() {
                 spyOn(location, "path");
 
                 scope.$apply();
 
-                expect(rootScope.authHeader).toEqual("Basic Auth");
                 expect(location.path).toHaveBeenCalledWith("/login");
             });
 
@@ -163,7 +145,7 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                     "id": "prj1"
                 });
             });
-            
+
             it("should save session state and redirect user to dashboard when project selection changes", function() {
                 var selectedProject = {
                     "id": "p1"

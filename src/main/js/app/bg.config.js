@@ -12,6 +12,7 @@ require.config({
         "hustleModule": "lib/angularjs-hustle/hustle.module",
         "angular": "lib/angular/angular",
         "md5": "lib/js-md5/js/md5",
+        "sjcl": "lib/sjcl/sjcl",
 
         //services
         "dataService": "app/service/data.service",
@@ -112,6 +113,7 @@ require.config({
         "dhisId": "app/utils/dhis.id",
         "dateUtils": "app/utils/date.utils",
         "lodashUtils": "app/utils/lodash.utils",
+        "cipherUtils": "app/utils/cipher.utils",
         "httpUtils": "app/utils/http.utils",
         "dhisUrl": "app/utils/dhis.url",
         "appSettingsUtils": "app/utils/app.settings.utils"

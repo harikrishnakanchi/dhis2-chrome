@@ -1,5 +1,5 @@
 define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, userPreferenceRepository) {
+    return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository) {
         $scope.projects = [];
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
@@ -78,14 +78,6 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             }
         };
 
-        var getAuthHeader = function() {
-            var deferred = $q.defer();
-            chromeUtils.getAuthHeader(function(result) {
-                deferred.resolve(result);
-            });
-            return deferred.promise;
-        };
-
         $scope.logout = function() {
             sessionHelper.logout();
         };
@@ -96,12 +88,6 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             $rootScope.$emit('selectedProjectUpdated');
             sessionHelper.saveSessionState();
             $location.path("/dashboard");
-        };
-
-        var loadAuthHeader = function() {
-            return getAuthHeader().then(function(result) {
-                $rootScope.authHeader = result ? result.authHeader : null;
-            });
         };
 
         var deregisterUserPreferencesListener = $rootScope.$on('userPreferencesUpdated', function() {
@@ -116,8 +102,8 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         var init = function() {
 
-            var validateAndContinue = function() {
-                if (_.isEmpty($rootScope.authHeader)) {
+            var validateAndContinue = function(isProductKeySet) {
+                if (!isProductKeySet) {
                     $location.path("/productKeyPage");
                 } else {
                     chromeUtils.sendMessage("dbReady");
@@ -127,7 +113,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
             $scope.allUserLineListModules = [];
             packagedDataImporter.run()
-                .then(loadAuthHeader)
+                .then(systemSettingRepository.isProductKeySet)
                 .then(validateAndContinue);
         };
 

@@ -7,7 +7,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             repositories.init(app);
             monitors.init(app);
 
-            app.factory('configureRequestInterceptor', ['$rootScope', configureRequestInterceptor]);
+            app.factory('configureRequestInterceptor', ['$rootScope', 'systemSettingRepository', configureRequestInterceptor]);
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', handleTimeoutInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
@@ -42,8 +42,9 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$hustle', '$log', '$rootScope',
-                function(consumerRegistry, dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $hustle, $log, $rootScope) {
+            app.run(['consumerRegistry', 'dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$hustle', '$log', '$rootScope', 'systemSettingRepository',
+
+                function(consumerRegistry, dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $hustle, $log, $rootScope, systemSettingRepository) {
 
                     $hustle.registerInterceptor(queuePostProcessInterceptor);
 
@@ -91,35 +92,40 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             .then(projectDataSync);
                     };
 
-                    var setAuthHeader = function(result) {
-                        if (!result || !result.authHeader) return;
-                        $rootScope.authHeader = result.authHeader;
-                        checkOnlineStatusAndSync();
-                    };
-
                     hustleMonitor.start();
 
-                    chrome.alarms.create('metadataSyncAlarm', {
-                        periodInMinutes: properties.metadata.sync.intervalInMinutes
-                    });
-                    chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataSync));
+                    var setupAlarms = function() {
+                        chrome.alarms.create('metadataSyncAlarm', {
+                            periodInMinutes: properties.metadata.sync.intervalInMinutes
+                        });
+                        chrome.alarms.onAlarm.addListener(registerCallback("metadataSyncAlarm", metadataSync));
 
-                    chrome.alarms.create('projectDataSyncAlarm', {
-                        periodInMinutes: properties.projectDataSync.intervalInMinutes
-                    });
+                        chrome.alarms.create('projectDataSyncAlarm', {
+                            periodInMinutes: properties.projectDataSync.intervalInMinutes
+                        });
+                    };
+
                     chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
 
                     chromeUtils.addListener("productKeyDecrypted", function() {
-                        chromeUtils.getAuthHeader(setAuthHeader);
+                        systemSettingRepository.loadProductKey().then(function() {
+                            consumerRegistry.register();
+                            setupAlarms();
+                            checkOnlineStatusAndSync();
+                        });
                     });
 
                     chromeUtils.addListener("productKeyExpired", function() {
                         dhisMonitor.stop();
                     });
 
-                    consumerRegistry.register().then(function() {
-                        chromeUtils.getAuthHeader(setAuthHeader);
-                    });
+                    systemSettingRepository.isProductKeySet()
+                        .then(systemSettingRepository.loadProductKey)
+                        .then(function() {
+                            consumerRegistry.register();
+                            setupAlarms();
+                            checkOnlineStatusAndSync();
+                        });
                 }
             ]);
 

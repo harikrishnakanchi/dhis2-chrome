@@ -15,7 +15,7 @@ define(["dataRepository", "datasetRepository", "userPreferenceRepository", "appr
             app.service('orgUnitGroupRepository', ['$indexedDB', '$q', orgUnitGroupRepository]);
             app.service('changeLogRepository', ['$indexedDB', changeLogRepository]);
             app.service('programRepository', ['$indexedDB', "$q", programRepository]);
-            app.service('systemSettingRepository', ['$indexedDB', '$q', systemSettingRepository]);
+            app.service('systemSettingRepository', ['$indexedDB', '$q', '$rootScope', systemSettingRepository]);
             app.service('patientOriginRepository', ['$indexedDB', '$q', patientOriginRepository]);
             app.service('excludedDataElementsRepository', ['$indexedDB', '$q', excludedDataElementsRepository]);
             app.service('metadataRepository', ['$indexedDB', "$q", metadataRepository]);

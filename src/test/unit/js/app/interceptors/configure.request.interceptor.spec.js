@@ -1,8 +1,11 @@
-define(["configureRequestInterceptor", "angularMocks", "properties", "utils"], function(ConfigureRequestInterceptor, mocks, properties, utils) {
+define(["configureRequestInterceptor", "angularMocks", "properties", "utils", "systemSettingRepository"], function(ConfigureRequestInterceptor, mocks, properties, utils, SystemSettingRepository) {
     describe("configureRequestInterceptor", function() {
-        var rootScope;
+        var rootScope, systemSettingRepository;
+
 
         beforeEach(mocks.inject(function($rootScope) {
+            systemSettingRepository = new SystemSettingRepository();
+            spyOn(systemSettingRepository, 'getAuthHeader').and.returnValue("Basic Auth");
             rootScope = $rootScope;
         }));
 
@@ -14,11 +17,11 @@ define(["configureRequestInterceptor", "angularMocks", "properties", "utils"], f
                 'headers': {},
                 'timeout': properties.http.timeout
             };
-            var configureRequestInterceptor = new ConfigureRequestInterceptor(rootScope);
+            var configureRequestInterceptor = new ConfigureRequestInterceptor(rootScope, systemSettingRepository);
             configureRequestInterceptor.request(config);
+            scope.$apply();
 
             expect(config.headers.Authorization).toEqual("Basic Auth");
         });
-
     });
 });

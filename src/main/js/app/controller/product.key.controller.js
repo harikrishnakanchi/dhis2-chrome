@@ -1,5 +1,5 @@
-define(["chromeUtils", "cipherUtils"], function(chromeUtils, cipherUtils) {
-    return function($scope, $location, $rootScope, packagedDataImporter, sessionHelper) {
+define(["chromeUtils"], function(chromeUtils) {
+    return function($scope, $location, $rootScope, packagedDataImporter, sessionHelper, systemSettingRepository) {
         var triggerImportAndSync = function() {
             packagedDataImporter.run().then(function() {
                 chromeUtils.sendMessage("dbReady");
@@ -8,20 +8,16 @@ define(["chromeUtils", "cipherUtils"], function(chromeUtils, cipherUtils) {
         };
 
         $scope.setAuthHeaderAndProceed = function() {
-            try {
-                var decryptedProductKey = cipherUtils.decrypt($scope.productKey);
-                chromeUtils.setAuthHeader(JSON.parse(decryptedProductKey).authHeader);
-                $rootScope.authHeader = JSON.parse(decryptedProductKey).authHeader;
-                $rootScope.dhisUrl = JSON.parse(decryptedProductKey).dhisUrl;
-                $rootScope.allowedOrgUnits = JSON.parse(decryptedProductKey).allowedOrgUnits;
-
+            var productKey = {
+                "key": "productKey",
+                "value": $scope.productKey
+            };
+            systemSettingRepository.upsertProductKey(productKey).then(function() {
                 triggerImportAndSync();
                 if ($rootScope.currentUser)
                     sessionHelper.logout();
                 $location.path("/login");
-            } catch (err) {
-                $scope.isKeyInvalid = true;
-            }
+            });
         };
     };
 });
