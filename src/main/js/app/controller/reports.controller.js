@@ -189,23 +189,41 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
                     var transformedChartData = _.transform(chartData.rows, function(result, row) {
 
-                        var item = _.find(result, {
-                            'key': getName(row[0])
+                        var dimensionIndex = _.findIndex(chartData.headers, {
+                            "name": "dx"
+                        });
+                        var categoryIndex = _.findIndex(chartData.headers, function(item) {
+                            return item.name !== "dx" && item.name !== "pe" && item.name !== "value";
+                        });
+                        var chartDataKey = categoryIndex > -1 ? getName(row[categoryIndex]) : getName(row[dimensionIndex]);
+
+                        var periodIndex = _.findIndex(chartData.headers, {
+                            "name": "pe"
+                        });
+                        var chartDataPeriod = parseInt(moment(row[periodIndex], 'GGGG[W]W').format('GGGGWW'));
+
+                        var valueIndex = _.findIndex(chartData.headers, {
+                            "name": "value"
+                        });
+                        var chartDataValue = parseInt(row[valueIndex]);
+
+                        var existingItem = _.find(result, {
+                            'key': chartDataKey
                         });
 
-                        if (item !== undefined) {
-                            item.values.push({
-                                "label": parseInt(moment(row[1], 'GGGG[W]W').format('GGGGWW')),
-                                "value": parseInt(row[2])
+                        if (existingItem !== undefined) {
+                            existingItem.values.push({
+                                "label": chartDataPeriod,
+                                "value": chartDataValue
                             });
                             return;
                         }
 
                         result.push({
-                            "key": getName(row[0]),
+                            "key": chartDataKey,
                             "values": [{
-                                "label": parseInt(moment(row[1], 'GGGG[W]W').format('GGGGWW')),
-                                "value": parseInt(row[2])
+                                "label": chartDataPeriod,
+                                "value": chartDataValue
                             }]
                         });
                     });

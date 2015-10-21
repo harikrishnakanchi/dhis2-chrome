@@ -1,11 +1,11 @@
-define(["lodash"], function (_) {
-    return function ($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
-                     createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
-                     downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
-                     downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadChartConsumer,
-                     uploadReferralLocationsConsumer, downloadPivotTableConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer) {
+define(["lodash"], function(_) {
+    return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
+        createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
+        downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
+        downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadReportsConsumer,
+        uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer) {
 
-        this.run = function (message) {
+        this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
             switch (message.data.type) {
                 case "downloadMetadata":
@@ -28,15 +28,13 @@ define(["lodash"], function (_) {
                     var downloadDataPromise = downloadDataConsumer.run(message)
                         .then(_.partial(downloadApprovalConsumer.run, message));
 
-                    var downloadPivotTablesPromise = downloadPivotTableConsumer.run(message);
-
                     var downloadProjectSettingsPromise = downloadProjectSettingsConsumer.run(message);
 
-                    var downloadChartsPromise = downloadChartConsumer.run(message);
+                    var downloadReportsPromise = downloadReportsConsumer.run(message);
 
                     var downloadEventDataPromise = downloadEventDataConsumer.run(message);
 
-                    return $q.all([downloadDataPromise, downloadPivotTablesPromise, downloadProjectSettingsPromise, downloadChartsPromise, downloadEventDataPromise]);
+                    return $q.all([downloadDataPromise, downloadProjectSettingsPromise, downloadReportsPromise, downloadEventDataPromise]);
 
 
                 case "downloadProjectDataForAdmin":

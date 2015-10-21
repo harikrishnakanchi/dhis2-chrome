@@ -60,31 +60,45 @@ define(["lodash", "moment"], function(_, moment) {
             return value;
         };
 
-        var getSortOrder = function(dataElement) {
-            var elementsToSort = $scope.definition.dataElements.length === 0 ? $scope.definition.indicators : $scope.definition.dataElements;
-            return _.indexOf(_.pluck(elementsToSort, "id"), dataElement) + 1;
+        var getSortOrder = function(dataElementId, categoryId) {
+            var categorySortOrder = 0.0;
+            if (categoryId) {
+                var sortedCategories = _.pluck(_.flatten(_.pluck($scope.definition.categoryDimensions, "categoryOptions")), "id");
+                categorySortOrder = (_.indexOf(sortedCategories, categoryId) + 1) * 0.1;
+            }
+
+            var sortedDataElements = _.pluck($scope.definition.dataElements.length === 0 ? $scope.definition.indicators : $scope.definition.dataElements, "id");
+            var dataElementSortOrder = _.indexOf(sortedDataElements, dataElementId) + 1;
+
+            return dataElementSortOrder + categorySortOrder;
         };
 
         var getDataMap = function(categoryIds) {
             return _.map($scope.data.rows, function(row) {
-                if (_.isUndefined(categoryIds)) {
-                    return {
-                        "dataElement": row[0],
-                        "period": row[1],
-                        "value": parseInt(row[2])
-                    };
-                } else {
-                    var category, dataElement;
-                    category = _.contains(categoryIds, row[0]) ? row[0] : row[1];
-                    dataElement = _.contains(categoryIds, row[0]) ? row[1] : row[0];
+                var map = {};
 
-                    return {
-                        "category": category,
-                        "dataElement": dataElement,
-                        "period": row[2],
-                        "value": parseInt(row[3])
-                    };
-                }
+                var dimensionIndex = _.findIndex($scope.data.headers, {
+                    "name": "dx"
+                });
+                map.dataElement = row[dimensionIndex];
+
+                var periodIndex = _.findIndex($scope.data.headers, {
+                    "name": "pe"
+                });
+                map.period = row[periodIndex];
+
+                var valueIndex = _.findIndex($scope.data.headers, {
+                    "name": "value"
+                });
+                map.value = parseInt(row[valueIndex]);
+
+                var categoryIndex = _.findIndex($scope.data.headers, function(item) {
+                    return item.name !== "dx" && item.name !== "pe" && item.name !== "value";
+                });
+                if (categoryIndex != -1)
+                    map.category = row[categoryIndex];
+
+                return map;
             });
         };
 
@@ -122,7 +136,7 @@ define(["lodash", "moment"], function(_, moment) {
                             "category": categoryId,
                             "dataElement": dataElement,
                             "dataElementName": $scope.data.metaData.names[dataElement],
-                            "sortOrder": getSortOrder(dataElement),
+                            "sortOrder": getSortOrder(dataElement, categoryId),
                         });
                     });
                 });

@@ -1,31 +1,71 @@
-define(['downloadChartConsumer', 'angularMocks', 'utils', 'chartService', 'chartRepository', 'userPreferenceRepository', 'datasetRepository'], function (DownloadChartConsumer, mocks, utils, ChartService, ChartRepository, UserPreferenceRepository, DatasetRepository) {
+define(['downloadReportsConsumer', 'angularMocks', 'utils', 'reportService', 'chartRepository', 'pivotTableRepository', 'userPreferenceRepository', 'datasetRepository'], function(DownloadReportsConsumer, mocks, utils, ReportService, ChartRepository, PivotTableRepository, UserPreferenceRepository, DatasetRepository) {
 
-    describe('Download Charts Consumer', function () {
-        var downloadChartConsumer, chartService, chartRepository, userPreferenceRepository, datasetRepository, scope, q;
+    describe('Download Reports Consumer', function() {
+        var downloadReportsConsumer, reportService, chartRepository, userPreferenceRepository, datasetRepository, scope, q;
 
-        beforeEach(mocks.inject(function ($q, $rootScope) {
+        beforeEach(mocks.inject(function($q, $rootScope) {
 
             scope = $rootScope;
             q = $q;
 
             datasetRepository = new DatasetRepository();
-            spyOn(datasetRepository , 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, {}));
+            spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, {}));
 
             userPreferenceRepository = new UserPreferenceRepository();
             spyOn(userPreferenceRepository, 'getUserModules').and.returnValue(utils.getPromise(q, {}));
 
-            chartService = new ChartService();
-            spyOn(chartService, 'getAllFieldAppChartsForDataset').and.returnValue(utils.getPromise(q, {}));
-            spyOn(chartService, 'getChartDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
+            reportService = new ReportService();
+            spyOn(reportService, 'getCharts').and.returnValue(utils.getPromise(q, {}));
+            spyOn(reportService, 'getPivotTables').and.returnValue(utils.getPromise(q, {}));
+            spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
 
             chartRepository = new ChartRepository();
             spyOn(chartRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
             spyOn(chartRepository, 'upsertChartData').and.returnValue(utils.getPromise(q, {}));
 
-            downloadChartConsumer = new DownloadChartConsumer(chartService, chartRepository, userPreferenceRepository, datasetRepository, $q);
+            pivotTableRepository = new PivotTableRepository();
+            spyOn(pivotTableRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
+            spyOn(pivotTableRepository, 'upsertPivotTableData').and.returnValue(utils.getPromise(q, {}));
+
+            downloadReportsConsumer = new DownloadReportsConsumer(reportService, chartRepository, pivotTableRepository, userPreferenceRepository, datasetRepository, $q);
         }));
 
-        it('should download all field app charts definitions for relevant datasets', function () {
+        it('should download all field app tables', function() {
+            var fieldAppPivotTables = [{
+                "id": "table1",
+                "name": "Field App - Nutrition Monthly Pediatric",
+                "someAttribute": "someValue"
+            }];
+
+
+            userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, [{
+                "id": "mod1"
+            }]));
+            datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [{
+                "id": "ds1"
+            }]));
+
+            reportService.getPivotTables.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
+            reportService.getReportDataForOrgUnit.and.returnValue(utils.getPromise(q, [{
+                "id": "id12"
+            }]));
+            pivotTableRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
+
+            downloadReportsConsumer.run();
+            scope.$apply();
+
+            expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(["mod1"]);
+            expect(reportService.getPivotTables).toHaveBeenCalledWith([{
+                id: 'ds1'
+            }]);
+            expect(pivotTableRepository.upsert).toHaveBeenCalledWith(fieldAppPivotTables);
+            expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod1");
+            expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith('Field App - Nutrition Monthly Pediatric', 'mod1', [{
+                id: 'id12'
+            }]);
+        });
+
+        it('should download all field app charts definitions for relevant datasets', function() {
             var datasetsAssociatedWithUserModules = [{
                 "id": "ds1",
                 "name": "Out Patient Department - General",
@@ -75,9 +115,9 @@ define(['downloadChartConsumer', 'angularMocks', 'utils', 'chartService', 'chart
             }];
             userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, userModules));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
-            chartService.getAllFieldAppChartsForDataset.and.returnValue(utils.getPromise(q, fieldAppCharts));
+            reportService.getCharts.and.returnValue(utils.getPromise(q, fieldAppCharts));
             chartRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppCharts));
-            chartService.getChartDataForOrgUnit.and.callFake(function (chart, modId) {
+            reportService.getReportDataForOrgUnit.and.callFake(function(chart, modId) {
                 if (chart === fieldAppCharts[0] && modId === "Mod1")
                     return utils.getPromise(q, "data1");
                 if (chart === fieldAppCharts[0] && modId === "Mod2")
@@ -89,17 +129,17 @@ define(['downloadChartConsumer', 'angularMocks', 'utils', 'chartService', 'chart
             });
             chartRepository.upsertChartData.and.returnValue(utils.getPromise(q, []));
 
-            downloadChartConsumer.run();
+            downloadReportsConsumer.run();
             scope.$apply();
 
             expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
             expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod1', 'Mod2']);
-            expect(chartService.getAllFieldAppChartsForDataset).toHaveBeenCalledWith(datasetsAssociatedWithUserModules);
+            expect(reportService.getCharts).toHaveBeenCalledWith(datasetsAssociatedWithUserModules);
             expect(chartRepository.upsert).toHaveBeenCalledWith(fieldAppCharts);
-            expect(chartService.getChartDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[0], 'Mod1');
-            expect(chartService.getChartDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[0], 'Mod2');
-            expect(chartService.getChartDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[1], 'Mod1');
-            expect(chartService.getChartDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[1], 'Mod2');
+            expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[0], 'Mod1');
+            expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[0], 'Mod2');
+            expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[1], 'Mod1');
+            expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[1], 'Mod2');
             expect(chartRepository.upsertChartData).toHaveBeenCalledWith("[FieldApp - GeneralIPDWard] Admission by Age Group", "Mod1", "data1");
             expect(chartRepository.upsertChartData).toHaveBeenCalledWith("[FieldApp - OutPatientDepartmentGeneral] Total Consultations", "Mod1", "data3");
             expect(chartRepository.upsertChartData).toHaveBeenCalledWith("[FieldApp - GeneralIPDWard] Admission by Age Group", "Mod2", "data2");
@@ -107,15 +147,15 @@ define(['downloadChartConsumer', 'angularMocks', 'utils', 'chartService', 'chart
 
         });
 
-        it('should exit if user module is empty', function () {
-            downloadChartConsumer.run();
+        it('should exit if user module is empty', function() {
+            downloadReportsConsumer.run();
             scope.$apply();
 
             expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
             expect(datasetRepository.findAllForOrgUnits).not.toHaveBeenCalled();
-            expect(chartService.getAllFieldAppChartsForDataset).not.toHaveBeenCalled();
+            expect(reportService.getCharts).not.toHaveBeenCalled();
             expect(chartRepository.upsert).not.toHaveBeenCalled();
-            expect(chartService.getChartDataForOrgUnit).not.toHaveBeenCalled();
+            expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
             expect(chartRepository.upsertChartData).not.toHaveBeenCalled();
         });
 
