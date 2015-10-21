@@ -1,11 +1,21 @@
-define(["lodash"], function(_) {
-    return function(reportService, chartRepository, pivotTableRepository, userPreferenceRepository, datasetRepository, $q) {
+define(["lodash", "moment"], function(_, moment) {
+    return function(reportService, chartRepository, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, $q) {
 
         this.run = function(message) {
 
-            var loadUserModuleIds = function() {
-                return userPreferenceRepository.getUserModules().then(function(modules) {
-                    return _.pluck(modules, "id");
+            var getLastDownloadedTime = function(userProjectIds) {
+                return changeLogRepository.get("reports:" + userProjectIds.join(';'));
+            };
+
+            var updateChangeLog = function(userProjectIds) {
+                return changeLogRepository.upsert("reports:" + userProjectIds.join(';'), moment().toISOString());
+            };
+
+            var loadUserProjectsAndModuleIds = function() {
+                return userPreferenceRepository.getCurrentProjects().then(function(projects) {
+                    return userPreferenceRepository.getUserModules().then(function(modules) {
+                        return [_.pluck(projects, "id"), _.pluck(modules, "id")];
+                    });
                 });
             };
 
@@ -13,7 +23,7 @@ define(["lodash"], function(_) {
                 return datasetRepository.findAllForOrgUnits(userModuleIds);
             };
 
-            var loadChartData = function(userModuleIds, datasets) {
+            var downloadAndSaveChartData = function(userModuleIds, datasets) {
 
                 var saveCharts = function(charts) {
                     return chartRepository.upsert(charts).then(function(data) {
@@ -36,7 +46,7 @@ define(["lodash"], function(_) {
                     .then(saveChartData);
             };
 
-            var loadPivotTableData = function(userModuleIds, datasets) {
+            var downloadAndSavePivotTableData = function(userModuleIds, datasets) {
 
                 var savePivotTables = function(pivotTables) {
                     return pivotTableRepository.upsert(pivotTables).then(function(data) {
@@ -59,16 +69,25 @@ define(["lodash"], function(_) {
                     .then(savePivotTableData);
             };
 
-            return loadUserModuleIds().then(function(userModuleIds) {
-                if (_.isEmpty(userModuleIds))
+            return loadUserProjectsAndModuleIds().then(function(data) {
+                var projectIds = data[0];
+                var moduleIds = data[1];
+
+                if (_.isEmpty(moduleIds))
                     return;
 
-                return loadRelevantDatasets(userModuleIds).then(function(datasets) {
-                    return $q.all([loadChartData(userModuleIds, datasets), loadPivotTableData(userModuleIds, datasets)]);
+                return getLastDownloadedTime(projectIds).then(function(lastDownloadedTime) {
+
+                    if (lastDownloadedTime && !moment().isAfter(lastDownloadedTime, 'day'))
+                        return;
+
+                    return loadRelevantDatasets(moduleIds).then(function(datasets) {
+                        return $q.all([downloadAndSaveChartData(moduleIds, datasets), downloadAndSavePivotTableData(moduleIds, datasets)]).then(function() {
+                            return updateChangeLog(projectIds);
+                        });
+                    });
                 });
             });
-
-
         };
     };
 });
