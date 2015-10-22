@@ -2,6 +2,18 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
     return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository) {
         $scope.projects = [];
 
+        $scope.environment = {
+            "172.18.41.4": "QA-1",
+            "datawhqa": "QA-1",
+            "172.18.41.2": "QA-2",
+            "datawhq2": "QA-2",
+            "172.18.41.5": "TW-UAT",
+            "datawhuat": "TW-UAT",
+            "uat": "BAO-UAT",
+            "ocpdata": "PROD",
+            "localhost": "Development"
+        };
+
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
             return hasUserLoggedIn && isCoordinationApprover;
         };
