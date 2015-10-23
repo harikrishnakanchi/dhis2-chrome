@@ -4,13 +4,13 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         $scope.environment = {
             "172.18.41.4": "QA-1",
-            "datawhqa": "QA-1",
+            "datawhqa.twhosted.com": "QA-1",
             "172.18.41.2": "QA-2",
-            "datawhq2": "QA-2",
+            "datawhqa2.twhosted.com": "QA-2",
             "172.18.41.5": "TW-UAT",
-            "datawhuat": "TW-UAT",
-            "uat": "BAO-UAT",
-            "ocpdata": "PROD",
+            "datawhuat.twhosted.com": "TW-UAT",
+            "uat.ocpdata.org": "BAO-UAT",
+            "ocpdata.org": "PROD",
             "localhost": "Development"
         };
 
