@@ -93,34 +93,34 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "population",
-                "name": "Population"
+                "code": "estimatedTargetPopulation",
+                "name": "Estimated target population"
             },
-            "value": orgUnit.population ? orgUnit.population.toString() : ""
+            "value": orgUnit.estimatedTargetPopulation ? orgUnit.estimatedTargetPopulation.toString() : ""
         }, {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "proportionOfChildrenLessThan1YearOld",
-                "name": "Proportion of children < 1 year old"
+                "code": "estPopulationLessThan1Year",
+                "name": "Est. population less than 1 year"
             },
-            "value": orgUnit.proportionOfChildrenLessThan1YearOld ? orgUnit.proportionOfChildrenLessThan1YearOld.toString() : ""
+            "value": orgUnit.estPopulationLessThan1Year ? orgUnit.estPopulationLessThan1Year.toString() : ""
         }, {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "proportionOfChildrenLessThan5YearsOld",
-                "name": "Proportion of children < 5 years old"
+                "code": "estPopulationBetween1And5Years",
+                "name": "Est. population between 1 and 5 years"
             },
-            "value": orgUnit.proportionOfChildrenLessThan5YearsOld ? orgUnit.proportionOfChildrenLessThan5YearsOld.toString() : ""
+            "value": orgUnit.estPopulationBetween1And5Years ? orgUnit.estPopulationBetween1And5Years.toString() : ""
         }, {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
             "attribute": {
-                "code": "proportionOfWomenOfChildBearingAge",
-                "name": "Proportion of women of child bearing age"
+                "code": "estPopulationOfWomenOfChildBearingAge",
+                "name": "Est. population of women of child bearing age"
             },
-            "value": orgUnit.proportionOfWomenOfChildBearingAge ? orgUnit.proportionOfWomenOfChildBearingAge.toString() : ""
+            "value": orgUnit.estPopulationOfWomenOfChildBearingAge ? orgUnit.estPopulationOfWomenOfChildBearingAge.toString() : ""
         });
 
         if (orgUnit.endDate)
@@ -219,10 +219,10 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
             'modelOfManagement': _.find(modelOfManagement, {
                 "name": self.getAttributeValue(dhisProject, "modelOfManagement")
             }),
-            'population': parseInt(self.getAttributeValue(dhisProject, "population")),
-            'proportionOfChildrenLessThan1YearOld': parseInt(self.getAttributeValue(dhisProject, "proportionOfChildrenLessThan1YearOld")),
-            'proportionOfChildrenLessThan5YearsOld': parseInt(self.getAttributeValue(dhisProject, "proportionOfChildrenLessThan5YearsOld")),
-            'proportionOfWomenOfChildBearingAge': parseInt(self.getAttributeValue(dhisProject, "proportionOfWomenOfChildBearingAge")),
+            'estimatedTargetPopulation': parseInt(self.getAttributeValue(dhisProject, "estimatedTargetPopulation")),
+            'estPopulationLessThan1Year': parseInt(self.getAttributeValue(dhisProject, "estPopulationLessThan1Year")),
+            'estPopulationBetween1And5Years': parseInt(self.getAttributeValue(dhisProject, "estPopulationBetween1And5Years")),
+            'estPopulationOfWomenOfChildBearingAge': parseInt(self.getAttributeValue(dhisProject, "estPopulationOfWomenOfChildBearingAge")),
             'autoApprove': autoApprove === undefined ? "false" : autoApprove
         };
     };

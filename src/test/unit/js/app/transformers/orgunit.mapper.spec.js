@@ -83,26 +83,26 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "value": "Some Type"
                 }, {
                     "attribute": {
-                        "code": "population",
-                        "name": "Population"
+                        "code": "estimatedTargetPopulation",
+                        "name": "Estimated target population"
                     },
                     "value": "1000"
                 }, {
                     "attribute": {
-                        "code": "proportionOfChildrenLessThan1YearOld",
-                        "name": "Proportion of children < 1 year old",
+                        "code": "estPopulationLessThan1Year",
+                        "name": "Est. population less than 1 year",
                     },
                     "value": "11"
                 }, {
                     "attribute": {
-                        "code": "proportionOfChildrenLessThan5YearsOld",
-                        "name": "Proportion of children < 5 years old"
+                        "code": "estPopulationBetween1And5Years",
+                        "name": "Est. population between 1 and 5 years"
                     },
                     "value": "12"
                 }, {
                     "attribute": {
-                        "code": "proportionOfWomenOfChildBearingAge",
-                        "name": "Proportion of women of child bearing age"
+                        "code": "estPopulationOfWomenOfChildBearingAge",
+                        "name": "Est. population of women of child bearing age"
                     },
                     "value": "13"
                 }]
@@ -168,10 +168,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "id": "a11a7a5d55a",
                     "name": "Collaboration"
                 },
-                "population": 1000,
-                "proportionOfChildrenLessThan1YearOld": 11,
-                "proportionOfChildrenLessThan5YearsOld": 12,
-                "proportionOfWomenOfChildBearingAge": 13,
+                "estimatedTargetPopulation": 1000,
+                "estPopulationLessThan1Year": 11,
+                "estPopulationBetween1And5Years": 12,
+                "estPopulationOfWomenOfChildBearingAge": 13,
                 "autoApprove": "true"
             };
 
@@ -212,10 +212,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "reasonForIntervention": undefined,
                 "modeOfOperation": undefined,
                 "modelOfManagement": undefined,
-                "population": NaN,
-                "proportionOfChildrenLessThan1YearOld": NaN,
-                "proportionOfChildrenLessThan5YearsOld": NaN,
-                "proportionOfWomenOfChildBearingAge": NaN,
+                "estimatedTargetPopulation": NaN,
+                "estPopulationLessThan1Year": NaN,
+                "estPopulationBetween1And5Years": NaN,
+                "estPopulationOfWomenOfChildBearingAge": NaN,
                 "autoApprove": "false"
             };
 
@@ -247,10 +247,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "modelOfManagement": {
                     "title": "Collaboration"
                 },
-                "population": "1000",
-                "proportionOfChildrenLessThan1YearOld": 11,
-                "proportionOfChildrenLessThan5YearsOld": 12,
-                "proportionOfWomenOfChildBearingAge": 13,
+                "estimatedTargetPopulation": "1000",
+                "estPopulationLessThan1Year": 11,
+                "estPopulationBetween1And5Years": 12,
+                "estPopulationOfWomenOfChildBearingAge": 13,
                 "autoApprove": "true"
             };
 
@@ -368,32 +368,32 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "population",
-                        "name": "Population"
+                        "code": "estimatedTargetPopulation",
+                        "name": "Estimated target population"
                     },
                     "value": "1000"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "proportionOfChildrenLessThan1YearOld",
-                        "name": "Proportion of children < 1 year old",
+                        "code": "estPopulationLessThan1Year",
+                        "name": "Est. population less than 1 year",
                     },
                     "value": "11"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "proportionOfChildrenLessThan5YearsOld",
-                        "name": "Proportion of children < 5 years old"
+                        "code": "estPopulationBetween1And5Years",
+                        "name": "Est. population between 1 and 5 years"
                     },
                     "value": "12"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "proportionOfWomenOfChildBearingAge",
-                        "name": "Proportion of women of child bearing age"
+                        "code": "estPopulationOfWomenOfChildBearingAge",
+                        "name": "Est. population of women of child bearing age"
                     },
                     "value": "13"
                 }, {
@@ -708,10 +708,10 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "name": "Collaboration"
                 },
                 "autoApprove": "true",
-                "population": "1000",
-                "proportionOfChildrenLessThan1YearOld": "11",
-                "proportionOfChildrenLessThan5YearsOld": "12",
-                "proportionOfWomenOfChildBearingAge": "13"
+                "estimatedTargetPopulation": "1000",
+                "estPopulationLessThan1Year": "11",
+                "estPopulationBetween1And5Years": "12",
+                "estPopulationOfWomenOfChildBearingAge": "13"
             };
 
             var expectedSavedProject = {
@@ -813,32 +813,32 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "population",
-                        "name": "Population"
+                        "code": "estimatedTargetPopulation",
+                        "name": "Estimated target population"
                     },
                     "value": "1000"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "proportionOfChildrenLessThan1YearOld",
-                        "name": "Proportion of children < 1 year old",
+                        "code": "estPopulationLessThan1Year",
+                        "name": "Est. population less than 1 year",
                     },
                     "value": "11"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "proportionOfChildrenLessThan5YearsOld",
-                        "name": "Proportion of children < 5 years old"
+                        "code": "estPopulationBetween1And5Years",
+                        "name": "Est. population between 1 and 5 years"
                     },
                     "value": "12"
                 }, {
                     "created": "2014-10-29T12:43:54.972Z",
                     "lastUpdated": "2014-10-29T12:43:54.972Z",
                     "attribute": {
-                        "code": "proportionOfWomenOfChildBearingAge",
-                        "name": "Proportion of women of child bearing age"
+                        "code": "estPopulationOfWomenOfChildBearingAge",
+                        "name": "Est. population of women of child bearing age"
                     },
                     "value": "13"
                 }, {
