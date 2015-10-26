@@ -23,7 +23,8 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "retryIntervalInMinutes": 1
         },
         "dhis": {
-            "url": url
+            "url": url,
+            "authHeader": "Basic c2VydmljZS5jaHJvbWU6UGFzc3dvcmQx"
         },
         "queue": {
             "maxretries": 5,

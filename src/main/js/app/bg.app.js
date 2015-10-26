@@ -109,9 +109,9 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
                     chromeUtils.addListener("productKeyDecrypted", function() {
                         systemSettingRepository.loadProductKey().then(function() {
-                            consumerRegistry.register();
                             setupAlarms();
-                            checkOnlineStatusAndSync();
+                            consumerRegistry.register()
+                                .then(checkOnlineStatusAndSync);
                         });
                     });
 
@@ -122,9 +122,9 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     systemSettingRepository.isProductKeySet()
                         .then(systemSettingRepository.loadProductKey)
                         .then(function() {
-                            consumerRegistry.register();
                             setupAlarms();
-                            checkOnlineStatusAndSync();
+                            consumerRegistry.register()
+                                .then(checkOnlineStatusAndSync);
                         });
                 }
             ]);

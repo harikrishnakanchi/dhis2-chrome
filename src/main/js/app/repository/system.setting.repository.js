@@ -1,4 +1,4 @@
-define(["lodash", "cipherUtils"], function(_, cipherUtils) {
+define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, properties) {
     return function(db, $q, $rootScope) {
         var decryptProductKey = function(productKey) {
             return cipherUtils.decrypt(productKey);
@@ -19,6 +19,9 @@ define(["lodash", "cipherUtils"], function(_, cipherUtils) {
         };
 
         var loadProductKey = function() {
+            if (properties.devMode)
+                return $q.when();
+
             return get("productKey").then(function(productKey) {
                 return cacheProductKeyDetails(productKey);
             });
@@ -43,11 +46,17 @@ define(["lodash", "cipherUtils"], function(_, cipherUtils) {
         };
 
         var getDhisUrl = function() {
+            if (properties.devMode && _.isUndefined($rootScope.dhisUrl))
+                return properties.dhis.url;
+
             if (!_.isUndefined($rootScope.dhisUrl))
                 return $rootScope.dhisUrl;
         };
 
         var getAuthHeader = function() {
+            if (properties.devMode && _.isUndefined($rootScope.authHeader))
+                return properties.dhis.authHeader;
+
             if (!_.isUndefined($rootScope.authHeader))
                 return $rootScope.authHeader;
         };
@@ -59,6 +68,9 @@ define(["lodash", "cipherUtils"], function(_, cipherUtils) {
         };
 
         var isProductKeySet = function() {
+            if (properties.devMode)
+                return $q.when(true);
+
             return get("productKey").then(function(productKey) {
                 return productKey !== undefined;
             }, function() {
