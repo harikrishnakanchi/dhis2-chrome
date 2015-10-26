@@ -55,6 +55,8 @@ define(["lodash", "moment"], function(_, moment) {
 
             var value = allValues !== undefined ? allValues.value : 0;
 
+            $scope.periodBasedValues[period] = $scope.periodBasedValues[period] || value;
+
             return value;
         };
 
@@ -90,9 +92,14 @@ define(["lodash", "moment"], function(_, moment) {
         if ($scope.definition && $scope.data) {
 
             $scope.viewMap = [];
+            $scope.periodBasedValues = {};
             $scope.periods = $scope.data.metaData.pe;
             $scope.isCategoryPresent = $scope.data.width === 4 ? true : false;
             var dataElements;
+
+            _.each($scope.periods, function(period) {
+                $scope.periodBasedValues[period] = 0;
+            });
 
             if ($scope.isCategoryPresent) {
                 var sortedCategories = _.map($scope.definition.categoryDimensions[0].categoryOptions, function(categoryOption, index) {
