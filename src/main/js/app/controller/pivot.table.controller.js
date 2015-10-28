@@ -90,7 +90,7 @@ define(["lodash", "moment"], function(_, moment) {
                 var valueIndex = _.findIndex($scope.data.headers, {
                     "name": "value"
                 });
-                map.value = parseInt(row[valueIndex]);
+                map.value = parseFloat(row[valueIndex]);
 
                 var categoryIndex = _.findIndex($scope.data.headers, function(item) {
                     return item.name !== "dx" && item.name !== "pe" && item.name !== "value";
