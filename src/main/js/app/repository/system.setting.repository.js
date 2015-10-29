@@ -28,12 +28,18 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
         };
 
         var upsertProductKey = function(productKeyJson) {
-            cacheProductKeyDetails(productKeyJson.value);
+            try {
+                JSON.parse(decryptProductKey(productKeyJson.value));
+                cacheProductKeyDetails(productKeyJson.value);
 
-            var store = db.objectStore("systemSettings");
-            return store.upsert(productKeyJson).then(function() {
-                return productKeyJson;
-            });
+                var store = db.objectStore("systemSettings");
+                return store.upsert(productKeyJson).then(function() {
+                    return productKeyJson;
+                });
+            } catch (e) {
+                return $q.reject();
+            }
+
         };
 
         var get = function(key) {

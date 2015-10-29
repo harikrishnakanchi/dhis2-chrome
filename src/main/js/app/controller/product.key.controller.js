@@ -7,17 +7,24 @@ define(["chromeUtils"], function(chromeUtils) {
             chromeUtils.sendMessage("productKeyDecrypted");
         };
 
+        var onSuccess = function() {
+            $scope.isKeyInvalid = false;
+            triggerImportAndSync();
+            if ($rootScope.currentUser)
+                sessionHelper.logout();
+            $location.path("/login");
+        };
+
+        var onFailure = function() {
+            $scope.isKeyInvalid = true;
+        };
+
         $scope.setAuthHeaderAndProceed = function() {
             var productKey = {
                 "key": "productKey",
                 "value": $scope.productKey
             };
-            systemSettingRepository.upsertProductKey(productKey).then(function() {
-                triggerImportAndSync();
-                if ($rootScope.currentUser)
-                    sessionHelper.logout();
-                $location.path("/login");
-            });
+            systemSettingRepository.upsertProductKey(productKey).then(onSuccess, onFailure);
         };
     };
 });
