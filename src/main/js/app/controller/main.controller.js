@@ -2,16 +2,8 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
     return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository) {
         $scope.projects = [];
 
-        $scope.environment = {
-            "172.18.41.4": "QA-1",
-            "datawhqa.twhosted.com": "QA-1",
-            "172.18.41.2": "QA-2",
-            "datawhqa2.twhosted.com": "QA-2",
-            "172.18.41.5": "TW-UAT",
-            "datawhuat.twhosted.com": "TW-UAT",
-            "uat.ocpdata.org": "BAO-UAT",
-            "ocpdata.org": "PROD",
-            "localhost": "Development"
+        $scope.isConnectedToProd = function() {
+            return systemSettingRepository.isKeyGeneratedFromProd();
         };
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {

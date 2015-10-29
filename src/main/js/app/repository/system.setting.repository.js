@@ -13,9 +13,11 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
 
         var cacheProductKeyDetails = function(productKey) {
             var decryptedProductKey = JSON.parse(decryptProductKey(productKey));
-            $rootScope.authHeader = decryptedProductKey.authHeader;
-            $rootScope.dhisUrl = decryptedProductKey.dhisUrl;
-            $rootScope.allowedOrgUnits = decryptedProductKey.allowedOrgUnits;
+            $rootScope.authHeader = decryptedProductKey.data.authHeader;
+            $rootScope.dhisUrl = decryptedProductKey.data.dhisUrl;
+            $rootScope.allowedOrgUnits = decryptedProductKey.data.allowedOrgUnits;
+
+            $rootScope.isKeyGeneratedFromProd = decryptedProductKey.keyGeneratedFromProd;
         };
 
         var loadProductKey = function() {
@@ -55,22 +57,22 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
             if (properties.devMode && _.isUndefined($rootScope.dhisUrl))
                 return properties.dhis.url;
 
-            if (!_.isUndefined($rootScope.dhisUrl))
-                return $rootScope.dhisUrl;
+            return $rootScope.dhisUrl;
         };
 
         var getAuthHeader = function() {
             if (properties.devMode && _.isUndefined($rootScope.authHeader))
                 return properties.dhis.authHeader;
 
-            if (!_.isUndefined($rootScope.authHeader))
-                return $rootScope.authHeader;
+            return $rootScope.authHeader;
         };
 
-
         var getAllowedOrgUnits = function() {
-            if (!_.isUndefined($rootScope.allowedOrgUnits))
-                return $rootScope.allowedOrgUnits;
+            return $rootScope.allowedOrgUnits;
+        };
+
+        var isKeyGeneratedFromProd = function() {
+            return $rootScope.isKeyGeneratedFromProd;
         };
 
         var isProductKeySet = function() {
@@ -91,6 +93,7 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
             "getDhisUrl": getDhisUrl,
             "getAuthHeader": getAuthHeader,
             "getAllowedOrgUnits": getAllowedOrgUnits,
+            "isKeyGeneratedFromProd": isKeyGeneratedFromProd,
             "isProductKeySet": isProductKeySet,
             "loadProductKey": loadProductKey
         };
