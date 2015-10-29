@@ -582,31 +582,30 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
             });
 
             it("should populate list of projectPopulation attributes", function() {
-
                 orgUnitRepository.getParentProject.and.returnValue(utils.getPromise(q, {
                     "id": "proj1",
                     "attributeValues": [{
                         'attribute': {
-                            'code': 'population',
+                            'code': 'estimatedTargetPopulation',
                             'name': 'Population',
                             'id': 'p1'
                         },
                         'value': '1000'
                     }, {
                         'attribute': {
-                            'code': 'proportionOfChildrenLessThan1YearOld',
+                            'code': 'estPopulationLessThan1Year',
                             'name': 'Proportion of children < 1 year old',
                         },
                         'value': '12'
                     }, {
                         'attribute': {
-                            'code': 'proportionOfChildrenLessThan5YearsOld',
+                            'code': 'estPopulationBetween1And5Years',
                             'name': 'Proportion of children < 5 years old',
                         },
                         'value': '20'
                     }, {
                         'attribute': {
-                            'code': 'proportionOfWomenOfChildBearingAge',
+                            'code': 'estPopulationOfWomenOfChildBearingAge',
                             'name': 'Proportion of women of child bearing age',
                         },
                         'value': '30'
@@ -627,10 +626,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
 
                 expect(scope.projectPopulationDetails).toEqual({
-                    "population": '1000',
-                    "proportionOfChildrenLessThan1YearOld": '12',
-                    "proportionOfChildrenLessThan5YearsOld": '20',
-                    "proportionOfWomenOfChildBearingAge": '30'
+                    "estimatedTargetPopulation": '1000',
+                    "estPopulationLessThan1Year": '12',
+                    "estPopulationBetween1And5Years": '20',
+                    "estPopulationOfWomenOfChildBearingAge": '30'
                 });
             });
 

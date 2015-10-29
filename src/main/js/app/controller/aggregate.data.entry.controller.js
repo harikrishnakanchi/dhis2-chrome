@@ -381,7 +381,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             };
 
             var extractPopulationDetails = function(orgUnitAttrs) {
-                var populationDataCodes = ["population", "proportionOfChildrenLessThan1YearOld", "proportionOfChildrenLessThan5YearsOld", "proportionOfWomenOfChildBearingAge"];
+                var populationDataCodes = ["estimatedTargetPopulation", "estPopulationLessThan1Year", "estPopulationBetween1And5Years", "estPopulationOfWomenOfChildBearingAge"];
                 var populationDetails = {};
                 _.forEach(orgUnitAttrs, function(attr) {
                     if (_.includes(populationDataCodes, attr.attribute.code)) {
