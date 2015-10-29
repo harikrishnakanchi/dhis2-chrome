@@ -24,6 +24,7 @@
         }
         .panel-default {
             border: none !important;
+            // page-break-after: always;
             .panel-heading {
                 background: #transparent !important;
                 padding-left: 0px;
@@ -65,7 +66,7 @@
         }
         .panel-group {
             margin-bottom: 0px;
-            .dataset-acc-wrapper {
+            .dataset-acc-wrapper > .panel-default {
                 page-break-after: always;
             }
         }
@@ -137,6 +138,10 @@
         }
         .display-print {
             text-indent: 0px;
+        }
+        .text-muted,
+        .glyphicon-tag {
+            display: none;
         }
     }
 }

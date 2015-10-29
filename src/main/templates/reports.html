@@ -1,4 +1,5 @@
-<div class="dataentrypage parent-margin">
+<div class="dataentrypage parent-margin report-container
+">
     <section class="panel tab-panel">
         <div class="row">
             <div class="col-md-12">
@@ -24,7 +25,8 @@
                                 <span class="glyphicon glyphicon-download-alt"></span>
                             </a>
                         </div>
-                        <p ng-if="chart.type === 'line'">
+                        <p ng-if="chart.type === 'line'" class="lineChart-container
+">
                             <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
                         </p>
                         <p ng-if="chart.type === 'column'">

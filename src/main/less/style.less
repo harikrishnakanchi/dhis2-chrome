@@ -23,6 +23,15 @@ body {
     .chart-title {
         font-size: 24px;
         font-weight: 500;
+        h3 {
+            text-decoration: underline;
+        }
+        .glyphicon-download-alt {
+            padding: 9px 7px 7px 9px;
+            border: 1px #EFEFEF solid;
+            margin-top: 5px;
+            box-shadow: 2px 2px 2px #ccc;
+        }
     }
     .dropdown-menu {
         li {
@@ -30,6 +39,9 @@ body {
                 border-bottom-color: #fff !important;
             }
         }
+    }
+    .position-relative {
+        position: relative;
     }
     .dropdown-submenu {
         position: relative;
@@ -68,6 +80,7 @@ body {
     .dropdown-submenu.pull-left {
         float: none;
         min-width: inherit;
+        width: 100%;
     }
     .dropdown-submenu.pull-left>.dropdown-menu {
         left: -100%;
@@ -301,6 +314,15 @@ body {
             margin-bottom: 5px;
             th {
                 line-height: 1.0000;
+                // background: #EAEAEA;
+            }
+        }
+        .dataset-acc-wrapper {
+            .table {
+                th {
+                    line-height: 1.0000;
+                    background: #EAEAEA;
+                }
             }
         }
     }
@@ -825,6 +847,7 @@ input[type="checkbox"].dashboard-form-checkbox {
 #dataentry {
     .accordion-toggle {
         cursor: pointer;
+        display: block;
     }
 }
 
@@ -897,4 +920,13 @@ input[type="checkbox"].dashboard-form-checkbox {
     position: absolute;
     top: 50px;
     right: 20px;
+}
+
+.report-container {
+    .table {
+        th {
+            line-height: 1.0000;
+            background: #EAEAEA;
+        }
+    }
 }
