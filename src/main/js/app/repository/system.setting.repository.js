@@ -15,7 +15,6 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
             var decryptedProductKey = JSON.parse(decryptProductKey(productKey));
             $rootScope.authHeader = decryptedProductKey.data.authHeader;
             $rootScope.dhisUrl = decryptedProductKey.data.dhisUrl;
-            $rootScope.allowedOrgUnits = decryptedProductKey.data.allowedOrgUnits;
 
             $rootScope.isKeyGeneratedFromProd = decryptedProductKey.keyGeneratedFromProd;
         };
@@ -67,10 +66,6 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
             return $rootScope.authHeader;
         };
 
-        var getAllowedOrgUnits = function() {
-            return $rootScope.allowedOrgUnits;
-        };
-
         var isKeyGeneratedFromProd = function() {
             return $rootScope.isKeyGeneratedFromProd;
         };
@@ -92,7 +87,6 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
             "get": get,
             "getDhisUrl": getDhisUrl,
             "getAuthHeader": getAuthHeader,
-            "getAllowedOrgUnits": getAllowedOrgUnits,
             "isKeyGeneratedFromProd": isKeyGeneratedFromProd,
             "isProductKeySet": isProductKeySet,
             "loadProductKey": loadProductKey
