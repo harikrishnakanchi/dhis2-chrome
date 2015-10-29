@@ -39,6 +39,8 @@ gulp.task('test', function() {
         });
 });
 
+gulp.task('pre-commit', ['test', 'lint']);
+
 gulp.task('devtest', function() {
     return gulp.src('_')
         .pipe(karma({
