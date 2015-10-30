@@ -119,7 +119,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
         };
 
         $scope.getTableName = function(tableName) {
-            var regex = /^\[FieldApp - ([a-zA-Z0-9><]+)\]([0-9\s]*)([a-zA-Z0-9\s]+)/;
+            var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9\s]+)/;
             var match = regex.exec(tableName);
             if (match) {
                 var parsedTableName = match[3];

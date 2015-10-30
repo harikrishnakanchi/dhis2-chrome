@@ -2,7 +2,7 @@ define(["lodash", "moment"], function(_, moment) {
     return function($scope) {
 
         $scope.getCsvFileName = function() {
-            var regex = /^\[FieldApp - ([a-zA-Z0-9><]+)\]\s([a-zA-Z0-9\s]+)/;
+            var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
             var match = regex.exec($scope.definition.name);
             if (match) {
                 var serviceName = match[1];
