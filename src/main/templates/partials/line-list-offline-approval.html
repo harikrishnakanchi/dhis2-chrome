@@ -26,7 +26,7 @@
                     </div>
                     <div class="exp-coll-group" ng-if="!isGenderFilterApplied &amp;&amp; !isAgeFilterApplied">
                         <accordion close-others="false">
-                            <div ng-repeat="programStage in program.programStages">
+                            <div ng-repeat="programStage in program.programStages" ng-class="'dataset-acc-wrapper'">
                                 <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                                     <div ng-repeat="psde in section.programStageDataElements">
                                         <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements)">
