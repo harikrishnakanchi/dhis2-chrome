@@ -6,6 +6,10 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return systemSettingRepository.isKeyGeneratedFromProd();
         };
 
+        $scope.getDhisUrl = function() {
+            return systemSettingRepository.getDhisUrl();
+        };
+
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
             return hasUserLoggedIn && isCoordinationApprover;
         };

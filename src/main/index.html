@@ -89,10 +89,13 @@
             </div>
             <div ng-view="ng-view">
             </div>
-            <div class="text-right small text-muted">
-                <p ng-if="isConnectedToProd()">Connected to PROD</p>
-            </div>
         </div>
+        <footer>
+            <div class="container text-right small text-muted">
+                <p ng-if="isConnectedToProd()">Connected to PROD</p>
+                <p ng-if="!isConnectedToProd()">Connected to {{ getDhisUrl() }}</p>
+            </div>
+    </div>
     </div>
 </body>
 
