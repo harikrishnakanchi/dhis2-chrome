@@ -12,9 +12,9 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             var loadUserProjectsAndModuleIds = function() {
-                return userPreferenceRepository.getCurrentProjects().then(function(projects) {
+                return userPreferenceRepository.getCurrentProjects().then(function(projectIds) {
                     return userPreferenceRepository.getUserModules().then(function(modules) {
-                        return [_.pluck(projects, "id"), _.pluck(modules, "id")];
+                        return [projectIds, _.pluck(modules, "id")];
                     });
                 });
             };

@@ -13,7 +13,7 @@ define(['downloadReportsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSe
                 spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, {}));
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, 'getCurrentProjects').and.returnValue(utils.getPromise(q, {}));
+                spyOn(userPreferenceRepository, 'getCurrentProjects').and.returnValue(utils.getPromise(q, []));
                 spyOn(userPreferenceRepository, 'getUserModules').and.returnValue(utils.getPromise(q, {}));
 
                 reportService = new ReportService();
@@ -120,11 +120,7 @@ define(['downloadReportsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSe
                     }]
                 }];
 
-                var userProjects = [{
-                    "id": "prj1"
-                }, {
-                    "id": "prj2"
-                }];
+                var userProjects = ["prj1", "prj2"];
 
                 var userModules = [{
                     "name": "Mod1",
