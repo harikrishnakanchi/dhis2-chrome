@@ -21,8 +21,9 @@ define(["lodash"], function(_) {
 
                     var downloadDatasetsPromise = downloadDatasetConsumer.run(message);
 
-                    return $q.all([downloadMetadataPromise, downloadSystemSettingPromise, downloadOrgUnitPromise, downloadOrgUnitGroupsPromise, downloadProgramPromise, downloadDatasetsPromise]);
-
+                    return $q.all([downloadMetadataPromise, downloadSystemSettingPromise, downloadOrgUnitPromise, downloadOrgUnitGroupsPromise, downloadProgramPromise, downloadDatasetsPromise]).then(function() {
+                        $log.info('Complete metadata sync');
+                    });
 
                 case "downloadProjectData":
                     var downloadDataPromise = downloadDataConsumer.run(message)
@@ -34,7 +35,10 @@ define(["lodash"], function(_) {
 
                     var downloadEventDataPromise = downloadEventDataConsumer.run(message);
 
-                    return $q.all([downloadDataPromise, downloadProjectSettingsPromise, downloadReportsPromise, downloadEventDataPromise]);
+                    return $q.all([downloadDataPromise, downloadProjectSettingsPromise, downloadReportsPromise, downloadEventDataPromise])
+                        .then(function() {
+                            $log.info('Complete project data sync');
+                        });
 
 
                 case "downloadProjectDataForAdmin":
