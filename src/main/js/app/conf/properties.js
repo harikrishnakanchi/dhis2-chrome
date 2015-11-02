@@ -3,7 +3,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
     var properties = {
         "metadata": {
             "sync": {
-                "intervalInMinutes": 1,
+                "intervalInMinutes": 720,
             },
             "types": ["categories", "categoryCombos", "categoryOptionCombos", "categoryOptions", "dataElements",
                 "sections", "organisationUnitLevels", "users", "programStages", "optionSets", "translations", "organisationUnitGroupSets", "dataElementGroups"
