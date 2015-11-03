@@ -31,9 +31,11 @@ define(["lodash"], function(_) {
 
         var loadChartData = function(chart, moduleId) {
             return chartRepository.getDataForChart(chart.name, moduleId).then(function(chartData) {
-                var periods = chartData.metaData.pe;
-                $scope.weeks = _.slice(periods, periods.length - 5, periods.length - 1);
-                return chartData;
+                if (chartData) {
+                    var periods = chartData.metaData.pe;
+                    $scope.weeks = _.slice(periods, periods.length - 5, periods.length - 1);
+                    return chartData;
+                }
             });
         };
 
@@ -109,7 +111,7 @@ define(["lodash"], function(_) {
         };
 
         var getDataElementValues = function(chartData, module) {
-            if (_.isEmpty(chartData.rows)) {
+            if (_.isEmpty(chartData) || _.isEmpty(chartData.rows)) {
                 return;
             }
 
