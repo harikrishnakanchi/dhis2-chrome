@@ -90,6 +90,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             log = $log;
             scope = $rootScope.$new();
 
+            downloadMetadataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadEventDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadApprovalConsumer.run.and.returnValue(utils.getPromise(q, {}));
@@ -129,7 +130,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             var returnValue = dispatcher.run(message);
             scope.$apply();
 
-            expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadDataConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
             expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
@@ -180,7 +181,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             dispatcher.run(message);
             scope.$apply();
-            expect(downloadOrgUnitConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadOrgUnitConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
             expect(uploadOrgUnitConsumer.run).not.toHaveBeenCalled();
         });
 
@@ -244,7 +245,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             dispatcher.run(message);
             scope.$apply();
-            expect(downloadProgramConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadProgramConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
         });
 
         it("should call event download and upload consumer", function() {
@@ -306,7 +307,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
 
-            expect(downloadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
         });
 
         it("should call delete approval consumer", function() {
@@ -327,8 +328,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
 
             dispatcher.run(message);
+            scope.$apply();
 
-            expect(downloadSystemSettingConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadSystemSettingConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
         });
 
         it("should upload patient origin consumer", function() {
@@ -352,7 +354,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
 
-            expect(downloadReportsConsumer.run).toHaveBeenCalledWith(message);
+            expect(downloadReportsConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
         });
 
         it("should call upload referral locations", function() {

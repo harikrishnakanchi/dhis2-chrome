@@ -32,13 +32,21 @@ define(["lodash", "moment"], function(_, moment) {
                 };
 
                 var saveChartData = function(charts) {
-                    return _.forEach(userModuleIds, function(userModule) {
-                        return _.forEach(charts, function(chart) {
-                            return reportService.getReportDataForOrgUnit(chart, userModule).then(function(data) {
-                                return chartRepository.upsertChartData(chart.name, userModule, data);
-                            });
+                    var promises = [];
+
+                    var downloadAndUpsertReportData = function(userModule, chart) {
+                        return reportService.getReportDataForOrgUnit(chart, userModule).then(function(data) {
+                            return chartRepository.upsertChartData(chart.name, userModule, data);
+                        });
+                    };
+
+                    _.forEach(userModuleIds, function(userModule) {
+                        _.forEach(charts, function(chart) {
+                            promises.push(downloadAndUpsertReportData(userModule, chart));
                         });
                     });
+
+                    return $q.all(promises);
                 };
 
                 return reportService.getCharts(datasets)
@@ -55,13 +63,21 @@ define(["lodash", "moment"], function(_, moment) {
                 };
 
                 var savePivotTableData = function(pivotTables) {
-                    return _.forEach(userModuleIds, function(userModule) {
-                        return _.forEach(pivotTables, function(pivotTable) {
-                            return reportService.getReportDataForOrgUnit(pivotTable, userModule).then(function(data) {
-                                return pivotTableRepository.upsertPivotTableData(pivotTable.name, userModule, data);
-                            });
+                    var promises = [];
+
+                    var downloadAndUpsertReportData = function(userModule, pivotTable) {
+                        return reportService.getReportDataForOrgUnit(pivotTable, userModule).then(function(data) {
+                            return pivotTableRepository.upsertPivotTableData(pivotTable.name, userModule, data);
+                        });
+                    };
+
+                    _.forEach(userModuleIds, function(userModule) {
+                        _.forEach(pivotTables, function(pivotTable) {
+                            promises.push(downloadAndUpsertReportData(userModule, pivotTable));
                         });
                     });
+
+                    return $q.all(promises);
                 };
 
                 return reportService.getPivotTables(datasets)
@@ -82,9 +98,9 @@ define(["lodash", "moment"], function(_, moment) {
                         return;
 
                     return loadRelevantDatasets(moduleIds).then(function(datasets) {
-                        return $q.all([downloadAndSaveChartData(moduleIds, datasets), downloadAndSavePivotTableData(moduleIds, datasets)]).then(function() {
-                            return updateChangeLog(projectIds);
-                        });
+                        return downloadAndSaveChartData(moduleIds, datasets)
+                            .then(_.partial(downloadAndSavePivotTableData, moduleIds, datasets))
+                            .then(_.partial(updateChangeLog, projectIds));
                     });
                 });
             });

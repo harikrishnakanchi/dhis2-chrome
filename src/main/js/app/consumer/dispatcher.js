@@ -9,37 +9,25 @@ define(["lodash"], function(_) {
             $log.info("Processing message: " + message.data.type, message.data);
             switch (message.data.type) {
                 case "downloadMetadata":
-                    var downloadMetadataPromise = downloadMetadataConsumer.run(message);
-
-                    var downloadSystemSettingPromise = downloadSystemSettingConsumer.run(message);
-
-                    var downloadOrgUnitPromise = downloadOrgUnitConsumer.run(message);
-
-                    var downloadOrgUnitGroupsPromise = downloadOrgUnitGroupConsumer.run(message);
-
-                    var downloadProgramPromise = downloadProgramConsumer.run(message);
-
-                    var downloadDatasetsPromise = downloadDatasetConsumer.run(message);
-
-                    return $q.all([downloadMetadataPromise, downloadSystemSettingPromise, downloadOrgUnitPromise, downloadOrgUnitGroupsPromise, downloadProgramPromise, downloadDatasetsPromise]).then(function() {
-                        $log.info('Complete metadata sync');
-                    });
-
-                case "downloadProjectData":
-                    var downloadDataPromise = downloadDataConsumer.run(message)
-                        .then(_.partial(downloadApprovalConsumer.run, message));
-
-                    var downloadProjectSettingsPromise = downloadProjectSettingsConsumer.run(message);
-
-                    var downloadReportsPromise = downloadReportsConsumer.run(message);
-
-                    var downloadEventDataPromise = downloadEventDataConsumer.run(message);
-
-                    return $q.all([downloadDataPromise, downloadProjectSettingsPromise, downloadReportsPromise, downloadEventDataPromise])
+                    return downloadMetadataConsumer.run(message)
+                        .then(_.partial(downloadSystemSettingConsumer.run, message))
+                        .then(_.partial(downloadOrgUnitConsumer.run, message))
+                        .then(_.partial(downloadOrgUnitGroupConsumer.run, message))
+                        .then(_.partial(downloadProgramConsumer.run, message))
+                        .then(_.partial(downloadDatasetConsumer.run, message))
                         .then(function() {
-                            $log.info('Complete project data sync');
+                            $log.info('Metadata sync complete');
                         });
 
+                case "downloadProjectData":
+                    return downloadProjectSettingsConsumer.run(message)
+                        .then(_.partial(downloadDataConsumer.run, message))
+                        .then(_.partial(downloadApprovalConsumer.run, message))
+                        .then(_.partial(downloadEventDataConsumer.run, message))
+                        .then(_.partial(downloadReportsConsumer.run, message))
+                        .then(function() {
+                            $log.info('Project data sync complete');
+                        });
 
                 case "downloadProjectDataForAdmin":
                     return downloadProjectSettingsConsumer.run(message);
