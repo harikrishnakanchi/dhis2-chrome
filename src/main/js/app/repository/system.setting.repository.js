@@ -67,7 +67,7 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
         };
 
         var isKeyGeneratedFromProd = function() {
-            return $rootScope.isKeyGeneratedFromProd;
+            return $rootScope.isKeyGeneratedFromProd || false;
         };
 
         var isProductKeySet = function() {

@@ -2,10 +2,6 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
     return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository) {
         $scope.projects = [];
 
-        $scope.isConnectedToProd = function() {
-            return systemSettingRepository.isKeyGeneratedFromProd();
-        };
-
         $scope.getDhisUrl = function() {
             return systemSettingRepository.getDhisUrl();
         };
@@ -26,6 +22,9 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return true;
         };
 
+        $scope.showTestLogo = function() {
+            return !systemSettingRepository.isKeyGeneratedFromProd();
+        };
 
         var deregisterCurrentUserLocaleWatcher = $rootScope.$watch("currentUser.locale", function() {
             var getResourceBundle = function(locale, shouldFetchTranslations) {

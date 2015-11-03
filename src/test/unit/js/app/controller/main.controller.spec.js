@@ -21,6 +21,7 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
 
                 spyOn(systemSettingRepository, "isProductKeySet").and.returnValue(utils.getPromise(q, true));
+                spyOn(systemSettingRepository, "isKeyGeneratedFromProd").and.returnValue(utils.getPromise(q, true));
 
                 i18nResourceBundle = {
                     get: function() {}
@@ -159,6 +160,11 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
 
                 expect(sessionHelper.saveSessionState).toHaveBeenCalled();
                 expect(location.path).toHaveBeenCalledWith("/dashboard");
+            });
+
+            it("should show the test logo if not connected to prod", function() {
+                systemSettingRepository.isKeyGeneratedFromProd.and.returnValue(false);
+                expect(scope.showTestLogo()).toBe(true);
             });
         });
     });

@@ -18,7 +18,8 @@
                 <nav class="navbar">
                     <div class="container-fluid">
                         <div class="navbar-header">
-                            <img src="img/logo.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1">
+                            <img src="img/logo.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="!showTestLogo()">
+                            <img src="img/logo-test.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="showTestLogo()">
                         </div>
                         <div class="nav navbar-nav navbar-right">
                             <p class="text-right login-message">&nbsp;<small ng-show="isLoggedIn">{{ resourceBundle.loggedInLabel }} {{currentUser.userCredentials.username}} <a ng-click="logout()" href="#/login" tabindex="-1">({{ resourceBundle.logoutLabel }})</a></small></p>
@@ -92,8 +93,7 @@
         </div>
         <footer>
             <div class="container text-right small text-muted">
-                <p ng-if="isConnectedToProd()">Connected to PROD</p>
-                <p ng-if="!isConnectedToProd()">Connected to {{ getDhisUrl() }}</p>
+                <p>Connected to {{ getDhisUrl() }}</p>
             </div>
     </div>
     </div>
