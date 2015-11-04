@@ -79,7 +79,7 @@ define(['downloadReportsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSe
                 }]);
             });
 
-            it('should download all field app charts definitions for relevant datasets', function() {
+            it('should download all field app charts definitions for relevant datasets for modules and origins', function() {
                 var datasetsAssociatedWithUserModules = [{
                     "id": "ds1",
                     "name": "Out Patient Department - General",
@@ -124,10 +124,16 @@ define(['downloadReportsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSe
 
                 var userModules = [{
                     "name": "Mod1",
-                    "id": "Mod1"
+                    "id": "Mod1",
+                    "children": [{
+                        "id": "origin1"
+                    }]
                 }, {
                     "name": "Mod2",
-                    "id": "Mod2"
+                    "id": "Mod2",
+                    "children": [{
+                        "id": "origin2"
+                    }]
                 }];
 
                 userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userProjects));
@@ -152,7 +158,7 @@ define(['downloadReportsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSe
 
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
                 expect(changeLogRepository.get).toHaveBeenCalledWith('reports:prj1;prj2');
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod1', 'Mod2']);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod1', 'Mod2', "origin1", "origin2"]);
                 expect(reportService.getCharts).toHaveBeenCalledWith(datasetsAssociatedWithUserModules);
                 expect(chartRepository.upsert).toHaveBeenCalledWith(fieldAppCharts);
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[0], 'Mod1');

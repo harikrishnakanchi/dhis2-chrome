@@ -14,13 +14,18 @@ define(["lodash", "moment"], function(_, moment) {
             var loadUserProjectsAndModuleIds = function() {
                 return userPreferenceRepository.getCurrentProjects().then(function(projectIds) {
                     return userPreferenceRepository.getUserModules().then(function(modules) {
-                        return [projectIds, _.pluck(modules, "id")];
+                        originIds = _.reduce(modules, function(allChildren, module) {
+                            allChildren.push(_.pluck(module.children, "id"));
+                            allChildren = _.flatten(allChildren);
+                            return allChildren;
+                        }, []);
+                        return [projectIds, _.pluck(modules, "id"), originIds];
                     });
                 });
             };
 
-            var loadRelevantDatasets = function(userModuleIds) {
-                return datasetRepository.findAllForOrgUnits(userModuleIds);
+            var loadRelevantDatasets = function(orgUnitIds) {
+                return datasetRepository.findAllForOrgUnits(orgUnitIds);
             };
 
             var downloadAndSaveChartData = function(userModuleIds, datasets) {
@@ -88,16 +93,15 @@ define(["lodash", "moment"], function(_, moment) {
             return loadUserProjectsAndModuleIds().then(function(data) {
                 var projectIds = data[0];
                 var moduleIds = data[1];
+                var originIds = data[2];
 
                 if (_.isEmpty(moduleIds))
                     return;
 
                 return getLastDownloadedTime(projectIds).then(function(lastDownloadedTime) {
-
                     if (lastDownloadedTime && !moment().isAfter(lastDownloadedTime, 'day'))
                         return;
-
-                    return loadRelevantDatasets(moduleIds).then(function(datasets) {
+                    return loadRelevantDatasets(_.union(moduleIds, originIds)).then(function(datasets) {
                         return downloadAndSaveChartData(moduleIds, datasets)
                             .then(_.partial(downloadAndSavePivotTableData, moduleIds, datasets))
                             .then(_.partial(updateChangeLog, projectIds));
