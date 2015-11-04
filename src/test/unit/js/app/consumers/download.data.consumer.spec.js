@@ -1,8 +1,8 @@
-define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "moment", "timecop", "mergeBy"],
-    function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DatasetRepository, UserPreferenceRepository, moment, timecop, MergeBy) {
+define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataService", "dataRepository", "datasetRepository", "userPreferenceRepository", "moment", "timecop", "mergeBy", "changeLogRepository"],
+    function(DownloadDataConsumer, mocks, properties, utils, DataService, DataRepository, DatasetRepository, UserPreferenceRepository, moment, timecop, MergeBy, ChangeLogRepository) {
         describe("download data consumer", function() {
 
-            var dataService, dataRepository, approvalDataRepository, datasetRepository, userPreferenceRepository, q, scope, downloadDataConsumer, message, approvalService, mergeBy;
+            var dataService, dataRepository, approvalDataRepository, datasetRepository, userPreferenceRepository, q, scope, downloadDataConsumer, message, approvalService, mergeBy, changeLogRepository;
 
             beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 q = $q;
@@ -14,12 +14,23 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, "getUserModules").and.returnValue(utils.getPromise(q, ["org_0"]));
+                spyOn(userPreferenceRepository, "getCurrentProjects").and.returnValue(utils.getPromise(q, ["proj_1"]));
 
                 datasetRepository = {
                     "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [{
                         'id': 'DS_OPD'
                     }]))
                 };
+
+                changeLogRepository = new ChangeLogRepository();
+                spyOn(changeLogRepository, "upsert").and.returnValue(utils.getPromise(q, {
+                    'type': "proj_1",
+                    'lastUpdatedTime': "2014-12-30T09:13:41.092Z"
+                }));
+
+                spyOn(changeLogRepository, "get").and.returnValue(utils.getPromise(q, {
+                    'lastUpdatedTime': "2014-12-30T09:13:41.092Z"
+                }));
 
                 dataRepository = new DataRepository();
                 spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
@@ -42,7 +53,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 mergeBy = new MergeBy($log);
 
-                downloadDataConsumer = new DownloadDataConsumer(dataService, dataRepository, datasetRepository, userPreferenceRepository, q, approvalDataRepository, mergeBy);
+                downloadDataConsumer = new DownloadDataConsumer(dataService, dataRepository, datasetRepository, userPreferenceRepository, q, approvalDataRepository, mergeBy, changeLogRepository);
             }));
 
             afterEach(function() {
@@ -79,15 +90,18 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 expect(datasetRepository.getAll).toHaveBeenCalled();
                 expect(dataService.downloadAllData.calls.argsFor(0)).toEqual([
                     ["mod1"],
-                    ['ds1'], '2013-10-09'
+                    ['ds1'], '2013-10-09',
+                    { lastUpdatedTime: '2014-12-30T09:13:41.092Z' }
                 ]);
                 expect(dataService.downloadAllData.calls.argsFor(1)).toEqual([
                     ["mod2"],
-                    ['ds1'], '2013-10-09'
+                    ['ds1'], '2013-10-09',
+                    { lastUpdatedTime: '2014-12-30T09:13:41.092Z' }
                 ]);
                 expect(dataService.downloadAllData.calls.argsFor(2)).toEqual([
                     ["mod3"],
-                    ['ds1'], '2013-10-09'
+                    ['ds1'], '2013-10-09',
+                    { lastUpdatedTime: '2014-12-30T09:13:41.092Z' }
                 ]);
             });
 

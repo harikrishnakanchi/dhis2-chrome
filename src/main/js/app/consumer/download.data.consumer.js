@@ -1,7 +1,26 @@
 define(["moment", "properties", "lodash", "dateUtils"], function(moment, properties, _, dateUtils) {
-    return function(dataService, dataRepository, datasetRepository, userPreferenceRepository, $q, approvalDataRepository, mergeBy) {
+    return function(dataService, dataRepository, datasetRepository, userPreferenceRepository, $q, approvalDataRepository, mergeBy, changeLogRepository) {
+
+        var userProjectIds = [];
+
         this.run = function() {
-            return downloadDataValues().then(mergeAndSaveDataValues);
+            return getUserProjects().then(downloadDataValues).then(mergeAndSaveDataValues).then(function() {
+                updateChangeLog(userProjectIds);
+            });
+        };
+
+        var getUserProjects = function() {
+            return userPreferenceRepository.getCurrentProjects().then(function(data) {
+                userProjectIds = data;
+            });
+        };
+
+        var updateChangeLog = function(userProjectIds) {
+            return changeLogRepository.upsert("dataValues:" + userProjectIds.join(';'), moment().toISOString());
+        };
+
+        var getLastUpdatedTime = function(userProjectIds) {
+            return changeLogRepository.get("dataValues:" + userProjectIds.join(';'));
         };
 
         var downloadDataValues = function() {
@@ -15,7 +34,9 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                 var downloadPromises = _.map(orgUnitIds, function(orgUnitId) {
                     return dataRepository.isDataPresent(orgUnitId).then(function(data) {
                         var startDate = data ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
-                        return dataService.downloadAllData([orgUnitId], allDataSetIds, startDate);
+                        return getLastUpdatedTime(userProjectIds).then(function(lastUpdated) {
+                            return dataService.downloadAllData([orgUnitId], allDataSetIds, startDate, lastUpdated);
+                        });
                     });
                 });
 

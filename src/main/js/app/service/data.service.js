@@ -1,6 +1,6 @@
 define(["lodash", "moment", "dhisUrl", "properties"], function(_, moment, dhisUrl, properties) {
     return function($http, $q) {
-        this.downloadAllData = function(orgUnitIds, dataSetIds, startDate) {
+        this.downloadAllData = function(orgUnitIds, dataSetIds, startDate, lastUpdated) {
             var today = moment().format("YYYY-MM-DD");
             var onSuccess = function(response) {
                 if (_.isEmpty(response.data))
@@ -17,7 +17,8 @@ define(["lodash", "moment", "dhisUrl", "properties"], function(_, moment, dhisUr
                     "children": true,
                     "dataSet": dataSetIds,
                     "startDate": startDate,
-                    "endDate": today
+                    "endDate": today,
+                    "lastUpdated": lastUpdated
                 }
             }).then(onSuccess);
         };
