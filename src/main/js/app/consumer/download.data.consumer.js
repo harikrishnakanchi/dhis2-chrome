@@ -23,6 +23,16 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
             return changeLogRepository.get("dataValues:" + userProjectIds.join(';'));
         };
 
+        var getPeriods = function(startDate) {
+            var numOfWeeks = moment().diff(moment(startDate), 'weeks');
+            var periods = [];
+            while (numOfWeeks > 0) {
+                periods.push(moment(startDate).add(numOfWeeks, 'weeks').format("GGGG[W]WW"));
+                numOfWeeks = numOfWeeks - 1;
+            }
+            return periods;
+        };
+
         var downloadDataValues = function() {
             var getAllDataValues = function(vals) {
                 var orgUnitIds = _.pluck(vals[0], "id");
@@ -35,13 +45,19 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                     return dataRepository.isDataPresent(orgUnitId).then(function(data) {
                         var startDate = data ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
                         return getLastUpdatedTime(userProjectIds).then(function(lastUpdated) {
-                            return dataService.downloadAllData([orgUnitId], allDataSetIds, startDate, lastUpdated);
+                            var periods = getPeriods(startDate);
+                            var promises = _.map(periods, function(period) {
+                                return dataService.downloadAllData([orgUnitId], allDataSetIds, period, lastUpdated);
+                            });
+                            return $q.all(promises).then(function(data) {
+                                return _.flatten(data);
+                            });
                         });
                     });
                 });
 
                 return $q.all(downloadPromises).then(function(data) {
-                    return _.flatten(data);
+                    return _.flattenDeep(data);
                 });
             };
 
@@ -96,9 +112,9 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                     return mergedData;
                 });
             };
-
             if (_.isEmpty(dataValuesFromDhis))
                 return;
+
 
             return getDataFromDb().then(function(dataFromLocalDb) {
                 var mergedData = merge(dataValuesFromDhis, dataFromLocalDb);

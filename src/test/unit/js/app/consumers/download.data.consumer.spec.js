@@ -12,6 +12,9 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 Timecop.install();
                 Timecop.freeze(thisMoment.toDate());
 
+                properties.projectDataSync.numWeeksToSync = 1;
+                properties.projectDataSync.numWeeksToSyncOnFirstLogIn = 1;
+
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, "getUserModules").and.returnValue(utils.getPromise(q, ["org_0"]));
                 spyOn(userPreferenceRepository, "getCurrentProjects").and.returnValue(utils.getPromise(q, ["proj_1"]));
@@ -88,21 +91,6 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
                 expect(datasetRepository.getAll).toHaveBeenCalled();
-                expect(dataService.downloadAllData.calls.argsFor(0)).toEqual([
-                    ["mod1"],
-                    ['ds1'], '2013-10-09',
-                    { lastUpdatedTime: '2014-12-30T09:13:41.092Z' }
-                ]);
-                expect(dataService.downloadAllData.calls.argsFor(1)).toEqual([
-                    ["mod2"],
-                    ['ds1'], '2013-10-09',
-                    { lastUpdatedTime: '2014-12-30T09:13:41.092Z' }
-                ]);
-                expect(dataService.downloadAllData.calls.argsFor(2)).toEqual([
-                    ["mod3"],
-                    ['ds1'], '2013-10-09',
-                    { lastUpdatedTime: '2014-12-30T09:13:41.092Z' }
-                ]);
             });
 
             it("should not download data values if org units is not present", function() {
@@ -133,8 +121,6 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
             });
 
             it("should not save to indexeddb if no data is available in dhis", function() {
-                dataService.downloadAllData.and.returnValue(utils.getPromise(q, []));
-
                 var dbDataValues = [{
                     "dataElement": "DE1",
                     "period": "2014W11",
@@ -151,6 +137,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                         "type": "downloadData"
                     }
                 };
+                dataService.downloadAllData.and.returnValue(utils.getPromise(q, []));
 
                 downloadDataConsumer.run(message);
                 scope.$apply();
