@@ -38,20 +38,28 @@ define(["lodash", "moment"], function(_, moment) {
 
                 var saveChartData = function(charts) {
                     var promises = [];
+                    var modulesAndCharts = [];
 
-                    var downloadAndUpsertReportData = function(userModule, chart) {
-                        return reportService.getReportDataForOrgUnit(chart, userModule).then(function(data) {
-                            return chartRepository.upsertChartData(chart.name, userModule, data);
+                    var downloadAndUpsertReportData = function(modulesAndCharts) {
+                        if (_.isEmpty(modulesAndCharts))
+                            return $q.when({});
+
+                        var datum = modulesAndCharts.pop();
+                        return reportService.getReportDataForOrgUnit(datum[1], datum[0]).then(function(data) {
+                            return chartRepository.upsertChartData(datum[1].name, datum[0], data).then(function() {
+                                return downloadAndUpsertReportData(modulesAndCharts);
+                            });
                         });
                     };
 
                     _.forEach(userModuleIds, function(userModule) {
                         _.forEach(charts, function(chart) {
-                            promises.push(downloadAndUpsertReportData(userModule, chart));
+                            modulesAndCharts.push([userModule, chart]);
                         });
                     });
 
-                    return $q.all(promises);
+                    return downloadAndUpsertReportData(modulesAndCharts);
+
                 };
 
                 return reportService.getCharts(datasets)
@@ -69,20 +77,28 @@ define(["lodash", "moment"], function(_, moment) {
 
                 var savePivotTableData = function(pivotTables) {
                     var promises = [];
+                    var modulesAndTables = [];
 
-                    var downloadAndUpsertReportData = function(userModule, pivotTable) {
-                        return reportService.getReportDataForOrgUnit(pivotTable, userModule).then(function(data) {
-                            return pivotTableRepository.upsertPivotTableData(pivotTable.name, userModule, data);
+                    var downloadAndUpsertReportData = function(modulesAndTables) {
+                        if (_.isEmpty(modulesAndTables))
+                            return $q.when({});
+
+                        var datum = modulesAndTables.pop();
+                        return reportService.getReportDataForOrgUnit(datum[1], datum[0]).then(function(data) {
+                            return pivotTableRepository.upsertPivotTableData(datum[1].name, datum[0], data).then(function() {
+                                return downloadAndUpsertReportData(modulesAndTables);
+                            });
                         });
                     };
 
                     _.forEach(userModuleIds, function(userModule) {
                         _.forEach(pivotTables, function(pivotTable) {
-                            promises.push(downloadAndUpsertReportData(userModule, pivotTable));
+                            modulesAndTables.push([userModule, pivotTable]);
                         });
                     });
 
-                    return $q.all(promises);
+                    return downloadAndUpsertReportData(modulesAndTables);
+
                 };
 
                 return reportService.getPivotTables(datasets)
