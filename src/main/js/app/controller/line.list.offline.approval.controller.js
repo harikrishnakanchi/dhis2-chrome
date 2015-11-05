@@ -105,6 +105,9 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.getReferralCount = function(locationName) {
+            if (_.isUndefined($scope.dataValues._referralLocations) || _.isEmpty($scope.referralOptions))
+                return 0;
+
             var optionId = _.find($scope.referralOptions, {
                 "name": locationName
             }).id;
