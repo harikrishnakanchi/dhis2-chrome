@@ -139,7 +139,7 @@ define(["lodash", "moment"], function(_, moment) {
                 $scope.originOrgUnits = data;
                 $scope.originMap = {};
                 _.forEach(data, function(origin) {
-                    $scope.originMap[origin.id] = origin.displayName;
+                    $scope.originMap[origin.id] = origin.displayName || origin.name;
                 });
             });
         };
