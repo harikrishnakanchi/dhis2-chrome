@@ -106,7 +106,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         };
 
         $scope.printWindow = function() {
-            $scope.printingTallySheet = true;
             $timeout(function() {
                 $window.print();
             }, 0);
