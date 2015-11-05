@@ -42,7 +42,6 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
 
         it("should download all data for an org unit", function() {
             var today = moment().format("YYYY-MM-DD");
-
             var dataValues = [{
                 "dataElement": "b9634a78271",
                 "period": "2014W8",
@@ -57,9 +56,10 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
                 "dataValues": dataValues
             };
 
-            var startDate = "2015-09-09";
+            var startDate = "2015-10-28";
+            var period = "2015W45";
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&orgUnit=company_0&period=" + startDate).respond(200, dataValuesFromDhis);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&orgUnit=company_0&period=" + period).respond(200, dataValuesFromDhis);
 
             var actualDataValues;
             var dataService = new DataService(http, q);
@@ -81,16 +81,6 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
             expect(actualDataValues).toEqual(expectedPayload);
         });
 
-
-        it("should return a reject promise if download all data fails", function() {
-            httpBackend.expectGET().respond(500, {});
-            var dataService = new DataService(http, q);
-            dataService.downloadAllData('company_0').then(undefined, function(data) {
-                expect(data.status).toBe(500);
-            });
-
-            httpBackend.flush();
-        });
 
     });
 });
