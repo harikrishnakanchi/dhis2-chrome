@@ -12,16 +12,7 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             var loadUserProjectsAndModuleIds = function() {
-                return userPreferenceRepository.getCurrentProjects().then(function(projectIds) {
-                    return userPreferenceRepository.getUserModules().then(function(modules) {
-                        originIds = _.reduce(modules, function(allChildren, module) {
-                            allChildren.push(_.pluck(module.children, "id"));
-                            allChildren = _.flatten(allChildren);
-                            return allChildren;
-                        }, []);
-                        return [projectIds, _.pluck(modules, "id"), originIds];
-                    });
-                });
+                return $q.all([userPreferenceRepository.getCurrentProjects(), userPreferenceRepository.getUserModules(), userPreferenceRepository.getOriginOrgUnitIds()]);
             };
 
             var loadRelevantDatasets = function(orgUnitIds) {
@@ -108,7 +99,7 @@ define(["lodash", "moment"], function(_, moment) {
 
             return loadUserProjectsAndModuleIds().then(function(data) {
                 var projectIds = data[0];
-                var moduleIds = data[1];
+                var moduleIds = _.pluck(data[1], "id");
                 var originIds = data[2];
 
                 if (_.isEmpty(moduleIds))
