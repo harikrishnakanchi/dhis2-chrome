@@ -2,9 +2,8 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
     return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository) {
         $scope.projects = [];
 
-        $scope.getConnectedToMessage = function() {
-            var dhisUrl = systemSettingRepository.getDhisUrl();
-            return dhisUrl ? "Connected to " + dhisUrl : ""
+        $scope.getDhisUrl = function() {
+            return systemSettingRepository.getDhisUrl();
         };
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {
