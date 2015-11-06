@@ -15,6 +15,7 @@ define(['downloadReportsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSe
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentProjects').and.returnValue(utils.getPromise(q, []));
                 spyOn(userPreferenceRepository, 'getUserModules').and.returnValue(utils.getPromise(q, {}));
+                spyOn(userPreferenceRepository, 'getOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
 
                 reportService = new ReportService();
                 spyOn(reportService, 'getCharts').and.returnValue(utils.getPromise(q, {}));
@@ -136,8 +137,11 @@ define(['downloadReportsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSe
                     }]
                 }];
 
+                var originIds = ["origin1", "origin2"];
+
                 userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userProjects));
                 userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, userModules));
+                userPreferenceRepository.getOriginOrgUnitIds.and.returnValue(utils.getPromise(q, originIds));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
                 reportService.getCharts.and.returnValue(utils.getPromise(q, fieldAppCharts));
                 chartRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppCharts));
