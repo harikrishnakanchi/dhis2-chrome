@@ -125,7 +125,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             var sum = 0;
             _.forEach(dataSet.organisationUnits, function(orgUnit) {
                 values = dataValues[orgUnit.id];
-                if (values) {
+                if (values && values[section.dataElements[0].id] && values[section.dataElements[0].id][section.categoryOptionComboIds[0]]) {
                     var value = values[section.dataElements[0].id][section.categoryOptionComboIds[0]].value || "0";
                     sum += parseInt(value);
                 }
