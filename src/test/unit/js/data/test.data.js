@@ -174,7 +174,14 @@ define(["lodash"], function(_) {
         "categoryCombo": {
             "id": categoryCombos[0].id,
             "name": categoryCombos[0].name
-        }
+        },
+        "attributeValues": [{
+            "value": "true",
+            "attribute": {
+                "id": "HjaBYio5UFK",
+                "code": "mandatory"
+            }
+        }]
     }, {
         "id": "DE2",
         "code": "DE2_code",
@@ -185,7 +192,14 @@ define(["lodash"], function(_) {
         "categoryCombo": {
             "id": categoryCombos[1].id,
             "name": categoryCombos[1].name
-        }
+        },
+        "attributeValues": [{
+            "value": "false",
+            "attribute": {
+                "id": "HjaBYio5UFK",
+                "code": "mandatory"
+            }
+        }]
     }, {
         "id": "DE3",
         "code": "DE3_code",

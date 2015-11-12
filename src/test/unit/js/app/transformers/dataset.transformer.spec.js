@@ -300,6 +300,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "subSection": "Default",
                     "isIncluded": true,
                     "formName": "DE1",
+                    "isMandatory": true,
                     "description": "some desc1",
                     "categoryCombo": {
                         "id": "CC1",
@@ -312,6 +313,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "isIncluded": true,
                     "subSection": "Default",
                     "formName": "DE2",
+                    "isMandatory": false,
                     "description": "some desc2",
                     "categoryCombo": {
                         "id": "CC2",
@@ -323,6 +325,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "name": "DE4 - ITFC",
                     "isIncluded": true,
                     "subSection": "Default",
+                    "isMandatory": false,
                     "formName": "DE4",
                     "categoryCombo": {
                         "id": "CC2",
@@ -340,6 +343,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "name": "DE1 - ITFC",
                     "subSection": "Default",
                     "isIncluded": true,
+                    "isMandatory": true,
                     "formName": "DE1",
                     "description": "some desc1",
                     "categoryCombo": {
@@ -358,6 +362,7 @@ define(["datasetTransformer", "testData", "lodash"], function(datasetTransformer
                     "id": "DE3",
                     "code": "DE3_code",
                     "subSection": "Default",
+                    "isMandatory": false,
                     "name": "DE3 - ITFC",
                     "isIncluded": false,
                     "formName": "DE3",

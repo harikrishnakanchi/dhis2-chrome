@@ -78,7 +78,7 @@
                                                         <ul>
                                                             <li ng-repeat="element in subSection.dataElements | orderBy : 'formName'">
                                                                 <label>
-                                                                    <input type="checkbox" ng-disabled="isDisabled==true" ng-model="element.isIncluded" ng-change="changeSubSectionSelection(subSection, section)">{{element.formName}}
+                                                                    <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSubSectionSelection(subSection, section)">{{element.formName}}
                                                                 </label>
                                                             </li>
                                                         </ul>
@@ -86,7 +86,7 @@
                                                 </li>
                                                 <li ng-repeat="element in section.unGroupedDataElements | orderBy : 'formName'">
                                                     <label>
-                                                        <input type="checkbox" ng-disabled="isDisabled==true" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">{{element.formName}}
+                                                        <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">{{element.formName}}
                                                     </label>
                                                 </li>
                                             </ul>

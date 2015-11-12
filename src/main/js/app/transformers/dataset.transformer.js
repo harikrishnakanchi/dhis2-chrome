@@ -65,6 +65,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 if (!_.isEmpty(associatedProgram))
                     enrichedDataElement.associatedProgramId = associatedProgram;
                 enrichedDataElement.isIncluded = _.isEmpty(excludedDataElements) ? true : !_.contains(excludedDataElements, dataElement.id);
+                enrichedDataElement.isMandatory = getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, "mandatory");
                 var subSection = getSubSection(enrichedDataElement)[0] || {
                     "name": "Default"
                 };
