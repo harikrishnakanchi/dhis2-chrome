@@ -13,14 +13,12 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
 
         var cacheProductKeyDetails = function(productKey) {
             var decryptedProductKey = JSON.parse(decryptProductKey(productKey));
+            $rootScope.authHeader = decryptedProductKey.data.authHeader;
+            $rootScope.dhisUrl = decryptedProductKey.data.dhisUrl;
+            $rootScope.productKeyLevel = decryptedProductKey.data.productKeyLevel;
+            $rootScope.allowedOrgUnits = decryptedProductKey.data.allowedOrgUnits;
 
-            $rootScope.appData = {
-                "authHeader": decryptedProductKey.data.authHeader,
-                "dhisUrl": decryptedProductKey.data.dhisUrl,
-                "productKeyLevel": decryptedProductKey.data.productKeyLevel,
-                "allowedOrgUnits": decryptedProductKey.data.allowedOrgUnits,
-                "isKeyGeneratedFromProd": decryptedProductKey.keyGeneratedFromProd
-            };
+            $rootScope.isKeyGeneratedFromProd = decryptedProductKey.keyGeneratedFromProd;
         };
 
         var loadProductKey = function() {
@@ -57,35 +55,35 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
         };
 
         var getDhisUrl = function() {
-            if (properties.devMode && _.isUndefined($rootScope.appData.dhisUrl))
+            if (properties.devMode && _.isUndefined($rootScope.dhisUrl))
                 return properties.dhis.url;
 
-            return $rootScope.appData.dhisUrl;
+            return $rootScope.dhisUrl;
         };
 
         var getAuthHeader = function() {
-            if (properties.devMode && _.isUndefined($rootScope.appData.authHeader))
+            if (properties.devMode && _.isUndefined($rootScope.authHeader))
                 return properties.dhis.authHeader;
 
-            return $rootScope.appData.authHeader;
+            return $rootScope.authHeader;
         };
 
         var getProductKeyLevel = function() {
-            if (properties.devMode && _.isUndefined($rootScope.appData.productKeyLevel))
+            if (properties.devMode && _.isUndefined($rootScope.productKeyLevel))
                 return undefined;
 
-            return $rootScope.appData.productKeyLevel;
+            return $rootScope.productKeyLevel;
         };
 
         var getAllowedOrgUnits = function() {
-            if (properties.devMode && _.isUndefined($rootScope.appData.allowedOrgUnits))
+            if (properties.devMode && _.isUndefined($rootScope.allowedOrgUnits))
                 return undefined;
 
-            return $rootScope.appData.allowedOrgUnits;
+            return $rootScope.allowedOrgUnits;
         };
 
         var isKeyGeneratedFromProd = function() {
-            return $rootScope.appData.isKeyGeneratedFromProd || false;
+            return $rootScope.isKeyGeneratedFromProd || false;
         };
 
         var isProductKeySet = function() {
