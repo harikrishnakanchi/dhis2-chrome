@@ -15,6 +15,8 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
             var decryptedProductKey = JSON.parse(decryptProductKey(productKey));
             $rootScope.authHeader = decryptedProductKey.data.authHeader;
             $rootScope.dhisUrl = decryptedProductKey.data.dhisUrl;
+            $rootScope.productKeyLevel = decryptedProductKey.data.productKeyLevel;
+            $rootScope.allowedOrgUnits = decryptedProductKey.data.allowedOrgUnits;
 
             $rootScope.isKeyGeneratedFromProd = decryptedProductKey.keyGeneratedFromProd;
         };
@@ -66,6 +68,20 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
             return $rootScope.authHeader;
         };
 
+        var getProductKeyLevel = function() {
+            if (properties.devMode && _.isUndefined($rootScope.productKeyLevel))
+                return undefined;
+
+            return $rootScope.productKeyLevel;
+        };
+
+        var getAllowedOrgUnits = function() {
+            if (properties.devMode && _.isUndefined($rootScope.allowedOrgUnits))
+                return undefined;
+
+            return $rootScope.allowedOrgUnits;
+        };
+
         var isKeyGeneratedFromProd = function() {
             return $rootScope.isKeyGeneratedFromProd || false;
         };
@@ -89,7 +105,9 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
             "getAuthHeader": getAuthHeader,
             "isKeyGeneratedFromProd": isKeyGeneratedFromProd,
             "isProductKeySet": isProductKeySet,
-            "loadProductKey": loadProductKey
+            "loadProductKey": loadProductKey,
+            "getAllowedOrgUnits": getAllowedOrgUnits,
+            "getProductKeyLevel": getProductKeyLevel
         };
     };
 });

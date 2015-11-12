@@ -1,5 +1,5 @@
 define(["md5", "lodash"], function(md5, _) {
-    return function($rootScope, $scope, $location, db, $q, sessionHelper, $hustle, userPreferenceRepository) {
+    return function($rootScope, $scope, $location, db, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository) {
         var loadUserData = function(loginUsername) {
             var getUser = function(username) {
                 var userStore = db.objectStore("users");
@@ -22,17 +22,70 @@ define(["md5", "lodash"], function(md5, _) {
             return $q.all([getUser(loginUsername), getUserCredentials(loginUsername), getExistingUserProjects()]);
         };
 
-        var authenticate = function(data) {
-            var user = data[0];
-            var userCredentials = data[1];
+        var isRole = function(user, role) {
+            return _.find(user.userCredentials.userRoles, {
+                "name": role
+            });
+        };
 
+        var resetFlags = function() {
+            $scope.invalidAccess = false;
             $scope.invalidCredentials = false;
             $scope.disabledCredentials = false;
+        };
+
+        var verifyProductKeyInstance = function(data) {
+            var user = data[0];
+            resetFlags();
 
             if (user === undefined) {
                 $scope.invalidCredentials = true;
                 return $q.reject("Invalid user");
             }
+
+            if (isRole(user, "Superuser"))
+                return data;
+
+            var userOrgUnitIds = _.pluck(data[0].organisationUnits, "id");
+            var allowedOrgUnitIds = _.pluck(systemSettingRepository.getAllowedOrgUnits(), "id");
+            var productKeyLevel = systemSettingRepository.getProductKeyLevel();
+
+            if (productKeyLevel === 'project' && _.isEmpty(_.intersection(allowedOrgUnitIds, userOrgUnitIds))) {
+                $scope.invalidAccess = true;
+                return $q.reject("User doesn’t have access to this Praxis instance.");
+            }
+
+            if (productKeyLevel === 'country' && isRole(user, "Coordination Level Approver") && _.isEmpty(_.intersection(allowedOrgUnitIds, userOrgUnitIds))) {
+                $scope.invalidAccess = true;
+                return $q.reject("User doesn’t have access to this Praxis instance.");
+            }
+
+            if (productKeyLevel === 'global' && !isRole(user, "Superadmin")) {
+                $scope.invalidAccess = true;
+                return $q.reject("User doesn’t have access to this Praxis instance.");
+            }
+
+
+            if (productKeyLevel === 'country' && !isRole(user, "Coordination Level Approver")) {
+                return orgUnitRepository.get(userOrgUnitIds[0]).then(function(project) {
+                    if (project.parent.id !== allowedOrgUnitIds[0]) {
+                        $scope.invalidAccess = true;
+                        return $q.reject("User doesn’t have access to this Praxis instance.");
+                    } else {
+                        $scope.invalidAccess = false;
+                        return data;
+                    }
+                });
+            }
+
+            return data;
+        };
+
+        var authenticateUser = function(data) {
+            var user = data[0];
+            var userCredentials = data[1];
+
+            resetFlags();
 
             if (user.userCredentials.disabled) {
                 $scope.disabledCredentials = true;
@@ -79,7 +132,8 @@ define(["md5", "lodash"], function(md5, _) {
         $scope.login = function() {
             var loginUsername = $scope.username.toLowerCase();
             loadUserData(loginUsername)
-                .then(authenticate)
+                .then(verifyProductKeyInstance)
+                .then(authenticateUser)
                 .then(login)
                 .then(startProjectDataSync)
                 .then(redirect);

@@ -1,4 +1,4 @@
-define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository"], function(LoginController, mocks, utils, SessionHelper, UserPreferenceRepository) {
+define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository"], function(LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository) {
     describe("login controller", function() {
         var rootScope, loginController, scope, location, db, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository;
 
@@ -39,7 +39,10 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 return utils.getPromise(q, {
                     "id": "xYRvx4y7Gm9",
                     "userCredentials": {
-                        "username": username
+                        "username": username,
+                        "userRoles": [{
+                            "name": "Superuser"
+                        }]
                     },
                     "organisationUnits": [{
                         "id": 123
@@ -51,16 +54,25 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 if (username === "projectadmin")
                     return utils.getPromise(q, {
                         "username": "projectadmin",
-                        "password": "5f4dcc3b5aa765d61d8327deb882cf99"
+                        "password": "5f4dcc3b5aa765d61d8327deb882cf99",
+                        "userRoles": [{
+                            "name": "Superuser"
+                        }]
                     });
                 if (username === "superadmin")
                     return utils.getPromise(q, {
                         "username": "superadmin",
-                        "password": "7536ad6ce98b48f23a1bf8f74f53da83"
+                        "password": "7536ad6ce98b48f23a1bf8f74f53da83",
+                        "userRoles": [{
+                            "name": "Superadmin"
+                        }]
                     });
                 return utils.getPromise(q, {
                     "username": "project_user",
-                    "password": "caa63a86bbc63b2ae67ef0a069db7fb9"
+                    "password": "caa63a86bbc63b2ae67ef0a069db7fb9",
+                    "userRoles": [{
+                        "name": "data entry"
+                    }]
                 });
             });
 
@@ -70,9 +82,16 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             userPreferenceRepository = new UserPreferenceRepository();
             spyOn(userPreferenceRepository, "getCurrentProjects").and.returnValue(utils.getPromise(q, []));
 
+            systemSettingRepository = new SystemSettingRepository();
+            spyOn(systemSettingRepository, "getAllowedOrgUnits").and.returnValue([]);
+            spyOn(systemSettingRepository, "getProductKeyLevel").and.returnValue("");
+
+            orgUnitRepository = new OrgUnitRepository();
+            spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
+
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-            loginController = new LoginController(rootScope, scope, location, db, q, sessionHelper, hustle, userPreferenceRepository);
+            loginController = new LoginController(rootScope, scope, location, db, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository);
         }));
 
         it("should login super admin user with valid credentials and redirect to orgUnits", function() {

@@ -1,5 +1,5 @@
-define(["selectProjectPreferenceController", "angularMocks", "utils", "lodash", "orgUnitRepository", "userPreferenceRepository"],
-    function(SelectProjectPreferenceController, mocks, utils, _, OrgUnitRepository, UserPreferenceRepository) {
+define(["selectProjectPreferenceController", "angularMocks", "utils", "lodash", "orgUnitRepository", "userPreferenceRepository", "systemSettingRepository"],
+    function(SelectProjectPreferenceController, mocks, utils, _, OrgUnitRepository, UserPreferenceRepository, SystemSettingRepository) {
         describe("referral locations controller", function() {
             var scope, allProjects, rootScope, hustle, location, userPreferenceRepository, orgUnitRepository, userPreference, q;
 
@@ -54,9 +54,16 @@ define(["selectProjectPreferenceController", "angularMocks", "utils", "lodash", 
                 spyOn(userPreferenceRepository, "get").and.returnValue(utils.getPromise(q, userPreference));
                 spyOn(userPreferenceRepository, "save").and.returnValue(utils.getPromise(q, {}));
 
+                systemSettingRepository = new SystemSettingRepository();
+                spyOn(systemSettingRepository, "getAllowedOrgUnits").and.returnValue([]);
+                spyOn(systemSettingRepository, "getProductKeyLevel").and.returnValue("");
+
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, "getAllProjects").and.returnValue(utils.getPromise(q, allProjects));
-                selectProjectPreferenceController = new SelectProjectPreferenceController(rootScope, scope, hustle, location, orgUnitRepository, userPreferenceRepository);
+                spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, {}));
+
+                selectProjectPreferenceController = new SelectProjectPreferenceController(rootScope, scope, hustle, location, orgUnitRepository, userPreferenceRepository, systemSettingRepository);
             }));
 
             it("should save the selected project", function() {
@@ -84,6 +91,45 @@ define(["selectProjectPreferenceController", "angularMocks", "utils", "lodash", 
                     "id": 1,
                     "name": "Test Project"
                 });
+            });
+
+            it("should call save preference when product key has just one project", function() {
+                systemSettingRepository.getAllowedOrgUnits.and.returnValue([{
+                    "id": "proj1",
+                    "name": "project"
+                }]);
+
+                systemSettingRepository.getProductKeyLevel.and.returnValue("project");
+
+                orgUnitRepository.get.and.returnValue(utils.getPromise(q, {
+                    "id": "proj1",
+                    "name": "project"
+                }));
+
+                selectProjectPreferenceController = new SelectProjectPreferenceController(rootScope, scope, hustle, location, orgUnitRepository, userPreferenceRepository, systemSettingRepository);
+
+                scope.$apply();
+
+                expect(userPreferenceRepository.save).toHaveBeenCalled();
+                expect(scope.selectedProject.originalObject).toEqual({
+                    "id": "proj1",
+                    "name": "project"
+                });
+            });
+
+            it("should call findAllByParent when product key is of country level", function() {
+                systemSettingRepository.getAllowedOrgUnits.and.returnValue([{
+                    "id": "country1",
+                    "name": "country"
+                }]);
+
+                systemSettingRepository.getProductKeyLevel.and.returnValue("country");
+
+                selectProjectPreferenceController = new SelectProjectPreferenceController(rootScope, scope, hustle, location, orgUnitRepository, userPreferenceRepository, systemSettingRepository);
+
+                scope.$apply();
+
+                expect(orgUnitRepository.findAllByParent).toHaveBeenCalled();
 
             });
         });

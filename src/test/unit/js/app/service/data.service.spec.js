@@ -6,11 +6,16 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
             q = $q;
             httpBackend = $injector.get('$httpBackend');
             http = $injector.get('$http');
+
+            Timecop.install();
+            Timecop.freeze(new Date("2015-11-05T12:43:54.972Z"));
         }));
 
         afterEach(function() {
             httpBackend.verifyNoOutstandingExpectation();
             httpBackend.verifyNoOutstandingRequest();
+            Timecop.returnToPresent();
+            Timecop.uninstall();
         });
 
         it("should save datavalues to dhis", function() {
