@@ -14,6 +14,8 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
         }));
 
         afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
             httpBackend.verifyNoOutstandingExpectation();
             httpBackend.verifyNoOutstandingRequest();
         });

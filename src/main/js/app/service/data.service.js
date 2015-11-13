@@ -15,7 +15,7 @@ define(["lodash", "moment", "dhisUrl", "properties"], function(_, moment, dhisUr
                 if (_.isEmpty(periods))
                     return $q.when(dataFromDhis);
 
-                return $http.get(dhisUrl.dataValueSets, {
+                var config = {
                     "params": {
                         "orgUnit": orgUnitIds,
                         "children": true,
@@ -23,7 +23,9 @@ define(["lodash", "moment", "dhisUrl", "properties"], function(_, moment, dhisUr
                         "period": periods.pop(),
                         "lastUpdated": lastUpdated
                     }
-                }).then(function(result) {
+                };
+
+                return $http.get(dhisUrl.dataValueSets, config).then(function(result) {
                     if (!_.isEmpty(result.data)) {
                         _.each(result.data.dataValues, function(dataValue) {
                             dataValue.period = moment(dataValue.period, "GGGG[W]W").format("GGGG[W]WW");
