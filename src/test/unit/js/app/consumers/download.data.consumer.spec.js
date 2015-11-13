@@ -21,7 +21,8 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 datasetRepository = {
                     "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [{
-                        'id': 'DS_OPD'
+                        'id': 'DS_OPD',
+                        "isLineListService": false
                     }]))
                 };
 
@@ -77,7 +78,8 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 }]));
 
                 datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
-                    "id": "ds1"
+                    "id": "ds1",
+                    "isLineListService": false
                 }]));
 
                 message = {

@@ -26,7 +26,9 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
         var downloadDataValues = function() {
             var getAllDataValues = function(vals) {
                 var orgUnitIds = _.pluck(vals[0], "id");
-                var allDataSetIds = _.pluck(vals[1], "id");
+                var allDataSetIds = _.pluck(_.filter(vals[1], {
+                    "isLineListService": false
+                }), "id");
 
                 if (orgUnitIds.length === 0 || allDataSetIds.length === 0)
                     return $q.when([]);
