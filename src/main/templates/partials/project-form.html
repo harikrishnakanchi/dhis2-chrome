@@ -4,7 +4,7 @@
     </div>
     <div class="top-actions" ng-if="!isNewMode && hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user', 'Superuser'])">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createOperationUnitBtnLabel }}" ng-click="openInNewMode('Operation Unit')" />
-        <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createUserBtnLabel }}" ng-click="openInNewMode('User')" />
+        <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createUserLabel }}" ng-click="openInNewMode('User')" />
     </div>
     <div ng-show="saveFailure" class="alert alert-danger">{{ resourceBundle.errorProject }}</div>
     <form name="createForm" class="form-horizontal" role="form" novalidate>

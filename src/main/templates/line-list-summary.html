@@ -48,7 +48,7 @@
                                 <li>|</li>
                                 <li><a href="#/line-list-summary/{{selectedModuleId}}/readyToSubmit" ng-class="{'active': (filterBy === 'readyToSubmit')}">{{resourceBundle.casesReadyToSubmit}}</a></li>
                                 <li>|</li>
-                                <li><a href="#/line-list-summary/{{selectedModuleId}}/eventSummary" ng-class="{'active': (filterBy === 'eventSummary')}">Case Summary</a></li>
+                                <li><a href="#/line-list-summary/{{selectedModuleId}}/eventSummary" ng-class="{'active': (filterBy === 'eventSummary')}">{{resourceBundle.caseSummary}}</a></li>
                             </ul>
                         </div>
                         <div class="col-md-4 text-right">
@@ -70,7 +70,7 @@
                                 <input type="button" value="Search" class="btn btn-default" ng-click="filterByCaseNumber()"/>
                             </span>
                                     <span ng-if="filterBy === 'dateRange'">
-                                <input type="date" class="form-control" ng-model="filterParams.startDate" /> and <input type="date" class="form-control" ng-model="filterParams.endDate" />
+                                <input type="date" class="form-control" ng-model="filterParams.startDate" /> {{resourceBundle.toLabel}} <input type="date" class="form-control" ng-model="filterParams.endDate" />
                                 <input type="button" value="Search" class="btn btn-default" ng-click="filterByDateRange()"/>
                             </span>
                                 </form>
@@ -103,8 +103,8 @@
                                             <td ng-if="showPatientOriginInSummaryTable()">{{ getOriginName(event.orgUnit)}}</td>
                                             <td ng-repeat="dataValue in event.dataValues" ng-if="dataValue.showInEventSummary">
                                                 <span ng-if="dataValue.type==='date'">{{ getFormattedDate(dataValue.value) }}</span>
-                                                <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='true'">{{ resourceBundle.yes }}</span>
-                                                <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='false'">{{ resourceBundle.no }}</span>
+                                                <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='true'">{{ resourceBundle.yesLabel }}</span>
+                                                <span ng-if="dataValue.type==='bool' &amp;&amp; dataValue.value==='false'">{{ resourceBundle.noLabel }}</span>
                                                 <span ng-if="dataValue.type !=='date' &amp;&amp; dataValue.type !=='bool'">{{ getDisplayValue(dataValue) }}</span>
                                             </td>
                                             <td>

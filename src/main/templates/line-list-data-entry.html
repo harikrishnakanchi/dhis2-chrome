@@ -53,12 +53,12 @@
                                                     <div ng-if="psde.dataElement.type === 'bool' &amp;&amp; !psde.dataElement.optionSet" class="col-sm-8 col-md-8 form-inline">
                                                         <div class="radio-inline">
                                                             <label for="Yes">
-                                                                <input type="radio" ng-model="dataValues[psde.dataElement.id]" value="true"> {{resourceBundle.yes}}
+                                                                <input type="radio" ng-model="dataValues[psde.dataElement.id]" value="true"> {{resourceBundle.yesLabel}}
                                                             </label>
                                                         </div>
                                                         <div class="radio-inline">
                                                             <label for="No">
-                                                                <input type="radio" ng-model="dataValues[psde.dataElement.id]" value="false"> {{resourceBundle.no}}
+                                                                <input type="radio" ng-model="dataValues[psde.dataElement.id]" value="false"> {{resourceBundle.noLabel}}
                                                             </label>
                                                         </div>
                                                     </div>
@@ -83,7 +83,7 @@
                                         <input type="button" class="btn btn-main" value="{{ resourceBundle.saveCaseBtnValue }}" ng-click="save()" ng-disabled="eventDataEntryForm.$invalid" ng-if="isNewMode" />
                                         <input type="button" class="btn btn-main" value="{{ resourceBundle.saveAndAddAnotherBtnValue }}" ng-click="save(true)" ng-disabled="eventDataEntryForm.$invalid" ng-if="isNewMode" />
                                         <input type="button" class="btn btn-main" value="{{ resourceBundle.updateBtnValue }}" ng-click="update()" ng-disabled="eventDataEntryForm.$invalid" ng-if="!isNewMode" />
-                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.cancelBtnValue }}" ng-click="loadEventsView()" />
+                                        <input type="button" class="btn btn-main" value="{{ resourceBundle.cancelLabel }}" ng-click="loadEventsView()" />
                                     </div>
                                 </li>
                             </ul>

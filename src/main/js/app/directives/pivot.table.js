@@ -4,7 +4,9 @@ define(["lodash", "moment"], function(_, moment) {
             scope: {
                 data: "=",
                 definition: "=",
-                exportButtonName: "="
+                exportButtonName: "@",
+                columnOneTitle: "@",
+                columnTwoTitle: "@"
             },
             controller: 'pivotTableController',
             templateUrl: "templates/pivot.table.html"

@@ -6,8 +6,8 @@
         <table class='table table-bordered'>
             <thead>
                 <tr>
-                    <th>Data Element</th>
-                    <th ng-if="isCategoryPresent &amp;&amp; !hasOnlyOneCategory">Category</th>
+                    <th>{{columnOneTitle}}</th>
+                    <th ng-if="isCategoryPresent &amp;&amp; !hasOnlyOneCategory">{{columnTwoTitle}}</th>
                     <th ng-repeat="period in periods" ng-show="periodBasedValues[period] !== 0">
                         <span>{{data.metaData.names[period]}}</span>
                     </th>

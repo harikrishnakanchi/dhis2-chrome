@@ -303,7 +303,7 @@
                                         <thead>
                                             <tr>
                                                 <th> {{resourceBundle.originName}} </th>
-                                                <th> {{resourceBundle.originCount}} </th>
+                                                <th> {{resourceBundle.countLabel}} </th>
                                             </tr>
                                         </thead>
                                         <tr ng-repeat="(originId, originName) in originMap">
@@ -322,14 +322,14 @@
                     <div ng-class="'dataset-acc-wrapper'">
                         <accordion-group is-open="status.open">
                             <accordion-heading>
-                                <span>Referral Location</span>
+                                <span>{{ resourceBundle.referralLocationLabel }}</span>
                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                             </accordion-heading>
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Location</th>
-                                        <th>Count</th>
+                                        <th>{{resourceBundle.locationLabel}}</th>
+                                        <th>{{resourceBundle.countLabel}}</th>
                                     </tr>
                                 </thead>
                                 <tr ng-repeat="name in locationNames">

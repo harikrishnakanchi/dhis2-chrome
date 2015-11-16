@@ -4,7 +4,8 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         $scope.getConnectedToMessage = function() {
             var dhisUrl = systemSettingRepository.getDhisUrl();
-            return dhisUrl ? "Connected to " + dhisUrl : "";
+            var message = $scope.resourceBundle ? $scope.resourceBundle.connectedTo + " " + dhisUrl : "";
+            return dhisUrl ? message : "";
         };
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {

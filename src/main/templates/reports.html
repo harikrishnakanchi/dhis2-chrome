@@ -1,5 +1,4 @@
-<div class="dataentrypage parent-margin report-container
-">
+<div class="dataentrypage parent-margin report-container">
     <section class="panel tab-panel">
         <div class="row">
             <div class="col-md-12">
@@ -8,7 +7,7 @@
         </div>
         <div class="row form-inline">
             <div class="col-md-4 form-group">
-                Select service name:
+                {{ resourceBundle.selectServiceNameLabel }}
                 <select id="selectDataset" class="form-control" ng-model="selectedDatasetId" ng-options="dataset.id as dataset.name for dataset in datasets"></select>
             </div>
         </div>
@@ -25,8 +24,7 @@
                                 <span class="glyphicon glyphicon-download-alt"></span>
                             </a>
                         </div>
-                        <p ng-if="chart.type === 'line'" class="lineChart-container
-">
+                        <p ng-if="chart.type === 'line'" class="lineChart-container">
                             <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
                         </p>
                         <p ng-if="chart.type === 'column'">
@@ -53,7 +51,7 @@
                                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                             </accordion-heading>
                                             <div>
-                                                <pivot-table definition="table.table" data="table.data" export-button-name="resourceBundle.exportAsCsv"></pivot-table>
+                                                <pivot-table definition="table.table" data="table.data" export-button-name="{{resourceBundle.exportAsCsv}}" column-one-title="{{resourceBundle.dataElement}}" column-two-title="{{resourceBundle.category}}"></pivot-table>
                                             </div>
                                         </accordion-group>
                                     </accordion>
@@ -83,7 +81,7 @@
                                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                             </accordion-heading>
                                             <div>
-                                                <pivot-table definition="table.table" data="table.data" export-button-name="resourceBundle.exportAsCsv"></pivot-table>
+                                                <pivot-table definition="table.table" data="table.data" export-button-name="{{resourceBundle.exportAsCsv}}" column-one-title="{{resourceBundle.dataElement}}" column-two-title="{{resourceBundle.category}}"></pivot-table>
                                             </div>
                                         </accordion-group>
                                     </accordion>
