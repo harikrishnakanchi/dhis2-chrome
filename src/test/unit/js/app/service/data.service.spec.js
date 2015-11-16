@@ -62,11 +62,11 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
             var startDate = "2014-02-10";
             var period = "2014W08";
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&orgUnit=company_0&period=2014W08").respond(200, dataValuesFromDhis);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&orgUnit=company_0&period=2014W08&period=2014W09").respond(200, dataValuesFromDhis);
 
             var actualDataValues;
             var dataService = new DataService(http, q);
-            dataService.downloadAllData('company_0', ["DS_OPD", "Vacc"], startDate).then(function(result) {
+            dataService.downloadData('company_0', ["DS_OPD", "Vacc"], ["2014W08", "2014W09"]).then(function(result) {
                 actualDataValues = result;
             });
 

@@ -12,11 +12,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 Timecop.install();
                 Timecop.freeze(thisMoment.toDate());
 
-                properties.projectDataSync.numWeeksToSync = 1;
-                properties.projectDataSync.numWeeksToSyncOnFirstLogIn = 1;
-
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, "getUserModules").and.returnValue(utils.getPromise(q, ["org_0"]));
                 spyOn(userPreferenceRepository, "getCurrentProjects").and.returnValue(utils.getPromise(q, ["proj_1"]));
 
                 datasetRepository = {
@@ -27,18 +23,12 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 };
 
                 changeLogRepository = new ChangeLogRepository();
-                spyOn(changeLogRepository, "upsert").and.returnValue(utils.getPromise(q, {
-                    'type': "proj_1",
-                    'lastUpdatedTime': "2014-12-30T09:13:41.092Z"
-                }));
-
-                spyOn(changeLogRepository, "get").and.returnValue(utils.getPromise(q, {
-                    'lastUpdatedTime': "2014-12-30T09:13:41.092Z"
-                }));
+                spyOn(changeLogRepository, "get").and.returnValue(utils.getPromise(q, "2013-12-30T09:13:41.092Z"));
+                spyOn(changeLogRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
 
                 dataRepository = new DataRepository();
                 spyOn(dataRepository, "getDataValues").and.returnValue(utils.getPromise(q, {}));
-                spyOn(dataRepository, "getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, {}));
+                spyOn(dataRepository, "getDataValuesForOrgUnitsPeriods").and.returnValue(utils.getPromise(q, {}));
                 spyOn(dataRepository, "isDataPresent").and.returnValue(utils.getPromise(q, true));
                 spyOn(dataRepository, "saveDhisData");
 
@@ -51,7 +41,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 };
 
                 dataService = {
-                    "downloadAllData": jasmine.createSpy("downloadAllData").and.returnValue(utils.getPromise(q, [])),
+                    "downloadData": jasmine.createSpy("downloadData").and.returnValue(utils.getPromise(q, [])),
                     "save": jasmine.createSpy("save")
                 };
 
@@ -65,23 +55,23 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 Timecop.uninstall();
             });
 
-            it("should download data values from dhis based on user preferences and dataset", function() {
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, [{
-                    "name": "mod1",
-                    "id": "mod1"
-                }, {
-                    "name": "mod2",
-                    "id": "mod2"
-                }, {
-                    "name": "mod3",
-                    "id": "mod3"
-                }]));
+            it("should download data values from dhis based on last updated date, user preferences and non-line-list datasets", function() {
+                var userProjects = [{
+                    "id": "prj1"
+                }];
+                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userProjects));
 
                 datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
                     "id": "ds1",
+                    "isLineListService": true
+                }, {
+                    "id": "ds2",
                     "isLineListService": false
                 }]));
 
+                var lastUpdated = "2013-12-15T09:13:41.092Z";
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, lastUpdated));
+
                 message = {
                     "data": {
                         "type": "downloadData"
@@ -91,26 +81,71 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 downloadDataConsumer.run(message);
                 scope.$apply();
 
-                expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
-                expect(datasetRepository.getAll).toHaveBeenCalled();
+                expect(userPreferenceRepository.getCurrentProjects).toHaveBeenCalled();
+                expect(dataService.downloadData).toHaveBeenCalledWith(userProjects, ["ds2"], jasmine.any(String), lastUpdated);
             });
 
-            it("should not download data values if org units is not present", function() {
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, []));
+            it("should recursively download data values from dhis once per week", function() {
+
+                var userProjects = [{
+                    "id": "prj1"
+                }];
+                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userProjects));
+
+                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
+                    "id": "ds1",
+                    "isLineListService": true
+                }, {
+                    "id": "ds2",
+                    "isLineListService": false
+                }]));
+
+                properties.projectDataSync.numWeeksToSync = 3;
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, "2013-12-15T09:13:41.092Z"));
+
+                var dhisDataValues = [{
+                    "dataElement": "DE1",
+                    "period": "2014W01",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "5"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2013W52",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "10"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2013W51",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "15"
+                }];
+
+                dataService.downloadData.and.returnValue(utils.getPromise(q, dhisDataValues));
+
                 message = {
                     "data": {
                         "type": "downloadData"
                     }
                 };
+
                 downloadDataConsumer.run(message);
                 scope.$apply();
 
-                expect(dataService.downloadAllData).not.toHaveBeenCalled();
+                expect(dataService.downloadData.calls.count()).toEqual(3);
+                expect(dataRepository.saveDhisData.calls.count()).toEqual(3);
+                expect(dataService.downloadData).toHaveBeenCalledWith(userProjects, ["ds2"], '2014W01', jasmine.any(String));
+                expect(dataService.downloadData).toHaveBeenCalledWith(userProjects, ["ds2"], '2013W52', jasmine.any(String));
+                expect(dataService.downloadData).toHaveBeenCalledWith(userProjects, ["ds2"], '2013W51', jasmine.any(String));
             });
 
-            it("should not download data values if dataSets is not present", function() {
-                datasetRepository.getAll.and.returnValue(utils.getPromise(q, []));
-
+            it("should not download data values if current user projects is not present", function() {
+                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, []));
                 message = {
                     "data": {
                         "type": "downloadData"
@@ -119,7 +154,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 downloadDataConsumer.run(message);
                 scope.$apply();
 
-                expect(dataService.downloadAllData).not.toHaveBeenCalled();
+                expect(dataService.downloadData).not.toHaveBeenCalled();
             });
 
             it("should not save to indexeddb if no data is available in dhis", function() {
@@ -132,14 +167,14 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "value": "5"
                 }];
 
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbDataValues));
+                dataRepository.getDataValuesForOrgUnitsPeriods.and.returnValue(utils.getPromise(q, dbDataValues));
 
                 message = {
                     "data": {
                         "type": "downloadData"
                     }
                 };
-                dataService.downloadAllData.and.returnValue(utils.getPromise(q, []));
+                dataService.downloadData.and.returnValue(utils.getPromise(q, []));
 
                 downloadDataConsumer.run(message);
                 scope.$apply();
@@ -164,9 +199,9 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "value": "10"
                 }];
 
-                dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
+                dataService.downloadData.and.returnValue(utils.getPromise(q, dhisDataValues));
 
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
+                dataRepository.getDataValuesForOrgUnitsPeriods.and.returnValue(utils.getPromise(q, []));
 
                 message = {
                     "data": {
@@ -230,9 +265,9 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "value": "4"
                 }];
 
-                dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
+                dataService.downloadData.and.returnValue(utils.getPromise(q, dhisDataValues));
 
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbDataValues));
+                dataRepository.getDataValuesForOrgUnitsPeriods.and.returnValue(utils.getPromise(q, dbDataValues));
 
                 message = {
                     "data": {
@@ -299,9 +334,9 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "value": "1"
                 }];
 
-                dataService.downloadAllData.and.returnValue(utils.getPromise(q, dhisDataValues));
+                dataService.downloadData.and.returnValue(utils.getPromise(q, dhisDataValues));
 
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dbDataValues));
+                dataRepository.getDataValuesForOrgUnitsPeriods.and.returnValue(utils.getPromise(q, dbDataValues));
 
                 message = {
                     "data": {

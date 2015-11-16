@@ -241,7 +241,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             }]));
 
             var actualDataValues;
-            dataRepository.getDataValuesForPeriodsOrgUnits("2014W02", "2014W03", ["ou1", "ou2"]).then(function(dataValues) {
+            dataRepository.getDataValuesForOrgUnitsPeriods(["ou1", "ou2"], ["2014W02", "2014W03"]).then(function(dataValues) {
                 actualDataValues = dataValues;
             });
 
