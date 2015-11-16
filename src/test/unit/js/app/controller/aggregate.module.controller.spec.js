@@ -1106,6 +1106,92 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(scope.selectedDataset).toEqual(expectedDataset);
             });
 
+            it("should include mandatory data elements irrespective of their status in module templates", function() {
+                var datasetId = "a4808d65f51";
+                scope.selectedTemplate[datasetId] = "War";
+
+                scope.selectedDataset = {
+                    "id": "a4808d65f51",
+                    "sections": [{
+                        "name": "section1",
+                        "id": "section_1",
+                        "isIncluded": true,
+                        "dataElements": [{
+                            "id": "de1",
+                            "isIncluded": true,
+                            "isMandatory": true
+                        }, {
+                            "id": "de2",
+                            "isIncluded": true,
+                            "isMandatory": false
+                        }]
+                    }, {
+                        "name": "section2",
+                        "id": "section_2",
+                        "dataElements": [{
+                            "id": "de3",
+                            "isIncluded": false,
+                            "isMandatory": false
+                        }]
+                    }]
+                };
+
+                scope.allTemplates = {
+                    "a4808d65f51": {
+                        "War": [
+                            "de1",
+                            "de2"
+                        ],
+                        "Emergency": [
+                            "blah1",
+                            "blah2"
+                        ],
+                        "Default": []
+                    },
+                    "a4808d65f52": {
+                        "War": [
+                            "a7d1f604051",
+                            "a6cb451f706"
+                        ],
+                        "Emergency": [
+                            3,
+                            4
+                        ],
+                        "Default": []
+                    }
+                };
+
+                var expectedDataset = {
+                    "id": "a4808d65f51",
+                    "sections": [{
+                        "name": "section1",
+                        "id": "section_1",
+                        "isIncluded": false,
+                        "dataElements": [{
+                            "id": "de1",
+                            "isIncluded": true,
+                            "isMandatory": true
+                        }, {
+                            "id": "de2",
+                            "isIncluded": false,
+                            "isMandatory": false
+                        }]
+                    }, {
+                        "name": "section2",
+                        "id": "section_2",
+                        "isIncluded": true,
+                        "dataElements": [{
+                            "id": "de3",
+                            "isIncluded": true,
+                            "isMandatory": false
+                        }]
+                    }]
+                };
+
+                scope.onTemplateSelect();
+                expect(scope.selectedDataset).toEqual(expectedDataset);
+            });
+
             it("should take the user to the view page of the parent opUnit on clicking cancel", function() {
                 scope.orgUnit = {
                     "id": "parent",

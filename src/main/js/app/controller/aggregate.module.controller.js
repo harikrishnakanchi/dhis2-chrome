@@ -92,8 +92,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 $scope.onTemplateSelect = function() {
                     _.each($scope.selectedDataset.sections, function(section) {
                         _.each(section.dataElements, function(de) {
-                            de.isIncluded = isDataElementExcluded(de);
+                            de.isIncluded = de.isMandatory ? true : isDataElementExcluded(de);
                         });
+
                         section.isIncluded = !_.any(section.dataElements, {
                             "isIncluded": false
                         });
