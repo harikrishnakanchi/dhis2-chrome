@@ -70,6 +70,7 @@
     "referralLocation_Private Facility 1": "Private Facility 1",
     "referralLocation_Private Facility 2": "Private Facility 2",
     "referralLocation_Other Facility": "Other Facility",
+    "noReferralLocationsMessage": "No referrals setup for the Operation Unit",
     "savedReferralLocations": "Referral Location names saved successfully",
     "uploadReferralLocationsDesc": "upsert referral Locations for op unit",
     "disableReferralLocationConfirmationMessage": "Referral Location will be disabled. Are you sure?",
