@@ -610,15 +610,20 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(scope.areDatasetsSelected()).toEqual(false);
             });
 
-            it("should de-select all data elements if the section containing it is de-selected", function() {
+            it("should de-select all data elements except mandatory elements if the section containing it is de-selected", function() {
                 var section = {
                     'id': "sec1",
                     "dataElements": [{
-                        'id': "test1"
+                        'id': "test1",
+                        'isMandatory': true
                     }, {
-                        'id': "test2"
+                        'id': "test2",
+                        'isIncluded': false,
+                        'isMandatory': false
                     }, {
-                        'id': "test3"
+                        'id': "test3",
+                        'isIncluded': false,
+                        'isMandatory': false
                     }],
                     isIncluded: false
                 };
@@ -627,13 +632,16 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     id: 'sec1',
                     dataElements: [{
                         id: 'test1',
-                        isIncluded: false
+                        'isMandatory': true,
+                        'isIncluded': true
                     }, {
                         id: 'test2',
-                        isIncluded: false
+                        'isIncluded': false,
+                        'isMandatory': false
                     }, {
                         id: 'test3',
-                        isIncluded: false
+                        'isIncluded': false,
+                        'isMandatory': false
                     }],
                     isIncluded: false
                 };
@@ -1288,6 +1296,10 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
             it('should not include section when the subSection is not included', function() {
                 var dataElements = [{
                     'isIncluded': true,
+                    'isMandatory': false
+                }, {
+                    'isIncluded': false,
+                    'isMandatory': true
                 }];
                 var subSection = {
                     'isIncluded': false,
@@ -1299,7 +1311,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 };
 
                 scope.changeDataElementSelectionInSubSection(subSection, section);
-                expect(subSection.dataElements[0].isIncluded).toBe(false);
+                expect(subSection.dataElements[0].isIncluded).toBeFalsy();
                 expect(section.isIncluded).toBe(false);
             });
 

@@ -344,7 +344,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
             $scope.changeDataElementSelection = function(section) {
                 _.each(section.dataElements, function(dataElement) {
-                    dataElement.isIncluded = section.isIncluded;
+                    dataElement.isIncluded = section.isIncluded || dataElement.isMandatory;
                 });
                 _.each(section.subSections, function(subSection) {
                     subSection.isIncluded = section.isIncluded;
@@ -353,7 +353,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
             $scope.changeDataElementSelectionInSubSection = function(subSection, section) {
                 _.each(subSection.dataElements, function(dataElement) {
-                    dataElement.isIncluded = subSection.isIncluded;
+                    dataElement.isIncluded = subSection.isIncluded || dataElement.isMandatory;
                 });
                 $scope.changeSectionSelection(section);
             };
