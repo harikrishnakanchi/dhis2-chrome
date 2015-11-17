@@ -18,7 +18,7 @@
         "angularjs-directives": "https://github.com/DWB-eHealth/angularjs-directives.git",
         "moment": "2.9.0",
         "js-md5": "1.1.0",
-        "hustle": "https://github.com/orthecreedence/hustle.git",
+        "hustle": "https://github.com/DWB-eHealth/hustle.git",
         "angularjs-hustle": "https://github.com/DWB-eHealth/angularjs-hustle.git",
         "timecop": "0.1.1",
         "jszip": "2.5.0",
