@@ -1,7 +1,7 @@
-define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], function(mocks, lodash, moment, PivotTableController, timecop) {
+define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "resourceBundleService"], function(mocks, lodash, moment, PivotTableController, timecop, ResourceBundleService) {
     describe("pivotTableControllerSpec", function() {
 
-        var scope, pivotTableController;
+        var scope, pivotTableController, resourceBundleService;
 
         beforeEach(mocks.inject(function($rootScope) {
             scope = $rootScope.$new();
@@ -82,6 +82,9 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 }]
             };
 
+            resourceBundleService = new ResourceBundleService();
+            spyOn(resourceBundleService, "getBundle").and.returnValue({});
+
         }));
 
         afterEach(function() {
@@ -93,14 +96,14 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
         describe("Export as csv", function() {
 
             it("should get csv file name in expected format", function() {
-                pivotTableController = new PivotTableController(scope);
+                pivotTableController = new PivotTableController(scope, resourceBundleService);
                 scope.$apply();
 
                 expect(scope.getCsvFileName()).toEqual("NewConsultations_Consultations_29-Oct-2015.csv");
             });
 
             it("should get headers if category is present", function() {
-                pivotTableController = new PivotTableController(scope);
+                pivotTableController = new PivotTableController(scope, resourceBundleService);
                 scope.$apply();
                 var expected = ['Data Element', 'Category', 'July 2015', 'August 2015'];
 
@@ -108,7 +111,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             });
 
             it("should get headers if category not present", function() {
-                pivotTableController = new PivotTableController(scope);
+                pivotTableController = new PivotTableController(scope, resourceBundleService);
                 scope.isCategoryPresent = false;
                 scope.$apply();
                 var expected = ['Data Element', 'July 2015', 'August 2015'];
@@ -117,7 +120,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             });
 
             it("should get data for csv file", function() {
-                pivotTableController = new PivotTableController(scope);
+                pivotTableController = new PivotTableController(scope, resourceBundleService);
                 scope.$apply();
                 var expectedDataValues = [{
                     "Data Element": 'New Consultations',
@@ -146,7 +149,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
         });
 
         it("should get data element name", function() {
-            pivotTableController = new PivotTableController(scope);
+            pivotTableController = new PivotTableController(scope, resourceBundleService);
             scope.$apply();
             var dataElementName = "FieldApp - test";
             var actualdataelementName = scope.getDataElementName(dataElementName);
@@ -155,7 +158,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
         });
 
         it("should populate viewmap and other scope variables on load when categories are present", function() {
-            pivotTableController = new PivotTableController(scope);
+            pivotTableController = new PivotTableController(scope, resourceBundleService);
             scope.$apply();
             var expectedViewMap = [{
                 category: 'ab3a614eed1',
@@ -230,7 +233,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 }]
             };
 
-            pivotTableController = new PivotTableController(scope);
+            pivotTableController = new PivotTableController(scope, resourceBundleService);
 
             scope.$apply();
 
@@ -304,7 +307,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 }]
             };
 
-            pivotTableController = new PivotTableController(scope);
+            pivotTableController = new PivotTableController(scope, resourceBundleService);
 
             scope.$apply();
 

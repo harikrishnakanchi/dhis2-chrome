@@ -1,13 +1,13 @@
 <div>
     <button class="col-md-2 exportCSV-btn" href="" ng-csv="getData()" csv-header="getHeaders()" filename="{{getCsvFileName()}}">
-        {{exportButtonName}}
+        {{resourceBundle.exportAsCsv}}
     </button>
     <div class="scroll-horizontal m-top-30">
         <table class='table table-bordered'>
             <thead>
                 <tr>
-                    <th>{{columnOneTitle}}</th>
-                    <th ng-if="isCategoryPresent &amp;&amp; !hasOnlyOneCategory">{{columnTwoTitle}}</th>
+                    <th>{{resourceBundle.dataElement}}</th>
+                    <th ng-if="isCategoryPresent &amp;&amp; !hasOnlyOneCategory">{{resourceBundle.category}}</th>
                     <th ng-repeat="period in periods" ng-show="periodBasedValues[period] !== 0">
                         <span>{{data.metaData.names[period]}}</span>
                     </th>

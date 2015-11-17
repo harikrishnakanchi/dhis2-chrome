@@ -1,6 +1,6 @@
-define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function(PivotTable, mocks, utils, PivotTableController) {
+define(["pivotTable", "angularMocks", "utils", "pivotTableController", "resourceBundleService"], function(PivotTable, mocks, utils, PivotTableController, ResourceBundleService) {
     describe("Pivot Table Directive", function() {
-        var $scope, tableDefinition, tableData;
+        var $scope, tableDefinition, tableData, resourceBundleService;
         beforeEach(function() {
             var app = angular.module("cc", []);
             app.directive("pivotTable", PivotTable);
@@ -152,13 +152,17 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
                 ],
                 "width": 4
             };
+
+            resourceBundleService = new ResourceBundleService();
+            spyOn(resourceBundleService, "getBundle").and.returnValue({});
+
         });
 
         it("should transform the data to the correct form", mocks.inject(function($rootScope, $controller) {
             $scope = $rootScope.$new();
             $scope.data = tableData;
             $scope.definition = tableDefinition;
-            var controller = PivotTableController($scope);
+            var controller = PivotTableController($scope, resourceBundleService);
             $scope.$apply();
             expect($scope.dataMap).toEqual([{
                 category: 'a0b89770007',
@@ -269,7 +273,7 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function
             $scope = $rootScope.$new();
             $scope.data = tableData;
             $scope.definition = tableDefinition;
-            var controller = PivotTableController($scope);
+            var controller = PivotTableController($scope, resourceBundleService);
             $scope.$apply();
 
             expect($scope.getValue('abf819dca06', 'a67aa742313', '201507')).toEqual(6433);

@@ -1,12 +1,9 @@
-define(["lodash", "moment"], function(_, moment) {
+define([], function() {
     return function() {
         return {
             scope: {
                 data: "=",
-                definition: "=",
-                exportButtonName: "@",
-                columnOneTitle: "@",
-                columnTwoTitle: "@"
+                definition: "="
             },
             controller: 'pivotTableController',
             templateUrl: "templates/pivot.table.html"
