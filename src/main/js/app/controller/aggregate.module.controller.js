@@ -368,7 +368,9 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 subSection.isIncluded = !_.any(subSection.dataElements, {
                     "isIncluded": false
                 });
-                section.isIncluded = subSection.isIncluded;
+                section.isIncluded = !_.any(section.dataElements, {
+                    "isIncluded": false
+                });
             };
 
             var setSelectedTemplate = function(datasetId) {
