@@ -87,7 +87,8 @@ require.config({
         "downloadPatientOriginConsumer": "app/consumer/download.patient.origin.consumer",
         "uploadExcludedDataElementsConsumer": "app/consumer/upload.excluded.dataelements.consumer",
         "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
-        "downloadReportsConsumer": "app/consumer/download.reports.consumer",
+        "downloadPivotTablesConsumer": "app/consumer/download.pivot.tables.consumer",
+        "downloadChartsConsumer": "app/consumer/download.charts.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
 
         //merge strategies
