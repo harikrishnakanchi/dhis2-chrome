@@ -74,7 +74,6 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             "chart": {
                 "type": "lineChart",
                 "height": 450,
-
                 "margin": {
                     "top": 20,
                     "right": 45,
@@ -98,7 +97,40 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     "tickFormat": function(d) {
                         return d3.format('.0f')(d);
                     }
-                }
+                },
+                "callback": function(chart) {
+                    if (chart.yAxis.scale().domain()[1] < 10) {
+                        chart.lines.forceY([0, 10]);
+                        chart.yAxis.tickValues(d3.range(1, 10));
+                        chart.update();
+                    }
+                },
+                "interactiveLayer": {
+                    "dispatch": {},
+                    "tooltip": {
+                        "duration": 0,
+                        "gravity": "w",
+                        "distance": 25,
+                        "snapDistance": 0,
+                        "enabled": true,
+                        "hideDelay": 0,
+                        "headerEnabled": true,
+                        "position": {
+                            "left": 1136,
+                            "top": 152
+                        },
+                        "offset": {
+                            "left": 0,
+                            "top": 0
+                        },
+                        "hidden": false,
+                    },
+                    "margin": {
+                        "left": 55,
+                        "top": 30
+                    },
+                    "showGuideLine": true
+                },
             }
         };
 
