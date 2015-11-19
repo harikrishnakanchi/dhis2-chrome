@@ -4,15 +4,48 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
         var userProjectIds = [];
 
         this.run = function() {
-            return getUserProjects().then(downloadDataValues).then(mergeAndSaveDataValues).then(function() {
-                updateChangeLog(userProjectIds);
+            return userPreferenceRepository.getCurrentProjects().then(function(userProjectIds) {
+                return getLastUpdatedTime(userProjectIds).then(function(lastUpdated) {
+                    return datasetRepository.getAll().then(function(allDataSets) {
+                        return downloadMergeAndSave(userProjectIds, allDataSets, lastUpdated).then(function() {
+                            return updateChangeLog(userProjectIds);
+                        });
+                    });
+                });
             });
         };
 
-        var getUserProjects = function() {
-            return userPreferenceRepository.getCurrentProjects().then(function(data) {
-                userProjectIds = data;
-            });
+        var downloadMergeAndSave = function(orgUnitIds, allDataSets, lastUpdated) {
+            if (_.isEmpty(orgUnitIds))
+                return $q.when();
+
+            var dataSetIds = _.pluck(_.filter(allDataSets, {
+                "isLineListService": false
+            }), "id");
+
+            var startDate = lastUpdated ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
+            var periods = getPeriods(startDate);
+
+            var recursivelyDownloadMergeAndSave = function() {
+                if (_.isEmpty(periods))
+                    return $q.when();
+
+                return dataService.downloadData(orgUnitIds, dataSetIds, periods.pop(), lastUpdated)
+                    .then(mergeAndSaveDataValues)
+                    .then(recursivelyDownloadMergeAndSave);
+            };
+
+            return recursivelyDownloadMergeAndSave();
+        };
+
+        var getPeriods = function(startDate) {
+            var numOfWeeks = moment().diff(moment(startDate), 'weeks');
+            var periods = [];
+            while (numOfWeeks > 0) {
+                periods.push(moment(startDate).add(numOfWeeks, 'weeks').format("GGGG[W]WW"));
+                numOfWeeks = numOfWeeks - 1;
+            }
+            return periods;
         };
 
         var updateChangeLog = function(userProjectIds) {
@@ -23,39 +56,11 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
             return changeLogRepository.get("dataValues:" + userProjectIds.join(';'));
         };
 
-        var downloadDataValues = function() {
-            var getAllDataValues = function(vals) {
-                var orgUnitIds = _.pluck(vals[0], "id");
-                var allDataSetIds = _.pluck(vals[1], "id");
-
-                if (orgUnitIds.length === 0 || allDataSetIds.length === 0)
-                    return $q.when([]);
-
-                var downloadPromises = _.map(orgUnitIds, function(orgUnitId) {
-                    return dataRepository.isDataPresent(orgUnitId).then(function(data) {
-                        var startDate = data ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
-                        return getLastUpdatedTime(userProjectIds).then(function(lastUpdated) {
-                            return dataService.downloadAllData([orgUnitId], allDataSetIds, startDate, lastUpdated);
-                        });
-                    });
-                });
-
-                return $q.all(downloadPromises).then(function(data) {
-                    return _.flattenDeep(data);
-                });
-            };
-
-            return $q.all([userPreferenceRepository.getUserModules(), datasetRepository.getAll()])
-                .then(getAllDataValues);
-        };
-
         var mergeAndSaveDataValues = function(dataValuesFromDhis) {
             var getDataFromDb = function() {
-                var m = moment();
-                var startPeriod = dateUtils.toDhisFormat(m.isoWeek(m.isoWeek() - properties.projectDataSync.numWeeksToSync + 1));
-                var endPeriod = dateUtils.toDhisFormat(moment());
+                var periods = _.unique(_.pluck(dataValuesFromDhis, "period"));
                 var moduleIds = _.unique(_.pluck(dataValuesFromDhis, "orgUnit"));
-                return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds);
+                return dataRepository.getDataValuesForOrgUnitsPeriods(moduleIds, periods);
             };
 
             var dataValuesEquals = function(d1, d2) {

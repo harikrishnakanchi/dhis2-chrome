@@ -78,6 +78,12 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             return attr && attr.value === "true";
         };
 
+        $scope.isReferralLocationPresent = function(dataElement) {
+            if ($scope.loading === false && _.endsWith(dataElement.code, "_referralLocations") && _.isUndefined($scope.optionSetMapping[dataElement.optionSet.id]))
+                return false;
+            return true;
+        };
+
         $scope.update = function() {
             var dataValuesAndEventDate = getDataValuesAndEventDate();
             $scope.event.orgUnit = $scope.patientOrigin.selected.id;

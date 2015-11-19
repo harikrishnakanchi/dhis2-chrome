@@ -2,7 +2,7 @@
     <div class="loading" ng-show="loading">
         <img src="img/ajax-loader.gif" class="spinner" />
     </div>
-    <div class="top-actions" ng-if="!isNewMode && hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user', 'Superuser'])">
+    <div class="top-actions" ng-if="!isNewMode &amp;&amp; hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user', 'Superuser'])">
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createOperationUnitBtnLabel }}" ng-click="openInNewMode('Operation Unit')" />
         <input type="button" class="btn btn-sub btn-sm pull-right" value="{{ resourceBundle.createUserLabel }}" ng-click="openInNewMode('User')" />
     </div>
@@ -65,35 +65,36 @@
                     <li class="form-group">
                         <label for="newPopulation" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.populationLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="number" class="form-control" name="newPopulation" id="newPopulation" ng-model="newOrgUnit.estimatedTargetPopulation" min="1" />
+                            <input type="text" class="form-control" name="newPopulation" id="newPopulation" ng-model="newOrgUnit.estimatedTargetPopulation" min="1" ng-pattern="/^[0-9]+$/" />
                             <span ng-show="createForm.newPopulation.$error.number" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
+                            <span ng-show="createForm.newPopulation.$error.pattern" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
                             <span ng-show="createForm.newPopulation.$error.min" class="errortxt">{{ resourceBundle.greaterThan0 }}</span>
                         </div>
                     </li>
                     <li class="form-group">
                         <label for="newProportionChildrenLessThanOneYear" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.proportionChildrenLessThanOneYearLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="number" class="form-control" name="newProportionChildrenLessThanOneYear" id="newProportionChildrenLessThanOneYear" ng-model="newOrgUnit.estPopulationLessThan1Year" min="1" max="100" />
+                            <input type="text" class="form-control" name="newProportionChildrenLessThanOneYear" id="newProportionChildrenLessThanOneYear" ng-model="newOrgUnit.estPopulationLessThan1Year" min="1" ng-pattern="/^[0-9]+$/" />
                             <span ng-show="createForm.newProportionChildrenLessThanOneYear.$error.number" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
-                            <span ng-show="createForm.newProportionChildrenLessThanOneYear.$error.max" class="errortxt">{{ resourceBundle.within100 }}</span>
+                            <span ng-show="createForm.newProportionChildrenLessThanOneYear.$error.pattern" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
                             <span ng-show="createForm.newProportionChildrenLessThanOneYear.$error.min" class="errortxt">{{ resourceBundle.greaterThan0 }}</span>
                         </div>
                     </li>
                     <li class="form-group">
                         <label for="newProportionChildrenLessThanFiveYears" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.proportionChildrenLessThanFiveYearsLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="number" class="form-control" name="newProportionChildrenLessThanFiveYears" id="newProportionChildrenLessThanFiveYears" ng-model="newOrgUnit.estPopulationBetween1And5Years" min="1" max="100" />
+                            <input type="text" class="form-control" name="newProportionChildrenLessThanFiveYears" id="newProportionChildrenLessThanFiveYears" ng-model="newOrgUnit.estPopulationBetween1And5Years" min="1" ng-pattern="/^[0-9]+$/" />
                             <span ng-show="createForm.newProportionChildrenLessThanFiveYears.$error.number" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
-                            <span ng-show="createForm.newProportionChildrenLessThanFiveYears.$error.max" class="errortxt">{{ resourceBundle.within100 }}</span>
+                            <span ng-show="createForm.newProportionChildrenLessThanFiveYears.$error.pattern" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
                             <span ng-show="createForm.newProportionChildrenLessThanFiveYears.$error.min" class="errortxt">{{ resourceBundle.greaterThan0 }}</span>
                         </div>
                     </li>
                     <li class="form-group">
                         <label for="newProportionWomenOfChildBearingAge" class="col-sm-4 col-md-4 control-label">{{ resourceBundle.proportionWomenOfChildBearingAgeLabel }}</label>
                         <div class="col-sm-6 col-md-6">
-                            <input type="number" class="form-control" name="newProportionWomenOfChildBearingAge" id="newProportionWomenOfChildBearingAge" ng-model="newOrgUnit.estPopulationOfWomenOfChildBearingAge" min="1" max="100" />
+                            <input type="text" class="form-control" name="newProportionWomenOfChildBearingAge" id="newProportionWomenOfChildBearingAge" ng-model="newOrgUnit.estPopulationOfWomenOfChildBearingAge" min="1" ng-pattern="/^[0-9]+$/" />
                             <span ng-show="createForm.newProportionWomenOfChildBearingAge.$error.number" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
-                            <span ng-show="createForm.newProportionWomenOfChildBearingAge.$error.max" class="errortxt">{{ resourceBundle.within100 }}</span>
+                            <span ng-show="createForm.newProportionWomenOfChildBearingAge.$error.pattern" class="errortxt">{{resourceBundle.notAValidNumber}}</span>
                             <span ng-show="createForm.newProportionWomenOfChildBearingAge.$error.min" class="errortxt">{{ resourceBundle.greaterThan0 }}</span>
                         </div>
                     </li>

@@ -6,12 +6,13 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
             q = $q;
             httpBackend = $injector.get('$httpBackend');
             http = $injector.get('$http');
-
             Timecop.install();
-            Timecop.freeze(new Date("2015-11-05T12:43:54.972Z"));
+            Timecop.freeze(new Date("2014-02-18T00:00:00.000Z"));
         }));
 
         afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
             httpBackend.verifyNoOutstandingExpectation();
             httpBackend.verifyNoOutstandingRequest();
             Timecop.returnToPresent();
@@ -46,7 +47,6 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
 
 
         it("should download all data for an org unit", function() {
-            var today = moment().format("YYYY-MM-DD");
             var dataValues = [{
                 "dataElement": "b9634a78271",
                 "period": "2014W8",
@@ -61,14 +61,14 @@ define(["dataService", "angularMocks", "properties", "moment", "testData"], func
                 "dataValues": dataValues
             };
 
-            var startDate = "2015-10-28";
-            var period = "2015W45";
+            var startDate = "2014-02-10";
+            var period = "2014W08";
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&orgUnit=company_0&period=" + period).respond(200, dataValuesFromDhis);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataValueSets?children=true&dataSet=DS_OPD&dataSet=Vacc&orgUnit=company_0&period=2014W08&period=2014W09").respond(200, dataValuesFromDhis);
 
             var actualDataValues;
             var dataService = new DataService(http, q);
-            dataService.downloadAllData('company_0', ["DS_OPD", "Vacc"], startDate).then(function(result) {
+            dataService.downloadData('company_0', ["DS_OPD", "Vacc"], ["2014W08", "2014W09"]).then(function(result) {
                 actualDataValues = result;
             });
 
