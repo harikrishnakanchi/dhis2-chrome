@@ -185,7 +185,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "isLineListService": false
                 }]));
 
-                properties.projectDataSync.numWeeksToSync = 3;
+                properties.projectDataSync.numWeeksToSync = 5;
                 changeLogRepository.get.and.returnValue(utils.getPromise(q, "2013-12-15T09:13:41.092Z"));
 
                 var dhisDataValues = [{
@@ -203,20 +203,38 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "lastUpdated": "2014-05-27T09:00:00.120Z",
                     "value": "10"
                 }, {
-                    "dataElement": "DE2",
+                    "dataElement": "DE3",
                     "period": "2013W51",
                     "orgUnit": "MSF_0",
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-27T09:00:00.120Z",
                     "value": "15"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2013W50",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "11"
+                }, {
+                    "dataElement": "DE3",
+                    "period": "2013W49",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "1"
                 }];
 
                 dataService.downloadData.and.callFake(function(projects, dataSetIds, period, lastUpdated) {
                     if (period == "2014W01")
                         return utils.getPromise(q, dhisDataValues);
                     if (period == "2013W52")
-                        return utils.getRejectedPromise(q, dhisDataValues);
+                        return utils.getPromise(q, dhisDataValues);
                     if (period == "2013W51")
+                        return utils.getRejectedPromise(q, dhisDataValues);
+                    if (period == "2013W50")
+                        return utils.getPromise(q, dhisDataValues);
+                    if (period == "2013W49")
                         return utils.getPromise(q, dhisDataValues);
                 });
 
@@ -241,8 +259,8 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 expect(success).toEqual(true);
                 expect(error).toEqual(false);
 
-                expect(dataService.downloadData.calls.count()).toEqual(3);
-                expect(dataRepository.saveDhisData.calls.count()).toEqual(2);
+                expect(dataService.downloadData.calls.count()).toEqual(5);
+                expect(dataRepository.saveDhisData.calls.count()).toEqual(4);
             });
 
             it("should not continue to recursively download data values from dhis in case of failure if message contains payload", function() {
@@ -260,7 +278,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "isLineListService": false
                 }]));
 
-                properties.projectDataSync.numWeeksToSync = 3;
+                properties.projectDataSync.numWeeksToSync = 5;
                 changeLogRepository.get.and.returnValue(utils.getPromise(q, "2013-12-15T09:13:41.092Z"));
 
                 var dhisDataValues = [{
@@ -284,14 +302,32 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                     "categoryOptionCombo": "C1",
                     "lastUpdated": "2014-05-27T09:00:00.120Z",
                     "value": "15"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2013W50",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "11"
+                }, {
+                    "dataElement": "DE3",
+                    "period": "2013W49",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "1"
                 }];
 
                 dataService.downloadData.and.callFake(function(projects, dataSetIds, period, lastUpdated) {
                     if (period == "2014W01")
                         return utils.getPromise(q, dhisDataValues);
                     if (period == "2013W52")
-                        return utils.getRejectedPromise(q, dhisDataValues);
+                        return utils.getPromise(q, dhisDataValues);
                     if (period == "2013W51")
+                        return utils.getRejectedPromise(q, dhisDataValues);
+                    if (period == "2013W50")
+                        return utils.getPromise(q, dhisDataValues);
+                    if (period == "2013W49")
                         return utils.getPromise(q, dhisDataValues);
                 });
 
@@ -319,8 +355,8 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 expect(success).toEqual(false);
                 expect(error).toEqual(true);
 
-                expect(dataService.downloadData.calls.count()).toEqual(2);
-                expect(dataRepository.saveDhisData.calls.count()).toEqual(1);
+                expect(dataService.downloadData.calls.count()).toEqual(3);
+                expect(dataRepository.saveDhisData.calls.count()).toEqual(2);
             });
 
 
