@@ -11,7 +11,6 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     "bottom": 60,
                     "left": 45
                 },
-
                 "clipEdge": true,
                 "staggerLabels": false,
                 "transitionDuration": 500,
@@ -32,9 +31,17 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     "tickFormat": function(d) {
                         return d3.format('.0f')(d);
                     }
+                },
+                "callback": function(chart) {
+                    if (chart.yAxis.scale().domain()[1] <= 10) {
+                        chart.yDomain([0, 10]);
+                        chart.yAxis.tickValues(d3.range(1, 10));
+                        chart.update();
+                    }
                 }
             }
         };
+
         $scope.stackedBarChartOptions = {
             "chart": {
                 "type": "multiBarChart",
@@ -49,7 +56,6 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 "clipEdge": true,
                 "staggerLabels": false,
                 "transitionDuration": 500,
-
                 "x": function(d) {
                     return d.label;
                 },
@@ -65,6 +71,13 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 "yAxis": {
                     "tickFormat": function(d) {
                         return d3.format('.0f')(d);
+                    }
+                },
+                "callback": function(chart) {
+                    if (chart.yAxis.scale().domain()[1] <= 10) {
+                        chart.yDomain([0, 10]);
+                        chart.yAxis.tickValues(d3.range(1, 10));
+                        chart.update();
                     }
                 }
             }
@@ -100,7 +113,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 },
                 "callback": function(chart) {
                     if (chart.yAxis.scale().domain()[1] <= 10) {
-                        chart.lines.forceY([0, 10]);
+                        //chart.lines.forceY([0, 10]);
+                        chart.yDomain([0, 10]);
                         chart.yAxis.tickValues(d3.range(1, 10));
                         chart.update();
                     }
