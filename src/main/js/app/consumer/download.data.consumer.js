@@ -3,11 +3,11 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
 
         var userProjectIds = [];
 
-        this.run = function() {
+        this.run = function(message) {
             return userPreferenceRepository.getCurrentProjects().then(function(userProjectIds) {
                 return getLastUpdatedTime(userProjectIds).then(function(lastUpdated) {
                     return datasetRepository.getAll().then(function(allDataSets) {
-                        return downloadMergeAndSave(userProjectIds, allDataSets, lastUpdated).then(function() {
+                        return downloadMergeAndSave(userProjectIds, allDataSets, lastUpdated, message.data).then(function() {
                             return updateChangeLog(userProjectIds);
                         });
                     });
@@ -15,7 +15,18 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
             });
         };
 
-        var downloadMergeAndSave = function(orgUnitIds, allDataSets, lastUpdated) {
+        var downloadMergeAndSave = function(orgUnitIds, allDataSets, lastUpdated, data) {
+
+            var onSuccess = function(dataValuesFromDhis) {
+                return mergeAndSaveDataValues(dataValuesFromDhis).then(recursivelyDownloadMergeAndSave);
+            };
+
+            var onFailure = function() {
+                if (data.data.length > 0)
+                    return $q.reject();
+                return recursivelyDownloadMergeAndSave();
+            };
+
             if (_.isEmpty(orgUnitIds))
                 return $q.when();
 
@@ -30,9 +41,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                 if (_.isEmpty(periods))
                     return $q.when();
 
-                return dataService.downloadData(orgUnitIds, dataSetIds, periods.pop(), lastUpdated)
-                    .then(mergeAndSaveDataValues)
-                    .then(recursivelyDownloadMergeAndSave);
+                return dataService.downloadData(orgUnitIds, dataSetIds, periods.pop(), lastUpdated).then(onSuccess, onFailure);
             };
 
             return recursivelyDownloadMergeAndSave();
@@ -102,7 +111,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                 });
             };
             if (_.isEmpty(dataValuesFromDhis))
-                return;
+                return $q.when();
 
 
             return getDataFromDb().then(function(dataFromLocalDb) {

@@ -74,9 +74,34 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 message = {
                     "data": {
+                        "data": [],
                         "type": "downloadData"
                     }
                 };
+                var dhisDataValues = [{
+                    "dataElement": "DE1",
+                    "period": "2014W01",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "5"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2013W52",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "10"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2013W51",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "15"
+                }];
+
+                dataService.downloadData.and.returnValue(utils.getPromise(q, dhisDataValues));
 
                 downloadDataConsumer.run(message);
                 scope.$apply();
@@ -130,6 +155,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 message = {
                     "data": {
+                        "data": [],
                         "type": "downloadData"
                     }
                 };
@@ -144,10 +170,165 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 expect(dataService.downloadData).toHaveBeenCalledWith(userProjects, ["ds2"], '2013W51', jasmine.any(String));
             });
 
+            it("should continue to recursively download data values from dhis even if call fails for any week", function() {
+
+                var userProjects = [{
+                    "id": "prj1"
+                }];
+                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userProjects));
+
+                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
+                    "id": "ds1",
+                    "isLineListService": true
+                }, {
+                    "id": "ds2",
+                    "isLineListService": false
+                }]));
+
+                properties.projectDataSync.numWeeksToSync = 3;
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, "2013-12-15T09:13:41.092Z"));
+
+                var dhisDataValues = [{
+                    "dataElement": "DE1",
+                    "period": "2014W01",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "5"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2013W52",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "10"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2013W51",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "15"
+                }];
+
+                dataService.downloadData.and.callFake(function(projects, dataSetIds, period, lastUpdated) {
+                    if (period == "2014W01")
+                        return utils.getPromise(q, dhisDataValues);
+                    if (period == "2013W52")
+                        return utils.getRejectedPromise(q, dhisDataValues);
+                    if (period == "2013W51")
+                        return utils.getPromise(q, dhisDataValues);
+                });
+
+                message = {
+                    "data": {
+                        "data": [],
+                        "type": "downloadData"
+                    }
+                };
+
+                var success = false;
+                var error = false;
+
+                downloadDataConsumer.run(message).then(function() {
+                    success = true;
+                }, function() {
+                    error = true;
+                });
+
+                scope.$apply();
+
+                expect(success).toEqual(true);
+                expect(error).toEqual(false);
+
+                expect(dataService.downloadData.calls.count()).toEqual(3);
+                expect(dataRepository.saveDhisData.calls.count()).toEqual(2);
+            });
+
+            it("should not continue to recursively download data values from dhis in case of failure if message contains payload", function() {
+
+                var userProjects = [{
+                    "id": "prj1"
+                }];
+                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userProjects));
+
+                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
+                    "id": "ds1",
+                    "isLineListService": true
+                }, {
+                    "id": "ds2",
+                    "isLineListService": false
+                }]));
+
+                properties.projectDataSync.numWeeksToSync = 3;
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, "2013-12-15T09:13:41.092Z"));
+
+                var dhisDataValues = [{
+                    "dataElement": "DE1",
+                    "period": "2014W01",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "5"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2013W52",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "10"
+                }, {
+                    "dataElement": "DE2",
+                    "period": "2013W51",
+                    "orgUnit": "MSF_0",
+                    "categoryOptionCombo": "C1",
+                    "lastUpdated": "2014-05-27T09:00:00.120Z",
+                    "value": "15"
+                }];
+
+                dataService.downloadData.and.callFake(function(projects, dataSetIds, period, lastUpdated) {
+                    if (period == "2014W01")
+                        return utils.getPromise(q, dhisDataValues);
+                    if (period == "2013W52")
+                        return utils.getRejectedPromise(q, dhisDataValues);
+                    if (period == "2013W51")
+                        return utils.getPromise(q, dhisDataValues);
+                });
+
+                message = {
+                    "data": {
+                        "data": [{
+                            "period": '2014W01',
+                            "orgUnit": 'mod1',
+                        }],
+                        "type": "downloadData"
+                    }
+                };
+
+                var success = false;
+                var error = false;
+
+                downloadDataConsumer.run(message).then(function() {
+                    success = true;
+                }, function() {
+                    error = true;
+                });
+
+                scope.$apply();
+
+                expect(success).toEqual(false);
+                expect(error).toEqual(true);
+
+                expect(dataService.downloadData.calls.count()).toEqual(2);
+                expect(dataRepository.saveDhisData.calls.count()).toEqual(1);
+            });
+
+
             it("should not download data values if current user projects is not present", function() {
                 userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, []));
                 message = {
                     "data": {
+                        "data": [],
                         "type": "downloadData"
                     }
                 };
@@ -171,6 +352,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 message = {
                     "data": {
+                        "data": [],
                         "type": "downloadData"
                     }
                 };
@@ -205,6 +387,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 message = {
                     "data": {
+                        "data": [],
                         "type": "downloadData"
                     }
                 };
@@ -271,6 +454,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 message = {
                     "data": {
+                        "data": [],
                         "type": "downloadData"
                     }
                 };
@@ -340,6 +524,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
 
                 message = {
                     "data": {
+                        "data": [],
                         "type": "downloadData"
                     }
                 };
