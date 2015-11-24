@@ -40,7 +40,7 @@ define(['lodash', 'overrides'], function(_, overrides) {
             "checkMsgcountDelayInMinutes": 1
         },
         "logging": {
-            "maxAgeinHours": 720
+            "maxAgeinHours": 168
         },
         "encryption": {
             "passphrase": "My Product Key"
