@@ -305,5 +305,7 @@
     "invalidAccess": "User doesn’t have access to this Praxis instance.",
     "connectedTo": "Connected to",
     "selectServiceNameLabel": "Select service name:",
-    "toLabel": "to"
+    "toLabel": "to",
+    "weeklyReports": "Weekly reports",
+    "monthlyReports": "Monthly reports"
 }
