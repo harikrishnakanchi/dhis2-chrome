@@ -156,28 +156,6 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             return showTable;
         };
 
-        $scope.isReportsAvailable = function() {
-            var filteredCharts = _.filter($scope.chartData, {
-                "dataset": $scope.selectedDatasetId
-            });
-
-            var filteredPivotTables = _.filter($scope.pivotTables, {
-                "dataset": $scope.selectedDatasetId
-            });
-
-            var isChartsAvailable = _.any(filteredCharts, function(chart) {
-                return chart.data.length !== 0;
-            });
-
-            $scope.isPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                if (table.data)
-                    return table.data.rows.length !== 0;
-                return false;
-            });
-
-            return isChartsAvailable || $scope.isPivotTablesAvailable;
-        };
-
         var loadChartData = function() {
 
             var insertMissingPeriods = function(chartData, periodsForXAxis) {
@@ -279,7 +257,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 return $q.all(getChartDataPromises);
             };
 
-            chartRepository.getAll().then(getChartData)
+            return chartRepository.getAll()
+                .then(getChartData)
                 .then(function(chartData) {
                     $scope.chartData = chartData;
                 });
@@ -288,13 +267,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
         var loadRelevantDatasets = function() {
 
             var loadDatasetsForModules = function(orgUnits) {
-                return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(datasets) {
-                    datasets = _.filter(datasets, {
-                        "isOriginDataset": false
+                return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(dataSets) {
+                    $scope.datasets = _.filter(dataSets, function(ds) {
+                        return !(ds.isOriginDataset || ds.isPopulationDataset || ds.isReferralDataset);
                     });
-                    $scope.datasets = _.sortBy(datasets, "name");
-                    if (!_.isEmpty(datasets))
-                        $scope.selectedDatasetId = datasets[0].id;
                 });
             };
 
@@ -327,9 +303,11 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 $scope.orgUnit = ou;
             });
         };
+
         var getDataForTableForOrgUnit = function(table, orgunit) {
             return pivotTableRepository.getDataForPivotTable(table.name, orgunit);
         };
+
         var transformTables = function(tables) {
             return $q.all(_.map(tables, function(table) {
                 return getDataForTableForOrgUnit(table, $routeParams.orgUnit).then(function(data) {
@@ -341,20 +319,56 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 });
             }));
         };
+
         var loadPivotTables = function() {
-            pivotTableRepository.getAll()
+            return pivotTableRepository.getAll()
                 .then(transformTables)
                 .then(function(pivotTables) {
                     $scope.pivotTables = pivotTables;
                 });
         };
 
+        var prepareDataForView = function() {
+            _.each($scope.datasets, function(eachDataSet) {
+
+                var filteredCharts = _.filter($scope.chartData, {
+                    "dataset": eachDataSet.id
+                });
+
+                var filteredPivotTables = _.filter($scope.pivotTables, {
+                    "dataset": eachDataSet.id
+                });
+
+                eachDataSet.isChartsAvailable = _.any(filteredCharts, function(chart) {
+                    return chart.data && chart.data.length !== 0;
+                });
+
+                eachDataSet.isPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
+                    if (table.data && table.data.rows)
+                        return table.data.rows.length !== 0;
+                    return false;
+                });
+
+                eachDataSet.isReportsAvailable = eachDataSet.isChartsAvailable || eachDataSet.isPivotTablesAvailable;
+            });
+
+            $scope.datasets = _.sortBy($scope.datasets, "name").reverse();
+            $scope.datasets = _.sortBy($scope.datasets, "isReportsAvailable").reverse();
+
+            if (!_.isEmpty($scope.datasets))
+                $scope.selectedDataset = $scope.datasets[0];
+
+            return $q.when();
+        };
+
         var init = function() {
             $scope.loading = true;
+            $scope.selectedDataset = null;
             loadOrgUnit()
                 .then(loadRelevantDatasets)
                 .then(loadChartData)
                 .then(loadPivotTables)
+                .then(prepareDataForView)
                 .finally(function() {
                     $scope.loading = false;
                 });

@@ -1,5 +1,4 @@
-<div class="dataentrypage parent-margin report-container
-">
+<div class="dataentrypage parent-margin report-container">
     <section class="panel tab-panel">
         <div class="row">
             <div class="col-md-12">
@@ -8,16 +7,16 @@
         </div>
         <div class="row form-inline">
             <div class="col-md-4 form-group">
-                Select service name:
-                <select id="selectDataset" class="form-control" ng-model="selectedDatasetId" ng-options="dataset.id as dataset.name for dataset in datasets"></select>
+                {{ resourceBundle.selectServiceNameLabel }}
+                <select id="selectDataset" class="form-control" ng-model="selectedDataset" ng-options="dataset as dataset.name for dataset in datasets"></select>
             </div>
         </div>
         <tabset>
-            <tab heading="Weekly reports" ng-click="resizeCharts()">
-                <div ng-show="!isReportsAvailable()">
+            <tab heading="{{resourceBundle.weeklyReports}}" ng-click="resizeCharts()">
+                <div ng-show="!selectedDataset.isReportsAvailable">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
-                <div ng-repeat="chart in chartData | filter: {dataset:selectedDatasetId} | orderBy: 'name'" ng-if="chart.data.length &gt; 0">
+                <div ng-repeat="chart in chartData | filter: {dataset:selectedDataset.id} | orderBy: 'name'" ng-if="chart.data.length &gt; 0">
                     <div>
                         <div class="row chart-title">
                             <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.title}}</h3>
@@ -25,8 +24,7 @@
                                 <span class="glyphicon glyphicon-download-alt"></span>
                             </a>
                         </div>
-                        <p ng-if="chart.type === 'line'" class="lineChart-container
-">
+                        <p ng-if="chart.type === 'line'" class="lineChart-container">
                             <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
                         </p>
                         <p ng-if="chart.type === 'column'">
@@ -37,7 +35,7 @@
                         </p>
                     </div>
                 </div>
-                <div ng-if="isReportsAvailable()">
+                <div ng-if="selectedDataset.isReportsAvailable">
                     <accordion is-open="true" close-others="false">
                         <accordion-group>
                             <accordion-heading>
@@ -45,7 +43,7 @@
                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                             </accordion-heading>
                             <div class="exp-coll-group">
-                                <div ng-if="!isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId} | orderBy: 'name'" class="exportCSV-container">
+                                <div ng-if="!isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDataset.id} | orderBy: 'name'" class="exportCSV-container">
                                     <accordion close-others="false">
                                         <accordion-group>
                                             <accordion-heading>
@@ -63,11 +61,11 @@
                     </accordion>
                 </div>
             </tab>
-            <tab heading="Monthly reports">
-                <div ng-show="!isReportsAvailable() || !isPivotTablesAvailable">
+            <tab heading="{{resourceBundle.monthlyReports}}">
+                <div ng-show="!selectedDataset.isReportsAvailable || !selectedDataset.isPivotTablesAvailable">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
-                <div class="margin-top" ng-if="isReportsAvailable()">
+                <div class="margin-top" ng-if="selectedDataset.isReportsAvailable">
                     <accordion is-open="true" close-others="false">
                         <accordion-group>
                             <accordion-heading>
@@ -75,7 +73,7 @@
                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                             </accordion-heading>
                             <div class="exp-coll-group">
-                                <div ng-if="isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDatasetId} | orderBy: 'name'" class="exportCSV-container">
+                                <div ng-if="isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDataset.id} | orderBy: 'name'" class="exportCSV-container">
                                     <accordion close-others="false">
                                         <accordion-group>
                                             <accordion-heading>

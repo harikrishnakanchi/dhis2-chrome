@@ -308,5 +308,11 @@
     "selectProjectLabel": "Select Project",
     "changeProject": "Change project",
     "tabularReports": "Tabular Reports",
-    "exportAsCsv": "Download report"
+    "exportAsCsv": "Download report",
+    "invalidAccess": "User doesn’t have access to this Praxis instance.",
+    "connectedTo": "Connected to",
+    "selectServiceNameLabel": "Select service name:",
+    "toLabel": "to",
+    "weeklyReports": "Weekly reports",
+    "monthlyReports": "Monthly reports"
 }

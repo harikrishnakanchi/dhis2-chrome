@@ -90,15 +90,34 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
 
             var datasets = [{
                 "id": "ds1",
-                "isOriginDataset": false
+                "isOriginDataset": false,
+                "isPopulationDataset": false,
+                "isReferralDataset": false
             }, {
                 "id": "ds2",
-                "isOriginDataset": true
+                "isOriginDataset": true,
+                "isPopulationDataset": false,
+                "isReferralDataset": false
+            }, {
+                "id": "ds3",
+                "isOriginDataset": false,
+                "isPopulationDataset": true,
+                "isReferralDataset": false
+            }, {
+                "id": "ds4",
+                "isOriginDataset": false,
+                "isPopulationDataset": false,
+                "isReferralDataset": true
             }];
 
             var expectedDatasets = [{
                 "id": "ds1",
-                "isOriginDataset": false
+                "isOriginDataset": false,
+                "isPopulationDataset": false,
+                "isReferralDataset": false,
+                "isChartsAvailable": false,
+                "isPivotTablesAvailable": false,
+                "isReportsAvailable": false
             }];
 
             orgUnitRepository.get.and.returnValue(utils.getPromise(q, prj1));
@@ -124,13 +143,19 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
 
             var datasets = [{
                 "id": "ds1",
-                "isOriginDataset": false
+                "isOriginDataset": false,
+                "isPopulationDataset": false,
+                "isReferralDataset": false
             }, {
                 "id": "ds2",
-                "isOriginDataset": false
+                "isOriginDataset": false,
+                "isPopulationDataset": false,
+                "isReferralDataset": false
             }, {
                 "id": "ds3",
-                "isOriginDataset": false
+                "isOriginDataset": false,
+                "isPopulationDataset": false,
+                "isReferralDataset": false
             }];
 
             var charts = [{
@@ -372,7 +397,13 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             }];
 
             expect(scope.chartData).toEqual(expectedChartData);
-            expect(scope.isReportsAvailable()).toEqual(true);
+
+            expect(scope.datasets[0].isChartsAvailable).toBeTruthy();
+            expect(scope.datasets[0].isPivotTablesAvailable).toBeFalsy();
+            expect(scope.datasets[0].isReportsAvailable).toBeTruthy();
+
+            expect(scope.datasets[2].isChartsAvailable).toBeFalsy();
+            expect(scope.datasets[2].isReportsAvailable).toBeFalsy();
         });
 
         it("should load pivot tables into the scope", function() {
