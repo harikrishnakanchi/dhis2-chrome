@@ -380,12 +380,35 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
                 spyOn(scope.dataentryForm, '$setPristine');
 
+                scope.dataValues = {
+                    "mod1": {
+                        "dataElement1": {
+                            "catCombo1": {
+                                "value": "1+9"
+                            }
+                        }
+                    },
+                    "origin1": {
+                        "dataElement2": {
+                            "catCombo2": {
+                                "value": "67"
+                            }
+                        }
+                    }
+                };
+
                 scope.submit();
                 scope.$apply();
 
                 expect(dataRepository.save).toHaveBeenCalled();
                 expect(hustle.publish).toHaveBeenCalledWith({
-                    data: [],
+                    data: [{
+                        orgUnit: "mod1",
+                        period: "2014W14"
+                    }, {
+                        orgUnit: "origin1",
+                        period: "2014W14"
+                    }],
                     type: 'uploadDataValues',
                     locale: 'en',
                     desc: 'upload data for 2014W14, Mod1'
