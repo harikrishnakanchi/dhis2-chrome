@@ -4,7 +4,6 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
         var userProjectIds = [];
 
         this.run = function(message) {
-
             return datasetRepository.getAll().then(function(allDataSets) {
                 if (message.data.data.length === 0) {
                     return userPreferenceRepository.getCurrentProjects().then(function(userProjectIds) {
@@ -16,7 +15,6 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
                             return downloadMergeAndSave(userProjectIds, allDataSets, periods, false, lastUpdated).then(function() {
                                 return updateChangeLog(userProjectIds);
                             });
-
                         });
                     });
                 } else {
@@ -27,6 +25,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
             });
 
         };
+
 
         var downloadMergeAndSave = function(orgUnitIds, allDataSets, periods, isMessageDataAvailable, lastUpdated) {
 
