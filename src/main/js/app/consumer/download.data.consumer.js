@@ -4,25 +4,38 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
         var userProjectIds = [];
 
         this.run = function(message) {
-            return userPreferenceRepository.getCurrentProjects().then(function(userProjectIds) {
-                return getLastUpdatedTime(userProjectIds).then(function(lastUpdated) {
-                    return datasetRepository.getAll().then(function(allDataSets) {
-                        return downloadMergeAndSave(userProjectIds, allDataSets, lastUpdated, message.data).then(function() {
-                            return updateChangeLog(userProjectIds);
+
+            return datasetRepository.getAll().then(function(allDataSets) {
+                if (message.data.data.length === 0) {
+                    return userPreferenceRepository.getCurrentProjects().then(function(userProjectIds) {
+                        return getLastUpdatedTime(userProjectIds).then(function(lastUpdated) {
+                            var startDate = lastUpdated ?
+                                dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) :
+                                dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
+                            var periods = getPeriods(startDate);
+                            return downloadMergeAndSave(userProjectIds, allDataSets, periods, false, lastUpdated).then(function() {
+                                return updateChangeLog(userProjectIds);
+                            });
+
                         });
                     });
-                });
+                } else {
+                    var orgUnitIds = _.uniq(_.pluck(message.data.data, "orgUnit"));
+                    var periods = _.uniq(_.pluck(message.data.data, "period"));
+                    return downloadMergeAndSave(orgUnitIds, allDataSets, periods, true, moment().toISOString());
+                }
             });
+
         };
 
-        var downloadMergeAndSave = function(orgUnitIds, allDataSets, lastUpdated, data) {
+        var downloadMergeAndSave = function(orgUnitIds, allDataSets, periods, isMessageDataAvailable, lastUpdated) {
 
             var onSuccess = function(dataValuesFromDhis) {
                 return mergeAndSaveDataValues(dataValuesFromDhis).then(recursivelyDownloadMergeAndSave);
             };
 
             var onFailure = function() {
-                if (data.data.length > 0)
+                if (isMessageDataAvailable)
                     return $q.reject();
                 return recursivelyDownloadMergeAndSave();
             };
@@ -33,9 +46,6 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
             var dataSetIds = _.pluck(_.filter(allDataSets, {
                 "isLineListService": false
             }), "id");
-
-            var startDate = lastUpdated ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
-            var periods = getPeriods(startDate);
 
             var recursivelyDownloadMergeAndSave = function() {
                 if (_.isEmpty(periods))

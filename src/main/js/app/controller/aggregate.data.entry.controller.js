@@ -180,11 +180,16 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                         };
                     });
                 }
-
             };
 
             updateDataValuesWithPopulationData();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, currentPeriod, $scope.currentUser.userCredentials.username);
+            var periodsAndOrgUnits = _.map(_.uniq(_.keys($scope.dataValues)), function(orgUnit) {
+                return {
+                    orgUnit: orgUnit,
+                    period: currentPeriod
+                };
+            });
 
             var publishToDhis = function() {
 
@@ -199,7 +204,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
 
                 var uploadDataValues = function() {
                     return $hustle.publish({
-                        "data": payload,
+                        "data": periodsAndOrgUnits,
                         "type": "uploadDataValues",
                         "locale": $scope.currentUser.locale,
                         "desc": $scope.resourceBundle.uploadDataValuesDesc + currentPeriod + ", " + $scope.selectedModule.name
