@@ -1,4 +1,4 @@
-define(["programEventRepository", "angularMocks", "utils", "moment", "properties"], function(ProgramEventRepository, mocks, utils, moment, properties) {
+define(["programEventRepository", "angularMocks", "utils", "moment", "properties", "timecop"], function(ProgramEventRepository, mocks, utils, moment, properties, timecop) {
     describe("programEventRepository", function() {
 
         var scope, q, programEventRepository, mockDB;
@@ -62,8 +62,16 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 return utils.getPromise(q, undefined);
             });
 
+            Timecop.install();
+            Timecop.freeze(new Date("2015-11-26T09:47:07.840Z"));
+
             programEventRepository = new ProgramEventRepository(mockDB.db, q);
         }));
+
+        afterEach(function() {
+            Timecop.returnToPresent();
+            Timecop.uninstall();
+        });
 
         it("should extract period and case number and upsert event payload", function() {
 
@@ -203,6 +211,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 'event': 'event1',
                 'eventDate': '2014-11-26T00:00:00',
                 'localStatus': 'READY_FOR_DHIS',
+                'clientLastUpdated': '2015-11-26T09:47:07.840Z',
                 'dataValues': [{
                     'dataElement': 'de1',
                     'value': '20'
@@ -211,6 +220,7 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
                 'event': 'event2',
                 'eventDate': '2014-11-26T00:00:00',
                 'localStatus': 'READY_FOR_DHIS',
+                'clientLastUpdated': '2015-11-26T09:47:07.840Z',
                 'dataValues': [{
                     'dataElement': 'de1',
                     'value': '20'

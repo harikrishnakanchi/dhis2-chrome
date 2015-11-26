@@ -3,7 +3,7 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
 
         var changeEventLocalStatus = function(events) {
             var updatedEvents = _.map(events, function(ev) {
-                return _.omit(ev, "localStatus");
+                return _.omit(ev, ["localStatus", "clientLastUpdated"]);
             });
 
             return programEventRepository.upsert(updatedEvents);
