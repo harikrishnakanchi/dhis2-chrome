@@ -39,9 +39,6 @@ define(['lodash', 'overrides'], function(_, overrides) {
             },
             "checkMsgcountDelayInMinutes": 1
         },
-        "eventsSync": {
-            "numberOfDaysToAllowResubmit": 3
-        },
         "logging": {
             "maxAgeinHours": 168
         },

@@ -60,7 +60,6 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
             var markEvents = function(events) {
                 return _.map(events, function(e) {
                     e.localStatus = "READY_FOR_DHIS";
-                    e.clientLastUpdated = moment().toISOString();
                     return e;
                 });
             };
@@ -140,8 +139,6 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
                     acc.push(store.each(newDraftQuery));
                     var updatedDraftQuery = db.queryBuilder().$eq([programId, orgUnitId, "UPDATED_DRAFT"]).$index("by_program_orgunit_status").compile();
                     acc.push(store.each(updatedDraftQuery));
-                    var readyForDhisQuery = db.queryBuilder().$eq([programId, orgUnitId, "READY_FOR_DHIS"]).$index("by_program_orgunit_status").compile();
-                    acc.push(store.each(readyForDhisQuery));
                 }, []);
                 return $q.all(queryPromises).then(function(data) {
                     return _.flatten(data);

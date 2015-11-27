@@ -59,21 +59,10 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 });
             }
             if ($scope.filterBy === "readyToSubmit") {
-                var acc = [];
                 $scope.eventListTitle = $scope.resourceBundle.readyToSubmitEventsTitle;
                 $scope.noCasesMsg = $scope.resourceBundle.noReadyToSubmitEventsFound;
                 return programEventRepository.getSubmitableEventsFor($scope.program.id, _.pluck($scope.originOrgUnits, "id")).then(function(data) {
-                    _.each(data, function(event) {
-                        if (event.localStatus === "NEW_DRAFT" || event.localStatus === "UPDATED_DRAFT")
-                            acc.push(event);
-                        if (event.localStatus === "READY_FOR_DHIS" && _.isUndefined(event.clientLastUpdated))
-                            acc.push(event);
-                        if (event.localStatus === "READY_FOR_DHIS" && !_.isUndefined(event.clientLastUpdated)) {
-                            if ((moment().diff(moment(event.clientLastUpdated), 'days')) > properties.eventsSync.numberOfDaysToAllowResubmit)
-                                acc.push(event);
-                        }
-                    });
-                    $scope.events = acc;
+                    $scope.events = data;
                 });
             }
             if ($scope.filterBy === "dateRange") {
@@ -151,7 +140,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
         $scope.submit = function() {
 
-            var submitableEvents = $scope.events;
+            var submitableEvents = getSubmitableEvents();
             var periodsAndOrgUnits = getPeriodsAndOrgUnits(submitableEvents);
 
             var clearAnyExisingApprovals = function() {

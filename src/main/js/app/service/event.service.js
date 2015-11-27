@@ -20,7 +20,7 @@ define(["moment", "dhisUrl"], function(moment, dhisUrl) {
         this.upsertEvents = function(eventsPayload) {
             var updatedEventsPayload = function() {
                 return _.map(eventsPayload.events, function(eventPayload) {
-                    return _.omit(eventPayload, ['period', 'localStatus', 'eventCode', 'clientLastUpdated']);
+                    return _.omit(eventPayload, ['period', 'localStatus', 'eventCode']);
                 });
             };
 
