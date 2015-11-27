@@ -17,29 +17,29 @@ define(["lodash"], function(_) {
         };
 
         var init = function() {
-            var allowedOrgUnits = systemSettingRepository.getAllowedOrgUnits();
-            var productKeyLevel = systemSettingRepository.getProductKeyLevel();
+            // var allowedOrgUnits = systemSettingRepository.getAllowedOrgUnits();
+            // var productKeyLevel = systemSettingRepository.getProductKeyLevel();
 
-            if (productKeyLevel === "project" && allowedOrgUnits.length === 1) {
-                return orgUnitRepository.get(allowedOrgUnits[0].id).then(function(selectedProject) {
-                    $scope.selectedProject = {
-                        'originalObject': selectedProject
-                    };
-                    $scope.savePreference();
-                });
-            }
+            // if (productKeyLevel === "project" && allowedOrgUnits.length === 1) {
+            //     return orgUnitRepository.get(allowedOrgUnits[0].id).then(function(selectedProject) {
+            //         $scope.selectedProject = {
+            //             'originalObject': selectedProject
+            //         };
+            //         $scope.savePreference();
+            //     });
+            // }
 
-            if (productKeyLevel === "project") {
-                return orgUnitRepository.findAll(_.pluck(allowedOrgUnits, "id")).then(function(projects) {
-                    $scope.allProjects = _.sortBy(projects, "name");
-                });
-            }
+            // if (productKeyLevel === "project") {
+            //     return orgUnitRepository.findAll(_.pluck(allowedOrgUnits, "id")).then(function(projects) {
+            //         $scope.allProjects = _.sortBy(projects, "name");
+            //     });
+            // }
 
-            if (productKeyLevel === "country") {
-                return orgUnitRepository.findAllByParent(_.pluck(allowedOrgUnits, "id"), true).then(function(projects) {
-                    $scope.allProjects = _.sortBy(projects, "name");
-                });
-            }
+            // if (productKeyLevel === "country") {
+            //     return orgUnitRepository.findAllByParent(_.pluck(allowedOrgUnits, "id"), true).then(function(projects) {
+            //         $scope.allProjects = _.sortBy(projects, "name");
+            //     });
+            // } required for next release
 
             return orgUnitRepository.getAllProjects().then(function(allProjects) {
                 $scope.allProjects = _.sortBy(allProjects, "name");

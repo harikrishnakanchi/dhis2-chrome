@@ -87,6 +87,11 @@ define(["md5", "lodash"], function(md5, _) {
 
             resetFlags();
 
+            if (user === undefined) {
+                $scope.invalidCredentials = true;
+                return $q.reject("Invalid user");
+            }
+
             if (user.userCredentials.disabled) {
                 $scope.disabledCredentials = true;
                 return $q.reject("Disabled user");
@@ -132,7 +137,7 @@ define(["md5", "lodash"], function(md5, _) {
         $scope.login = function() {
             var loginUsername = $scope.username.toLowerCase();
             loadUserData(loginUsername)
-                .then(verifyProductKeyInstance)
+                // .then(verifyProductKeyInstance) required for next release
                 .then(authenticateUser)
                 .then(login)
                 .then(startProjectDataSync)

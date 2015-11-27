@@ -93,7 +93,7 @@ define(["selectProjectPreferenceController", "angularMocks", "utils", "lodash", 
                 });
             });
 
-            it("should call save preference when product key has just one project", function() {
+            xit("should call save preference when product key has just one project", function() {
                 systemSettingRepository.getAllowedOrgUnits.and.returnValue([{
                     "id": "proj1",
                     "name": "project"
@@ -117,7 +117,7 @@ define(["selectProjectPreferenceController", "angularMocks", "utils", "lodash", 
                 });
             });
 
-            it("should call findAllByParent when product key is of country level", function() {
+            xit("should call findAllByParent when product key is of country level", function() {
                 systemSettingRepository.getAllowedOrgUnits.and.returnValue([{
                     "id": "country1",
                     "name": "country"
