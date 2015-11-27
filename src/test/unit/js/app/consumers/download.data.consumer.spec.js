@@ -336,18 +336,6 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                         "data": [{
                             "period": '2014W01',
                             "orgUnit": 'mod1',
-                        }, {
-                            "period": '2013W52',
-                            "orgUnit": 'mod2',
-                        }, {
-                            "period": '2013W51',
-                            "orgUnit": 'mod3',
-                        }, {
-                            "period": '2013W50',
-                            "orgUnit": 'mod4',
-                        }, {
-                            "period": '2013W49',
-                            "orgUnit": 'mod5',
                         }],
                         "type": "downloadData"
                     }
@@ -371,41 +359,6 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 expect(dataRepository.saveDhisData.calls.count()).toEqual(2);
             });
 
-            it("should download data only for periods and org units if specified", function() {
-
-                datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
-                    "id": "ds1",
-                    "isLineListService": false
-                }]));
-
-                var dhisDataValues = [{
-                    "dataElement": "DE1",
-                    "period": "2014W01",
-                    "orgUnit": "MSF_0",
-                    "categoryOptionCombo": "C1",
-                    "lastUpdated": "2014-05-27T09:00:00.120Z",
-                    "value": "5"
-                }];
-
-                dataService.downloadData.and.returnValue(utils.getPromise(q, dhisDataValues));
-                message = {
-                    "data": {
-                        "data": [{
-                            "period": '2014W01',
-                            "orgUnit": 'mod1',
-                        }],
-                        "type": "downloadData"
-                    }
-                };
-
-                downloadDataConsumer.run(message);
-
-                scope.$apply();
-
-                expect(dataService.downloadData.calls.count()).toEqual(1);
-                expect(dataService.downloadData).toHaveBeenCalledWith(["mod1"], ["ds1"], '2014W01', jasmine.any(String));
-
-            });
 
             it("should not download data values if current user projects is not present", function() {
                 userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, []));
