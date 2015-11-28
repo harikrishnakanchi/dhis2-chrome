@@ -10,7 +10,11 @@ define(["JSZip", "lodash"], function(JSZip, _) {
         });
 
         var contents = zip.generate({
-            type: "blob"
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: {
+                level: 6
+            }
         });
         return contents;
     };
