@@ -73,8 +73,7 @@ define(["lodash"], function(_) {
                         .then(_.partial(uploadProgramConsumer.run, message));
 
                 case "uploadProgramEvents":
-                    return downloadEventDataConsumer.run(message)
-                        .then(_.partial(uploadEventDataConsumer.run, message));
+                    return uploadEventDataConsumer.run(message);
 
                 case "deleteEvent":
                     return deleteEventConsumer.run(message);

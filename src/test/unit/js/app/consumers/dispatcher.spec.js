@@ -261,8 +261,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
 
-            expect(downloadEventDataConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadEventDataConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(uploadEventDataConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should call delete event consumer", function() {

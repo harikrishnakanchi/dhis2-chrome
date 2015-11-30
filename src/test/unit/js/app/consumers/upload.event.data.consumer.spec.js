@@ -35,7 +35,7 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
 
                 var message = {
                     'data': {
-                        'eventIds': ['ev1', 'ev2']
+                        'data': ['ev1', 'ev2']
                     }
                 };
 
@@ -52,7 +52,9 @@ define(["uploadEventDataConsumer", "angularMocks", "properties", "utils", "event
                     'eventDate': '2014-09-29'
                 }];
 
+                expect(programEventRepository.getEventsForUpload).toHaveBeenCalledWith(['ev1', 'ev2']);
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventUpserts);
+
             });
         });
     });

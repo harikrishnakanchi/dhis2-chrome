@@ -162,7 +162,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var uploadEvents = function() {
                     return $hustle.publish({
                         "type": "uploadProgramEvents",
-                        "eventIds": _.pluck(submitableEvents, 'event'),
+                        "data": _.pluck(submitableEvents, 'event'),
                         "locale": $scope.currentUser.locale,
                         "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
@@ -220,6 +220,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var uploadEvents = function() {
                     return $hustle.publish({
                         "type": "uploadProgramEvents",
+                        "data": _.pluck(submitableEvents, "event"),
                         "locale": $scope.currentUser.locale,
                         "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");

@@ -359,7 +359,7 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
 
                 expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
                     type: 'uploadProgramEvents',
-                    eventIds: ['event1'],
+                    data: ['event1'],
                     locale: 'en',
                     desc: 'submit cases for 2014W44, Module: Mod1'
                 }, 'dataValues');
@@ -411,9 +411,10 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                 }, "dataValues");
 
                 expect(hustle.publish.calls.argsFor(1)[0]).toEqual({
-                    type: 'uploadProgramEvents',
-                    locale: 'en',
-                    desc: 'submit cases for 2014W44, Module: Mod1'
+                    "data": ["event1"],
+                    "type": 'uploadProgramEvents',
+                    "locale": 'en',
+                    "desc": 'submit cases for 2014W44, Module: Mod1'
                 }, 'dataValues');
 
                 expect(hustle.publish.calls.argsFor(2)[0]).toEqual({
