@@ -7,7 +7,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 scope = $rootScope.$new();
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, "getOriginOrgUnitIds").and.returnValue(utils.getPromise(q, ["origin1"]));
+                spyOn(userPreferenceRepository, "getOriginOrgUnitIds").and.returnValue(utils.getPromise(q, ["mod1"]));
                 eventService = new EventService();
                 programEventRepository = new ProgramEventRepository();
                 downloadEventDataConsumer = new DownloadEventDataConsumer(eventService, programEventRepository, userPreferenceRepository, q);
@@ -29,8 +29,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
 
                 var message = {
                     "data": {
-                        "type": "downloadEventData",
-                        "data": []
+                        "type": "downloadEventData"
                     }
                 };
 
@@ -42,46 +41,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                     'eventDate': '2015-06-28T18:30:00.000Z'
                 }];
 
-                expect(eventService.getRecentEvents.calls.count()).toEqual(1);
-
-                expect(eventService.getRecentEvents).toHaveBeenCalledWith(jasmine.any(String), 'origin1');
-                expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventPayload);
-            });
-
-            it("should download events from dhis for spceified origin ids and save them to indexeddb", function() {
-                var dhisEventList = {
-                    'events': [{
-                        'event': 'e1',
-                        'eventDate': '2015-06-28T18:30:00.000Z'
-                    }]
-                };
-
-                spyOn(programEventRepository, "isDataPresent").and.returnValue(utils.getPromise(q, true));
-                spyOn(eventService, "getRecentEvents").and.returnValue(utils.getPromise(q, dhisEventList));
-                spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, []));
-                spyOn(programEventRepository, "delete").and.returnValue(utils.getPromise(q, []));
-                spyOn(programEventRepository, "upsert");
-
-                var message = {
-                    "data": {
-                        "type": "downloadEventData",
-                        "data": [{
-                            orgUnit: 'o1',
-                            eventId: 'e1'
-                        }]
-                    }
-                };
-
-                downloadEventDataConsumer.run(message);
-                scope.$apply();
-
-                var expectedEventPayload = [{
-                    'event': 'e1',
-                    'eventDate': '2015-06-28T18:30:00.000Z'
-                }];
-
-                expect(eventService.getRecentEvents.calls.count()).toEqual(1);
-                expect(eventService.getRecentEvents).toHaveBeenCalledWith(jasmine.any(String), 'o1');
+                expect(eventService.getRecentEvents).toHaveBeenCalled();
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(expectedEventPayload);
             });
 
@@ -115,8 +75,7 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
 
                 var message = {
                     "data": {
-                        "type": "downloadEventData",
-                        "data": []
+                        "type": "downloadEventData"
                     }
                 };
 
@@ -128,6 +87,5 @@ define(["downloadEventDataConsumer", "angularMocks", "properties", "utils", "eve
                 expect(programEventRepository.upsert).toHaveBeenCalledWith(upsertPayload);
                 expect(programEventRepository.delete).toHaveBeenCalledWith([dbEventNotPresentInDHIS.event]);
             });
-
         });
     });

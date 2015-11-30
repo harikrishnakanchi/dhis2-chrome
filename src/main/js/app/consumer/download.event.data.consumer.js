@@ -67,15 +67,10 @@ define(["moment", "properties", "dateUtils", "lodash"], function(moment, propert
             return programEventRepository.getEventsFromPeriod(startPeriod, orgUnitIds);
         };
 
-        this.run = function(message) {
-            if (message.data.data.length === 0) {
-                return userPreferenceRepository.getOriginOrgUnitIds().then(function(originOrgUnitIds) {
-                    return $q.all([downloadEventsData(originOrgUnitIds), getLocalData(originOrgUnitIds)]).then(mergeAndSave);
-                });
-            } else {
-                var originOrgUnitIds = _.pluck(message.data.data, 'orgUnit');
+        this.run = function() {
+            return userPreferenceRepository.getOriginOrgUnitIds().then(function(originOrgUnitIds) {
                 return $q.all([downloadEventsData(originOrgUnitIds), getLocalData(originOrgUnitIds)]).then(mergeAndSave);
-            }
+            });
         };
     };
 });

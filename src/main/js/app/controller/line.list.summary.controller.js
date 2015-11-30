@@ -152,13 +152,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         $scope.submit = function() {
 
             var submitableEvents = $scope.events;
-            var submitableEventAndOrgUnitIds = _.map(submitableEvents, function(event) {
-                return {
-                    orgUnit: event.orgUnit,
-                    eventId: event.event
-                };
-            });
-
             var periodsAndOrgUnits = getPeriodsAndOrgUnits(submitableEvents);
 
             var clearAnyExisingApprovals = function() {
@@ -168,8 +161,8 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             var publishToDhis = function() {
                 var uploadEvents = function() {
                     return $hustle.publish({
-                        "data": submitableEventAndOrgUnitIds,
                         "type": "uploadProgramEvents",
+                        "eventIds": _.pluck(submitableEvents, 'event'),
                         "locale": $scope.currentUser.locale,
                         "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
@@ -202,13 +195,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
         $scope.submitAndApprove = function() {
 
             var submitableEvents = getSubmitableEvents();
-            var submitableEventAndOrgUnitIds = _.map(submitableEvents, function(event) {
-                return {
-                    orgUnit: event.orgUnit,
-                    eventId: event.event
-                };
-            });
-
             var periodsAndOrgUnits = getPeriodsAndOrgUnits(submitableEvents);
 
             var clearAnyExisingApprovals = function() {
@@ -233,7 +219,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
 
                 var uploadEvents = function() {
                     return $hustle.publish({
-                        "data": submitableEventAndOrgUnitIds,
                         "type": "uploadProgramEvents",
                         "locale": $scope.currentUser.locale,
                         "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName

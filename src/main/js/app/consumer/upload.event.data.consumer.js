@@ -19,7 +19,7 @@ define(["moment", "dateUtils", "properties"], function(moment, dateUtils, proper
         };
 
         this.run = function(message) {
-            var eventIds = _.pluck(message.data.data, "eventId");
+            var eventIds = message.data.eventIds;
             return programEventRepository.getEventsForUpload(eventIds)
                 .then(uploadEventData)
                 .then(changeEventLocalStatus);
