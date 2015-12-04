@@ -24,6 +24,8 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 chartRepository = new ChartRepository();
                 spyOn(chartRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
                 spyOn(chartRepository, 'upsertChartData').and.returnValue(utils.getPromise(q, {}));
+                spyOn(chartRepository, 'deleteMultipleChartsById').and.returnValue(utils.getPromise(q, {}));
+                spyOn(chartRepository, 'getAll').and.returnValue(utils.getPromise(q, {}));
 
                 changeLogRepository = new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, '2014-09-30T11:00:00.000Z'));
@@ -81,6 +83,21 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                     }]
                 }];
 
+                var chartsFromDb = [{
+                    "id": "chart1",
+                    "name": "[FieldApp - GeneralIPDWard] Admission by Old Age Group",
+                    "relativePeriods": {
+                        "last12Months": false,
+                        "last12Weeks": true
+                    },
+                    "indicators": [],
+                    "dataElements": [{
+                        "id": "de1",
+                        "name": "New Admission - Emergency Department - Admission - General IPD Ward",
+                        "code": "de1"
+                    }]
+                }];
+
                 var userProjects = ["prj1", "prj2"];
 
                 var userModules = [{
@@ -105,6 +122,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
                 reportService.getCharts.and.returnValue(utils.getPromise(q, fieldAppCharts));
                 chartRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppCharts));
+                chartRepository.getAll.and.returnValue(utils.getPromise(q, chartsFromDb));
                 reportService.getReportDataForOrgUnit.and.callFake(function(chart, modId) {
                     if (chart === fieldAppCharts[0] && modId === "Mod1")
                         return utils.getPromise(q, "data1");
@@ -134,6 +152,8 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 expect(chartRepository.upsertChartData).toHaveBeenCalledWith("[FieldApp - GeneralIPDWard] Admission by Age Group", "Mod2", "data2");
                 expect(chartRepository.upsertChartData).toHaveBeenCalledWith("[FieldApp - OutPatientDepartmentGeneral] Total Consultations", "Mod2", "data4");
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith('charts:prj1;prj2', '2014-10-01T12:00:00.000Z');
+                expect(chartRepository.getAll).toHaveBeenCalled();
+                expect(chartRepository.deleteMultipleChartsById).toHaveBeenCalledWith(["chart1"], chartsFromDb);
             });
 
             it('should continue download of charts even if one call fails', function() {
