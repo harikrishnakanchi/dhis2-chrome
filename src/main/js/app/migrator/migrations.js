@@ -200,8 +200,8 @@ define([], function() {
         create_index(pivotTableDataStore, "by_pivot_table", "pivotTable", false);
     };
 
-    var delete_keys_from_changelog = function() {
-        var changeLogStore = tx.objectStore("changeLog");
+    var delete_keys_from_changelog = function(db, txt) {
+        var changeLogStore = txt.objectStore("changeLog");
         changeLogStore.delete("metaData");
         changeLogStore.delete("datasets");
         changeLogStore.delete("programs");
