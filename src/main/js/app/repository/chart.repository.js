@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function(db,$q) {
+    return function(db) {
         this.upsert = function(charts) {
             var store = db.objectStore("charts");
             return store.upsert(charts);
@@ -22,14 +22,6 @@ define(["lodash"], function(_) {
                     return _.endsWith(chart.name, "Notifications");
                 });
             });
-        };
-
-        this.deleteMultipleChartsById = function(idsToDelete,charts) {
-            var store = db.objectStore("charts");
-            return $q.all(_.map(idsToDelete,function(id){
-                chartToDelete = _.find(charts,{"id":id});
-                return store.delete(chartToDelete.name);
-            }));
         };
 
         this.getAll = function() {
