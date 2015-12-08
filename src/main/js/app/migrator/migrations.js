@@ -200,6 +200,13 @@ define([], function() {
         create_index(pivotTableDataStore, "by_pivot_table", "pivotTable", false);
     };
 
+    var delete_keys_from_changelog = function(db, txt) {
+        var changeLogStore = txt.objectStore("changeLog");
+        changeLogStore.delete("metaData");
+        changeLogStore.delete("datasets");
+        changeLogStore.delete("programs");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -227,6 +234,7 @@ define([], function() {
         add_pivot_table_data_store,
         add_excluded_dataelements_store,
         add_super_admin_user_to_local_cred_store,
-        change_msfadmin_to_projectadmin
+        change_msfadmin_to_projectadmin,
+        delete_keys_from_changelog
     ];
 });
