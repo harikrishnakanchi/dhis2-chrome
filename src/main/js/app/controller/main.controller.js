@@ -1,5 +1,5 @@
 define(["chromeUtils", "lodash"], function(chromeUtils, _) {
-    return function($q, $scope, $location, $rootScope, $hustle, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository) {
+    return function($q, $scope, $location, $rootScope, $hustle, $timeout, ngI18nResourceBundle, db, packagedDataImporter, sessionHelper, orgUnitRepository, systemSettingRepository, dhisMonitor) {
         $scope.projects = [];
 
         $scope.getConnectedToMessage = function() {
@@ -106,6 +106,11 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             deregisterCurrentUserLocaleWatcher();
         });
 
+        var checkConnectionQuality = function() {
+            $scope.poorConnection = dhisMonitor.hasPoorConnectivity();
+            $timeout(checkConnectionQuality, 5000);
+        };
+
         var init = function() {
 
             var validateAndContinue = function(isProductKeySet) {
@@ -116,6 +121,8 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
                     $location.path("/login");
                 }
             };
+
+            checkConnectionQuality();
 
             $scope.allUserLineListModules = [];
             packagedDataImporter.run()

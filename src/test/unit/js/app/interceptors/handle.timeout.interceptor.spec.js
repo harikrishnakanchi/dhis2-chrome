@@ -1,42 +1,61 @@
 define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeUtils"], function(HandleTimeoutInterceptor, mocks, properties, chromeUtils) {
     describe("httpInterceptor", function() {
-        var q, handleTimeoutInterceptor;
+        var q, injector, fakeHttp, handleTimeoutInterceptor;
 
         beforeEach(mocks.inject(function($q) {
             q = $q;
-            handleTimeoutInterceptor = new HandleTimeoutInterceptor(q);
+
+            fakeHttp = jasmine.createSpy();
+
+            injector = {
+                "get": jasmine.createSpy().and.returnValue(fakeHttp)
+            };
+
+            handleTimeoutInterceptor = new HandleTimeoutInterceptor(q, injector);
         }));
 
-        it("should check for connectivity in case of timeout", function() {
+        it("should retry in case of timeout", function() {
             spyOn(q, "reject");
-            var handleTimeoutInterceptor = new HandleTimeoutInterceptor(q);
+            spyOn(chromeUtils, "sendMessage");
+
             var rejection = {
                 "config": {
-                    "url": "templates/blah"
+                    "method": "GET",
+                    "url": "http://localhost:8080/api/someUrl"
                 },
                 "status": 0
             };
 
-            spyOn(chromeUtils, "sendMessage");
             handleTimeoutInterceptor.responseError(rejection);
-            expect(chromeUtils.sendMessage).toHaveBeenCalledWith("checkNow");
-            expect(q.reject).toHaveBeenCalledWith(rejection);
+
+            expect(q.reject).not.toHaveBeenCalled();
+            expect(chromeUtils.sendMessage).toHaveBeenCalledWith("timeoutOccurred");
+            expect(fakeHttp).toHaveBeenCalledWith({
+                method: 'GET',
+                url: 'http://localhost:8080/api/someUrl',
+                params: {
+                    retry: 1
+                }
+            });
         });
 
-        it("should not proxy dhis ping requests", function() {
+        it("should not retry in case of non-GET requests", function() {
             spyOn(q, "reject");
-            var handleTimeoutInterceptor = new HandleTimeoutInterceptor(q);
+            spyOn(chromeUtils, "sendMessage");
+
             var rejection = {
                 "config": {
+                    "method": "HEAD",
                     "url": properties.dhisPing.url + "?sdfgdsfgsdfg"
                 },
                 "status": 0
             };
 
-            spyOn(chromeUtils, "sendMessage");
             handleTimeoutInterceptor.responseError(rejection);
-            expect(chromeUtils.sendMessage).not.toHaveBeenCalled();
+
             expect(q.reject).toHaveBeenCalledWith(rejection);
+            expect(chromeUtils.sendMessage).not.toHaveBeenCalled();
+            expect(fakeHttp).not.toHaveBeenCalled();
         });
     });
 });

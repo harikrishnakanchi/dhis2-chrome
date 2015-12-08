@@ -9,7 +9,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
 
             app.factory('configureRequestInterceptor', ['$rootScope', 'systemSettingRepository', configureRequestInterceptor]);
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
-            app.factory('handleTimeoutInterceptor', ['$q', handleTimeoutInterceptor]);
+            app.factory('handleTimeoutInterceptor', ['$q', '$injector', handleTimeoutInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
             app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', queuePostProcessInterceptor]);
 

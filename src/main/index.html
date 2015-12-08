@@ -25,7 +25,7 @@
                             <p class="text-right login-message">&nbsp;<small ng-show="isLoggedIn">{{ resourceBundle.loggedInLabel }} {{currentUser.userCredentials.username}} <a ng-click="logout()" href="#/login" tabindex="-1">({{ resourceBundle.logoutLabel }})</a></small></p>
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
-                                    <span class="glyphicon dhis-status" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline, 'dhis-offline':!isDhisOnline}" ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
+                                    <span class="glyphicon dhis-status" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline &amp;&amp; !poorConnection, 'dhis-poor-connection': poorConnection, 'dhis-offline':!isDhisOnline}" ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
                                         || !isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.notConnectedNoPendingRequests || !isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.notConnectedWithPendingRequests}}"></span>
                                 </li>
                                 <li ng-show="isLoggedIn">
