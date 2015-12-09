@@ -207,6 +207,25 @@ define([], function() {
         changeLogStore.delete("programs");
     };
 
+    var clear_metadata_objectstores = function(db, txt) {
+        txt.objectStore("dataSets").clear();
+        txt.objectStore("programs").clear();
+        txt.objectStore("categories").clear();
+        txt.objectStore("categoryCombos").clear();
+        txt.objectStore("categoryOptionCombos").clear();
+        txt.objectStore("categoryOptions").clear();
+        txt.objectStore("dataElements").clear();
+        txt.objectStore("sections").clear();
+        txt.objectStore("programStages").clear();
+        txt.objectStore("optionSets").clear();
+        txt.objectStore("dataElementGroups").clear();
+
+        var changeLogStore = txt.objectStore("changeLog");
+        changeLogStore.delete("metaData");
+        changeLogStore.delete("datasets");
+        changeLogStore.delete("programs");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -235,6 +254,7 @@ define([], function() {
         add_excluded_dataelements_store,
         add_super_admin_user_to_local_cred_store,
         change_msfadmin_to_projectadmin,
-        delete_keys_from_changelog
+        delete_keys_from_changelog,
+        clear_metadata_objectstores
     ];
 });

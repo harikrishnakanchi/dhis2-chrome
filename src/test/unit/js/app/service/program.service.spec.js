@@ -84,5 +84,27 @@ define(["programService", "angularMocks", "properties", "utils"], function(Progr
             httpBackend.expectGET(properties.dhis.url + '/api/programs.json?fields=:all&paging=false&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, payload);
             httpBackend.flush();
         });
+
+        it("should load pre-packaged programs data", function() {
+            var programDataFromFile = {
+                "programs": [{
+                    "id": "prg1"
+                }]
+            };
+
+            httpBackend.expectGET("/data/programs.json").respond(200, programDataFromFile);
+
+            var actualResult;
+            programService.loadFromFile().then(function(result) {
+                actualResult = result;
+            });
+            httpBackend.flush();
+
+            expectedProgramData = [{
+                "id": "prg1"
+            }];
+
+            expect(actualResult).toEqual(expectedProgramData);
+        });
     });
 });
