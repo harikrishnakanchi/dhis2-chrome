@@ -22,7 +22,7 @@ define(["lodash", "moment"], function(_, moment) {
             var downloadAndSavePivotTableData = function(userModuleIds, datasets, projectIds) {
 
                 var savePivotTables = function(pivotTables) {
-                    return pivotTableRepository.upsert(pivotTables).then(function(data) {
+                    return pivotTableRepository.replaceAll(pivotTables).then(function(data) {
                         return pivotTables;
                     });
                 };

@@ -22,7 +22,7 @@ define(["lodash", "moment"], function(_, moment) {
             var downloadAndSaveChartData = function(userModuleIds, datasets, projectIds) {
 
                 var saveCharts = function(charts) {
-                    return chartRepository.upsert(charts).then(function(data) {
+                    return chartRepository.replaceAll(charts).then(function(data) {
                         return charts;
                     });
                 };
@@ -63,10 +63,10 @@ define(["lodash", "moment"], function(_, moment) {
                     });
                 };
 
-                var removeDuplicateCharts = function (dhisCharts) {
-                    return chartRepository.getAll().then(function(chartsFromDB){
+                var removeDuplicateCharts = function(dhisCharts) {
+                    return chartRepository.getAll().then(function(chartsFromDB) {
                         var duplicateIds = _.intersection(_.pluck(chartsFromDB, "id"), _.pluck(dhisCharts, "id"));
-                        return chartRepository.deleteMultipleChartsById(duplicateIds,chartsFromDB).then(function(){
+                        return chartRepository.deleteMultipleChartsById(duplicateIds, chartsFromDB).then(function() {
                             return dhisCharts;
                         });
                     });

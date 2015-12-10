@@ -16,7 +16,11 @@ define(["pivotTableRepository", "angularMocks", "utils"], function(PivotTableRep
                 'id': 'new pivot table id',
                 'title': 'The pivot table'
             }];
-            pivotTableRepository.upsert(tables);
+
+            pivotTableRepository.replaceAll(tables);
+            scope.$apply();
+
+            expect(mockStore.clear).toHaveBeenCalled();
             expect(mockStore.upsert).toHaveBeenCalledWith(tables);
         });
 

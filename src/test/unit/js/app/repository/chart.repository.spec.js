@@ -8,7 +8,7 @@ define(["chartRepository", "angularMocks", "utils"], function(ChartRepository, m
             scope = $rootScope.$new();
             mockStore = mockDB.objectStore;
 
-            chartRepository = new ChartRepository(mockDB.db,q);
+            chartRepository = new ChartRepository(mockDB.db, q);
         }));
 
         it('should save the charts', function() {
@@ -16,7 +16,11 @@ define(["chartRepository", "angularMocks", "utils"], function(ChartRepository, m
                 'id': 'new chart id',
                 'title': 'The chart'
             }];
-            chartRepository.upsert(charts);
+
+            chartRepository.replaceAll(charts);
+            scope.$apply();
+
+            expect(mockStore.clear).toHaveBeenCalled();
             expect(mockStore.upsert).toHaveBeenCalledWith(charts);
         });
 
@@ -87,7 +91,7 @@ define(["chartRepository", "angularMocks", "utils"], function(ChartRepository, m
         });
 
         it('should remove all charts by id', function() {
-            var chartIds = ['1','2'];
+            var chartIds = ['1', '2'];
             var dbCharts = [{
                 "name": "chart 1",
                 "id": "1"

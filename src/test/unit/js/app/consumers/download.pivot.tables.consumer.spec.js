@@ -22,7 +22,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
 
                 pivotTableRepository = new PivotTableRepository();
-                spyOn(pivotTableRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
+                spyOn(pivotTableRepository, 'replaceAll').and.returnValue(utils.getPromise(q, {}));
                 spyOn(pivotTableRepository, 'upsertPivotTableData').and.returnValue(utils.getPromise(q, {}));
 
                 changeLogRepository = new ChangeLogRepository();
@@ -59,7 +59,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 reportService.getReportDataForOrgUnit.and.returnValue(utils.getPromise(q, [{
                     "id": "id12"
                 }]));
-                pivotTableRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
+                pivotTableRepository.replaceAll.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
 
                 downloadPivotTablesConsumer.run();
                 scope.$apply();
@@ -68,7 +68,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 expect(reportService.getPivotTables).toHaveBeenCalledWith([{
                     id: 'ds1'
                 }]);
-                expect(pivotTableRepository.upsert).toHaveBeenCalledWith(fieldAppPivotTables);
+                expect(pivotTableRepository.replaceAll).toHaveBeenCalledWith(fieldAppPivotTables);
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod1");
                 expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith('Field App - Nutrition Monthly Pediatric', 'mod1', [{
                     id: 'id12'
@@ -105,7 +105,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                         return utils.getPromise(q, "data3");
                 });
 
-                pivotTableRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
+                pivotTableRepository.replaceAll.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
 
                 downloadPivotTablesConsumer.run();
                 scope.$apply();
@@ -114,7 +114,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 expect(reportService.getPivotTables).toHaveBeenCalledWith([{
                     id: 'ds1'
                 }]);
-                expect(pivotTableRepository.upsert).toHaveBeenCalledWith(fieldAppPivotTables);
+                expect(pivotTableRepository.replaceAll).toHaveBeenCalledWith(fieldAppPivotTables);
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod1");
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod2");
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod3");
@@ -130,7 +130,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
                 expect(datasetRepository.findAllForOrgUnits).not.toHaveBeenCalled();
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(pivotTableRepository.upsert).not.toHaveBeenCalled();
+                expect(pivotTableRepository.replaceAll).not.toHaveBeenCalled();
                 expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalled();
             });
 
@@ -143,7 +143,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
                 expect(datasetRepository.findAllForOrgUnits).not.toHaveBeenCalled();
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(pivotTableRepository.upsert).not.toHaveBeenCalled();
+                expect(pivotTableRepository.replaceAll).not.toHaveBeenCalled();
                 expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalled();
             });
 

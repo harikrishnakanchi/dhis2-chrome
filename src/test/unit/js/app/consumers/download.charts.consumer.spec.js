@@ -22,7 +22,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
 
                 chartRepository = new ChartRepository();
-                spyOn(chartRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
+                spyOn(chartRepository, 'replaceAll').and.returnValue(utils.getPromise(q, {}));
                 spyOn(chartRepository, 'upsertChartData').and.returnValue(utils.getPromise(q, {}));
                 spyOn(chartRepository, 'deleteMultipleChartsById').and.returnValue(utils.getPromise(q, {}));
                 spyOn(chartRepository, 'getAll').and.returnValue(utils.getPromise(q, {}));
@@ -121,7 +121,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 userPreferenceRepository.getOriginOrgUnitIds.and.returnValue(utils.getPromise(q, originIds));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
                 reportService.getCharts.and.returnValue(utils.getPromise(q, fieldAppCharts));
-                chartRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppCharts));
+                chartRepository.replaceAll.and.returnValue(utils.getPromise(q, fieldAppCharts));
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, chartsFromDb));
                 reportService.getReportDataForOrgUnit.and.callFake(function(chart, modId) {
                     if (chart === fieldAppCharts[0] && modId === "Mod1")
@@ -142,7 +142,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 expect(changeLogRepository.get).toHaveBeenCalledWith('charts:prj1;prj2');
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod1', 'Mod2', "origin1", "origin2"]);
                 expect(reportService.getCharts).toHaveBeenCalledWith(datasetsAssociatedWithUserModules);
-                expect(chartRepository.upsert).toHaveBeenCalledWith(fieldAppCharts);
+                expect(chartRepository.replaceAll).toHaveBeenCalledWith(fieldAppCharts);
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[0], 'Mod1');
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[0], 'Mod2');
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[1], 'Mod1');
@@ -189,7 +189,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 userPreferenceRepository.getOriginOrgUnitIds.and.returnValue(utils.getPromise(q, []));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
                 reportService.getCharts.and.returnValue(utils.getPromise(q, fieldAppCharts));
-                chartRepository.upsert.and.returnValue(utils.getPromise(q, fieldAppCharts));
+                chartRepository.replaceAll.and.returnValue(utils.getPromise(q, fieldAppCharts));
                 reportService.getReportDataForOrgUnit.and.callFake(function(chart, modId) {
                     if (chart === fieldAppCharts[0] && modId === "Mod1")
                         return utils.getPromise(q, "data1");
@@ -207,7 +207,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 expect(changeLogRepository.get).toHaveBeenCalledWith('charts:prj1;prj2');
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod1', 'Mod2', 'Mod3']);
                 expect(reportService.getCharts).toHaveBeenCalledWith(datasetsAssociatedWithUserModules);
-                expect(chartRepository.upsert).toHaveBeenCalledWith(fieldAppCharts);
+                expect(chartRepository.replaceAll).toHaveBeenCalledWith(fieldAppCharts);
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[0], 'Mod1');
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[0], 'Mod2');
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppCharts[0], 'Mod3');
@@ -223,7 +223,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
                 expect(datasetRepository.findAllForOrgUnits).not.toHaveBeenCalled();
                 expect(reportService.getCharts).not.toHaveBeenCalled();
-                expect(chartRepository.upsert).not.toHaveBeenCalled();
+                expect(chartRepository.replaceAll).not.toHaveBeenCalled();
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
                 expect(chartRepository.upsertChartData).not.toHaveBeenCalled();
             });
@@ -237,7 +237,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
                 expect(datasetRepository.findAllForOrgUnits).not.toHaveBeenCalled();
                 expect(reportService.getCharts).not.toHaveBeenCalled();
-                expect(chartRepository.upsert).not.toHaveBeenCalled();
+                expect(chartRepository.replaceAll).not.toHaveBeenCalled();
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
                 expect(chartRepository.upsertChartData).not.toHaveBeenCalled();
             });
