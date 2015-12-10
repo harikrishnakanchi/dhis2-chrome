@@ -23,15 +23,24 @@ define(["lodash", "moment"], function(_, moment) {
             var sortedViewMap = _.sortBy($scope.viewMap, "sortOrder");
             var dataValues = [];
             _.each(sortedViewMap, function(datum) {
-                var value = {};
-                value["Data Element"] = $scope.getDataElementName($scope.data.metaData.names[datum.dataElement]);
                 if ($scope.isCategoryPresent) {
-                    value.Category = $scope.data.metaData.names[datum.category];
+                    _.each(getSortedCategories(), function(category) {
+                        var value = {};
+                        value["Data Element"] = $scope.getDataElementName($scope.data.metaData.names[datum.dataElement]);
+                        value.Category = $scope.data.metaData.names[category.id];
+                        _.each($scope.periods, function(period) {
+                            value[$scope.data.metaData.names[period]] = $scope.getValue(category.id, datum.dataElement, period);
+                        });
+                        dataValues.push(value);
+                    });
+                } else {
+                    var value = {};
+                    value["Data Element"] = $scope.getDataElementName($scope.data.metaData.names[datum.dataElement]);
+                    _.each($scope.periods, function(period) {
+                        value[$scope.data.metaData.names[period]] = $scope.getValue(datum.category, datum.dataElement, period);
+                    });
+                    dataValues.push(value);
                 }
-                _.each($scope.periods, function(period) {
-                    value[$scope.data.metaData.names[period]] = $scope.getValue(datum.category, datum.dataElement, period);
-                });
-                dataValues.push(value);
             });
             return dataValues;
 
@@ -104,7 +113,6 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
-
         if ($scope.definition && $scope.data) {
 
             $scope.viewMap = [];
@@ -117,45 +125,64 @@ define(["lodash", "moment"], function(_, moment) {
                 $scope.periodBasedValues[period] = 0;
             });
 
-            if ($scope.isCategoryPresent) {
-                var sortedCategories = _.map($scope.definition.categoryDimensions[0].categoryOptions, function(categoryOption, index) {
+            var periodsForHeader = _.map($scope.periods, function(pe) {
+                return {
+                    "period": pe,
+                    "name": $scope.data.metaData.names[pe]
+                };
+            });
+            $scope.headersForTable = [{
+                "showHeader": true,
+                "headers": periodsForHeader
+            }];
+
+            var getSortedCategories = function() {
+                return _.map($scope.definition.categoryDimensions[0].categoryOptions, function(categoryOption, index) {
                     return {
+                        "name": categoryOption.name,
                         "sortOrder": index + 1,
                         "id": categoryOption.id
                     };
                 });
+            };
+
+            if ($scope.isCategoryPresent) {
+                var sortedCategories = getSortedCategories();
 
                 $scope.hasOnlyOneCategory = sortedCategories.length === 1;
                 var sortedCategoriesIds = _.pluck(sortedCategories, "id");
 
-                $scope.dataMap = getDataMap(sortedCategoriesIds);
+                var sortedCategoryNamesForDisplay = [];
 
-                dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
-
-                _.each(sortedCategoriesIds, function(categoryId) {
-                    _.each(dataElements, function(dataElement) {
-                        $scope.viewMap.push({
-                            "category": categoryId,
-                            "dataElement": dataElement,
-                            "dataElementName": $scope.data.metaData.names[dataElement],
-                            "sortOrder": getSortOrder(dataElement, categoryId),
+                _.each($scope.periods, function(pe) {
+                    _.each(sortedCategories, function(category) {
+                        sortedCategoryNamesForDisplay.push({
+                            "period": pe,
+                            "name": category.name,
+                            "category": category.id
                         });
+
                     });
                 });
-            } else {
-                $scope.dataMap = getDataMap();
 
-                dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
-
-                _.each(dataElements, function(dataElement) {
-                    $scope.viewMap.push({
-                        "dataElement": dataElement,
-                        "dataElementName": $scope.data.metaData.names[dataElement],
-                        "sortOrder": getSortOrder(dataElement),
-                    });
+                $scope.headersForTable.push({
+                    "showHeader": !$scope.hasOnlyOneCategory,
+                    "headers": sortedCategoryNamesForDisplay
                 });
             }
+            $scope.dataMap = getDataMap();
 
+            dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
+
+            _.each(dataElements, function(dataElement) {
+                $scope.viewMap.push({
+                    "dataElement": dataElement,
+                    "dataElementName": $scope.data.metaData.names[dataElement],
+                    "sortOrder": getSortOrder(dataElement)
+                });
+            });
+
+            $scope.maxColumnsHeader = _.last($scope.headersForTable);
         }
     };
 });
