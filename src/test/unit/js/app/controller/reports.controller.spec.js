@@ -22,6 +22,8 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
 
+            scope.resourceBundle = {};
+
         }));
 
         it("should set the orgunit display name for modules", function() {
@@ -75,9 +77,13 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             expect(scope.orgUnit.displayName).toEqual("project 1");
         });
 
-        it("should load datasets into scope", function() {
+        it("should load datasets into scope along with their translated names", function() {
             routeParams = {
                 "orgUnit": "prj1"
+            };
+
+            scope.resourceBundle = {
+                "ds1": "Localised_ds1"
             };
 
             var prj1 = {
@@ -90,21 +96,25 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
 
             var datasets = [{
                 "id": "ds1",
+                "name": "ds1",
                 "isOriginDataset": false,
                 "isPopulationDataset": false,
                 "isReferralDataset": false
             }, {
                 "id": "ds2",
+                "name": "ds2",
                 "isOriginDataset": true,
                 "isPopulationDataset": false,
                 "isReferralDataset": false
             }, {
                 "id": "ds3",
+                "name": "ds3",
                 "isOriginDataset": false,
                 "isPopulationDataset": true,
                 "isReferralDataset": false
             }, {
                 "id": "ds4",
+                "name": "ds4",
                 "isOriginDataset": false,
                 "isPopulationDataset": false,
                 "isReferralDataset": true
@@ -112,6 +122,8 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
 
             var expectedDatasets = [{
                 "id": "ds1",
+                "name": "ds1",
+                "displayName": "Localised_ds1",
                 "isOriginDataset": false,
                 "isPopulationDataset": false,
                 "isReferralDataset": false,
