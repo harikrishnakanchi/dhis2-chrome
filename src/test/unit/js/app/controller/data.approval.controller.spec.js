@@ -115,10 +115,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 datasetRepository = new DatasetRepository();
                 spyOn(datasetRepository, "findAllForOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(datasetRepository, "includeDataElements").and.returnValue(utils.getPromise(q, []));
-                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, {
-                    'enrichedDataSets': [],
-                    'catOptComboIdsToBeTotalled': ['c1', 'c2']
-                }));
+                spyOn(datasetRepository, "includeCategoryOptionCombinations").and.returnValue(utils.getPromise(q, []));
 
                 programRepository = new ProgramRepository();
                 spyOn(programRepository, "getProgramForOrgUnit").and.returnValue(utils.getPromise(q, undefined));
@@ -390,7 +387,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "name": "ou3"
                 }];
                 scope.$apply();
-                expect(scope.sum(dataValues, orgUnits, "de1")).toBe(6);
+                expect(scope.sum(dataValues, orgUnits, "de1", ['c1', 'c2'])).toBe(6);
             });
             it("should return the sum of column for given option ", function() {
                 var sectionDataElements = [{
@@ -548,8 +545,8 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "name": "ou3"
                 }];
                 scope.$apply();
-                scope.sum(dataValues, orgUnits, "de1");
-                scope.sum(dataValues, orgUnits, "de2");
+                scope.sum(dataValues, orgUnits, "de1", ['c1', 'c2']);
+                scope.sum(dataValues, orgUnits, "de2", ['c1', 'c2']);
                 expect(scope.rowTotal).toEqual({
                     "de1": 6,
                     "de2": 30
@@ -599,7 +596,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "name": "ou3"
                 }];
                 scope.$apply();
-                expect(scope.sum(dataValues, orgUnits, "de1")).toBe(2);
+                expect(scope.sum(dataValues, orgUnits, "de1", ['c1', 'c2'])).toBe(2);
             });
         });
     });

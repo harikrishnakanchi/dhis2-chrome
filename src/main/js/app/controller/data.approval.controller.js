@@ -3,7 +3,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
         $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository) {
 
         $scope.rowTotal = {};
-        var currentPeriod, currentPeriodAndOrgUnit, catOptComboIdsToBeTotalled;
+        var currentPeriod, currentPeriodAndOrgUnit;
         var removeReferral = false;
 
         var resetForm = function() {
@@ -62,7 +62,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             return result;
         };
 
-        $scope.sum = function(dataValues, orgUnits, dataElementId) {
+        $scope.sum = function(dataValues, orgUnits, dataElementId, catOptComboIdsForTotalling) {
             orgUnits = _.isArray(orgUnits) ? orgUnits : [orgUnits];
 
             var allValues = [];
@@ -70,11 +70,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 dataValues[orgUnit.id] = dataValues[orgUnit.id] || {};
                 dataValues[orgUnit.id][dataElementId] = dataValues[orgUnit.id][dataElementId] || {};
 
-                var allOptions = _.keys(dataValues[orgUnit.id][dataElementId]);
-                var optionsThatCanBeTotalled = _.filter(allOptions, function(option) {
-                    return _.contains(catOptComboIdsToBeTotalled, option);
-                });
-                _.forEach(optionsThatCanBeTotalled, function(option) {
+                _.forEach(catOptComboIdsForTotalling, function(option) {
                     dataValues[orgUnit.id][dataElementId][option] = dataValues[orgUnit.id][dataElementId][option] || {};
                     allValues.push(dataValues[orgUnit.id][dataElementId][option].value);
                 });
@@ -248,9 +244,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 var loadDataSetsPromise = datasetRepository.findAllForOrgUnits($scope.moduleAndOriginOrgUnitIds)
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
-                    .then(function(data) {
-                        var datasets = data.enrichedDataSets;
-                        catOptComboIdsToBeTotalled = data.catOptComboIdsToBeTotalled;
+                    .then(function(datasets) {
                         var dataSetPromises = _.map(datasets, function(dataset) {
                             return findallOrgUnits(dataset.organisationUnits).then(function(orgunits) {
                                 dataset.organisationUnits = orgunits;
