@@ -9,8 +9,9 @@ define(["properties", "chromeUtils"], function(properties, chromeUtils) {
                     response.config.params.retry = response.config.params.retry || 0;
                     response.config.params.retry++;
                     return $http(response.config);
+                } else {
+                    return $q.reject(response);
                 }
-                return $q.reject(response);
             }
         };
     };
