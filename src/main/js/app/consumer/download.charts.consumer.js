@@ -8,7 +8,9 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             var updateChangeLog = function(userProjectIds) {
-                return changeLogRepository.upsert("charts:" + userProjectIds.join(';'), moment().toISOString());
+                return changeLogRepository.clear("charts:").then(function() {
+                    return changeLogRepository.upsert("charts:" + userProjectIds.join(';'), moment().toISOString());
+                });
             };
 
             var loadUserProjectsAndModuleIds = function() {
@@ -63,17 +65,7 @@ define(["lodash", "moment"], function(_, moment) {
                     });
                 };
 
-                var removeDuplicateCharts = function(dhisCharts) {
-                    return chartRepository.getAll().then(function(chartsFromDB) {
-                        var duplicateIds = _.intersection(_.pluck(chartsFromDB, "id"), _.pluck(dhisCharts, "id"));
-                        return chartRepository.deleteMultipleChartsById(duplicateIds, chartsFromDB).then(function() {
-                            return dhisCharts;
-                        });
-                    });
-                };
-
                 return reportService.getCharts(datasets)
-                    .then(removeDuplicateCharts)
                     .then(saveCharts)
                     .then(saveChartData);
             };

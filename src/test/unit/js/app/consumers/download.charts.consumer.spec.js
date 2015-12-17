@@ -29,6 +29,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
 
                 changeLogRepository = new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, '2014-09-30T11:00:00.000Z'));
+                spyOn(changeLogRepository, 'clear').and.returnValue(utils.getPromise(q, {}));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 Timecop.install();
@@ -152,8 +153,6 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 expect(chartRepository.upsertChartData).toHaveBeenCalledWith("[FieldApp - GeneralIPDWard] Admission by Age Group", "Mod2", "data2");
                 expect(chartRepository.upsertChartData).toHaveBeenCalledWith("[FieldApp - OutPatientDepartmentGeneral] Total Consultations", "Mod2", "data4");
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith('charts:prj1;prj2', '2014-10-01T12:00:00.000Z');
-                expect(chartRepository.getAll).toHaveBeenCalled();
-                expect(chartRepository.deleteMultipleChartsById).toHaveBeenCalledWith(["chart1"], chartsFromDb);
             });
 
             it('should continue download of charts even if one call fails', function() {

@@ -27,6 +27,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
 
                 changeLogRepository = new ChangeLogRepository();
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, '2014-09-30T11:00:00.000Z'));
+                spyOn(changeLogRepository, 'clear').and.returnValue(utils.getPromise(q, {}));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 Timecop.install();

@@ -13,13 +13,13 @@ define(["dataRepository", "datasetRepository", "userPreferenceRepository", "appr
             app.service('approvalDataRepository', ['$indexedDB', '$q', approvalDataRepository]);
             app.service('programEventRepository', ['$indexedDB', '$q', programEventRepository]);
             app.service('orgUnitGroupRepository', ['$indexedDB', '$q', orgUnitGroupRepository]);
-            app.service('changeLogRepository', ['$indexedDB', changeLogRepository]);
+            app.service('changeLogRepository', ['$indexedDB', '$q', changeLogRepository]);
             app.service('programRepository', ['$indexedDB', "$q", programRepository]);
             app.service('systemSettingRepository', ['$indexedDB', '$q', '$rootScope', systemSettingRepository]);
             app.service('patientOriginRepository', ['$indexedDB', '$q', patientOriginRepository]);
             app.service('excludedDataElementsRepository', ['$indexedDB', '$q', excludedDataElementsRepository]);
             app.service('metadataRepository', ['$indexedDB', "$q", metadataRepository]);
-            app.service('chartRepository', ['$indexedDB','$q', chartRepository]);
+            app.service('chartRepository', ['$indexedDB', '$q', chartRepository]);
             app.service('referralLocationsRepository', ['$indexedDB', '$q', referralLocationsRepository]);
             app.service('pivotTableRepository', ['$indexedDB', pivotTableRepository]);
         };
