@@ -39,7 +39,11 @@
 
                 var getDhisApprovalDataPromises = _.map(userModuleIds, function(moduleId) {
                     return getDatasetsForModule(moduleId).then(function(datasets) {
-                        return approvalService.getApprovalData(moduleId, _.pluck(datasets, "id"));
+                        if (_.isEmpty(datasets)) {
+                            return $q.when([]);
+                        } else {
+                            return approvalService.getApprovalData(moduleId, _.pluck(datasets, "id"));
+                        }
                     });
                 });
 

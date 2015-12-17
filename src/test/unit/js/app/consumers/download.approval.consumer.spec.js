@@ -92,6 +92,21 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 expect(approvalService.getApprovalData).not.toHaveBeenCalled();
             });
 
+            it("should not download approval data from dhis if the modules have no associated datasets", function() {
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, []));
+
+                message = {
+                    "data": {
+                        "type": "downloadData"
+                    }
+                };
+
+                downloadApprovalConsumer.run(message);
+                scope.$apply();
+
+                expect(approvalService.getApprovalData).not.toHaveBeenCalled();
+            });
+
             it("should save downloaded dhis completion data to idb if completion data doesn't exist in idb", function() {
                 var dhisCompletionData = [{
                     "period": "2014W01",
