@@ -226,6 +226,12 @@ define([], function() {
         changeLogStore.delete("programs");
     };
 
+    var recreate_translations_store = function(db, tx) {
+        db.deleteObjectStore("translations");
+        var translationsStore = create_store_with_key("translations", "id", db);
+        create_index(translationsStore, "by_locale", "locale", false);
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -255,6 +261,7 @@ define([], function() {
         add_super_admin_user_to_local_cred_store,
         change_msfadmin_to_projectadmin,
         delete_keys_from_changelog,
-        clear_metadata_objectstores
+        clear_metadata_objectstores,
+        recreate_translations_store
     ];
 });

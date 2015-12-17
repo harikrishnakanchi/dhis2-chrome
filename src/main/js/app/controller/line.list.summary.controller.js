@@ -137,9 +137,11 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 return $scope.referralLocations[dataValue.value].name;
 
             if (dataValue.optionSet && dataValue.optionSet.options.length > 0) {
-                return _.find(dataValue.optionSet.options, function(o) {
+                var option = _.find(dataValue.optionSet.options, function(o) {
                     return o.code === dataValue.value;
-                }).name;
+                });
+
+                return $scope.resourceBundle[option.id] || option.name;
             } else {
                 return dataValue.value;
             }
