@@ -17,7 +17,7 @@ define(['lodash'], function(_) {
                         return !_.isUndefined(referralLocations[ops.name]) && !referralLocations[ops.name].isDisabled;
                 });
                 _.each(options, function(o) {
-                    o.displayName = resourceBundle[o.id] || referralLocations[o.name].name;
+                    o.displayName = referralLocations[o.name].name;
                     optionMapping[o.id] = referralLocations[o.name].name;
                 });
                 optionSetMapping[optionSet.id] = _.map(options, function(option) {
