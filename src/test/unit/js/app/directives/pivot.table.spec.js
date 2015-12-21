@@ -227,45 +227,13 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController", "resource
             }]);
 
             expect($scope.viewMap).toEqual([{
-                category: 'ab3a614eed1',
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1.1
+                sortOrder: 1
             }, {
-                category: 'ab3a614eed1',
                 dataElement: 'a67aa742313',
                 dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 2.1
-            }, {
-                category: 'abf819dca06',
-                dataElement: 'a0e7d3973e3',
-                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1.2
-            }, {
-                category: 'abf819dca06',
-                dataElement: 'a67aa742313',
-                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 2.2
-            }, {
-                category: 'a0b89770007',
-                dataElement: 'a0e7d3973e3',
-                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1.3
-            }, {
-                category: 'a0b89770007',
-                dataElement: 'a67aa742313',
-                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 2.3
-            }, {
-                category: 'afca0bdf0f1',
-                dataElement: 'a0e7d3973e3',
-                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1.4
-            }, {
-                category: 'afca0bdf0f1',
-                dataElement: 'a67aa742313',
-                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 2.4
+                sortOrder: 2
             }]);
         }));
 

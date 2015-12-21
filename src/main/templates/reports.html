@@ -8,7 +8,7 @@
         <div class="row form-inline">
             <div class="col-md-4 form-group">
                 {{ resourceBundle.selectServiceNameLabel }}
-                <select id="selectDataset" class="form-control" ng-model="selectedDataset" ng-options="dataset as dataset.name for dataset in datasets"></select>
+                <select id="selectDataset" class="form-control" ng-model="selectedDataset" ng-options="dataset as dataset.displayName for dataset in datasets"></select>
             </div>
         </div>
         <tabset>

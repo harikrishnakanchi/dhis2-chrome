@@ -1,7 +1,7 @@
-define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataService", "systemSettingService", "changeLogRepository", "metadataRepository", "orgUnitRepository", "orgUnitGroupRepository", "datasetRepository", "programRepository", "systemSettingRepository"],
-    function(mocks, utils, moment, PackagedDataImporter, MetadataService, SystemSettingService, ChangeLogRepository, MetadataRepository, OrgUnitRepository, OrgUnitGroupRepository, DatasetRepository, ProgramRepository, SystemSettingRepository) {
+define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataService", "systemSettingService", "datasetService", "programService", "changeLogRepository", "metadataRepository", "orgUnitRepository", "orgUnitGroupRepository", "datasetRepository", "programRepository", "systemSettingRepository"],
+    function(mocks, utils, moment, PackagedDataImporter, MetadataService, SystemSettingService, DatasetService, ProgramService, ChangeLogRepository, MetadataRepository, OrgUnitRepository, OrgUnitGroupRepository, DatasetRepository, ProgramRepository, SystemSettingRepository) {
         describe("packagedDataImporter", function() {
-            var q, scope, packagedDataImporter, metadataService, systemSettingService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository;
+            var q, scope, packagedDataImporter, metadataService, systemSettingService, datasetService, programService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
@@ -13,9 +13,13 @@ define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataServ
                 };
 
                 metadataService = new MetadataService();
+                datasetService = new DatasetService();
+                programService = new ProgramService();
                 systemSettingService = new SystemSettingService();
 
                 spyOn(metadataService, "loadMetadataFromFile").and.returnValue(utils.getPromise(q, {}));
+                spyOn(datasetService, "loadFromFile").and.returnValue(utils.getPromise(q, {}));
+                spyOn(programService, "loadFromFile").and.returnValue(utils.getPromise(q, {}));
                 spyOn(systemSettingService, "loadFromFile").and.returnValue(utils.getPromise(q, {}));
 
                 metadataRepository = new MetadataRepository();
@@ -32,7 +36,7 @@ define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataServ
                 spyOn(programRepository, "upsertDhisDownloadedData");
                 spyOn(systemSettingRepository, "upsert");
 
-                packagedDataImporter = new PackagedDataImporter(q, metadataService, systemSettingService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository);
+                packagedDataImporter = new PackagedDataImporter(q, metadataService, systemSettingService, datasetService, programService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository);
             }));
 
             it("should not run import if run once before", function() {
@@ -42,6 +46,8 @@ define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataServ
 
                 expect(metadataService.loadMetadataFromFile).not.toHaveBeenCalled();
                 expect(systemSettingService.loadFromFile).not.toHaveBeenCalled();
+                expect(datasetService.loadFromFile).not.toHaveBeenCalled();
+                expect(programService.loadFromFile).not.toHaveBeenCalled();
                 expect(metadataRepository.upsertMetadata).not.toHaveBeenCalled();
                 expect(orgUnitRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(orgUnitGroupRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
@@ -58,23 +64,13 @@ define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataServ
                 var orgUnitGroups = [{
                     'id': 'oug1'
                 }];
-                var dataSets = [{
-                    'id': 'ds1'
-                }];
-                var programs = [{
-                    'id': 'prog1'
-                }];
-                var sections = [{
-                    "id": "sec1"
-                }];
+
                 var metadataCreateDate = moment().toISOString();
                 var dhisMetadata = {
                     'created': metadataCreateDate,
+                    'users': [],
                     'organisationUnits': orgUnits,
-                    'organisationUnitGroups': orgUnitGroups,
-                    "dataSets": dataSets,
-                    'programs': programs,
-                    'sections': sections
+                    'organisationUnitGroups': orgUnitGroups
                 };
 
                 metadataService.loadMetadataFromFile.and.returnValue(utils.getPromise(q, dhisMetadata));
@@ -86,8 +82,20 @@ define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataServ
                 expect(metadataRepository.upsertMetadata).toHaveBeenCalledWith(dhisMetadata);
                 expect(orgUnitRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnits);
                 expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitGroups);
-                expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(dataSets, sections);
-                expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programs);
+            });
+
+            it("should update changelog after metadata import", function() {
+                var metadataCreateDate = moment().toISOString();
+                var dhisMetadata = {
+                    'created': metadataCreateDate,
+                    'users': []
+                };
+
+                metadataService.loadMetadataFromFile.and.returnValue(utils.getPromise(q, dhisMetadata));
+
+                packagedDataImporter.run();
+                scope.$apply();
+
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith("metaData", metadataCreateDate);
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnits", metadataCreateDate);
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith("orgUnitGroups", metadataCreateDate);
@@ -104,8 +112,6 @@ define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataServ
                 expect(metadataRepository.upsertMetadata).not.toHaveBeenCalled();
                 expect(orgUnitRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(orgUnitGroupRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
-                expect(datasetRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
-                expect(programRepository.upsertDhisDownloadedData).not.toHaveBeenCalled();
                 expect(changeLogRepository.upsert).not.toHaveBeenCalled();
             });
 
@@ -120,6 +126,36 @@ define(["angularMocks", "utils", "moment", "packagedDataImporter", "metadataServ
                 scope.$apply();
 
                 expect(systemSettingRepository.upsert).toHaveBeenCalledWith(systemSettings);
+            });
+
+            it("should import datasets for fresh installations", function() {
+                var dataSets = {
+                    "dataSets": [{
+                        "id": "ds1"
+                    }]
+                };
+
+                datasetService.loadFromFile.and.returnValue(utils.getPromise(q, dataSets));
+
+                packagedDataImporter.run();
+                scope.$apply();
+
+                expect(datasetRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(dataSets);
+            });
+
+            it("should import programs for fresh installations", function() {
+                var programs = {
+                    "programs": [{
+                        "id": "prg1"
+                    }]
+                };
+
+                programService.loadFromFile.and.returnValue(utils.getPromise(q, programs));
+
+                packagedDataImporter.run();
+                scope.$apply();
+
+                expect(programRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(programs);
             });
 
         });

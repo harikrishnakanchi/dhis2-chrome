@@ -7,6 +7,8 @@ define(["lodash"], function(_) {
                     var query = db.queryBuilder().$index('by_locale').$eq($rootScope.currentUser.locale).compile();
                     return store.each(query).then(function(translations) {
                         _.transform(translations, function(acc, translation) {
+                            if (translation.className === "DataElement" && translation.property !== "formName")
+                                return;
                             acc[translation.objectUid] = translation.value;
                         }, $rootScope.resourceBundle);
                     });

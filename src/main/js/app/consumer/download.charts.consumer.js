@@ -8,7 +8,9 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             var updateChangeLog = function(userProjectIds) {
-                return changeLogRepository.upsert("charts:" + userProjectIds.join(';'), moment().toISOString());
+                return changeLogRepository.clear("charts:").then(function() {
+                    return changeLogRepository.upsert("charts:" + userProjectIds.join(';'), moment().toISOString());
+                });
             };
 
             var loadUserProjectsAndModuleIds = function() {
@@ -22,7 +24,7 @@ define(["lodash", "moment"], function(_, moment) {
             var downloadAndSaveChartData = function(userModuleIds, datasets, projectIds) {
 
                 var saveCharts = function(charts) {
-                    return chartRepository.upsert(charts).then(function(data) {
+                    return chartRepository.replaceAll(charts).then(function(data) {
                         return charts;
                     });
                 };

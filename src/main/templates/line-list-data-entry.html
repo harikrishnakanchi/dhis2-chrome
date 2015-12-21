@@ -33,7 +33,7 @@
                                         <div ng-repeat="psde in section.programStageDataElements">
                                             <li class="form-group" ng-if="psde.dataElement.isIncluded">
                                                 <div ng-if="psde.dataElement.isIncluded">
-                                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" class="col-sm-4 col-md-4 control-label" ng-if="resourceBundle[psde.dataElement.id]">{{ resourceBundle[psde.dataElement.id] }}</label>
+                                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': psde.compulsory }" ng-if="resourceBundle[psde.dataElement.id] &amp;&amp; isReferralLocationPresent(psde.dataElement)">{{ resourceBundle[psde.dataElement.id] }}</label>
                                                     <label for="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': psde.compulsory }" ng-if="!resourceBundle[psde.dataElement.id] &amp;&amp; isReferralLocationPresent(psde.dataElement)"> {{ psde.dataElement.formName }}
                                                         <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{psde.dataElement.description}}" />
                                                     </label>

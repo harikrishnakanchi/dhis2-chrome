@@ -8,7 +8,9 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             var updateChangeLog = function(userProjectIds) {
-                return changeLogRepository.upsert("reports:" + userProjectIds.join(';'), moment().toISOString());
+                return changeLogRepository.clear("reports:").then(function() {
+                    return changeLogRepository.upsert("reports:" + userProjectIds.join(';'), moment().toISOString());
+                });
             };
 
             var loadUserProjectsAndModuleIds = function() {
@@ -22,7 +24,7 @@ define(["lodash", "moment"], function(_, moment) {
             var downloadAndSavePivotTableData = function(userModuleIds, datasets, projectIds) {
 
                 var savePivotTables = function(pivotTables) {
-                    return pivotTableRepository.upsert(pivotTables).then(function(data) {
+                    return pivotTableRepository.replaceAll(pivotTables).then(function(data) {
                         return pivotTables;
                     });
                 };

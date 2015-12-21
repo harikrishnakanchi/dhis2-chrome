@@ -95,6 +95,9 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 var result = extractHeaders(categories, categoryCombo, allCategoryOptionCombos);
                 section.headers = result.headers;
                 section.categoryOptionComboIds = result.categoryOptionComboIds;
+                section.categoryOptionComboIdsForTotals = _.pluck(_.reject(allCategoryOptionCombos, function(catOptCombo) {
+                    return _.endsWith(catOptCombo.code, "excludeFromTotal") || !_.contains(section.categoryOptionComboIds, catOptCombo.id);
+                }), "id");
                 return section;
             });
 

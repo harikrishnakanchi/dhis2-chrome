@@ -63,14 +63,7 @@ define(["lodash", "datasetTransformer", "moment"], function(_, datasetTransforme
                 var allCategoryCombos = data[0];
                 var allCategories = data[1];
                 var allCategoryOptionCombos = data[2];
-                var catOptComboIdsToBeIncludedInTotal = _.pluck(_.reject(allCategoryOptionCombos, function(catOptCombo) {
-                    return _.endsWith(catOptCombo.code, "excludeFromTotal");
-                }), "id");
-                return {
-                    'enrichedDataSets': datasetTransformer.enrichWithCategoryOptionCombinations(datasets, allCategoryCombos, allCategories, allCategoryOptionCombos),
-                    'catOptComboIdsToBeTotalled': catOptComboIdsToBeIncludedInTotal
-                };
-
+                return datasetTransformer.enrichWithCategoryOptionCombinations(datasets, allCategoryCombos, allCategories, allCategoryOptionCombos);
             });
         };
 

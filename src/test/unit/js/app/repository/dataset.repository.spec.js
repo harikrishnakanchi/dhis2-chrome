@@ -183,8 +183,7 @@ define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "
             var actualDatasets;
 
             datasetRepository.includeCategoryOptionCombinations(dataSets).then(function(data) {
-                actualDatasets = data.enrichedDataSets;
-                actualCatOptCombos = data.catOptComboIdsToBeTotalled;
+                actualDatasets = data;
             });
 
             scope.$apply();
@@ -213,7 +212,7 @@ define(["datasetRepository", "datasetTransformer", "testData", "angularMocks", "
             ];
             expect(actualDatasets[0].sections[0].headers).toEqual(expectedSectionHeaders);
             expect(actualDatasets[0].sections[0].categoryOptionComboIds).toEqual(['1', '2', '3', '4']);
-            expect(actualCatOptCombos).toEqual(["2","3","4","5","6"]);
+            expect(actualDatasets[0].sections[0].categoryOptionComboIdsForTotals).toEqual(['2', '3', '4']);
         });
 
         it("should upsert datasets downloaded from dhis", function() {

@@ -197,6 +197,10 @@ body {
         color: green;
         font-size: large;
     }
+    .dhis-poor-connection {
+        color: @brand-warning;
+        font-size: large;
+    }
     .dhis-offline {
         color: red;
         font-size: large;
@@ -629,6 +633,9 @@ body {
         .top-actions {
             overflow: hidden;
             margin: 20px 0;
+            input[type="button"] {
+                margin-bottom: 10px;
+            }
         }
     }
     .required:after {

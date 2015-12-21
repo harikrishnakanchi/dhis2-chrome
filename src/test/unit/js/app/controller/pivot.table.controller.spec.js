@@ -161,31 +161,49 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             pivotTableController = new PivotTableController(scope, resourceBundleService);
             scope.$apply();
             var expectedViewMap = [{
-                category: 'ab3a614eed1',
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1.1
+                sortOrder: 1
             }, {
-                category: 'ab3a614eed1',
                 dataElement: 'a67aa742313',
                 dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 2.1
-            }, {
-                category: 'abf819dca06',
-                dataElement: 'a0e7d3973e3',
-                dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1.2
-            }, {
-                category: 'abf819dca06',
-                dataElement: 'a67aa742313',
-                dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 2.2
+                sortOrder: 2
             }];
 
+            var expectedHeaders = [{
+                showHeader: true,
+                headers: [{
+                    period: '201507',
+                    name: 'July 2015'
+                }, {
+                    period: '201508',
+                    name: 'August 2015'
+                }]
+            }, {
+                showHeader: true,
+                headers: [{
+                    period: '201507',
+                    name: '1-23 months',
+                    category: 'ab3a614eed1'
+                }, {
+                    period: '201507',
+                    name: '24-59 months',
+                    category: 'abf819dca06'
+                }, {
+                    period: '201508',
+                    name: '1-23 months',
+                    category: 'ab3a614eed1'
+                }, {
+                    period: '201508',
+                    name: '24-59 months',
+                    category: 'abf819dca06'
+                }]
+            }];
 
             expect(scope.viewMap).toEqual(expectedViewMap);
             expect(scope.isCategoryPresent).toEqual(true);
             expect(scope.hasOnlyOneCategory).toEqual(false);
+            expect(scope.headersForTable).toEqual(expectedHeaders);
         });
 
         it("should populate viewmap and other scope variables on load when categories are not present", function() {
@@ -312,10 +330,9 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             scope.$apply();
 
             var expectedViewMap = [{
-                category: 'ab3a614eed1',
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1.1
+                sortOrder: 1
             }];
 
             expect(scope.viewMap).toEqual(expectedViewMap);

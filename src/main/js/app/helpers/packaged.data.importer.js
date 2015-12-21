@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($q, metadataService, systemSettingService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository) {
+    return function($q, metadataService, systemSettingService, datasetService, programService, changeLogRepository, metadataRepository, orgUnitRepository, orgUnitGroupRepository, datasetRepository, programRepository, systemSettingRepository) {
         this.run = function() {
             return verifyIsNewInstall().then(importData);
         };
@@ -32,7 +32,7 @@ define(["lodash", "moment"], function(_, moment) {
             if (!isNewInstall)
                 return;
 
-            return $q.all([importMetadata(), importSystemSettings()])
+            return $q.all([importMetadata(), importSystemSettings(), importDataSets(), importPrograms()])
                 .then(updateChangeLog);
         };
 
@@ -44,8 +44,6 @@ define(["lodash", "moment"], function(_, moment) {
                 promises.push(metadataRepository.upsertMetadata(metadata));
                 promises.push(orgUnitRepository.upsertDhisDownloadedData(metadata.organisationUnits));
                 promises.push(orgUnitGroupRepository.upsertDhisDownloadedData(metadata.organisationUnitGroups));
-                promises.push(datasetRepository.upsertDhisDownloadedData(metadata.dataSets, metadata.sections));
-                promises.push(programRepository.upsertDhisDownloadedData(metadata.programs));
                 return $q.all(promises).then(function() {
                     return metadata;
                 });
@@ -55,6 +53,16 @@ define(["lodash", "moment"], function(_, moment) {
         var importSystemSettings = function() {
             return systemSettingService.loadFromFile()
                 .then(systemSettingRepository.upsert);
+        };
+
+        var importDataSets = function() {
+            return datasetService.loadFromFile()
+                .then(datasetRepository.upsertDhisDownloadedData);
+        };
+
+        var importPrograms = function() {
+            return programService.loadFromFile()
+                .then(programRepository.upsertDhisDownloadedData);
         };
     };
 });

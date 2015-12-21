@@ -1,8 +1,10 @@
 define(["lodash"], function(_) {
-    return function(db) {
-        this.upsert = function(charts) {
+    return function(db, $q) {
+        this.replaceAll = function(charts) {
             var store = db.objectStore("charts");
-            return store.upsert(charts);
+            return store.clear().then(function() {
+                return store.upsert(charts);
+            });
         };
 
         this.upsertChartData = function(chartName, moduleId, data) {
@@ -22,6 +24,16 @@ define(["lodash"], function(_) {
                     return _.endsWith(chart.name, "Notifications");
                 });
             });
+        };
+
+        this.deleteMultipleChartsById = function(idsToDelete, charts) {
+            var store = db.objectStore("charts");
+            return $q.all(_.map(idsToDelete, function(id) {
+                chartToDelete = _.find(charts, {
+                    "id": id
+                });
+                return store.delete(chartToDelete.name);
+            }));
         };
 
         this.getAll = function() {

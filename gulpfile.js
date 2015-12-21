@@ -22,7 +22,7 @@ var Q = require('q');
 var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
 var metadata_sync_interval = argv.metadataSyncInterval || "1";
-var auth = argv.auth || "c2VydmljZS5hY2NvdW50OiFBQkNEMTIzNA==";
+var auth = argv.auth || "YWRtaW46ZGlzdHJpY3Q=";
 auth = "Basic " + auth;
 var passphrase = argv.passphrase || "My Product Key";
 var iter = argv.iter || 1000;
@@ -114,13 +114,25 @@ gulp.task('download-metadata', function() {
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });
 
+gulp.task('download-datasets', function() {
+    return download(baseIntUrl + "/api/dataSets.json?fields=:all&paging=false", auth)
+        .pipe(rename("dataSets.json"))
+        .pipe(gulp.dest(path.dirname("src/main/data/dataSets.json")));
+});
+
+gulp.task('download-programs', function() {
+    return download(baseIntUrl + "/api/programs.json?fields=:all&paging=false", auth)
+        .pipe(rename("programs.json"))
+        .pipe(gulp.dest(path.dirname("src/main/data/programs.json")));
+});
+
 gulp.task('download-fieldapp-settings', function() {
     return download(baseIntUrl + "/api/systemSettings.json?key=fieldAppSettings", auth)
         .pipe(rename("systemSettings.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/systemSettings.json")));
 });
 
-gulp.task('pack', ['less', 'config', 'download-metadata', 'download-fieldapp-settings'], function() {
+gulp.task('pack', ['less', 'config', 'download-metadata', 'download-datasets', 'download-programs', 'download-fieldapp-settings'], function() {
     var stream = shell(["./scripts/crxmake.sh ./src/main key.pem " + "praxis_" + (argv.env || "dev")]);
     stream.write(process.stdout);
     return stream;

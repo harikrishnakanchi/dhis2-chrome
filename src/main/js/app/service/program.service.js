@@ -13,5 +13,12 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
                 return data.data.programs;
             });
         };
+
+        this.loadFromFile = function() {
+            return $http.get("/data/programs.json").then(function(response) {
+                return response.data.programs;
+            });
+        };
+
     };
 });

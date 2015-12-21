@@ -73,7 +73,7 @@
                                                                 <br/>
                                                             </ng-form>
                                                         </td>
-                                                        <td class="last-column">{{sum(dataValues, dataSet.organisationUnits, dataElement.id)}}</td>
+                                                        <td class="last-column">{{sum(dataValues, dataSet.organisationUnits, dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                     </tr>
                                                     <tr>
                                                         <td>
@@ -142,7 +142,7 @@
                                                                 <br/>
                                                             </ng-form>
                                                         </td>
-                                                        <td class="last-column">{{sum(dataValues, orgUnit ,dataElement.id)}}</td>
+                                                        <td class="last-column">{{sum(dataValues, orgUnit ,dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                     </tr>
                                                 </tbody>
                                                 <tbody>

@@ -1,5 +1,5 @@
 define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils, _) {
-    return function($http, $log) {
+    return function($http, $log, $timeout, $rootScope) {
         var onlineEventHandlers = [];
         var offlineEventHandlers = [];
         var isDhisOnline;
@@ -42,6 +42,16 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
             });
         };
 
+        var onTimeoutOccurred = function() {
+            if ($rootScope.timeoutEventReferenceCount === undefined)
+                $rootScope.timeoutEventReferenceCount = 0;
+            $rootScope.timeoutEventReferenceCount++;
+            var timeoutDelay = properties.http.timeout + 5000;
+            $timeout(function() {
+                $rootScope.timeoutEventReferenceCount--;
+            }, timeoutDelay);
+        };
+
         var createAlarms = function() {
             if (chrome.alarms) {
                 $log.info("Registering dhis monitor alarm");
@@ -81,13 +91,19 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
             return dhisConnectivityCheck();
         };
 
+        var hasPoorConnectivity = function() {
+            return $rootScope.timeoutEventReferenceCount !== undefined && $rootScope.timeoutEventReferenceCount > 0;
+        };
+
         chromeUtils.addListener("dhisOffline", onDhisOffline);
         chromeUtils.addListener("dhisOnline", onDhisOnline);
         chromeUtils.addListener("checkNow", checkNow);
+        chromeUtils.addListener("timeoutOccurred", onTimeoutOccurred);
 
         return {
             "start": start,
             "stop": stop,
+            "hasPoorConnectivity": hasPoorConnectivity,
             "isOnline": isOnline,
             "online": online,
             "offline": offline,

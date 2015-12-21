@@ -355,6 +355,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             $scope.datasets = _.sortBy($scope.datasets, "name").reverse();
             $scope.datasets = _.sortBy($scope.datasets, "isReportsAvailable").reverse();
 
+            _.each($scope.datasets, function(ds) {
+                ds.displayName = $scope.resourceBundle[ds.id] ? $scope.resourceBundle[ds.id] : ds.name;
+            });
+
             if (!_.isEmpty($scope.datasets))
                 $scope.selectedDataset = $scope.datasets[0];
 

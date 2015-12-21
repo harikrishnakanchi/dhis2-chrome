@@ -47,18 +47,34 @@ define(["moment", "properties", "dateUtils", "lodash"], function(moment, propert
         };
 
         var downloadEventsData = function(orgUnitIds) {
-            var downloadPromises = _.map(orgUnitIds, function(orgUnitId) {
+            var events = [];
+
+            var onSuccess = function(data) {
+                events.push(data);
+                return recursivelyDownload();
+            };
+
+            var onFailure = function() {
+                return recursivelyDownload();
+            };
+
+            var recursivelyDownload = function() {
+                if (_.isEmpty(orgUnitIds))
+                    return $q.when([]);
+                var orgUnitId = orgUnitIds.pop();
                 return programEventRepository.isDataPresent(orgUnitId).then(function(data) {
                     var startDate = data ? dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) : dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSyncOnFirstLogIn);
-                    return eventService.getRecentEvents(startDate, orgUnitId);
+                    return eventService.getRecentEvents(startDate, orgUnitId).then(onSuccess, onFailure);
                 });
-            });
-            return $q.all(downloadPromises).then(function(data) {
-                data = _.reject(data, function(d) {
+            };
+
+            return recursivelyDownload().then(function() {
+                events = _.reject(events, function(d) {
                     return d.events === undefined;
                 });
-                return _.flatten(_.pluck(_.flatten(data), 'events'));
+                return _.flatten(_.pluck(_.flatten(events), 'events'));
             });
+
         };
 
         var getLocalData = function(orgUnitIds) {
@@ -69,7 +85,7 @@ define(["moment", "properties", "dateUtils", "lodash"], function(moment, propert
 
         this.run = function() {
             return userPreferenceRepository.getOriginOrgUnitIds().then(function(originOrgUnitIds) {
-                return $q.all([downloadEventsData(originOrgUnitIds), getLocalData(originOrgUnitIds)]).then(mergeAndSave);
+                return $q.all([downloadEventsData(_.clone(originOrgUnitIds, true)), getLocalData(originOrgUnitIds)]).then(mergeAndSave);
             });
         };
     };
