@@ -3,10 +3,12 @@ define(["properties", "chromeUtils"], function(properties, chromeUtils) {
 
         var checkHustleQueueCount = function() {
             return $hustle.getCount("dataValues").then(function(count) {
-                if (count > 0)
-                    chromeUtils.sendMessage("msgInSyncQueue");
-                else
-                    chromeUtils.sendMessage("noMsgInSyncQueue");
+                return $hustle.getReservedCount().then(function(reservedCount) {
+                    if (count > 0 || reservedCount > 0)
+                        chromeUtils.sendMessage("msgInSyncQueue");
+                    else
+                        chromeUtils.sendMessage("noMsgInSyncQueue");
+                });
             });
         };
 
