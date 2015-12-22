@@ -53,7 +53,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-if="!dataSet.isReferralDataset || (dataSet.isReferralDataset &amp;&amp; referralLocations[dataElement.formName] !== undefined)" ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } | orderBy: 'name' track by dataElement.id" ng-form="dataElementForm">
+                                                <tr ng-if="!dataSet.isReferralDataset || (dataSet.isReferralDataset &amp;&amp; referralLocations[dataElement.formName] !== undefined)" ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true } track by dataElement.id" ng-form="dataElementForm">
                                                     <td>
                                                         <div ng-if="!dataSet.isReferralDataset">
                                                             <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
