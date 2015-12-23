@@ -69,19 +69,6 @@ define(["lodash", "moment"], function(_, moment) {
                 return programsStore.find(programId);
             };
 
-            var enrichProgramStages = function(program) {
-                if (!program) return undefined;
-                var programStagesStore = db.objectStore("programStages");
-                var programStageGetPromises = [];
-                _.each(program.programStages, function(s) {
-                    programStageGetPromises.push(programStagesStore.find(s.id));
-                });
-                return $q.all(programStageGetPromises).then(function(programStages) {
-                    program.programStages = programStages;
-                    return program;
-                });
-            };
-
             var enrichDataElements = function(program) {
                 if (!program) return undefined;
 
@@ -104,7 +91,6 @@ define(["lodash", "moment"], function(_, moment) {
             };
 
             return getProgram(programId)
-                .then(enrichProgramStages)
                 .then(enrichDataElements);
         };
 

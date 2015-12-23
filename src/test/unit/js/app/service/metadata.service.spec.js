@@ -64,7 +64,7 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
             var filterString = "attributes=false&dataApprovalLevels=false&userRoles=false&userGroups=false&options=false" +
                 "&dashboardItems=false&dashboards=false&dataElementGroupSets=false&indicators=false&indicatorTypes=false" +
                 "&organisationUnits=false&organisationUnitGroups=false&sqlViews=false&charts=false" +
-                "&reportTables=false&dataSets=false&eventReports=false&eventCharts=false&programs=false&programStageSections=false" +
+                "&reportTables=false&dataSets=false&eventReports=false&eventCharts=false&programs=false&programStages=false&programStageSections=false" +
                 "&trackedEntities=false";
             httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString + "&lastUpdated=" + lastUpdated).respond(200, metadata);
 
@@ -88,7 +88,7 @@ define(["metadataService", "properties", "angularMocks", "moment"], function(Met
             var filterString = "attributes=false&dataApprovalLevels=false&userRoles=false&userGroups=false&options=false" +
                 "&dashboardItems=false&dashboards=false&dataElementGroupSets=false&indicators=false&indicatorTypes=false" +
                 "&organisationUnits=false&organisationUnitGroups=false&sqlViews=false&charts=false" +
-                "&reportTables=false&dataSets=false&eventReports=false&eventCharts=false&programs=false&programStageSections=false" +
+                "&reportTables=false&dataSets=false&eventReports=false&eventCharts=false&programs=false&programStages=false&programStageSections=false" +
                 "&trackedEntities=false";
             httpBackend.expectGET(properties.dhis.url + "/api/metadata.json?" + filterString).respond(200, metadata);
 
