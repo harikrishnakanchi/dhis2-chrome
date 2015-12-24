@@ -10,7 +10,27 @@ define(["programEventRepository", "angularMocks", "utils", "moment", "properties
             var program = {
                 'id': 'p1',
                 'programStages': [{
-                    'id': 'p1s1'
+                    'id': 'p1s1',
+                    'programStageSections': [{
+                        'id': 'st1',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'de1',
+                                'shortName': 'Age',
+                                "attributeValues": [{
+                                    "attribute": {
+                                        "code": "showInEventSummary",
+                                    },
+                                    "value": "true"
+                                }]
+                            }
+                        }, {
+                            'dataElement': {
+                                'id': 'de2',
+                                'shortName': 'PatientId',
+                            }
+                        }]
+                    }]
                 }]
             };
 
