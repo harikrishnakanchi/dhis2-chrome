@@ -107,6 +107,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     $scope.allPrograms = _.sortBy(data[0], function(program) {
                         return program.name;
                     });
+
+                    $scope.allPrograms = _.map($scope.allPrograms, function(program) {
+                        program.name = $scope.resourceBundle[program.id] || program.name;
+                        return program;
+                    });
                 };
 
                 var getPrograms = function() {

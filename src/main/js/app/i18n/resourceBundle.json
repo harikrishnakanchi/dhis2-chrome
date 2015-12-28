@@ -307,5 +307,9 @@
     "selectServiceNameLabel": "Select service name:",
     "toLabel": "to",
     "weeklyReports": "Weekly reports",
-    "monthlyReports": "Monthly reports"
+    "monthlyReports": "Monthly reports",
+    "caseNumber": "Case Number",
+    "dateRange": "Date Range",
+    "search": "Search"
+
 }

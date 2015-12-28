@@ -63,15 +63,18 @@
                                 {{resourceBundle.findCaseBy}}
                             </span>
                                     <span>
-                                <select class="form-control" ng-model="filterBy" ng-options="option.id as option.name for option in filterByOptions"></select>
+                                    <select class="form-control" ng-model="filterBy">
+                                      <option value="caseNumber">{{resourceBundle.caseNumber}}</option>
+                                      <option value="dateRange">{{resourceBundle.dateRange}}</option>
+                                    </select>
                             </span>
                                     <span ng-if="filterBy === 'caseNumber'">
                                 <input type="text" class="form-control" ng-model="filterParams.caseNumber" />
-                                <input type="button" value="Search" class="btn btn-default" ng-click="filterByCaseNumber()"/>
+                                <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByCaseNumber()"/>
                             </span>
                                     <span ng-if="filterBy === 'dateRange'">
                                 <input type="date" class="form-control" ng-model="filterParams.startDate" /> {{resourceBundle.toLabel}} <input type="date" class="form-control" ng-model="filterParams.endDate" />
-                                <input type="button" value="Search" class="btn btn-default" ng-click="filterByDateRange()"/>
+                                <input type="button" value="{{resourceBundle.search}}" class="btn btn-default" ng-click="filterByDateRange()"/>
                             </span>
                                 </form>
                             </div>

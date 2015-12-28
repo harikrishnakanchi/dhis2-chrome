@@ -79,7 +79,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             if ($scope.filterBy === "dateRange") {
                 var startDate = $location.search().startDate;
                 var endDate = $location.search().endDate;
-                $scope.filterBy = $scope.filterByOptions[1].id;
+                $scope.filterBy = 'caseNumber';
                 $scope.filterParams.startDate = moment(startDate).startOf('day').toDate();
                 $scope.filterParams.endDate = moment(endDate).endOf('day').toDate();
 
@@ -89,7 +89,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             }
 
             if ($scope.filterBy === "caseNumber") {
-                $scope.filterBy = $scope.filterByOptions[0].id;
+                $scope.filterBy = 'dateRange';
                 $scope.filterParams.caseNumber = "";
                 $scope.events = undefined;
             }
@@ -406,14 +406,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             };
 
             showResultMessage($location.search().messageType, $location.search().message);
-
-            $scope.filterByOptions = [{
-                'id': 'caseNumber',
-                'name': 'Case Number'
-            }, {
-                'id': 'dateRange',
-                'name': 'Date Range'
-            }];
 
             $scope.filterBy = $routeParams.filterBy;
             if (!$scope.filterBy)
