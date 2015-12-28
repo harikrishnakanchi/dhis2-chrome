@@ -66,7 +66,7 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                         eventDate = value;
                     }
                     if (psde.compulsory) {
-                        if (type === "INTEGER") {
+                        if (type === "NUMBER") {
                             compulsoryFieldsPresent = isNaN(value) || value === null ? false : compulsoryFieldsPresent;
                         } else if (_.isEmpty(value))
                             compulsoryFieldsPresent = false;
