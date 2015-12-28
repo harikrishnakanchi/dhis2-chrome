@@ -73,13 +73,24 @@ define(["lodash", "moment"], function(_, moment) {
 
         var getSortOrder = function(dataElementId, categoryId) {
             var categorySortOrder = 0.0;
+            var dataElementSortOrder = 0;
+            var sortedDataElements = [];
             if (categoryId) {
                 var sortedCategories = _.pluck(_.flatten(_.pluck($scope.definition.categoryDimensions, "categoryOptions")), "id");
                 categorySortOrder = (_.indexOf(sortedCategories, categoryId) + 1) * 0.1;
             }
 
-            var sortedDataElements = _.pluck($scope.definition.dataElements.length === 0 ? $scope.definition.indicators : $scope.definition.dataElements, "id");
-            var dataElementSortOrder = _.indexOf(sortedDataElements, dataElementId) + 1;
+            if (!_.isUndefined($scope.definition.dataDimensionItems)) {
+                _.each($scope.definition.dataDimensionItems, function(dimensionItem) {
+                    var id = _.isUndefined(dimensionItem.indicator) ? dimensionItem.dataElement.id : dimensionItem.indicator.id;
+                    sortedDataElements.push(id);
+                });
+                dataElementSortOrder = _.indexOf(sortedDataElements, dataElementId) + 1;
+            } else {
+                sortedDataElements = _.pluck($scope.definition.dataElements.length === 0 ? $scope.definition.indicators : $scope.definition.dataElements, "id");
+                dataElementSortOrder = _.indexOf(sortedDataElements, dataElementId) + 1;
+            }
+
 
             return dataElementSortOrder + categorySortOrder;
         };
