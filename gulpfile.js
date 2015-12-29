@@ -121,7 +121,7 @@ gulp.task('download-datasets', function() {
 });
 
 gulp.task('download-programs', function() {
-    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", auth)
+    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues,programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", auth)
         .pipe(rename("programs.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/programs.json")));
 });
