@@ -35,7 +35,7 @@ define(["properties"], function(properties) {
         "orgUnitGroups": with_host("/api/organisationUnitGroups.json"),
         "orgUnits": with_host("/api/organisationUnits.json"),
         "users": with_host("/api/users"),
-        "programs": with_host("/api/programs.json"),
+        "getProgramsAndStages": with_host("/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues,programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false"),
         "dataSets": with_host("/api/dataSets.json"),
         "charts": with_host("/api/charts"),
         "pivotTables": with_host("/api/reportTables"),
