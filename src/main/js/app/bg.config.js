@@ -2,16 +2,16 @@ require.config({
     paths: {
         "Q": "lib/q/q",
         "lodash": "lib/lodash/lodash",
-        "ng-i18n": "lib/ng-i18n/src/js/ng-i18n",
+        "ng-i18n": "lib/ng-i18n/ng-i18n",
         "properties": "app/conf/properties",
         "overrides": "app/conf/overrides",
         "indexedDBLogger": "app/utils/indexeddb.logger",
         "app": "app/bg.app",
         "hustle": "lib/hustle/hustle",
-        "moment": "lib/moment/moment",
+        "moment": "lib/moment/moment-with-locales",
         "hustleModule": "lib/angularjs-hustle/hustle.module",
         "angular": "lib/angular/angular",
-        "md5": "lib/js-md5/js/md5",
+        "md5": "lib/js-md5/md5",
         "sjcl": "lib/sjcl/sjcl",
 
         //services
@@ -96,7 +96,7 @@ require.config({
         "mergeByUnion": "app/consumer/mergestrategies/merge.by.union",
         "mergeByLastUpdated": "app/consumer/mergestrategies/merge.by.lastupdated",
 
-        "angular-indexedDB": "lib/angular-indexedDB/src/indexeddb",
+        "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
 
         //Interceptors
         "cleanupPayloadInterceptor": "app/interceptors/cleanup.payload.interceptor",
