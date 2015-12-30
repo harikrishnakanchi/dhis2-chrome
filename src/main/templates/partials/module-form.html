@@ -42,7 +42,7 @@
                                         <span class="glyphicon glyphicon-info-sign"></span>
                                         <span>{{resourceBundle.selectDatasets}}</span>
                                     </div>
-                                    <multiselect left-list="nonAssociatedDataSets" name="name" ng-model="associatedDatasets" disabled="!isNewMode" on-right-item-select="selectDataSet(item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
+                                    <multiselect resource-bundle="resourceBundle" left-list="nonAssociatedDataSets" name="name" ng-model="associatedDatasets" disabled="!isNewMode" on-right-item-select="selectDataSet(item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
                                 </div>
                                 <div class="details" ng-show="selectedDataset.sections.length > 0">
                                     <span ng-hide="areDataElementsSelectedForSection()">{{resourceBundle.selectDatasetSection}}</span>
