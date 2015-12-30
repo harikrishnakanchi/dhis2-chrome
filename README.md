@@ -9,8 +9,9 @@ DHIS2-Chrome is a Chrome extension that is used in the field and synchronises wi
 - IndexedDB
 
 ### Requirements
+- npm
 - bower
-- npm 
+- bower-installer
 
 ### Installing the application
 
