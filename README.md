@@ -18,7 +18,9 @@ DHIS2-Chrome is a Chrome extension that is used in the field and synchronises wi
 
 1. Navigate to the `dhis2-chrome` folder and run the following commands:
   ```
-  npm install && bower cache clean && bower install
+  npm install
+  bower cache clean
+  bower-installer
   gulp less
   ```
 
