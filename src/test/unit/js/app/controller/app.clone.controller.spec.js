@@ -1,9 +1,10 @@
 define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemService", "indexeddbUtils", "sessionHelper", "indexedDBLogger", "zipUtils"],
     function(AppCloneController, mocks, utils, timecop, FilesystemService, IndexeddbUtils, SessionHelper, indexedDBLogger, zipUtils) {
         describe("appCloneController", function() {
-            var appCloneController, scope, q, timeout, location, idbDump, fakeModal;
+            var appCloneController, scope, q, timeout, location, idbDump, fakeModal, rootScope;
 
             beforeEach(mocks.inject(function($rootScope, $q, $timeout, $location) {
+                rootScope = $rootScope;
                 scope = $rootScope.$new();
                 q = $q;
                 timeout = $timeout;
@@ -43,7 +44,7 @@ define(["appCloneController", "angularMocks", "utils", "timecop", "filesystemSer
                 Timecop.install();
                 Timecop.freeze(new Date("2014-05-30 12:43:54"));
 
-                appCloneController = new AppCloneController(scope, fakeModal, timeout, indexeddbUtils, filesystemService, sessionHelper, location);
+                appCloneController = new AppCloneController(scope, fakeModal, timeout, indexeddbUtils, filesystemService, sessionHelper, location, rootScope);
             }));
 
             afterEach(function() {
