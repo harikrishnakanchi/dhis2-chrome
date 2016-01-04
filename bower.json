@@ -38,8 +38,8 @@
     },
     "install": {
         "path": "src/main/js/lib",
-        "sources" : {
-            "angular" : [
+        "sources": {
+            "angular": [
                 "bower_components/angular/angular.js",
                 "bower_components/angular/angular-csp.css"
             ],

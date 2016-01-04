@@ -32,7 +32,7 @@ module.exports = function(config) {
         frameworks: ['jasmine', 'requirejs'],
         reporters: ['dots', 'coverage'],
         preprocessors: {
-            'main/js/app/**/*.js': 'coverage',
+            'main/js/app/**/*.js': ['coverage'],
             '**/*.html': ['ng-html2js']
         },
         browsers: ['ChromeTop'],
