@@ -33,7 +33,8 @@
                                             <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements)">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
-                                                        <span>{{psde.dataElement.formName}}</span>
+                                                        <span ng-if="!resourceBundle[psde.dataElement.id]">{{ psde.dataElement.formName }}</span>
+                                                        <span ng-if="resourceBundle[psde.dataElement.id]">{{resourceBundle[psde.dataElement.id]}}</span>
                                                         <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                                     </accordion-heading>
                                                     <table class="table table-bordered">

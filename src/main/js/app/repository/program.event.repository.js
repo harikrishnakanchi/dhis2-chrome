@@ -233,14 +233,6 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
                     return store.find(programId);
                 };
 
-                var getProgramStages = function(program) {
-                    var store = db.objectStore('programStages');
-                    var programStageIds = _.pluck(program.programStages, "id");
-                    return $q.all(_.map(programStageIds, function(programStageId) {
-                        return store.find(programStageId);
-                    }));
-                };
-
                 var getDataElementIds = function(programStages) {
                     var programStageSections = _.flatten(_.pluck(programStages, "programStageSections"));
                     var programStageDataElements = _.flatten(_.pluck(programStageSections, "programStageDataElements"));
@@ -249,9 +241,9 @@ define(["moment", "lodash", "properties", "dateUtils"], function(moment, _, prop
                 };
 
 
-                return getProgram().then(getProgramStages).then(function(programStages) {
+                return getProgram().then(function(program) {
                     var store = db.objectStore("dataElements");
-                    var dataElementIds = getDataElementIds(programStages);
+                    var dataElementIds = getDataElementIds(program.programStages);
 
                     return $q.all(_.map(dataElementIds, function(dataElementId) {
                         return store.find(dataElementId).then(function(dataElement) {

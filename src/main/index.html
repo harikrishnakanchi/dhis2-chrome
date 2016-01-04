@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <link rel="stylesheet" type="text/css" href="js/lib/angular/angular-csp.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
-    <link rel="stylesheet" type="text/css" href="js/lib/nvd3/build/nv.d3.css">
+    <link rel="stylesheet" type="text/css" href="js/lib/nvd3/nv.d3.css">
     <script src="js/lib/requirejs/require.js" data-main="js/app/bootstrap.js"></script>
 </head>
 
@@ -86,7 +86,10 @@
         </div>
         <div class="container" style="padding-top:10px; padding-bottom: 30px;">
             <div class="loading" ng-show="cloning">
-                <img src="img/ajax-loader.gif" class="spinner" />
+                <div class="spinner">
+                    <img src="img/ajax-loader.gif" />
+                    <span>Please wait...</span>
+                </div>
             </div>
             <div ng-view="ng-view">
             </div>

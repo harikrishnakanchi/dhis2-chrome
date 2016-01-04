@@ -92,8 +92,6 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                             .then(projectDataSync);
                     };
 
-                    hustleMonitor.start();
-
                     var setupAlarms = function() {
                         chrome.alarms.create('metadataSyncAlarm', {
                             periodInMinutes: properties.metadata.sync.intervalInMinutes
@@ -103,9 +101,10 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         chrome.alarms.create('projectDataSyncAlarm', {
                             periodInMinutes: properties.projectDataSync.intervalInMinutes
                         });
+                        chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
                     };
 
-                    chrome.alarms.onAlarm.addListener(registerCallback("projectDataSyncAlarm", projectDataSync));
+                    hustleMonitor.start();
 
                     chromeUtils.addListener("productKeyDecrypted", function() {
                         systemSettingRepository.loadProductKey().then(function() {

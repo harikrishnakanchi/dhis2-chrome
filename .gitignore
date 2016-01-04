@@ -1,4 +1,5 @@
 node_modules/
+bower_components/
 src/main/js/lib/*
 src/test/unit/coverage/
 src/main/css

@@ -304,5 +304,8 @@
     "selectServiceNameLabel": "Selectionner le nom du service",
     "toLabel": "a",
     "weeklyReports": "Rapports hebdomadaires",
-    "monthlyReports": "Rapports Mensuels"
+    "monthlyReports": "Rapports Mensuels",
+    "caseNumber": "Case Number in french",
+    "dateRange": "Date Range in french",
+    "search": "Search"
 }

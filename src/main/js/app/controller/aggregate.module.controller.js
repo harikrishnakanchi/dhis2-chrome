@@ -25,14 +25,12 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     .filter({
                         'subSection': 'Default'
                     })
-                    .sortBy('formName')
                     .value();
 
                 var subSections = _(section.dataElements)
                     .reject({
                         'subSection': 'Default'
                     })
-                    .sortBy('formName')
                     .groupBy('subSection')
                     .each(function(elements, subSectionName) {
                         if (!$scope.isSubSectionExpanded[section.id]) {

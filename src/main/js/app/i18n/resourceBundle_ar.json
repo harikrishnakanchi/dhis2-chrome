@@ -89,5 +89,8 @@
     "projectCodeExists": "Project code already exists",
     "dateInvalid": "Not a valid date",
     "selectLanguageLabel": "اختار اللغة",
-    "importExportMenuLabel": "Import / Export to USB "
+    "importExportMenuLabel": "Import / Export to USB ",
+    "caseNumber": "Case Number in french",
+    "dateRange": "Date Range in french",
+    "search": "Search"
 }

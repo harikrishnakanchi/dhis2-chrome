@@ -42,7 +42,7 @@
                                         <span class="glyphicon glyphicon-info-sign"></span>
                                         <span>{{resourceBundle.selectDatasets}}</span>
                                     </div>
-                                    <multiselect left-list="nonAssociatedDataSets" name="name" ng-model="associatedDatasets" disabled="!isNewMode" on-right-item-select="selectDataSet(item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
+                                    <multiselect resource-bundle="resourceBundle" left-list="nonAssociatedDataSets" name="name" ng-model="associatedDatasets" disabled="!isNewMode" on-right-item-select="selectDataSet(item)" on-move-left="discardDataSet(module, items)" select-first-item="true"></multiselect>
                                 </div>
                                 <div class="details" ng-show="selectedDataset.sections.length > 0">
                                     <span ng-hide="areDataElementsSelectedForSection()">{{resourceBundle.selectDatasetSection}}</span>
@@ -50,13 +50,13 @@
                                     <h4 ng-if="resourceBundle[selectedDataset.id]" ng-class="{cur: true}">{{resourceBundle[selectedDataset.id]}}</h4>
                                     <div class="template-selection">
                                         <label>
-                                            <input type="radio" ng-model="selectedTemplate[selectedDataset.id]" value="{{resourceBundle.defaultTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.defaultTemplateLabel}}
+                                            <input type="radio" ng-model="selectedTemplate[selectedDataset.id]" value="Default" ng-change="onTemplateSelect()" /> {{resourceBundle.defaultTemplateLabel}}
                                         </label>
                                         <label>
-                                            <input type="radio" ng-model="selectedTemplate[selectedDataset.id]" value="{{resourceBundle.warTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.warTemplateLabel}}
+                                            <input type="radio" ng-model="selectedTemplate[selectedDataset.id]" value="War" ng-change="onTemplateSelect()" /> {{resourceBundle.warTemplateLabel}}
                                         </label>
                                         <label>
-                                            <input type="radio" ng-model="selectedTemplate[selectedDataset.id]" value="{{resourceBundle.emergencyTemplateLabel}}" ng-change="onTemplateSelect()" /> {{resourceBundle.emergencyTemplateLabel}}
+                                            <input type="radio" ng-model="selectedTemplate[selectedDataset.id]" value="Emergency" ng-change="onTemplateSelect()" /> {{resourceBundle.emergencyTemplateLabel}}
                                         </label>
                                     </div>
                                     <div ng-repeat="section in selectedDataset.sections">
@@ -73,13 +73,13 @@
                                         </div>
                                         <div collapse="!isExpanded[section.id]" class="collapse-body">
                                             <ul>
-                                                <li ng-repeat="subSection in section.subSections | orderBy : 'name'">
+                                                <li ng-repeat="subSection in section.subSections">
                                                     <div class="collapse-head">
-                                                        <h5 ng-if="!resourceBundle[subSection.id]" ng-click="isSubSectionExpanded[section.id][subSection.name] = !isSubSectionExpanded[section.id][subSection.name]"> 
+                                                        <h5 ng-if="!resourceBundle[subSection.id]" ng-click="isSubSectionExpanded[section.id][subSection.name] = !isSubSectionExpanded[section.id][subSection.name]">
                                                             <span class="glyphicon"
                                                             ng-class="{'glyphicon-chevron-right':!isSubSectionExpanded[section.id][subSection.name], 'glyphicon-chevron-down':isSubSectionExpanded[section.id][subSection.name]}" aria-hidden="true"></span>  {{subSection.name}}
                                                         </h5>
-                                                        <h5 ng-if="resourceBundle[subSection.id]" ng-click="isSubSectionExpanded[section.id][subSection.name] = !isSubSectionExpanded[section.id][subSection.name]"> 
+                                                        <h5 ng-if="resourceBundle[subSection.id]" ng-click="isSubSectionExpanded[section.id][subSection.name] = !isSubSectionExpanded[section.id][subSection.name]">
                                                             <span class="glyphicon"
                                                             ng-class="{'glyphicon-chevron-right':!isSubSectionExpanded[section.id][subSection.name], 'glyphicon-chevron-down':isSubSectionExpanded[section.id][subSection.name]}" aria-hidden="true"></span>  {{resourceBundle[subSection.id]}}
                                                         </h5>
@@ -87,7 +87,7 @@
                                                     </div>
                                                     <div collapse="!isSubSectionExpanded[section.id][subSection.name]" class="collapse-body">
                                                         <ul>
-                                                            <li ng-repeat="element in subSection.dataElements | orderBy : 'formName'">
+                                                            <li ng-repeat="element in subSection.dataElements">
                                                                 <label ng-if="!resourceBundle[element.id]">
                                                                     <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSubSectionSelection(subSection, section)">{{element.formName}}
                                                                 </label>
@@ -98,7 +98,7 @@
                                                         </ul>
                                                     </div>
                                                 </li>
-                                                <li ng-repeat="element in section.unGroupedDataElements | orderBy : 'formName'">
+                                                <li ng-repeat="element in section.unGroupedDataElements">
                                                     <label ng-if="!resourceBundle[element.id]">
                                                         <input type="checkbox" ng-disabled="isDisabled || element.isMandatory" ng-model="element.isIncluded" ng-change="changeSectionSelection(section)">{{element.formName}}
                                                     </label>

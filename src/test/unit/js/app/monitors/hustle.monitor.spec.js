@@ -14,6 +14,7 @@ define(["hustleMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome"], 
             spyOn(chromeUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
             spyOn(chromeUtils, "addListener").and.callFake(mockChrome.addListener);
             spyOn(hustle, "getCount").and.returnValue(utils.getPromise(q, 3));
+            spyOn(hustle, "getReservedCount").and.returnValue(utils.getPromise(q, 3));
         }));
 
         it("should check hustle queue count", function() {
@@ -47,6 +48,7 @@ define(["hustleMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome"], 
             var msgInQCallback = jasmine.createSpy();
             var noMsgInQCallback = jasmine.createSpy();
             hustle.getCount.and.returnValue(utils.getPromise(q, 0));
+            hustle.getReservedCount.and.returnValue(utils.getPromise(q, 0));
 
             var hustleMonitor = new HustleMonitor(hustle, log);
 

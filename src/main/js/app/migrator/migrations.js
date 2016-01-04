@@ -232,6 +232,10 @@ define([], function() {
         create_index(translationsStore, "by_locale", "locale", false);
     };
 
+    var delete_program_stages_store = function(db, tx) {
+        db.deleteObjectStore("programStages");
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -262,6 +266,7 @@ define([], function() {
         change_msfadmin_to_projectadmin,
         delete_keys_from_changelog,
         clear_metadata_objectstores,
-        recreate_translations_store
+        recreate_translations_store,
+        delete_program_stages_store
     ];
 });

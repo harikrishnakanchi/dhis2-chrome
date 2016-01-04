@@ -75,14 +75,6 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
             expect(actualUpsertResult).toEqual(expectedUpsertedPrograms);
         });
 
-        it("should return undefined", function() {
-            mockStore.find.and.returnValue(utils.getPromise(q, undefined));
-            programRepository.get("nonexistant").then(function(actual) {
-                expect(actual).toBe(undefined);
-            });
-            scope.$apply();
-        });
-
         it("should get program", function() {
 
             var programData = {
@@ -91,58 +83,49 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                 'displayName': 'ER - Presenting Line List',
                 'programStages': [{
                     'id': 'p1s1',
-                    'name': 'ER - Presenting Line List Stage 1'
+                    'name': 'ER - Presenting Line List Stage 1',
+                    'programStageSections': [{
+                        'id': 'st1',
+                        'name': 'Arrival',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'd1',
+                                'name': 'Date'
+                            }
+                        }, {
+                            'dataElement': {
+                                'id': 'd2',
+                                'name': 'Mode of Arrival'
+                            }
+                        }]
+                    }, {
+                        'id': 'st2',
+                        'name': 'Discharge',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'd1',
+                                'name': 'Date'
+                            }
+                        }, {
+                            'dataElement': {
+                                'id': 'd3',
+                                'name': 'Mode of Discharge'
+                            }
+                        }]
+                    }]
+
                 }, {
                     'id': 'p1s2',
-                    'name': 'ER - Presenting Line List Stage 2'
-                }]
-            };
-
-            var programStage1Data = {
-                'id': 'p1s1',
-                'name': 'ER - Presenting Line List Stage 1',
-                'programStageSections': [{
-                    'id': 'st1',
-                    'name': 'Arrival',
-                    'programStageDataElements': [{
-                        'dataElement': {
-                            'id': 'd1',
-                            'name': 'Date'
-                        }
-                    }, {
-                        'dataElement': {
-                            'id': 'd2',
-                            'name': 'Mode of Arrival'
-                        }
-                    }]
-                }, {
-                    'id': 'st2',
-                    'name': 'Discharge',
-                    'programStageDataElements': [{
-                        'dataElement': {
-                            'id': 'd1',
-                            'name': 'Date'
-                        }
-                    }, {
-                        'dataElement': {
-                            'id': 'd3',
-                            'name': 'Mode of Discharge'
-                        }
-                    }]
-                }]
-            };
-
-            var programStage2Data = {
-                'id': 'p1s2',
-                'name': 'ER - Presenting Line List Stage 2',
-                'programStageSections': [{
-                    'id': 'st3',
-                    'name': 'Default Section',
-                    'programStageDataElements': [{
-                        'dataElement': {
-                            'id': 'd1',
-                            'name': 'Date'
-                        }
+                    'name': 'ER - Presenting Line List Stage 2',
+                    'programStageSections': [{
+                        'id': 'st3',
+                        'name': 'Default Section',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'd1',
+                                'name': 'Date'
+                            }
+                        }]
                     }]
                 }]
             };
@@ -170,10 +153,6 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
             mockStore.find.and.callFake(function(id) {
                 if (id === "p1")
                     return utils.getPromise(q, programData);
-                if (id === "p1s1")
-                    return utils.getPromise(q, programStage1Data);
-                if (id === "p1s2")
-                    return utils.getPromise(q, programStage2Data);
                 if (id === "d1")
                     return utils.getPromise(q, dataElement1Data);
                 if (id === "d2")
@@ -268,40 +247,35 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                 'displayName': 'ER - Presenting Line List',
                 'programStages': [{
                     'id': 'p1s1',
-                    'name': 'ER - Presenting Line List Stage 1'
-                }]
-            };
-
-            var programStage1Data = {
-                'id': 'p1s1',
-                'name': 'ER - Presenting Line List Stage 1',
-                'programStageSections': [{
-                    'id': 'st1',
-                    'name': 'Arrival',
-                    'programStageDataElements': [{
-                        'dataElement': {
-                            'id': 'd1',
-                            'name': 'Date'
-                        }
+                    'name': 'ER - Presenting Line List Stage 1',
+                    'programStageSections': [{
+                        'id': 'st1',
+                        'name': 'Arrival',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'd1',
+                                'name': 'Date'
+                            }
+                        }, {
+                            'dataElement': {
+                                'id': 'd2',
+                                'name': 'Mode of Arrival'
+                            }
+                        }]
                     }, {
-                        'dataElement': {
-                            'id': 'd2',
-                            'name': 'Mode of Arrival'
-                        }
-                    }]
-                }, {
-                    'id': 'st2',
-                    'name': 'Discharge',
-                    'programStageDataElements': [{
-                        'dataElement': {
-                            'id': 'd1',
-                            'name': 'Date'
-                        }
-                    }, {
-                        'dataElement': {
-                            'id': 'd3',
-                            'name': 'Mode of Discharge'
-                        }
+                        'id': 'st2',
+                        'name': 'Discharge',
+                        'programStageDataElements': [{
+                            'dataElement': {
+                                'id': 'd1',
+                                'name': 'Date'
+                            }
+                        }, {
+                            'dataElement': {
+                                'id': 'd3',
+                                'name': 'Mode of Discharge'
+                            }
+                        }]
                     }]
                 }]
             };
@@ -329,10 +303,6 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
             mockStore.find.and.callFake(function(id) {
                 if (id === "p1")
                     return utils.getPromise(q, programData);
-                if (id === "p1s1")
-                    return utils.getPromise(q, programStage1Data);
-                if (id === "p1s2")
-                    return utils.getPromise(q, programStage2Data);
                 if (id === "d1")
                     return utils.getPromise(q, dataElement1Data);
                 if (id === "d2")

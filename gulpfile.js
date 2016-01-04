@@ -1,5 +1,5 @@
 var gulp = require('gulp');
-var karma = require('gulp-karma');
+var karmaServer = require('karma').Server;
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var shell = require('gulp-shell');
@@ -8,16 +8,12 @@ var ecstatic = require('ecstatic');
 var protractor = require('gulp-protractor').protractor;
 var download = require('gulp-download');
 var argv = require('yargs').argv;
-var karmaConf = 'src/test/unit/conf/karma.conf.js';
+var karmaConf = __dirname + '/src/test/unit/conf/karma.conf.js';
 var webserver;
-var fs = require('fs');
 var rename = require('gulp-rename');
 var path = require('path');
 var preprocess = require("gulp-preprocess");
-var cat = require("gulp-cat");
 var zip = require('gulp-zip');
-var rest = require('restler');
-var Q = require('q');
 
 var baseUrl = argv.url || "http://localhost:8080";
 var baseIntUrl = argv.int_url || baseUrl;
@@ -29,25 +25,25 @@ var iter = argv.iter || 1000;
 var ks = argv.ks || 128;
 var ts = argv.ts || 64;
 
-gulp.task('test', function() {
-    return gulp.src('_')
-        .pipe(karma({
-            configFile: karmaConf,
-            action: 'run'
-        })).on('error', function(err) {
-            throw err;
-        });
+gulp.task('test', function(onDone) {
+    new karmaServer({
+        configFile: karmaConf,
+        singleRun: true
+    }, function(exitCode) {
+        if (exitCode !== 0)
+            onDone('Karma has exited with exit code' + exitCode);
+        else
+            onDone();
+        process.exit(exitCode);
+    }).start();
 });
 
 gulp.task('pre-commit', ['test', 'lint']);
 
-gulp.task('devtest', function() {
-    return gulp.src('_')
-        .pipe(karma({
-            configFile: karmaConf,
-            action: 'watch',
-            preprocessors: {}
-        }));
+gulp.task('devtest', function(onDone) {
+    new karmaServer({
+        configFile: karmaConf
+    }, onDone).start();
 });
 
 gulp.task('update-webdriver', shell.task([
@@ -121,7 +117,7 @@ gulp.task('download-datasets', function() {
 });
 
 gulp.task('download-programs', function() {
-    return download(baseIntUrl + "/api/programs.json?fields=:all&paging=false", auth)
+    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues,programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", auth)
         .pipe(rename("programs.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/programs.json")));
 });

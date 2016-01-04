@@ -1,5 +1,5 @@
 define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], function(moment, properties, _, indexedDBLogger, zipUtils) {
-    return function($scope, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location) {
+    return function($scope, $modal, $timeout, indexeddbUtils, filesystemService, sessionHelper, $location, $rootScope) {
         $scope.status = {
             isopen: false
         };
@@ -83,7 +83,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
             };
 
             var successCallback = function(fileData) {
-                $scope.cloning = true;
+                $rootScope.cloning = true;
                 var zipFiles = zipUtils.readZipFile(fileData.target.result);
 
                 var result = {};
@@ -102,7 +102,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
                         $location.path("/login");
                     }, errorCallback)
                     .finally(function() {
-                        $scope.cloning = false;
+                        $rootScope.cloning = false;
                     });
             };
 
@@ -118,13 +118,13 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
         };
 
         var createZip = function(folderName, fileNamePrefix, fileNameExtn, backupCallback) {
-            $scope.cloning = true;
+            $rootScope.cloning = true;
             return backupCallback().then(function(data) {
-                $scope.cloning = false;
+                $rootScope.cloning = false;
                 var zippedData = zipUtils.zipData(folderName, fileNamePrefix, fileNameExtn, data);
                 return filesystemService.writeFile(fileNamePrefix + moment().format("YYYYMMDD-HHmmss") + ".msf", zippedData);
             }).finally(function() {
-                $scope.cloning = false;
+                $rootScope.cloning = false;
             });
         };
 

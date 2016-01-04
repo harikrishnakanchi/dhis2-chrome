@@ -24,7 +24,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "event": "event1",
                     "dataValues": [{
                         "name": "Case Number - Measles Outbreak",
-                        "type": "string",
                         "value": "66",
                         "dataElement": "de1"
                     }]
@@ -82,6 +81,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                             'programStageDataElements': [{
                                 "dataElement": {
                                     "id": "de1",
+                                    "valueType": "DATE",
                                     'attributeValues': [{
                                         'attribute': {
                                             'code': 'useAsEventDate'
@@ -92,7 +92,8 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                             }, {
                                 "compulsory": true,
                                 "dataElement": {
-                                    "id": "de2"
+                                    "id": "de2",
+                                    "valueType": "TEXT"
                                 }
                             }]
                         }, {
@@ -100,11 +101,12 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                             'programStageDataElements': [{
                                 "dataElement": {
                                     "id": "de3",
-                                    "type": "date"
+                                    "valueType": "DATE"
                                 }
                             }, {
                                 "dataElement": {
                                     "id": "de4",
+                                    "valueType": "TEXT",
                                     "optionSet": {
                                         "id": "os1"
                                     }
@@ -112,7 +114,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                             }, {
                                 "dataElement": {
                                     "id": "de5",
-                                    "type": "datetime"
+                                    "valueType": "DATETIME"
                                 }
                             }]
                         }]
@@ -153,22 +155,22 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     "event": "event1",
                     "dataValues": [{
                         "name": "Case Number - Measles Outbreak",
-                        "type": "string",
+                        "type": "TEXT",
                         "value": "66",
                         "dataElement": "de1"
                     }, {
                         "name": "Date of admission - Measles Outbreak",
-                        "type": "date",
+                        "type": "DATE",
                         "value": "2015-04-15",
                         "dataElement": "de2"
                     }, {
                         "name": "Age at visit - Measles Outbreak",
-                        "type": "int",
+                        "type": "INTEGER",
                         "value": 3,
                         "dataElement": "de3"
                     }, {
                         "name": "Sex - Measles Outbreak",
-                        "type": "string",
+                        "type": "TEXT",
                         "value": "os1o1",
                         "dataElement": "de4"
                     }]
@@ -199,7 +201,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 expect(scope.dataValues).toEqual({
                     'de1': '66',
-                    'de2': new Date("2015-04-15"),
+                    'de2': "2015-04-15",
                     'de3': 3,
                     'de4': {
                         'id': 'os1o1',
@@ -211,7 +213,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             });
 
             it("should save event details as newDraft and show summary view", function() {
-
                 var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, referralLocationsRepository);
                 scope.$apply();
 
@@ -336,7 +337,6 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
             it("should save incomplete events", function() {
                 var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, referralLocationsRepository);
                 scope.$apply();
-
                 scope.dataValues = {
                     'de1': "2015-02-03",
                     'de2': undefined,

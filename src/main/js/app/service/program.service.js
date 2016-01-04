@@ -7,7 +7,7 @@ define(["dhisUrl", "lodash"], function(dhisUrl, _) {
         };
 
         this.getAll = function(lastUpdatedTime) {
-            var url = dhisUrl.programs + '?fields=:all&paging=false';
+            var url = dhisUrl.getProgramsAndStages;
             url = lastUpdatedTime ? url + "&filter=lastUpdated:gte:" + lastUpdatedTime : url;
             return $http.get(url).then(function(data) {
                 return data.data.programs;
