@@ -86,7 +86,10 @@
         </div>
         <div class="container" style="padding-top:10px; padding-bottom: 30px;">
             <div class="loading" ng-show="cloning">
-                <img src="img/ajax-loader.gif" class="spinner" />
+                <div class="spinner">
+                    <img src="img/ajax-loader.gif" />
+                    <span>Please wait...</span>
+                </div>
             </div>
             <div ng-view="ng-view">
             </div>
