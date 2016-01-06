@@ -27,8 +27,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
                     $routeProvider.
                     when('/dashboard', {
-                        templateUrl: 'templates/dashboard.html',
-                        controller: 'dashboardController'
+                        templateUrl: 'templates/dashboard.html'
                     }).
                     when('/selectProjectPreference', {
                         templateUrl: 'templates/selectProjectPreference.html',

@@ -47,7 +47,6 @@ require.config({
 
         //Controllers
         "controllers": "app/controller/controllers",
-        "dashboardController": "app/controller/dashboard.controller",
         "dataEntryApprovalDashboardController": "app/controller/data.entry.approval.dashboard.controller",
         "dataEntryController": "app/controller/data.entry.controller",
         "dataApprovalController": "app/controller/data.approval.controller",
