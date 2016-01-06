@@ -8,8 +8,7 @@
                 <accordion close-others="false">
                     <accordion-group is-open="true">
                         <accordion-heading>
-                            <span ng-if="resourceBundle[program.id]">{{ resourceBundle[program.id] }}</span>
-                            <span ng-if="!resourceBundle[program.id]">{{ program.name }}</span>
+                            <span>{{ resourceBundle[program.id] || program.name}}</span>
                         </accordion-heading>
                         <div class="exp-coll-group" ng-repeat="programStage in program.programStages">
                             <accordion close-others="false">
@@ -26,15 +25,14 @@
                                 </ul>
                                 <accordion-group ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'" is-open="true" ng-if="section.isIncluded">
                                     <accordion-heading>
-                                        <span ng-if="resourceBundle[section.id]">{{ resourceBundle[section.id] }}</span>
-                                        <span ng-if="!resourceBundle[section.id]">{{ section.name }}</span>
+                                        <span>{{ resourceBundle[section.id] || section.name}}</span>
                                     </accordion-heading>
                                     <ul>
                                         <div ng-repeat="psde in section.programStageDataElements">
                                             <li class="form-group" ng-if="psde.dataElement.isIncluded">
                                                 <div ng-if="psde.dataElement.isIncluded">
-                                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': psde.compulsory }" ng-if="resourceBundle[psde.dataElement.id] &amp;&amp; isReferralLocationPresent(psde.dataElement)">{{ resourceBundle[psde.dataElement.id] }}</label>
-                                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': psde.compulsory }" ng-if="!resourceBundle[psde.dataElement.id] &amp;&amp; isReferralLocationPresent(psde.dataElement)"> {{ psde.dataElement.formName }}
+                                                    <label for="eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}" class="col-sm-4 col-md-4 control-label ng-class:{ 'required': psde.compulsory }"
+                                                           ng-if="isReferralLocationPresent(psde.dataElement)"> {{ resourceBundle[psde.dataElement.id] || psde.dataElement.formName }}
                                                         <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{psde.dataElement.description}}" />
                                                     </label>
                                                 </div>

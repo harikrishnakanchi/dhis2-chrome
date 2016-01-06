@@ -10,8 +10,7 @@
                 <div ng-class="'dataset-acc-wrapper'">
                     <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: false }" is-open="true">
                         <accordion-heading>
-                            <span ng-if="!resourceBundle[dataSet.id]">{{ dataSet.name }}</span>
-                            <span ng-if="resourceBundle[dataSet.id]">{{ resourceBundle[dataSet.id] }}</span>
+                            <span>{{ resourceBundle[dataSet.id] || dataSet.name}}</span>
                             <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
                         </accordion-heading>
                         <div class="filter">
@@ -33,8 +32,7 @@
                                             <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements)">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
-                                                        <span ng-if="!resourceBundle[psde.dataElement.id]">{{ psde.dataElement.formName }}</span>
-                                                        <span ng-if="resourceBundle[psde.dataElement.id]">{{resourceBundle[psde.dataElement.id]}}</span>
+                                                        <span>{{resourceBundle[psde.dataElement.id] || psde.dataElement.formName}}</span>
                                                         <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                                     </accordion-heading>
                                                     <table class="table table-bordered">
@@ -289,8 +287,7 @@
                 <div ng-class="'dataset-acc-wrapper'">
                     <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" is-open="true">
                         <accordion-heading>
-                            <span ng-if="!resourceBundle[dataSet.id]">{{ dataSet.name }}</span>
-                            <span ng-if="resourceBundle[dataSet.id]">{{ resourceBundle[dataSet.id] }}</span>
+                            <span>{{ resourceBundle[dataSet.id] || dataSet.name}}</span>
                             <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
                         </accordion-heading>
                         <div class="exp-coll-group">
