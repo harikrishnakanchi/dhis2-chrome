@@ -51,12 +51,14 @@
                                                     <tr ng-if="!dataSet.isReferralDataset || (dataSet.isReferralDataset &amp;&amp; referralLocations[dataElement.formName] !== undefined)" ng-repeat="dataElement in section.dataElements | filter:{ isIncluded: true }" ng-form="dataElementForm">
                                                         <td>
                                                             <div ng-if="!dataSet.isReferralDataset">
-                                                                <span> {{ resourceBundle[dataElement.id] || dataElement.formName}}</span>
+                                                            <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
+                                                                <span ng-if="!resourceBundle[dataElement.id]"> {{ dataElement.formName }}
                                                             <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{dataElement.description}}"/>
                                                         </span>
                                                             </div>
                                                             <div ng-if="dataSet.isReferralDataset">
-                                                                <span> {{ resourceBundle[dataElement.id] || referralLocations[dataElement.formName].name}}</span>
+                                                            <span ng-if="resourceBundle[dataElement.id]"> {{ resourceBundle[dataElement.id] }}</span>
+                                                                <span ng-if="!resourceBundle[dataElement.id]"> {{ referralLocations[dataElement.formName].name }}
                                                             <p class="glyphicon glyphicon-tag" tooltip-placement="top" tooltip-trigger="click" tooltip="{{dataElement.description}}"/>
                                                         </span>
                                                             </div>
