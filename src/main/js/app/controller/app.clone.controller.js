@@ -12,11 +12,13 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
 
         $scope.dumpLogs = function() {
             var errorCallback = function(error) {
-                var notificationMessages = {
-                    "notificationMessage": $scope.resourceBundle.dumpLogsErrorMessage + error.name,
-                    "notificationTitle": $scope.resourceBundle.errorNotification
-                };
-                showNotification(notificationMessages);
+                if(_.isObject(error)) {
+                    var notificationMessages = {
+                        "notificationMessage": $scope.resourceBundle.dumpLogsErrorMessage + error.message,
+                        "notificationTitle": $scope.resourceBundle.errorNotification
+                    };
+                    showNotification(notificationMessages);
+                }
             };
 
             var successCallback = function(directory) {
@@ -33,11 +35,13 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
 
         $scope.createClone = function() {
             var errorCallback = function(error) {
-                var notificationMessages = {
-                    "notificationMessage": $scope.resourceBundle.createCloneErrorMessage + error.name,
-                    "notificationTitle": $scope.resourceBundle.errorNotification
-                };
-                showNotification(notificationMessages);
+                if(_.isObject(error)) {
+                    var notificationMessages = {
+                        "notificationMessage": $scope.resourceBundle.createCloneErrorMessage + error.message,
+                        "notificationTitle": $scope.resourceBundle.errorNotification
+                    };
+                    showNotification(notificationMessages);
+                }
             };
 
             var successCallback = function(directory) {

@@ -1,8 +1,6 @@
 define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
     return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository) {
 
-        var formattedPeriods = {};
-
         var deregisterSelectedProjectListener = $rootScope.$on('selectedProjectUpdated', function() {
             init();
         });
@@ -119,7 +117,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                 var dataSubmissionInfo = _.map(data, function(datum) {
                     return {
-                        "period": formattedPeriods[datum.period],
+                        "period": datum.period,
                         "moduleId": datum.orgUnit,
                         "isSubmitted": true
                     };
@@ -144,7 +142,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                     var eventsSubmissionInfo = _.uniq(_.map(data, function(datum) {
                         return {
-                            "period": formattedPeriods[datum.period],
+                            "period": datum.period,
                             "moduleId": indexedOrginOrgUnits[datum.orgUnit].parent.id,
                             "isSubmitted": true
                         };
@@ -164,7 +162,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                 var approvalData = _.map(data, function(datum) {
                     return {
-                        "period": formattedPeriods[datum.period],
+                        "period": datum.period,
                         "moduleId": datum.orgUnit,
                         "isComplete": datum.isComplete,
                         "isApproved": datum.isApproved
@@ -277,19 +275,9 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             return "#/aggregate-data-entry/" + item.moduleId + "/" + item.period;
         };
 
-        var loadFormattedPeriods = function(noOfWeeks) {
-            var period = moment().format("GGGG[W]W");
-            while (noOfWeeks > 0) {
-                period = moment().subtract(noOfWeeks, "weeks").format("GGGG[W]W");
-                formattedPeriods[period] = moment().subtract(noOfWeeks, "weeks").format("GGGG[W]WW");
-                noOfWeeks--;
-            }
-        };
-
         var init = function() {
             if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
                 $scope.loading = true;
-                loadFormattedPeriods(12);
                 return getUserModules().then(loadDashboard).finally(function() {
                     $scope.loading = false;
                 });

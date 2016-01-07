@@ -36,8 +36,7 @@
             <div ng-class="'dataset-acc-wrapper'">
                 <accordion-group is-open="true">
                     <accordion-heading>
-                        <span ng-if="resourceBundle[program.id]">{{ resourceBundle[program.id] }}</span>
-                        <span ng-if="!resourceBundle[program.id]">{{ program.name }}</span>
+                        <span>{{ resourceBundle[program.id] || program.name}}</span>
                     </accordion-heading>
                     <div class="row sub-nav">
                         <div class="col-md-8">

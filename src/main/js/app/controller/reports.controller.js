@@ -24,7 +24,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 "xAxis": {
                     "axisLabel": "Period",
                     "tickFormat": function(d) {
-                        return moment(d, 'GGGGWW').format('GGGG[W]W');
+                        return moment.unix(d).format('GGGG[W]W');
                     }
                 },
                 "yAxis": {
@@ -65,7 +65,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 "xAxis": {
                     "axisLabel": "Period",
                     "tickFormat": function(d) {
-                        return moment(d, 'GGGGWW').format('GGGG[W]W');
+                        return moment.unix(d).format('GGGG[W]W');
                     }
                 },
                 "yAxis": {
@@ -103,7 +103,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 "xAxis": {
                     "axisLabel": "Period",
                     "tickFormat": function(d) {
-                        return moment(d, 'GGGGWW').format('GGGG[W]W');
+                        return moment.unix(d).format('GGGG[W]W');
+                    },
+                    "tickValues": function(d) {
+                        return _.pluck(d[0].values, 'label');
                     }
                 },
                 "yAxis": {
@@ -188,7 +191,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     };
 
                     var periodsForXAxis = _.reduce(chartData.metaData.pe, function(result, period) {
-                        result.push(parseInt(moment(period, 'GGGG[W]W').format('GGGGWW')));
+                        result.push(parseInt(moment(period, 'GGGG[W]W').format('X')));
                         return result;
                     }, []);
 
@@ -205,7 +208,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         var periodIndex = _.findIndex(chartData.headers, {
                             "name": "pe"
                         });
-                        var chartDataPeriod = parseInt(moment(row[periodIndex], 'GGGG[W]W').format('GGGGWW'));
+                        var chartDataPeriod = parseInt(moment(row[periodIndex], 'GGGG[W]W').format('X'));
 
                         var valueIndex = _.findIndex(chartData.headers, {
                             "name": "value"

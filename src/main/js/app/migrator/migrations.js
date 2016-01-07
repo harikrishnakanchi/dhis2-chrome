@@ -267,6 +267,7 @@ define([], function() {
         delete_keys_from_changelog,
         clear_metadata_objectstores,
         recreate_translations_store,
-        delete_program_stages_store
+        delete_program_stages_store,
+        delete_keys_from_changelog
     ];
 });
