@@ -35,7 +35,7 @@ define(["moment", "properties", "lodash", "indexedDBLogger", "zipUtils"], functi
 
         $scope.createClone = function() {
             var errorCallback = function(error) {
-                if(!_.isObject(error)) {
+                if(_.isObject(error)) {
                     var notificationMessages = {
                         "notificationMessage": $scope.resourceBundle.createCloneErrorMessage + error.message,
                         "notificationTitle": $scope.resourceBundle.errorNotification
