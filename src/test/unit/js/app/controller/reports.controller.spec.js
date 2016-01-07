@@ -328,51 +328,50 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                 "data": [{
                     "key": "5-14 years",
                     "values": [{
-                        label: 201525,
-                        value: 0
+                        "label": 1434306600,
+                        "value": 0
                     }, {
-                        label: 201526,
-                        value: 48
+                        "label": 1434911400,
+                        "value": 48
                     }, {
-                        label: 201527,
-                        value: 0
+                        "label": 1435516200,
+                        "value": 0
                     }]
-
                 }, {
                     "key": "24-59 months",
                     "values": [{
-                        label: 201525,
-                        value: 0
+                        "label": 1434306600,
+                        "value": 0
                     }, {
-                        label: 201526,
-                        value: 36
+                        "label": 1434911400,
+                        "value": 36
                     }, {
-                        label: 201527,
-                        value: 0
+                        "label": 1435516200,
+                        "value": 0
                     }]
                 }, {
                     "key": "<1 month",
                     "values": [{
-                        label: 201525,
-                        value: 0
+                        "label": 1434306600,
+                        "value": 0
                     }, {
-                        label: 201526,
-                        value: 12
+                        "label": 1434911400,
+                        "value": 12
                     }, {
-                        label: 201527,
-                        value: 0
+                        "label": 1435516200,
+                        "value": 0
                     }]
                 }, {
                     "key": "1-23 months",
                     "values": [{
-                        label: 201525,
-                        value: 0
+                        "label": 1434306600,
+                        "value": 0
                     }, {
-                        label: 201526,
-                        value: 24
+                        "label": 1434911400,
+                        "value": 24
                     }, {
-                        label: 201527,
-                        value: 0
+                        "label": 1435516200,
+                        "value": 0
                     }]
                 }]
             }, {
@@ -382,30 +381,28 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
                 "data": [{
                     "key": "Total Consultations 1-23 months Pediatric OPD",
                     "values": [{
-                        label: 201521,
-                        value: 0
+                        "label": 1431887400,
+                        "value": 0
                     }, {
-                        label: 201522,
-                        value: 0
+                        "label": 1432492200,
+                        "value": 0
                     }, {
-                        label: 201523,
-                        value: 260
+                        "label": 1433097000,
+                        "value": 260
                     }, {
-                        label: 201524,
-                        value: 168
+                        "label": 1433701800,
+                        "value": 168
                     }, {
-                        label: 201525,
-                        value: 168
+                        "label": 1434306600,
+                        "value": 168
                     }, {
-                        label: 201526,
-                        value: 200
+                        "label": 1434911400,
+                        "value": 200
                     }, {
-                        label: 201527,
-                        value: 0
+                        "label": 1435516200,
+                        "value": 0
                     }]
-
                 }]
-
             }];
 
             expect(scope.chartData).toEqual(expectedChartData);
