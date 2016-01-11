@@ -1,3 +1,7 @@
 define([], function() {
-    return {};
+    return {
+        "dhis": {
+            "authHeader": "Basic YWRtaW46ZGlzdHJpY3Q="
+        }
+    };
 });
