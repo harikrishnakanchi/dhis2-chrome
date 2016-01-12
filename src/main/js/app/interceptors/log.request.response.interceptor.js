@@ -19,7 +19,7 @@ define([], function() {
 
                 var method = response.config.method;
                 if (method === "GET")
-                    $log.info("Response", response.config.method, response.config.url, response.data);
+                    $log.info("Response", response.config.method, response.config.url);
                 if (method === "POST" || method === "PUT" || method === "DELETE")
                     $log.info("Response", response.config.method, response.config.url, response.config.data, response.data);
 
