@@ -33,9 +33,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     }
                 },
                 "callback": function(chart) {
-                    if (chart.yAxis.scale().domain()[1] <= 10) {
-                        chart.yDomain([0, 10]);
-                        chart.yAxis.tickValues(d3.range(1, 10));
+                    if (chart.yAxis.scale().domain()[1] <= 5) {
+                        chart.yDomain([0, 5]);
+                        chart.yAxis.tickValues(d3.range(1, 5));
                         chart.update();
                     }
                 }
@@ -74,9 +74,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     }
                 },
                 "callback": function(chart) {
-                    if (chart.yAxis.scale().domain()[1] <= 10) {
-                        chart.yDomain([0, 10]);
-                        chart.yAxis.tickValues(d3.range(1, 10));
+                    if (chart.yAxis.scale().domain()[1] <= 5) {
+                        chart.yDomain([0, 5]);
+                        chart.yAxis.tickValues(d3.range(1, 5));
                         chart.update();
                     }
                 }
@@ -115,10 +115,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     }
                 },
                 "callback": function(chart) {
-                    if (chart.yAxis.scale().domain()[1] <= 10) {
-                        //chart.lines.forceY([0, 10]);
-                        chart.yDomain([0, 10]);
-                        chart.yAxis.tickValues(d3.range(1, 10));
+                    if (chart.yAxis.scale().domain()[1] <= 5) {
+                        //chart.lines.forceY([0, 5]);
+                        chart.yDomain([0, 5]);
+                        chart.yAxis.tickValues(d3.range(1, 5));
                         chart.update();
                     }
                 }
