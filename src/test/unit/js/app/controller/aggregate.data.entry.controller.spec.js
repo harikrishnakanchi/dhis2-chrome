@@ -554,11 +554,13 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                         "DE_Oedema": {
                             "32": {
                                 "formula": '3',
-                                "value": '3'
+                                "value": '3',
+                                "existingValue": true
                             },
                             "33": {
                                 "formula": '12',
-                                "value": '12'
+                                "value": '12',
+                                "existingValue": true
                             }
                         }
                     }

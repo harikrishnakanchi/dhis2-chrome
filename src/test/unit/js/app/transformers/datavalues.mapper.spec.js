@@ -9,21 +9,25 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                     "DE_Oedema": {
                         "32": {
                             "value": "3",
-                            "formula": "1+2"
+                            "formula": "1+2",
+                            "existingValue": true
                         },
                         "33": {
                             "value": "12",
-                            "formula": "12"
+                            "formula": "12",
+                            "existingValue": true
                         },
                     },
                     "DE_MLT115": {
                         "32": {
                             "value": "49",
-                            "formula": "49"
+                            "formula": "49",
+                            "existingValue": true
                         },
                         "37": {
                             "value": "67",
-                            "formula": "67"
+                            "formula": "67",
+                            "existingValue": true
                         }
                     }
                 },
@@ -31,7 +35,8 @@ define(["dataValuesMapper", "angularMocks", "properties", "moment", "lodash"], f
                     "NumPatients": {
                         "Number": {
                             "value": "10",
-                            "formula": "10"
+                            "formula": "10",
+                            "existingValue": true
                         }
                     }
                 }

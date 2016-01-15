@@ -53,9 +53,9 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             $anchorScroll();
         };
 
-        var calculateSum = function(cellValue) {
+        var calculateSum = function(cellValue, existingValue) {
             if (!cellValue)
-                return 0;
+                return existingValue ? 0 : "";
 
             cellValue = cellValue.toString().split("+").filter(function(e) {
                 return e;
@@ -84,9 +84,9 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         $scope.evaluateExpression = function(orgUnit, elementId, option) {
             if (!$scope.validDataValuePattern.test($scope.dataValues[orgUnit][elementId][option].value))
                 return;
-            var cellValue = $scope.dataValues[orgUnit][elementId][option].value;
-            $scope.dataValues[orgUnit][elementId][option].formula = cellValue;
-            $scope.dataValues[orgUnit][elementId][option].value = calculateSum(cellValue).toString();
+            var cell = $scope.dataValues[orgUnit][elementId][option];
+            cell.formula = cell.value;
+            cell.value = calculateSum(cell.value, cell.existingValue).toString();
         };
 
         $scope.restoreExpression = function(orgUnit, elementId, option) {

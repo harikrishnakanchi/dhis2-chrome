@@ -27,7 +27,8 @@ define(["moment"], function(moment) {
             dataValues[v.orgUnit][v.dataElement] = dataValues[v.orgUnit][v.dataElement] || {};
             dataValues[v.orgUnit][v.dataElement][v.categoryOptionCombo] = {
                 formula: v.formula || v.value,
-                value: v.value
+                value: v.value,
+                existingValue: true
             };
             return dataValues;
         }, {});
