@@ -82,17 +82,18 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         $scope.validDataValuePattern = /^[0-9+]*$/;
 
         $scope.evaluateExpression = function(orgUnit, elementId, option) {
-            if (!$scope.validDataValuePattern.test($scope.dataValues[orgUnit][elementId][option].value))
-                return;
             var cell = $scope.dataValues[orgUnit][elementId][option];
+            if (!$scope.validDataValuePattern.test(cell.value))
+                return;
             cell.formula = cell.value;
             cell.value = calculateSum(cell.value, cell.existingValue).toString();
         };
 
         $scope.restoreExpression = function(orgUnit, elementId, option) {
-            if (!$scope.validDataValuePattern.test($scope.dataValues[orgUnit][elementId][option].value))
+            var cell = $scope.dataValues[orgUnit][elementId][option];
+            if (!$scope.validDataValuePattern.test(cell.value))
                 return;
-            $scope.dataValues[orgUnit][elementId][option].value = $scope.dataValues[orgUnit][elementId][option].formula;
+            cell.value = cell.formula || cell.value;
         };
 
         $scope.getDatasetState = function(id, isFirst) {
