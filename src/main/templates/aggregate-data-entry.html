@@ -66,7 +66,12 @@
                                                     </td>
                                                     <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
                                                         <ng-form ng-class="{'has-error': datavalueForm.datavalue.$invalid}" name="datavalueForm">
-                                                            <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, selectedModule.id)['value']" ng-focus="restoreExpression(selectedModule.id, dataElement.id, option)" class="form-control input-sm" ng-blur="evaluateExpression(selectedModule.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
+                                                            <input type="text" name="datavalue" id="datafield_{{$index}}" class="form-control input-sm"
+                                                                   ng-pattern="validDataValuePattern"
+                                                                   ng-model="safeGet(dataValues, dataElement.id, option, selectedModule.id)['value']"
+                                                                   ng-focus="restoreExpression(selectedModule.id, dataElement.id, option)"
+                                                                   ng-blur="evaluateExpression(selectedModule.id, dataElement.id, option)"
+                                                                   ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
                                                     </td>
                                                     <td class="last-column">{{sum(dataValues[selectedModule.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
