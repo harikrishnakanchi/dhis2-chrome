@@ -84,10 +84,10 @@
                                                 </tbody>
                                             </table>
                                         </accordion-group>
+                                    </accordion>
                                 </div>
-                                </accordion>
+                            </accordion-group>
                         </div>
-                        </accordion-group>
                         <div ng-if="!isLineListModule" ng-class="'dataset-acc-wrapper'">
                             <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: true }" is-open="getDatasetState(dataSet.id, false)[dataSet.id]">
                                 <accordion-heading>
