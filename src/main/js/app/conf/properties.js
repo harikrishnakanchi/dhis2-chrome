@@ -28,7 +28,8 @@ define(['lodash', 'overrides'], function(_, overrides) {
         "queue": {
             "maxretries": 5,
             "delay": 100,
-            "skipRetryMessages": ["downloadMetadata", "downloadProjectData"],
+            "skipRetryMessages": [],
+            "httpGetRetryDelay": 10000,
             "retryDelayConfig": {
                 0: 10000,
                 1: 10000,

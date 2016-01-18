@@ -78,6 +78,9 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
         });
 
         it('should return false for retry if job type is blacklisted for retrial', function() {
+
+            properties.queue.skipRetryMessages = ['downloadMetadata'];
+
             var actualResult = queuePostProcessInterceptor.shouldRetry({
                 "id": 1,
                 "data": {
