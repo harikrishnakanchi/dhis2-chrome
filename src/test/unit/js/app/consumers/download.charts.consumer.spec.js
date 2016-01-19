@@ -158,7 +158,8 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
             it('should continue download of charts even if one call fails', function() {
                 var datasetsAssociatedWithUserModules = [{
                     "id": "ds1",
-                    "name": "Out Patient Department - General"
+                    "name": "Out Patient Department - General",
+                    "code": "OutPatientDepartmentGeneral"
                 }];
 
                 var fieldAppCharts = [{

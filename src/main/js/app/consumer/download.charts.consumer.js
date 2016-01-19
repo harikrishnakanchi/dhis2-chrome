@@ -30,7 +30,7 @@ define(["lodash", "moment"], function(_, moment) {
                 };
 
                 var saveChartData = function(charts) {
-                    var modulesAndCharts = [];
+
                     var downloadOfAtLeastOneChartFailed = false;
 
                     var downloadAndUpsertChartData = function(modulesAndCharts) {
@@ -52,17 +52,43 @@ define(["lodash", "moment"], function(_, moment) {
                         return reportService.getReportDataForOrgUnit(datum[1], datum[0]).then(onSuccess, onFailure);
                     };
 
-                    _.forEach(userModuleIds, function(userModule) {
-                        _.forEach(charts, function(chart) {
-                            modulesAndCharts.push([userModule, chart]);
-                        });
-                    });
+                    var getDatasetCodesByModule = function() {
+                        var promises = [];
 
-                    return downloadAndUpsertChartData(modulesAndCharts).then(function() {
-                        if (!downloadOfAtLeastOneChartFailed) {
-                            return updateChangeLog(projectIds);
-                        }
-                    });
+                        _.forEach(userModuleIds, function(userModuleId) {
+                            promises.push(datasetRepository.findAllForOrgUnits([userModuleId]));
+                        });
+
+                        return $q.all(promises).then(function(datasets) {
+                            var datasetCodesByModule = {};
+                            _.forEach(userModuleIds, function(userModuleId, index) {
+                                datasetCodesByModule[userModuleId] = _.pluck(datasets[index], 'code');
+                            });
+                            return datasetCodesByModule;
+                        });
+                    };
+
+                    var filterChartsForModules = function(datasetCodesByModule) {
+                        var modulesAndCharts = [];
+                        _.forEach(userModuleIds, function(userModule) {
+                            _.forEach(charts, function(chart) {
+                                _.forEach(datasetCodesByModule[userModule], function(datasetCode) {
+                                    if (_.contains(chart.name, datasetCode))
+                                        modulesAndCharts.push([userModule, chart]);
+                                });
+                            });
+                        });
+                        return $q.when(modulesAndCharts);
+                    };
+
+                    return getDatasetCodesByModule()
+                        .then(filterChartsForModules)
+                        .then(downloadAndUpsertChartData)
+                        .then(function() {
+                            if (!downloadOfAtLeastOneChartFailed) {
+                                return updateChangeLog(projectIds);
+                            }
+                        });
                 };
 
                 return reportService.getCharts(datasets)
