@@ -48,13 +48,15 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                     "someAttribute": "someValue"
                 }];
 
+                var dataSets = [{
+                    "id": "ds1",
+                    "code": "Nutrition Monthly Pediatric"
+                }];
 
                 userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, [{
                     "id": "mod1"
                 }]));
-                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [{
-                    "id": "ds1"
-                }]));
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, dataSets));
 
                 reportService.getPivotTables.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
                 reportService.getReportDataForOrgUnit.and.returnValue(utils.getPromise(q, [{
@@ -66,9 +68,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 scope.$apply();
 
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(["mod1"]);
-                expect(reportService.getPivotTables).toHaveBeenCalledWith([{
-                    id: 'ds1'
-                }]);
+                expect(reportService.getPivotTables).toHaveBeenCalledWith(dataSets);
                 expect(pivotTableRepository.replaceAll).toHaveBeenCalledWith(fieldAppPivotTables);
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod1");
                 expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith('Field App - Nutrition Monthly Pediatric', 'mod1', [{
@@ -91,10 +91,13 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                     "id": "mod3"
                 }];
 
+                var dataSets = [{
+                    "id": "ds1",
+                    "code": "Nutrition Monthly Pediatric"
+                }];
+
                 userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, userModules));
-                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, [{
-                    "id": "ds1"
-                }]));
+                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, dataSets));
 
                 reportService.getPivotTables.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
                 reportService.getReportDataForOrgUnit.and.callFake(function(table, modId) {
@@ -112,9 +115,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 scope.$apply();
 
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(["mod1", "mod2", "mod3"]);
-                expect(reportService.getPivotTables).toHaveBeenCalledWith([{
-                    id: 'ds1'
-                }]);
+                expect(reportService.getPivotTables).toHaveBeenCalledWith(dataSets);
                 expect(pivotTableRepository.replaceAll).toHaveBeenCalledWith(fieldAppPivotTables);
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod1");
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod2");
