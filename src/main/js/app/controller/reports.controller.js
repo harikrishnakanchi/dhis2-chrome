@@ -1,6 +1,44 @@
 define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
     return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository) {
 
+        var chartLoadedCallback = function (chart) {
+
+            var chartMaxTicks = chart.yAxis.ticks();
+
+            chart.dispatch.on('stateChange', function (event) {
+                setTimeout(function () {
+                    var currentMaxValue = chart.yAxis.scale().domain()[1];
+                    function getTicks(max) {
+                        var values = {
+                            '0': 1,
+                            '1': 2,
+                            '2': 2,
+                            '3': 4,
+                            '4': 5,
+                            '5': 5
+                        };
+                        return values[max.toString()];
+                    }
+                    if (currentMaxValue <= 5) {
+                        chart.yAxis.ticks(getTicks(currentMaxValue));
+                    } else {
+                        chart.yAxis.ticks(chartMaxTicks);
+                    }
+                    chart.update();
+                }, 0);
+            });
+
+            //chart.legend.dispatch.legendClick = function (dataForCurrentLegend, index) { };
+
+            if (chart.yAxis.scale().domain()[1] <= 5) {
+                //chart.lines.forceY([0, 5]);
+                chart.yDomain([0, 5]);
+                chart.yAxis.tickValues(d3.range(1, 5));
+                chart.update();
+            }
+
+        };
+
         $scope.barChartOptions = {
             "chart": {
                 "type": "multiBarChart",
@@ -32,13 +70,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         return d3.format('.0f')(d);
                     }
                 },
-                "callback": function(chart) {
-                    if (chart.yAxis.scale().domain()[1] <= 5) {
-                        chart.yDomain([0, 5]);
-                        chart.yAxis.tickValues(d3.range(1, 5));
-                        chart.update();
-                    }
-                }
+                "callback": chartLoadedCallback
             }
         };
 
@@ -73,13 +105,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         return d3.format('.0f')(d);
                     }
                 },
-                "callback": function(chart) {
-                    if (chart.yAxis.scale().domain()[1] <= 5) {
-                        chart.yDomain([0, 5]);
-                        chart.yAxis.tickValues(d3.range(1, 5));
-                        chart.update();
-                    }
-                }
+                "callback": chartLoadedCallback
             }
         };
 
@@ -114,14 +140,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         return d3.format('.0f')(d);
                     }
                 },
-                "callback": function(chart) {
-                    if (chart.yAxis.scale().domain()[1] <= 5) {
-                        //chart.lines.forceY([0, 5]);
-                        chart.yDomain([0, 5]);
-                        chart.yAxis.tickValues(d3.range(1, 5));
-                        chart.update();
-                    }
-                }
+                "callback": chartLoadedCallback
             }
         };
 
