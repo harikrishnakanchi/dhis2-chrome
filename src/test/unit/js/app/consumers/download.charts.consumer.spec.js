@@ -1,5 +1,5 @@
-define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportService', 'chartRepository', 'userPreferenceRepository', 'datasetRepository', 'changeLogRepository'],
-    function(DownloadChartsConsumer, mocks, utils, timecop, ReportService, ChartRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository) {
+define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportService', 'chartRepository', 'userPreferenceRepository', 'datasetRepository', 'changeLogRepository', 'orgUnitRepository'],
+    function(DownloadChartsConsumer, mocks, utils, timecop, ReportService, ChartRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository) {
 
         describe('Download Charts Consumer', function() {
             var downloadChartsConsumer, reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, scope, q;
@@ -32,10 +32,13 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 spyOn(changeLogRepository, 'clear').and.returnValue(utils.getPromise(q, {}));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
+                orgUnitRepository = new OrgUnitRepository();
+                spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, {}));
+
                 Timecop.install();
                 Timecop.freeze(new Date('2014-10-01T12:00:00.000Z'));
 
-                downloadChartsConsumer = new DownloadChartsConsumer(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, $q);
+                downloadChartsConsumer = new DownloadChartsConsumer(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q);
             }));
 
             afterEach(function() {
