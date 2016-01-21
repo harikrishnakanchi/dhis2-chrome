@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, $q) {
+    return function(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q) {
 
         this.run = function(message) {
 
@@ -53,36 +53,42 @@ define(["lodash", "moment"], function(_, moment) {
                         return reportService.getReportDataForOrgUnit(datum[1], datum[0]).then(onSuccess, onFailure);
                     };
 
-                    var getDatasetCodesByModule = function() {
-                        var promises = [];
+                    var getDatasetsByModule = function() {
 
-                        _.forEach(userModuleIds, function(userModuleId) {
-                            promises.push(datasetRepository.findAllForOrgUnits([userModuleId]));
-                        });
+                        var getAllDataSetsUnderModule = function(moduleIdAndOrigins) {
+                            var modulesAndAllDataSets = _.reduce(moduleIdAndOrigins, function(mapOfModuleIdsToDataSets, origins, moduleId) {
+                                var firstOriginId = _.pluck(origins, "id")[0];
+                                mapOfModuleIdsToDataSets[moduleId] = loadRelevantDatasets([moduleId, firstOriginId]);
+                                return mapOfModuleIdsToDataSets;
+                            }, {});
+                            return $q.all(modulesAndAllDataSets);
+                        };
 
-                        return $q.all(promises).then(function(datasets) {
-                            var datasetCodesByModule = {};
-                            _.forEach(userModuleIds, function(userModuleId, index) {
-                                datasetCodesByModule[userModuleId] = _.pluck(datasets[index], 'code');
-                            });
-                            return datasetCodesByModule;
-                        });
+                        var moduleIdsAndOrigins = _.reduce(userModuleIds, function(mapOfModuleIdsToOrigins, moduleId) {
+                            mapOfModuleIdsToOrigins[moduleId] = orgUnitRepository.findAllByParent([moduleId]);
+                            return mapOfModuleIdsToOrigins;
+                        }, {});
+
+                        return $q.all(moduleIdsAndOrigins)
+                            .then(getAllDataSetsUnderModule);
+
                     };
 
-                    var filterPivotTablesForModules = function(datasetCodesByModule) {
+                    var filterPivotTablesForModules = function(datasetsByModule) {
                         var modulesAndPivotTables = [];
-                        _.forEach(userModuleIds, function(userModule) {
+                        _.forEach(userModuleIds, function(userModuleId) {
+                            var dataSetCodesForModule = _.pluck(datasetsByModule[userModuleId], "code");
                             _.forEach(pivotTables, function(pivotTable) {
-                                _.forEach(datasetCodesByModule[userModule], function(datasetCode) {
+                                _.forEach(dataSetCodesForModule, function(datasetCode) {
                                     if (_.contains(pivotTable.name, datasetCode))
-                                        modulesAndPivotTables.push([userModule, pivotTable]);
+                                        modulesAndPivotTables.push([userModuleId, pivotTable]);
                                 });
                             });
                         });
                         return $q.when(modulesAndPivotTables);
                     };
 
-                    return getDatasetCodesByModule()
+                    return getDatasetsByModule()
                         .then(filterPivotTablesForModules)
                         .then(downloadAndUpsertPivotTableData)
                         .then(function() {
