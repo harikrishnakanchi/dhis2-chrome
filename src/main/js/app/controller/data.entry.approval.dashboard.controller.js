@@ -117,7 +117,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                 var dataSubmissionInfo = _.map(data, function(datum) {
                     return {
-                        "period": dateUtils.getFormattedPeriod(datum.period),
+                        "period": datum.period,
                         "moduleId": datum.orgUnit,
                         "isSubmitted": true
                     };
@@ -142,7 +142,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                     var eventsSubmissionInfo = _.uniq(_.map(data, function(datum) {
                         return {
-                            "period": dateUtils.getFormattedPeriod(datum.period),
+                            "period": datum.period,
                             "moduleId": indexedOrginOrgUnits[datum.orgUnit].parent.id,
                             "isSubmitted": true
                         };
@@ -162,7 +162,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                 var approvalData = _.map(data, function(datum) {
                     return {
-                        "period": dateUtils.getFormattedPeriod(datum.period),
+                        "period": datum.period,
                         "moduleId": datum.orgUnit,
                         "isComplete": datum.isComplete,
                         "isApproved": datum.isApproved
