@@ -122,7 +122,8 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                         .then(systemSettingRepository.loadProductKey)
                         .then(function() {
                             setupAlarms();
-                            consumerRegistry.register()
+                            $hustle.cleanupAbandonedItems()
+                                .then(consumerRegistry.register)
                                 .then(checkOnlineStatusAndSync);
                         });
                 }
