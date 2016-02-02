@@ -1,6 +1,6 @@
 define(["lodash", "moment"], function(_, moment) {
     return function($q, db) {
-        var transformAndSave = function(payload) {
+        var transformAndSave = function(payload, localStatus) {
             var groupedDataValues = _.groupBy(payload, function(dataValue) {
                 return [dataValue.period, dataValue.orgUnit];
             });
@@ -10,7 +10,8 @@ define(["lodash", "moment"], function(_, moment) {
                 var dataValue = {
                     "period": split[0],
                     "dataValues": dataValues,
-                    "orgUnit": split[1]
+                    "orgUnit": split[1],
+                    "localStatus": localStatus
                 };
                 result.push(dataValue);
             };
@@ -36,7 +37,7 @@ define(["lodash", "moment"], function(_, moment) {
                 return dataValue;
             });
 
-            return transformAndSave(payload);
+            return transformAndSave(payload, 'WAITING_TO_SYNC');
         };
 
         this.saveAsDraft = function(payload) {
@@ -46,11 +47,11 @@ define(["lodash", "moment"], function(_, moment) {
                 return dataValue;
             });
 
-            return transformAndSave(payload);
+            return transformAndSave(payload, 'SAVED');
         };
 
         this.saveDhisData = function(payload) {
-            return transformAndSave(payload);
+            return transformAndSave(payload, 'DATA_FROM_DHIS');
         };
 
         this.getDataValues = function(period, orgUnitIds) {
@@ -82,10 +83,24 @@ define(["lodash", "moment"], function(_, moment) {
             var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
             return store.each(query).then(function(dataValues) {
                 var filteredDV = _.filter(dataValues, function(dv) {
-                    return _.contains(orgUnits, dv.orgUnit);
+                    return _.contains(orgUnits, dv.orgUnit) && dv.localStatus != 'SAVED';
                 });
-                return _.flatten(_.pluck(filteredDV, 'dataValues'));
+                return filteredDV;
             });
         };
+
+        this.setLocalStatus = function(periodsAndOrgUnits, localStatus) {
+            periodsAndOrgUnits = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
+               return [periodAndOrgUnit.period, periodAndOrgUnit.orgUnit];
+            });
+            var store = db.objectStore("dataValues");
+            _.each(periodsAndOrgUnits, function(tuple) {
+                store.find(tuple).then(function (data) {
+                    data.localStatus = localStatus;
+                    return store.upsert(data);
+                });
+            });
+        };
+
     };
 });

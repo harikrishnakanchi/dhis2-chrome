@@ -113,13 +113,12 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
         var getDataSubmissionInfo = function(moduleIds, startPeriod, endPeriod) {
             return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(data) {
 
-                data = _.reject(data, 'isDraft', true);
-
                 var dataSubmissionInfo = _.map(data, function(datum) {
                     return {
                         "period": datum.period,
                         "moduleId": datum.orgUnit,
-                        "isSubmitted": true
+                        "isSubmitted": true,
+                        "localStatus": datum.localStatus
                     };
                 });
 
@@ -213,7 +212,8 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                             "isSubmitted": submittedData[period + module.id] && submittedData[period + module.id].isSubmitted || submittedEventsData[period + module.id] && submittedEventsData[period + module.id].isSubmitted || false,
                             "isComplete": approvalData[period + module.id] && approvalData[period + module.id].isComplete || false,
                             "isApproved": approvalData[period + module.id] && approvalData[period + module.id].isApproved || false,
-                            "isLineListService": isLineListService(module)
+                            "isLineListService": isLineListService(module),
+                            "isNotSynced": submittedData[period + module.id] && submittedData[period + module.id].localStatus == 'FAILED_TO_SYNC' || false
                         };
                     }));
                 });

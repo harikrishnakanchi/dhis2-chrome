@@ -504,17 +504,8 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     }
                 }];
 
-                var dataValues = [{
-                    "categoryOptionCombo": "co123",
-                    "dataElement": "de123",
-                    "orgUnit": "123",
-                    "period": "2014W16",
-                    "value": "9",
-                    "isDraft": true
-                }];
-
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
 

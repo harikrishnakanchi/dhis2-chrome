@@ -1,5 +1,5 @@
 define(["properties", "chromeUtils", "moment", "lodash"], function(properties, chromeUtils, moment, _) {
-    return function($log, ngI18nResourceBundle) {
+    return function($log, ngI18nResourceBundle, dataRepository) {
         var getResourceBundle = function(locale) {
             return ngI18nResourceBundle.get({
                 "locale": locale
@@ -67,7 +67,10 @@ define(["properties", "chromeUtils", "moment", "lodash"], function(properties, c
                     return true;
                 }
 
-                $log.warn("Burried job", job);
+                $log.warn("Buried job", job);
+                if(job.data.type == 'uploadDataValues') {
+                    dataRepository.setLocalStatus(job.data.data, "FAILED_TO_SYNC");
+                }
                 return false;
             },
             "onFailure": function(job, data, hustleQueue) {

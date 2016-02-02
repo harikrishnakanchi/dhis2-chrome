@@ -10,9 +10,15 @@ define(["moment", "properties", "lodash"], function(moment, properties, _) {
             return dataService.save(data);
         };
 
+        var setLocalStatus = function(periodsAndOrgUnits) {
+            return dataRepository.setLocalStatus(periodsAndOrgUnits, 'SYNCED_TO_DHIS');
+        };
+
         this.run = function(message) {
             if (!_.isEmpty(message.data.data))
-                return preparePayload(message.data.data).then(uploadData);
+                return preparePayload(message.data.data)
+                    .then(uploadData)
+                    .then(_.partial(setLocalStatus, message.data.data));
         };
     };
 });

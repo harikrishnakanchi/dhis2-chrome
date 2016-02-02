@@ -47,12 +47,13 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             Timecop.uninstall();
         });
 
-        xit("should save data values sent from client", function() {
+        it("should save data values sent from client", function() {
             dataRepository.save(dataValuesFromClient);
 
             expect(mockStore.upsert).toHaveBeenCalledWith([{
                 "period": "2014W15",
                 "orgUnit": "company_0",
+                "localStatus": "WAITING_TO_SYNC",
                 "dataValues": [{
                     "period": '2014W15',
                     "orgUnit": 'company_0',
@@ -99,12 +100,13 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             scope.$apply();
         });
 
-        xit("should save data values sent from client as draft", function() {
+        it("should save data values sent from client as draft", function() {
             dataRepository.saveAsDraft(dataValuesFromClient);
 
             expect(mockStore.upsert).toHaveBeenCalledWith([{
                 "period": "2014W15",
                 "orgUnit": "company_0",
+                "localStatus": "SAVED",
                 "dataValues": [{
                     "period": '2014W15',
                     "orgUnit": 'company_0',
@@ -131,6 +133,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             expect(mockStore.upsert).toHaveBeenCalledWith([{
                 "period": "2014W20",
                 "orgUnit": "company_0",
+                "localStatus": "DATA_FROM_DHIS",
                 "dataValues": [{
                     "period": '2014W20',
                     "orgUnit": 'company_0',
@@ -264,5 +267,106 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                 "clientLastUpdated": "2014-01-22T00:00:00.000"
             }]);
         });
+
+        it("should change status of dataValues", function () {
+            var dataValues = {
+                "orgUnit": "abcd",
+                "period": "2016W01",
+                "dataValues": [{
+                    "period": '2014W02',
+                    "orgUnit": 'ou1',
+                    "dataElement": "DE2",
+                    "categoryOptionCombo": "COC2",
+                    "value": "2",
+                    "lastUpdated": "2014-01-15T00:00:00.000"
+                }],
+                "localStatus": "WAITING_TO_SYNC"
+            };
+
+            mockStore.find.and.callFake(function(periodsAndOrgUnits) {
+                return utils.getPromise(q, dataValues);
+            });
+
+            var periodsAndOrgUnits = [{
+                "period": "2016W01",
+                "orgUnit": "abcd"
+            }];
+
+            dataRepository.setLocalStatus(periodsAndOrgUnits, 'FAILED_TO_SYNC');
+
+            scope.$apply();
+
+            expect(mockStore.upsert).toHaveBeenCalledWith({
+                "orgUnit": "abcd",
+                "period": "2016W01",
+                "dataValues": [{
+                    "period": '2014W02',
+                    "orgUnit": 'ou1',
+                    "dataElement": "DE2",
+                    "categoryOptionCombo": "COC2",
+                    "value": "2",
+                    "lastUpdated": "2014-01-15T00:00:00.000"
+                }],
+                "localStatus": "FAILED_TO_SYNC"
+            });
+
+        });
+
+        it("should get dataValues for orgUnits within two periods", function(){
+
+            var dataValues = [{
+                "orgUnit": "ou1",
+                "period": "2016W01",
+                "dataValues": [{
+                    "period": '2016W01',
+                    "orgUnit": 'ou1',
+                    "dataElement": "DE2",
+                    "categoryOptionCombo": "COC2",
+                    "value": "2",
+                    "lastUpdated": "2014-01-15T00:00:00.000"
+                }],
+                "localStatus": "WAITING_TO_SYNC"
+            }, {
+                "orgUnit": "ou2",
+                "period": "2016W02",
+                "dataValues": [{
+                    "period": '2016W02',
+                    "orgUnit": 'ou2',
+                    "dataElement": "DE2",
+                    "categoryOptionCombo": "COC2",
+                    "value": "4",
+                    "isDraft": true,
+                    "clientLastUpdated": "2014-01-22T00:00:00.000"
+                }],
+                "localStatus": "SAVED"
+            }];
+
+            mockStore.each.and.returnValue(utils.getPromise(q, dataValues));
+
+            var actual;
+            dataRepository.getDataValuesForPeriodsOrgUnits("2016W01","2016W02",["ou1","ou2"]).then(function(data) {
+                actual = data;
+            });
+
+            scope.$apply();
+
+            expect(actual).toEqual([{
+                "orgUnit": "ou1",
+                "period": "2016W01",
+                "dataValues": [{
+                    "period": '2016W01',
+                    "orgUnit": 'ou1',
+                    "dataElement": "DE2",
+                    "categoryOptionCombo": "COC2",
+                    "value": "2",
+                    "lastUpdated": "2014-01-15T00:00:00.000"
+                }],
+                "localStatus": "WAITING_TO_SYNC"
+            }]);
+
+            expect(actual).not.toEqual(dataValues);
+
+        });
+
     });
 });
