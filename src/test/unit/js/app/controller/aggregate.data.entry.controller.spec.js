@@ -136,6 +136,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 dataRepository = new DataRepository();
                 getDataValuesSpy = spyOn(dataRepository, "getDataValues");
+                spyOn(dataRepository, "getLocalStatus").and.returnValue(utils.getPromise(q, 'FAILED_TO_SYNC'));
                 getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
 
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
@@ -464,6 +465,21 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.saveSuccess).toBe(false);
                 expect(scope.submitError).toBe(true);
                 expect(scope.saveError).toBe(false);
+            });
+
+            it("should set syncError to true when selected orgUnit and period data failed to sync to DHIS", function() {
+                scope.$apply();
+                expect(scope.syncError).toBe(true);
+            });
+
+            it("should set syncError to false when user resubmits the data for approval", function() {
+                dataRepository.getLocalStatus.and.returnValue(utils.getPromise(q, 'WAITING_TO_SYNC'));
+                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+
+                scope.submit();
+                scope.$apply();
+
+                expect(scope.syncError).toBeFalsy();
             });
 
             it("should fetch max length to calculate col span for category options", function() {

@@ -15,6 +15,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             $scope.submitAndApprovalSuccess = false;
             $scope.saveError = false;
             $scope.submitError = false;
+            $scope.syncError = false;
             $scope.projectIsAutoApproved = false;
             $scope.excludedDataElements = {};
             $scope.associatedProgramId = undefined;
@@ -442,10 +443,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     $scope.isApproved = !_.isEmpty(data) && data.isApproved;
                 });
 
+                var loadSyncStatusForPeriodAndOrgunitPromise = dataRepository.getLocalStatus(currentPeriodAndOrgUnit.period, currentPeriodAndOrgUnit.orgUnit)
+                    .then(function(status) {
+                        $scope.syncError = status == 'FAILED_TO_SYNC';
+                    });
+
                 if ($scope.dataentryForm !== undefined)
                     $scope.dataentryForm.$setPristine();
-
-                return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadProjectPromise, loadApprovalDataPromise]);
+                return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadProjectPromise, loadApprovalDataPromise, loadSyncStatusForPeriodAndOrgunitPromise]);
 
             }).finally(function() {
                 $scope.loading = false;

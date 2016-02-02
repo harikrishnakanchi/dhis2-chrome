@@ -368,5 +368,31 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
 
         });
 
+        it("should get localStatus for specific period and orgunit", function() {
+
+            var period = '2016W02',
+                orgUnit = 'mod1',
+                localStatus;
+
+            mockStore.find.and.callFake(function(period, orgUnit) {
+                var result = {
+                    "period": "2016W02",
+                    "orgUnit": "mod1",
+                    "dataValues": [],
+                    "localStatus": "FAILED_TO_SYNC"
+                };
+                return utils.getPromise(q, result);
+            });
+
+            dataRepository.getLocalStatus(period, orgUnit).then(function(status) {
+                localStatus = status;
+            });
+
+            scope.$apply();
+
+            expect(localStatus).toEqual('FAILED_TO_SYNC');
+
+        });
+
     });
 });

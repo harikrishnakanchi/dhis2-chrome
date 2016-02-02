@@ -151,6 +151,7 @@
     "saveBtnValue": "Enregistrer",
     "backBtnValue": "Retour",
     "submitBtnValue": "Envoyer",
+    "resubmitButton": "Renvoyer",
     "updateBtnValue": "Mettre à jour",
     "disableBtnValue": "Désactiver",
     "disableUserLabel": "Désactiver l'utilisateur",
@@ -307,5 +308,6 @@
     "monthlyReports": "Rapports Mensuels",
     "caseNumber": "Case Number in french",
     "dateRange": "Date Range in french",
-    "search": "Search"
+    "search": "Search",
+    "aggregateDataSyncError": "Impossible de soumettre des données pour approbation. S'il vous plaît soumettre à nouveau."
 }

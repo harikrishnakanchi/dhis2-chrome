@@ -102,5 +102,14 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
+        this.getLocalStatus = function(period, orgUnit) {
+            var store = db.objectStore("dataValues");
+            return store.find([period, orgUnit]).then(function(data) {
+                if (!_.isEmpty(data))
+                    return data.localStatus;
+                return undefined;
+            });
+        };
+
     };
 });

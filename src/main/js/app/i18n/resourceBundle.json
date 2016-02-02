@@ -152,6 +152,7 @@
     "saveBtnValue": "Save",
     "backBtnValue": "Back",
     "submitBtnValue": "Submit",
+    "resubmitButton": "Resubmit",
     "updateBtnValue": "Update",
     "disableBtnValue": "Disable",
     "disableUserLabel": "Disable User",
@@ -310,6 +311,6 @@
     "monthlyReports": "Monthly reports",
     "caseNumber": "Case Number",
     "dateRange": "Date Range",
-    "search": "Search"
-
+    "search": "Search",
+    "aggregateDataSyncError": "Failed to submit data for approval. Please resubmit."
 }
