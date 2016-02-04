@@ -12,14 +12,12 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         var values = {
                             '0': 1,
                             '1': 2,
-                            '2': 2,
                             '3': 4,
-                            '4': 5,
-                            '5': 5
+                            '4': 5
                         };
-                        return values[max.toString()];
+                        return values[max.toString()] || max;
                     }
-                    if (currentMaxValue <= 5) {
+                    if (currentMaxValue <= 10) {
                         chart.yAxis.ticks(getTicks(currentMaxValue));
                     } else {
                         chart.yAxis.ticks(chartMaxTicks);
