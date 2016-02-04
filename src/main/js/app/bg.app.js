@@ -23,7 +23,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                     ]);
 
                     $provide.decorator('$window', function($delegate) {
-                        $delegate.history = null;
+                        Object.defineProperty($delegate, 'history', {
+                            get: function() {
+                                return null;
+                            }
+                        });
                         return $delegate;
                     });
 

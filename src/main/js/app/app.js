@@ -85,7 +85,11 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     ]);
 
                     $provide.decorator('$window', function($delegate) {
-                        $delegate.history = null;
+                        Object.defineProperty($delegate, 'history', {
+                            get: function() {
+                                return null;
+                            }
+                        });
                         return $delegate;
                     });
 
