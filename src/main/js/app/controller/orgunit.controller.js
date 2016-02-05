@@ -25,6 +25,11 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             return $rootScope.currentUser.userCredentials.username === "projectadmin";
         };
 
+        var getUserSelectedProjectId = function() {
+            if($rootScope.currentUser.selectedProject)
+                return $rootScope.currentUser.selectedProject.id;
+        };
+
         var selectCurrentNode = function(transformedOrgUnits) {
             if (!transformedOrgUnits.selectedNode) return;
 
@@ -47,11 +52,16 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             };
 
             var getOrgUnits = function() {
-                if (isSuperAdmin())
+                if (isSuperAdmin() && $rootScope.productKeyLevel == "global")
                     return orgUnitRepository.getOrgUnitAndDescendants(4);
 
+                if (isSuperAdmin() && $rootScope.productKeyLevel == "country") {
+                    var countryId = $rootScope.allowedOrgUnits[0].id;
+                    return orgUnitRepository.getOrgUnitAndDescendants(4, countryId);
+                }
+
                 if (isProjectAdmin()) {
-                    var orgUnitId = $rootScope.currentUser.selectedProject.id;
+                    var orgUnitId = getUserSelectedProjectId();
                     return orgUnitRepository.getOrgUnitAndDescendants(6, orgUnitId);
                 }
                 return $q.when([]);
@@ -61,7 +71,22 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         var init = function() {
-            if (isProjectAdmin() && _.isUndefined($rootScope.currentUser.selectedProject)) {
+            var getAllAllowedOrgunitIds = function() {
+                return _.flatten(_.union(_.pluck($rootScope.allowedOrgUnits[0].children,"id"), _.pluck($rootScope.allowedOrgUnits, "id")));
+            };
+
+            var isGlobalProductKey = function() {
+                return $rootScope.productKeyLevel == "global";
+            };
+
+            var isSelectedProjectInAllowedOrgUnits = function() {
+                if (_.isUndefined($rootScope.currentUser.selectedProject) || isGlobalProductKey())
+                    return true;
+
+                return !_.contains(getAllAllowedOrgunitIds(), getUserSelectedProjectId());
+            };
+
+            if (isProjectAdmin() && isSelectedProjectInAllowedOrgUnits()) {
                 $location.path("/selectProjectPreference");
                 return;
             }

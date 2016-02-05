@@ -12,7 +12,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                     "username": "superadmin"
                 }
             };
-
+            rootScope.productKeyLevel = "global";
             scope = rootScope.$new();
             location = $location;
             timeout = $timeout;
@@ -35,7 +35,8 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             anchorScroll = jasmine.createSpy();
         }));
 
-        it("should fetch and display organisation units for superadmin", function() {
+        it("should fetch and display all countries for superadmin when productKeylevel is global", function() {
+            rootScope.productKeyLevel = "global";
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
             spyOn(scope, "onOrgUnitSelect");
@@ -63,7 +64,39 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             expect(scope.state).toEqual(undefined);
         });
 
-        it("should fetch and display organisation units for msfadmin", function() {
+        it("should fetch and display all countries for superadmin when productKeylevel is country", function() {
+            rootScope.productKeyLevel = "country";
+            rootScope.allowedOrgUnits = [{
+                "id": 1
+            }];
+            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+
+            spyOn(scope, "onOrgUnitSelect");
+            scope.$apply();
+
+            var expectedOrgUnitTree = [{
+                "id": "1",
+                "level": 1,
+                "children": [{
+                    "id": "2",
+                    "level": 2,
+                    "parent": {
+                        "id": "1"
+                    },
+                    "children": [],
+                    "selected": false,
+                    "collapsed": true
+                }],
+                "selected": false,
+                "collapsed": true
+            }];
+            expect(orgUnitRepository.getOrgUnitAndDescendants).toHaveBeenCalledWith(4, 1);
+            expect(scope.organisationUnits).toEqual(expectedOrgUnitTree);
+            expect(scope.onOrgUnitSelect).not.toHaveBeenCalled();
+            expect(scope.state).toEqual(undefined);
+        });
+
+        it("should fetch and display organisation units for projectadmin", function() {
             var orgunits = [{
                 "id": "3",
                 "level": 3,
@@ -83,6 +116,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                     "id": "4"
                 }
             }];
+            rootScope.productKeyLevel = "country";
             orgUnitRepository.getOrgUnitAndDescendants.and.returnValue(utils.getPromise(q, orgunits));
 
             rootScope.currentUser = {
@@ -93,6 +127,11 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
                     "id": "3"
                 }
             };
+
+            rootScope.allowedOrgUnits = [{
+                "id" : "3",
+                "children" : []
+            }];
 
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
 
@@ -285,6 +324,61 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
 
             expect(scope.templateUrl.split('?')[0]).toEqual('templates/partials/module-form.html');
             expect(scope.isNewMode).toEqual(false);
+        });
+
+        it("should redirect to project preference if project user logged in using global product key and user hadn't selected a project", function(){
+            spyOn(location,"path");
+
+            rootScope.currentUser = {
+                "userCredentials": {
+                    "username": "projectadmin"
+                },
+                "selectedProject": undefined
+            };
+
+            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+
+            scope.$apply();
+
+            expect(location.path).toHaveBeenCalledWith("/selectProjectPreference");
+        });
+
+        it("should redirect to project preference page if user selected project is not in allowed projects",function(){
+            spyOn(location,"path");
+            rootScope.productKeyLevel = "country";
+            rootScope.currentUser = {
+                "userCredentials": {
+                    "username": "projectadmin"
+                },
+                "selectedProject": "123"
+            };
+
+            rootScope.allowedOrgUnits = [{
+                "id" : "3",
+                "children" : [{"id":"4"}]
+            }];
+
+            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+
+            scope.$apply();
+
+            expect(location.path).toHaveBeenCalledWith("/selectProjectPreference");
+        });
+
+        it("should redirect to project preference page if user selected project is not in allowed projects",function(){
+            spyOn(location,"path");
+            rootScope.currentUser = {
+                "userCredentials": {
+                    "username": "projectadmin"
+                },
+                "selectedProject": "123"
+            };
+
+            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+
+            scope.$apply();
+
+            expect(location.path).toHaveBeenCalledWith("/selectProjectPreference");
         });
     });
 });

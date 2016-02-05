@@ -41,7 +41,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                     "userCredentials": {
                         "username": username,
                         "userRoles": [{
-                            "name": "Superuser"
+                            "name": "Superadmin"
                         }]
                     },
                     "organisationUnits": [{
@@ -71,7 +71,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                     "username": "project_user",
                     "password": "caa63a86bbc63b2ae67ef0a069db7fb9",
                     "userRoles": [{
-                        "name": "data entry"
+                        "name": "Coordination Level Approver"
                     }]
                 });
             });
@@ -93,6 +93,86 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
 
             loginController = new LoginController(rootScope, scope, location, db, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository);
         }));
+
+        it("should set invalid access as true when their is project level product key and there is no common org unit", function() {
+            scope.username = "superadmin";
+            scope.password = "msfsuperadmin";
+
+            systemSettingRepository.getProductKeyLevel.and.returnValue("project");
+            systemSettingRepository.getAllowedOrgUnits.and.returnValue([{"id" : 22}]);
+
+            scope.login();
+            scope.$apply();
+
+            expect(scope.invalidAccess).toEqual(true);
+        });
+
+        it("should set invalid access as false when their is project level product key and there is common org unit", function() {
+            scope.username = "superadmin";
+            scope.password = "msfsuperadmin";
+
+            systemSettingRepository.getProductKeyLevel.and.returnValue("project");
+            systemSettingRepository.getAllowedOrgUnits.and.returnValue([{"id" : 123}]);
+
+            scope.login();
+            scope.$apply();
+
+            expect(scope.invalidAccess).toEqual(false);
+        });
+
+        it("should set invalid access as true when their is country level product key and there is no common org unit for coordinator level approver", function() {
+            scope.username = "project_user";
+            scope.password = "msfuser";
+
+            fakeUserStoreSpy.and.callFake(function(username) {
+                return utils.getPromise(q, {
+                    "id": "xYRvx4y7Gm9",
+                    "userCredentials": {
+                        "username": username,
+                        "userRoles": [{
+                            "name": "Coordination Level Approver"
+                        }]
+                    },
+                    "organisationUnits": [{
+                        "id": 123
+                    }]
+                });
+            });
+
+            systemSettingRepository.getProductKeyLevel.and.returnValue("country");
+            systemSettingRepository.getAllowedOrgUnits.and.returnValue([{"id" : 22}]);
+
+            scope.login();
+            scope.$apply();
+
+            expect(scope.invalidAccess).toEqual(true);
+        });
+
+        it("should set invalid access as false when their is country level product key and there is common org unit", function() {
+            scope.username = "superadmin";
+            scope.password = "msfsuperadmin";
+            orgUnitRepository.get.and.returnValue(utils.getPromise(q, {"parent": {"id": 123}}));
+            systemSettingRepository.getProductKeyLevel.and.returnValue("country");
+            systemSettingRepository.getAllowedOrgUnits.and.returnValue([{"id" : 123}]);
+
+            scope.login();
+            scope.$apply();
+
+            expect(scope.invalidAccess).toEqual(false);
+        });
+
+        it("should set invalid access as true when their is country level product key and there is no common org unit", function() {
+            scope.username = "superadmin";
+            scope.password = "msfsuperadmin";
+            orgUnitRepository.get.and.returnValue(utils.getPromise(q, {"parent": {"id": 12}}));
+            systemSettingRepository.getProductKeyLevel.and.returnValue("country");
+            systemSettingRepository.getAllowedOrgUnits.and.returnValue([{"id" : 123}]);
+
+            scope.login();
+            scope.$apply();
+
+            expect(scope.invalidAccess).toEqual(true);
+        });
 
         it("should login super admin user with valid credentials and redirect to orgUnits", function() {
             scope.username = "superadmin";
@@ -121,7 +201,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             expect(scope.invalidCredentials).toEqual(true);
         });
 
-        it("should login admin user with valid credentials and redirect to orgunits", function() {
+        it("should login project admin user with valid credentials and redirect to orgunits", function() {
             scope.username = "projectadmin";
             scope.password = "password";
 

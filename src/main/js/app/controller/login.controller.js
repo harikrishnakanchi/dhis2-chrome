@@ -46,7 +46,7 @@ define(["md5", "lodash"], function(md5, _) {
             if (isRole(user, "Superuser"))
                 return data;
 
-            var userOrgUnitIds = _.pluck(data[0].organisationUnits, "id");
+            var userOrgUnitIds = _.pluck(user.organisationUnits, "id");
             var allowedOrgUnitIds = _.pluck(systemSettingRepository.getAllowedOrgUnits(), "id");
             var productKeyLevel = systemSettingRepository.getProductKeyLevel();
 
@@ -60,24 +60,18 @@ define(["md5", "lodash"], function(md5, _) {
                 return $q.reject("User doesn’t have access to this Praxis instance.");
             }
 
-            if (productKeyLevel === 'global' && !isRole(user, "Superadmin")) {
-                $scope.invalidAccess = true;
-                return $q.reject("User doesn’t have access to this Praxis instance.");
-            }
-
-
             if (productKeyLevel === 'country' && !isRole(user, "Coordination Level Approver")) {
-                return orgUnitRepository.get(userOrgUnitIds[0]).then(function(project) {
-                    if (project.parent.id !== allowedOrgUnitIds[0]) {
-                        $scope.invalidAccess = true;
-                        return $q.reject("User doesn’t have access to this Praxis instance.");
-                    } else {
-                        $scope.invalidAccess = false;
-                        return data;
-                    }
-                });
+                if(!_.isEmpty(userOrgUnitIds))
+                    return orgUnitRepository.get(userOrgUnitIds[0]).then(function(project) {
+                        if (project.parent.id !== allowedOrgUnitIds[0]) {
+                            $scope.invalidAccess = true;
+                            return $q.reject("User doesn’t have access to this Praxis instance.");
+                        } else {
+                            $scope.invalidAccess = false;
+                            return data;
+                        }
+                    });
             }
-
             return data;
         };
 
@@ -137,7 +131,7 @@ define(["md5", "lodash"], function(md5, _) {
         $scope.login = function() {
             var loginUsername = $scope.username.toLowerCase();
             loadUserData(loginUsername)
-                // .then(verifyProductKeyInstance) required for next release
+                .then(verifyProductKeyInstance)
                 .then(authenticateUser)
                 .then(login)
                 .then(startProjectDataSync)
