@@ -28,12 +28,12 @@
                                     <span class="glyphicon dhis-status" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline &amp;&amp; !poorConnection, 'dhis-poor-connection': poorConnection, 'dhis-offline':!isDhisOnline}" ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
                                         || !isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.notConnectedNoPendingRequests || !isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.notConnectedWithPendingRequests}}"></span>
                                 </li>
-                                <li ng-show="isLoggedIn">
+                                <li>
                                     <div class="btn-group" dropdown>
                                         <button type="button" class="btn btn-link dropdown-toggle" dropdown-toggle ng-disabled="disabled">
                                             <span class="glyphicon glyphicon-align-justify" ng-attr-title="{{resourceBundle.menu}}"></span>
                                         </button>
-                                        <ul class="dropdown-menu" role="menu">
+                                        <ul class="dropdown-menu" role="menu" ng-if="isLoggedIn">
                                             <li ng-include="'templates/partials/download-data.html'"> </li>
                                             <li><a href="#/selectProjectPreference" ng-if="hasRoles(['Superuser'])" tabindex="-1">{{resourceBundle.changeProject}}</a></li>
                                             <li class="divider"></li>
@@ -42,6 +42,9 @@
                                             <li class="dropdown-submenu pull-left" ng-include="'templates/partials/select-language.html'"></li>
                                             <li class="divider"></li>
                                             <li><a ng-click="logout()" href="#/login" id="linkToLogout" tabindex="-1">{{ resourceBundle.logoutLabel }}</a></li>
+                                        </ul>
+                                        <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
+                                            <li><a href="#/productKeyPage" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
                                         </ul>
                                     </div>
                                 </li>

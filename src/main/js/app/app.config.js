@@ -148,6 +148,7 @@ require.config({
         "zipUtils": "app/utils/zip.utils",
         "cipherUtils": "app/utils/cipher.utils",
         "appSettingsUtils": "app/utils/app.settings.utils",
+        "authenticationUtils": "app/utils/authentication.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",
