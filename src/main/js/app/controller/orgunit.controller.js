@@ -1,7 +1,9 @@
 define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment, properties) {
     return function($scope, $q, $location, $timeout, $anchorScroll, $rootScope, orgUnitRepository) {
 
-        var templateUrlMap = {
+        var userIsProjectAdmin,
+            userIsSuperAdmin,
+            templateUrlMap = {
             'Company': 'templates/partials/company-form.html',
             'Operational Center': 'templates/partials/oc-form.html',
             'Country': 'templates/partials/country-form.html',
@@ -15,15 +17,6 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         $scope.organisationUnits = [];
-
-
-        var isSuperAdmin = function() {
-            return $rootScope.currentUser.userCredentials.username === "superadmin";
-        };
-
-        var isProjectAdmin = function() {
-            return $rootScope.currentUser.userCredentials.username === "projectadmin";
-        };
 
         var getUserSelectedProjectId = function() {
             if($rootScope.currentUser.selectedProject)
@@ -52,15 +45,15 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
             };
 
             var getOrgUnits = function() {
-                if (isSuperAdmin() && $rootScope.productKeyLevel == "global")
+                if (userIsSuperAdmin && $rootScope.productKeyLevel == "global")
                     return orgUnitRepository.getOrgUnitAndDescendants(4);
 
-                if (isSuperAdmin() && $rootScope.productKeyLevel == "country") {
+                if (userIsSuperAdmin && $rootScope.productKeyLevel == "country") {
                     var countryId = $rootScope.allowedOrgUnits[0].id;
                     return orgUnitRepository.getOrgUnitAndDescendants(4, countryId);
                 }
 
-                if (isProjectAdmin()) {
+                if (userIsProjectAdmin) {
                     var orgUnitId = getUserSelectedProjectId();
                     return orgUnitRepository.getOrgUnitAndDescendants(6, orgUnitId);
                 }
@@ -71,26 +64,24 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         var init = function() {
+            userIsSuperAdmin = $rootScope.currentUser.userCredentials.username === "superadmin";
+            userIsProjectAdmin = $rootScope.currentUser.userCredentials.username === "projectadmin";
+
             var getAllAllowedOrgunitIds = function() {
                 return _.flatten(_.union(_.pluck($rootScope.allowedOrgUnits[0].children,"id"), _.pluck($rootScope.allowedOrgUnits, "id")));
             };
 
-            var isGlobalProductKey = function() {
-                return $rootScope.productKeyLevel == "global";
-            };
-
-            var isSelectedProjectInAllowedOrgUnits = function() {
-                if (_.isUndefined($rootScope.currentUser.selectedProject) || isGlobalProductKey())
+            var selectedProjectIsInAllowedOrgUnits = function() {
+                if($rootScope.productKeyLevel == "global")
                     return true;
-
-                return !_.contains(getAllAllowedOrgunitIds(), getUserSelectedProjectId());
+                return _.contains(getAllAllowedOrgunitIds(), getUserSelectedProjectId());
             };
 
-            if (isProjectAdmin() && isSelectedProjectInAllowedOrgUnits()) {
+            var userHasNotSelectedProject = _.isUndefined($rootScope.currentUser.selectedProject);
+            if (userIsProjectAdmin && (userHasNotSelectedProject || !selectedProjectIsInAllowedOrgUnits())) {
                 $location.path("/selectProjectPreference");
                 return;
             }
-
             var selectedNodeId = $location.hash()[0];
 
             reloadTree(selectedNodeId);

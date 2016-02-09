@@ -365,13 +365,30 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             expect(location.path).toHaveBeenCalledWith("/selectProjectPreference");
         });
 
-        it("should redirect to project preference page if user selected project is not in allowed projects",function(){
+        it("should not redirect if user has a global product key",function(){
             spyOn(location,"path");
+            rootScope.productKeyLevel = "global";
             rootScope.currentUser = {
                 "userCredentials": {
                     "username": "projectadmin"
                 },
                 "selectedProject": "123"
+            };
+
+            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+
+            scope.$apply();
+
+            expect(location.path).not.toHaveBeenCalled();
+        });
+
+        it("should redirect if user has a global product key but no project is selected",function(){
+            spyOn(location,"path");
+            rootScope.productKeyLevel = "global";
+            rootScope.currentUser = {
+                "userCredentials": {
+                    "username": "projectadmin"
+                }
             };
 
             orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
