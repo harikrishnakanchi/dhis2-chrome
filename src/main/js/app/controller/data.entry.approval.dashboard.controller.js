@@ -209,7 +209,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                             "moduleId": module.id,
                             "moduleName": module.parent.name + " - " + module.name,
                             "period": period,
-                            "isSubmitted": submittedData[period + module.id] && submittedData[period + module.id].isSubmitted || submittedEventsData[period + module.id] && submittedEventsData[period + module.id].isSubmitted || false,
+                            "isSubmitted": submittedData[period + module.id] && submittedData[period + module.id].isSubmitted && submittedData[period + module.id].localStatus != 'FAILED_TO_SYNC' || submittedEventsData[period + module.id] && submittedEventsData[period + module.id].isSubmitted || false,
                             "isComplete": approvalData[period + module.id] && approvalData[period + module.id].isComplete || false,
                             "isApproved": approvalData[period + module.id] && approvalData[period + module.id].isApproved || false,
                             "isLineListService": isLineListService(module),
