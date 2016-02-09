@@ -1,25 +1,12 @@
 define(["md5", "lodash"], function(md5, _) {
-    return function($rootScope, $scope, $location, db, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository) {
+    return function($rootScope, $scope, $location, db, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository) {
         var loadUserData = function(loginUsername) {
-            var getUser = function(username) {
-                var userStore = db.objectStore("users");
-                return userStore.find(username);
-            };
-
-            var getUserCredentials = function(username) {
-                var userCredentialsStore = db.objectStore("localUserCredentials");
-
-                if (username === "superadmin" || username === "projectadmin")
-                    return userCredentialsStore.find(username);
-                else
-                    return userCredentialsStore.find("project_user");
-            };
-
             var getExistingUserProjects = function() {
                 return userPreferenceRepository.getCurrentProjects();
             };
-
-            return $q.all([getUser(loginUsername), getUserCredentials(loginUsername), getExistingUserProjects()]);
+            var user = userRepository.getUser(loginUsername);
+            var userCredentials = userRepository.getUserCredentials(loginUsername);
+            return $q.all([user, userCredentials, getExistingUserProjects()]);
         };
 
         var isRole = function(user, role) {
@@ -95,7 +82,6 @@ define(["md5", "lodash"], function(md5, _) {
                 $scope.invalidCredentials = true;
                 return $q.reject("Invalid credentials");
             }
-
             return data;
         };
 
