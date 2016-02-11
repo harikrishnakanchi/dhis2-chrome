@@ -1,5 +1,5 @@
 define(["md5", "lodash"], function(md5, _) {
-    return function($rootScope, $scope, $location, db, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository) {
+    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository) {
         var loadUserData = function(loginUsername) {
             var getExistingUserProjects = function() {
                 return userPreferenceRepository.getCurrentProjects();
