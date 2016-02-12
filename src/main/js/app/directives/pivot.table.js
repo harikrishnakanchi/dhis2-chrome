@@ -6,7 +6,7 @@ define([], function() {
                 definition: "="
             },
             controller: 'pivotTableController',
-            templateUrl: "templates/pivot.table.html"
+            templateUrl: "templates/pivot-table/pivot.table.html"
         };
     };
 });

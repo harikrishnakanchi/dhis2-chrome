@@ -6,7 +6,7 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController", "resource
             app.directive("pivotTable", PivotTable);
             app.controller("pivotTableController", ['$scope', PivotTableController]);
             module("cc");
-            module("templates/pivot.table.html");
+            module("templates/pivot-table/pivot.table.html");
             tableDefinition = {
                 "name": "[fieldApp] ABC",
                 "columns": [{
@@ -229,11 +229,35 @@ define(["pivotTable", "angularMocks", "utils", "pivotTableController", "resource
             expect($scope.viewMap).toEqual([{
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1
+                dataElementIndex: 1,
+                sortKey_201410: 0,
+                sortKey_201411: 0,
+                sortKey_201412: 0,
+                sortKey_201501: 0,
+                sortKey_201502: 0,
+                sortKey_201503: 0,
+                sortKey_201504: 0,
+                sortKey_201505: 0,
+                sortKey_201506: 0,
+                sortKey_201507: 879538,
+                sortKey_201508: 717,
+                sortKey_201509: 0
             }, {
                 dataElement: 'a67aa742313',
                 dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 2
+                dataElementIndex: 2,
+                sortKey_201410: 0,
+                sortKey_201411: 0,
+                sortKey_201412: 0,
+                sortKey_201501: 0,
+                sortKey_201502: 0,
+                sortKey_201503: 0,
+                sortKey_201504: 0,
+                sortKey_201505: 0,
+                sortKey_201506: 0,
+                sortKey_201507: 20297,
+                sortKey_201508: 0,
+                sortKey_201509: 0
             }]);
         }));
 

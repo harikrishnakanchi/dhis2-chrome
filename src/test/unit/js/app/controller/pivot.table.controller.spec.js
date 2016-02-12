@@ -53,9 +53,9 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                 },
                 "rows": [
                     ["ab3a614eed1", "a0e7d3973e3", "201508", "215.0"],
-                    ["abf819dca06", "a67aa742313", "201507", "6433.0"],
-                    ["ab3a614eed1", "a67aa742313", "201507", "1772.0"],
                     ["abf819dca06", "a0e7d3973e3", "201508", "201.0"],
+                    ["ab3a614eed1", "a67aa742313", "201507", "1772.0"],
+                    ["abf819dca06", "a67aa742313", "201507", "6433.0"],
                     ["ab3a614eed1", "a0e7d3973e3", "201507", "1387.0"],
                     ["abf819dca06", "a0e7d3973e3", "201507", "264.0"]
                 ],
@@ -64,6 +64,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
 
             scope.definition = {
                 "name": "[FieldApp - NewConsultations] Consultations",
+                "sortOrder": 0,
                 "categoryDimensions": [{
                     "categoryOptions": [{
                         "id": "ab3a614eed1",
@@ -119,7 +120,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                 expect(scope.getHeaders()).toEqual(expected);
             });
 
-            it("should get data for csv file", function() {
+            it("should get data for csv file when categories are present", function() {
                 pivotTableController = new PivotTableController(scope, resourceBundleService);
                 scope.$apply();
                 var expectedDataValues = [{
@@ -146,6 +147,63 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
 
                 expect(scope.getData()).toEqual(expectedDataValues);
             });
+
+            it("should get data for csv file when categories are not present", function() {
+                scope.data = {
+                    "headers": [{
+                        "name": "dx",
+                        "column": "Data",
+                        "type": "java.lang.String",
+                        "hidden": false,
+                        "meta": true
+                    }, {
+                        "name": "pe",
+                        "column": "Period",
+                        "type": "java.lang.String",
+                        "hidden": false,
+                        "meta": true
+                    }, {
+                        "name": "value",
+                        "column": "Value",
+                        "type": "java.lang.Double",
+                        "hidden": false,
+                        "meta": false
+                    }],
+                    "metaData": {
+                        "pe": ["201508", "201509"],
+                        "names": {
+                            "dx": "Data",
+                            "a2cf79e8f13": "MSF",
+                            "201508": "August 2015",
+                            "201509": "September 2015",
+                            "a0e7d3973e3": "New Consultations - Consultations - Out Patient Department - Pediatric",
+                            "pe": "Period"
+                        }
+                    },
+                    "rows": [
+                        ["a0e7d3973e3", "201508", "215.0"],
+                        ["a0e7d3973e3", "201509", "45.0"]
+                    ],
+                    "width": 3
+                };
+
+                scope.definition = {
+                    "name": "[FieldApp - NewConsultations] Consultations",
+                    "dataElements": [{
+                        "id": "a0e7d3973e3",
+                        "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
+                    }]
+                };
+                pivotTableController = new PivotTableController(scope, resourceBundleService);
+                scope.$apply();
+                var expectedDataValues = [{
+                    "Data Element": 'New Consultations',
+                    "August 2015": 215,
+                    "September 2015": 45
+                }];
+
+                expect(scope.getData()).toEqual(expectedDataValues);
+            });
         });
 
         it("should get data element name", function() {
@@ -163,40 +221,50 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             var expectedViewMap = [{
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1
+                dataElementIndex: 1,
+                sortKey_201507: 1651,
+                sortKey_201508: 416
             }, {
                 dataElement: 'a67aa742313',
                 dataElementName: 'Follow-up Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 2
+                dataElementIndex: 2,
+                sortKey_201507: 8205,
+                sortKey_201508: 0
             }];
 
             var expectedHeaders = [{
                 showHeader: true,
                 headers: [{
                     period: '201507',
-                    name: 'July 2015'
+                    name: 'July 2015',
+                    sortKey: 'sortKey_201507'
                 }, {
                     period: '201508',
-                    name: 'August 2015'
+                    name: 'August 2015',
+                    sortKey: 'sortKey_201508'
                 }]
             }, {
                 showHeader: true,
                 headers: [{
                     period: '201507',
                     name: '1-23 months',
-                    category: 'ab3a614eed1'
+                    category: 'ab3a614eed1',
+                    sortKey: 'sortKey_201507'
                 }, {
                     period: '201507',
                     name: '24-59 months',
-                    category: 'abf819dca06'
+                    category: 'abf819dca06',
+                    sortKey: 'sortKey_201507'
                 }, {
                     period: '201508',
                     name: '1-23 months',
-                    category: 'ab3a614eed1'
+                    category: 'ab3a614eed1',
+                    sortKey: 'sortKey_201508'
                 }, {
                     period: '201508',
                     name: '24-59 months',
-                    category: 'abf819dca06'
+                    category: 'abf819dca06',
+                    sortKey: 'sortKey_201508'
                 }]
             }];
 
@@ -228,7 +296,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                     "meta": false
                 }],
                 "metaData": {
-                    "pe": ["201410", "201411", "201412", "201501", "201502", "201503", "201504", "201505", "201506", "201507", "201508", "201509"],
+                    "pe": ["201508", "201509"],
                     "names": {
                         "dx": "Data",
                         "a2cf79e8f13": "MSF",
@@ -238,7 +306,8 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                     }
                 },
                 "rows": [
-                    ["a0e7d3973e3", "201508", "215.0"]
+                    ["a0e7d3973e3", "201508", "215.0"],
+                    ["a0e7d3973e3", "201509", "45.0"]
                 ],
                 "width": 3
             };
@@ -258,7 +327,9 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             var expectedViewMap = [{
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1
+                dataElementIndex: 1,
+                sortKey_201508: 215,
+                sortKey_201509: 45
             }];
 
             expect(scope.viewMap).toEqual(expectedViewMap);
@@ -268,12 +339,6 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
         it("should populate viewmap and other scope variables on load when only one category is present", function() {
             scope.data = {
                 "headers": [{
-                    "name": "a1948a9c6f4",
-                    "column": "Surveillance",
-                    "type": "java.lang.String",
-                    "hidden": false,
-                    "meta": true
-                }, {
                     "name": "dx",
                     "column": "Data",
                     "type": "java.lang.String",
@@ -286,6 +351,12 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                     "hidden": false,
                     "meta": true
                 }, {
+                    "name": "a1948a9c6f4",
+                    "column": "Surveillance",
+                    "type": "java.lang.String",
+                    "hidden": false,
+                    "meta": true
+                }, {
                     "name": "value",
                     "column": "Value",
                     "type": "java.lang.Double",
@@ -293,7 +364,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                     "meta": false
                 }],
                 "metaData": {
-                    "pe": ["201410", "201411", "201412", "201501", "201502", "201503", "201504", "201505", "201506", "201507", "201508", "201509"],
+                    "pe": ["201410", "201411", "201412"],
                     "names": {
                         "dx": "Data",
                         "a2cf79e8f13": "MSF",
@@ -306,7 +377,9 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                     }
                 },
                 "rows": [
-                    ["ab3a614eed1", "a0e7d3973e3", "201508", "215.0"]
+                    ["a0e7d3973e3", "201410", "ab3a614eed1", "215.0"],
+                    ["a0e7d3973e3", "201411", "ab3a614eed1", "22.0"],
+                    ["a0e7d3973e3", "201412", "ab3a614eed1", "25.0"]
                 ],
                 "width": 4
             };
@@ -332,12 +405,45 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             var expectedViewMap = [{
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
-                sortOrder: 1
+                dataElementIndex: 1,
+                sortKey_201410: 215,
+                sortKey_201411: 22,
+                sortKey_201412: 25
             }];
 
             expect(scope.viewMap).toEqual(expectedViewMap);
             expect(scope.isCategoryPresent).toEqual(true);
             expect(scope.hasOnlyOneCategory).toEqual(true);
+        });
+
+        it("should find if the table is sortable", function () {
+            pivotTableController = new PivotTableController(scope, resourceBundleService);
+
+            expect(scope.isSortable()).toBeFalsy();
+
+            scope.definition.sortOrder = 2;
+            expect(scope.isSortable()).toBeTruthy();
+        });
+
+        it("should set sortOrder", function () {
+            pivotTableController = new PivotTableController(scope, resourceBundleService);
+
+            scope.definition.sortOrder = 2;
+
+            scope.sortByColumn('2015W02');
+            expect(scope.sortOrder).toEqual('sortKey_2015W02');
+
+            scope.sortByColumn('2015W03');
+            expect(scope.sortOrder).toEqual('sortKey_2015W03');
+
+            scope.sortByColumn('2015W03');
+            expect(scope.sortOrder).toEqual('dataElementIndex');
+
+            scope.sortByColumn('2015W04');
+            expect(scope.sortOrder).toEqual('sortKey_2015W04');
+
+            scope.sortByColumn();
+            expect(scope.sortOrder).toEqual('dataElementIndex');
         });
 
     });

@@ -1,0 +1,26 @@
+<table class='table table-bordered'>
+    <thead>
+    <tr class="cursorPointer" ng-repeat="header in headersForTable" ng-show="header.showHeader">
+        <th class="display-print" ng-click="sortByColumn()"></th>
+        <th ng-repeat="item in header.headers"
+            ng-show="periodBasedValues[item.period] !== 0"
+            ng-click="sortByColumn(item.period)"
+            ng-mouseover="periodHover = true"
+            ng-mouseout="periodHover = false"
+            colspan="{{ maxColumnsHeader.headers.length / header.headers.length}}">
+            <span>
+                {{ item.name }}
+                <span ng-class="{ 'invisible' : !($parent.$index == 0 && (periodHover || sortOrder == item.sortKey)) }">&#9660;</span>
+            </span>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="datum in viewMap | orderBy : sortOrder : true">
+        <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
+        <td ng-class="{ 'active' : sortOrder == item.sortKey }" ng-repeat="item in maxColumnsHeader.headers" ng-show="periodBasedValues[item.period] !== 0">
+            <span> {{getValue(item.category, datum.dataElement, item.period)}}</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
