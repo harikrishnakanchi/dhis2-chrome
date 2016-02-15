@@ -403,27 +403,27 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             expect(scope.hasOnlyOneCategory).toEqual(true);
         });
 
-        it("should set sortOrder", function () {
+        it("should set selectedSortKey", function () {
             scope.definition.sortAscending = false;
             scope.definition.sortDescending = true;
             scope.definition.sortable = true;
 
             pivotTableController = new PivotTableController(scope, rootScope);
 
-            scope.sortByColumn('2015W02');
-            expect(scope.sortOrder).toEqual('sortKey_2015W02');
+            scope.sortByColumn({sortKey: 'sortKey_2015W02'});
+            expect(scope.selectedSortKey).toEqual('sortKey_2015W02');
 
-            scope.sortByColumn('2015W03');
-            expect(scope.sortOrder).toEqual('sortKey_2015W03');
+            scope.sortByColumn({sortKey: 'sortKey_2015W03'});
+            expect(scope.selectedSortKey).toEqual('sortKey_2015W03');
 
-            scope.sortByColumn('2015W03');
-            expect(scope.sortOrder).toEqual('dataElementIndex');
+            scope.sortByColumn({sortKey: 'dataElementIndex'});
+            expect(scope.selectedSortKey).toEqual('dataElementIndex');
 
-            scope.sortByColumn('2015W04');
-            expect(scope.sortOrder).toEqual('sortKey_2015W04');
+            scope.sortByColumn({sortKey: 'sortKey_2015W04'});
+            expect(scope.selectedSortKey).toEqual('sortKey_2015W04');
 
             scope.sortByColumn();
-            expect(scope.sortOrder).toEqual('dataElementIndex');
+            expect(scope.selectedSortKey).toEqual('dataElementIndex');
         });
 
     });

@@ -1,7 +1,7 @@
 define(["lodash", "moment"], function(_, moment) {
     return function($scope, $rootScope) {
-
         $scope.resourceBundle = $rootScope.resourceBundle;
+        var DEFAULT_SORT_KEY = 'dataElementIndex';
 
         $scope.getCsvFileName = function() {
             var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
@@ -20,7 +20,7 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.getData = function() {
-            var sortedViewMap = _.sortBy($scope.viewMap, $scope.sortOrder);
+            var sortedViewMap = _.sortBy($scope.viewMap, $scope.selectedSortKey);
             if($scope.reverseSort()) {
                 sortedViewMap = sortedViewMap.reverse();
             }
@@ -74,26 +74,23 @@ define(["lodash", "moment"], function(_, moment) {
             return value;
         };
 
-        var defaultSortOrder = 'dataElementIndex';
-        $scope.sortOrder = defaultSortOrder;
+        $scope.selectedSortKey = DEFAULT_SORT_KEY;
 
         $scope.reverseSort = function () {
-            return $scope.definition.sortDescending && $scope.sortOrder != defaultSortOrder;
+            return $scope.definition.sortDescending && $scope.selectedSortKey != DEFAULT_SORT_KEY;
         };
 
-        $scope.sortByColumn = function (period) {
-            if(!$scope.definition.sortable) return;
-            if (period) {
-                period = 'sortKey_' + period;
-                $scope.sortOrder = $scope.sortOrder == period ? defaultSortOrder : period;
+        $scope.sortByColumn = function (subHeader) {
+            if (subHeader && $scope.selectedSortKey != subHeader.sortKey) {
+                $scope.selectedSortKey = subHeader.sortKey;
             } else {
-                $scope.sortOrder = defaultSortOrder;
+                $scope.selectedSortKey = DEFAULT_SORT_KEY;
             }
         };
 
-        var getSortOrder = function(dataElementId) {
-            var dataElementSortOrder = 0;
-            var sortedDataElements = [];
+        var getDefaultSortOrder = function(dataElementId) {
+            var dataElementSortOrder,
+                sortedDataElements = [];
 
             if (!_.isUndefined($scope.definition.dataDimensionItems)) {
                 _.each($scope.definition.dataDimensionItems, function(dimensionItem) {
@@ -203,27 +200,26 @@ define(["lodash", "moment"], function(_, moment) {
 
             _.each(dataElements, function(dataElementId) {
 
-                var periodsAndValues = {};
+                var sortKeysAndValues = {};
                 _.each($scope.periods, function (period) {
                     var filteredObjects = _.filter($scope.dataMap, function(data) {
                          return data.dataElement === dataElementId && data.period === period;
                     });
-                    period = 'sortKey_' + period;
                     var dataValues = _.map(filteredObjects, function (dataValue) {
                         return dataValue.value;
                     });
-                    periodsAndValues[period] = _.reduce(dataValues, function(previous, current) {
+                    sortKeysAndValues['sortKey_' + period] = _.reduce(dataValues, function(previous, current) {
                         return previous + current;
                     }, 0);
                 });
 
-                var viewMapIncludingPeriodsAndValues = _.merge({
+                var dataElementInfo = {
                     "dataElement": dataElementId,
                     "dataElementName": $scope.data.metaData.names[dataElementId],
-                    "dataElementIndex": getSortOrder(dataElementId)
-                }, periodsAndValues);
+                };
+                dataElementInfo[DEFAULT_SORT_KEY] = getDefaultSortOrder(dataElementId);
 
-                $scope.viewMap.push(viewMapIncludingPeriodsAndValues);
+                $scope.viewMap.push(_.merge(dataElementInfo, sortKeysAndValues));
             });
 
             $scope.maxColumnsHeader = _.last($scope.headersForTable);
