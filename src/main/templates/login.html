@@ -1,14 +1,14 @@
 <div class="login-form">
     <form name="loginForm" role="form" ng-submit="login()" class="form-horizontal">
-        <p class='alert alert-danger' ng-show='invalidCredentials' id="loginFailedMsg">{{resourceBundle.loginFailed}}</p>
-        <p class='alert alert-danger' ng-show='invalidAccess' id="invalidAccessMsg">{{resourceBundle.invalidAccess}}</p>
-        <p class='alert alert-danger' ng-show='disabledCredentials' id="userDisabledMsg">{{resourceBundle.disabledCredentials}}</p>
+        <p class='alert alert-danger' ng-show='invalidCredentials' id="loginFailedMsg">{{ resourceBundle.loginFailed }}</p>
+        <p class='alert alert-danger' ng-show='invalidAccess' id="invalidAccessMsg">{{ resourceBundle.invalidAccess }}</p>
+        <p class='alert alert-danger' ng-show='disabledCredentials' id="userDisabledMsg">{{ resourceBundle.disabledCredentials }}</p>
         <ul>
             <li class="form-group">
                 <label for="username" class="col-sm-4 control-label">{{ resourceBundle.usernameLabel }}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-8 col-md-8">
                     <input type="text" class="form-control" id="username" ng-model="username" placeholder="{{ resourceBundle.usernameLabel }}" autofocus required>
-                    <div class="col-sm-8">
+                </div>
             </li>
             <li class="form-group">
                 <label for="password" class="col-sm-4 control-label">{{ resourceBundle.passwordLabel }}</label>
@@ -23,4 +23,4 @@
             </li>
         </ul>
     </form>
-    </div>
+</div>
