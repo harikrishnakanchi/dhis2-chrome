@@ -20,7 +20,10 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.getData = function() {
-            var sortedViewMap = _.sortBy($scope.viewMap, "dataElementIndex");
+            var sortedViewMap = _.sortBy($scope.viewMap, $scope.sortOrder);
+            if($scope.reverseSort()) {
+                sortedViewMap = sortedViewMap.reverse();
+            }
             var dataValues = [];
             _.each(sortedViewMap, function(datum) {
                 if ($scope.isCategoryPresent) {
