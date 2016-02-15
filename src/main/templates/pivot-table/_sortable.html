@@ -18,7 +18,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="datum in viewMap | orderBy : selectedSortKey : reverseSort()">
+    <tr ng-repeat="datum in viewMap | orderBy : orderBySortKeys">
         <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
         <td ng-class="{ 'active' : selectedSortKey == subHeader.sortKey }" ng-repeat="subHeader in maxColumnsHeader.headers" ng-show="periodBasedValues[subHeader.period] !== 0">
             <span ng-class="{'font-bold':selectedSortKey==subHeader.sortKey}"> {{getValue(subHeader.category, datum.dataElement, subHeader.period)}}</span>

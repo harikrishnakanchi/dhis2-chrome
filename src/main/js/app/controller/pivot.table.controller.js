@@ -20,9 +20,12 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.getData = function() {
-            var sortedViewMap = _.sortBy($scope.viewMap, $scope.selectedSortKey);
-            if($scope.reverseSort()) {
-                sortedViewMap = sortedViewMap.reverse();
+            var sortedViewMap;
+            if($scope.selectedSortKey == DEFAULT_SORT_KEY) {
+                sortedViewMap = _.sortBy($scope.viewMap, DEFAULT_SORT_KEY);
+            } else {
+                var ascOrDesc = $scope.definition.sortAscending ? 'asc' : 'desc';
+                sortedViewMap = _.sortByOrder($scope.viewMap, [$scope.selectedSortKey, DEFAULT_SORT_KEY], [ascOrDesc, 'asc']);
             }
             var dataValues = [];
             _.each(sortedViewMap, function(datum) {
@@ -74,19 +77,17 @@ define(["lodash", "moment"], function(_, moment) {
             return value;
         };
 
-        $scope.selectedSortKey = DEFAULT_SORT_KEY;
-
-        $scope.reverseSort = function () {
-            return $scope.definition.sortDescending && $scope.selectedSortKey != DEFAULT_SORT_KEY;
-        };
-
         $scope.sortByColumn = function (subHeader) {
             if (subHeader && $scope.selectedSortKey != subHeader.sortKey) {
+                var sortKeyNegator = $scope.definition.sortAscending ? '+' : '-';
                 $scope.selectedSortKey = subHeader.sortKey;
+                $scope.orderBySortKeys = [sortKeyNegator + subHeader.sortKey, DEFAULT_SORT_KEY];
             } else {
                 $scope.selectedSortKey = DEFAULT_SORT_KEY;
+                $scope.orderBySortKeys = [DEFAULT_SORT_KEY];
             }
         };
+        $scope.sortByColumn();
 
         var getDefaultSortOrder = function(dataElementId) {
             var dataElementSortOrder,
