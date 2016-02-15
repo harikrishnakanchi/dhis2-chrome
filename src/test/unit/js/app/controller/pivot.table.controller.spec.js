@@ -65,6 +65,9 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             scope.definition = {
                 "name": "[FieldApp - NewConsultations] Consultations",
                 "sortOrder": 0,
+                "sortAscending": false,
+                "sortDescending": false,
+                "sortable": false,
                 "categoryDimensions": [{
                     "categoryOptions": [{
                         "id": "ab3a614eed1",
@@ -416,19 +419,12 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             expect(scope.hasOnlyOneCategory).toEqual(true);
         });
 
-        it("should find if the table is sortable", function () {
-            pivotTableController = new PivotTableController(scope, resourceBundleService);
-
-            expect(scope.isSortable()).toBeFalsy();
-
-            scope.definition.sortOrder = 2;
-            expect(scope.isSortable()).toBeTruthy();
-        });
-
         it("should set sortOrder", function () {
-            pivotTableController = new PivotTableController(scope, resourceBundleService);
+            scope.definition.sortAscending = false;
+            scope.definition.sortDescending = true;
+            scope.definition.sortable = true;
 
-            scope.definition.sortOrder = 2;
+            pivotTableController = new PivotTableController(scope, resourceBundleService);
 
             scope.sortByColumn('2015W02');
             expect(scope.sortOrder).toEqual('sortKey_2015W02');

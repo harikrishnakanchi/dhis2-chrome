@@ -74,12 +74,12 @@ define(["lodash", "moment"], function(_, moment) {
         var defaultSortOrder = 'dataElementIndex';
         $scope.sortOrder = defaultSortOrder;
 
-        $scope.isSortable = function() {
-            return $scope.definition.sortOrder !== 0;
+        $scope.reverseSort = function () {
+            return $scope.definition.sortDescending && $scope.sortOrder != defaultSortOrder;
         };
 
         $scope.sortByColumn = function (period) {
-            if(!$scope.isSortable()) return;
+            if(!$scope.definition.sortable) return;
             if (period) {
                 period = 'sortKey_' + period;
                 $scope.sortOrder = $scope.sortOrder == period ? defaultSortOrder : period;

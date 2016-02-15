@@ -20,9 +20,18 @@ define(["lodash"], function(_) {
             return store.upsert(pivotTableDataItem);
         };
 
+        var addSortVars = function(pivotTables) {
+            _.each(pivotTables,function(eachPivotTable){
+                eachPivotTable.sortAscending = eachPivotTable.sortOrder == 1;
+                eachPivotTable.sortDescending = eachPivotTable.sortOrder == 2;
+                eachPivotTable.sortable = eachPivotTable.sortAscending || eachPivotTable.sortDescending;
+            });
+            return pivotTables;
+        };
+
         this.getAll = function(pivotTables) {
             var store = db.objectStore(pivotTableObjectStoreName);
-            return store.getAll();
+            return store.getAll().then(addSortVars);
         };
 
         this.getDataForPivotTable = function(pivotTableName, orgUnitId) {

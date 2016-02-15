@@ -3,7 +3,7 @@
         {{resourceBundle.exportAsCsv}}
     </button>
     <div class="scroll-horizontal m-top-30">
-        <ng-include ng-if="isSortable()" src="'templates/pivot-table/_sortable.html'"></ng-include>
-        <ng-include ng-if="!isSortable()" src="'templates/pivot-table/_unsortable.html'"></ng-include>
+        <ng-include ng-if="definition.sortable" src="'templates/pivot-table/_sortable.html'"></ng-include>
+        <ng-include ng-if="!definition.sortable" src="'templates/pivot-table/_unsortable.html'"></ng-include>
     </div>
 </div>
