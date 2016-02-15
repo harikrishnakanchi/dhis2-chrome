@@ -1,10 +1,11 @@
-define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "resourceBundleService"], function(mocks, lodash, moment, PivotTableController, timecop, ResourceBundleService) {
+define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], function(mocks, lodash, moment, PivotTableController, timecop) {
     describe("pivotTableControllerSpec", function() {
 
-        var scope, pivotTableController, resourceBundleService;
+        var scope, rootScope, pivotTableController;
 
         beforeEach(mocks.inject(function($rootScope) {
             scope = $rootScope.$new();
+            rootScope = $rootScope;
 
             Timecop.install();
             Timecop.freeze(new Date("2015-10-29T12:43:54.972Z"));
@@ -86,9 +87,8 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                 }]
             };
 
-            resourceBundleService = new ResourceBundleService();
-            spyOn(resourceBundleService, "getBundle").and.returnValue({});
-
+            pivotTableController = new PivotTableController(scope, rootScope);
+            scope.$apply();
         }));
 
         afterEach(function() {
@@ -98,24 +98,16 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
 
 
         describe("Export as csv", function() {
-
             it("should get csv file name in expected format", function() {
-                pivotTableController = new PivotTableController(scope, resourceBundleService);
-                scope.$apply();
-
                 expect(scope.getCsvFileName()).toEqual("NewConsultations_Consultations_29-Oct-2015.csv");
             });
 
             it("should get headers if category is present", function() {
-                pivotTableController = new PivotTableController(scope, resourceBundleService);
-                scope.$apply();
                 var expected = ['Data Element', 'Category', 'July 2015', 'August 2015'];
-
                 expect(scope.getHeaders()).toEqual(expected);
             });
 
             it("should get headers if category not present", function() {
-                pivotTableController = new PivotTableController(scope, resourceBundleService);
                 scope.isCategoryPresent = false;
                 scope.$apply();
                 var expected = ['Data Element', 'July 2015', 'August 2015'];
@@ -124,8 +116,6 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             });
 
             it("should get data for csv file when categories are present", function() {
-                pivotTableController = new PivotTableController(scope, resourceBundleService);
-                scope.$apply();
                 var expectedDataValues = [{
                     "Data Element": 'New Consultations',
                     "Category": '1-23 months',
@@ -197,7 +187,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                         "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
                     }]
                 };
-                pivotTableController = new PivotTableController(scope, resourceBundleService);
+                pivotTableController = new PivotTableController(scope, rootScope);
                 scope.$apply();
                 var expectedDataValues = [{
                     "Data Element": 'New Consultations',
@@ -210,8 +200,6 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
         });
 
         it("should get data element name", function() {
-            pivotTableController = new PivotTableController(scope, resourceBundleService);
-            scope.$apply();
             var dataElementName = "FieldApp - test";
             var actualdataelementName = scope.getDataElementName(dataElementName);
 
@@ -219,8 +207,6 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
         });
 
         it("should populate viewmap and other scope variables on load when categories are present", function() {
-            pivotTableController = new PivotTableController(scope, resourceBundleService);
-            scope.$apply();
             var expectedViewMap = [{
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
@@ -323,8 +309,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                 }]
             };
 
-            pivotTableController = new PivotTableController(scope, resourceBundleService);
-
+            pivotTableController = new PivotTableController(scope, rootScope);
             scope.$apply();
 
             var expectedViewMap = [{
@@ -401,8 +386,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                 }]
             };
 
-            pivotTableController = new PivotTableController(scope, resourceBundleService);
-
+            pivotTableController = new PivotTableController(scope, rootScope);
             scope.$apply();
 
             var expectedViewMap = [{
@@ -424,7 +408,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
             scope.definition.sortDescending = true;
             scope.definition.sortable = true;
 
-            pivotTableController = new PivotTableController(scope, resourceBundleService);
+            pivotTableController = new PivotTableController(scope, rootScope);
 
             scope.sortByColumn('2015W02');
             expect(scope.sortOrder).toEqual('sortKey_2015W02');

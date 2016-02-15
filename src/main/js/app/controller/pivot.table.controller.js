@@ -1,7 +1,7 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, resourceBundleService) {
+    return function($scope, $rootScope) {
 
-        $scope.resourceBundle = resourceBundleService.getBundle();
+        $scope.resourceBundle = $rootScope.resourceBundle;
 
         $scope.getCsvFileName = function() {
             var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
