@@ -3,7 +3,11 @@ define(["lodash"], function (_) {
         return {
             restrict: 'A',
             link: function (scope, elem) {
-                var getOriginalHeaderCellWidths = function (originalHeader) {
+                var table = elem[0],
+                    originalHeader = table.querySelector('thead'),
+                    fixedHeader;
+
+                var getOriginalHeaderCellWidths = function () {
                     var headerCells = originalHeader.getElementsByTagName('th'),
                         cellWidths = [];
 
@@ -14,52 +18,58 @@ define(["lodash"], function (_) {
                     return cellWidths;
                 };
 
-                var setFixedHeaderCellWidths = function (fixedHeader, cellWidths) {
-                    var headerCells = fixedHeader.getElementsByTagName('th');
+                var setFixedHeaderWidth = function () {
+                    var cellWidths = getOriginalHeaderCellWidths(),
+                        headerCells = fixedHeader.getElementsByTagName('th');
 
                     for (var i = 0; i < headerCells.length; i++) {
-                        console.log(headerCells[i]);
-                        console.log(cellWidths[i]);
                         headerCells[i].style.width = cellWidths[i] + "px";
                     }
                 };
 
-                var generateFixedHeader = function (originalHeader) {
-                    var fixedHeader = angular.element(originalHeader).clone()[0];
+                var generateFixedHeader = function () {
+                    fixedHeader = angular.element(originalHeader).clone()[0];
                     fixedHeader.style = 'position: fixed; top: 0; margin-left: -1px; visibility: hidden; will-change: top;';
-                    setFixedHeaderCellWidths(fixedHeader, getOriginalHeaderCellWidths(originalHeader));
-                    return fixedHeader;
                 };
 
-                var setupFixedHeader = function (table) {
-                    var originalHeader = table.getElementsByTagName('thead')[0],
-                        fixedHeader = generateFixedHeader(originalHeader);
-                    table.appendChild(fixedHeader);
-                    angular.element($window).bind('scroll', function (event) {
-                        if (table.getBoundingClientRect().top <= 0 && table.getBoundingClientRect().bottom > 2 * originalHeader.getBoundingClientRect().height) {
+                var setFixedHeaderVisibility = function () {
+                    var tableTopIsAboveScreen = table.getBoundingClientRect().top <= 0,
+                        tableBottomIsAboveScreen = table.getBoundingClientRect().bottom <= 0,
+                        onlyFixedHeaderIsVisible = table.getBoundingClientRect().bottom < fixedHeader.getBoundingClientRect().height;
+
+                    if (tableTopIsAboveScreen && !tableBottomIsAboveScreen) {
+                        if (fixedHeader.style.visibility == 'hidden') {
+                            setFixedHeaderWidth();
                             fixedHeader.style.visibility = 'visible';
+                        }
+                        if (onlyFixedHeaderIsVisible) {
+                            fixedHeader.style.top = (table.getBoundingClientRect().bottom - fixedHeader.getBoundingClientRect().height) + 'px';
                         } else {
-                            fixedHeader.style.visibility = 'hidden';
+                            fixedHeader.style.top = '0px';
                         }
-                    });
+                    } else {
+                        fixedHeader.style.visibility = 'hidden';
+                    }
                 };
 
-                var init = function () {
-                    var table = elem[0];
-                    var unwatch = scope.$watch(function () {
-                        return table.getBoundingClientRect().height;
-                    }, function (tableHeight) {
-                        if (tableHeight > 0) {
-                            // timeout for accordion to complete the open animation
-                            $timeout(function () {
-                                setupFixedHeader(table);
-                            }, 500);
-                            unwatch();
-                        }
-                    });
+                var setupFixedHeader = function () {
+                    generateFixedHeader();
+                    setFixedHeaderWidth();
+                    setFixedHeaderVisibility();
+                    table.appendChild(fixedHeader);
+                    angular.element($window).bind('scroll', setFixedHeaderVisibility);
+                    angular.element($window).bind('resize', setFixedHeaderWidth);
                 };
 
-                init();
+                var unwatch = scope.$watch(function () {
+                    return table.getBoundingClientRect().height;
+                }, function (tableHeight) {
+                    if (tableHeight > 0) {
+                        // timeout for accordion to complete the open animation
+                        $timeout(setupFixedHeader, 500);
+                        unwatch();
+                    }
+                });
             }
         };
     };
