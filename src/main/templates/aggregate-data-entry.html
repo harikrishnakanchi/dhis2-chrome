@@ -37,7 +37,7 @@
                                             <span>{{ resourceBundle[section.id] || section.name}}</span>
                                             <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
                                         </accordion-heading>
-                                        <table class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
+                                        <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                             <thead>
                                                 <tr ng-repeat="category in section.headers track by $id(category)">
                                                     <th class="display-print" ng-if="$index===0">
@@ -48,9 +48,9 @@
                                                     <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
                                                         <span>{{resourceBundle[option.id] || option.name}}</span>
                                                     </th>
-                                                    <th ng-hide="$last" class="last-column">
+                                                    <th ng-if="!$last" class="last-column">
                                                     </th>
-                                                    <th ng-show="$last" class="last-column">
+                                                    <th ng-if="$last" class="last-column">
                                                         {{ resourceBundle.totalLabel }}
                                                     </th>
                                                 </tr>

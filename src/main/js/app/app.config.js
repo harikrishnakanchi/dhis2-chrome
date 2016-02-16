@@ -158,7 +158,8 @@ require.config({
 
         //Directives
         "directives": "app/directives/directives",
-        "pivotTable": "app/directives/pivot.table"
+        "pivotTable": "app/directives/pivot.table",
+        "lockedTableHeader": "app/directives/locked.table.header"
     },
     shim: {
         "ng-i18n": {
