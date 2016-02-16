@@ -216,7 +216,7 @@ define(["lodash", "moment"], function(_, moment) {
 
                 var dataElementInfo = {
                     "dataElement": dataElementId,
-                    "dataElementName": $scope.data.metaData.names[dataElementId],
+                    "dataElementName": $scope.data.metaData.names[dataElementId]
                 };
                 dataElementInfo[DEFAULT_SORT_KEY] = getDefaultSortOrder(dataElementId);
 
