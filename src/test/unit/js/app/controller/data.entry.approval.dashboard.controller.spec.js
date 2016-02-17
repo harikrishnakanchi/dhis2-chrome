@@ -42,7 +42,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
 
                 dataRepository = new DataRepository();
-                spyOn(dataRepository, "getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, []));
+                spyOn(dataRepository, "getSubmittedDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, []));
 
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, []));
@@ -166,7 +166,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "children": []
                 }];
 
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q,modules));
 
@@ -257,7 +257,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "children": []
                 }];
 
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q,modules));
 
@@ -543,7 +543,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
 
                 dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
@@ -564,7 +564,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
 
@@ -595,7 +595,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
 
@@ -662,7 +662,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
                 orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, origins));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, eventDataValues));
 
                 dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
@@ -696,7 +696,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
 
@@ -744,7 +744,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, approvalData));
 
@@ -798,7 +798,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, approvalData));
 
@@ -852,7 +852,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, approvalData));
 

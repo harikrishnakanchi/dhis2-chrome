@@ -111,7 +111,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
         };
 
         var getDataSubmissionInfo = function(moduleIds, startPeriod, endPeriod) {
-            return dataRepository.getDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(data) {
+            return dataRepository.getSubmittedDataValuesForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function(data) {
 
                 var dataSubmissionInfo = _.map(data, function(datum) {
                     return {

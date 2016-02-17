@@ -358,7 +358,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
 
         });
 
-        it("should get dataValues for orgUnits within two periods", function(){
+        it("should get submitted dataValues for orgUnits within two periods", function(){
 
             var dataValues = [{
                 "orgUnit": "ou1",
@@ -385,12 +385,31 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
                     "clientLastUpdated": "2014-01-22T00:00:00.000"
                 }],
                 "localStatus": "SAVED"
+            }, {
+                "orgUnit": "ou1",
+                "period": "2016W02",
+                "dataValues": [{
+                    "period": '2016W02',
+                    "orgUnit": 'ou1',
+                    "dataElement": "DE2",
+                    "categoryOptionCombo": "COC2",
+                    "value": "5",
+                    "isDraft": true,
+                    "clientLastUpdated": "2014-01-22T00:00:00.000"
+                }, {
+                    "period": '2016W02',
+                    "orgUnit": 'ou1',
+                    "dataElement": "DE2",
+                    "categoryOptionCombo": "COC3",
+                    "value": "5",
+                    "clientLastUpdated": "2014-01-22T00:00:00.000"
+                }]
             }];
 
             mockStore.each.and.returnValue(utils.getPromise(q, dataValues));
 
             var actual;
-            dataRepository.getDataValuesForPeriodsOrgUnits("2016W01","2016W02",["ou1","ou2"]).then(function(data) {
+            dataRepository.getSubmittedDataValuesForPeriodsOrgUnits("2016W01","2016W02",["ou1","ou2"]).then(function(data) {
                 actual = data;
             });
 

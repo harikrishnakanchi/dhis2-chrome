@@ -93,12 +93,13 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
-        this.getDataValuesForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
+        this.getSubmittedDataValuesForPeriodsOrgUnits = function(startPeriod, endPeriod, orgUnits) {
             var store = db.objectStore("dataValues");
             var query = db.queryBuilder().$between(startPeriod, endPeriod).$index("by_period").compile();
             return store.each(query).then(function(dataValues) {
                 var filteredDV = _.filter(dataValues, function(dv) {
-                    return _.contains(orgUnits, dv.orgUnit) && dv.localStatus != 'SAVED';
+                    var hasSomeDraftValues = _.some(dv.dataValues, { isDraft: true });
+                    return _.contains(orgUnits, dv.orgUnit) && dv.localStatus != 'SAVED' && !hasSomeDraftValues;
                 });
                 return filteredDV;
             });
