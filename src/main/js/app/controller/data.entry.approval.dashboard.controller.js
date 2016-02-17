@@ -205,41 +205,53 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                     results = results.concat(_.times(weeksToDisplayStatus, function(n) {
                         var period = dateUtils.toDhisFormat(moment().subtract(weeksToDisplayStatus - n - 1, 'weeks'));
+                        var isNotSyncedToDhis = submittedData[period + module.id] && submittedData[period + module.id].localStatus == 'FAILED_TO_SYNC';
                         return {
                             "moduleId": module.id,
                             "moduleName": module.parent.name + " - " + module.name,
                             "period": period,
-                            "isSubmitted": submittedData[period + module.id] && submittedData[period + module.id].isSubmitted && submittedData[period + module.id].localStatus != 'FAILED_TO_SYNC' || submittedEventsData[period + module.id] && submittedEventsData[period + module.id].isSubmitted || false,
+                            "isSubmitted": submittedData[period + module.id] && submittedData[period + module.id].isSubmitted || submittedEventsData[period + module.id] && submittedEventsData[period + module.id].isSubmitted || false,
                             "isComplete": approvalData[period + module.id] && approvalData[period + module.id].isComplete || false,
                             "isApproved": approvalData[period + module.id] && approvalData[period + module.id].isApproved || false,
                             "isLineListService": isLineListService(module),
-                            "isNotSynced": submittedData[period + module.id] && submittedData[period + module.id].localStatus == 'FAILED_TO_SYNC' || false
+                            "isNotSynced": isNotSyncedToDhis || false
                         };
                     }));
                 });
 
                 $scope.dashboardData = _.sortByAll(results, "moduleName", "period");
 
-                $scope.itemsAwaitingSubmission = _.filter($scope.dashboardData, {
+                $scope.itemsAwaitingSubmission = _.union(_.filter($scope.dashboardData, {
                     'isSubmitted': false,
                     'isComplete': false,
                     'isApproved': false
-                });
+                }), _.filter($scope.dashboardData, {
+                    'isNotSynced': true
+                }));
 
                 $scope.itemsAwaitingApprovalAtUserLevel = [];
-                $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
+                $scope.itemsAwaitingApprovalAtOtherLevels = _.difference(_.filter($scope.dashboardData, {
                     'isSubmitted': true,
                     'isApproved': false
-                });
+                }), _.filter($scope.dashboardData, {
+                    'isNotSynced': true
+                }));
 
                 if ($rootScope.hasRoles(['Project Level Approver'])) {
                     $scope.itemsAwaitingApprovalAtUserLevel = _.filter($scope.dashboardData, {
                         'isSubmitted': true,
                         'isComplete': false
                     });
+
                     $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
                         'isSubmitted': true,
                         'isComplete': true,
+                        'isApproved': false
+                    });
+
+                    $scope.itemsAwaitingSubmission = _.filter($scope.dashboardData, {
+                        'isSubmitted': false,
+                        'isComplete': false,
                         'isApproved': false
                     });
                 }
@@ -253,6 +265,11 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                     $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
                         'isSubmitted': true,
                         'isComplete': false
+                    });
+                    $scope.itemsAwaitingSubmission = _.filter($scope.dashboardData, {
+                        'isSubmitted': false,
+                        'isComplete': false,
+                        'isApproved': false
                     });
                 }
             });

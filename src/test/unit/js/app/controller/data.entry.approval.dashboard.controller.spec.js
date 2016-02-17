@@ -87,7 +87,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 expect(scope.formatPeriods("2014W42")).toEqual(expectedPeriod);
             });
 
-            it("should include list of items in 'items awaiting submission' when items are not synced to dhis", function(){
+            it("should include list of items in 'items awaiting submission' when items are not synced to dhis for data entry user", function(){
                 var dataValues = [{
                     "orgUnit": "ou1",
                     "period": "2014W22",
@@ -175,7 +175,107 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 scope.$apply();
 
                 expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual([{moduleId: 'ou1', moduleName: 'opUnit1 - module 1', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: false}]);
-                expect(scope.itemsAwaitingSubmission).toEqual([{moduleId: 'ou2', moduleName: 'opUnit1 - module 2', period: '2014W22', isSubmitted: false, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: true}]);
+                expect(scope.itemsAwaitingSubmission).toEqual([{moduleId: 'ou2', moduleName: 'opUnit1 - module 2', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: true}]);
+            });
+
+            it("should include items that are not submitted in 'items awaiting submission' for project level user", function(){
+                var dataValues = [{
+                    "orgUnit": "ou1",
+                    "period": "2014W22",
+                    "dataValues": [{
+                        "period": '2016W01',
+                        "orgUnit": 'ou1',
+                        "dataElement": "DE2",
+                        "categoryOptionCombo": "COC2",
+                        "value": "2",
+                        "lastUpdated": "2014-01-15T00:00:00.000"
+                    }],
+                    "localStatus": "WAITING_TO_SYNC"
+                }, {
+                    "orgUnit": "ou2",
+                    "period": "2014W22",
+                    "dataValues": [{
+                        "period": '2016W02',
+                        "orgUnit": 'ou2',
+                        "dataElement": "DE2",
+                        "categoryOptionCombo": "COC2",
+                        "value": "4",
+                        "clientLastUpdated": "2014-01-22T00:00:00.000"
+                    }],
+                    "localStatus": "FAILED_TO_SYNC"
+                }];
+
+                var modules = [{
+                    "id": "ou1",
+                    "name": "module 1",
+                    "level": 6,
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }, {
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Module"
+                    }, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "false"
+                    }],
+                    "parent": {
+                        "id": "opUnit1",
+                        "name": "opUnit1"
+                    },
+                    "children": []
+                },{
+                    "id": "ou2",
+                    "name": "module 2",
+                    "level": 6,
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }, {
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Module"
+                    }, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "false"
+                    }],
+                    "parent": {
+                        "id": "opUnit1",
+                        "name": "opUnit1"
+                    },
+                    "children": []
+                }];
+
+                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q,modules));
+
+                rootScope.hasRoles.and.callFake(function(roles) {
+                    if (_.contains(roles, 'Project Level Approver'))
+                        return true;
+                    return false;
+                });
+
+                dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+
+                scope.$apply();
+
+                expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual([
+                    {moduleId: 'ou1', moduleName: 'opUnit1 - module 1', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: false},
+                    {moduleId: 'ou2', moduleName: 'opUnit1 - module 2', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: true}
+                ]);
+                expect(scope.itemsAwaitingSubmission).toEqual([]);
             });
 
             it("should select appropriate modules for approval for project level users", function() {
