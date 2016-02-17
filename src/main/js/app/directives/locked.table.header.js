@@ -52,11 +52,16 @@ define([], function () {
                     }
                 };
 
+                var appendHeaderToTable = function () {
+                    table.appendChild(fixedHeader);
+                    table.style.borderBottom = '0px';
+                };
+
                 var setupFixedHeader = function () {
                     generateFixedHeader();
                     setFixedHeaderWidth();
                     setFixedHeaderVisibility();
-                    table.appendChild(fixedHeader);
+                    appendHeaderToTable();
                     angular.element($window).bind('scroll', setFixedHeaderVisibility);
                     angular.element($window).bind('resize', setFixedHeaderWidth);
                 };
