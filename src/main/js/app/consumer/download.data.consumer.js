@@ -1,8 +1,6 @@
 define(["moment", "properties", "lodash", "dateUtils"], function(moment, properties, _, dateUtils) {
     return function(dataService, dataRepository, datasetRepository, userPreferenceRepository, $q, approvalDataRepository, mergeBy, changeLogRepository) {
 
-        var userProjectIds = [];
-
         this.run = function(message) {
             return datasetRepository.getAll().then(function(allDataSets) {
                 if (message.data.data.length === 0) {
@@ -25,7 +23,6 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
             });
 
         };
-
 
         var downloadMergeAndSave = function(orgUnitIds, allDataSets, periods, isMessageDataAvailable, lastUpdated) {
 
