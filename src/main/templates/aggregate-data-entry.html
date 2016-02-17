@@ -114,7 +114,7 @@
                                             <span>{{ resourceBundle[section.id] || section.name}}</span>
                                             <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
                                         </accordion-heading>
-                                        <table class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
+                                        <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                             <thead>
                                                 <tr ng-repeat="category in section.headers track by $id(category)">
                                                     <th class="display-print" ng-if="$index===0">

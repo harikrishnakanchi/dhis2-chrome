@@ -1,4 +1,4 @@
-define(["lodash"], function (_) {
+define([], function () {
     return function ($timeout, $window) {
         return {
             restrict: 'A',
