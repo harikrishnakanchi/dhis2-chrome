@@ -152,6 +152,48 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             }]);
         });
 
+        it("should save merged data values from localDB and DHIS and retain localStatus", function() {
+            var dataValuesFromLocalDbAndDHIS = [{
+                "period": '2014W20',
+                "orgUnit": 'company_0',
+                "localStatus": "WAITING_TO_SYNC",
+                "dataElement": "DE1",
+                "categoryOptionCombo": "COC1",
+                "value": "1",
+                "lastUpdated": "2014-05-20T00:00:00"
+            }, {
+                "period": '2014W20',
+                "orgUnit": 'company_0',
+                "dataElement": "DE2",
+                "categoryOptionCombo": "COC2",
+                "value": "2",
+                "lastUpdated": "2014-05-20T00:00:00"
+            }];
+
+            dataRepository.saveDhisData(dataValuesFromLocalDbAndDHIS);
+
+            expect(mockStore.upsert).toHaveBeenCalledWith([{
+                "period": "2014W20",
+                "orgUnit": "company_0",
+                "localStatus": "WAITING_TO_SYNC",
+                "dataValues": [{
+                    "period": '2014W20',
+                    "orgUnit": 'company_0',
+                    "dataElement": "DE1",
+                    "categoryOptionCombo": "COC1",
+                    "value": "1",
+                    "lastUpdated": "2014-05-20T00:00:00"
+                }, {
+                    "period": '2014W20',
+                    "orgUnit": 'company_0',
+                    "dataElement": "DE2",
+                    "categoryOptionCombo": "COC2",
+                    "value": "2",
+                    "lastUpdated": "2014-05-20T00:00:00"
+                }]
+            }]);
+        });
+
         it("should get the data values", function() {
 
             var dv1 = {
@@ -210,6 +252,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             mockStore.each.and.returnValue(utils.getPromise(q, [{
                 "orgUnit": "ou1",
                 "period": "2014W02",
+                "localStatus": "WAITING_TO_SYNC",
                 "dataValues": [{
                     "period": '2014W02',
                     "orgUnit": 'ou1',
@@ -221,6 +264,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             }, {
                 "orgUnit": "ou1",
                 "period": "2014W03",
+                "localStatus": "FAILED_TO_SYNC",
                 "dataValues": [{
                     "period": '2014W03',
                     "orgUnit": 'ou1',
@@ -253,6 +297,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             expect(actualDataValues).toEqual([{
                 "period": '2014W02',
                 "orgUnit": 'ou1',
+                "localStatus": "WAITING_TO_SYNC",
                 "dataElement": "DE2",
                 "categoryOptionCombo": "COC2",
                 "value": "2",
@@ -260,6 +305,7 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
             }, {
                 "period": '2014W03',
                 "orgUnit": 'ou1',
+                "localStatus": "FAILED_TO_SYNC",
                 "dataElement": "DE2",
                 "categoryOptionCombo": "COC2",
                 "value": "4",

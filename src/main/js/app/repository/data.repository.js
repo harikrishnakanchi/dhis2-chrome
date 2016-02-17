@@ -6,12 +6,20 @@ define(["lodash", "moment"], function(_, moment) {
             });
 
             var dataValueSetsAggregator = function(result, dataValues, tuple) {
-                var split = tuple.split(",");
+                var split = tuple.split(","),
+                    existingLocalStatus = null,
+                    dataValuesWithLocalStatus = _.filter(dataValues, function(dataValue){ return !_.isUndefined(dataValue.localStatus); });
+                if (!_.isEmpty(dataValuesWithLocalStatus)) {
+                    existingLocalStatus = _.first(dataValuesWithLocalStatus).localStatus;
+                    _.each(dataValuesWithLocalStatus, function(dataValue) {
+                        delete dataValue.localStatus;
+                    });
+                }
                 var dataValue = {
                     "period": split[0],
                     "dataValues": dataValues,
                     "orgUnit": split[1],
-                    "localStatus": localStatus
+                    "localStatus": existingLocalStatus || localStatus
                 };
                 result.push(dataValue);
             };
@@ -71,10 +79,17 @@ define(["lodash", "moment"], function(_, moment) {
             var store = db.objectStore("dataValues");
             var query = db.queryBuilder().$index("by_period").$in(periods).compile();
             return store.each(query).then(function(dataValues) {
-                var filteredDataValaues = _.filter(dataValues, function(dv) {
+                var filteredDataValues = _.filter(dataValues, function(dv) {
                     return _.contains(orgUnits, dv.orgUnit);
                 });
-                return _.flatten(_.pluck(filteredDataValaues, 'dataValues'));
+                _.each(filteredDataValues, function(dataValueBlock) {
+                    if(dataValueBlock.localStatus) {
+                        _.each(dataValueBlock.dataValues, function(dataValue) {
+                            dataValue.localStatus = dataValueBlock.localStatus;
+                        });
+                    }
+                });
+                return _.flatten(_.pluck(filteredDataValues, 'dataValues'));
             });
         };
 
