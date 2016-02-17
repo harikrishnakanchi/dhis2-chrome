@@ -1,7 +1,8 @@
 define([], function() {
     return {
         "dhis": {
-            "authHeader": "Basic YWRtaW46ZGlzdHJpY3Q="
+            "authHeader": "Basic YWRtaW46ZGlzdHJpY3Q=",
+            "productKeyLevel": "global"
         }
     };
 });

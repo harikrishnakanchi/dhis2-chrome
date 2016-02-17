@@ -70,8 +70,7 @@ define(["lodash", "cipherUtils", "properties"], function(_, cipherUtils, propert
 
         var getProductKeyLevel = function() {
             if (properties.devMode && _.isUndefined($rootScope.productKeyLevel))
-                return undefined;
-
+                $rootScope.productKeyLevel = properties.dhis.productKeyLevel;
             return $rootScope.productKeyLevel;
         };
 
