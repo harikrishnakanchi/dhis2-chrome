@@ -20,14 +20,16 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
             if ($rootScope.hasRoles(['Project Level Approver']))
                 itemsAwaitingApprovalAtUserLevel = _.filter($scope.dashboardData, {
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 });
 
             if ($rootScope.hasRoles(['Coordination Level Approver']))
                 itemsAwaitingApprovalAtUserLevel = _.filter($scope.dashboardData, {
                     'isSubmitted': true,
                     'isComplete': true,
-                    'isApproved': false
+                    'isApproved': false,
+                    'isNotSynced': false
                 });
 
             _.each(itemsAwaitingApprovalAtUserLevel, function(item) {
@@ -230,29 +232,24 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                 }));
 
                 $scope.itemsAwaitingApprovalAtUserLevel = [];
-                $scope.itemsAwaitingApprovalAtOtherLevels = _.difference(_.filter($scope.dashboardData, {
+                $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
                     'isSubmitted': true,
-                    'isApproved': false
-                }), _.filter($scope.dashboardData, {
-                    'isNotSynced': true
-                }));
+                    'isApproved': false,
+                    'isNotSynced': false
+                });
 
                 if ($rootScope.hasRoles(['Project Level Approver'])) {
                     $scope.itemsAwaitingApprovalAtUserLevel = _.filter($scope.dashboardData, {
                         'isSubmitted': true,
-                        'isComplete': false
+                        'isComplete': false,
+                        'isNotSynced': false
                     });
 
                     $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
                         'isSubmitted': true,
                         'isComplete': true,
-                        'isApproved': false
-                    });
-
-                    $scope.itemsAwaitingSubmission = _.filter($scope.dashboardData, {
-                        'isSubmitted': false,
-                        'isComplete': false,
-                        'isApproved': false
+                        'isApproved': false,
+                        'isNotSynced': false
                     });
                 }
 
@@ -260,16 +257,13 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                     $scope.itemsAwaitingApprovalAtUserLevel = _.filter($scope.dashboardData, {
                         'isSubmitted': true,
                         'isComplete': true,
-                        'isApproved': false
+                        'isApproved': false,
+                        'isNotSynced': false
                     });
                     $scope.itemsAwaitingApprovalAtOtherLevels = _.filter($scope.dashboardData, {
                         'isSubmitted': true,
-                        'isComplete': false
-                    });
-                    $scope.itemsAwaitingSubmission = _.filter($scope.dashboardData, {
-                        'isSubmitted': false,
                         'isComplete': false,
-                        'isApproved': false
+                        'isNotSynced': false
                     });
                 }
             });

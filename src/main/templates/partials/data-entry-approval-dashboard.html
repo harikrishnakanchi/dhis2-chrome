@@ -55,7 +55,7 @@
                         <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
                                 <a ng-href="{{getTemplateUrl(item)}}" ng-if="hasRoles(['Data entry user'])" ng-class="{ 'errorHref': item.isNotSynced }">{{formatPeriods(item.period)}}</a>
-                                <span ng-if="!hasRoles(['Data entry user'])">{{formatPeriods(item.period)}}</span>
+                                <span ng-if="!hasRoles(['Data entry user'])" ng-class="{ 'errorHref': item.isNotSynced }">{{formatPeriods(item.period)}}</span>
                             </li>
                         </ul>
                     </td>

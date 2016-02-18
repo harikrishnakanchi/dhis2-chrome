@@ -272,10 +272,11 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 scope.$apply();
 
                 expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual([
-                    {moduleId: 'ou1', moduleName: 'opUnit1 - module 1', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: false},
-                    {moduleId: 'ou2', moduleName: 'opUnit1 - module 2', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: true}
+                    { moduleId: 'ou1', moduleName: 'opUnit1 - module 1', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: false }
                 ]);
-                expect(scope.itemsAwaitingSubmission).toEqual([]);
+                expect(scope.itemsAwaitingSubmission).toEqual([
+                    { moduleId: 'ou2', moduleName: 'opUnit1 - module 2', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: true }
+                ]);
             });
 
             it("should select appropriate modules for approval for project level users", function() {
@@ -292,19 +293,22 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod1",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }];
 
                 scope.toggleSelectAll(true);
@@ -314,19 +318,22 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod1",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }]);
             });
 
@@ -344,19 +351,22 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod1",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }];
 
                 scope.toggleSelectAll(false);
@@ -366,19 +376,22 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": false
                 }, {
                     "moduleId": "mod1",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": false
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }]);
             });
 
@@ -396,20 +409,23 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }];
 
                 scope.toggleSelectAll(true);
@@ -418,13 +434,15 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
@@ -432,6 +450,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }]);
             });
@@ -450,20 +469,23 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }];
 
                 scope.toggleSelectAll(false);
@@ -472,13 +494,15 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": false
                 }, {
                     "moduleId": "mod2",
@@ -486,6 +510,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": false
                 }]);
             });
