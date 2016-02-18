@@ -2,10 +2,28 @@ define([], function () {
     return function ($timeout, $window) {
         return {
             restrict: 'A',
+            transclude: 'element',
+            replace: true,
+            templateUrl: 'templates/locked.table.header.html',
             link: function (scope, elem) {
-                var table = elem[0],
-                    originalHeader = table.querySelector('thead'),
+                var wrapperDiv = elem[0],
+                    originalTableDiv = elem.find('div')[0],
+                    originalTable = originalTableDiv.querySelector('table'),
+                    originalHeader = originalTable.querySelector('thead'),
+                    fixedHeaderDiv = elem.find('div')[1],
+                    fixedTable = document.createElement('table'),
                     fixedHeader;
+
+                var setStyles = function () {
+                    wrapperDiv.style.border = 'none';
+                    wrapperDiv.classList.remove('table');
+                    wrapperDiv.classList.remove('table-bordered');
+                    wrapperDiv.classList.remove('table-hover');
+
+                    fixedTable.classList.add('table');
+                    fixedTable.classList.add('table-bordered');
+                    fixedTable.style.border = 'none';
+                };
 
                 var getOriginalHeaderCellWidths = function () {
                     var headerCells = originalHeader.getElementsByTagName('th'),
@@ -24,50 +42,64 @@ define([], function () {
 
                     for (var i = 0; i < headerCells.length; i++) {
                         headerCells[i].style.width = cellWidths[i] + "px";
+                        headerCells[i].style.minWidth = cellWidths[i] + 'px';
                     }
                 };
 
                 var generateFixedHeader = function () {
                     fixedHeader = angular.element(originalHeader).clone()[0];
-                    fixedHeader.style = 'position: fixed; top: 0; margin-left: -1px; visibility: hidden; will-change: top;';
                 };
 
                 var setFixedHeaderVisibility = function () {
-                    var tableTopIsAboveScreen = table.getBoundingClientRect().top <= 0,
-                        tableBottomIsAboveScreen = table.getBoundingClientRect().bottom <= 0,
-                        onlyFixedHeaderIsVisible = table.getBoundingClientRect().bottom < fixedHeader.getBoundingClientRect().height;
+                    var tableTopIsAboveScreen = originalTable.getBoundingClientRect().top <= 0,
+                        tableBottomIsAboveScreen = originalTable.getBoundingClientRect().bottom <= 0,
+                        onlyFixedHeaderIsVisible = originalTable.getBoundingClientRect().bottom < fixedHeaderDiv.getBoundingClientRect().height;
 
                     if (tableTopIsAboveScreen && !tableBottomIsAboveScreen) {
-                        if (fixedHeader.style.visibility == 'hidden') {
+                        if (fixedHeaderDiv.style.visibility == 'hidden') {
                             setFixedHeaderWidth();
-                            fixedHeader.style.visibility = 'visible';
+                            fixedHeaderDiv.style.visibility = 'visible';
                         }
                         if (onlyFixedHeaderIsVisible) {
-                            fixedHeader.style.top = (table.getBoundingClientRect().bottom - fixedHeader.getBoundingClientRect().height) + 'px';
+                            fixedHeaderDiv.style.top = (originalTable.getBoundingClientRect().bottom - fixedHeaderDiv.getBoundingClientRect().height) + 'px';
                         } else {
-                            fixedHeader.style.top = '0px';
+                            fixedHeaderDiv.style.top = '0px';
                         }
                     } else {
-                        fixedHeader.style.visibility = 'hidden';
+                        fixedHeaderDiv.style.visibility = 'hidden';
                     }
                 };
 
-                var appendHeaderToTable = function () {
-                    table.appendChild(fixedHeader);
-                    table.style.borderBottom = '0px';
+                var appendFixedHeaderDivToWrapperDiv = function () {
+                    fixedTable.appendChild(fixedHeader);
+                    fixedHeaderDiv.appendChild(fixedTable);
+                    setFixedHeaderDivWidth();
+                };
+
+                var setFixedHeaderDivWidth = function () {
+                    fixedHeaderDiv.style.width = wrapperDiv.getBoundingClientRect().width + 'px';
+                };
+
+                var setUpListeners = function () {
+                    angular.element($window).bind('scroll', setFixedHeaderVisibility);
+                    angular.element($window).bind('resize', setFixedHeaderWidth);
+                    angular.element($window).bind('resize', setFixedHeaderDivWidth);
+                    angular.element(originalTableDiv).bind('scroll', function (event) {
+                        fixedHeaderDiv.scrollLeft = event.target.scrollLeft;
+                    });
                 };
 
                 var setupFixedHeader = function () {
+                    setStyles();
                     generateFixedHeader();
                     setFixedHeaderWidth();
                     setFixedHeaderVisibility();
-                    appendHeaderToTable();
-                    angular.element($window).bind('scroll', setFixedHeaderVisibility);
-                    angular.element($window).bind('resize', setFixedHeaderWidth);
+                    appendFixedHeaderDivToWrapperDiv();
+                    setUpListeners();
                 };
 
                 var unwatch = scope.$watch(function () {
-                    return table.getBoundingClientRect().height;
+                    return originalTable.getBoundingClientRect().height;
                 }, function (tableHeight) {
                     if (tableHeight > 0) {
                         // timeout for accordion to complete the open animation
