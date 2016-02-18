@@ -50,18 +50,18 @@ define([], function () {
                     fixedHeader = angular.element(originalHeader).clone()[0];
                 };
 
-                var setFixedHeaderVisibility = function () {
-                    var tableTopIsAboveScreen = originalTable.getBoundingClientRect().top <= 0,
-                        tableBottomIsAboveScreen = originalTable.getBoundingClientRect().bottom <= 0,
-                        onlyFixedHeaderIsVisible = originalTable.getBoundingClientRect().bottom < fixedHeaderDiv.getBoundingClientRect().height;
+                var setFixedHeaderDivVisibility = function () {
+                    var tableTopIsAboveScreen = originalTableDiv.getBoundingClientRect().top <= 0,
+                        tableBottomIsAboveScreen = originalTableDiv.getBoundingClientRect().bottom <= 0,
+                        onlyFixedHeaderDivIsVisible = originalTableDiv.getBoundingClientRect().bottom < fixedHeaderDiv.getBoundingClientRect().height;
 
                     if (tableTopIsAboveScreen && !tableBottomIsAboveScreen) {
                         if (fixedHeaderDiv.style.visibility == 'hidden') {
                             setFixedHeaderWidth();
                             fixedHeaderDiv.style.visibility = 'visible';
                         }
-                        if (onlyFixedHeaderIsVisible) {
-                            fixedHeaderDiv.style.top = (originalTable.getBoundingClientRect().bottom - fixedHeaderDiv.getBoundingClientRect().height) + 'px';
+                        if (onlyFixedHeaderDivIsVisible) {
+                            fixedHeaderDiv.style.top = (originalTableDiv.getBoundingClientRect().bottom - fixedHeaderDiv.getBoundingClientRect().height) + 'px';
                         } else {
                             fixedHeaderDiv.style.top = '0px';
                         }
@@ -81,7 +81,7 @@ define([], function () {
                 };
 
                 var setUpListeners = function () {
-                    angular.element($window).bind('scroll', setFixedHeaderVisibility);
+                    angular.element($window).bind('scroll', setFixedHeaderDivVisibility);
                     angular.element($window).bind('resize', setFixedHeaderWidth);
                     angular.element($window).bind('resize', setFixedHeaderDivWidth);
                     angular.element(originalTableDiv).bind('scroll', function (event) {
@@ -93,7 +93,7 @@ define([], function () {
                     setStyles();
                     generateFixedHeader();
                     setFixedHeaderWidth();
-                    setFixedHeaderVisibility();
+                    setFixedHeaderDivVisibility();
                     appendFixedHeaderDivToWrapperDiv();
                     setUpListeners();
                 };
