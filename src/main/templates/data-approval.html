@@ -6,11 +6,18 @@
         </div>
         <div ng-if="!isLineListModule &amp;&amp; !loading &amp;&amp; week &amp;&amp; selectedModule">
             <section class="panel tab-panel">
-                <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
-                <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
-                <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-                <div class="alert alert-danger" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver']) &amp;&amp; ((!isCompleted || !isSubmitted) &amp;&amp; hasRoles(['Coordination Level Approver'])) || (!isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) &amp;&amp; dataValues !== undefined">{{resourceBundle.noDataForApproval}}</div>
-                <div class="alert alert-info" ng-if="!isApproved  &amp;&amp; !isCompleted  &amp;&amp; !isSubmitted &amp;&amp; hasRoles(['Observer'])">{{resourceBundle.noDataAvailable}}</div>
+                <div ng-if="!syncError">
+                    <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
+                    <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
+                    <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
+                    <div class="alert alert-danger" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver']) &amp;&amp; ((!isCompleted || !isSubmitted) &amp;&amp; hasRoles(['Coordination Level Approver'])) || (!isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) &amp;&amp; dataValues !== undefined">{{resourceBundle.noDataForApproval}}</div>
+                    <div class="alert alert-info" ng-if="!isApproved  &amp;&amp; !isCompleted  &amp;&amp; !isSubmitted &amp;&amp; hasRoles(['Observer'])">{{resourceBundle.noDataAvailable}}</div>
+                </div>
+                <div ng-if="syncError">
+                    <div class="alert alert-danger" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
+                    <div class="alert alert-info" ng-if="hasRoles(['Observer'])">{{resourceBundle.noDataAvailable}}</div>
+                </div>
+
                 <form name="dataentryForm" id="dataentry" ng-if="showForm()">
                     <accordion close-others="false">
                         <div ng-class="'dataset-acc-wrapper'">

@@ -3,7 +3,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
     function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository) {
         describe("dataApprovalController ", function() {
             var scope, routeParams, q, location, anchorScroll, dataApprovalController, rootScope, approvalStore,
-                saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getApprovalDataSpy, getDataValuesSpy,
+                saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getApprovalDataSpy, getDataValuesSpy, getLocalStatusSpy,
                 orgUnits, window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2, geographicOrigins;
 
             beforeEach(module('hustle'));
@@ -147,6 +147,8 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 dataRepository = new DataRepository();
                 getDataValuesSpy = spyOn(dataRepository, "getDataValues");
                 getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
+                getLocalStatusSpy = spyOn(dataRepository, "getLocalStatus");
+                getLocalStatusSpy.and.returnValue(utils.getPromise(q, undefined));
 
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, []));
