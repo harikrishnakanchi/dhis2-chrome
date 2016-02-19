@@ -3,7 +3,7 @@ define(["lodash"], function(_) {
         createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTablesConsumer, downloadChartDataConsumer,
-        uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer) {
+        uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
@@ -24,6 +24,7 @@ define(["lodash"], function(_) {
                         .then(_.partial(downloadDataConsumer.run, message))
                         .then(_.partial(downloadApprovalConsumer.run, message))
                         .then(_.partial(downloadEventDataConsumer.run, message))
+                        .then(_.partial(downloadChartsConsumer.run, message))
                         .then(_.partial(downloadPivotTablesConsumer.run, message))
                         .then(_.partial(downloadChartDataConsumer.run, message))
                         .then(function() {
