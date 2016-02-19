@@ -100,24 +100,6 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             return $q.all(enrichReportPromises);
         };
 
-        this.getCharts = function(datasets) {
-
-            var getFieldAppCharts = function() {
-                var config = {
-                    params: {
-                        "filter": "name:like:[FieldApp - ",
-                        "paging": false,
-                    }
-                };
-
-                return $http.get(dhisUrl.charts, config).then(function(response) {
-                    return response.data ? filterAndMergeDatasetInfo(response.data.charts, datasets) : [];
-                });
-            };
-
-            return getFieldAppCharts().then(enrich);
-        };
-
         this.getPivotTables = function(datasets) {
 
             var getFieldAppPivotTables = function() {
