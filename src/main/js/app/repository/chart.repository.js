@@ -2,6 +2,7 @@ define(["lodash"], function(_) {
     return function(db, $q) {
         var CHART_STORE_NAME = 'charts';
         var CHART_DATA_STORE_NAME = 'chartData';
+        var FIELD_APP_DATASET_CODE_REGEX = /\[FieldApp - (.*)]/;
 
         this.upsert = function(charts) {
             var store = db.objectStore(CHART_STORE_NAME);
@@ -38,8 +39,16 @@ define(["lodash"], function(_) {
         };
 
         this.getAll = function() {
+            var parseDataSetCodes = function(allCharts) {
+                return _.map(allCharts, function(chart) {
+                    var matches = FIELD_APP_DATASET_CODE_REGEX.exec(chart.name);
+                    chart.dataSetCode = matches && matches[1];
+                    return chart;
+                });
+            };
+
             var store = db.objectStore(CHART_STORE_NAME);
-            return store.getAll();
+            return store.getAll().then(parseDataSetCodes);
         };
 
         this.getDataForChart = function(chartName, orgUnitId) {

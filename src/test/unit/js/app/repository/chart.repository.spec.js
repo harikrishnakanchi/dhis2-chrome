@@ -29,8 +29,33 @@ define(["chartRepository", "angularMocks", "utils", "lodash"], function(ChartRep
 
                 expect(mockStore.getAll).toHaveBeenCalled();
             });
-        });
 
+            it('should parse the dataSet code from the chart name', function() {
+                var allCharts = [{
+                    'id': 'chart1',
+                    'name': '[FieldApp - someDataSetCode] # Name'
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
+
+                chartRepository.getAll().then(function(chartsFromRepository) {
+                    expect(chartsFromRepository[0].dataSetCode).toEqual('someDataSetCode');
+                });
+                scope.$apply();
+            });
+
+            it('should leave the dataSet code as null if the chart name is malformed', function() {
+                var allCharts = [{
+                    'id': 'chart1',
+                    'name': 'some malformed chart name'
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allCharts));
+
+                chartRepository.getAll().then(function(chartsFromRepository) {
+                    expect(chartsFromRepository[0].dataSetCode).toBeNull();
+                });
+                scope.$apply();
+            });
+        });
         it('should upsert the charts', function() {
             var chartsToUpsert = [{
                 'id': 'newChartId',

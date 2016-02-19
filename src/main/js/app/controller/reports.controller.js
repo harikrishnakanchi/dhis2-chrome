@@ -217,7 +217,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
                     return {
                         "title": chart.title,
-                        "dataset": chart.dataset,
+                        "dataSetCode": chart.dataSetCode,
                         "type": chart.type,
                         "data": transformedChartData
                     };
@@ -312,7 +312,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             _.each($scope.datasets, function(eachDataSet) {
 
                 var filteredCharts = _.filter($scope.chartData, {
-                    "dataset": eachDataSet.id
+                    "dataSetCode": eachDataSet.code
                 });
 
                 var filteredPivotTables = _.filter($scope.pivotTables, {

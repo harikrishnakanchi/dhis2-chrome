@@ -155,16 +155,19 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
 
             var datasets = [{
                 "id": "ds1",
+                "code": "dataSetCode1",
                 "isOriginDataset": false,
                 "isPopulationDataset": false,
                 "isReferralDataset": false
             }, {
                 "id": "ds2",
                 "isOriginDataset": false,
+                "code": "dataSetCode2",
                 "isPopulationDataset": false,
                 "isReferralDataset": false
             }, {
                 "id": "ds3",
+                "code": "dataSetCode3",
                 "isOriginDataset": false,
                 "isPopulationDataset": false,
                 "isReferralDataset": false
@@ -173,17 +176,17 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             var charts = [{
                 "name": "chart1",
                 "title": "Title1",
-                "dataset": "ds1",
+                "dataSetCode": "dataSetCode1",
                 "type": "STACKED_COLUMN"
             }, {
                 "name": "chart2",
                 "title": "Title2",
-                "dataset": "ds2",
+                "dataSetCode": "dataSetCode2",
                 "type": "LINE"
             }, {
                 "name": "chart3 Notifications",
                 "title": "Title1",
-                "dataset": "ds1",
+                "dataSetCode": "dataSetCode1",
                 "type": "STACKED_COLUMN"
             }];
 
@@ -327,7 +330,7 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
 
             var expectedChartData = [{
                 "title": "Title1",
-                "dataset": "ds1",
+                "dataSetCode": "dataSetCode1",
                 "type": "STACKED_COLUMN",
                 "data": [{
                     "key": "5-14 years",
@@ -380,7 +383,7 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 }]
             }, {
                 "title": "Title2",
-                "dataset": "ds2",
+                "dataSetCode": "dataSetCode2",
                 "type": "LINE",
                 "data": [{
                     "key": "Total Consultations 1-23 months Pediatric OPD",
