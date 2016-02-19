@@ -3,13 +3,6 @@ define(["lodash"], function(_) {
         var CHART_STORE_NAME = 'charts';
         var CHART_DATA_STORE_NAME = 'chartData';
 
-        this.replaceAll = function(charts) {
-            var store = db.objectStore(CHART_STORE_NAME);
-            return store.clear().then(function() {
-                return store.upsert(charts);
-            });
-        };
-
         this.upsert = function(charts) {
             var store = db.objectStore(CHART_STORE_NAME);
             return store.upsert(charts);

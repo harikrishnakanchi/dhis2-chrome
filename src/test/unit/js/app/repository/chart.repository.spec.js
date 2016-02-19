@@ -11,19 +11,6 @@ define(["chartRepository", "angularMocks", "utils"], function(ChartRepository, m
             chartRepository = new ChartRepository(mockDB.db, q);
         }));
 
-        it('should save the charts', function() {
-            var charts = [{
-                'id': 'new chart id',
-                'title': 'The chart'
-            }];
-
-            chartRepository.replaceAll(charts);
-            scope.$apply();
-
-            expect(mockStore.clear).toHaveBeenCalled();
-            expect(mockStore.upsert).toHaveBeenCalledWith(charts);
-        });
-
         it('should upsert the charts', function() {
             var chartsToUpsert = [{
                 'id': 'newChartId',
