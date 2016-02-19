@@ -304,7 +304,54 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 "filters": []
             }]);
         });
+
+        describe('getAllCharts', function () {
+            it('should download field app charts modified since lastUpdated', function () {
+                var lastUpdatedTime = '2016-02-19T04:28:32.082Z';
+
+                reportService.getAllCharts(lastUpdatedTime).then(function (chartsFromService) {
+                    expect(chartsFromService).toEqual([chart1DetailsResponse, chart2DetailsResponse]);
+                });
+
+                var updatedChartsResponse = {
+                    'charts': [
+                        { 'id': 'chart1' },
+                        { 'id': 'chart2' }
+                    ]
+                };
+
+                var chart1DetailsResponse = {
+                    'id': 'chart1',
+                    'more': 'details',
+                    'rows': [],
+                    'columns': [],
+                    'filters': []
+                };
+
+                var chart2DetailsResponse = {
+                    'id': 'chart2',
+                    'more': 'details',
+                    'rows': [],
+                    'columns': [],
+                    'filters': []
+                };
+
+                var expectedQueryParamsForUpdatedCharts = 'fields=id&filter=name:like:%5BFieldApp+-+&filter=lastUpdated:gte:' + lastUpdatedTime + '&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForUpdatedCharts).respond(200, updatedChartsResponse);
+
+                var expectedQueryParamsForChartDetails = 'fields=id,name,title,type,sortOrder,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart1.json?' + expectedQueryParamsForChartDetails).respond(200, chart1DetailsResponse);
+                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart2.json?' + expectedQueryParamsForChartDetails).respond(200, chart2DetailsResponse);
+                httpBackend.flush();
+            });
+
+            it('should download all field app charts if lastUpdated is not provided', function () {
+                reportService.getAllCharts();
+
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.flush();
+            });
+        });
     });
-
-
 });

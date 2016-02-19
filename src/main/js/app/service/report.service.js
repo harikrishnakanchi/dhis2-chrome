@@ -136,5 +136,62 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             return getFieldAppPivotTables().then(enrich);
         };
 
+        this.getAllCharts = function(lastUpdatedTime) {
+            var getIdsOfUpdatedCharts = function() {
+                var config = {
+                    params: {
+                        'filter': ['name:like:[FieldApp - '],
+                        'paging': false,
+                        'fields': 'id'
+                    }
+                };
+
+                if(lastUpdatedTime) {
+                    config.params.filter.push('lastUpdated:gte:' + lastUpdatedTime);
+                }
+
+                return $http.get(dhisUrl.charts + '.json', config).then(function(response) {
+                    return _.pluck(response.data.charts, 'id');
+                });
+            };
+
+            var getChartDetails = function(chartId) {
+                var config = {
+                    params: {
+                        'fields': 'id,name,title,type,sortOrder,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]'
+                    }
+                };
+
+                return $http.get(dhisUrl.charts + '/' + chartId +'.json', config).then(function(response) {
+                    var chartDetails = response.data;
+
+                    // TODO: Remove following three mappings after switching to DHIS 2.20 or greater
+                    chartDetails.rows = _.map(chartDetails.rows || [], function(row) {
+                        if (row.dimension === "in" || row.dimension === "de")
+                            row.dimension = "dx";
+                        return row;
+                    });
+                    chartDetails.columns = _.map(chartDetails.columns || [], function(column) {
+                        if (column.dimension === "in" || column.dimension === "de")
+                            column.dimension = "dx";
+                        return column;
+                    });
+                    chartDetails.filters = _.map(chartDetails.filters || [], function(filter) {
+                        if (filter.dimension === "in" || filter.dimension === "de")
+                            filter.dimension = "dx";
+                        return filter;
+                    });
+
+                    return chartDetails;
+                });
+            };
+
+            var getIndividualChartDetails = function(chartIds) {
+                var getChartDetailPromises = _.map(chartIds, getChartDetails);
+                return $q.all(getChartDetailPromises);
+            };
+
+            return getIdsOfUpdatedCharts().then(getIndividualChartDetails);
+        };
     };
 });
