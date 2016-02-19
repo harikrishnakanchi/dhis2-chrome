@@ -4,7 +4,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTablesConsumer, downloadChartDataConsumer,
-            uploadReferralLocationsConsumer;
+            uploadReferralLocationsConsumer, downloadProjectSettingsConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -125,7 +125,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(uploadDataConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
-        it("should call download data consumer for downloading data values as a fire-and-forget", function() {
+        it("should call all project-data-related download consumers", function() {
             var message = {};
             message.data = {
                 "data": {},
@@ -134,8 +134,12 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             var returnValue = dispatcher.run(message);
             scope.$apply();
 
+            expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
             expect(downloadDataConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
             expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(downloadEventDataConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(downloadPivotTablesConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call completion data consumer for uploading completion data", function() {
@@ -348,30 +352,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(uploadPatientOriginConsumer.run).toHaveBeenCalledWith(message);
         });
 
-        it("should call download pivot tables", function() {
-            message.data = {
-                "data": {},
-                "type": "downloadProjectData"
-            };
-
-            dispatcher.run(message);
-            scope.$apply();
-
-            expect(downloadPivotTablesConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
-        });
-
-        it("should call download charts", function() {
-            message.data = {
-                "data": {},
-                "type": "downloadProjectData"
-            };
-
-            dispatcher.run(message);
-            scope.$apply();
-
-            expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
-        });
-
         it("should call upload referral locations", function() {
             message.data = {
                 "data": {},
@@ -394,18 +374,6 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             scope.$apply();
 
             expect(uploadExcludedDataElementsConsumer.run).toHaveBeenCalledWith(message);
-        });
-
-        it("should call download project settings", function() {
-            message.data = {
-                "data": {},
-                "type": "downloadProjectData"
-            };
-
-            dispatcher.run(message);
-            scope.$apply();
-
-            expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
         });
     });
 });
