@@ -353,5 +353,24 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.flush();
             });
         });
+
+        describe('getAllCurrentChartIds', function () {
+            it('should get the ids of all the current field app charts', function() {
+                reportService.getAllCurrentChartIds().then(function (chartIdsFromService) {
+                    expect(chartIdsFromService).toEqual(['chart1', 'chart2']);
+                });
+
+                var currentChartsResponse = {
+                    'charts': [
+                        { 'id': 'chart1' },
+                        { 'id': 'chart2' }
+                    ]
+                };
+
+                var expectedQueryParamsForUpdatedCharts = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForUpdatedCharts).respond(200, currentChartsResponse);
+                httpBackend.flush();
+            });
+        });
     });
 });

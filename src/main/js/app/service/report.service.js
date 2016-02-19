@@ -193,5 +193,19 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
 
             return getIdsOfUpdatedCharts().then(getIndividualChartDetails);
         };
+
+        this.getAllCurrentChartIds = function() {
+            var config = {
+                params: {
+                    'filter': ['name:like:[FieldApp - '],
+                    'paging': false,
+                    'fields': 'id'
+                }
+            };
+
+            return $http.get(dhisUrl.charts + '.json', config).then(function(response) {
+                return _.pluck(response.data.charts, 'id');
+            });
+        };
     };
 });
