@@ -24,6 +24,21 @@ define(["chartRepository", "angularMocks", "utils"], function(ChartRepository, m
             expect(mockStore.upsert).toHaveBeenCalledWith(charts);
         });
 
+        it('should upsert the charts', function() {
+            var chartsToUpsert = [{
+                'id': 'newChartId',
+                'title': 'New Chart'
+            }, {
+                'id': 'existingChartId',
+                'title': 'Updated Chart'
+            }];
+
+            chartRepository.upsert(chartsToUpsert);
+            scope.$apply();
+
+            expect(mockStore.upsert).toHaveBeenCalledWith(chartsToUpsert);
+        });
+
         it('should save chart data', function() {
             var chart = {
                 'id': 'new chart id',
