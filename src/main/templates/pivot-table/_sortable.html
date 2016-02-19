@@ -4,7 +4,7 @@
         <th class="display-print" ng-click="sortByColumn()"></th>
         <th ng-repeat="subHeader in header.headers"
             ng-show="periodBasedValues[subHeader.period] !== 0"
-            ng-click="sortByColumn(subHeader)"
+            ng-click="$parent.$index == 0 && sortByColumn(subHeader)"
             ng-class="{ 'cursorPointer' : $parent.$index == 0 }"
             colspan="{{ maxColumnsHeader.headers.length / header.headers.length}}">
             <span>
