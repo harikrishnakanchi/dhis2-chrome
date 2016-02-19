@@ -1,8 +1,8 @@
-define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportService', 'chartRepository', 'userPreferenceRepository', 'datasetRepository', 'changeLogRepository', 'orgUnitRepository'],
-    function(DownloadChartsConsumer, mocks, utils, timecop, ReportService, ChartRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository) {
+define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'reportService', 'chartRepository', 'userPreferenceRepository', 'datasetRepository', 'changeLogRepository', 'orgUnitRepository'],
+    function(DownloadChartDataConsumer, mocks, utils, timecop, ReportService, ChartRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository) {
 
-        describe('Download Charts Consumer', function() {
-            var downloadChartsConsumer, reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, scope, q;
+        describe('Download Chart Data Consumer', function() {
+            var downloadChartDataConsumer, reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, scope, q;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
 
@@ -38,7 +38,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 Timecop.install();
                 Timecop.freeze(new Date('2014-10-01T12:00:00.000Z'));
 
-                downloadChartsConsumer = new DownloadChartsConsumer(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q);
+                downloadChartDataConsumer = new DownloadChartDataConsumer(reportService, chartRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q);
             }));
 
             afterEach(function() {
@@ -139,7 +139,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 });
                 chartRepository.upsertChartData.and.returnValue(utils.getPromise(q, []));
 
-                downloadChartsConsumer.run();
+                downloadChartDataConsumer.run();
                 scope.$apply();
 
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
@@ -203,7 +203,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 });
                 chartRepository.upsertChartData.and.returnValue(utils.getPromise(q, []));
 
-                downloadChartsConsumer.run();
+                downloadChartDataConsumer.run();
                 scope.$apply();
 
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
@@ -220,7 +220,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
             });
 
             it('should exit if user module is empty', function() {
-                downloadChartsConsumer.run();
+                downloadChartDataConsumer.run();
                 scope.$apply();
 
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
@@ -234,7 +234,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
             it('should exit if reports had already been downloaded for the day', function() {
                 changeLogRepository.get.and.returnValue(utils.getPromise(q, '2014-10-01T05:00:00.000Z'));
 
-                downloadChartsConsumer.run();
+                downloadChartDataConsumer.run();
                 scope.$apply();
 
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();

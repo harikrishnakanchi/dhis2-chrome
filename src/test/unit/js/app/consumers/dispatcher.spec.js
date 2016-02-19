@@ -3,7 +3,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, log, scope,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
-            downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTablesConsumer, downloadChartsConsumer,
+            downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTablesConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
@@ -76,8 +76,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadPivotTablesConsumer = {
                 'run': jasmine.createSpy("downloadPivotTablesConsumer")
             };
-            downloadChartsConsumer = {
-                'run': jasmine.createSpy("downloadChartsConsumer")
+            downloadChartDataConsumer = {
+                'run': jasmine.createSpy("downloadChartDataConsumer")
             };
             uploadReferralLocationsConsumer = {
                 'run': jasmine.createSpy("uploadReferralLocationsConsumer")
@@ -103,13 +103,13 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadDatasetConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadSystemSettingConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadPivotTablesConsumer.run.and.returnValue(utils.getPromise(q, {}));
-            downloadChartsConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadChartDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadProjectSettingsConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
                 deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTablesConsumer,
-                downloadChartsConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer);
+                downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -369,7 +369,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
 
-            expect(downloadChartsConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
+            expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
         });
 
         it("should call upload referral locations", function() {
