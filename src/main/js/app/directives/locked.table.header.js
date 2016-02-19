@@ -57,6 +57,7 @@ define([], function () {
 
                     if (tableTopIsAboveScreen && !tableBottomIsAboveScreen) {
                         if (fixedHeaderDiv.style.visibility == 'hidden') {
+                            resetFixedHeaderCellStyling();
                             setFixedHeaderWidth();
                             fixedHeaderDiv.style.visibility = 'visible';
                         }
@@ -80,6 +81,38 @@ define([], function () {
                     fixedHeaderDiv.style.width = wrapperDiv.getBoundingClientRect().width + 'px';
                 };
 
+                var resetFixedHeaderCellStyling = function () {
+                    var fixedHeaderCells = fixedHeader.getElementsByTagName('th');
+                    var originalHeaderCells = originalHeader.getElementsByTagName('th');
+                    for (var i = 0; i < fixedHeaderCells.length; i++) {
+                        fixedHeaderCells[i].innerHTML = originalHeaderCells[i].innerHTML;
+                    }
+                    previouslyReferredCellIndex = null;
+                };
+
+                var previouslyReferredCellIndex = null;
+                var setUpFixedHeaderClickListeners = function () {
+                    var fixedHeaderCells = fixedHeader.getElementsByTagName('th');
+                    var originalHeaderCells = originalHeader.getElementsByTagName('th');
+                    var addListenersToHeaderCellWithIndex = function (index) {
+                        angular.element(fixedHeaderCells[index]).bind('click', function (event) {
+                            $timeout(function () {
+                                angular.element(originalHeaderCells[index]).triggerHandler('click');
+                                if (previouslyReferredCellIndex) {
+                                    fixedHeaderCells[previouslyReferredCellIndex].innerHTML = originalHeaderCells[previouslyReferredCellIndex].innerHTML;
+                                } else {
+                                    resetFixedHeaderCellStyling();
+                                }
+                                fixedHeaderCells[index].innerHTML = originalHeaderCells[index].innerHTML;
+                                previouslyReferredCellIndex = index;
+                            });
+                        });
+                    };
+                    for (var i = 0; i < fixedHeaderCells.length; i++) {
+                        addListenersToHeaderCellWithIndex(i);
+                    }
+                };
+
                 var setUpListeners = function () {
                     angular.element($window).bind('scroll', setFixedHeaderDivVisibility);
                     angular.element($window).bind('resize', setFixedHeaderWidth);
@@ -96,6 +129,7 @@ define([], function () {
                     setFixedHeaderDivVisibility();
                     appendFixedHeaderDivToWrapperDiv();
                     setUpListeners();
+                    setUpFixedHeaderClickListeners();
                 };
 
                 var unwatch = scope.$watch(function () {
