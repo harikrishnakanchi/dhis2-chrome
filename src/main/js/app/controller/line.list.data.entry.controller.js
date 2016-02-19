@@ -3,7 +3,6 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
 
         var resetForm = function() {
             $scope.form = $scope.form || {};
-            $scope.numberPattern = "^[1-9][0-9]*$";
             $scope.dataValues = {};
             $scope.patientOrigin = {};
             $scope.isNewMode = true;
@@ -16,6 +15,18 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
         var setEventMinAndMaxDate = function() {
             $scope.minEventDate = dateUtils.max([dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync), $scope.selectedModuleOpeningDate]).startOf('day').toISOString();
             $scope.maxEventDate = moment().endOf('day').toISOString();
+        };
+
+        $scope.getNumberPattern = function(dataElement) {
+            var attr = _.find(dataElement.attributeValues, {
+                attribute: {
+                    name: 'Pediatric Age Field'
+                }
+            });
+            if((!_.isEmpty(attr)) && attr.value === 'true')
+                return '^([0][.][5]|[1-9][0-9]*)$';
+            else
+                return '^[1-9][0-9]*$';
         };
 
         //TODO remove this when all clients have moved to 2.21
