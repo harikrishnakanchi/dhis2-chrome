@@ -117,6 +117,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             return sum;
         };
 
+        $scope.showTotalLabelForOriginDatasetSection = function (dataSet) {
+            var count = 0;
+            _.each(dataSet.organisationUnits, function (orgUnit) {
+                if ($scope.moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) >= 0)
+                    count++;
+            });
+            return count > 1;
+        };
+
         var getReferralDataElementIds = function(dataElements) {
             var dataElementsForReferral = _.filter(dataElements, function(de) {
                 return $scope.referralLocations[de.formName] !== undefined;

@@ -50,7 +50,7 @@
                                                     </th>
                                                     <th ng-if="!$last" class="last-column">
                                                     </th>
-                                                    <th ng-if="$last" class="last-column">
+                                                    <th ng-if="$last && section.categoryOptionComboIds.length > 1" class="last-column">
                                                         {{ resourceBundle.totalLabel }}
                                                     </th>
                                                 </tr>
@@ -81,16 +81,16 @@
                                                                    ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
                                                     </td>
-                                                    <td class="last-column">{{sum(dataValues[selectedModule.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1">{{sum(dataValues[selectedModule.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                 </tr>
-                                                <tr class="hide-from-print">
+                                                <tr class="hide-from-print" ng-if="(section.dataElements | filter:{ isIncluded: true }).length > 1">
                                                     <td>
                                                         <span> {{ resourceBundle.totalLabel }}</span>
                                                     </td>
                                                     <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
                                                         {{columnSum(dataValues[selectedModule.id], section , option, dataSet.isReferralDataset)}}
                                                     </td>
-                                                    <td class="last-column"> {{totalSum(section)}}
+                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1"> {{totalSum(section)}}
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -127,7 +127,7 @@
                                                     </th>
                                                     <th ng-hide="$last" class="last-column">
                                                     </th>
-                                                    <th ng-show="$last" class="last-column">
+                                                    <th ng-show="$last && section.categoryOptionComboIds.length > 1" class="last-column">
                                                         {{ resourceBundle.totalLabel }}
                                                     </th>
                                                 </tr>
@@ -142,18 +142,18 @@
                                                             <input type="text" name="datavalue" id="datafield_{{$index}}" ng-pattern="validDataValuePattern" ng-model="safeGet(dataValues, dataElement.id, option, orgUnit.id)['value']" ng-focus="restoreExpression(orgUnit.id, dataElement.id, option)" class="form-control input-sm" ng-blur="evaluateExpression(orgUnit.id, dataElement.id, option)" ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
                                                     </td>
-                                                    <td class="last-column">{{sum(dataValues[orgUnit.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1">{{sum(dataValues[orgUnit.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                 </tr>
                                             </tbody>
                                             <tbody>
-                                                <tr class="hide-from-print">
+                                                <tr class="hide-from-print" ng-if="showTotalLabelForOriginDatasetSection(dataSet)">
                                                     <td>
                                                         <span> {{ resourceBundle.totalLabel }}</span>
                                                     </td>
                                                     <td>
                                                         {{originSum(dataValues, dataSet, section)}}
                                                     </td>
-                                                    <td class="last-column"> {{originSum(dataValues, dataSet,section)}}
+                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1"> {{originSum(dataValues, dataSet,section)}}
                                                     </td>
                                                 </tr>
                                             </tbody>

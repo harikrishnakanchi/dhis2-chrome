@@ -200,6 +200,19 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.sum(list, "de1", ['option1', 'option3', 'option4'])).toBe(5);
             });
 
+            it("should return true if number of origins are greater than 1 ", function() {
+
+                scope.$apply();
+                scope.moduleAndOriginOrgUnitIds = ["a3439134495", "a469d3ba630", "aff112d79b4"];
+                var dataSet = {id: "a339b7fa9eb",
+                    organisationUnits:[
+                        {id:"a3439134495"},
+                        {id:"a469d3ba630"}
+                ]};
+
+                expect(scope.showTotalLabelForOriginDatasetSection(dataSet)).toBe(true);
+            });
+
             it("should return the sum of valid expressions ", function() {
                 scope.$apply();
                 var list = {
