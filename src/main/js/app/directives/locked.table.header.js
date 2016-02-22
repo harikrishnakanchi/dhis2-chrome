@@ -15,7 +15,7 @@ define([], function () {
                     originalTable = originalTableDiv.querySelector('table'),
                     originalHeader = originalTable.querySelector('thead'),
                     fixedHeaderDiv = elem.find('div')[1],
-                    fixedTable = document.createElement('table'),
+                    fixedHeaderTable = document.createElement('table'),
                     fixedHeader,
                     eventOnFixedHeaderCells = attrs.bindEvent;
 
@@ -25,9 +25,9 @@ define([], function () {
                     wrapperDiv.classList.remove('table-bordered');
                     wrapperDiv.classList.remove('table-hover');
 
-                    fixedTable.classList.add('table');
-                    fixedTable.classList.add('table-bordered');
-                    fixedTable.style.border = 'none';
+                    fixedHeaderTable.classList.add('table');
+                    fixedHeaderTable.classList.add('table-bordered');
+                    fixedHeaderTable.style.border = 'none';
                 };
 
                 var getOriginalHeaderCellWidths = function () {
@@ -79,8 +79,8 @@ define([], function () {
                 };
 
                 var appendFixedHeaderDivToWrapperDiv = function () {
-                    fixedTable.appendChild(fixedHeader);
-                    fixedHeaderDiv.appendChild(fixedTable);
+                    fixedHeaderTable.appendChild(fixedHeader);
+                    fixedHeaderDiv.appendChild(fixedHeaderTable);
                     setFixedHeaderDivWidth();
                 };
 
