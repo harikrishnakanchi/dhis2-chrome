@@ -1,3 +1,7 @@
+/**
+ * Usage: <table locked-table-header bind-event="click">
+ */
+
 define([], function () {
     return function ($timeout, $window) {
         return {
@@ -5,14 +9,15 @@ define([], function () {
             transclude: 'element',
             replace: true,
             templateUrl: 'templates/locked.table.header.html',
-            link: function (scope, elem) {
+            link: function (scope, elem, attrs) {
                 var wrapperDiv = elem[0],
                     originalTableDiv = elem.find('div')[0],
                     originalTable = originalTableDiv.querySelector('table'),
                     originalHeader = originalTable.querySelector('thead'),
                     fixedHeaderDiv = elem.find('div')[1],
                     fixedTable = document.createElement('table'),
-                    fixedHeader;
+                    fixedHeader,
+                    eventOnFixedHeaderCells = attrs.bindEvent;
 
                 var setStyles = function () {
                     wrapperDiv.style.border = 'none';
@@ -57,7 +62,9 @@ define([], function () {
 
                     if (tableTopIsAboveScreen && !tableBottomIsAboveScreen) {
                         if (fixedHeaderDiv.style.visibility == 'hidden') {
-                            resetFixedHeaderCellStyling();
+                            if (eventOnFixedHeaderCells) {
+                                resetFixedHeaderCellStyling();
+                            }
                             setFixedHeaderWidth();
                             fixedHeaderDiv.style.visibility = 'visible';
                         }
@@ -87,25 +94,15 @@ define([], function () {
                     for (var i = 0; i < fixedHeaderCells.length; i++) {
                         fixedHeaderCells[i].innerHTML = originalHeaderCells[i].innerHTML;
                     }
-                    previouslyReferredCellIndex = null;
                 };
 
-                var previouslyReferredCellIndex = null;
-                var setUpFixedHeaderClickListeners = function () {
+                var setUpFixedHeaderCellClickListeners = function () {
                     var fixedHeaderCells = fixedHeader.getElementsByTagName('th');
                     var originalHeaderCells = originalHeader.getElementsByTagName('th');
                     var addListenersToHeaderCellWithIndex = function (index) {
-                        angular.element(fixedHeaderCells[index]).bind('click', function (event) {
-                            $timeout(function () {
-                                angular.element(originalHeaderCells[index]).triggerHandler('click');
-                                if (previouslyReferredCellIndex) {
-                                    fixedHeaderCells[previouslyReferredCellIndex].innerHTML = originalHeaderCells[previouslyReferredCellIndex].innerHTML;
-                                } else {
-                                    resetFixedHeaderCellStyling();
-                                }
-                                fixedHeaderCells[index].innerHTML = originalHeaderCells[index].innerHTML;
-                                previouslyReferredCellIndex = index;
-                            });
+                        angular.element(fixedHeaderCells[index]).bind(eventOnFixedHeaderCells, function (event) {
+                            angular.element(originalHeaderCells[index]).triggerHandler(eventOnFixedHeaderCells);
+                            resetFixedHeaderCellStyling();
                         });
                     };
                     for (var i = 0; i < fixedHeaderCells.length; i++) {
@@ -129,7 +126,8 @@ define([], function () {
                     setFixedHeaderDivVisibility();
                     appendFixedHeaderDivToWrapperDiv();
                     setUpListeners();
-                    setUpFixedHeaderClickListeners();
+                    if (eventOnFixedHeaderCells)
+                        setUpFixedHeaderCellClickListeners();
                 };
 
                 var unwatch = scope.$watch(function () {
