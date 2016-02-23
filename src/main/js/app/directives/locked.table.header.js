@@ -41,7 +41,7 @@ define([], function () {
                     return cellWidths;
                 };
 
-                var setFixedHeaderWidth = function () {
+                var setFixedHeaderCellsWidth = function () {
                     var cellWidths = getOriginalHeaderCellWidths(),
                         headerCells = fixedHeader.getElementsByTagName('th');
 
@@ -66,7 +66,7 @@ define([], function () {
                                 resetFixedHeaderCellStyling();
                             }
                             setFixedHeaderDivWidth();
-                            setFixedHeaderWidth();
+                            setFixedHeaderCellsWidth();
                             fixedHeaderDiv.style.visibility = 'visible';
                         }
                         if (onlyFixedHeaderDivIsVisible) {
@@ -113,7 +113,7 @@ define([], function () {
 
                 var setUpListeners = function () {
                     angular.element($window).bind('scroll', setFixedHeaderDivVisibility);
-                    angular.element($window).bind('resize', setFixedHeaderWidth);
+                    angular.element($window).bind('resize', setFixedHeaderCellsWidth);
                     angular.element($window).bind('resize', setFixedHeaderDivWidth);
                     angular.element(originalTableDiv).bind('scroll', function (event) {
                         fixedHeaderDiv.scrollLeft = event.target.scrollLeft;
@@ -123,7 +123,7 @@ define([], function () {
                 var setupFixedHeader = function () {
                     setStyles();
                     generateFixedHeader();
-                    setFixedHeaderWidth();
+                    setFixedHeaderCellsWidth();
                     setFixedHeaderDivVisibility();
                     appendFixedHeaderDivToWrapperDiv();
                     setUpListeners();
