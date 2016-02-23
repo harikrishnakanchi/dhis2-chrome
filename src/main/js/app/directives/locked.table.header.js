@@ -65,6 +65,7 @@ define([], function () {
                             if (eventOnFixedHeaderCells) {
                                 resetFixedHeaderCellStyling();
                             }
+                            setFixedHeaderDivWidth();
                             setFixedHeaderWidth();
                             fixedHeaderDiv.style.visibility = 'visible';
                         }
