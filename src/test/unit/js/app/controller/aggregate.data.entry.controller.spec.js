@@ -432,6 +432,54 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
             });
 
+            it("should not include orgUnits which doesn't have any dataValues in hustle message", function() {
+                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+                spyOn(scope.dataentryForm, '$setPristine');
+
+                scope.dataValues = {
+                    "mod1": {
+                        "dataElement1": {
+                            "catCombo1": {
+                                "value": "10",
+                                "formula": "1+9"
+                            }
+                        }
+                    },
+                    "origin1": {
+                        "dataElement2": {
+                            "catCombo2": {
+                                "value": "67",
+                                "formula": "67"
+                            }
+                        }
+                    },
+                    "origin2": {
+                        "dataElement2": {
+                            "catCombo2": {
+                                "value": "",
+                                "formula": ""
+                            }
+                        }
+                    }
+                };
+
+                scope.submit();
+                scope.$apply();
+
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    data: [{
+                        orgUnit: "mod1",
+                        period: "2014W14"
+                    }, {
+                        orgUnit: "origin1",
+                        period: "2014W14"
+                    }],
+                    type: 'uploadDataValues',
+                    locale: 'en',
+                    desc: 'upload data for 2014W14, Mod1'
+                }, 'dataValues');
+            });
+
             it("should save data values as draft to indexeddb", function() {
 
                 spyOn(dataRepository, "saveAsDraft").and.returnValue(saveSuccessPromise);

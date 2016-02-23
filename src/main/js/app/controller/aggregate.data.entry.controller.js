@@ -195,7 +195,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
 
             updateDataValuesWithPopulationData();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, currentPeriod, $scope.currentUser.userCredentials.username);
-            var periodsAndOrgUnits = _.map(_.uniq(_.keys($scope.dataValues)), function(orgUnit) {
+            var periodsAndOrgUnits = _.map(_.uniq(_.pluck(payload, "orgUnit")), function(orgUnit) {
                 return {
                     orgUnit: orgUnit,
                     period: currentPeriod
