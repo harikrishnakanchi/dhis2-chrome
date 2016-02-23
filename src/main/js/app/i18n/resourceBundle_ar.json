@@ -92,5 +92,6 @@
     "importExportMenuLabel": "Import / Export to USB ",
     "caseNumber": "Case Number in french",
     "dateRange": "Date Range in french",
-    "search": "Search"
+    "search": "Search",
+    "connectedTo": "connected to"
 }
