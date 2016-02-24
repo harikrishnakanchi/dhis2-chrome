@@ -56,8 +56,14 @@ define(["lodash", "moment"], function(_, moment) {
             var headers = ["Data Element"];
             if ($scope.isCategoryPresent)
                 headers.push("Category");
-            _.each($scope.periods, function(period) {
-                headers.push($scope.data.metaData.names[period]);
+            _.each($scope.periods, function (period) {
+                var month = $scope.data.metaData.names[period];
+                if ($scope.showWeeks == 'true') {
+                    var numberofWeeks = getNumberOfISOWeeksInMonth(period);
+                    headers.push(month + " (" + numberofWeeks + " weeks)");
+                } else {
+                    headers.push(month);
+                }
             });
             return headers;
         };
@@ -136,6 +142,30 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
+
+        var getNumberOfISOWeeksInMonth = function (period) {
+            if (!$scope.showWeeks) return;
+            var m = moment(period, 'YYYYMM');
+
+            var year = parseInt(m.format('YYYY'));
+            var month = parseInt(m.format('M')) - 1;
+            var day = 1,
+                mondays = 0;
+
+            var date = new Date(year, month, day);
+
+            while (date.getMonth() == month) {
+                if (date.getDay() === 1) {
+                    mondays += 1;
+                    day += 7;
+                } else {
+                    day++;
+                }
+                date = new Date(year, month, day);
+            }
+            return mondays;
+        };
+
         if ($scope.definition && $scope.data) {
 
             $scope.viewMap = [];
@@ -152,7 +182,8 @@ define(["lodash", "moment"], function(_, moment) {
                 return {
                     "period": pe,
                     "name": $scope.data.metaData.names[pe],
-                    "sortKey": "sortKey_" + pe
+                    "sortKey": "sortKey_" + pe,
+                    "numberOfISOWeeks": getNumberOfISOWeeksInMonth(pe)
                 };
             });
             $scope.headersForTable = [{
@@ -174,8 +205,6 @@ define(["lodash", "moment"], function(_, moment) {
                 var sortedCategories = getSortedCategories();
 
                 $scope.hasOnlyOneCategory = sortedCategories.length === 1;
-                var sortedCategoriesIds = _.pluck(sortedCategories, "id");
-
                 var sortedCategoryNamesForDisplay = [];
 
                 _.each($scope.periods, function(pe) {

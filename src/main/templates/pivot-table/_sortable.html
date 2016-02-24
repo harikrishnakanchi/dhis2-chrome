@@ -7,13 +7,23 @@
             ng-click="$parent.$index == 0 && sortByColumn(subHeader)"
             ng-class="{ 'cursorPointer' : $parent.$index == 0 }"
             colspan="{{ maxColumnsHeader.headers.length / header.headers.length}}">
-            <span>
+            <div ng-show="showWeeks == 'false'">
                 {{ subHeader.name }}
                 <span ng-class="{ 'text-danger' : selectedSortKey == subHeader.sortKey }" ng-if="$parent.$index == 0">
                     <span ng-show="definition.sortAscending" class="icon-small">&#9650;</span>
                     <span ng-show="definition.sortDescending" class="icon-small">&#9660;</span>
                 </span>
-            </span>
+            </div>
+            <div class="sortable-header-cell-with-weeks" ng-show="showWeeks == 'true'">
+                <div class="name">
+                    {{ subHeader.name }}
+                    <p ng-if="$parent.$index == 0" class="small">{{ '[' + subHeader.numberOfISOWeeks + ' weeks]' }}</p>
+                </div>
+                <div class="icon" ng-class="{ 'text-danger' : selectedSortKey == subHeader.sortKey }" ng-if="$parent.$index == 0">
+                    <span ng-show="definition.sortAscending" class="icon-small">&#9650;</span>
+                    <span ng-show="definition.sortDescending" class="icon-small ">&#9660;</span>
+                </div>
+            </div>
         </th>
     </tr>
     </thead>

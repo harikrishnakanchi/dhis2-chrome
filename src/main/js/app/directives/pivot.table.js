@@ -3,7 +3,8 @@ define([], function() {
         return {
             scope: {
                 data: "=",
-                definition: "="
+                definition: "=",
+                showWeeks: "@"
             },
             controller: 'pivotTableController',
             templateUrl: "templates/pivot-table/pivot.table.html"

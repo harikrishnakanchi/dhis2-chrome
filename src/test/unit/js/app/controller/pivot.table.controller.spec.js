@@ -10,6 +10,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             Timecop.install();
             Timecop.freeze(new Date("2015-10-29T12:43:54.972Z"));
 
+            scope.showWeeks = "true";
             scope.data = {
                 "headers": [{
                     "name": "a1948a9c6f4",
@@ -103,14 +104,14 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             });
 
             it("should get headers if category is present", function() {
-                var expected = ['Data Element', 'Category', 'July 2015', 'August 2015'];
+                var expected = ['Data Element', 'Category', 'July 2015 (4 weeks)', 'August 2015 (5 weeks)'];
                 expect(scope.getHeaders()).toEqual(expected);
             });
 
             it("should get headers if category not present", function() {
                 scope.isCategoryPresent = false;
                 scope.$apply();
-                var expected = ['Data Element', 'July 2015', 'August 2015'];
+                var expected = ['Data Element', 'July 2015 (4 weeks)', 'August 2015 (5 weeks)'];
 
                 expect(scope.getHeaders()).toEqual(expected);
             });
@@ -226,11 +227,13 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 headers: [{
                     period: '201507',
                     name: 'July 2015',
-                    sortKey: 'sortKey_201507'
+                    sortKey: 'sortKey_201507',
+                    numberOfISOWeeks: 4
                 }, {
                     period: '201508',
                     name: 'August 2015',
-                    sortKey: 'sortKey_201508'
+                    sortKey: 'sortKey_201508',
+                    numberOfISOWeeks: 5
                 }]
             }, {
                 showHeader: true,
