@@ -20,6 +20,11 @@ define(["authenticationUtils"], function(authenticationUtils) {
             it("returns true if user is not logged in already and is not accessing product key page", function() {
                 expect(authenticationUtils.shouldRedirectToLogin(mockRootScope, newUrl)).toBe(true);
             });
+
+            it("returns false if rootscope.isLoogedIn undefined", function() {
+                mockRootScope = {};
+                expect(authenticationUtils.shouldRedirectToLogin(mockRootScope, newUrl)).toBe(false);
+            });
         });
     });
 });
