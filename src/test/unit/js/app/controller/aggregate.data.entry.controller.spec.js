@@ -259,9 +259,11 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
                 var section = {
                     "dataElements": [{
-                        "id": "de1"
+                        "id": "de1",
+                        "isIncluded": true
                     }, {
-                        "id": "de2"
+                        "id": "de2",
+                        "isIncluded": true
                     }]
                 };
 
@@ -300,13 +302,16 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 var section = {
                     "dataElements": [{
                         "id": "de1",
-                        "formName": "DE 1"
+                        "formName": "DE 1",
+                        "isIncluded": true
                     }, {
                         "id": "de2",
-                        "formName": "DE 2"
+                        "formName": "DE 2",
+                        "isIncluded": true
                     }, {
                         "id": "de3",
-                        "formName": "DE 3"
+                        "formName": "DE 3",
+                        "isIncluded": true
                     }]
                 };
 
@@ -335,6 +340,46 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 };
 
                 expect(scope.columnSum(list, section, option, true)).toBe(15);
+            });
+
+            it("should return the column sum in a section for only data elements which are included", function() {
+                var section = {
+                    "dataElements": [{
+                        "id": "de1",
+                        "formName": "DE 1",
+                        "isIncluded": true
+                    }, {
+                        "id": "de2",
+                        "formName": "DE 2",
+                        "isIncluded": true
+                    }, {
+                        "id": "de3",
+                        "formName": "DE 3",
+                        "isIncluded": false
+                    }]
+                };
+
+                var option = "option1";
+                var list = {
+                    "de1": {
+                        "option1": {
+                            "value": "5"
+                        }
+                    },
+                    "de2": {
+                        "option1": {
+                            "value": "1"
+                        }
+                    },
+                    "de3": {
+                        "option1": {
+                            "value": "10"
+                        }
+                    }
+                };
+                scope.$apply();
+
+                expect(scope.columnSum(list, section, option, false)).toBe(6);
             });
 
             it("should return the sum of all the rows for a given section", function() {

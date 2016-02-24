@@ -135,7 +135,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         };
 
         $scope.columnSum = function(iterable, section, option, isReferralDataset) {
-            var dataElementsIds = isReferralDataset ? getReferralDataElementIds(section.dataElements) : _.pluck(section.dataElements, "id");
+            var filteredDataElements = _.filter(section.dataElements, {"isIncluded": true});
+            var dataElementsIds = isReferralDataset ? getReferralDataElementIds(filteredDataElements) : _.pluck(filteredDataElements, "id");
             return _.reduce(iterable, function(sum, value, key) {
                 if (_.includes(dataElementsIds, key)) {
                     exp = value[option].value || "0";
