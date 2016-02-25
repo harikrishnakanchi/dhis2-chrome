@@ -96,7 +96,7 @@ define(["md5", "lodash"], function(md5, _) {
             var previousUserProjects = data[2];
 
             userPreferenceRepository.getCurrentProjects().then(function(currentUserProjects) {
-                if (previousUserProjects !== currentUserProjects) {
+                if (!_.isEqual(previousUserProjects,currentUserProjects) && !$rootScope.hasRoles(['Superadmin', 'Superuser'])){
                     $hustle.publish({
                         "type": "downloadProjectData",
                         "data": []
