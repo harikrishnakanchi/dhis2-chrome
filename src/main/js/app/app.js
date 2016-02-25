@@ -26,6 +26,9 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 function($routeProvider, $indexedDBProvider, $httpProvider, $hustleProvider, $compileProvider, $provide, $tooltipProvider) {
                     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension):/);
                     $routeProvider.
+                    when('/', {
+                        templateUrl: 'templates/init.html'
+                    }).
                     when('/dashboard', {
                         templateUrl: 'templates/dashboard.html'
                     }).
