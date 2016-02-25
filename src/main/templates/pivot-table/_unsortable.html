@@ -12,7 +12,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="datum in viewMap | orderBy : sortOrder">
+    <tr ng-repeat="datum in viewMap | orderBy : orderBySortKeys">
         <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
         <td ng-repeat="item in maxColumnsHeader.headers" ng-show="periodBasedValues[item.period] !== 0">
             <span> {{getValue(item.category, datum.dataElement, item.period)}}</span>
