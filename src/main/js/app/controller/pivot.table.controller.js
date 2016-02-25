@@ -144,7 +144,6 @@ define(["lodash", "moment"], function(_, moment) {
 
 
         var getNumberOfISOWeeksInMonth = function (period) {
-            if (!$scope.showWeeks) return;
             var m = moment(period, 'YYYYMM');
 
             var year = parseInt(m.format('YYYY'));
@@ -183,7 +182,7 @@ define(["lodash", "moment"], function(_, moment) {
                     "period": pe,
                     "name": $scope.data.metaData.names[pe],
                     "sortKey": "sortKey_" + pe,
-                    "numberOfISOWeeks": getNumberOfISOWeeksInMonth(pe)
+                    "numberOfISOWeeks": $scope.showWeeks == 'true' ? getNumberOfISOWeeksInMonth(pe) : ''
                 };
             });
             $scope.headersForTable = [{

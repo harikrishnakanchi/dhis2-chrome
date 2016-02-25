@@ -4,9 +4,9 @@
         <th class="display-print"></th>
         <th ng-repeat="item in header.headers" ng-show="periodBasedValues[item.period] !== 0"
             colspan="{{ maxColumnsHeader.headers.length / header.headers.length}}">
-            <div class="sortable-header-cell-without-weeks">
+            <div ng-class="{ 'header-cell-with-weeks' : showWeeks == 'true' }">
                 <span>{{ item.name }}</span>
-                <p ng-if="$parent.$index == 0 && showWeeks == 'true'" class="small">{{ '[' + item.numberOfISOWeeks + ' weeks]' }}</p>
+                <p ng-if="$parent.$index == 0 && showWeeks == 'true'" class="small weeks">{{ '[' + item.numberOfISOWeeks + ' weeks]' }}</p>
             </div>
         </th>
     </tr>

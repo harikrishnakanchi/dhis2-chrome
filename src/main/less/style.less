@@ -388,22 +388,20 @@ body {
     .icon-small {
         font-size:smaller;
     }
-    div.sortable-header-cell-without-weeks p {
-        padding-top: 3px;
-        margin-bottom: 0px;
-    }
-    div.sortable-header-cell-with-weeks {
+    div.header-cell-with-weeks {
         white-space: nowrap;
         margin-right: 8px;
-        div.name {
+        p.weeks {
+            padding-top: 3px;
+            margin-bottom: 0;
+        }
+        span.name {
+            display: block;
             float: left;
             margin-right: 5px;
-            p {
-                padding-top: 3px;
-                margin-bottom: 0px;
-            }
         }
-        div.icon {
+        span.icon {
+            display: block;
             padding-top: 5px;
         }
     }
