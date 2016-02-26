@@ -30,12 +30,13 @@ define(["md5", "lodash"], function(md5, _) {
                 return $q.reject("Invalid user");
             }
 
+            var productKeyLevel = systemSettingRepository.getProductKeyLevel();
+
             if (isRole(user, "Superuser"))
                 return data;
 
             var userOrgUnitIds = _.pluck(user.organisationUnits, "id");
             var allowedOrgUnitIds = _.pluck(systemSettingRepository.getAllowedOrgUnits(), "id");
-            var productKeyLevel = systemSettingRepository.getProductKeyLevel();
 
             if (productKeyLevel === 'project' && _.isEmpty(_.intersection(allowedOrgUnitIds, userOrgUnitIds))) {
                 $scope.invalidAccess = true;
