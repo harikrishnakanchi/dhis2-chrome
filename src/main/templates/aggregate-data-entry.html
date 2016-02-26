@@ -145,8 +145,8 @@
                                                     <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1">{{sum(dataValues[orgUnit.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                 </tr>
                                             </tbody>
-                                            <tbody>
-                                                <tr class="hide-from-print" ng-if="showTotalLabelForOriginDatasetSection(dataSet)">
+                                            <tbody ng-if="showTotalLabelForOriginDatasetSection(dataSet)">
+                                                <tr class="hide-from-print">
                                                     <td>
                                                         <span> {{ resourceBundle.totalLabel }}</span>
                                                     </td>

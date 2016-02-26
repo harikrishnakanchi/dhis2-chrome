@@ -600,5 +600,19 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 scope.$apply();
                 expect(scope.sum(dataValues, orgUnits, "de1", ['c1', 'c2'])).toBe(2);
             });
+
+            it("should return true if number of origins are greater than 1", function () {
+                scope.$apply();
+                scope.moduleAndOriginOrgUnitIds = ["a3439134495", "a469d3ba630", "aff112d79b4"];
+                var dataSet = {
+                    id: "a339b7fa9eb",
+                    organisationUnits: [
+                        {id: "a3439134495"},
+                        {id: "a469d3ba630"}
+                    ]
+                };
+                expect(scope.showTotalLabelForOriginDatasetSection(dataSet)).toBe(true);
+            });
+
         });
     });

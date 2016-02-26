@@ -190,6 +190,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 .finally(scrollToTop);
         };
 
+        $scope.showTotalLabelForOriginDatasetSection = function (dataSet) {
+            var count = 0;
+            _.each(dataSet.organisationUnits, function (orgUnit) {
+                if ($scope.moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) >= 0)
+                    count++;
+            });
+            return count > 1;
+        };
+
         var initializeForm = function() {
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
             currentPeriodAndOrgUnit = {
