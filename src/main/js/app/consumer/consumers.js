@@ -40,7 +40,7 @@ define(["uploadApprovalDataConsumer", "downloadOrgUnitConsumer", "uploadOrgUnitC
             app.service("uploadPatientOriginConsumer", ["$q", "systemSettingService", "patientOriginRepository", "orgUnitRepository", uploadPatientOriginConsumer]);
             app.service("downloadPivotTablesConsumer", ["reportService", "pivotTableRepository", "changeLogRepository", downloadPivotTablesConsumer]);
             app.service("downloadPivotTableDataConsumer", ["reportService", "pivotTableRepository", "userPreferenceRepository", "datasetRepository", "changeLogRepository", "orgUnitRepository", "$q", downloadPivotTableDataConsumer]);
-            app.service("downloadChartsConsumer", ["reportService", "chartRepository", "changeLogRepository", "$q", downloadChartsConsumer]);
+            app.service("downloadChartsConsumer", ["reportService", "chartRepository", "changeLogRepository", downloadChartsConsumer]);
             app.service("downloadChartDataConsumer", ["reportService", "chartRepository", "userPreferenceRepository", "datasetRepository", "changeLogRepository", "orgUnitRepository", "$q", downloadChartDataConsumer]);
             app.service("uploadReferralLocationsConsumer", ["$q", "systemSettingService", "referralLocationsRepository", "orgUnitRepository", uploadReferralLocationsConsumer]);
             app.service("uploadExcludedDataElementsConsumer", ["$q", "systemSettingService", "excludedDataElementsRepository", "orgUnitRepository", uploadExcludedDataElementsConsumer]);

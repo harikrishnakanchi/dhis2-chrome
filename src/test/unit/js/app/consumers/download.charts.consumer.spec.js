@@ -29,7 +29,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 Timecop.install();
                 Timecop.freeze(currentTime);
 
-                downloadChartsConsumer = new DownloadChartsConsumer(reportService, chartRepository, changeLogRepository, $q);
+                downloadChartsConsumer = new DownloadChartsConsumer(reportService, chartRepository, changeLogRepository);
             }));
 
             it('should download and upsert any charts that have been updated', function () {

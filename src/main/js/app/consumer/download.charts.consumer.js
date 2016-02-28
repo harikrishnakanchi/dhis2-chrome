@@ -1,5 +1,5 @@
 define(['moment'], function (moment) {
-    return function(reportService, chartRepository, changeLogRepository, $q) {
+    return function(reportService, chartRepository, changeLogRepository) {
         var updateChangeLog = function() {
             return changeLogRepository.upsert('charts', moment().toISOString());
         };
