@@ -75,6 +75,32 @@ define(["pivotTableRepository", "angularMocks", "utils", "lodash"], function(Piv
 
                 expect(mockStore.getAll).toHaveBeenCalled();
             });
+
+            it('should parse the dataSet code from the pivot table name', function() {
+                var allPivotTables = [{
+                    'id': 'pivotTable1',
+                    'name': '[FieldApp - someDataSetCode] # Name'
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allPivotTables));
+
+                pivotTableRepository.getAll().then(function(pivotTablesFromRepository) {
+                    expect(pivotTablesFromRepository[0].dataSetCode).toEqual('someDataSetCode');
+                });
+                scope.$apply();
+            });
+
+            it('should leave the dataSet code as null if the pivot table name is malformed', function() {
+                var allPivotTables = [{
+                    'id': 'pivotTable1',
+                    'name': 'some malformed pivot table name'
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allPivotTables));
+
+                pivotTableRepository.getAll().then(function(pivotTablesFromRepository) {
+                    expect(pivotTablesFromRepository[0].dataSetCode).toBeNull();
+                });
+                scope.$apply();
+            });
         });
     });
 });

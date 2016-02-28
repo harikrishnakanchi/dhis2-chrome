@@ -2,6 +2,7 @@ define(["lodash"], function(_) {
     return function(db, $q) {
         var PIVOT_TABLE_STORE_NAME = 'pivotTables';
         var PIVOT_TABLE_DATA_STORE_NAME = 'pivotTableData';
+        var FIELD_APP_DATASET_CODE_REGEX = /\[FieldApp - (.*)]/;
 
         this.upsert = function(pivotTables) {
             var store = db.objectStore(PIVOT_TABLE_STORE_NAME);
@@ -37,9 +38,17 @@ define(["lodash"], function(_) {
             return pivotTables;
         };
 
+        var parseDataSetCodes = function(pivotTables) {
+            return _.map(pivotTables, function(pivotTable) {
+                var matches = FIELD_APP_DATASET_CODE_REGEX.exec(pivotTable.name);
+                pivotTable.dataSetCode = matches && matches[1];
+                return pivotTable;
+            });
+        };
+
         this.getAll = function(pivotTables) {
             var store = db.objectStore(PIVOT_TABLE_STORE_NAME);
-            return store.getAll().then(addSortVars);
+            return store.getAll().then(addSortVars).then(parseDataSetCodes);
         };
 
         this.getDataForPivotTable = function(pivotTableName, orgUnitId) {

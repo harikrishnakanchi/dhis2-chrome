@@ -433,21 +433,24 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
 
             var datasets = [{
                 "id": "ds1",
-                "isOriginDataset": false
+                "code": "dataSetCode1",
+                "isOriginDataset": false,
             }, {
                 "id": "ds2",
+                "code": "dataSetCode2",
                 "isOriginDataset": false
             }, {
                 "id": "ds3",
+                "code": "dataSetCode2",
                 "isOriginDataset": false
             }];
 
             var pivotTables = [{
                 "name": "Table 1",
-                "dataset": "ds1"
+                "dataSetCode": "dataSetCode1"
             }, {
                 "name": "Table 2",
-                "dataset": "ds2"
+                "dataSetCode": "dataSetCode2"
             }];
 
             var pivotTableData1 = "table 1 data";
@@ -465,11 +468,11 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             });
             var expectedPivotTableData = [{
                 "table": pivotTables[0],
-                "dataset": "ds1",
+                "dataSetCode": "dataSetCode1",
                 "data": pivotTableData1
             }, {
                 "table": pivotTables[1],
-                "dataset": "ds2",
+                "dataSetCode": "dataSetCode2",
                 "data": pivotTableData2
             }];
             reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository);

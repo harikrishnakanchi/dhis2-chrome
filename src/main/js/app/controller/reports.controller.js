@@ -294,7 +294,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     return {
                         'table': table,
                         'data': data,
-                        'dataset': table.dataset
+                        'dataSetCode': table.dataSetCode
                     };
                 });
             }));
@@ -316,7 +316,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 });
 
                 var filteredPivotTables = _.filter($scope.pivotTables, {
-                    "dataset": eachDataSet.id
+                    "dataSetCode": eachDataSet.code
                 });
 
                 eachDataSet.isChartsAvailable = _.any(filteredCharts, function(chart) {
