@@ -12,8 +12,8 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                 q = $q;
 
                 reportService = new ReportService();
-                spyOn(reportService, 'getAllCharts').and.returnValue(utils.getPromise(q, {}));
-                spyOn(reportService, 'getAllCurrentChartIds').and.returnValue(utils.getPromise(q, {}));
+                spyOn(reportService, 'getUpdatedCharts').and.returnValue(utils.getPromise(q, {}));
+                spyOn(reportService, 'getAllChartIds').and.returnValue(utils.getPromise(q, {}));
 
                 chartRepository = new ChartRepository();
                 spyOn(chartRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
@@ -37,13 +37,13 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                     'id': 'updatedChartId',
                     'some': 'details'
                 }];
-                reportService.getAllCharts.and.returnValue(utils.getPromise(q, updatedCharts));
+                reportService.getUpdatedCharts.and.returnValue(utils.getPromise(q, updatedCharts));
 
                 downloadChartsConsumer.run();
                 scope.$apply();
 
                 expect(changeLogRepository.get).toHaveBeenCalledWith('charts');
-                expect(reportService.getAllCharts).toHaveBeenCalledWith(lastUpdated);
+                expect(reportService.getUpdatedCharts).toHaveBeenCalledWith(lastUpdated);
                 expect(chartRepository.upsert).toHaveBeenCalledWith(updatedCharts);
             });
 
@@ -63,7 +63,7 @@ define(['downloadChartsConsumer', 'angularMocks', 'utils', 'timecop', 'reportSer
                     'id': 'chart2',
                     'some': 'details'
                 }];
-                reportService.getAllCurrentChartIds.and.returnValue(utils.getPromise(q, remoteChartIds));
+                reportService.getAllChartIds.and.returnValue(utils.getPromise(q, remoteChartIds));
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, localDbCharts));
 
                 downloadChartsConsumer.run();

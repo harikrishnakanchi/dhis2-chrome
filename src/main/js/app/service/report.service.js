@@ -118,7 +118,7 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             return getFieldAppPivotTables().then(enrich);
         };
 
-        this.getAllCharts = function(lastUpdatedTime) {
+        this.getUpdatedCharts = function(lastUpdatedTime) {
             var getIdsOfUpdatedCharts = function() {
                 var config = {
                     params: {
@@ -176,7 +176,7 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             return getIdsOfUpdatedCharts().then(getIndividualChartDetails);
         };
 
-        this.getAllCurrentChartIds = function() {
+        this.getAllChartIds = function() {
             var config = {
                 params: {
                     'filter': ['name:like:[FieldApp - '],

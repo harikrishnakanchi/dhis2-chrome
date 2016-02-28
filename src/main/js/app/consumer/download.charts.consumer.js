@@ -5,7 +5,7 @@ define(['moment'], function (moment) {
         };
 
         var removeChartsThatHaveBeenDeletedRemotely = function() {
-            return reportService.getAllCurrentChartIds().then(function(remoteChartIds) {
+            return reportService.getAllChartIds().then(function(remoteChartIds) {
                 return chartRepository.getAll().then(function(localDbCharts) {
                     var localDbChartIds = _.pluck(localDbCharts, 'id');
                     var chartIdsToRemove = _.difference(localDbChartIds, remoteChartIds);
@@ -16,7 +16,7 @@ define(['moment'], function (moment) {
 
         this.run = function() {
             return changeLogRepository.get('charts')
-                .then(reportService.getAllCharts)
+                .then(reportService.getUpdatedCharts)
                 .then(chartRepository.upsert)
                 .then(updateChangeLog)
                 .then(removeChartsThatHaveBeenDeletedRemotely);

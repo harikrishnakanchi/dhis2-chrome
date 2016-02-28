@@ -195,11 +195,11 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             }]);
         });
 
-        describe('getAllCharts', function () {
+        describe('getUpdatedCharts', function () {
             it('should download field app charts modified since lastUpdated', function () {
                 var lastUpdatedTime = '2016-02-19T04:28:32.082Z';
 
-                reportService.getAllCharts(lastUpdatedTime).then(function (chartsFromService) {
+                reportService.getUpdatedCharts(lastUpdatedTime).then(function (chartsFromService) {
                     expect(chartsFromService).toEqual([chart1DetailsResponse, chart2DetailsResponse]);
                 });
 
@@ -236,7 +236,7 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             });
 
             it('should download all field app charts if lastUpdated is not provided', function () {
-                reportService.getAllCharts();
+                reportService.getUpdatedCharts();
 
                 var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
                 httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParams).respond(200, {});
@@ -244,21 +244,21 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             });
         });
 
-        describe('getAllCurrentChartIds', function () {
-            it('should get the ids of all the current field app charts', function() {
-                reportService.getAllCurrentChartIds().then(function (chartIdsFromService) {
+        describe('getAllChartIds', function () {
+            it('should get the ids of all field app charts', function() {
+                reportService.getAllChartIds().then(function (chartIdsFromService) {
                     expect(chartIdsFromService).toEqual(['chart1', 'chart2']);
                 });
 
-                var currentChartsResponse = {
+                var chartIdsResponse = {
                     'charts': [
                         { 'id': 'chart1' },
                         { 'id': 'chart2' }
                     ]
                 };
 
-                var expectedQueryParamsForUpdatedCharts = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
-                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForUpdatedCharts).respond(200, currentChartsResponse);
+                var expectedQueryParamsForChartIds = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForChartIds).respond(200, chartIdsResponse);
                 httpBackend.flush();
             });
         });
