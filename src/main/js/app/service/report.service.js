@@ -247,5 +247,19 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
 
             return getIdsOfUpdatedPivotTables().then(getIndividualPivotTableDetails);
         };
+
+        this.getAllPivotTableIds = function() {
+            var config = {
+                params: {
+                    'filter': ['name:like:[FieldApp - '],
+                    'paging': false,
+                    'fields': 'id'
+                }
+            };
+
+            return $http.get(dhisUrl.pivotTables + '.json', config).then(function(response) {
+                return _.pluck(response.data.reportTables, 'id');
+            });
+        };
     };
 });

@@ -311,5 +311,24 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.flush();
             });
         });
+
+        describe('getAllPivotTableIds', function () {
+            it('should get the ids of all field app pivot tables', function() {
+                reportService.getAllPivotTableIds().then(function (pivotTableIdsFromService) {
+                    expect(pivotTableIdsFromService).toEqual(['pivotTable1', 'pivotTable2']);
+                });
+
+                var pivotTableIdsResponse = {
+                    'reportTables': [
+                        { 'id': 'pivotTable1' },
+                        { 'id': 'pivotTable2' }
+                    ]
+                };
+
+                var expectedQueryParamsForPivotTableIds = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParamsForPivotTableIds).respond(200, pivotTableIdsResponse);
+                httpBackend.flush();
+            });
+        });
     });
 });
