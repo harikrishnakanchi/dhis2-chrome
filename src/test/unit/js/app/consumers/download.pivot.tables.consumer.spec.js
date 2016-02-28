@@ -12,9 +12,12 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
 
                 reportService = new ReportService();
                 spyOn(reportService, 'getUpdatedPivotTables').and.returnValue(utils.getPromise(q, {}));
+                spyOn(reportService, 'getAllPivotTableIds').and.returnValue(utils.getPromise(q, {}));
 
                 pivotTableRepository = new PivotTableRepository();
                 spyOn(pivotTableRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
+                spyOn(pivotTableRepository, 'getAll').and.returnValue(utils.getPromise(q, {}));
+                spyOn(pivotTableRepository, 'deleteByIds').and.returnValue(utils.getPromise(q, {}));
 
                 lastUpdated = new Date('2016-02-29T00:40:00.000Z');
                 changeLogRepository = new ChangeLogRepository();
@@ -48,6 +51,24 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 scope.$apply();
 
                 expect(changeLogRepository.upsert).toHaveBeenCalledWith('pivotTables', currentTime);
+            });
+
+            it('should delete any charts that are stored locally but not available remotely on DHIS', function () {
+                var remotePivotTableIds = ['pivotTable2', 'pivotTable3'];
+                var localDbPivotTables = [{
+                    'id': 'pivotTable1',
+                    'some': 'details'
+                }, {
+                    'id': 'pivotTable2',
+                    'some': 'details'
+                }];
+                reportService.getAllPivotTableIds.and.returnValue(utils.getPromise(q, remotePivotTableIds));
+                pivotTableRepository.getAll.and.returnValue(utils.getPromise(q, localDbPivotTables));
+
+                downloadPivotTablesConsumer.run();
+                scope.$apply();
+
+                expect(pivotTableRepository.deleteByIds).toHaveBeenCalledWith(['pivotTable1'], localDbPivotTables);
             });
        });
     });
