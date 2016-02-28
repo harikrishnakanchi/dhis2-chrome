@@ -3,13 +3,6 @@ define(["lodash"], function(_) {
         var PIVOT_TABLE_STORE_NAME = 'pivotTables';
         var PIVOT_TABLE_DATA_STORE_NAME = 'pivotTableData';
 
-        this.replaceAll = function(pivotTables) {
-            var store = db.objectStore(PIVOT_TABLE_STORE_NAME);
-            return store.clear().then(function() {
-                return store.upsert(pivotTables);
-            });
-        };
-
         this.upsert = function(pivotTables) {
             var store = db.objectStore(PIVOT_TABLE_STORE_NAME);
             return store.upsert(pivotTables);

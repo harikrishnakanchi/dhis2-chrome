@@ -11,19 +11,6 @@ define(["pivotTableRepository", "angularMocks", "utils"], function(PivotTableRep
             pivotTableRepository = new PivotTableRepository(mockDB.db, q);
         }));
 
-        it('should save the tables', function() {
-            var tables = [{
-                'id': 'new pivot table id',
-                'title': 'The pivot table'
-            }];
-
-            pivotTableRepository.replaceAll(tables);
-            scope.$apply();
-
-            expect(mockStore.clear).toHaveBeenCalled();
-            expect(mockStore.upsert).toHaveBeenCalledWith(tables);
-        });
-
         it('should upsert the pivot tables', function() {
             var pivotTablesToUpsert = [{
                 'id': 'newPivotTableId',
