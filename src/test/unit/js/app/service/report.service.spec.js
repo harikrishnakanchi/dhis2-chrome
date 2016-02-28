@@ -262,5 +262,54 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
                 httpBackend.flush();
             });
         });
+
+        describe('getUpdatedPivotTables', function () {
+            it('should download field app pivot tables modified since lastUpdated', function () {
+                var lastUpdatedTime = '2016-02-19T04:28:32.082Z';
+
+                reportService.getUpdatedPivotTables(lastUpdatedTime).then(function (pivotTablesFromService) {
+                    expect(pivotTablesFromService).toEqual([pivotTable1DetailsResponse, pivotTable2DetailsResponse]);
+                });
+
+                var updatedPivotTablesResponse = {
+                    'reportTables': [
+                        { 'id': 'pivotTable1' },
+                        { 'id': 'pivotTable2' }
+                    ]
+                };
+
+                var pivotTable1DetailsResponse = {
+                    'id': 'pivotTable1',
+                    'more': 'details',
+                    'rows': [],
+                    'columns': [],
+                    'filters': []
+                };
+
+                var pivotTable2DetailsResponse = {
+                    'id': 'pivotTable2',
+                    'more': 'details',
+                    'rows': [],
+                    'columns': [],
+                    'filters': []
+                };
+
+                var expectedQueryParamsForUpdatedPivotTables = 'fields=id&filter=name:like:%5BFieldApp+-+&filter=lastUpdated:gte:' + lastUpdatedTime + '&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParamsForUpdatedPivotTables).respond(200, updatedPivotTablesResponse);
+
+                var expectedQueryParamsForPivotTableDetails = 'fields=id,name,title,type,sortOrder,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParamsForPivotTableDetails).respond(200, pivotTable1DetailsResponse);
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParamsForPivotTableDetails).respond(200, pivotTable2DetailsResponse);
+                httpBackend.flush();
+            });
+
+            it('should download all field app pivot tables if lastUpdated is not provided', function () {
+                reportService.getUpdatedPivotTables();
+
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.flush();
+            });
+        });
     });
 });

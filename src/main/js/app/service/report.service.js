@@ -189,5 +189,63 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
                 return _.pluck(response.data.charts, 'id');
             });
         };
+
+        this.getUpdatedPivotTables = function(lastUpdatedTime) {
+            var getIdsOfUpdatedPivotTables = function() {
+                var config = {
+                    params: {
+                        'filter': ['name:like:[FieldApp - '],
+                        'paging': false,
+                        'fields': 'id'
+                    }
+                };
+
+                if(lastUpdatedTime) {
+                    config.params.filter.push('lastUpdated:gte:' + lastUpdatedTime);
+                }
+
+                return $http.get(dhisUrl.pivotTables + '.json', config).then(function(response) {
+                    return _.pluck(response.data.reportTables, 'id');
+                });
+            };
+
+            var getPivotTableDetails = function(pivotTableId) {
+                var config = {
+                    params: {
+                        'fields': 'id,name,title,type,sortOrder,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]'
+                    }
+                };
+
+                return $http.get(dhisUrl.pivotTables + '/' + pivotTableId +'.json', config).then(function(response) {
+                    var pivotTableDetails = response.data;
+
+                    // TODO: Remove following three mappings after switching to DHIS 2.20 or greater
+                    pivotTableDetails.rows = _.map(pivotTableDetails.rows || [], function(row) {
+                        if (row.dimension === "in" || row.dimension === "de")
+                            row.dimension = "dx";
+                        return row;
+                    });
+                    pivotTableDetails.columns = _.map(pivotTableDetails.columns || [], function(column) {
+                        if (column.dimension === "in" || column.dimension === "de")
+                            column.dimension = "dx";
+                        return column;
+                    });
+                    pivotTableDetails.filters = _.map(pivotTableDetails.filters || [], function(filter) {
+                        if (filter.dimension === "in" || filter.dimension === "de")
+                            filter.dimension = "dx";
+                        return filter;
+                    });
+
+                    return pivotTableDetails;
+                });
+            };
+
+            var getIndividualPivotTableDetails = function(pivotTableIds) {
+                var getPivotTableDetailPromises = _.map(pivotTableIds, getPivotTableDetails);
+                return $q.all(getPivotTableDetailPromises);
+            };
+
+            return getIdsOfUpdatedPivotTables().then(getIndividualPivotTableDetails);
+        };
     };
 });
