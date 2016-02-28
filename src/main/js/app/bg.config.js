@@ -87,7 +87,7 @@ require.config({
         "downloadPatientOriginConsumer": "app/consumer/download.patient.origin.consumer",
         "uploadExcludedDataElementsConsumer": "app/consumer/upload.excluded.dataelements.consumer",
         "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
-        "downloadPivotTablesConsumer": "app/consumer/download.pivot.tables.consumer",
+        "downloadPivotTableDataConsumer": "app/consumer/download.pivot.table.data.consumer",
         "downloadChartsConsumer": "app/consumer/download.charts.consumer",
         "downloadChartDataConsumer": "app/consumer/download.chart.data.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",

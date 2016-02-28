@@ -3,7 +3,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, log, scope,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
-            downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTablesConsumer, downloadChartDataConsumer,
+            downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
@@ -73,8 +73,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             uploadPatientOriginConsumer = {
                 'run': jasmine.createSpy("uploadPatientOriginConsumer")
             };
-            downloadPivotTablesConsumer = {
-                'run': jasmine.createSpy("downloadPivotTablesConsumer")
+            downloadPivotTableDataConsumer = {
+                'run': jasmine.createSpy("downloadPivotTableDataConsumer")
             };
             downloadChartDataConsumer = {
                 'run': jasmine.createSpy("downloadChartDataConsumer")
@@ -105,14 +105,14 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadProgramConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadDatasetConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadSystemSettingConsumer.run.and.returnValue(utils.getPromise(q, {}));
-            downloadPivotTablesConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadPivotTableDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadChartDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadProjectSettingsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadChartsConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
-                deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTablesConsumer,
+                deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer,
                 downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer);
         }));
 
@@ -143,7 +143,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
             expect(downloadEventDataConsumer.run).toHaveBeenCalledWith(message, {});
             expect(downloadChartsConsumer.run).toHaveBeenCalledWith(message, {});
-            expect(downloadPivotTablesConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(downloadPivotTableDataConsumer.run).toHaveBeenCalledWith(message, {});
             expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(message, {});
         });
 

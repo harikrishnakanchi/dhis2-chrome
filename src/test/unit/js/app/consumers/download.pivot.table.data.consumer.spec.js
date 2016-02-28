@@ -1,8 +1,8 @@
-define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'reportService', 'pivotTableRepository', 'userPreferenceRepository', 'datasetRepository', 'changeLogRepository', 'orgUnitRepository'],
-    function(DownloadPivotTablesConsumer, mocks, utils, timecop, ReportService, PivotTableRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository) {
+define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'timecop', 'reportService', 'pivotTableRepository', 'userPreferenceRepository', 'datasetRepository', 'changeLogRepository', 'orgUnitRepository'],
+    function(DownloadPivotTableDataConsumer, mocks, utils, timecop, ReportService, PivotTableRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository) {
 
-        describe('Download Pivot Tables Consumer', function() {
-            var downloadPivotTablesConsumer, reportService, userPreferenceRepository, datasetRepository, changeLogRepository, scope, q;
+        describe('Download Pivot Table Data Consumer', function() {
+            var downloadPivotTableDataConsumer, reportService, userPreferenceRepository, datasetRepository, changeLogRepository, scope, q;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
 
@@ -36,7 +36,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 Timecop.install();
                 Timecop.freeze(new Date('2014-10-01T12:00:00.000Z'));
 
-                downloadPivotTablesConsumer = new DownloadPivotTablesConsumer(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q);
+                downloadPivotTableDataConsumer = new DownloadPivotTableDataConsumer(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q);
             }));
 
             afterEach(function() {
@@ -67,7 +67,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
                 }]));
                 pivotTableRepository.replaceAll.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
 
-                downloadPivotTablesConsumer.run();
+                downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(["mod1"]);
@@ -114,7 +114,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
 
                 pivotTableRepository.replaceAll.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
 
-                downloadPivotTablesConsumer.run();
+                downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(["mod1", "mod2", "mod3"]);
@@ -129,7 +129,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
             });
 
             it('should exit if user module is empty', function() {
-                downloadPivotTablesConsumer.run();
+                downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
@@ -142,7 +142,7 @@ define(['downloadPivotTablesConsumer', 'angularMocks', 'utils', 'timecop', 'repo
             it('should exit if reports had already been downloaded for the day', function() {
                 changeLogRepository.get.and.returnValue(utils.getPromise(q, '2014-10-01T05:00:00.000Z'));
 
-                downloadPivotTablesConsumer.run();
+                downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
