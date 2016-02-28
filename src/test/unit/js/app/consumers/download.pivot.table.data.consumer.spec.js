@@ -1,40 +1,56 @@
-define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'timecop', 'reportService', 'pivotTableRepository', 'userPreferenceRepository', 'datasetRepository', 'changeLogRepository', 'orgUnitRepository'],
-    function(DownloadPivotTableDataConsumer, mocks, utils, timecop, ReportService, PivotTableRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository) {
-
+define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'timecop', 'reportService', 'pivotTableRepository', 'userPreferenceRepository', 'datasetRepository', 'changeLogRepository', 'orgUnitRepository'],
+    function(DownloadPivotTableDataConsumer, mocks, utils, moment, timecop, ReportService, PivotTableRepository, UserPreferenceRepository, DatasetRepository, ChangeLogRepository, OrgUnitRepository) {
         describe('Download Pivot Table Data Consumer', function() {
-            var downloadPivotTableDataConsumer, reportService, userPreferenceRepository, datasetRepository, changeLogRepository, scope, q;
+            var downloadPivotTableDataConsumer,
+                reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
+                scope, q, currentTime, pivotTables;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
-
                 scope = $rootScope;
                 q = $q;
 
+                var usersModules = [{
+                    'id': 'someModuleId'
+                }];
+
+                var dataSets = [{
+                    "id": "ds1",
+                    "code": "dataSetCode1"
+                }];
+
+                pivotTables = [{
+                    "id": "table1",
+                    "name": "[Field App - dataSetCode1]"
+                }, {
+                    "id": "table2",
+                    "name": "[Field App - dataSetCode2]"
+                }];
+
                 datasetRepository = new DatasetRepository();
-                spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, {}));
+                spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, dataSets));
 
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentProjects').and.returnValue(utils.getPromise(q, []));
-                spyOn(userPreferenceRepository, 'getUserModules').and.returnValue(utils.getPromise(q, {}));
+                spyOn(userPreferenceRepository, 'getUserModules').and.returnValue(utils.getPromise(q, usersModules));
                 spyOn(userPreferenceRepository, 'getOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
 
                 reportService = new ReportService();
-                spyOn(reportService, 'getPivotTables').and.returnValue(utils.getPromise(q, {}));
                 spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
 
                 pivotTableRepository = new PivotTableRepository();
-                spyOn(pivotTableRepository, 'replaceAll').and.returnValue(utils.getPromise(q, {}));
+                spyOn(pivotTableRepository, 'getAll').and.returnValue(utils.getPromise(q, pivotTables));
                 spyOn(pivotTableRepository, 'upsertPivotTableData').and.returnValue(utils.getPromise(q, {}));
 
                 changeLogRepository = new ChangeLogRepository();
-                spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, '2014-09-30T11:00:00.000Z'));
-                spyOn(changeLogRepository, 'clear').and.returnValue(utils.getPromise(q, {}));
+                spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, null));
                 spyOn(changeLogRepository, 'upsert').and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'findAllByParent').and.returnValue(utils.getPromise(q, {}));
 
+                currentTime = moment('2016-02-29T02:03:00.000Z');
                 Timecop.install();
-                Timecop.freeze(new Date('2014-10-01T12:00:00.000Z'));
+                Timecop.freeze(currentTime.toISOString());
 
                 downloadPivotTableDataConsumer = new DownloadPivotTableDataConsumer(reportService, pivotTableRepository, userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository, $q);
             }));
@@ -44,113 +60,81 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'timecop', 'r
                 Timecop.uninstall();
             });
 
-            it('should download all field app tables', function() {
-                var fieldAppPivotTables = [{
-                    "id": "table1",
-                    "name": "Field App - Nutrition Monthly Pediatric",
-                    "someAttribute": "someValue"
+            it('should download pivot table data for relevant modules and datasets', function() {
+                var usersModules = [{
+                    'id': 'module1'
                 }];
 
-                var dataSets = [{
-                    "id": "ds1",
-                    "code": "Nutrition Monthly Pediatric"
-                }];
-
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, [{
-                    "id": "mod1"
-                }]));
-                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, dataSets));
-
-                reportService.getPivotTables.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
-                reportService.getReportDataForOrgUnit.and.returnValue(utils.getPromise(q, [{
-                    "id": "id12"
-                }]));
-                pivotTableRepository.replaceAll.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
+                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, usersModules));
+                reportService.getReportDataForOrgUnit.and.returnValue(utils.getPromise(q, 'pivotTableData'));
 
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(["mod1"]);
-                expect(reportService.getPivotTables).toHaveBeenCalledWith(dataSets);
-                expect(pivotTableRepository.replaceAll).toHaveBeenCalledWith(fieldAppPivotTables);
-                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod1");
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith('Field App - Nutrition Monthly Pediatric', 'mod1', [{
-                    id: 'id12'
-                }]);
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTables[0], 'module1');
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(pivotTables[0].name, 'module1', 'pivotTableData');
             });
 
-            it('should continue download of all field app tables even if one call fails', function() {
-                var fieldAppPivotTables = [{
-                    "id": "table1",
-                    "name": "Field App - Nutrition Monthly Pediatric",
-                    "someAttribute": "someValue"
-                }];
+            it('should retrieve then update the lastUpdated time in the changeLog', function () {
+                var usersProjectIds = ['project1'];
 
+                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, usersProjectIds));
+
+                downloadPivotTableDataConsumer.run();
+                scope.$apply();
+
+                expect(changeLogRepository.get).toHaveBeenCalledWith('pivotTableData:project1');
+                expect(changeLogRepository.upsert).toHaveBeenCalledWith('pivotTableData:project1', currentTime.toISOString());
+            });
+
+            it('should continue downloading remaining pivot table data even if one call fails', function() {
                 var userModules = [{
-                    "id": "mod1"
+                    "id": "module1"
                 }, {
-                    "id": "mod2"
+                    "id": "module2"
                 }, {
-                    "id": "mod3"
-                }];
-
-                var dataSets = [{
-                    "id": "ds1",
-                    "code": "Nutrition Monthly Pediatric"
+                    "id": "module3"
                 }];
 
                 userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, userModules));
-                datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, dataSets));
-
-                reportService.getPivotTables.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
-                reportService.getReportDataForOrgUnit.and.callFake(function(table, modId) {
-                    if (table === fieldAppPivotTables[0] && modId === "mod1")
+                reportService.getReportDataForOrgUnit.and.callFake(function(table, moduleId) {
+                    if (table === pivotTables[0] && moduleId === "module1")
                         return utils.getPromise(q, "data1");
-                    if (table === fieldAppPivotTables[0] && modId === "mod2")
+                    if (table === pivotTables[0] && moduleId === "module2")
                         return utils.getRejectedPromise(q, {});
-                    if (table === fieldAppPivotTables[0] && modId === "mod3")
+                    if (table === pivotTables[0] && moduleId === "module3")
                         return utils.getPromise(q, "data3");
                 });
 
-                pivotTableRepository.replaceAll.and.returnValue(utils.getPromise(q, fieldAppPivotTables));
-
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(["mod1", "mod2", "mod3"]);
-                expect(reportService.getPivotTables).toHaveBeenCalledWith(dataSets);
-                expect(pivotTableRepository.replaceAll).toHaveBeenCalledWith(fieldAppPivotTables);
-                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod1");
-                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod2");
-                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(fieldAppPivotTables[0], "mod3");
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith('Field App - Nutrition Monthly Pediatric', 'mod1', "data1");
-                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith('Field App - Nutrition Monthly Pediatric', 'mod2', "data2");
-                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith('Field App - Nutrition Monthly Pediatric', 'mod3', "data3");
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTables[0], "module1");
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTables[0], "module2");
+                expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(pivotTables[0], "module3");
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(pivotTables[0].name, 'module1', "data1");
+                expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalledWith(pivotTables[0].name, 'module2', "data2");
+                expect(pivotTableRepository.upsertPivotTableData).toHaveBeenCalledWith(pivotTables[0].name, 'module3', "data3");
             });
 
-            it('should exit if user module is empty', function() {
+            it('should not download pivot table data if user has no modules', function() {
+                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, []));
+
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
-                expect(datasetRepository.findAllForOrgUnits).not.toHaveBeenCalled();
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(pivotTableRepository.replaceAll).not.toHaveBeenCalled();
                 expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalled();
             });
 
-            it('should exit if reports had already been downloaded for the day', function() {
-                changeLogRepository.get.and.returnValue(utils.getPromise(q, '2014-10-01T05:00:00.000Z'));
+            it('should not download pivot table data if it has already been downloaded that same day', function() {
+                changeLogRepository.get.and.returnValue(utils.getPromise(q, currentTime.subtract(1, 'hour').toISOString()));
 
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();
 
-                expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
-                expect(datasetRepository.findAllForOrgUnits).not.toHaveBeenCalled();
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
-                expect(pivotTableRepository.replaceAll).not.toHaveBeenCalled();
                 expect(pivotTableRepository.upsertPivotTableData).not.toHaveBeenCalled();
             });
-
         });
     });
