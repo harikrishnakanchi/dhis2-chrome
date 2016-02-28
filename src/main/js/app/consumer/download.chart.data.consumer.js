@@ -12,28 +12,23 @@ define(["lodash", "moment"], function(_, moment) {
                     usersProjectIds: userPreferenceRepository.getCurrentProjects(),
                     usersModuleIds: userPreferenceRepository.getUserModules().then(function(modules) {
                         return _.pluck(modules, 'id');
-                    }),
-                    usersOriginIds: userPreferenceRepository.getOriginOrgUnitIds()
+                    })
                 });
             };
 
-            var loadRelevantDatasets = function(orgUnitIds) {
-                return datasetRepository.findAllForOrgUnits(orgUnitIds);
-            };
-
-            var downloadRelevantChartData = function(charts, userModuleIds, datasets, changeLogKey) {
+            var downloadRelevantChartData = function(charts, userModuleIds, changeLogKey) {
                 var downloadOfAtLeastOneChartFailed = false;
 
-                var downloadAndUpsertChartData = function(modulesAndCharts) {
+                var recursivelyDownloadAndUpsertChartData = function(modulesAndCharts) {
                     var onSuccess = function(data) {
                         return chartRepository.upsertChartData(datum[1].name, datum[0], data).then(function() {
-                            return downloadAndUpsertChartData(modulesAndCharts);
+                            return recursivelyDownloadAndUpsertChartData(modulesAndCharts);
                         });
                     };
 
                     var onFailure = function() {
                         downloadOfAtLeastOneChartFailed = true;
-                        return downloadAndUpsertChartData(modulesAndCharts);
+                        return recursivelyDownloadAndUpsertChartData(modulesAndCharts);
                     };
 
                     if (_.isEmpty(modulesAndCharts))
@@ -43,12 +38,12 @@ define(["lodash", "moment"], function(_, moment) {
                     return reportService.getReportDataForOrgUnit(datum[1], datum[0]).then(onSuccess, onFailure);
                 };
 
-                var getDatasetsByModule = function() {
+                var getDatasetsRelevantToEachModule = function() {
 
                     var getAllDataSetsUnderModule = function(moduleIdAndOrigins) {
                         var modulesAndAllDataSets = _.reduce(moduleIdAndOrigins, function(mapOfModuleIdsToDataSets, origins, moduleId) {
                             var firstOriginId = _.pluck(origins, "id")[0];
-                            mapOfModuleIdsToDataSets[moduleId] = loadRelevantDatasets([moduleId, firstOriginId]);
+                            mapOfModuleIdsToDataSets[moduleId] = datasetRepository.findAllForOrgUnits([moduleId, firstOriginId]);
                             return mapOfModuleIdsToDataSets;
                         }, {});
                         return $q.all(modulesAndAllDataSets);
@@ -78,9 +73,9 @@ define(["lodash", "moment"], function(_, moment) {
                     return $q.when(modulesAndCharts);
                 };
 
-                return getDatasetsByModule()
+                return getDatasetsRelevantToEachModule()
                     .then(filterChartsForModules)
-                    .then(downloadAndUpsertChartData)
+                    .then(recursivelyDownloadAndUpsertChartData)
                     .then(function() {
                         if (!downloadOfAtLeastOneChartFailed) {
                             return updateChangeLog(changeLogKey);
@@ -91,7 +86,6 @@ define(["lodash", "moment"], function(_, moment) {
             return loadUserProjectsAndModuleIds().then(function(data) {
                 var projectIds = data.usersProjectIds,
                     moduleIds = data.usersModuleIds,
-                    originIds = data.usersOriginIds,
                     changeLogKey = "chartData:" + projectIds.join(';');
 
                 if (_.isEmpty(moduleIds))
@@ -102,10 +96,8 @@ define(["lodash", "moment"], function(_, moment) {
                         return;
                     }
 
-                    return loadRelevantDatasets(_.union(moduleIds, originIds)).then(function(datasets) {
-                        return chartRepository.getAll().then(function(charts) {
-                            downloadRelevantChartData(charts, moduleIds, datasets, changeLogKey);
-                        });
+                    return chartRepository.getAll().then(function(charts) {
+                        downloadRelevantChartData(charts, moduleIds, changeLogKey);
                     });
                 });
 

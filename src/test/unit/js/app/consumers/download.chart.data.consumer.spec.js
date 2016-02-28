@@ -88,6 +88,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, usersModules));
                 userPreferenceRepository.getOriginOrgUnitIds.and.returnValue(utils.getPromise(q, usersOriginIds));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [{'id': 'someOriginId'}]));
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, chartsFromDb));
                 reportService.getReportDataForOrgUnit.and.callFake(function(chart, moduleId) {
                     if (chart === chartsFromDb[0] && moduleId === "Mod1")
@@ -105,7 +106,8 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
 
                 expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
                 expect(changeLogRepository.get).toHaveBeenCalledWith('chartData:prj1;prj2');
-                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod1', 'Mod2', "origin1", "origin2"]);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod1', 'someOriginId']);
+                expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod2', 'someOriginId']);
                 expect(chartRepository.getAll).toHaveBeenCalled();
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(chartsFromDb[0], 'Mod1');
                 expect(reportService.getReportDataForOrgUnit).toHaveBeenCalledWith(chartsFromDb[0], 'Mod2');
