@@ -8,7 +8,7 @@ define(["pivotTableRepository", "angularMocks", "utils"], function(PivotTableRep
             scope = $rootScope.$new();
             mockStore = mockDB.objectStore;
 
-            pivotTableRepository = new PivotTableRepository(mockDB.db);
+            pivotTableRepository = new PivotTableRepository(mockDB.db, q);
         }));
 
         it('should save the tables', function() {
@@ -22,6 +22,38 @@ define(["pivotTableRepository", "angularMocks", "utils"], function(PivotTableRep
 
             expect(mockStore.clear).toHaveBeenCalled();
             expect(mockStore.upsert).toHaveBeenCalledWith(tables);
+        });
+
+        it('should upsert the pivot tables', function() {
+            var pivotTablesToUpsert = [{
+                'id': 'newPivotTableId',
+                'title': 'New PivotTable'
+            }, {
+                'id': 'existingPivotTableId',
+                'title': 'Updated PivotTable'
+            }];
+
+            pivotTableRepository.upsert(pivotTablesToUpsert);
+            scope.$apply();
+
+            expect(mockStore.upsert).toHaveBeenCalledWith(pivotTablesToUpsert);
+        });
+
+        it('should remove pivot tables by id', function() {
+            var pivotTableIds = ['1', '2'];
+            var dbPivotTables = [{
+                "name": "pivot table 1",
+                "id": "1"
+            }, {
+                "name": "pivot table 2",
+                "id": "2"
+            }, {
+                "name": "pivot table 3",
+                "id": "3"
+            }];
+            pivotTableRepository.deleteByIds(pivotTableIds, dbPivotTables);
+            expect(mockStore.delete).toHaveBeenCalledWith('pivot table 1');
+            expect(mockStore.delete).toHaveBeenCalledWith('pivot table 2');
         });
 
         it('should save table data', function() {

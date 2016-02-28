@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function(db) {
+    return function(db, $q) {
         var PIVOT_TABLE_STORE_NAME = 'pivotTables';
         var PIVOT_TABLE_DATA_STORE_NAME = 'pivotTableData';
 
@@ -8,6 +8,21 @@ define(["lodash"], function(_) {
             return store.clear().then(function() {
                 return store.upsert(pivotTables);
             });
+        };
+
+        this.upsert = function(pivotTables) {
+            var store = db.objectStore(PIVOT_TABLE_STORE_NAME);
+            return store.upsert(pivotTables);
+        };
+
+        this.deleteByIds = function(idsToDelete, pivotTables) {
+            var store = db.objectStore(PIVOT_TABLE_STORE_NAME);
+            return $q.all(_.map(idsToDelete, function(id) {
+                var pivotTableToDelete = _.find(pivotTables, {
+                    'id': id
+                });
+                return store.delete(pivotTableToDelete.name);
+            }));
         };
 
         this.upsertPivotTableData = function(pivotTableName, moduleId, data) {
