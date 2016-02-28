@@ -1,4 +1,4 @@
-define(["pivotTableRepository", "angularMocks", "utils"], function(PivotTableRepository, mocks, utils) {
+define(["pivotTableRepository", "angularMocks", "utils", "lodash"], function(PivotTableRepository, mocks, utils, _) {
     describe('Pivot Table Repository', function() {
         var mockStore, pivotTableRepository, q, mockDB;
 
@@ -57,9 +57,24 @@ define(["pivotTableRepository", "angularMocks", "utils"], function(PivotTableRep
             });
         });
 
-        it('should get All the tables', function() {
-            pivotTableRepository.getAll();
-            expect(mockStore.getAll).toHaveBeenCalled();
+        describe('getAll', function() {
+            it('should get all the pivot tables', function () {
+                var allPivotTables = [{
+                    'id': 'pivotTable1',
+                    'name': '[FieldApp - dataSetCode] # Name'
+                }, {
+                    'id': 'pivotTable2',
+                    'name': '[FieldApp - dataSetCode] # Name'
+                }];
+                mockStore.getAll.and.returnValue(utils.getPromise(q, allPivotTables));
+
+                pivotTableRepository.getAll().then(function (pivotTablesFromRepository) {
+                    expect(_.pluck(pivotTablesFromRepository, 'id')).toEqual(['pivotTable1', 'pivotTable2']);
+                });
+                scope.$apply();
+
+                expect(mockStore.getAll).toHaveBeenCalled();
+            });
         });
     });
 });
