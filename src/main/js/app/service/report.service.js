@@ -62,10 +62,10 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             });
         };
 
-        var getResourceDetails = function(resourceUrl, resourceIds) {
+        var getResourceDetails = function(resourceUrl, requiredFields, resourceIds) {
             var config = {
                 params: {
-                    'fields': 'id,name,title,type,sortOrder,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]'
+                    'fields': requiredFields
                 }
             };
 
@@ -99,7 +99,8 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         this.getUpdatedCharts = function(lastUpdatedTime) {
-            return getResourceIds(dhisUrl.charts, 'charts', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.charts));
+            var requiredFields = 'id,name,title,type,sortOrder,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
+            return getResourceIds(dhisUrl.charts, 'charts', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.charts, requiredFields));
         };
 
         this.getAllChartIds = function() {
@@ -107,7 +108,8 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         this.getUpdatedPivotTables = function(lastUpdatedTime) {
-            return getResourceIds(dhisUrl.pivotTables, 'reportTables', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.pivotTables));
+            var requiredFields = 'id,name,title,type,sortOrder,categoryDimensions,dataElements,indicators,dataDimensionItems,relativePeriods,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
+            return getResourceIds(dhisUrl.pivotTables, 'reportTables', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.pivotTables, requiredFields));
         };
 
         this.getAllPivotTableIds = function() {
