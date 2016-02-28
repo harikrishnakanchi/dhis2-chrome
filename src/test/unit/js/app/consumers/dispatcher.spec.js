@@ -4,7 +4,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
-            uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer;
+            uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -91,6 +91,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadChartsConsumer = {
                 'run': jasmine.createSpy("downloadChartsConsumer")
             };
+            downloadPivotTablesConsumer = {
+                'run': jasmine.createSpy("downloadPivotTablesConsumer")
+            };
             message = {};
             q = $q;
             log = $log;
@@ -109,11 +112,12 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadChartDataConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadProjectSettingsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadChartsConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            downloadPivotTablesConsumer.run.and.returnValue(utils.getPromise(q, {}));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
                 deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer,
-                downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer);
+                downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -145,6 +149,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(downloadChartsConsumer.run).toHaveBeenCalledWith(message, {});
             expect(downloadPivotTableDataConsumer.run).toHaveBeenCalledWith(message, {});
             expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(downloadPivotTablesConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
         it("should call completion data consumer for uploading completion data", function() {
