@@ -30,7 +30,7 @@ define(["lodash"], function(_) {
             });
         };
 
-        var getOriginOrgUnitIds = function() {
+        var getCurrentUsersOriginOrgUnitIds = function() {
             return getCurrentUsersModules().then(function(modules) {
                 var moduleIds = _.pluck(modules, "id");
                 return orgUnitRepository.findAllByParent(moduleIds).then(function(originOrgUnits) {
@@ -44,7 +44,7 @@ define(["lodash"], function(_) {
             "save": save,
             "getCurrentUsersProjectIds": getCurrentUsersProjectIds,
             "getCurrentUsersModules": getCurrentUsersModules,
-            "getOriginOrgUnitIds": getOriginOrgUnitIds
+            "getCurrentUsersOriginOrgUnitIds": getCurrentUsersOriginOrgUnitIds
         };
     };
 });

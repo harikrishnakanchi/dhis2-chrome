@@ -92,7 +92,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
             orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
 
             var actualResult;
-            userPreferenceRepository.getOriginOrgUnitIds().then(function(data) {
+            userPreferenceRepository.getCurrentUsersOriginOrgUnitIds().then(function(data) {
                 actualResult = data;
             });
             scope.$apply();

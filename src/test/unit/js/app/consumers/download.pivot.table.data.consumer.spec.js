@@ -32,7 +32,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, []));
                 spyOn(userPreferenceRepository, 'getCurrentUsersModules').and.returnValue(utils.getPromise(q, usersModules));
-                spyOn(userPreferenceRepository, 'getOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
+                spyOn(userPreferenceRepository, 'getCurrentUsersOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
 
                 reportService = new ReportService();
                 spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));

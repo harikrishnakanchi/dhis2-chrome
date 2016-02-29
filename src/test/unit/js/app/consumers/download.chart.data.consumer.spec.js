@@ -17,7 +17,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, []));
                 spyOn(userPreferenceRepository, 'getCurrentUsersModules').and.returnValue(utils.getPromise(q, {}));
-                spyOn(userPreferenceRepository, 'getOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
+                spyOn(userPreferenceRepository, 'getCurrentUsersOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
 
                 reportService = new ReportService();
                 spyOn(reportService, 'getReportDataForOrgUnit').and.returnValue(utils.getPromise(q, {}));
@@ -86,7 +86,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
 
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, usersProjects));
                 userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, usersModules));
-                userPreferenceRepository.getOriginOrgUnitIds.and.returnValue(utils.getPromise(q, usersOriginIds));
+                userPreferenceRepository.getCurrentUsersOriginOrgUnitIds.and.returnValue(utils.getPromise(q, usersOriginIds));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
                 orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [{'id': 'someOriginId'}]));
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, chartsFromDb));
@@ -147,7 +147,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
 
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, usersProjects));
                 userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, usersModules));
-                userPreferenceRepository.getOriginOrgUnitIds.and.returnValue(utils.getPromise(q, []));
+                userPreferenceRepository.getCurrentUsersOriginOrgUnitIds.and.returnValue(utils.getPromise(q, []));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUsersModules));
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, chartsFromDb));
                 reportService.getReportDataForOrgUnit.and.callFake(function(chart, moduleId) {
