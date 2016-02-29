@@ -4,7 +4,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
-            uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer;
+            uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
+            uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -338,7 +339,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(deleteApprovalConsumer.run).toHaveBeenCalledWith(message);
         });
 
-        it("should download  system setting consumer", function() {
+        it("should download system setting consumer", function() {
             message.data = {
                 "data": {},
                 "type": "downloadMetadata"
