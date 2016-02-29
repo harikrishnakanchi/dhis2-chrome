@@ -24,9 +24,9 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                 }
             });
             if((!_.isEmpty(attr)) && attr.value === 'true')
-                return '^([0][.][5]|[1-9][0-9]*)$';
+                return '^((0.5)|[1-9][0-9]?)$';
             else
-                return '^[1-9][0-9]*$';
+                return '^[1-9][0-9]?$';
         };
 
         //TODO remove this when all clients have moved to 2.21
