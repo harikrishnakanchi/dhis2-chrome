@@ -73,7 +73,6 @@
                                                         <td ng-repeat="option in section.categoryOptionComboIds">
                                                             <ng-form name="datavalueForm">
                                                                 <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, option, dataSet.organisationUnits)" ng-disabled="true" />
-                                                                <br/>
                                                             </ng-form>
                                                         </td>
                                                         <td ng-if="section.categoryOptionComboIds.length > 1" class="last-column">{{sum(dataValues, dataSet.organisationUnits, dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
@@ -137,7 +136,6 @@
                                                         <td ng-repeat="option in section.categoryOptionComboIds">
                                                             <ng-form name="datavalueForm">
                                                                 <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, option, orgUnit)" ng-disabled="true" />
-                                                                <br/>
                                                             </ng-form>
                                                         </td>
                                                         <td ng-if="section.categoryOptionComboIds.length > 1" class="last-column">{{sum(dataValues, orgUnit ,dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
