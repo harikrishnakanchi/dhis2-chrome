@@ -30,7 +30,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                 spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, dataSets));
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, 'getCurrentProjects').and.returnValue(utils.getPromise(q, []));
+                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, []));
                 spyOn(userPreferenceRepository, 'getUserModules').and.returnValue(utils.getPromise(q, usersModules));
                 spyOn(userPreferenceRepository, 'getOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
 
@@ -78,7 +78,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
             it('should retrieve then update the lastUpdated time in the changeLog', function () {
                 var usersProjectIds = ['project1'];
 
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, usersProjectIds));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, usersProjectIds));
 
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();

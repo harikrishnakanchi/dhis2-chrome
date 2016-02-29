@@ -4,7 +4,7 @@ define(["moment", "properties", "lodash", "dateUtils"], function(moment, propert
         this.run = function(message) {
             return datasetRepository.getAll().then(function(allDataSets) {
                 if (message.data.data.length === 0) {
-                    return userPreferenceRepository.getCurrentProjects().then(function(userProjectIds) {
+                    return userPreferenceRepository.getCurrentUsersProjectIds().then(function(userProjectIds) {
                         return getLastUpdatedTime(userProjectIds).then(function(lastUpdated) {
                             var startDate = lastUpdated ?
                                 dateUtils.subtractWeeks(properties.projectDataSync.numWeeksToSync) :

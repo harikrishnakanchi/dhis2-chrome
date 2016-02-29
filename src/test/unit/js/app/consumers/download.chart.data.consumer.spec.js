@@ -15,7 +15,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 spyOn(datasetRepository, 'findAllForOrgUnits').and.returnValue(utils.getPromise(q, {}));
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, 'getCurrentProjects').and.returnValue(utils.getPromise(q, []));
+                spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, []));
                 spyOn(userPreferenceRepository, 'getUserModules').and.returnValue(utils.getPromise(q, {}));
                 spyOn(userPreferenceRepository, 'getOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
 
@@ -84,7 +84,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                     "name": "[FieldApp - OutPatientDepartmentGeneral] Total Consultations"
                 }];
 
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, usersProjects));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, usersProjects));
                 userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, usersModules));
                 userPreferenceRepository.getOriginOrgUnitIds.and.returnValue(utils.getPromise(q, usersOriginIds));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
@@ -145,7 +145,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                     "name": "[FieldApp - OutPatientDepartmentGeneral] Total Consultations"
                 }];
 
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, usersProjects));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, usersProjects));
                 userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, usersModules));
                 userPreferenceRepository.getOriginOrgUnitIds.and.returnValue(utils.getPromise(q, []));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUsersModules));

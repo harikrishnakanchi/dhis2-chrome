@@ -123,7 +123,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
             });
         });
 
-        describe("getCurrentProjects", function() {
+        describe("getCurrentUsersProjectIds", function() {
             it("should get current user projects", function() {
                 var userPrefs = [{
                     "username": "msfadmin",
@@ -145,7 +145,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
 
                 mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
                 var actualUserProjects;
-                userPreferenceRepository.getCurrentProjects().then(function(data) {
+                userPreferenceRepository.getCurrentUsersProjectIds().then(function(data) {
                     actualUserProjects = data;
                 });
                 scope.$apply();

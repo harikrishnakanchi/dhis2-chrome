@@ -42,7 +42,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             spyOn(sessionHelper, "login").and.returnValue(utils.getPromise(q, {}));
 
             userPreferenceRepository = new UserPreferenceRepository();
-            spyOn(userPreferenceRepository, "getCurrentProjects").and.returnValue(utils.getPromise(q, []));
+            spyOn(userPreferenceRepository, "getCurrentUsersProjectIds").and.returnValue(utils.getPromise(q, []));
 
             systemSettingRepository = new SystemSettingRepository();
             spyOn(systemSettingRepository, "getAllowedOrgUnits").and.returnValue([]);
@@ -245,7 +245,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             var currentOrgUnits = ['id5'];
 
             var callIndex = 0;
-            userPreferenceRepository.getCurrentProjects.and.callFake(function () {
+            userPreferenceRepository.getCurrentUsersProjectIds.and.callFake(function () {
                 callIndex++;
                 if (callIndex == 1)
                     return utils.getPromise(q, previousOrgUnits);

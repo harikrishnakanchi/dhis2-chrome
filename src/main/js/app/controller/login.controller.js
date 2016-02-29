@@ -2,7 +2,7 @@ define(["md5", "lodash"], function(md5, _) {
     return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository) {
         var loadUserData = function(loginUsername) {
             var getExistingUserProjects = function() {
-                return userPreferenceRepository.getCurrentProjects();
+                return userPreferenceRepository.getCurrentUsersProjectIds();
             };
             var user = userRepository.getUser(loginUsername);
             var userCredentials = userRepository.getUserCredentials(loginUsername);
@@ -96,7 +96,7 @@ define(["md5", "lodash"], function(md5, _) {
         var startProjectDataSync = function(data) {
             var previousUserProjects = data[2];
 
-            userPreferenceRepository.getCurrentProjects().then(function(currentUserProjects) {
+            userPreferenceRepository.getCurrentUsersProjectIds().then(function(currentUserProjects) {
                 if (!_.isEqual(previousUserProjects,currentUserProjects) && !$rootScope.hasRoles(['Superadmin', 'Superuser'])){
                     $hustle.publish({
                         "type": "downloadProjectData",

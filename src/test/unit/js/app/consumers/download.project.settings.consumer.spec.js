@@ -20,7 +20,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                 spyOn(systemSettingService, "getProjectSettings").and.returnValue(utils.getPromise(q, {}));
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, "getCurrentProjects").and.returnValue(utils.getPromise(q, []));
+                spyOn(userPreferenceRepository, "getCurrentUsersProjectIds").and.returnValue(utils.getPromise(q, []));
 
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
@@ -35,7 +35,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             }));
 
             it("should download project settings for current user projects", function() {
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['prj1', 'prj2']));
 
                 consumer.run();
                 scope.$apply();
@@ -45,7 +45,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
             it("should download project settings and save referral locations", function() {
                 var userCurrentProjects = ['prj', 'prjWithNoReferralLocations'];
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userCurrentProjects));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
 
                 var projectSettingsFromDhis = {
                     "prjWithNoReferralLocations": {
@@ -88,7 +88,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
             it("should download project settings and save patient origin details", function() {
                 var userCurrentProjects = ['prj', 'prjWithNoPatientOriginDetails'];
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userCurrentProjects));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
 
                 var projectSettingsFromDhis = {
                     "prjWithNoPatientOriginDetails": {
@@ -127,7 +127,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
             it("should download project settings and save excluded data element details", function() {
                 var userCurrentProjects = ['prj', 'prjWithNoExcludedDataElements'];
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userCurrentProjects));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
 
                 var projectSettingsFromDhis = {
                     "prjWithNoExcludedDataElements": {
@@ -165,7 +165,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             });
 
             it("should not fail if current user projects are not available", function() {
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, undefined));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, undefined));
 
                 consumer.run();
                 scope.$apply();

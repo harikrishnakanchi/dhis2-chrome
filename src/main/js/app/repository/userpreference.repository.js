@@ -15,7 +15,7 @@ define(["lodash"], function(_) {
             return store.upsert(userPreferences);
         };
 
-        var getCurrentProjects = function() {
+        var getCurrentUsersProjectIds = function() {
             return getAll().then(function(userPreferences) {
                 var currentUserPreferences = _.last(_.sortBy(userPreferences, "lastUpdated")) || {};
                 return _.pluck(currentUserPreferences.organisationUnits, "id");
@@ -23,13 +23,13 @@ define(["lodash"], function(_) {
         };
 
         var getCurrentUserOperationalUnits = function() {
-            return getCurrentProjects().then(function(currentProjectIds) {
+            return getCurrentUsersProjectIds().then(function(currentProjectIds) {
                 return orgUnitRepository.getAllOpUnitsInOrgUnits(currentProjectIds);
             });
         };
 
         var getUserModules = function() {
-            return getCurrentProjects().then(function(currentProjectIds) {
+            return getCurrentUsersProjectIds().then(function(currentProjectIds) {
                 return orgUnitRepository.getAllModulesInOrgUnits(currentProjectIds).then(function(userModules) {
                     return userModules;
                 });
@@ -48,7 +48,7 @@ define(["lodash"], function(_) {
         return {
             "get": get,
             "save": save,
-            "getCurrentProjects": getCurrentProjects,
+            "getCurrentUsersProjectIds": getCurrentUsersProjectIds,
             "getCurrentUserOperationalUnits": getCurrentUserOperationalUnits,
             "getUserModules": getUserModules,
             "getOriginOrgUnitIds": getOriginOrgUnitIds
