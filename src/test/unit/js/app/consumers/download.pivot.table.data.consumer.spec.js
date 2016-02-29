@@ -31,7 +31,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
 
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, []));
-                spyOn(userPreferenceRepository, 'getUserModules').and.returnValue(utils.getPromise(q, usersModules));
+                spyOn(userPreferenceRepository, 'getCurrentUsersModules').and.returnValue(utils.getPromise(q, usersModules));
                 spyOn(userPreferenceRepository, 'getOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
 
                 reportService = new ReportService();
@@ -65,7 +65,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                     'id': 'module1'
                 }];
 
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, usersModules));
+                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, usersModules));
                 reportService.getReportDataForOrgUnit.and.returnValue(utils.getPromise(q, 'pivotTableData'));
 
                 downloadPivotTableDataConsumer.run();
@@ -96,7 +96,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
                     "id": "module3"
                 }];
 
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, userModules));
+                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, userModules));
                 reportService.getReportDataForOrgUnit.and.callFake(function(table, moduleId) {
                     if (table === pivotTables[0] && moduleId === "module1")
                         return utils.getPromise(q, "data1");
@@ -118,7 +118,7 @@ define(['downloadPivotTableDataConsumer', 'angularMocks', 'utils', 'moment', 'ti
             });
 
             it('should not download pivot table data if user has no modules', function() {
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, []));
+                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, []));
 
                 downloadPivotTableDataConsumer.run();
                 scope.$apply();

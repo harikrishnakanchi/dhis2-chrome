@@ -22,7 +22,7 @@ define(["lodash"], function(_) {
             });
         };
 
-        var getUserModules = function() {
+        var getCurrentUsersModules = function() {
             return getCurrentUsersProjectIds().then(function(currentProjectIds) {
                 return orgUnitRepository.getAllModulesInOrgUnits(currentProjectIds).then(function(userModules) {
                     return userModules;
@@ -31,7 +31,7 @@ define(["lodash"], function(_) {
         };
 
         var getOriginOrgUnitIds = function() {
-            return getUserModules().then(function(modules) {
+            return getCurrentUsersModules().then(function(modules) {
                 var moduleIds = _.pluck(modules, "id");
                 return orgUnitRepository.findAllByParent(moduleIds).then(function(originOrgUnits) {
                     return _.pluck(originOrgUnits, "id");
@@ -43,7 +43,7 @@ define(["lodash"], function(_) {
             "get": get,
             "save": save,
             "getCurrentUsersProjectIds": getCurrentUsersProjectIds,
-            "getUserModules": getUserModules,
+            "getCurrentUsersModules": getCurrentUsersModules,
             "getOriginOrgUnitIds": getOriginOrgUnitIds
         };
     };

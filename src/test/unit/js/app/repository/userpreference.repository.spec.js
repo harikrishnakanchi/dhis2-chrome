@@ -64,7 +64,7 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModulesInRepo));
 
             var actualUserModules;
-            userPreferenceRepository.getUserModules().then(function(data) {
+            userPreferenceRepository.getCurrentUsersModules().then(function(data) {
                 actualUserModules = data;
             });
             scope.$apply();

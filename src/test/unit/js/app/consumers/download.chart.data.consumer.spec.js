@@ -16,7 +16,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
 
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, []));
-                spyOn(userPreferenceRepository, 'getUserModules').and.returnValue(utils.getPromise(q, {}));
+                spyOn(userPreferenceRepository, 'getCurrentUsersModules').and.returnValue(utils.getPromise(q, {}));
                 spyOn(userPreferenceRepository, 'getOriginOrgUnitIds').and.returnValue(utils.getPromise(q, {}));
 
                 reportService = new ReportService();
@@ -85,7 +85,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 }];
 
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, usersProjects));
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, usersModules));
+                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, usersModules));
                 userPreferenceRepository.getOriginOrgUnitIds.and.returnValue(utils.getPromise(q, usersOriginIds));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUserModules));
                 orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [{'id': 'someOriginId'}]));
@@ -104,7 +104,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
+                expect(userPreferenceRepository.getCurrentUsersModules).toHaveBeenCalled();
                 expect(changeLogRepository.get).toHaveBeenCalledWith('chartData:prj1;prj2');
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod1', 'someOriginId']);
                 expect(datasetRepository.findAllForOrgUnits).toHaveBeenCalledWith(['Mod2', 'someOriginId']);
@@ -146,7 +146,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 }];
 
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, usersProjects));
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, usersModules));
+                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, usersModules));
                 userPreferenceRepository.getOriginOrgUnitIds.and.returnValue(utils.getPromise(q, []));
                 datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasetsAssociatedWithUsersModules));
                 chartRepository.getAll.and.returnValue(utils.getPromise(q, chartsFromDb));
@@ -171,7 +171,7 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
+                expect(userPreferenceRepository.getCurrentUsersModules).toHaveBeenCalled();
                 expect(datasetRepository.findAllForOrgUnits).not.toHaveBeenCalled();
                 expect(chartRepository.getAll).not.toHaveBeenCalled();
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();
@@ -190,13 +190,13 @@ define(['downloadChartDataConsumer', 'angularMocks', 'utils', 'timecop', 'moment
                     "id": "Mod3"
                 }];
 
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, usersModules));
+                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, usersModules));
                 changeLogRepository.get.and.returnValue(utils.getPromise(q, currentTime.subtract(1, 'hour').toISOString()));
 
                 downloadChartDataConsumer.run();
                 scope.$apply();
 
-                expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
+                expect(userPreferenceRepository.getCurrentUsersModules).toHaveBeenCalled();
                 expect(datasetRepository.findAllForOrgUnits).not.toHaveBeenCalled();
                 expect(chartRepository.getAll).not.toHaveBeenCalled();
                 expect(reportService.getReportDataForOrgUnit).not.toHaveBeenCalled();

@@ -9,7 +9,7 @@ define(["lodash", "moment"], function(_, moment) {
             var loadUserProjectsAndModuleIds = function() {
                 return $q.all({
                     usersProjectIds: userPreferenceRepository.getCurrentUsersProjectIds(),
-                    usersModuleIds: userPreferenceRepository.getUserModules().then(function(modules) {
+                    usersModuleIds: userPreferenceRepository.getCurrentUsersModules().then(function(modules) {
                         return _.pluck(modules, 'id');
                     })
                 });
