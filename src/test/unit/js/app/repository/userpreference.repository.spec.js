@@ -102,27 +102,6 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
             expect(actualResult).toEqual(["o1", "o2"]);
         });
 
-        describe("getCurrentUserOperationalUnits", function() {
-            it("should get operational units for current user", function() {
-                var opUnits = [{
-                    "id": "opUnit1"
-                }, {
-                    "id": "opUnit2"
-                }];
-
-                orgUnitRepository.getAllOpUnitsInOrgUnits.and.returnValue(utils.getPromise(q, opUnits));
-
-                var actualOpUnits;
-                userPreferenceRepository.getCurrentUserOperationalUnits().then(function(data) {
-                    actualOpUnits = data;
-                });
-
-                scope.$apply();
-                expect(orgUnitRepository.getAllOpUnitsInOrgUnits).toHaveBeenCalledWith(['proj1']);
-                expect(actualOpUnits).toEqual(opUnits);
-            });
-        });
-
         describe("getCurrentUsersProjectIds", function() {
             it("should get current user projects", function() {
                 var userPrefs = [{

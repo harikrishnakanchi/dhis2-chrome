@@ -22,12 +22,6 @@ define(["lodash"], function(_) {
             });
         };
 
-        var getCurrentUserOperationalUnits = function() {
-            return getCurrentUsersProjectIds().then(function(currentProjectIds) {
-                return orgUnitRepository.getAllOpUnitsInOrgUnits(currentProjectIds);
-            });
-        };
-
         var getUserModules = function() {
             return getCurrentUsersProjectIds().then(function(currentProjectIds) {
                 return orgUnitRepository.getAllModulesInOrgUnits(currentProjectIds).then(function(userModules) {
@@ -49,7 +43,6 @@ define(["lodash"], function(_) {
             "get": get,
             "save": save,
             "getCurrentUsersProjectIds": getCurrentUsersProjectIds,
-            "getCurrentUserOperationalUnits": getCurrentUserOperationalUnits,
             "getUserModules": getUserModules,
             "getOriginOrgUnitIds": getOriginOrgUnitIds
         };
