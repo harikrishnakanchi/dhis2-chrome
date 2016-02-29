@@ -136,5 +136,27 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
                 expect(actualUserProjects).toEqual(["proj1"]);
             });
         });
+
+        describe('getCurrentUsersUsername', function() {
+            it('should get current users username', function() {
+                var userPrefs = [{
+                    'username': 'msfadmin',
+                    'lastUpdated': ''
+                }, {
+                    'username': 'new_user',
+                    'lastUpdated': moment('2015-08-24').toISOString()
+                }, {
+                    'username': 'new2_user',
+                    'lastUpdated': moment('2015-08-23').toISOString()
+                }];
+
+                mockStore.getAll.and.returnValue(utils.getPromise(q, userPrefs));
+
+                userPreferenceRepository.getCurrentUsersUsername().then(function(repositoryResponse) {
+                    expect(repositoryResponse).toEqual('new_user');
+                });
+                scope.$apply();
+            });
+        });
     });
 });

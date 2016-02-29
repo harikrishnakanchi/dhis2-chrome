@@ -15,10 +15,22 @@ define(["lodash"], function(_) {
             return store.upsert(userPreferences);
         };
 
-        var getCurrentUsersProjectIds = function() {
+        var getCurrentUsersPreferences = function() {
             return getAll().then(function(userPreferences) {
-                var currentUserPreferences = _.last(_.sortBy(userPreferences, "lastUpdated")) || {};
-                return _.pluck(currentUserPreferences.organisationUnits, "id");
+                var currentUserPreferences = _.last(_.sortBy(userPreferences, 'lastUpdated')) || {};
+                return currentUserPreferences;
+            });
+        };
+
+        var getCurrentUsersUsername = function() {
+            return getCurrentUsersPreferences().then(function(userPreference) {
+                return userPreference.username;
+            });
+        };
+
+        var getCurrentUsersProjectIds = function() {
+            return getCurrentUsersPreferences().then(function(userPreference) {
+                return _.pluck(userPreference.organisationUnits, 'id');
             });
         };
 
@@ -40,11 +52,12 @@ define(["lodash"], function(_) {
         };
 
         return {
-            "get": get,
-            "save": save,
-            "getCurrentUsersProjectIds": getCurrentUsersProjectIds,
-            "getCurrentUsersModules": getCurrentUsersModules,
-            "getCurrentUsersOriginOrgUnitIds": getCurrentUsersOriginOrgUnitIds
+            'get': get,
+            'save': save,
+            'getCurrentUsersUsername': getCurrentUsersUsername,
+            'getCurrentUsersProjectIds': getCurrentUsersProjectIds,
+            'getCurrentUsersModules': getCurrentUsersModules,
+            'getCurrentUsersOriginOrgUnitIds': getCurrentUsersOriginOrgUnitIds
         };
     };
 });
