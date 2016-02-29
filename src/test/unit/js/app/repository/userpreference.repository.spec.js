@@ -1,6 +1,6 @@
 define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitRepository"], function(UserPreferenceRepository, mocks, utils, moment, OrgUnitRepository) {
     describe("User Preference repository", function() {
-        var db, mockStore, q, scope, orgUnitRepository;
+        var db, mockStore, q, scope, orgUnitRepository, userPreferenceRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             var mockDB = utils.getMockDB($q);
@@ -53,72 +53,76 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
             expect(mockStore.upsert).toHaveBeenCalledWith(userPreference);
         });
 
-        it("should get all modules id", function() {
-            var userModulesInRepo = [{
-                "id": "mod1"
-            }, {
-                "id": "mod2"
-            }, {
-                "id": "mod3"
-            }];
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModulesInRepo));
-
-            var actualUserModules;
-            userPreferenceRepository.getCurrentUsersModules().then(function(data) {
-                actualUserModules = data;
-            });
-            scope.$apply();
-
-            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1']);
-            expect(actualUserModules).toEqual(userModulesInRepo);
-        });
-
-        it("should get all patient origin org units for user's modules", function() {
-            var userModules = [{
-                "id": "mod1"
-            }, {
-                "id": "mod2"
-            }];
-
-            var originOrgUnits = [{
-                "id": "o1",
-                "name": "o1"
-            }, {
-                "id": "o2",
-                "name": "o2"
-            }];
-
-            orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModules));
-            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
-
-            var actualResult;
-            userPreferenceRepository.getCurrentUsersOriginOrgUnitIds().then(function(data) {
-                actualResult = data;
-            });
-            scope.$apply();
-
-            expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1']);
-            expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(['mod1', 'mod2']);
-            expect(actualResult).toEqual(["o1", "o2"]);
-        });
-
-        describe("getCurrentUsersProjectIds", function() {
-            it("should get current user projects", function() {
-                var userPrefs = [{
-                    "username": "msfadmin",
-                    "lastUpdated": "",
-                    "organisationUnits": []
+        describe('getCurrentUsersModules', function() {
+            it('should get current users modules', function() {
+                var userModulesInRepo = [{
+                    'id': 'mod1'
                 }, {
-                    "username": "new_user",
-                    "lastUpdated": moment("2015-08-24").toISOString(),
-                    "organisationUnits": [{
-                        "id": "proj1"
+                    'id': 'mod2'
+                }, {
+                    'id': 'mod3'
+                }];
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModulesInRepo));
+
+                var actualUserModules;
+                userPreferenceRepository.getCurrentUsersModules().then(function(data) {
+                    actualUserModules = data;
+                });
+                scope.$apply();
+
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1']);
+                expect(actualUserModules).toEqual(userModulesInRepo);
+            });
+        });
+
+        describe('getCurrentUsersOriginOrgUnitIds', function() {
+            it('should get all patient origin org units for users modules', function() {
+                var userModules = [{
+                    'id': 'mod1'
+                }, {
+                    'id': 'mod2'
+                }];
+
+                var originOrgUnits = [{
+                    'id': 'o1',
+                    'name': 'o1'
+                }, {
+                    'id': 'o2',
+                    'name': 'o2'
+                }];
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, userModules));
+                orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, originOrgUnits));
+
+                var actualResult;
+                userPreferenceRepository.getCurrentUsersOriginOrgUnitIds().then(function(data) {
+                    actualResult = data;
+                });
+                scope.$apply();
+
+                expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(['proj1']);
+                expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(['mod1', 'mod2']);
+                expect(actualResult).toEqual(['o1', 'o2']);
+            });
+        });
+
+        describe('getCurrentUsersProjectIds', function() {
+            it('should get current user projects', function() {
+                var userPrefs = [{
+                    'username': 'msfadmin',
+                    'lastUpdated': '',
+                    'organisationUnits': []
+                }, {
+                    'username': 'new_user',
+                    'lastUpdated': moment('2015-08-24').toISOString(),
+                    'organisationUnits': [{
+                        'id': 'proj1'
                     }]
                 }, {
-                    "username": "new2_user",
-                    "lastUpdated": moment("2015-08-23").toISOString(),
-                    "organisationUnits": [{
-                        "id": "proj2"
+                    'username': 'new2_user',
+                    'lastUpdated': moment('2015-08-23').toISOString(),
+                    'organisationUnits': [{
+                        'id': 'proj2'
                     }]
                 }];
 
