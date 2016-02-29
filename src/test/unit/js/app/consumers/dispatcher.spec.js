@@ -5,7 +5,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
-            uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer;
+            uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository;
 
         beforeEach(mocks.inject(function($q, $log, $rootScope) {
             uploadApprovalDataConsumer = {
@@ -95,6 +95,9 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadPivotTablesConsumer = {
                 'run': jasmine.createSpy("downloadPivotTablesConsumer")
             };
+            userPreferenceRepository = {
+                'getCurrentUsersUsername': jasmine.createSpy("userPreferenceRepository")
+            };
             message = {};
             q = $q;
             log = $log;
@@ -114,11 +117,12 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadProjectSettingsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadChartsConsumer.run.and.returnValue(utils.getPromise(q, {}));
             downloadPivotTablesConsumer.run.and.returnValue(utils.getPromise(q, {}));
+            userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'someUsername'));
 
             dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
                 deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer,
-                downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer);
+                downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository);
         }));
 
         it("should call upload data consumer for uploading data values", function() {
@@ -134,23 +138,46 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             expect(uploadDataConsumer.run).toHaveBeenCalledWith(message, {});
         });
 
-        it("should call all project-data-related download consumers", function() {
-            var message = {};
-            message.data = {
-                "data": {},
-                "type": "downloadProjectData"
-            };
-            var returnValue = dispatcher.run(message);
-            scope.$apply();
+        describe('downloadProjectData job', function() {
+            it("should call all project-data-related download consumers", function() {
+                var message = {};
+                message.data = {
+                    "data": {},
+                    "type": "downloadProjectData"
+                };
+                var returnValue = dispatcher.run(message);
+                scope.$apply();
 
-            expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
-            expect(downloadDataConsumer.run).toHaveBeenCalledWith(message, jasmine.any(Object));
-            expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
-            expect(downloadEventDataConsumer.run).toHaveBeenCalledWith(message, {});
-            expect(downloadChartsConsumer.run).toHaveBeenCalledWith(message, {});
-            expect(downloadPivotTableDataConsumer.run).toHaveBeenCalledWith(message, {});
-            expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(message, {});
-            expect(downloadPivotTablesConsumer.run).toHaveBeenCalledWith(message, {});
+                expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
+                expect(downloadDataConsumer.run).toHaveBeenCalledWith(message);
+                expect(downloadApprovalConsumer.run).toHaveBeenCalledWith(message, {});
+                expect(downloadEventDataConsumer.run).toHaveBeenCalledWith(message, {});
+                expect(downloadChartsConsumer.run).toHaveBeenCalledWith(message, {});
+                expect(downloadPivotTableDataConsumer.run).toHaveBeenCalledWith(message, {});
+                expect(downloadChartDataConsumer.run).toHaveBeenCalledWith(message, {});
+                expect(downloadPivotTablesConsumer.run).toHaveBeenCalledWith(message, {});
+            });
+
+            it('should only call project settings download consumer if current user is an admin', function() {
+                var message = {};
+                message.data = {
+                    "data": {},
+                    "type": 'downloadProjectData'
+                };
+                userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'projectadmin'));
+
+                var returnValue = dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
+                expect(downloadDataConsumer.run).not.toHaveBeenCalled();
+                expect(downloadApprovalConsumer.run).not.toHaveBeenCalled();
+                expect(downloadEventDataConsumer.run).not.toHaveBeenCalled();
+                expect(downloadChartsConsumer.run).not.toHaveBeenCalled();
+                expect(downloadPivotTableDataConsumer.run).not.toHaveBeenCalled();
+                expect(downloadChartDataConsumer.run).not.toHaveBeenCalled();
+                expect(downloadPivotTablesConsumer.run).not.toHaveBeenCalled();
+            });
         });
 
         it("should call completion data consumer for uploading completion data", function() {
