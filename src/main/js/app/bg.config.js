@@ -34,7 +34,7 @@ require.config({
         "dataRepository": "app/repository/data.repository",
         "approvalDataRepository": "app/repository/approval.data.repository",
         "datasetRepository": "app/repository/dataset.repository",
-        "userPreferenceRepository": "app/repository/userpreference.repository",
+        "userPreferenceRepository": "app/repository/user.preference.repository",
         "orgUnitRepository": "app/repository/orgunit.repository",
         "programEventRepository": "app/repository/program.event.repository",
         "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
