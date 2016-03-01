@@ -139,13 +139,15 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
         });
 
         describe('downloadProjectData job', function() {
+            var message = {
+                'data': {
+                    'data': {},
+                    'type': 'downloadProjectData'
+                }
+            };
+
             it("should call all project-data-related download consumers", function() {
-                var message = {};
-                message.data = {
-                    "data": {},
-                    "type": "downloadProjectData"
-                };
-                var returnValue = dispatcher.run(message);
+                dispatcher.run(message);
                 scope.$apply();
 
                 expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
@@ -159,25 +161,25 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             });
 
             it('should only call project settings download consumer if current user is an admin', function() {
-                var message = {};
-                message.data = {
-                    "data": {},
-                    "type": 'downloadProjectData'
-                };
                 userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'projectadmin'));
 
-                var returnValue = dispatcher.run(message);
+                dispatcher.run(message);
                 scope.$apply();
 
                 expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
                 expect(downloadDataConsumer.run).not.toHaveBeenCalled();
-                expect(downloadApprovalConsumer.run).not.toHaveBeenCalled();
-                expect(downloadEventDataConsumer.run).not.toHaveBeenCalled();
-                expect(downloadChartsConsumer.run).not.toHaveBeenCalled();
-                expect(downloadPivotTableDataConsumer.run).not.toHaveBeenCalled();
-                expect(downloadChartDataConsumer.run).not.toHaveBeenCalled();
-                expect(downloadPivotTablesConsumer.run).not.toHaveBeenCalled();
             });
+
+            it('should only call project settings download consumer if no user has ever logged in', function() {
+                userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, null));
+
+                dispatcher.run(message);
+                scope.$apply();
+
+                expect(downloadProjectSettingsConsumer.run).toHaveBeenCalledWith(message);
+                expect(downloadDataConsumer.run).not.toHaveBeenCalled();
+            });
+
         });
 
         it("should call completion data consumer for uploading completion data", function() {

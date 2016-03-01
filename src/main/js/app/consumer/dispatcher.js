@@ -23,7 +23,7 @@ define(["lodash"], function(_) {
                     return downloadProjectSettingsConsumer.run(message)
                         .then(userPreferenceRepository.getCurrentUsersUsername)
                         .then(function(currentUsersUsername) {
-                            if(currentUsersUsername == 'superadmin' || currentUsersUsername == 'projectadmin') {
+                            if(currentUsersUsername == 'superadmin' || currentUsersUsername == 'projectadmin' || currentUsersUsername === null) {
                                 $log.info('Project data sync complete');
                                 return;
                             }

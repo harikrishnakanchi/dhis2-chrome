@@ -24,7 +24,7 @@ define(["lodash"], function(_) {
 
         var getCurrentUsersUsername = function() {
             return getCurrentUsersPreferences().then(function(userPreference) {
-                return userPreference.username;
+                return userPreference.username || null;
             });
         };
 

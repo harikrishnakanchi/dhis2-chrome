@@ -157,6 +157,15 @@ define(["userPreferenceRepository", "angularMocks", "utils", "moment", "orgUnitR
                 });
                 scope.$apply();
             });
+
+            it('should return null if current user is not defined', function() {
+                mockStore.getAll.and.returnValue(utils.getPromise(q, []));
+
+                userPreferenceRepository.getCurrentUsersUsername().then(function(repositoryResponse) {
+                    expect(repositoryResponse).toBeNull();
+                });
+                scope.$apply();
+            });
         });
     });
 });
