@@ -259,8 +259,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                         return new Date(dv.value);
                     }
 
-                    if (dv.type === "int") {
-                        return parseInt(dv.value);
+                    if (dv.type === "int" || dv.type === 'NUMBER') {
+                        return parseFloat(dv.value);
                     }
 
                     return dv.value;
