@@ -393,9 +393,11 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
             });
             it("should return the sum of column for given option ", function() {
                 var sectionDataElements = [{
-                    "id": "de1"
+                    "id": "de1",
+                    "isIncluded": true
                 }, {
-                    "id": "de2"
+                    "id": "de2",
+                    "isIncluded": true
                 }];
                 var dataValues = {
                     "ou1": {
@@ -447,17 +449,79 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
                 expect(scope.columnSum(dataValues, orgUnits, sectionDataElements, "c1")).toBe(12);
             });
+            
+            it("should return the column sum in a section for only data elements which are included", function() {
+                var sectionDataElements = [{
+                    "id": "de1",
+                    "isIncluded": true
+                }, {
+                    "id": "de2",
+                    "isIncluded": false
+                }];
+                var dataValues = {
+                    "ou1": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c2": {
+                                "value": "2"
+                            }
+                        },
+                        "de2": {
+                            "c1": {
+                                "value": "10"
+                            },
+                            "c2": {
+                                "value": "20"
+                            }
+                        }
+                    },
+                    "ou2": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c2": {
+                                "value": "2"
+                            }
+                        },
+                        "de3": {
+                            "c1": {
+                                "value": "10"
+                            }
+                        }
+                    },
+                    "ou3": undefined
+                };
+
+                var orgUnits = [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }, {
+                    "id": "ou2",
+                    "name": "ou2"
+                }, {
+                    "id": "ou3",
+                    "name": "ou3"
+                }];
+
+                expect(scope.columnSum(dataValues, orgUnits, sectionDataElements, "c1")).toBe(2);
+            });
 
             it("should return the column sum in a section for configured data elements in referral dataset", function() {
                 var sectionDataElements = [{
                     "id": "de1",
-                    "formName": "DE 1"
+                    "formName": "DE 1",
+                    "isIncluded": true
                 }, {
                     "id": "de2",
-                    "formName": "DE 2"
+                    "formName": "DE 2",
+                    "isIncluded": true
                 }, {
                     "id": "de3",
-                    "formName": "DE 3"
+                    "formName": "DE 3",
+                    "isIncluded": true
                 }];
 
                 var dataValues = {
