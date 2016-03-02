@@ -3,9 +3,10 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         $scope.projects = [];
 
         $scope.getConnectedToMessage = function() {
+            var praxisVersionMessage = 'Version ' + chrome.runtime.getManifest().version + ' ';
             var dhisUrl = systemSettingRepository.getDhisUrl();
             var message = $scope.resourceBundle ? $scope.resourceBundle.connectedTo + " " + dhisUrl : "";
-            return dhisUrl ? message : "";
+            return dhisUrl ? praxisVersionMessage + message : praxisVersionMessage;
         };
 
         $scope.canChangeProject = function(hasUserLoggedIn, isCoordinationApprover) {

@@ -1,6 +1,11 @@
 define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
     return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository) {
 
+        var formatYAxisTicks = function(datum) {
+            var isFraction = function(x) { return x % 1 !== 0; };
+            return isFraction(datum) ? '' : d3.format('.0f')(datum);
+        };
+
         $scope.barChartOptions = {
             "chart": {
                 "type": "multiBarChart",
@@ -28,16 +33,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     }
                 },
                 "yAxis": {
-                    "tickFormat": function(d) {
-                        return d3.format('.0f')(d);
-                    }
-                },
-                "callback": function(chart) {
-                    if (chart.yAxis.scale().domain()[1] <= 10) {
-                        chart.yDomain([0, 10]);
-                        chart.yAxis.tickValues(d3.range(1, 10));
-                        chart.update();
-                    }
+                    "tickFormat": formatYAxisTicks
                 }
             }
         };
@@ -69,16 +65,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     }
                 },
                 "yAxis": {
-                    "tickFormat": function(d) {
-                        return d3.format('.0f')(d);
-                    }
-                },
-                "callback": function(chart) {
-                    if (chart.yAxis.scale().domain()[1] <= 10) {
-                        chart.yDomain([0, 10]);
-                        chart.yAxis.tickValues(d3.range(1, 10));
-                        chart.update();
-                    }
+                    "tickFormat": formatYAxisTicks
                 }
             }
         };
@@ -110,17 +97,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     }
                 },
                 "yAxis": {
-                    "tickFormat": function(d) {
-                        return d3.format('.0f')(d);
-                    }
-                },
-                "callback": function(chart) {
-                    if (chart.yAxis.scale().domain()[1] <= 10) {
-                        //chart.lines.forceY([0, 10]);
-                        chart.yDomain([0, 10]);
-                        chart.yAxis.tickValues(d3.range(1, 10));
-                        chart.update();
-                    }
+                    "tickFormat": formatYAxisTicks
                 }
             }
         };
@@ -240,7 +217,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
                     return {
                         "title": chart.title,
-                        "dataset": chart.dataset,
+                        "dataSetCode": chart.dataSetCode,
                         "type": chart.type,
                         "data": transformedChartData
                     };
@@ -317,7 +294,7 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     return {
                         'table': table,
                         'data': data,
-                        'dataset': table.dataset
+                        'dataSetCode': table.dataSetCode
                     };
                 });
             }));
@@ -335,11 +312,11 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             _.each($scope.datasets, function(eachDataSet) {
 
                 var filteredCharts = _.filter($scope.chartData, {
-                    "dataset": eachDataSet.id
+                    "dataSetCode": eachDataSet.code
                 });
 
                 var filteredPivotTables = _.filter($scope.pivotTables, {
-                    "dataset": eachDataSet.id
+                    "dataSetCode": eachDataSet.code
                 });
 
                 eachDataSet.isChartsAvailable = _.any(filteredCharts, function(chart) {

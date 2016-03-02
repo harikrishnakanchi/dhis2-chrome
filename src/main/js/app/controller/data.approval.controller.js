@@ -13,6 +13,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
             $scope.firstLevelApproveSuccess = false;
             $scope.secondLevelApproveSuccess = false;
             $scope.approveError = false;
+            $scope.syncError = false;
             $scope.excludedDataElements = {};
             $scope.associatedProgramId = undefined;
             $scope.rowTotal = {};
@@ -24,7 +25,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
         };
 
         $scope.showForm = function() {
-            if (_.isEmpty($scope.dataValues))
+            if (_.isEmpty($scope.dataValues) || $scope.syncError)
                 return false;
 
             return ($scope.isSubmitted && $rootScope.hasRoles(['Project Level Approver', 'Observer'])) || ($scope.isCompleted && $rootScope.hasRoles(['Coordination Level Approver', 'Observer']));
@@ -89,8 +90,9 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
         };
 
         $scope.columnSum = function(dataValues, orgUnits, sectionDataElements, optionId, isReferralDataset) {
+            var filteredDataElements = _.filter(sectionDataElements, {"isIncluded": true});
             orgUnits = _.isArray(orgUnits) ? orgUnits : [orgUnits];
-            var dataElementIds = isReferralDataset ? getReferralDataElementIds(sectionDataElements) : _.pluck(sectionDataElements, "id");
+            var dataElementIds = isReferralDataset ? getReferralDataElementIds(filteredDataElements) : _.pluck(filteredDataElements, "id");
 
             var allValues = [];
             _.forEach(orgUnits, function(orgUnit) {
@@ -189,6 +191,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 .finally(scrollToTop);
         };
 
+        $scope.showTotalLabelForOriginDatasetSection = function (dataSet) {
+            var count = 0;
+            _.each(dataSet.organisationUnits, function (orgUnit) {
+                if ($scope.moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) >= 0)
+                    count++;
+            });
+            return count > 1;
+        };
+
         var initializeForm = function() {
             currentPeriod = moment().isoWeekYear($scope.week.weekYear).isoWeek($scope.week.weekNumber).format("GGGG[W]WW");
             currentPeriodAndOrgUnit = {
@@ -275,10 +286,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     $scope.isApproved = !_.isEmpty(data) && data.isApproved;
                 });
 
+                var loadSyncStatusForPeriodAndOrgunitPromise = dataRepository.getLocalStatus(currentPeriodAndOrgUnit.period, currentPeriodAndOrgUnit.orgUnit)
+                    .then(function(status) {
+                        $scope.syncError = status == 'FAILED_TO_SYNC';
+                    });
+
                 if ($scope.dataentryForm !== undefined)
                     $scope.dataentryForm.$setPristine();
 
-                return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadApprovalDataPromise]);
+                return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadApprovalDataPromise, loadSyncStatusForPeriodAndOrgunitPromise]);
 
             }).finally(function() {
                 $scope.loading = false;

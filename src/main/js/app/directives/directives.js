@@ -1,7 +1,8 @@
-define(["pivotTable", "pivotTableController"], function(pivotTable, pivotTableController) {
-    var init = function(app) {
+define(["pivotTable", "pivotTableController", "lockedTableHeader"], function (pivotTable, pivotTableController, lockedTableHeader) {
+    var init = function (app) {
         app.directive('pivotTable', ['$http', pivotTable]);
-        app.controller('pivotTableController', ['$scope', 'resourceBundleService', pivotTableController]);
+        app.controller('pivotTableController', ['$scope', '$rootScope', pivotTableController]);
+        app.directive('lockedTableHeader', ['$timeout', '$window', lockedTableHeader]);
     };
     return {
         init: init

@@ -13,7 +13,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 Timecop.freeze(thisMoment.toDate());
 
                 userPreferenceRepository = new UserPreferenceRepository();
-                spyOn(userPreferenceRepository, "getCurrentProjects").and.returnValue(utils.getPromise(q, ["proj_1"]));
+                spyOn(userPreferenceRepository, "getCurrentUsersProjectIds").and.returnValue(utils.getPromise(q, ["proj_1"]));
 
                 datasetRepository = {
                     "getAll": jasmine.createSpy("getAll").and.returnValue(utils.getPromise(q, [{
@@ -59,7 +59,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 var userProjects = [{
                     "id": "prj1"
                 }];
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userProjects));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userProjects));
 
                 datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
                     "id": "ds1",
@@ -106,7 +106,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 downloadDataConsumer.run(message);
                 scope.$apply();
 
-                expect(userPreferenceRepository.getCurrentProjects).toHaveBeenCalled();
+                expect(userPreferenceRepository.getCurrentUsersProjectIds).toHaveBeenCalled();
                 expect(dataService.downloadData).toHaveBeenCalledWith(userProjects, ["ds2"], jasmine.any(String), lastUpdated);
             });
 
@@ -115,7 +115,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 var userProjects = [{
                     "id": "prj1"
                 }];
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userProjects));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userProjects));
 
                 datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
                     "id": "ds1",
@@ -175,7 +175,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 var userProjects = [{
                     "id": "prj1"
                 }];
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userProjects));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userProjects));
 
                 datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
                     "id": "ds1",
@@ -268,7 +268,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
                 var userProjects = [{
                     "id": "prj1"
                 }];
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, userProjects));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userProjects));
 
                 datasetRepository.getAll.and.returnValue(utils.getPromise(q, [{
                     "id": "ds1",
@@ -408,7 +408,7 @@ define(["downloadDataConsumer", "angularMocks", "properties", "utils", "dataServ
             });
 
             it("should not download data values if current user projects is not present", function() {
-                userPreferenceRepository.getCurrentProjects.and.returnValue(utils.getPromise(q, []));
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, []));
                 message = {
                     "data": {
                         "data": [],

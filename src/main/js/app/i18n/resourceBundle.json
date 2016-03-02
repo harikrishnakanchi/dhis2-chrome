@@ -152,6 +152,7 @@
     "saveBtnValue": "Save",
     "backBtnValue": "Back",
     "submitBtnValue": "Submit",
+    "resubmitButton": "Resubmit",
     "updateBtnValue": "Update",
     "disableBtnValue": "Disable",
     "disableUserLabel": "Disable User",
@@ -302,14 +303,14 @@
     "changeProject": "Change project",
     "tabularReports": "Tabular Reports",
     "exportAsCsv": "Download report",
-    "invalidAccess": "User doesn’t have access to this Praxis instance.",
-    "connectedTo": "Connected to",
+    "invalidAccess": "User does not have access to this Praxis instance.",
+    "connectedTo": "connected to",
     "selectServiceNameLabel": "Select service name:",
     "toLabel": "to",
     "weeklyReports": "Weekly reports",
     "monthlyReports": "Monthly reports",
     "caseNumber": "Case Number",
     "dateRange": "Date Range",
-    "search": "Search"
-
+    "search": "Search",
+    "aggregateDataSyncError": "Failed to submit data for approval. Please resubmit."
 }

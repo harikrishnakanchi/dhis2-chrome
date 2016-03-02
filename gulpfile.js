@@ -106,7 +106,8 @@ gulp.task('watch', function() {
 });
 
 gulp.task('download-metadata', function() {
-    return download(baseIntUrl + "/api/metadata.json", auth)
+    return download(baseIntUrl + "/api/metadata.json?attributes=false&dataApprovalLevels=false&userRoles=false&userGroups=false&options=false&dashboardItems=false&dashboards=false&dataElementGroupSets=false&indicators=false&indicatorTypes=false&sqlViews=false&charts=false&reportTables=false&dataSets=false&eventReports=false&eventCharts=false&programs=false&programStages=false&programStageSections=false&trackedEntities=false", auth)
+        .pipe(rename("metadata.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });
 

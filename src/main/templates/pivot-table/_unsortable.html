@@ -1,0 +1,22 @@
+<table class="table table-bordered table-hover sortable" locked-table-header>
+    <thead>
+    <tr ng-repeat="header in headersForTable" ng-show="header.showHeader">
+        <th class="display-print"></th>
+        <th ng-repeat="item in header.headers" ng-show="periodBasedValues[item.period] !== 0"
+            colspan="{{ maxColumnsHeader.headers.length / header.headers.length}}">
+            <div ng-class="{ 'header-cell-with-weeks' : showWeeks == 'true' }">
+                <span>{{ item.name }}</span>
+                <p ng-if="$parent.$index == 0 && showWeeks == 'true'" class="small weeks">{{ '[' + item.numberOfISOWeeks + ' weeks]' }}</p>
+            </div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="datum in viewMap | orderBy : orderBySortKeys">
+        <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
+        <td ng-repeat="item in maxColumnsHeader.headers" ng-show="periodBasedValues[item.period] !== 0">
+            <span> {{getValue(item.category, datum.dataElement, item.period)}}</span>
+        </td>
+    </tr>
+    </tbody>
+</table>

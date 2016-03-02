@@ -46,7 +46,7 @@
              $rootScope.hasRoles = jasmine.createSpy("hasRoles").and.returnValue(false);
 
              userPreferenceRepository = new UserPreferenceRepository();
-             spyOn(userPreferenceRepository, "getUserModules").and.returnValue(utils.getPromise(q, userModules));
+             spyOn(userPreferenceRepository, "getCurrentUsersModules").and.returnValue(utils.getPromise(q, userModules));
 
              orgUnitRepository = new OrgUnitRepository();
              spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, userModules));

@@ -122,189 +122,140 @@ define(["reportService", "angularMocks", "properties", "utils", "lodash", "timec
             httpBackend.flush();
         });
 
-        it("should get field app chart configs for specified datasets", function() {
+        describe('getUpdatedCharts', function () {
+            it('should download field app charts modified since lastUpdated', function () {
+                var lastUpdatedTime = '2016-02-19T04:28:32.082Z';
 
-            httpBackend.expectGET(properties.dhis.url + "/api/charts?filter=name:like:%5BFieldApp+-+&paging=false")
-                .respond(200, {
-                    "charts": [{
-                        "id": "ch1",
-                        "name": "[FieldApp - Funky Dataset]",
-                        "href": properties.dhis.url + "/api/charts/ch1"
-                    }, {
-                        "id": "ch2",
-                        "name": "[FieldApp - CoolDataset]",
-                        "href": properties.dhis.url + "/api/charts/ch2"
-                    }, {
-                        "id": "ch3",
-                        "name": "[FieldApp - Not needed Dataset]",
-                        "href": properties.dhis.url + "/api/charts/ch3"
-                    }]
+                reportService.getUpdatedCharts(lastUpdatedTime).then(function (chartsFromService) {
+                    expect(chartsFromService).toEqual([chart1DetailsResponse, chart2DetailsResponse]);
                 });
 
-            httpBackend.expectGET(properties.dhis.url + "/api/charts/ch1?fields=*,program[id,name],programStage[id,name],columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]")
-                .respond(200, {
-                    "id": "ch1",
-                    "name": "[FieldApp - Funky Dataset]",
-                    "type": "line",
-                    "columns": [{
-                        "dimension": "in",
-                        "items": [{
-                            "id": "pgtbTi2TJOk",
-                            "name": "Some indicator"
-                        }]
-                    }],
-                    "rows": [{
-                        "dimension": "in",
-                        "items": [{
-                            "id": "tqt3zzHDlgR",
-                            "name": "Some other indicator"
-                        }]
-                    }],
-                    "filters": [{
-                        "dimension": "in",
-                        "items": [{
-                            "id": "IYpnsZJHOpS",
-                            "name": "Yet another indicator"
-                        }]
-                    }]
-                });
+                var updatedChartsResponse = {
+                    'charts': [
+                        { 'id': 'chart1' },
+                        { 'id': 'chart2' }
+                    ]
+                };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/charts/ch2?fields=*,program[id,name],programStage[id,name],columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]")
-                .respond(200, {
-                    "id": "ch2",
-                    "name": "[FieldApp - CoolDataset]",
-                    "type": "line",
-                    "columns": [],
-                    "rows": [],
-                    "filters": []
-                });
+                var chart1DetailsResponse = {
+                    'id': 'chart1',
+                    'more': 'details',
+                    'rows': [],
+                    'columns': [],
+                    'filters': []
+                };
 
-            var datasets = [{
-                "id": "ds1",
-                "code": "Funky Dataset"
-            }, {
-                "id": "ds2",
-                "code": "CoolDataset"
-            }];
+                var chart2DetailsResponse = {
+                    'id': 'chart2',
+                    'more': 'details',
+                    'rows': [],
+                    'columns': [],
+                    'filters': []
+                };
 
-            var actualData;
-            reportService.getCharts(datasets).then(function(data) {
-                actualData = data;
+                var expectedQueryParamsForUpdatedCharts = 'fields=id&filter=name:like:%5BFieldApp+-+&filter=lastUpdated:gte:' + lastUpdatedTime + '&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForUpdatedCharts).respond(200, updatedChartsResponse);
+
+                var expectedQueryParamsForChartDetails = 'fields=id,name,title,type,sortOrder,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart1.json?' + expectedQueryParamsForChartDetails).respond(200, chart1DetailsResponse);
+                httpBackend.expectGET(properties.dhis.url + '/api/charts/chart2.json?' + expectedQueryParamsForChartDetails).respond(200, chart2DetailsResponse);
+                httpBackend.flush();
             });
 
-            httpBackend.flush();
+            it('should download all field app charts if lastUpdated is not provided', function () {
+                reportService.getUpdatedCharts();
 
-            expect(actualData).toEqual([{
-                "id": "ch1",
-                "name": "[FieldApp - Funky Dataset]",
-                'dataset': 'ds1',
-                "type": "line",
-                "columns": [{
-                    "dimension": "dx",
-                    "items": [{
-                        "id": "pgtbTi2TJOk",
-                        "name": "Some indicator"
-                    }]
-                }],
-                "rows": [{
-                    "dimension": "dx",
-                    "items": [{
-                        "id": "tqt3zzHDlgR",
-                        "name": "Some other indicator"
-                    }]
-                }],
-                "filters": [{
-                    "dimension": "dx",
-                    "items": [{
-                        "id": "IYpnsZJHOpS",
-                        "name": "Yet another indicator"
-                    }]
-                }]
-            }, {
-                "id": "ch2",
-                "name": "[FieldApp - CoolDataset]",
-                'dataset': 'ds2',
-                "type": "line",
-                "columns": [],
-                "rows": [],
-                "filters": []
-            }]);
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.flush();
+            });
         });
 
-
-        it("should get field app report table configs for specified datasets", function() {
-            httpBackend.expectGET(properties.dhis.url + "/api/reportTables?filter=name:like:%5BFieldApp+-+&paging=false")
-                .respond(200, {
-                    "reportTables": [{
-                        "id": "tab1",
-                        "name": "[FieldApp - Funky Dataset]",
-                        "href": properties.dhis.url + "/api/reportTables/tab1"
-                    }, {
-                        "id": "tab2",
-                        "name": "[FieldApp - CoolDataset]",
-                        "href": properties.dhis.url + "/api/reportTables/tab2"
-                    }, {
-                        "id": "tab3",
-                        "name": "[FieldApp - Not needed Dataset]",
-                        "href": properties.dhis.url + "/api/reportTables/tab3"
-                    }]
+        describe('getAllChartIds', function () {
+            it('should get the ids of all field app charts', function() {
+                reportService.getAllChartIds().then(function (chartIdsFromService) {
+                    expect(chartIdsFromService).toEqual(['chart1', 'chart2']);
                 });
 
-            httpBackend.expectGET(properties.dhis.url + "/api/reportTables/tab1?fields=*,program[id,name],programStage[id,name],columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]")
-                .respond(200, {
-                    "id": "tab1",
-                    "name": "[FieldApp - Funky Dataset]",
-                    "type": "line",
-                    "columns": [],
-                    "rows": [],
-                    "filters": []
+                var chartIdsResponse = {
+                    'charts': [
+                        { 'id': 'chart1' },
+                        { 'id': 'chart2' }
+                    ]
+                };
+
+                var expectedQueryParamsForChartIds = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/charts.json?' + expectedQueryParamsForChartIds).respond(200, chartIdsResponse);
+                httpBackend.flush();
+            });
+        });
+
+        describe('getUpdatedPivotTables', function () {
+            it('should download field app pivot tables modified since lastUpdated', function () {
+                var lastUpdatedTime = '2016-02-19T04:28:32.082Z';
+
+                reportService.getUpdatedPivotTables(lastUpdatedTime).then(function (pivotTablesFromService) {
+                    expect(pivotTablesFromService).toEqual([pivotTable1DetailsResponse, pivotTable2DetailsResponse]);
                 });
 
-            httpBackend.expectGET(properties.dhis.url + "/api/reportTables/tab2?fields=*,program[id,name],programStage[id,name],columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]")
-                .respond(200, {
-                    "id": "tab2",
-                    "name": "[FieldApp - CoolDataset]",
-                    "type": "line",
-                    "columns": [],
-                    "rows": [],
-                    "filters": []
-                });
+                var updatedPivotTablesResponse = {
+                    'reportTables': [
+                        { 'id': 'pivotTable1' },
+                        { 'id': 'pivotTable2' }
+                    ]
+                };
 
-            var datasets = [{
-                "id": "ds1",
-                "code": "Funky Dataset"
-            }, {
-                "id": "ds2",
-                "code": "CoolDataset"
-            }];
+                var pivotTable1DetailsResponse = {
+                    'id': 'pivotTable1',
+                    'more': 'details',
+                    'rows': [],
+                    'columns': [],
+                    'filters': []
+                };
 
-            var actualData;
+                var pivotTable2DetailsResponse = {
+                    'id': 'pivotTable2',
+                    'more': 'details',
+                    'rows': [],
+                    'columns': [],
+                    'filters': []
+                };
 
-            reportService.getPivotTables(datasets).then(function(data) {
-                actualData = data;
+                var expectedQueryParamsForUpdatedPivotTables = 'fields=id&filter=name:like:%5BFieldApp+-+&filter=lastUpdated:gte:' + lastUpdatedTime + '&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParamsForUpdatedPivotTables).respond(200, updatedPivotTablesResponse);
+
+                var expectedQueryParamsForPivotTableDetails = 'fields=id,name,title,type,sortOrder,categoryDimensions,dataElements,indicators,dataDimensionItems,relativePeriods,columns%5Bdimension,filter,items%5Bid,name%5D%5D,rows%5Bdimension,filter,items%5Bid,name%5D%5D,filters%5Bdimension,filter,items%5Bid,name%5D%5D';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable1.json?' + expectedQueryParamsForPivotTableDetails).respond(200, pivotTable1DetailsResponse);
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables/pivotTable2.json?' + expectedQueryParamsForPivotTableDetails).respond(200, pivotTable2DetailsResponse);
+                httpBackend.flush();
             });
 
-            httpBackend.flush();
+            it('should download all field app pivot tables if lastUpdated is not provided', function () {
+                reportService.getUpdatedPivotTables();
 
-            expect(actualData).toEqual([{
-                "id": "tab1",
-                "name": "[FieldApp - Funky Dataset]",
-                "dataset": "ds1",
-                "type": "line",
-                "columns": [],
-                "rows": [],
-                "filters": []
-            }, {
-                "id": "tab2",
-                "name": "[FieldApp - CoolDataset]",
-                "dataset": "ds2",
-                "type": "line",
-                "columns": [],
-                "rows": [],
-                "filters": []
-            }]);
+                var expectedQueryParams = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParams).respond(200, {});
+                httpBackend.flush();
+            });
+        });
+
+        describe('getAllPivotTableIds', function () {
+            it('should get the ids of all field app pivot tables', function() {
+                reportService.getAllPivotTableIds().then(function (pivotTableIdsFromService) {
+                    expect(pivotTableIdsFromService).toEqual(['pivotTable1', 'pivotTable2']);
+                });
+
+                var pivotTableIdsResponse = {
+                    'reportTables': [
+                        { 'id': 'pivotTable1' },
+                        { 'id': 'pivotTable2' }
+                    ]
+                };
+
+                var expectedQueryParamsForPivotTableIds = 'fields=id&filter=name:like:%5BFieldApp+-+&paging=false';
+                httpBackend.expectGET(properties.dhis.url + '/api/reportTables.json?' + expectedQueryParamsForPivotTableIds).respond(200, pivotTableIdsResponse);
+                httpBackend.flush();
+            });
         });
     });
-
-
 });

@@ -3,7 +3,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
     function(DataApprovalController, testData, mocks, _, utils, orgUnitMapper, moment, timecop, DataRepository, ApprovalDataRepository, OrgUnitRepository, ExcludedDataElementsRepository, DatasetRepository, ProgramRepository, ReferralLocationsRepository) {
         describe("dataApprovalController ", function() {
             var scope, routeParams, q, location, anchorScroll, dataApprovalController, rootScope, approvalStore,
-                saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getApprovalDataSpy, getDataValuesSpy,
+                saveSuccessPromise, saveErrorPromise, dataEntryFormMock, parentProject, getApprovalDataSpy, getDataValuesSpy, getLocalStatusSpy,
                 orgUnits, window, getOrgUnitSpy, hustle, dataRepository, approvalDataRepository, timeout, orgUnitRepository, excludedDataElementsRepository, origin1, origin2, geographicOrigins;
 
             beforeEach(module('hustle'));
@@ -147,6 +147,8 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 dataRepository = new DataRepository();
                 getDataValuesSpy = spyOn(dataRepository, "getDataValues");
                 getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
+                getLocalStatusSpy = spyOn(dataRepository, "getLocalStatus");
+                getLocalStatusSpy.and.returnValue(utils.getPromise(q, undefined));
 
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, []));
@@ -391,9 +393,11 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
             });
             it("should return the sum of column for given option ", function() {
                 var sectionDataElements = [{
-                    "id": "de1"
+                    "id": "de1",
+                    "isIncluded": true
                 }, {
-                    "id": "de2"
+                    "id": "de2",
+                    "isIncluded": true
                 }];
                 var dataValues = {
                     "ou1": {
@@ -445,17 +449,79 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
                 expect(scope.columnSum(dataValues, orgUnits, sectionDataElements, "c1")).toBe(12);
             });
+            
+            it("should return the column sum in a section for only data elements which are included", function() {
+                var sectionDataElements = [{
+                    "id": "de1",
+                    "isIncluded": true
+                }, {
+                    "id": "de2",
+                    "isIncluded": false
+                }];
+                var dataValues = {
+                    "ou1": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c2": {
+                                "value": "2"
+                            }
+                        },
+                        "de2": {
+                            "c1": {
+                                "value": "10"
+                            },
+                            "c2": {
+                                "value": "20"
+                            }
+                        }
+                    },
+                    "ou2": {
+                        "de1": {
+                            "c1": {
+                                "value": "1"
+                            },
+                            "c2": {
+                                "value": "2"
+                            }
+                        },
+                        "de3": {
+                            "c1": {
+                                "value": "10"
+                            }
+                        }
+                    },
+                    "ou3": undefined
+                };
+
+                var orgUnits = [{
+                    "id": "ou1",
+                    "name": "ou1"
+                }, {
+                    "id": "ou2",
+                    "name": "ou2"
+                }, {
+                    "id": "ou3",
+                    "name": "ou3"
+                }];
+
+                expect(scope.columnSum(dataValues, orgUnits, sectionDataElements, "c1")).toBe(2);
+            });
 
             it("should return the column sum in a section for configured data elements in referral dataset", function() {
                 var sectionDataElements = [{
                     "id": "de1",
-                    "formName": "DE 1"
+                    "formName": "DE 1",
+                    "isIncluded": true
                 }, {
                     "id": "de2",
-                    "formName": "DE 2"
+                    "formName": "DE 2",
+                    "isIncluded": true
                 }, {
                     "id": "de3",
-                    "formName": "DE 3"
+                    "formName": "DE 3",
+                    "isIncluded": true
                 }];
 
                 var dataValues = {
@@ -598,5 +664,19 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                 scope.$apply();
                 expect(scope.sum(dataValues, orgUnits, "de1", ['c1', 'c2'])).toBe(2);
             });
+
+            it("should return true if number of origins are greater than 1", function () {
+                scope.$apply();
+                scope.moduleAndOriginOrgUnitIds = ["a3439134495", "a469d3ba630", "aff112d79b4"];
+                var dataSet = {
+                    id: "a339b7fa9eb",
+                    organisationUnits: [
+                        {id: "a3439134495"},
+                        {id: "a469d3ba630"}
+                    ]
+                };
+                expect(scope.showTotalLabelForOriginDatasetSection(dataSet)).toBe(true);
+            });
+
         });
     });

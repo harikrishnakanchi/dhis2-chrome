@@ -9,7 +9,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 scope = $rootScope.$new();
 
                 userPreferenceRepository = {
-                    "getUserModules": jasmine.createSpy("getUserModules").and.returnValue(utils.getPromise(q, ["org_0"]))
+                    "getCurrentUsersModules": jasmine.createSpy("getCurrentUsersModules").and.returnValue(utils.getPromise(q, ["org_0"]))
                 };
 
                 datasetRepository = {
@@ -39,7 +39,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
             }));
 
             it("should download approval data from dhis based on user module ids and dataset", function() {
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, [{
+                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, [{
                     "name": "mod1",
                     "id": "mod1"
                 }, {
@@ -65,7 +65,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
                 downloadApprovalConsumer.run(message);
                 scope.$apply();
 
-                expect(userPreferenceRepository.getUserModules).toHaveBeenCalled();
+                expect(userPreferenceRepository.getCurrentUsersModules).toHaveBeenCalled();
                 expect(datasetRepository.getAll).toHaveBeenCalled();
 
                 expect(approvalService.getCompletionData).toHaveBeenCalledWith(["mod1", "mod2", "mod3"], originOrgUnits, ["DS_OPD"]);
@@ -75,7 +75,7 @@ define(["downloadApprovalConsumer", "angularMocks", "properties", "utils", "data
             });
 
             it("should not download approval data from dhis if the user does not have any preferred moduleids", function() {
-                userPreferenceRepository.getUserModules.and.returnValue(utils.getPromise(q, []));
+                userPreferenceRepository.getCurrentUsersModules.and.returnValue(utils.getPromise(q, []));
 
                 datasetRepository.getAll.and.returnValue(utils.getPromise(q, ["ds1"]));
 

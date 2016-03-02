@@ -15,6 +15,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             $scope.submitAndApprovalSuccess = false;
             $scope.saveError = false;
             $scope.submitError = false;
+            $scope.syncError = false;
             $scope.projectIsAutoApproved = false;
             $scope.excludedDataElements = {};
             $scope.associatedProgramId = undefined;
@@ -116,6 +117,15 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
             return sum;
         };
 
+        $scope.showTotalLabelForOriginDatasetSection = function (dataSet) {
+            var count = 0;
+            _.each(dataSet.organisationUnits, function (orgUnit) {
+                if ($scope.moduleAndOriginOrgUnitIds.indexOf(orgUnit.id) >= 0)
+                    count++;
+            });
+            return count > 1;
+        };
+
         var getReferralDataElementIds = function(dataElements) {
             var dataElementsForReferral = _.filter(dataElements, function(de) {
                 return $scope.referralLocations[de.formName] !== undefined;
@@ -125,7 +135,8 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
         };
 
         $scope.columnSum = function(iterable, section, option, isReferralDataset) {
-            var dataElementsIds = isReferralDataset ? getReferralDataElementIds(section.dataElements) : _.pluck(section.dataElements, "id");
+            var filteredDataElements = _.filter(section.dataElements, {"isIncluded": true});
+            var dataElementsIds = isReferralDataset ? getReferralDataElementIds(filteredDataElements) : _.pluck(filteredDataElements, "id");
             return _.reduce(iterable, function(sum, value, key) {
                 if (_.includes(dataElementsIds, key)) {
                     exp = value[option].value || "0";
@@ -185,7 +196,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
 
             updateDataValuesWithPopulationData();
             var payload = dataValuesMapper.mapToDomain($scope.dataValues, currentPeriod, $scope.currentUser.userCredentials.username);
-            var periodsAndOrgUnits = _.map(_.uniq(_.keys($scope.dataValues)), function(orgUnit) {
+            var periodsAndOrgUnits = _.map(_.uniq(_.pluck(payload, "orgUnit")), function(orgUnit) {
                 return {
                     orgUnit: orgUnit,
                     period: currentPeriod
@@ -442,10 +453,14 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     $scope.isApproved = !_.isEmpty(data) && data.isApproved;
                 });
 
+                var loadSyncStatusForPeriodAndOrgunitPromise = dataRepository.getLocalStatus(currentPeriodAndOrgUnit.period, currentPeriodAndOrgUnit.orgUnit)
+                    .then(function(status) {
+                        $scope.syncError = status == 'FAILED_TO_SYNC';
+                    });
+
                 if ($scope.dataentryForm !== undefined)
                     $scope.dataentryForm.$setPristine();
-
-                return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadProjectPromise, loadApprovalDataPromise]);
+                return $q.all([loadDataSetsPromise, loadDataValuesPromise, loadProjectPromise, loadApprovalDataPromise, loadSyncStatusForPeriodAndOrgunitPromise]);
 
             }).finally(function() {
                 $scope.loading = false;

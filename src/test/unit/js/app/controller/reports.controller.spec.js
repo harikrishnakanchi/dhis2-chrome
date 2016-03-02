@@ -1,4 +1,4 @@
-define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository"], function(mocks, utils, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository) {
+define(["angularMocks", "utils", "moment", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository"], function(mocks, utils, moment, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository) {
     describe("reportsControllerspec", function() {
 
         var scope, reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository;
@@ -155,16 +155,19 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
 
             var datasets = [{
                 "id": "ds1",
+                "code": "dataSetCode1",
                 "isOriginDataset": false,
                 "isPopulationDataset": false,
                 "isReferralDataset": false
             }, {
                 "id": "ds2",
                 "isOriginDataset": false,
+                "code": "dataSetCode2",
                 "isPopulationDataset": false,
                 "isReferralDataset": false
             }, {
                 "id": "ds3",
+                "code": "dataSetCode3",
                 "isOriginDataset": false,
                 "isPopulationDataset": false,
                 "isReferralDataset": false
@@ -173,17 +176,17 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             var charts = [{
                 "name": "chart1",
                 "title": "Title1",
-                "dataset": "ds1",
+                "dataSetCode": "dataSetCode1",
                 "type": "STACKED_COLUMN"
             }, {
                 "name": "chart2",
                 "title": "Title2",
-                "dataset": "ds2",
+                "dataSetCode": "dataSetCode2",
                 "type": "LINE"
             }, {
                 "name": "chart3 Notifications",
                 "title": "Title1",
-                "dataset": "ds1",
+                "dataSetCode": "dataSetCode1",
                 "type": "STACKED_COLUMN"
             }];
 
@@ -321,85 +324,89 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[0].name, "mod1");
             expect(chartRepository.getDataForChart).toHaveBeenCalledWith(charts[1].name, "mod1");
 
+            var unixTimestamp = function(period) {
+                return moment(period, 'GGGG[W]W').unix();
+            };
+
             var expectedChartData = [{
                 "title": "Title1",
-                "dataset": "ds1",
+                "dataSetCode": "dataSetCode1",
                 "type": "STACKED_COLUMN",
                 "data": [{
                     "key": "5-14 years",
                     "values": [{
-                        "label": 1434306600,
+                        "label": unixTimestamp('2015W25'),
                         "value": 0
                     }, {
-                        "label": 1434911400,
+                        "label": unixTimestamp('2015W26'),
                         "value": 48
                     }, {
-                        "label": 1435516200,
+                        "label": unixTimestamp('2015W27'),
                         "value": 0
                     }]
                 }, {
                     "key": "24-59 months",
                     "values": [{
-                        "label": 1434306600,
+                        "label": unixTimestamp('2015W25'),
                         "value": 0
                     }, {
-                        "label": 1434911400,
+                        "label": unixTimestamp('2015W26'),
                         "value": 36
                     }, {
-                        "label": 1435516200,
+                        "label": unixTimestamp('2015W27'),
                         "value": 0
                     }]
                 }, {
                     "key": "<1 month",
                     "values": [{
-                        "label": 1434306600,
+                        "label": unixTimestamp('2015W25'),
                         "value": 0
                     }, {
-                        "label": 1434911400,
+                        "label": unixTimestamp('2015W26'),
                         "value": 12
                     }, {
-                        "label": 1435516200,
+                        "label": unixTimestamp('2015W27'),
                         "value": 0
                     }]
                 }, {
                     "key": "1-23 months",
                     "values": [{
-                        "label": 1434306600,
+                        "label": unixTimestamp('2015W25'),
                         "value": 0
                     }, {
-                        "label": 1434911400,
+                        "label": unixTimestamp('2015W26'),
                         "value": 24
                     }, {
-                        "label": 1435516200,
+                        "label": unixTimestamp('2015W27'),
                         "value": 0
                     }]
                 }]
             }, {
                 "title": "Title2",
-                "dataset": "ds2",
+                "dataSetCode": "dataSetCode2",
                 "type": "LINE",
                 "data": [{
                     "key": "Total Consultations 1-23 months Pediatric OPD",
                     "values": [{
-                        "label": 1431887400,
+                        "label": unixTimestamp('2015W21'),
                         "value": 0
                     }, {
-                        "label": 1432492200,
+                        "label": unixTimestamp('2015W22'),
                         "value": 0
                     }, {
-                        "label": 1433097000,
+                        "label": unixTimestamp('2015W23'),
                         "value": 260
                     }, {
-                        "label": 1433701800,
+                        "label": unixTimestamp('2015W24'),
                         "value": 168
                     }, {
-                        "label": 1434306600,
+                        "label": unixTimestamp('2015W25'),
                         "value": 168
                     }, {
-                        "label": 1434911400,
+                        "label": unixTimestamp('2015W26'),
                         "value": 200
                     }, {
-                        "label": 1435516200,
+                        "label": unixTimestamp('2015W27'),
                         "value": 0
                     }]
                 }]
@@ -426,21 +433,24 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
 
             var datasets = [{
                 "id": "ds1",
-                "isOriginDataset": false
+                "code": "dataSetCode1",
+                "isOriginDataset": false,
             }, {
                 "id": "ds2",
+                "code": "dataSetCode2",
                 "isOriginDataset": false
             }, {
                 "id": "ds3",
+                "code": "dataSetCode2",
                 "isOriginDataset": false
             }];
 
             var pivotTables = [{
                 "name": "Table 1",
-                "dataset": "ds1"
+                "dataSetCode": "dataSetCode1"
             }, {
                 "name": "Table 2",
-                "dataset": "ds2"
+                "dataSetCode": "dataSetCode2"
             }];
 
             var pivotTableData1 = "table 1 data";
@@ -458,11 +468,11 @@ define(["angularMocks", "utils", "reportsController", "datasetRepository", "orgU
             });
             var expectedPivotTableData = [{
                 "table": pivotTables[0],
-                "dataset": "ds1",
+                "dataSetCode": "dataSetCode1",
                 "data": pivotTableData1
             }, {
                 "table": pivotTables[1],
-                "dataset": "ds2",
+                "dataSetCode": "dataSetCode2",
                 "data": pivotTableData2
             }];
             reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository);

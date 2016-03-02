@@ -28,5 +28,19 @@ define(["lodash"], function(_) {
             var store = db.objectStore("users");
             return store.getAll().then(filterProjectUsers);
         };
+
+        this.getUser = function(username) {
+            var userStore = db.objectStore("users");
+            return userStore.find(username);
+        };
+
+        this.getUserCredentials = function(username) {
+            var userCredentialsStore = db.objectStore("localUserCredentials");
+
+            if (username === "superadmin" || username === "projectadmin")
+                return userCredentialsStore.find(username);
+            else
+                return userCredentialsStore.find("project_user");
+        };
     };
 });

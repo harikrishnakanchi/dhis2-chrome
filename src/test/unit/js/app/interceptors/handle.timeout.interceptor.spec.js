@@ -1,17 +1,29 @@
 define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeUtils"], function(HandleTimeoutInterceptor, mocks, properties, chromeUtils) {
     describe("httpInterceptor", function() {
-        var q, injector, fakeHttp, handleTimeoutInterceptor;
+        var q, injector, fakeHttp, timeout, handleTimeoutInterceptor;
 
-        beforeEach(mocks.inject(function($q) {
+        beforeEach(mocks.inject(function($q, $timeout) {
             q = $q;
-
-            fakeHttp = jasmine.createSpy();
+            timeout = $timeout;
 
             injector = {
-                "get": jasmine.createSpy().and.returnValue(fakeHttp)
+                "get": jasmine.createSpy('injectorGet')
             };
 
-            handleTimeoutInterceptor = new HandleTimeoutInterceptor(q, injector);
+            fakeHttp = jasmine.createSpy('http');
+
+            var injectorGetStubs = {
+                '$http': fakeHttp,
+                'dhisMonitor': {
+                    'isOnline': jasmine.createSpy('dhisMonitorIsOnline').and.returnValue(true)
+                }
+            };
+
+            injector.get.and.callFake(function(service) {
+                return injectorGetStubs[service];
+            });
+
+            handleTimeoutInterceptor = new HandleTimeoutInterceptor(q, injector, timeout);
         }));
 
         it("should retry in case of timeout", function() {
@@ -30,6 +42,9 @@ define(["handleTimeoutInterceptor", "angularMocks", "properties", "chromeUtils"]
 
             expect(q.reject).not.toHaveBeenCalled();
             expect(chromeUtils.sendMessage).toHaveBeenCalledWith("timeoutOccurred");
+
+            timeout.flush();
+
             expect(fakeHttp).toHaveBeenCalledWith({
                 method: 'GET',
                 url: 'http://localhost:8080/api/someUrl',

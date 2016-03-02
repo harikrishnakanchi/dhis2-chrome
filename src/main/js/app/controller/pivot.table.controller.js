@@ -1,7 +1,7 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, resourceBundleService) {
-
-        $scope.resourceBundle = resourceBundleService.getBundle();
+    return function($scope, $rootScope) {
+        $scope.resourceBundle = $rootScope.resourceBundle;
+        var DEFAULT_SORT_KEY = 'dataElementIndex';
 
         $scope.getCsvFileName = function() {
             var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
@@ -20,7 +20,13 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.getData = function() {
-            var sortedViewMap = _.sortBy($scope.viewMap, "sortOrder");
+            var sortedViewMap;
+            if($scope.selectedSortKey == DEFAULT_SORT_KEY) {
+                sortedViewMap = _.sortBy($scope.viewMap, DEFAULT_SORT_KEY);
+            } else {
+                var ascOrDesc = $scope.definition.sortAscending ? 'asc' : 'desc';
+                sortedViewMap = _.sortByOrder($scope.viewMap, [$scope.selectedSortKey, DEFAULT_SORT_KEY], [ascOrDesc, 'asc']);
+            }
             var dataValues = [];
             _.each(sortedViewMap, function(datum) {
                 if ($scope.isCategoryPresent) {
@@ -50,8 +56,14 @@ define(["lodash", "moment"], function(_, moment) {
             var headers = ["Data Element"];
             if ($scope.isCategoryPresent)
                 headers.push("Category");
-            _.each($scope.periods, function(period) {
-                headers.push($scope.data.metaData.names[period]);
+            _.each($scope.periods, function (period) {
+                var month = $scope.data.metaData.names[period];
+                if ($scope.showWeeks == 'true') {
+                    var numberofWeeks = getNumberOfISOWeeksInMonth(period);
+                    headers.push(month + " (" + numberofWeeks + " weeks)");
+                } else {
+                    headers.push(month);
+                }
             });
             return headers;
         };
@@ -71,14 +83,21 @@ define(["lodash", "moment"], function(_, moment) {
             return value;
         };
 
-        var getSortOrder = function(dataElementId, categoryId) {
-            var categorySortOrder = 0.0;
-            var dataElementSortOrder = 0;
-            var sortedDataElements = [];
-            if (categoryId) {
-                var sortedCategories = _.pluck(_.flatten(_.pluck($scope.definition.categoryDimensions, "categoryOptions")), "id");
-                categorySortOrder = (_.indexOf(sortedCategories, categoryId) + 1) * 0.1;
+        $scope.sortByColumn = function (subHeader) {
+            if (subHeader && $scope.selectedSortKey != subHeader.sortKey) {
+                var sortKeyNegator = $scope.definition.sortAscending ? '+' : '-';
+                $scope.selectedSortKey = subHeader.sortKey;
+                $scope.orderBySortKeys = [sortKeyNegator + subHeader.sortKey, DEFAULT_SORT_KEY];
+            } else {
+                $scope.selectedSortKey = DEFAULT_SORT_KEY;
+                $scope.orderBySortKeys = [DEFAULT_SORT_KEY];
             }
+        };
+        $scope.sortByColumn();
+
+        var getDefaultSortOrder = function(dataElementId) {
+            var dataElementSortOrder,
+                sortedDataElements = [];
 
             if (!_.isUndefined($scope.definition.dataDimensionItems)) {
                 _.each($scope.definition.dataDimensionItems, function(dimensionItem) {
@@ -91,11 +110,10 @@ define(["lodash", "moment"], function(_, moment) {
                 dataElementSortOrder = _.indexOf(sortedDataElements, dataElementId) + 1;
             }
 
-
-            return dataElementSortOrder + categorySortOrder;
+            return dataElementSortOrder;
         };
 
-        var getDataMap = function(categoryIds) {
+        var getDataMap = function() {
             return _.map($scope.data.rows, function(row) {
                 var map = {};
 
@@ -124,12 +142,35 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
+
+        var getNumberOfISOWeeksInMonth = function (period) {
+            var m = moment(period, 'YYYYMM');
+
+            var year = parseInt(m.format('YYYY'));
+            var month = parseInt(m.format('M')) - 1;
+            var day = 1,
+                mondays = 0;
+
+            var date = new Date(year, month, day);
+
+            while (date.getMonth() == month) {
+                if (date.getDay() === 1) {
+                    mondays += 1;
+                    day += 7;
+                } else {
+                    day++;
+                }
+                date = new Date(year, month, day);
+            }
+            return mondays;
+        };
+
         if ($scope.definition && $scope.data) {
 
             $scope.viewMap = [];
             $scope.periodBasedValues = {};
             $scope.periods = $scope.data.metaData.pe;
-            $scope.isCategoryPresent = $scope.data.width === 4 ? true : false;
+            $scope.isCategoryPresent = $scope.data.width === 4;
             var dataElements;
 
             _.each($scope.periods, function(period) {
@@ -139,7 +180,9 @@ define(["lodash", "moment"], function(_, moment) {
             var periodsForHeader = _.map($scope.periods, function(pe) {
                 return {
                     "period": pe,
-                    "name": $scope.data.metaData.names[pe]
+                    "name": $scope.data.metaData.names[pe],
+                    "sortKey": "sortKey_" + pe,
+                    "numberOfISOWeeks": $scope.showWeeks == 'true' ? getNumberOfISOWeeksInMonth(pe) : ''
                 };
             });
             $scope.headersForTable = [{
@@ -161,8 +204,6 @@ define(["lodash", "moment"], function(_, moment) {
                 var sortedCategories = getSortedCategories();
 
                 $scope.hasOnlyOneCategory = sortedCategories.length === 1;
-                var sortedCategoriesIds = _.pluck(sortedCategories, "id");
-
                 var sortedCategoryNamesForDisplay = [];
 
                 _.each($scope.periods, function(pe) {
@@ -170,7 +211,8 @@ define(["lodash", "moment"], function(_, moment) {
                         sortedCategoryNamesForDisplay.push({
                             "period": pe,
                             "name": category.name,
-                            "category": category.id
+                            "category": category.id,
+                            "sortKey": "sortKey_" + pe
                         });
 
                     });
@@ -185,12 +227,28 @@ define(["lodash", "moment"], function(_, moment) {
 
             dataElements = _.uniq(_.pluck($scope.dataMap, "dataElement"));
 
-            _.each(dataElements, function(dataElement) {
-                $scope.viewMap.push({
-                    "dataElement": dataElement,
-                    "dataElementName": $scope.data.metaData.names[dataElement],
-                    "sortOrder": getSortOrder(dataElement)
+            _.each(dataElements, function(dataElementId) {
+
+                var sortKeysAndValues = {};
+                _.each($scope.periods, function (period) {
+                    var filteredObjects = _.filter($scope.dataMap, function(data) {
+                         return data.dataElement === dataElementId && data.period === period;
+                    });
+                    var dataValues = _.map(filteredObjects, function (dataValue) {
+                        return dataValue.value;
+                    });
+                    sortKeysAndValues['sortKey_' + period] = _.reduce(dataValues, function(previous, current) {
+                        return previous + current;
+                    }, 0);
                 });
+
+                var dataElementInfo = {
+                    "dataElement": dataElementId,
+                    "dataElementName": $scope.data.metaData.names[dataElementId]
+                };
+                dataElementInfo[DEFAULT_SORT_KEY] = getDefaultSortOrder(dataElementId);
+
+                $scope.viewMap.push(_.merge(dataElementInfo, sortKeysAndValues));
             });
 
             $scope.maxColumnsHeader = _.last($scope.headersForTable);

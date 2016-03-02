@@ -3,7 +3,6 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         var fieldAppReportRegex = /\[FieldApp - (.*)\]/;
 
         this.getReportDataForOrgUnit = function(report, orgUnit) {
-
             var buildDimension = function() {
                 var columnDimensions = _.map(report.columns, function(col) {
                     return col.dimension + ":" + _.pluck(col.items, "id").join(";");
@@ -45,96 +44,76 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
             });
         };
 
-        var filterAndMergeDatasetInfo = function(reports, datasets) {
-            var getDataset = function(report) {
-                var matches = fieldAppReportRegex.exec(report.name);
-                if (!matches || matches.length <= 1)
-                    return undefined;
-                var datasetCodeInReportName = matches[1];
-
-                return _.find(datasets, {
-                    'code': datasetCodeInReportName
-                });
+        var getResourceIds = function(resourceUrl, resourceCollectionName, lastUpdatedTime) {
+            var config = {
+                params: {
+                    'filter': ['name:like:[FieldApp - '],
+                    'paging': false,
+                    'fields': 'id'
+                }
             };
 
-            return _.transform(reports, function(result, report) {
+            if(lastUpdatedTime) {
+                config.params.filter.push('lastUpdated:gte:' + lastUpdatedTime);
+            }
 
-                var dataset = getDataset(report);
-
-                if (dataset !== undefined) {
-                    result.push(_.merge(report, {
-                        'dataset': dataset.id
-                    }));
-                }
-
-            }, []);
+            return $http.get(resourceUrl + '.json', config).then(function(response) {
+                return _.pluck(response.data[resourceCollectionName], 'id');
+            });
         };
 
-        var enrich = function(reports) {
-            var enrichReportPromises = _.map(reports, function(report) {
-                var url = report.href + "?fields=*,program[id,name],programStage[id,name],columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]";
-                return $http.get(url).then(function(response) {
-                    reportDetails = response.data;
-                    reportDetails.dataset = report.dataset;
+        var getResourceDetails = function(resourceUrl, requiredFields, resourceIds) {
+            var config = {
+                params: {
+                    'fields': requiredFields
+                }
+            };
+
+            var getIndividualResourceDetails = function(resourceId) {
+                return $http.get(resourceUrl + '/' + resourceId + '.json', config).then(function (response) {
+                    var resourceDetails = response.data;
 
                     // TODO: Remove following three mappings after switching to DHIS 2.20 or greater
-                    reportDetails.rows = _.map(reportDetails.rows || [], function(row) {
+                    resourceDetails.rows = _.map(resourceDetails.rows || [], function (row) {
                         if (row.dimension === "in" || row.dimension === "de")
                             row.dimension = "dx";
                         return row;
                     });
-                    reportDetails.columns = _.map(reportDetails.columns || [], function(column) {
+                    resourceDetails.columns = _.map(resourceDetails.columns || [], function (column) {
                         if (column.dimension === "in" || column.dimension === "de")
                             column.dimension = "dx";
                         return column;
                     });
-                    reportDetails.filters = _.map(reportDetails.filters || [], function(filter) {
+                    resourceDetails.filters = _.map(resourceDetails.filters || [], function (filter) {
                         if (filter.dimension === "in" || filter.dimension === "de")
                             filter.dimension = "dx";
                         return filter;
                     });
 
-                    return reportDetails;
-                });
-            });
-            return $q.all(enrichReportPromises);
-        };
-
-        this.getCharts = function(datasets) {
-
-            var getFieldAppCharts = function() {
-                var config = {
-                    params: {
-                        "filter": "name:like:[FieldApp - ",
-                        "paging": false,
-                    }
-                };
-
-                return $http.get(dhisUrl.charts, config).then(function(response) {
-                    return response.data ? filterAndMergeDatasetInfo(response.data.charts, datasets) : [];
+                    return resourceDetails;
                 });
             };
 
-            return getFieldAppCharts().then(enrich);
+            var allPromises = _.map(resourceIds, getIndividualResourceDetails);
+            return $q.all(allPromises);
         };
 
-        this.getPivotTables = function(datasets) {
-
-            var getFieldAppPivotTables = function() {
-                var config = {
-                    params: {
-                        "filter": "name:like:[FieldApp - ",
-                        "paging": false,
-                    }
-                };
-
-                return $http.get(dhisUrl.pivotTables, config).then(function(response) {
-                    return response.data ? filterAndMergeDatasetInfo(response.data.reportTables, datasets) : [];
-                });
-            };
-
-            return getFieldAppPivotTables().then(enrich);
+        this.getUpdatedCharts = function(lastUpdatedTime) {
+            var requiredFields = 'id,name,title,type,sortOrder,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
+            return getResourceIds(dhisUrl.charts, 'charts', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.charts, requiredFields));
         };
 
+        this.getAllChartIds = function() {
+            return getResourceIds(dhisUrl.charts, 'charts');
+        };
+
+        this.getUpdatedPivotTables = function(lastUpdatedTime) {
+            var requiredFields = 'id,name,title,type,sortOrder,categoryDimensions,dataElements,indicators,dataDimensionItems,relativePeriods,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
+            return getResourceIds(dhisUrl.pivotTables, 'reportTables', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.pivotTables, requiredFields));
+        };
+
+        this.getAllPivotTableIds = function() {
+            return getResourceIds(dhisUrl.pivotTables, 'reportTables');
+        };
     };
 });

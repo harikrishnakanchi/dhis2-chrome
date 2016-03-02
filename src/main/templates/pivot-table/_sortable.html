@@ -1,0 +1,31 @@
+<table class="table table-bordered table-hover sortable" locked-table-header bind-event="click">
+    <thead>
+    <tr ng-repeat="header in headersForTable" ng-show="header.showHeader">
+        <th class="display-print" ng-click="sortByColumn()"></th>
+        <th ng-repeat="subHeader in header.headers"
+            ng-show="periodBasedValues[subHeader.period] !== 0"
+            ng-click="$parent.$index == 0 && sortByColumn(subHeader)"
+            ng-class="{ 'cursorPointer' : $parent.$index == 0 }"
+            colspan="{{ maxColumnsHeader.headers.length / header.headers.length}}">
+            <div ng-class="{ 'header-cell-with-weeks' : showWeeks == 'true' }">
+                <span class="name">
+                    {{ subHeader.name }}
+                    <p ng-if="$parent.$index == 0 && showWeeks == 'true'" class="small weeks">{{ '[' + subHeader.numberOfISOWeeks + ' weeks]' }}</p>
+                </span>
+                <span class="icon" ng-class="{ 'text-danger' : selectedSortKey == subHeader.sortKey }" ng-if="$parent.$index == 0">
+                    <span ng-show="definition.sortAscending" class="icon-small">&#9650;</span>
+                    <span ng-show="definition.sortDescending" class="icon-small">&#9660;</span>
+                </span>
+            </div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="datum in viewMap | orderBy : orderBySortKeys">
+        <td>{{getDataElementName(data.metaData.names[datum.dataElement])}}</td>
+        <td ng-class="{ 'info' : selectedSortKey == subHeader.sortKey }" ng-repeat="subHeader in maxColumnsHeader.headers" ng-show="periodBasedValues[subHeader.period] !== 0">
+            <span ng-class="{'font-bold':selectedSortKey==subHeader.sortKey}"> {{getValue(subHeader.category, datum.dataElement, subHeader.period)}}</span>
+        </td>
+    </tr>
+    </tbody>
+</table>

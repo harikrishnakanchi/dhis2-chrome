@@ -42,7 +42,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
 
                 dataRepository = new DataRepository();
-                spyOn(dataRepository, "getDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, []));
+                spyOn(dataRepository, "getSubmittedDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, []));
 
                 programEventRepository = new ProgramEventRepository();
                 spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, []));
@@ -87,6 +87,198 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 expect(scope.formatPeriods("2014W42")).toEqual(expectedPeriod);
             });
 
+            it("should include list of items in 'items awaiting submission' when items are not synced to dhis for data entry user", function(){
+                var dataValues = [{
+                    "orgUnit": "ou1",
+                    "period": "2014W22",
+                    "dataValues": [{
+                        "period": '2016W01',
+                        "orgUnit": 'ou1',
+                        "dataElement": "DE2",
+                        "categoryOptionCombo": "COC2",
+                        "value": "2",
+                        "lastUpdated": "2014-01-15T00:00:00.000"
+                    }],
+                    "localStatus": "WAITING_TO_SYNC"
+                }, {
+                    "orgUnit": "ou2",
+                    "period": "2014W22",
+                    "dataValues": [{
+                        "period": '2016W02',
+                        "orgUnit": 'ou2',
+                        "dataElement": "DE2",
+                        "categoryOptionCombo": "COC2",
+                        "value": "4",
+                        "clientLastUpdated": "2014-01-22T00:00:00.000"
+                    }],
+                    "localStatus": "FAILED_TO_SYNC"
+                }];
+
+                var modules = [{
+                    "id": "ou1",
+                    "name": "module 1",
+                    "level": 6,
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }, {
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Module"
+                    }, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "false"
+                    }],
+                    "parent": {
+                        "id": "opUnit1",
+                        "name": "opUnit1"
+                    },
+                    "children": []
+                },{
+                    "id": "ou2",
+                    "name": "module 2",
+                    "level": 6,
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }, {
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Module"
+                    }, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "false"
+                    }],
+                    "parent": {
+                        "id": "opUnit1",
+                        "name": "opUnit1"
+                    },
+                    "children": []
+                }];
+
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q,modules));
+
+                dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+
+                scope.$apply();
+
+                expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual([{moduleId: 'ou1', moduleName: 'opUnit1 - module 1', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: false}]);
+                expect(scope.itemsAwaitingSubmission).toEqual([{moduleId: 'ou2', moduleName: 'opUnit1 - module 2', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: true}]);
+            });
+
+            it("should include items that are not submitted in 'items awaiting submission' for project level user", function(){
+                var dataValues = [{
+                    "orgUnit": "ou1",
+                    "period": "2014W22",
+                    "dataValues": [{
+                        "period": '2016W01',
+                        "orgUnit": 'ou1',
+                        "dataElement": "DE2",
+                        "categoryOptionCombo": "COC2",
+                        "value": "2",
+                        "lastUpdated": "2014-01-15T00:00:00.000"
+                    }],
+                    "localStatus": "WAITING_TO_SYNC"
+                }, {
+                    "orgUnit": "ou2",
+                    "period": "2014W22",
+                    "dataValues": [{
+                        "period": '2016W02',
+                        "orgUnit": 'ou2',
+                        "dataElement": "DE2",
+                        "categoryOptionCombo": "COC2",
+                        "value": "4",
+                        "clientLastUpdated": "2014-01-22T00:00:00.000"
+                    }],
+                    "localStatus": "FAILED_TO_SYNC"
+                }];
+
+                var modules = [{
+                    "id": "ou1",
+                    "name": "module 1",
+                    "level": 6,
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }, {
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Module"
+                    }, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "false"
+                    }],
+                    "parent": {
+                        "id": "opUnit1",
+                        "name": "opUnit1"
+                    },
+                    "children": []
+                },{
+                    "id": "ou2",
+                    "name": "module 2",
+                    "level": 6,
+                    "attributeValues": [{
+                        "attribute": {
+                            "code": "isNewDataModel"
+                        },
+                        "value": "true"
+                    }, {
+                        "attribute": {
+                            "code": "Type"
+                        },
+                        "value": "Module"
+                    }, {
+                        "attribute": {
+                            "code": "isLineListService"
+                        },
+                        "value": "false"
+                    }],
+                    "parent": {
+                        "id": "opUnit1",
+                        "name": "opUnit1"
+                    },
+                    "children": []
+                }];
+
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q,modules));
+
+                rootScope.hasRoles.and.callFake(function(roles) {
+                    if (_.contains(roles, 'Project Level Approver'))
+                        return true;
+                    return false;
+                });
+
+                dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+
+                scope.$apply();
+
+                expect(scope.itemsAwaitingApprovalAtUserLevel).toEqual([
+                    { moduleId: 'ou1', moduleName: 'opUnit1 - module 1', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: false }
+                ]);
+                expect(scope.itemsAwaitingSubmission).toEqual([
+                    { moduleId: 'ou2', moduleName: 'opUnit1 - module 2', period: '2014W22', isSubmitted: true, isComplete: false, isApproved: false, isLineListService: false, isNotSynced: true }
+                ]);
+            });
+
             it("should select appropriate modules for approval for project level users", function() {
 
                 rootScope.hasRoles.and.callFake(function(roles) {
@@ -101,19 +293,22 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod1",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }];
 
                 scope.toggleSelectAll(true);
@@ -123,19 +318,22 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod1",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }]);
             });
 
@@ -153,19 +351,22 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod1",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }];
 
                 scope.toggleSelectAll(false);
@@ -175,19 +376,22 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": false
                 }, {
                     "moduleId": "mod1",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': false,
+                    'isNotSynced': false,
                     "selectedForApproval": false
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }]);
             });
 
@@ -205,20 +409,23 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }];
 
                 scope.toggleSelectAll(true);
@@ -227,13 +434,15 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
@@ -241,6 +450,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }]);
             });
@@ -259,20 +469,23 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": true
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W02",
                     'isSubmitted': true,
                     'isComplete': true,
-                    "isApproved": false
+                    "isApproved": false,
+                    'isNotSynced': false
                 }];
 
                 scope.toggleSelectAll(false);
@@ -281,13 +494,15 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     "moduleId": "mod1",
                     "period": "2014W01",
                     'isSubmitted': true,
-                    'isComplete': false
+                    'isComplete': false,
+                    'isNotSynced': false
                 }, {
                     "moduleId": "mod2",
                     "period": "2014W01",
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": false
                 }, {
                     "moduleId": "mod2",
@@ -295,6 +510,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     'isSubmitted': true,
                     'isComplete': true,
                     "isApproved": false,
+                    'isNotSynced': false,
                     "selectedForApproval": false
                 }]);
             });
@@ -352,7 +568,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
 
                 dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
@@ -373,7 +589,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
 
@@ -404,7 +620,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
 
@@ -471,7 +687,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
                 orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, origins));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, eventDataValues));
 
                 dataEntryApprovalDashboardController = new DataEntryApprovalDashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
@@ -504,17 +720,8 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                     }
                 }];
 
-                var dataValues = [{
-                    "categoryOptionCombo": "co123",
-                    "dataElement": "de123",
-                    "orgUnit": "123",
-                    "period": "2014W16",
-                    "value": "9",
-                    "isDraft": true
-                }];
-
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, []));
 
@@ -562,7 +769,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, approvalData));
 
@@ -616,7 +823,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, approvalData));
 
@@ -670,7 +877,7 @@ define(["dataEntryApprovalDashboardController", "angularMocks", "approvalDataRep
                 }];
 
                 orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, modules));
-                dataRepository.getDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
+                dataRepository.getSubmittedDataValuesForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, dataValues));
                 programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, []));
                 approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, approvalData));
 

@@ -136,6 +136,7 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
 
                 dataRepository = new DataRepository();
                 getDataValuesSpy = spyOn(dataRepository, "getDataValues");
+                spyOn(dataRepository, "getLocalStatus").and.returnValue(utils.getPromise(q, 'FAILED_TO_SYNC'));
                 getDataValuesSpy.and.returnValue(utils.getPromise(q, undefined));
 
                 spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
@@ -199,6 +200,19 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.sum(list, "de1", ['option1', 'option3', 'option4'])).toBe(5);
             });
 
+            it("should return true if number of origins are greater than 1 ", function() {
+
+                scope.$apply();
+                scope.moduleAndOriginOrgUnitIds = ["a3439134495", "a469d3ba630", "aff112d79b4"];
+                var dataSet = {id: "a339b7fa9eb",
+                    organisationUnits:[
+                        {id:"a3439134495"},
+                        {id:"a469d3ba630"}
+                ]};
+
+                expect(scope.showTotalLabelForOriginDatasetSection(dataSet)).toBe(true);
+            });
+
             it("should return the sum of valid expressions ", function() {
                 scope.$apply();
                 var list = {
@@ -245,9 +259,11 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 scope.$apply();
                 var section = {
                     "dataElements": [{
-                        "id": "de1"
+                        "id": "de1",
+                        "isIncluded": true
                     }, {
-                        "id": "de2"
+                        "id": "de2",
+                        "isIncluded": true
                     }]
                 };
 
@@ -286,13 +302,16 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 var section = {
                     "dataElements": [{
                         "id": "de1",
-                        "formName": "DE 1"
+                        "formName": "DE 1",
+                        "isIncluded": true
                     }, {
                         "id": "de2",
-                        "formName": "DE 2"
+                        "formName": "DE 2",
+                        "isIncluded": true
                     }, {
                         "id": "de3",
-                        "formName": "DE 3"
+                        "formName": "DE 3",
+                        "isIncluded": true
                     }]
                 };
 
@@ -321,6 +340,46 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 };
 
                 expect(scope.columnSum(list, section, option, true)).toBe(15);
+            });
+
+            it("should return the column sum in a section for only data elements which are included", function() {
+                var section = {
+                    "dataElements": [{
+                        "id": "de1",
+                        "formName": "DE 1",
+                        "isIncluded": true
+                    }, {
+                        "id": "de2",
+                        "formName": "DE 2",
+                        "isIncluded": true
+                    }, {
+                        "id": "de3",
+                        "formName": "DE 3",
+                        "isIncluded": false
+                    }]
+                };
+
+                var option = "option1";
+                var list = {
+                    "de1": {
+                        "option1": {
+                            "value": "5"
+                        }
+                    },
+                    "de2": {
+                        "option1": {
+                            "value": "1"
+                        }
+                    },
+                    "de3": {
+                        "option1": {
+                            "value": "10"
+                        }
+                    }
+                };
+                scope.$apply();
+
+                expect(scope.columnSum(list, section, option, false)).toBe(6);
             });
 
             it("should return the sum of all the rows for a given section", function() {
@@ -418,6 +477,54 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.dataentryForm.$setPristine).toHaveBeenCalled();
             });
 
+            it("should not include orgUnits which doesn't have any dataValues in hustle message", function() {
+                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+                spyOn(scope.dataentryForm, '$setPristine');
+
+                scope.dataValues = {
+                    "mod1": {
+                        "dataElement1": {
+                            "catCombo1": {
+                                "value": "10",
+                                "formula": "1+9"
+                            }
+                        }
+                    },
+                    "origin1": {
+                        "dataElement2": {
+                            "catCombo2": {
+                                "value": "67",
+                                "formula": "67"
+                            }
+                        }
+                    },
+                    "origin2": {
+                        "dataElement2": {
+                            "catCombo2": {
+                                "value": "",
+                                "formula": ""
+                            }
+                        }
+                    }
+                };
+
+                scope.submit();
+                scope.$apply();
+
+                expect(hustle.publish).toHaveBeenCalledWith({
+                    data: [{
+                        orgUnit: "mod1",
+                        period: "2014W14"
+                    }, {
+                        orgUnit: "origin1",
+                        period: "2014W14"
+                    }],
+                    type: 'uploadDataValues',
+                    locale: 'en',
+                    desc: 'upload data for 2014W14, Mod1'
+                }, 'dataValues');
+            });
+
             it("should save data values as draft to indexeddb", function() {
 
                 spyOn(dataRepository, "saveAsDraft").and.returnValue(saveSuccessPromise);
@@ -464,6 +571,21 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 expect(scope.saveSuccess).toBe(false);
                 expect(scope.submitError).toBe(true);
                 expect(scope.saveError).toBe(false);
+            });
+
+            it("should set syncError to true when selected orgUnit and period data failed to sync to DHIS", function() {
+                scope.$apply();
+                expect(scope.syncError).toBe(true);
+            });
+
+            it("should set syncError to false when user resubmits the data for approval", function() {
+                dataRepository.getLocalStatus.and.returnValue(utils.getPromise(q, 'WAITING_TO_SYNC'));
+                spyOn(dataRepository, "save").and.returnValue(saveSuccessPromise);
+
+                scope.submit();
+                scope.$apply();
+
+                expect(scope.syncError).toBeFalsy();
             });
 
             it("should fetch max length to calculate col span for category options", function() {

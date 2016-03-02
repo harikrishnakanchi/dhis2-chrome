@@ -47,7 +47,6 @@ require.config({
 
         //Controllers
         "controllers": "app/controller/controllers",
-        "dashboardController": "app/controller/dashboard.controller",
         "dataEntryApprovalDashboardController": "app/controller/data.entry.approval.dashboard.controller",
         "dataEntryController": "app/controller/data.entry.controller",
         "dataApprovalController": "app/controller/data.approval.controller",
@@ -91,7 +90,6 @@ require.config({
         "eventService": "app/service/event.service",
         "orgUnitGroupService": "app/service/orgunit.group.service",
         "filesystemService": "app/service/filesystem.service",
-        "resourceBundleService": "app/service/resource.bundle.service",
 
         //Repositories
         "repositories": "app/repository/repositories",
@@ -99,7 +97,7 @@ require.config({
         "approvalDataRepository": "app/repository/approval.data.repository",
         "datasetRepository": "app/repository/dataset.repository",
         "systemSettingRepository": "app/repository/system.setting.repository",
-        "userPreferenceRepository": "app/repository/userpreference.repository",
+        "userPreferenceRepository": "app/repository/user.preference.repository",
         "orgUnitRepository": "app/repository/orgunit.repository",
         "userRepository": "app/repository/user.repository",
         "programRepository": "app/repository/program.repository",
@@ -149,6 +147,7 @@ require.config({
         "zipUtils": "app/utils/zip.utils",
         "cipherUtils": "app/utils/cipher.utils",
         "appSettingsUtils": "app/utils/app.settings.utils",
+        "authenticationUtils": "app/utils/authentication.utils",
 
         //Helpers
         "helpers": "app/helpers/helpers",
@@ -159,7 +158,8 @@ require.config({
 
         //Directives
         "directives": "app/directives/directives",
-        "pivotTable": "app/directives/pivot.table"
+        "pivotTable": "app/directives/pivot.table",
+        "lockedTableHeader": "app/directives/locked.table.header"
     },
     shim: {
         "ng-i18n": {

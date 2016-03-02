@@ -1,6 +1,6 @@
 define(["selectProjectPreferenceController", "angularMocks", "utils", "lodash", "orgUnitRepository", "userPreferenceRepository", "systemSettingRepository"],
     function(SelectProjectPreferenceController, mocks, utils, _, OrgUnitRepository, UserPreferenceRepository, SystemSettingRepository) {
-        describe("referral locations controller", function() {
+        describe("select project preference controller", function() {
             var scope, allProjects, rootScope, hustle, location, userPreferenceRepository, orgUnitRepository, userPreference, q;
 
             beforeEach(module("hustle"));
@@ -62,6 +62,7 @@ define(["selectProjectPreferenceController", "angularMocks", "utils", "lodash", 
                 spyOn(orgUnitRepository, "getAllProjects").and.returnValue(utils.getPromise(q, allProjects));
                 spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, {}));
+                spyOn(orgUnitRepository, "findAll").and.returnValue(utils.getPromise(q, {}));
 
                 selectProjectPreferenceController = new SelectProjectPreferenceController(rootScope, scope, hustle, location, orgUnitRepository, userPreferenceRepository, systemSettingRepository);
             }));
@@ -93,7 +94,7 @@ define(["selectProjectPreferenceController", "angularMocks", "utils", "lodash", 
                 });
             });
 
-            xit("should call save preference when product key has just one project", function() {
+            it("should call findAll when product key is project level", function() {
                 systemSettingRepository.getAllowedOrgUnits.and.returnValue([{
                     "id": "proj1",
                     "name": "project"
@@ -110,14 +111,10 @@ define(["selectProjectPreferenceController", "angularMocks", "utils", "lodash", 
 
                 scope.$apply();
 
-                expect(userPreferenceRepository.save).toHaveBeenCalled();
-                expect(scope.selectedProject.originalObject).toEqual({
-                    "id": "proj1",
-                    "name": "project"
-                });
+                expect(orgUnitRepository.findAll).toHaveBeenCalled();
             });
 
-            xit("should call findAllByParent when product key is of country level", function() {
+            it("should call findAllByParent when product key is of country level", function() {
                 systemSettingRepository.getAllowedOrgUnits.and.returnValue([{
                     "id": "country1",
                     "name": "country"

@@ -9,7 +9,7 @@
             };
 
             var getMetadata = function() {
-                return $q.all([userPreferenceRepository.getUserModules(), datasetRepository.getAll()]).then(function(data) {
+                return $q.all([userPreferenceRepository.getCurrentUsersModules(), datasetRepository.getAll()]).then(function(data) {
                     var userModuleIds = _.pluck(data[0], "id");
                     var allDataSetIds = _.pluck(data[1], "id");
                     var originOrgUnits = [];

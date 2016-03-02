@@ -1,25 +1,12 @@
 define(["md5", "lodash"], function(md5, _) {
-    return function($rootScope, $scope, $location, db, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository) {
+    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository) {
         var loadUserData = function(loginUsername) {
-            var getUser = function(username) {
-                var userStore = db.objectStore("users");
-                return userStore.find(username);
-            };
-
-            var getUserCredentials = function(username) {
-                var userCredentialsStore = db.objectStore("localUserCredentials");
-
-                if (username === "superadmin" || username === "projectadmin")
-                    return userCredentialsStore.find(username);
-                else
-                    return userCredentialsStore.find("project_user");
-            };
-
             var getExistingUserProjects = function() {
-                return userPreferenceRepository.getCurrentProjects();
+                return userPreferenceRepository.getCurrentUsersProjectIds();
             };
-
-            return $q.all([getUser(loginUsername), getUserCredentials(loginUsername), getExistingUserProjects()]);
+            var user = userRepository.getUser(loginUsername);
+            var userCredentials = userRepository.getUserCredentials(loginUsername);
+            return $q.all([user, userCredentials, getExistingUserProjects()]);
         };
 
         var isRole = function(user, role) {
@@ -43,12 +30,13 @@ define(["md5", "lodash"], function(md5, _) {
                 return $q.reject("Invalid user");
             }
 
+            var productKeyLevel = systemSettingRepository.getProductKeyLevel();
+
             if (isRole(user, "Superuser"))
                 return data;
 
-            var userOrgUnitIds = _.pluck(data[0].organisationUnits, "id");
+            var userOrgUnitIds = _.pluck(user.organisationUnits, "id");
             var allowedOrgUnitIds = _.pluck(systemSettingRepository.getAllowedOrgUnits(), "id");
-            var productKeyLevel = systemSettingRepository.getProductKeyLevel();
 
             if (productKeyLevel === 'project' && _.isEmpty(_.intersection(allowedOrgUnitIds, userOrgUnitIds))) {
                 $scope.invalidAccess = true;
@@ -60,24 +48,18 @@ define(["md5", "lodash"], function(md5, _) {
                 return $q.reject("User doesn’t have access to this Praxis instance.");
             }
 
-            if (productKeyLevel === 'global' && !isRole(user, "Superadmin")) {
-                $scope.invalidAccess = true;
-                return $q.reject("User doesn’t have access to this Praxis instance.");
-            }
-
-
             if (productKeyLevel === 'country' && !isRole(user, "Coordination Level Approver")) {
-                return orgUnitRepository.get(userOrgUnitIds[0]).then(function(project) {
-                    if (project.parent.id !== allowedOrgUnitIds[0]) {
-                        $scope.invalidAccess = true;
-                        return $q.reject("User doesn’t have access to this Praxis instance.");
-                    } else {
-                        $scope.invalidAccess = false;
-                        return data;
-                    }
-                });
+                if(!_.isEmpty(userOrgUnitIds))
+                    return orgUnitRepository.get(userOrgUnitIds[0]).then(function(project) {
+                        if (project.parent.id !== allowedOrgUnitIds[0]) {
+                            $scope.invalidAccess = true;
+                            return $q.reject("User doesn’t have access to this Praxis instance.");
+                        } else {
+                            $scope.invalidAccess = false;
+                            return data;
+                        }
+                    });
             }
-
             return data;
         };
 
@@ -101,7 +83,6 @@ define(["md5", "lodash"], function(md5, _) {
                 $scope.invalidCredentials = true;
                 return $q.reject("Invalid credentials");
             }
-
             return data;
         };
 
@@ -115,8 +96,8 @@ define(["md5", "lodash"], function(md5, _) {
         var startProjectDataSync = function(data) {
             var previousUserProjects = data[2];
 
-            userPreferenceRepository.getCurrentProjects().then(function(currentUserProjects) {
-                if (previousUserProjects !== currentUserProjects) {
+            userPreferenceRepository.getCurrentUsersProjectIds().then(function(currentUserProjects) {
+                if (!_.isEqual(previousUserProjects,currentUserProjects)){
                     $hustle.publish({
                         "type": "downloadProjectData",
                         "data": []
@@ -137,7 +118,7 @@ define(["md5", "lodash"], function(md5, _) {
         $scope.login = function() {
             var loginUsername = $scope.username.toLowerCase();
             loadUserData(loginUsername)
-                // .then(verifyProductKeyInstance) required for next release
+                .then(verifyProductKeyInstance)
                 .then(authenticateUser)
                 .then(login)
                 .then(startProjectDataSync)

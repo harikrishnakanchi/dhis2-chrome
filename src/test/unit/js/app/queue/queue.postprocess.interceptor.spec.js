@@ -1,12 +1,14 @@
-define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils"], function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils) {
+define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository"], function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository) {
     describe('queuePostProcessInterceptor', function() {
 
-        var hustle, queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope;
+        var hustle, queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
             rootScope = $rootScope;
             scope = $rootScope.$new();
+
+            dataRepository = new DataRepository();
 
             spyOn(chromeUtils, "sendMessage");
             spyOn(chromeUtils, "createNotification");
@@ -17,7 +19,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                 }))
             };
 
-            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle);
+            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository);
         }));
 
         it('should return true for retry if number of releases is less than max retries', function() {
@@ -44,6 +46,8 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
 
             expect(actualResult).toBeFalsy();
         });
+
+
 
         it("should send message on failure", function() {
             queuePostProcessInterceptor.onFailure({
@@ -78,6 +82,9 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
         });
 
         it('should return false for retry if job type is blacklisted for retrial', function() {
+
+            properties.queue.skipRetryMessages = ['downloadMetadata'];
+
             var actualResult = queuePostProcessInterceptor.shouldRetry({
                 "id": 1,
                 "data": {
@@ -142,6 +149,50 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             expect(chromeUtils.sendMessage.calls.count()).toEqual(3);
             expect(chromeUtils.sendMessage.calls.argsFor(1)).toEqual(["dhisOffline"]);
             expect(chromeUtils.sendMessage.calls.argsFor(2)).toEqual(["productKeyExpired"]);
+        });
+
+        it("should change dataValues status for specific period and orgUnit to 'FAILED_TO_SYNC' after maxretries", function() {
+            var periodAndOrgUnit = {
+                "period": "2016W01",
+                "orgUnit": "abcd"
+            };
+            var job = {
+                "id": 1,
+                "data": {
+                    "type": "uploadDataValues",
+                    "data": periodAndOrgUnit
+                },
+                "releases": 6
+            };
+
+            spyOn(dataRepository, "setLocalStatus");
+            queuePostProcessInterceptor.shouldRetry(job, {});
+
+            scope.$apply();
+
+            expect(dataRepository.setLocalStatus).toHaveBeenCalledWith(periodAndOrgUnit, "FAILED_TO_SYNC");
+        });
+
+        it("should not call dataRepository for other jobs except 'uploadDataValues'", function() {
+            var periodsAndOrgUnits = [{
+                "period": "2016W01",
+                "orgUnit": "abcd"
+            }];
+            var job = {
+                "id": 1,
+                "data": {
+                    "type": "NOTUploadDataValues",
+                    "data": periodsAndOrgUnits
+                },
+                "releases": 6
+            };
+
+            spyOn(dataRepository, "setLocalStatus");
+            queuePostProcessInterceptor.shouldRetry(job, {});
+
+            scope.$apply();
+
+            expect(dataRepository.setLocalStatus).not.toHaveBeenCalled();
         });
     });
 });

@@ -16,7 +16,7 @@
                 <div ng-hide="selectedDataset.isReportsAvailable">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
-                <div ng-repeat="chart in chartData | filter: {dataset:selectedDataset.id} | orderBy: 'name'" ng-if="chart.data.length &gt; 0">
+                <div ng-repeat="chart in chartData | filter: {dataSetCode: selectedDataset.code} | orderBy: 'name'" ng-if="chart.data.length &gt; 0">
                     <div>
                         <div class="row chart-title">
                             <h3 class="col-md-6 col-md-offset-3 text-center">{{chart.title}}</h3>
@@ -43,7 +43,7 @@
                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                             </accordion-heading>
                             <div class="exp-coll-group">
-                                <div ng-if="!isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDataset.id} | orderBy: 'name'" class="exportCSV-container">
+                                <div ng-if="!isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'name'" class="exportCSV-container">
                                     <accordion close-others="false">
                                         <accordion-group>
                                             <accordion-heading>
@@ -51,7 +51,7 @@
                                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                             </accordion-heading>
                                             <div>
-                                                <pivot-table definition="table.table" data="table.data" export-button-name="{{resourceBundle.exportAsCsv}}" column-one-title="{{resourceBundle.dataElement}}" column-two-title="{{resourceBundle.category}}"></pivot-table>
+                                                <pivot-table definition="table.table" data="table.data" show-weeks="false"></pivot-table>
                                             </div>
                                         </accordion-group>
                                     </accordion>
@@ -73,7 +73,7 @@
                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                             </accordion-heading>
                             <div class="exp-coll-group">
-                                <div ng-if="isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataset:selectedDataset.id} | orderBy: 'name'" class="exportCSV-container">
+                                <div ng-if="isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'name'" class="exportCSV-container">
                                     <accordion close-others="false">
                                         <accordion-group>
                                             <accordion-heading>
@@ -81,7 +81,7 @@
                                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                             </accordion-heading>
                                             <div>
-                                                <pivot-table definition="table.table" data="table.data"></pivot-table>
+                                                <pivot-table definition="table.table" data="table.data" show-weeks="true"></pivot-table>
                                             </div>
                                         </accordion-group>
                                     </accordion>

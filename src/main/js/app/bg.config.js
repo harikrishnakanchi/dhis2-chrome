@@ -34,7 +34,7 @@ require.config({
         "dataRepository": "app/repository/data.repository",
         "approvalDataRepository": "app/repository/approval.data.repository",
         "datasetRepository": "app/repository/dataset.repository",
-        "userPreferenceRepository": "app/repository/userpreference.repository",
+        "userPreferenceRepository": "app/repository/user.preference.repository",
         "orgUnitRepository": "app/repository/orgunit.repository",
         "programEventRepository": "app/repository/program.event.repository",
         "orgUnitGroupRepository": "app/repository/orgunit.group.repository",
@@ -88,7 +88,9 @@ require.config({
         "uploadExcludedDataElementsConsumer": "app/consumer/upload.excluded.dataelements.consumer",
         "uploadPatientOriginConsumer": "app/consumer/upload.patient.origin.consumer",
         "downloadPivotTablesConsumer": "app/consumer/download.pivot.tables.consumer",
+        "downloadPivotTableDataConsumer": "app/consumer/download.pivot.table.data.consumer",
         "downloadChartsConsumer": "app/consumer/download.charts.consumer",
+        "downloadChartDataConsumer": "app/consumer/download.chart.data.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
 
         //merge strategies

@@ -9,7 +9,7 @@ define(["lodash"], function(_) {
         };
 
         var getUserProjectIds = function() {
-            return userPreferenceRepository.getCurrentProjects();
+            return userPreferenceRepository.getCurrentUsersProjectIds();
         };
 
         var downloadedProjectSettings = function(projectIds) {

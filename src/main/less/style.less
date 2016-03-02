@@ -162,7 +162,7 @@ body {
         }
     }
     .scroll-horizontal {
-        overflow-x: scroll;
+        overflow-x: auto;
     }
     .error-data-entry {
         margin-top: 20px;
@@ -375,6 +375,67 @@ body {
             font-size: 20px;
         }
     }
+    .errorHref {
+        .text-danger;
+        .font-bold;
+    }
+    .cursorPointer {
+        cursor: pointer;
+    }
+    .font-bold {
+        font-weight:bolder;
+    }
+    .icon-small {
+        font-size:smaller;
+    }
+    .init-screen {
+        position: fixed;
+        padding: 0;
+        margin: 0;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 1);
+        .contents {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -65px;
+            margin-top: -100px;
+        }
+    }
+    div.header-cell-with-weeks {
+        white-space: nowrap;
+        margin-right: 8px;
+        p.weeks {
+            padding-top: 3px;
+            margin-bottom: 0;
+        }
+        span.name {
+            display: block;
+            float: left;
+            margin-right: 5px;
+        }
+        span.icon {
+            display: block;
+            padding-top: 5px;
+        }
+    }
+    table.sortable {
+        white-space: nowrap;
+    }
+    .locked-table-header {
+        .fixed-header-table-div {
+            position: fixed;
+            will-change: top;
+            overflow-x: hidden;
+            top: 0;
+        }
+        table {
+            margin-bottom: 0 !important;
+        }
+    }
     .errortxt {
         color: #f00;
     }
@@ -525,9 +586,6 @@ body {
         line-height: 26px;
         text-align: center;
     }
-    .errortxt {
-        color: #f00;
-    }
     //accordion control
     .accordion {
         a {
@@ -657,7 +715,7 @@ body {
     }
     //spinner
     .loading {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;

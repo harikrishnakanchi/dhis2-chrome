@@ -18,7 +18,7 @@ define(["lodash"], function(_) {
             if (isCoordinationLevelApprover)
                 return orgUnitRepository.getAllModulesInOrgUnits($rootScope.currentUser.selectedProject.id);
 
-            return userPreferenceRepository.getUserModules().then(function(modules) {
+            return userPreferenceRepository.getCurrentUsersModules().then(function(modules) {
                 return modules;
             });
         };

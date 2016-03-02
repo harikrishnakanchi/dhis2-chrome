@@ -6,11 +6,18 @@
         </div>
         <div ng-if="!isLineListModule &amp;&amp; !loading &amp;&amp; week &amp;&amp; selectedModule">
             <section class="panel tab-panel">
-                <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
-                <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
-                <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
-                <div class="alert alert-danger" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver']) &amp;&amp; ((!isCompleted || !isSubmitted) &amp;&amp; hasRoles(['Coordination Level Approver'])) || (!isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) &amp;&amp; dataValues !== undefined">{{resourceBundle.noDataForApproval}}</div>
-                <div class="alert alert-info" ng-if="!isApproved  &amp;&amp; !isCompleted  &amp;&amp; !isSubmitted &amp;&amp; hasRoles(['Observer'])">{{resourceBundle.noDataAvailable}}</div>
+                <div ng-if="!syncError">
+                    <div ng-show="isCompleted &amp;&amp; !isApproved &amp;&amp; !hasRoles(['Coordination Level Approver'])" class="alert alert-success">{{resourceBundle.firstLevelApproveSuccess}}</div>
+                    <div ng-show="isApproved &amp;&amp; !submitAndApprovalSuccess" class="alert alert-success">{{resourceBundle.secondLevelApproveSuccess}}</div>
+                    <div ng-show="approveError" class="alert alert-danger">{{resourceBundle.dataApproveFailure}}</div>
+                    <div class="alert alert-danger" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver']) &amp;&amp; ((!isCompleted || !isSubmitted) &amp;&amp; hasRoles(['Coordination Level Approver'])) || (!isSubmitted &amp;&amp; hasRoles(['Project Level Approver'])) &amp;&amp; dataValues !== undefined">{{resourceBundle.noDataForApproval}}</div>
+                    <div class="alert alert-info" ng-if="!isApproved  &amp;&amp; !isCompleted  &amp;&amp; !isSubmitted &amp;&amp; hasRoles(['Observer'])">{{resourceBundle.noDataAvailable}}</div>
+                </div>
+                <div ng-if="syncError">
+                    <div class="alert alert-danger" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])">{{resourceBundle.noDataForApproval}}</div>
+                    <div class="alert alert-info" ng-if="hasRoles(['Observer'])">{{resourceBundle.noDataAvailable}}</div>
+                </div>
+
                 <form name="dataentryForm" id="dataentry" ng-if="showForm()">
                     <accordion close-others="false">
                         <div ng-class="'dataset-acc-wrapper'">
@@ -29,7 +36,7 @@
                                                 <span>{{ resourceBundle[section.id] || section.name}}</span>
                                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
                                             </accordion-heading>
-                                            <table class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
+                                            <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                                 <thead>
                                                     <tr ng-repeat="category in section.headers">
                                                         <th class="display-print" ng-if="$index===0">
@@ -40,9 +47,9 @@
                                                         <th ng-repeat="option in category track by $index" colspan="{{ maxcolumns(section.headers) / category.length}}">
                                                             <span>{{resourceBundle[option.id] || option.name}}</span>
                                                         </th>
-                                                        <th ng-hide="$last" class="last-column">
+                                                        <th ng-if="!$last" class="last-column">
                                                         </th>
-                                                        <th ng-show="$last" class="last-column">
+                                                        <th ng-if="$last && section.categoryOptionComboIds.length > 1" class="last-column">
                                                             {{ resourceBundle.totalLabel }}
                                                         </th>
                                                     </tr>
@@ -66,28 +73,27 @@
                                                         <td ng-repeat="option in section.categoryOptionComboIds">
                                                             <ng-form name="datavalueForm">
                                                                 <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, option, dataSet.organisationUnits)" ng-disabled="true" />
-                                                                <br/>
                                                             </ng-form>
                                                         </td>
-                                                        <td class="last-column">{{sum(dataValues, dataSet.organisationUnits, dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                                        <td ng-if="section.categoryOptionComboIds.length > 1" class="last-column">{{sum(dataValues, dataSet.organisationUnits, dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                     </tr>
-                                                    <tr>
+                                                    <tr ng-if="(section.dataElements | filter:{ isIncluded: true }).length > 1">
                                                         <td>
                                                             <span> {{ resourceBundle.totalLabel }}</span>
                                                         </td>
                                                         <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
                                                             {{columnSum(dataValues, dataSet.organisationUnits, section.dataElements, option, dataSet.isReferralDataset)}}
                                                         </td>
-                                                        <td class="last-column"> {{totalSum(dataValues, section.dataElements)}}
+                                                        <td ng-if="section.categoryOptionComboIds.length > 1" class="last-column"> {{totalSum(dataValues, section.dataElements)}}
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </accordion-group>
+                                    </accordion>
                                 </div>
-                                </accordion>
+                            </accordion-group>
                         </div>
-                        </accordion-group>
                         <div ng-if="!isLineListModule" ng-class="'dataset-acc-wrapper'">
                             <accordion-group ng-repeat="dataSet in dataSets | filter:{ isOriginDataset: true }" is-open="getDatasetState(dataSet.id, false)[dataSet.id]">
                                 <accordion-heading>
@@ -104,7 +110,7 @@
                                                 <span>{{ resourceBundle[section.id] || section.name}}</span>
                                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen[section.id], 'glyphicon-chevron-right': !isopen[section.id]}"></i>
                                             </accordion-heading>
-                                            <table class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
+                                            <table locked-table-header class="table table-bordered" ng-if="isDatasetOpen[dataSet.id] || printingTallySheet">
                                                 <thead>
                                                     <tr ng-repeat="category in section.headers">
                                                         <th class="display-print" ng-if="$index===0">
@@ -117,7 +123,7 @@
                                                         </th>
                                                         <th ng-hide="$last" class="last-column">
                                                         </th>
-                                                        <th ng-show="$last" class="last-column">
+                                                        <th ng-show="$last && section.categoryOptionComboIds.length > 1" class="last-column">
                                                             {{ resourceBundle.totalLabel }}
                                                         </th>
                                                     </tr>
@@ -130,13 +136,12 @@
                                                         <td ng-repeat="option in section.categoryOptionComboIds">
                                                             <ng-form name="datavalueForm">
                                                                 <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, option, orgUnit)" ng-disabled="true" />
-                                                                <br/>
                                                             </ng-form>
                                                         </td>
-                                                        <td class="last-column">{{sum(dataValues, orgUnit ,dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                                        <td ng-if="section.categoryOptionComboIds.length > 1" class="last-column">{{sum(dataValues, orgUnit ,dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                     </tr>
                                                 </tbody>
-                                                <tbody>
+                                                <tbody ng-if="showTotalLabelForOriginDatasetSection(dataSet)">
                                                     <tr>
                                                         <td>
                                                             <span> {{ resourceBundle.totalLabel }}</span>
@@ -144,7 +149,7 @@
                                                         <td>
                                                             {{originSum(dataValues, dataSet, section)}}
                                                         </td>
-                                                        <td class="last-column"> {{originSum(dataValues, dataSet,section)}}
+                                                        <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1"> {{originSum(dataValues, dataSet,section)}}
                                                         </td>
                                                     </tr>
                                                 </tbody>
