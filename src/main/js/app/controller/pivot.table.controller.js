@@ -76,9 +76,10 @@ define(["lodash", "moment"], function(_, moment) {
                     return false;
             });
 
-            var value = allValues !== undefined ? allValues.value : 0;
+            var value = allValues !== undefined ? allValues.value : undefined;
 
-            $scope.periodBasedValues[period] = $scope.periodBasedValues[period] || value;
+            if(_.isUndefined($scope.periodBasedValues[period]))
+                $scope.periodBasedValues[period] = value;
 
             return value;
         };
@@ -172,10 +173,6 @@ define(["lodash", "moment"], function(_, moment) {
             $scope.periods = $scope.data.metaData.pe;
             $scope.isCategoryPresent = $scope.data.width === 4;
             var dataElements;
-
-            _.each($scope.periods, function(period) {
-                $scope.periodBasedValues[period] = 0;
-            });
 
             var periodsForHeader = _.map($scope.periods, function(pe) {
                 return {

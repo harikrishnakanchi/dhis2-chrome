@@ -131,12 +131,12 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                     "Data Element": 'Follow-up Consultations',
                     "Category": '1-23 months',
                     "July 2015": 1772,
-                    "August 2015": 0
+                    "August 2015": undefined
                 }, {
                     "Data Element": 'Follow-up Consultations',
                     "Category": '24-59 months',
                     "July 2015": 6433,
-                    "August 2015": 0
+                    "August 2015": undefined
                 }];
 
                 expect(scope.getData()).toEqual(expectedDataValues);
