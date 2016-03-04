@@ -139,17 +139,21 @@ body {
     .nav .open > a:focus {
         border-color: #a0a0a0;
     }
-    li.praxis-dropdown-menu {
-        ul {
-            li {
-                a {
-                    background: #fff !important;
-                    border: none !important;
-                }
-                a:hover{
-                    background: #ddd !important;
-                    border: none !important;
-                }
+    .nav-tabs > li.active > a,
+    .nav-tabs > li.active > a:hover,
+    .nav-tabs > li.active > a:focus {
+        cursor: pointer;
+    }
+    .nav-tabs > li.praxis-dropdown-menu,
+    .nav-tabs > li.praxis-dropdown-menu:hover {
+        ul li {
+            a {
+                background: #fff;
+                border: none;
+            }
+            a:hover {
+                background: #ddd;
+                border: none;
             }
         }
     }
