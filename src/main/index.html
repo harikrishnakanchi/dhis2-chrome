@@ -62,7 +62,7 @@
                 <li role="presentation" ng-class="{ active: isActive('\/aggregate-data-entry')}" ng-if="hasRoles(['Data entry user'])"><a href="#/aggregate-data-entry">{{ resourceBundle.dataEntryLabel }}</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/data-approval')}" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])"><a href="#/data-approval">{{ resourceBundle.approveDataLabel }}</a></li>
                 <li role="presentation" ng-class="{ active: isActive('\/data-approval')}" ng-if="hasRoles(['Observer'])"><a href="#/data-approval">{{resourceBundle.observerDataLabel}}</a></li>
-                <li role="presentation" ng-class="{ active: isActive('\/line-list')}" class="dropdown" ng-if="hasRoles(['Data entry user']) &amp;&amp; (allUserModules | filter: {isLineListService:true}).length > 0" dropdown>
+                <li role="presentation" ng-class="{ active: isActive('\/line-list')}" class="dropdown praxis-dropdown-menu" ng-if="hasRoles(['Data entry user']) &amp;&amp; (allUserModules | filter: {isLineListService:true}).length > 0" dropdown>
                     <a class="dropdown-toggle" dropdown-toggle href="" role="button">{{ resourceBundle.lineListDataEntryMenuLabel }} <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         <li ng-repeat="module in allUserModules | filter: {isLineListService:true} | orderBy:'displayName'">
@@ -70,7 +70,7 @@
                         </li>
                     </ul>
                 </li>
-                <li role="presentation" ng-class="{ active: isActive('\/reports')}" class="dropdown" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) &amp;&amp; allUserModules.length > 0" dropdown>
+                <li role="presentation" ng-class="{ active: isActive('\/reports')}" class="dropdown praxis-dropdown-menu" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) &amp;&amp; allUserModules.length > 0" dropdown>
                     <a class="dropdown-toggle" dropdown-toggle href="" role="button">{{ resourceBundle.reportsLabel }} <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         <li ng-repeat="module in allUserModules | orderBy:'displayName'">
