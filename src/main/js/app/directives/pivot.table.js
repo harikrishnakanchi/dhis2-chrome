@@ -4,7 +4,8 @@ define([], function() {
             scope: {
                 data: "=",
                 definition: "=",
-                showWeeks: "@"
+                showWeeks: "@",
+                resourceBundle:"="
             },
             controller: 'pivotTableController',
             templateUrl: "templates/pivot-table/pivot.table.html"
