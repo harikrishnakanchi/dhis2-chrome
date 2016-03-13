@@ -6,6 +6,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             return isFraction(datum) ? '' : d3.format('.0f')(datum);
         };
 
+        $scope.isReportOpen = false;
+
         $scope.barChartOptions = {
             "chart": {
                 "type": "multiBarChart",
