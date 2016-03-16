@@ -312,5 +312,7 @@
     "caseNumber": "Case Number",
     "dateRange": "Date Range",
     "search": "Search",
-    "aggregateDataSyncError": "Failed to submit data for approval. Please resubmit."
+    "aggregateDataSyncError": "Failed to submit data for approval. Please resubmit.",
+    "datasetReportsLabel": "Data Set Reports",
+    "projectBaselineReportsLabel": "Project Baseline Reports"
 }

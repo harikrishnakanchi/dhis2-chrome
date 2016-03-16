@@ -102,9 +102,22 @@
                         {{ resourceBundle.reportsLabel }}
                         <span class="caret"></span>
                     </a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li ng-repeat="module in allUserModules | orderBy:'displayName'">
-                            <a class="submenu-item" ng-href="#/reports/{{module.id}}" tabindex="-1">{{module.displayName}}</a>
+                    <ul class="dropdown-menu multi-level" role="menu">
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-toggle">
+                                {{ resourceBundle.datasetReportsLabel }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li ng-repeat="module in allUserModules | orderBy:'displayName'">
+                                    <a class="submenu-item" ng-href="#/reports/{{ module.id }}" tabindex="-1">{{ module.displayName }}</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="dropdown-toggle">
+                                {{ resourceBundle.projectBaselineReportsLabel }}
+                            </a>
                         </li>
                     </ul>
                 </li>

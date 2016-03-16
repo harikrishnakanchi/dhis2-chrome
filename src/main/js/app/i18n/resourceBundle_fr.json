@@ -309,5 +309,7 @@
     "caseNumber": "Case Number in french",
     "dateRange": "Date Range in french",
     "search": "Search",
-    "aggregateDataSyncError": "Impossible de soumettre des données pour approbation. S'il vous plaît soumettre à nouveau."
+    "aggregateDataSyncError": "Impossible de soumettre des données pour approbation. S'il vous plaît soumettre à nouveau.",
+    "datasetReportsLabel": "Data Set Reports F",
+    "projectBaselineReportsLabel": "Project Baseline Reports F"
 }
