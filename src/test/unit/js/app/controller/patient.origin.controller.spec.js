@@ -382,5 +382,74 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
                 "desc": "upsert New Origin 1"
             }, "dataValues"]);
         });
+
+        it("should load existing origin names when opening create origin form", function () {
+            var patientOrigins = {
+                orgUnit: "ou1",
+                origins: [{
+                    "id": "origin1",
+                    "name": "Origin1",
+                    "isDisabled": false,
+                    "longitude": 100,
+                    "latitude": 80,
+                    "clientLastUpdated": "2014-05-30T12:43:54.972Z"
+                }, {
+                    "id": "Origin2",
+                    "name": "Origin2",
+                    "isDisabled": false,
+                    "longitude": 100,
+                    "latitude": 80,
+                    "clientLastUpdated": "2014-04-01T00:00:00.000Z",
+                }]
+            };
+            scope.orgUnit = {
+                "id": "ou1"
+            };
+
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
+
+            patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper);
+            scope.$apply();
+
+            expect(scope.existingPatientOrigins).toEqual(["Origin1", "Origin2"]);
+        });
+
+        it("should load existing origin names when opening update origin form", function () {
+            var patientOrigins = {
+                orgUnit: "ou1",
+                origins: [{
+                    "id": "origin1",
+                    "name": "Origin1",
+                    "isDisabled": false,
+                    "longitude": 100,
+                    "latitude": 80,
+                    "clientLastUpdated": "2014-05-30T12:43:54.972Z"
+                }, {
+                    "id": "Origin2",
+                    "name": "Origin2",
+                    "isDisabled": false,
+                    "longitude": 100,
+                    "latitude": 80,
+                    "clientLastUpdated": "2014-04-01T00:00:00.000Z",
+                }]
+            };
+            scope.orgUnit = {
+                "id": "ou1"
+            };
+
+            scope.patientOrigin = {
+                "id": "origin1",
+                "name": "Origin1",
+                "longitude": 100,
+                "latitude": 80
+            };
+
+            patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientOrigins));
+
+            patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper);
+            scope.$apply();
+
+            expect(scope.existingPatientOrigins).toEqual(["Origin1", "Origin2"]);
+        });
     });
 });
