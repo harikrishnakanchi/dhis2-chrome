@@ -1,7 +1,14 @@
-<div class="exportCSV-container">
+<div class="position-relative">
     <h4>{{resourceBundle.projectBaselineReportsLabel}} - {{ projectName }}</h4>
 
     <button class="col-md-2 exportCSV-btn-project-baseline btn btn-xs btn-primary">
         {{resourceBundle.exportAsCsv}}
     </button>
+
+    <table class="table table-bordered">
+        <tr ng-repeat="projectBasicInfo in projectAttributes">
+            <td> {{ projectBasicInfo.name }} </td>
+            <td> {{ projectBasicInfo.value }} </td>
+        </tr>
+    </table>
 </div>

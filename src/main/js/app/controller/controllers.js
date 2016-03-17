@@ -38,7 +38,7 @@ define(['reportsController', 'dataEntryController', 'mainController', 'orgUnitCo
             app.controller('referralLocationsController', ['$scope', '$hustle', '$modal', 'referralLocationsRepository', referralLocationsController]);
             app.controller('notificationsController', ['$scope', '$q', '$rootScope', 'userPreferenceRepository', 'chartRepository', 'orgUnitRepository', notificationsController]);
             app.controller('selectProjectPreferenceController', ['$rootScope', '$scope', '$hustle', '$location', 'orgUnitRepository', 'userPreferenceRepository', 'systemSettingRepository', selectProjectPreferenceController]);
-            app.controller('projectBaselineReportsController', ['$rootScope', '$scope', projectBaselineReportsController]);
+            app.controller('projectBaselineReportsController', ['$rootScope', '$scope', 'orgUnitRepository', projectBaselineReportsController]);
         };
         return {
             init: init
