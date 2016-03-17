@@ -1,4 +1,4 @@
-define([], function() {
+define(["moment", "lodash"], function(moment, _) {
 
     return function($rootScope, $scope, orgUnitRepository) {
         var selectedProject = $rootScope.currentUser.selectedProject;
@@ -9,20 +9,28 @@ define([], function() {
         });
 
         var parseProjectAttributes = function(projectInfo) {
-            var filteredResult = _.filter(projectInfo.attributeValues, function (attributeInfo) {
-                return _.contains(["prjCon", "projCode", "modeOfOperation", "projectType", "modelOfManagement", "prjPopType", "reasonForIntervention"], attributeInfo.attribute.code);
-            });
+            var attributeNames = ["Project Code", "Project Type", "Context", "Type of population", "Reason For Intervention", "Mode Of Operation", "Model Of Management"];
+            var attributeInfo, projectAttribute;
+
             var projectAttributes = [{name: "Country", value: projectInfo.parent.name}];
             projectAttributes.push({name: "Name", value: projectInfo.name});
-            projectAttributes.push({name: "Opening Date", value: projectInfo.openingDate});
-            projectAttributes.push(_.map(filteredResult, function (attributeInfo) {
-                    return {
-                        name: attributeInfo.attribute.name,
-                        value: attributeInfo.value
-                    };
-                }
-            ));
-            return _.flatten(projectAttributes);
+            attributeNames.forEach(function(attributeName) {
+                attributeInfo = _.find(projectInfo.attributeValues, {
+                    "attribute": {
+                        "name": attributeName
+                    }
+                });
+                projectAttribute = {
+                    name: attributeName,
+                    value: attributeInfo && attributeInfo.value || ""
+                };
+                projectAttributes.push(projectAttribute);
+            });
+
+            projectAttributes.push({name: "Opening Date", value: moment(projectInfo.openingDate).format("MM/DD/YYYY")});
+            projectAttributes.push({name: "End Date", value: (projectInfo.endDate && moment(projectInfo.endDate).format("MM/DD/YYYY")) || ""});
+            return projectAttributes;
+
         };
     };
 

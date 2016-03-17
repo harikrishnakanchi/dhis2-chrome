@@ -155,32 +155,39 @@ define(["orgUnitRepository", "angularMocks", "projectBaselineReportsController",
                     name: "Name",
                     value: "test_project"
                 }, {
-                    name : "Opening Date",
-                    value: "2007-12-31"
-                }, {
-                    name: 'Context',
-                    value: 'Cross-border instability'
-                }, {
                     name: 'Project Code',
                     value: 'SS153'
-                }, {
-                    name: 'Mode Of Operation',
-                    value: 'Direct operation'
-                }, {
+                },
+                {
                     name: 'Project Type',
                     value: 'Regular Project'
-                }, {
-                    name: 'Model Of Management',
-                    value: 'Collaboration'
-                }, {
+                },
+                {
+                    name: 'Context',
+                    value: 'Cross-border instability'
+                },
+                {
                     name: 'Type of population',
                     value: 'General Population'
                 }, {
                     name: 'Reason For Intervention',
                     value: 'Access to health care'
+                },
+                {
+                    name: 'Mode Of Operation',
+                    value: 'Direct operation'
+                }, {
+                    name: 'Model Of Management',
+                    value: 'Collaboration'
+                },  {
+                    name : "Opening Date",
+                    value: "12/31/2007"
+                },
+                {
+                    name : "End Date",
+                    value: ""
                 }
             ];
-
             scope.$apply();
             expect(_.isEqual(scope.projectAttributes, expectedProjectAttributes)).toBe(true);
         });
