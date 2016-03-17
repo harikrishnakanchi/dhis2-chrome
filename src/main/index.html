@@ -96,7 +96,7 @@
                         </li>
                     </ul>
                 </li>
-                <li role="presentation" ng-class="{ active: isActive('\/reports')}" class="dropdown praxis-dropdown-menu" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) &amp;&amp; allUserModules.length > 0" dropdown>
+                <li role="presentation" ng-class="{ active: isActive('\/reports') || isActive('\/projectBaselineReports')}" class="dropdown praxis-dropdown-menu" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) &amp;&amp; allUserModules.length > 0" dropdown>
                     <a class="dropdown-toggle" dropdown-toggle href="" role="button">
                         <i class="fa fa-bar-chart"></i>
                         {{ resourceBundle.reportsLabel }}
