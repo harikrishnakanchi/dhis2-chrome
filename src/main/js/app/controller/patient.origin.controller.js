@@ -198,7 +198,9 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
             return patientOriginRepository.get($scope.orgUnit.id).then(function(patientOriginDetails) {
                 if (!_.isEmpty(patientOriginDetails)) {
                     patientOrigins = patientOriginDetails.origins;
-                    $scope.existingPatientOrigins = _.pluck(patientOrigins, "name");
+                    $scope.existingPatientOrigins = _.reject(_.pluck(patientOrigins, "name"), function (patientOriginName) {
+                        return patientOriginName == oldName;
+                    });
                 } else {
                     $scope.existingPatientOrigins = [];
                 }

@@ -414,7 +414,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             expect(scope.existingPatientOrigins).toEqual(["Origin1", "Origin2"]);
         });
 
-        it("should load existing origin names when opening update origin form", function () {
+        it("should load existing origin names except selected origin when opening update origin form", function () {
             var patientOrigins = {
                 orgUnit: "ou1",
                 origins: [{
@@ -449,7 +449,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             patientOriginController = new PatientOriginController(scope, hustle, q, patientOriginRepository, orgUnitRepository, datasetRepository, programRepository, originOrgunitCreator, orgUnitGroupHelper);
             scope.$apply();
 
-            expect(scope.existingPatientOrigins).toEqual(["Origin1", "Origin2"]);
+            expect(scope.existingPatientOrigins).toEqual(["Origin2"]);
         });
     });
 });
