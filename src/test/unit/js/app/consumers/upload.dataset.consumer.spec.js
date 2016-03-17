@@ -1,38 +1,35 @@
-define(["uploadDatasetConsumer", "utils", "angularMocks", "datasetService", "datasetRepository"], function(UploadDatasetConsumer, utils, mocks, DatasetService, DatasetRepository) {
+define(["uploadDatasetConsumer", "utils", "angularMocks", "datasetService"], function(UploadDatasetConsumer, utils, mocks, DatasetService) {
     describe("uploadDatasetConsumer", function() {
-        var uploadDatasetConsumer, message, datasetService, datasetRepository, q, allDatasets, scope;
+        var uploadDatasetConsumer, message, datasetService, q, scope;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
             scope = $rootScope.$new();
 
             datasetService = new DatasetService();
-            datasetRepository = new DatasetRepository();
+            spyOn(datasetService, "assignOrgUnitToDataset").and.returnValue(utils.getPromise(q, {}));
 
-            allDatasets = [{
-                "id": "ds1",
-                "name": "Dataset1"
-            }, {
-                "id": "ds2",
-                "name": "Dataset2"
-            }];
+            uploadDatasetConsumer = new UploadDatasetConsumer(datasetService, q);
         }));
 
-        it("should save datasets to dhis", function() {
-            spyOn(datasetService, "associateDataSetsToOrgUnit").and.returnValue(utils.getPromise(q, {}));
-            spyOn(datasetRepository, "findAllDhisDatasets").and.returnValue(utils.getPromise(q, allDatasets));
-            uploadDatasetConsumer = new UploadDatasetConsumer(datasetService, datasetRepository);
-
+        it("should save each orgUnit to each dataset", function() {
             message = {
                 data: {
-                    data: ["ds1", "ds2"],
+                    data: {
+                        orgUnitIds: ['orgUnit1', 'orgUnit2'],
+                        dataSetIds: ['dataSetA', 'dataSetB']
+                    },
                     type: "associateDataset"
                 }
             };
 
             uploadDatasetConsumer.run(message);
             scope.$apply();
-            expect(datasetService.associateDataSetsToOrgUnit).toHaveBeenCalledWith([allDatasets[0], allDatasets[1]]);
+
+            expect(datasetService.assignOrgUnitToDataset).toHaveBeenCalledWith('dataSetA', 'orgUnit1');
+            expect(datasetService.assignOrgUnitToDataset).toHaveBeenCalledWith('dataSetA', 'orgUnit2');
+            expect(datasetService.assignOrgUnitToDataset).toHaveBeenCalledWith('dataSetB', 'orgUnit1');
+            expect(datasetService.assignOrgUnitToDataset).toHaveBeenCalledWith('dataSetB', 'orgUnit2');
         });
     });
 });
