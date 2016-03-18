@@ -3,7 +3,9 @@ define(["lodash"], function(_) {
         var assignOrgUnitsToDatasets = function(orgUnitIds, dataSetIds) {
             return _.reduce(dataSetIds, function(wholePromise, dataSetId){
                 return _.reduce(orgUnitIds, function(eachPromise, orgUnitId) {
-                    return eachPromise.then(datasetService.assignOrgUnitToDataset(dataSetId, orgUnitId));
+                    return eachPromise.then(function(){
+                        return datasetService.assignOrgUnitToDataset(dataSetId, orgUnitId);
+                    });
                 }, wholePromise);
             }, $q.when({}));
         };
