@@ -5,10 +5,18 @@
         {{resourceBundle.exportAsCsv}}
     </button>
 
-    <table class="table table-bordered">
+
+    <table class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <h3><th colspan="2">Project Basic Information</th></h3>
+        </tr>
+        </thead>
+        <tbody>
         <tr ng-repeat="projectBasicInfo in projectAttributes">
             <td> {{ projectBasicInfo.name }} </td>
             <td> {{ projectBasicInfo.value }} </td>
         </tr>
+        </tbody>
     </table>
 </div>
