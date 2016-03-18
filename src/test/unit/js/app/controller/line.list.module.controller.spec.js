@@ -106,7 +106,8 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     "disableOrgUnitDesc": "disable organisation unit: ",
                     "upsertOrgUnitDesc": "save organisation unit: ",
                     "associateOrgUnitToDatasetDesc": "associate datasets for ",
-                    "uploadSystemSettingDesc": "upload sys settings for "
+                    "uploadSystemSettingDesc": "upload sys settings for ",
+                    "uploadProgramDesc": "associate selected program to "
                 };
 
                 scope.isNewMode = true;
@@ -703,7 +704,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 }, "dataValues"]);
             });
 
-            it("should associate origin org units to programs and datasets", function() {
+            it("should associate origin org units to programs and datasets and publish jobs accordingly", function() {
                 var today = new Date();
                 scope.$apply();
 
@@ -768,6 +769,20 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                 expect(programRepository.associateOrgUnits).toHaveBeenCalledWith(program, originOrgUnit);
                 expect(datasetRepository.associateOrgUnits).toHaveBeenCalledWith(["Ds1", "OrgDs1"], originOrgUnit);
+                expect(hustle.publish.calls.argsFor(3)).toEqual([{
+                    data: program,
+                    type: "uploadProgram",
+                    locale: "en",
+                    desc: "associate selected program to Unknown"
+                }, "dataValues"]);
+
+                expect(hustle.publish.calls.argsFor(4)).toEqual([{
+                    data: {"orgUnitIds":["UnknownModule2someId"], "dataSetIds":["Ds1", "OrgDs1"]},
+                    type: "associateOrgUnitToDataset",
+                    locale: "en",
+                    desc: "associate datasets for SomeName"
+                }, "dataValues"]);
+
             });
 
             it("should create org unit groups", function() {
