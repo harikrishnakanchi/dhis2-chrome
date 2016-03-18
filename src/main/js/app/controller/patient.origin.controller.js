@@ -58,7 +58,12 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                     publishMessage(allOriginOrgUnits, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(allOriginOrgUnits, "name")));
 
                     associatedDatasetIds = _.flatten(associatedDatasetIds);
-                    publishMessage(associatedDatasetIds, "associateOrgUnitToDataset",
+                    var allOriginOrgUnitIds = _.pluck(allOriginOrgUnits, "id");
+                    var orgunitIdsAndDatasetIds = {
+                        "orgUnitIds": allOriginOrgUnitIds,
+                        "dataSetIds": associatedDatasetIds
+                    };
+                    publishMessage(orgunitIdsAndDatasetIds, "associateOrgUnitToDataset",
                         $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
 
                     if (!_.isEmpty(associatedPrograms))
