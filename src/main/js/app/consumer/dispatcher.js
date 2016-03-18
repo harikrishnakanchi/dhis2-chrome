@@ -68,8 +68,7 @@ define(["lodash"], function(_) {
                         .then(_.partial(uploadOrgUnitGroupConsumer.run, message));
 
                 case "associateOrgUnitToDataset":
-                    return downloadDatasetConsumer.run()
-                        .then(_.partial(uploadDatasetConsumer.run, message));
+                    return uploadDatasetConsumer.run(message);
 
                 case "createUser":
                     return createUserConsumer.run(message);
