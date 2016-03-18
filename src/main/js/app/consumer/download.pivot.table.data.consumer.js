@@ -15,7 +15,7 @@ define(["lodash", "moment"], function(_, moment) {
                 });
             };
 
-            var downloadRelevantPivotTableData = function(pivotTables, userModuleIds, changeLogKey) {
+            var downloadRelevantPivotTableData = function(pivotTables, projectIds, userModuleIds, changeLogKey) {
                 var downloadOfAtLeastOneReportFailed = false;
 
                 var recursivelyDownloadAndUpsertPivotTableData = function(modulesAndTables) {
@@ -74,8 +74,25 @@ define(["lodash", "moment"], function(_, moment) {
                     return $q.when(modulesAndPivotTables);
                 };
 
+                var addProjectLevelPivotTables = function(orUnitsAndTables){
+
+                    _.forEach(projectIds, function(projectId) {
+                        _.forEach(pivotTables, function(pivotTable) {
+                            if(_.contains(pivotTable.name, "ProjectBaselineReport")) {
+                                orUnitsAndTables.push({
+                                    moduleId: projectId,
+                                    pivotTable: pivotTable
+                                });
+                            }
+                        });
+                    });
+
+                    return $q.when(orUnitsAndTables);
+                };
+
                 return getDatasetsRelevantToEachModule()
                     .then(filterPivotTablesForModules)
+                    .then(addProjectLevelPivotTables)
                     .then(recursivelyDownloadAndUpsertPivotTableData)
                     .then(function() {
                         if (!downloadOfAtLeastOneReportFailed) {
@@ -98,7 +115,7 @@ define(["lodash", "moment"], function(_, moment) {
                     }
 
                     return pivotTableRepository.getAll().then(function(pivotTables) {
-                        return downloadRelevantPivotTableData(pivotTables, moduleIds, changeLogKey);
+                        return downloadRelevantPivotTableData(pivotTables, projectIds, moduleIds, changeLogKey);
                     });
                 });
 
