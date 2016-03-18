@@ -92,7 +92,7 @@ define(["datasetService", "angularMocks", "properties"], function(DatasetService
 
             datasetService.assignOrgUnitToDataset(datasetId, orgUnitId);
 
-            httpBackend.expectPOST(properties.dhis.url + '/api/dataSets/' + datasetId + '/' + orgUnitId).respond(204);
+            httpBackend.expectPOST(properties.dhis.url + '/api/dataSets/' + datasetId + '/organisationUnits/' + orgUnitId).respond(204);
             httpBackend.flush();
         });
 

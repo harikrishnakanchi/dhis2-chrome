@@ -15,7 +15,7 @@ define(["dhisUrl"], function(dhisUrl) {
         };
 
         this.assignOrgUnitToDataset = function(datasetId, orgUnitId) {
-            return $http.post(dhisUrl.dataSets + '/' + datasetId + '/' + orgUnitId);
+            return $http.post(dhisUrl.dataSets + '/' + datasetId + '/organisationUnits/' + orgUnitId);
         };
         this.getAll = function(lastUpdatedTime) {
             var url = dhisUrl.dataSets + '.json?fields=:all&paging=false';
