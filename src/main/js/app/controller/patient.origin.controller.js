@@ -29,14 +29,19 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
 
             var createOrgUnitsAndGroups = function() {
                 var allOriginOrgUnits = [];
-                var associatedDatasetIds = [];
+                var associatedDatasetIdsAndOrgUnitIdsList = [];
                 var associatedPrograms = [];
                 var orgUnitsForGroups = [];
 
                 var doAssociations = function(originOrgUnits, siblingOriginOrgUnit) {
                     var associate = function(datasets, program) {
                         var datasetIds = _.pluck(datasets, "id");
-                        associatedDatasetIds = associatedDatasetIds.concat(datasetIds);
+                        var originOrgUnitIds = _.pluck(originOrgUnits, "id");
+                        var orgunitIdsAndDatasetIds = {
+                            "orgUnitIds": originOrgUnitIds,
+                            "dataSetIds": datasetIds
+                        };
+                        associatedDatasetIdsAndOrgUnitIdsList.push(orgunitIdsAndDatasetIds);
                         return datasetRepository.associateOrgUnits(datasetIds, originOrgUnits).then(function() {
                             if (program) {
                                 associatedPrograms.push(program);
@@ -57,14 +62,10 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
                 var publishMessages = function() {
                     publishMessage(allOriginOrgUnits, "upsertOrgUnit", $scope.resourceBundle.upsertOrgUnitDesc + _.uniq(_.pluck(allOriginOrgUnits, "name")));
 
-                    associatedDatasetIds = _.flatten(associatedDatasetIds);
-                    var allOriginOrgUnitIds = _.pluck(allOriginOrgUnits, "id");
-                    var orgunitIdsAndDatasetIds = {
-                        "orgUnitIds": allOriginOrgUnitIds,
-                        "dataSetIds": associatedDatasetIds
-                    };
-                    publishMessage(orgunitIdsAndDatasetIds, "associateOrgUnitToDataset",
-                        $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
+                    _.each(associatedDatasetIdsAndOrgUnitIdsList, function(associatedDatasetIdsAndOrgUnitIds){
+                        publishMessage(associatedDatasetIdsAndOrgUnitIds, "associateOrgUnitToDataset",
+                            $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
+                    });
 
                     if (!_.isEmpty(associatedPrograms))
                         publishMessage(associatedPrograms, "uploadProgram",
