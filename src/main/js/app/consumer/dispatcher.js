@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
+    return function($q, $log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer,
         createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
@@ -68,7 +68,7 @@ define(["lodash"], function(_) {
                         .then(_.partial(uploadOrgUnitGroupConsumer.run, message));
 
                 case "associateOrgUnitToDataset":
-                    return uploadDatasetConsumer.run(message);
+                    return updateDatasetConsumer.run(message);
 
                 case "createUser":
                     return createUserConsumer.run(message);

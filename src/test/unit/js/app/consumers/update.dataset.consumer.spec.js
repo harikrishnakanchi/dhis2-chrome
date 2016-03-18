@@ -1,6 +1,6 @@
-define(["uploadDatasetConsumer", "utils", "angularMocks", "datasetService"], function(UploadDatasetConsumer, utils, mocks, DatasetService) {
-    describe("uploadDatasetConsumer", function() {
-        var uploadDatasetConsumer, message, datasetService, q, scope;
+define(["updateDatasetConsumer", "utils", "angularMocks", "datasetService"], function(UpdateDatasetConsumer, utils, mocks, DatasetService) {
+    describe("updateDatasetConsumer", function() {
+        var updateDatasetConsumer, message, datasetService, q, scope;
 
         beforeEach(mocks.inject(function($q, $rootScope) {
             q = $q;
@@ -9,7 +9,7 @@ define(["uploadDatasetConsumer", "utils", "angularMocks", "datasetService"], fun
             datasetService = new DatasetService();
             spyOn(datasetService, "assignOrgUnitToDataset").and.returnValue(utils.getPromise(q, {}));
 
-            uploadDatasetConsumer = new UploadDatasetConsumer(datasetService, q);
+            updateDatasetConsumer = new UpdateDatasetConsumer(datasetService, q);
         }));
 
         it("should save each orgUnit to each dataset", function() {
@@ -23,7 +23,7 @@ define(["uploadDatasetConsumer", "utils", "angularMocks", "datasetService"], fun
                 }
             };
 
-            uploadDatasetConsumer.run(message);
+            updateDatasetConsumer.run(message);
             scope.$apply();
 
             expect(datasetService.assignOrgUnitToDataset).toHaveBeenCalledWith('dataSetA', 'orgUnit1');
