@@ -9,7 +9,7 @@
     <table class="table table-bordered table-hover">
         <thead>
         <tr>
-            <h3><th colspan="2">Project Basic Information</th></h3>
+            <h3><th colspan="2">Basic Project Information</th></h3>
         </tr>
         </thead>
         <tbody>
@@ -19,4 +19,20 @@
         </tr>
         </tbody>
     </table>
+
+    <div class="exp-coll-group">
+        <div ng-repeat="table in pivotTables">
+            <accordion>
+                <accordion-group is-open="status.open">
+                    <accordion-heading>
+                        <span>{{getTableName(table.table.name)}}</span>
+                        <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                    </accordion-heading>
+                    <div>
+                        <pivot-table definition="table.table" data="table.data" show-weeks="true" resource-bundle="resourceBundle" show-download="false"></pivot-table>
+                    </div>
+                </accordion-group>
+            </accordion>
+        </div>
+    </div>
 </div>

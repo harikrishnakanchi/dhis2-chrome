@@ -1,12 +1,19 @@
 define(["moment", "lodash"], function(moment, _) {
 
-    return function($rootScope, $scope, orgUnitRepository) {
+    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository) {
         var selectedProject = $rootScope.currentUser.selectedProject;
         $scope.projectName = selectedProject.name;
 
-        orgUnitRepository.get(selectedProject.id).then(function(projectInfo) {
-            $scope.projectAttributes = parseProjectAttributes(projectInfo);
-        });
+        $scope.getTableName = function(tableName) {
+            var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
+            var match = regex.exec(tableName);
+            if (match) {
+                var parsedTableName = match[3];
+                return parsedTableName;
+            } else {
+                return "";
+            }
+        };
 
         var parseProjectAttributes = function(projectInfo) {
             var attributeNames = ["Project Code", "Project Type", "Context", "Type of population", "Reason For Intervention", "Mode Of Operation", "Model Of Management"];
@@ -30,8 +37,48 @@ define(["moment", "lodash"], function(moment, _) {
             projectAttributes.push({name: "Opening Date", value: moment(projectInfo.openingDate).format("MM/DD/YYYY")});
             projectAttributes.push({name: "End Date", value: (projectInfo.endDate && moment(projectInfo.endDate).format("MM/DD/YYYY")) || ""});
             return projectAttributes;
-
         };
+
+        var loadProjectBasicInfo = function() {
+            orgUnitRepository.get(selectedProject.id).then(function(projectInfo) {
+                $scope.projectAttributes = parseProjectAttributes(projectInfo);
+            });
+        };
+
+        var getProjectBaselineReportTables = function(tables) {
+            var projectBaselineReportTable = [];
+            tables.forEach(function(table) {
+               if(_.contains(table.name, "ProjectBaselineReport"))
+                   projectBaselineReportTable.push(table);
+            });
+            return $q.when(projectBaselineReportTable);
+        };
+
+        var transformTables = function(tables) {
+            return $q.all(_.map(tables, function(table) {
+                return pivotTableRepository.getDataForPivotTable(table.name, selectedProject.id).then(function(data) {
+                    return {
+                        'table': table,
+                        'data': data
+                    };
+                });
+            }));
+        };
+        var loadPivotTables = function() {
+            return pivotTableRepository.getAll()
+                .then(getProjectBaselineReportTables)
+                .then(transformTables)
+                .then(function(pivotTables) {
+                    $scope.pivotTables = pivotTables;
+                });
+        };
+
+        var init = function() {
+          loadProjectBasicInfo();
+          loadPivotTables();
+        };
+
+        init();
     };
 
 });

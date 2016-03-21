@@ -3,6 +3,7 @@ define(["lodash", "moment"], function(_, moment) {
         $scope.resourceBundle = $rootScope.resourceBundle;
         var DEFAULT_SORT_KEY = 'dataElementIndex';
 
+        $scope.showDownload = angular.isDefined($scope.showDownload) ? $scope.showDownload : true;
         $scope.getCsvFileName = function() {
             var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]\s([a-zA-Z0-9\s]+)/;
             var match = regex.exec($scope.definition.name);

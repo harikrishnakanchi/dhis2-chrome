@@ -5,7 +5,8 @@ define([], function() {
                 data: "=",
                 definition: "=",
                 showWeeks: "@",
-                resourceBundle:"="
+                resourceBundle:"=",
+                showDownload: "=?"
             },
             controller: 'pivotTableController',
             templateUrl: "templates/pivot-table/pivot.table.html"
