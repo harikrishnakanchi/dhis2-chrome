@@ -31,6 +31,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "getOrgUnitAndDescendants").and.returnValue(utils.getPromise(q, orgunits));
+            spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, {}));
 
             anchorScroll = jasmine.createSpy();
         }));
@@ -345,7 +346,7 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
 
         it("should redirect to project preference page if user selected project is not in allowed projects",function(){
             spyOn(location,"path");
-            rootScope.productKeyLevel = "country";
+            rootScope.productKeyLevel = "project";
             rootScope.currentUser = {
                 "userCredentials": {
                     "username": "projectadmin"
@@ -363,6 +364,36 @@ define(["orgUnitContoller", "angularMocks", "utils", "lodash", "orgUnitRepositor
             scope.$apply();
 
             expect(location.path).toHaveBeenCalledWith("/selectProjectPreference");
+        });
+
+        it('should not redirect if selected project belongs to country specified in country level product key',function(){
+            spyOn(location,'path');
+            rootScope.productKeyLevel = 'country';
+            rootScope.currentUser = {
+                'userCredentials': {
+                    'username': 'projectadmin'
+                },
+                'selectedProject': {
+                    'id': '123'
+                }
+            };
+
+            rootScope.allowedOrgUnits = [{
+                'id' : '3',
+                'children' : [{'id':'4'}]
+            }];
+
+            var projectOrgUnits = [{
+                'id': '123'
+            }];
+
+            orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, projectOrgUnits));
+            orgUnitContoller = new OrgUnitController(scope, q, location, timeout, anchorScroll, rootScope, orgUnitRepository);
+
+            scope.$apply();
+
+            expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(_.pluck(rootScope.allowedOrgUnits, 'id'));
+            expect(location.path).not.toHaveBeenCalled();
         });
 
         it("should not redirect if user has a global product key",function(){

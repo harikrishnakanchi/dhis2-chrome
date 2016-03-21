@@ -64,27 +64,51 @@ define(["toTree", "lodash", "moment", "properties"], function(toTree, _, moment,
         };
 
         var init = function() {
+            var userHasNotSelectedProject = _.isUndefined($rootScope.currentUser.selectedProject),
+                productKeyIsGlobal = $rootScope.productKeyLevel == "global";
             userIsSuperAdmin = $rootScope.currentUser.userCredentials.username === "superadmin";
             userIsProjectAdmin = $rootScope.currentUser.userCredentials.username === "projectadmin";
 
             var getAllAllowedOrgunitIds = function() {
-                return _.flatten(_.union(_.pluck($rootScope.allowedOrgUnits[0].children,"id"), _.pluck($rootScope.allowedOrgUnits, "id")));
+                var allowedOrgUnitIds = _.pluck($rootScope.allowedOrgUnits, 'id');
+                if($rootScope.productKeyLevel == "country") {
+                    return orgUnitRepository.findAllByParent(allowedOrgUnitIds).then(function(childOrgUnits) {
+                        var childOrgUnitIds = _.pluck(childOrgUnits, 'id');
+                        return _.union(allowedOrgUnitIds, childOrgUnitIds);
+                    });
+                } else {
+                    return $q.when(allowedOrgUnitIds);
+                }
             };
 
-            var selectedProjectIsInAllowedOrgUnits = function() {
-                if($rootScope.productKeyLevel == "global")
-                    return true;
-                return _.contains(getAllAllowedOrgunitIds(), getUserSelectedProjectId());
+            var initializeTree = function() {
+                var selectedNodeId = $location.hash()[0];
+                reloadTree(selectedNodeId);
             };
 
-            var userHasNotSelectedProject = _.isUndefined($rootScope.currentUser.selectedProject);
-            if (userIsProjectAdmin && (userHasNotSelectedProject || !selectedProjectIsInAllowedOrgUnits())) {
-                $location.path("/selectProjectPreference");
-                return;
+            var checkIfUserNeedsToSelectProject = function() {
+                if(userHasNotSelectedProject) {
+                    return $q.when(true);
+                } else if(productKeyIsGlobal) {
+                    return $q.when(false);
+                } else {
+                    return getAllAllowedOrgunitIds().then(function(allowedOrgUnitIds) {
+                        return !_.contains(allowedOrgUnitIds, getUserSelectedProjectId());
+                    });
+                }
+            };
+
+            if (userIsProjectAdmin) {
+                return checkIfUserNeedsToSelectProject().then(function(shouldRedirect) {
+                    if(shouldRedirect) {
+                        $location.path("/selectProjectPreference");
+                    } else {
+                        initializeTree();
+                    }
+                });
+            } else {
+                initializeTree();
             }
-            var selectedNodeId = $location.hash()[0];
-
-            reloadTree(selectedNodeId);
         };
 
         $scope.closeNewForm = function(selectedNode, message) {
