@@ -311,5 +311,5 @@
     "search": "Search",
     "aggregateDataSyncError": "Impossible de soumettre des données pour approbation. S'il vous plaît soumettre à nouveau.",
     "datasetReportsLabel": "Data Set Reports F",
-    "projectBaselineReportsLabel": "Project Baseline Reports F"
+    "projectBaselineReportLabel": "Project Baseline Report F"
 }

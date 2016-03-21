@@ -2,13 +2,13 @@ define(['reportsController', 'dataEntryController', 'mainController', 'orgUnitCo
         'lineListModuleController', 'projectController', 'countryController', 'confirmDialogController', 'projectUserController',
         'aggregateDataEntryController', 'lineListDataEntryController', 'patientOriginController', 'productKeyController',
         'lineListSummaryController', 'dataApprovalController', 'dataEntryApprovalDashboardController', 'lineListOfflineApprovalController', 'appCloneController', 'downloadDataController', 'notificationDialogController', 'selectLanguageController',
-        'referralLocationsController', 'notificationsController', 'selectProjectPreferenceController', 'projectBaselineReportsController'
+        'referralLocationsController', 'notificationsController', 'selectProjectPreferenceController', 'projectBaselineReportController'
     ],
     function(reportsController, dataEntryController, mainController, orgUnitContoller, loginController, opUnitController, aggregateModuleController,
         lineListModuleController, projectController, countryController, confirmDialogController, projectUserController,
         aggregateDataEntryController, lineListDataEntryController, patientOriginController, productKeyController,
         lineListSummaryController, dataApprovalController, dataEntryApprovalDashboardController, lineListOfflineApprovalController, appCloneController, downloadDataController, notificationDialogController, selectLanguageController,
-        referralLocationsController, notificationsController, selectProjectPreferenceController, projectBaselineReportsController) {
+        referralLocationsController, notificationsController, selectProjectPreferenceController, projectBaselineReportController) {
 
         var init = function(app) {
             app.controller('reportsController', ['$scope', '$q', '$routeParams', 'datasetRepository', 'orgUnitRepository', 'chartRepository', 'pivotTableRepository', reportsController]);
@@ -38,7 +38,7 @@ define(['reportsController', 'dataEntryController', 'mainController', 'orgUnitCo
             app.controller('referralLocationsController', ['$scope', '$hustle', '$modal', 'referralLocationsRepository', referralLocationsController]);
             app.controller('notificationsController', ['$scope', '$q', '$rootScope', 'userPreferenceRepository', 'chartRepository', 'orgUnitRepository', notificationsController]);
             app.controller('selectProjectPreferenceController', ['$rootScope', '$scope', '$hustle', '$location', 'orgUnitRepository', 'userPreferenceRepository', 'systemSettingRepository', selectProjectPreferenceController]);
-            app.controller('projectBaselineReportsController', ['$rootScope', '$q', '$scope', 'orgUnitRepository','pivotTableRepository', projectBaselineReportsController]);
+            app.controller('projectBaselineReportController', ['$rootScope', '$q', '$scope', 'orgUnitRepository','pivotTableRepository', projectBaselineReportController]);
         };
         return {
             init: init

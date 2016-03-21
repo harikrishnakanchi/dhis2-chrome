@@ -76,7 +76,7 @@ require.config({
         "notificationsController": "app/controller/notifications.controller",
         "pivotTableController": "app/controller/pivot.table.controller",
         "selectProjectPreferenceController": "app/controller/select.project.preference.controller",
-        "projectBaselineReportsController": "app/controller/project.baseline.reports.controller",
+        "projectBaselineReportController": "app/controller/project.baseline.report.controller",
 
         //Services
         "services": "app/service/services",
