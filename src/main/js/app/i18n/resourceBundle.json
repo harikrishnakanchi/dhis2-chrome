@@ -314,5 +314,6 @@
     "search": "Search",
     "aggregateDataSyncError": "Failed to submit data for approval. Please resubmit.",
     "datasetReportsLabel": "Data Set Reports",
-    "projectBaselineReportLabel": "Project Baseline Report"
+    "projectBaselineReportLabel": "Project Baseline Report",
+    "projectInformationLabel": "Project Information"
 }

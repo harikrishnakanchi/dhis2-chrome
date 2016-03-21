@@ -95,5 +95,6 @@
     "search": "Search",
     "connectedTo": "connected to",
     "datasetReportsLabel": "Data Set Reports",
-    "projectBaselineReportLabel": "Project Baseline Report"
+    "projectBaselineReportLabel": "Project Baseline Report",
+    "projectInformationLabel": "Project Information"
 }
