@@ -10,12 +10,14 @@ define(["uploadOrgUnitGroupConsumer", "orgUnitGroupService", "orgUnitGroupReposi
             orgUnitGroupRepository = new OrgUnitGroupRepository();
 
             spyOn(orgUnitGroupService, "upsert").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitGroupService, "addOrgUnit").and.returnValue(utils.getPromise(q, {}));
+            spyOn(orgUnitGroupService, "deleteOrgUnit").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitGroupRepository, "clearStatusFlag").and.returnValue(utils.getPromise(q, {}));
 
             uploadOrgUnitGroupConsumer = new UploadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, q);
         }));
 
-        it("should upload orgunit groups to dhis", function() {
+        it("should update orgunit groups to dhis", function() {
             orgUnitGroupFromIDB = {
                 "id": "a35778ed565",
                 "lastUpdated": "2014-10-20T09:01:12.020+0000",
@@ -44,7 +46,7 @@ define(["uploadOrgUnitGroupConsumer", "orgUnitGroupService", "orgUnitGroupReposi
                 "data": {
                     "data": {
                         "orgUnitGroupIds": ["a35778ed565"],
-                        "orgUnitIds": ["o1", "o3", "o4"]
+                        "orgUnitIds": ["o1", "o3"]
                     },
                     "type": "upsertOrgUnitGroups"
                 }
@@ -67,9 +69,11 @@ define(["uploadOrgUnitGroupConsumer", "orgUnitGroupService", "orgUnitGroupReposi
             }];
 
             expect(orgUnitGroupRepository.findAll).toHaveBeenCalledWith(["a35778ed565"]);
-            expect(orgUnitGroupService.upsert).toHaveBeenCalledWith(expectedDhisPayload);
             expect(orgUnitGroupRepository.clearStatusFlag.calls.count()).toEqual(1);
-            expect(orgUnitGroupRepository.clearStatusFlag.calls.argsFor(0)).toEqual(["a35778ed565", ["o1", "o3", "o4"]]);
+            expect(orgUnitGroupRepository.clearStatusFlag.calls.argsFor(0)).toEqual(["a35778ed565", ["o1", "o3"]]);
+            expect(orgUnitGroupService.addOrgUnit).toHaveBeenCalledWith("a35778ed565", "o1");
+            expect(orgUnitGroupService.deleteOrgUnit).toHaveBeenCalledWith("a35778ed565", "o3");
+            expect(orgUnitGroupService.deleteOrgUnit).not.toHaveBeenCalledWith("a35778ed565", "o2");
         });
     });
 });
