@@ -1,10 +1,5 @@
 define(["dhisUrl", "httpUtils", "lodash"], function(dhisUrl, httpUtils, _) {
-    return function($http, db) {
-        this.upsert = function(orgUnitGroupRequest) {
-            return $http.post(dhisUrl.metadata, {
-                'organisationUnitGroups': angular.isArray(orgUnitGroupRequest) ? orgUnitGroupRequest : [orgUnitGroupRequest]
-            });
-        };
+    return function($http) {
 
         this.get = function(orgUnitGroupIds) {
             orgUnitGroupIds = _.isArray(orgUnitGroupIds) ? orgUnitGroupIds : [orgUnitGroupIds];

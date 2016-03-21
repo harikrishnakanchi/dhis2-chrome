@@ -13,32 +13,6 @@ define(["orgUnitGroupService", "angularMocks", "properties"], function(OrgUnitGr
             httpBackend.verifyNoOutstandingRequest();
         });
 
-        it("should update orgUnitGroups", function() {
-            var orgUnitGroups = [{
-                "id": "a35778ed565",
-                "name": "Most-at-risk Population",
-                "organisationUnits": [{
-                    "id": "a119bd25ace",
-                    "name": "Out-patient General"
-                }, {
-                    "id": "a0c51512f88",
-                    "name": "OBGYN"
-                }, {
-                    "id": "a43bd484a05",
-                    "name": "Laboratory"
-                }],
-                "shortName": "Most-at-risk Population"
-            }];
-
-            var expectedPayload = {
-                organisationUnitGroups: orgUnitGroups
-            };
-
-            orgUnitGroupService.upsert(orgUnitGroups);
-            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
-            httpBackend.flush();
-        });
-
         it("should get org unit groups with specific ids", function() {
             var orgUnitGroupIds = ["id1", "id2", "id3"];
 

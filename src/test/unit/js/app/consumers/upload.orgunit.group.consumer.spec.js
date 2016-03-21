@@ -9,7 +9,6 @@ define(["uploadOrgUnitGroupConsumer", "orgUnitGroupService", "orgUnitGroupReposi
             orgUnitGroupService = new OrgUnitGroupService();
             orgUnitGroupRepository = new OrgUnitGroupRepository();
 
-            spyOn(orgUnitGroupService, "upsert").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitGroupService, "addOrgUnit").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitGroupService, "deleteOrgUnit").and.returnValue(utils.getPromise(q, {}));
             spyOn(orgUnitGroupRepository, "clearStatusFlag").and.returnValue(utils.getPromise(q, {}));
