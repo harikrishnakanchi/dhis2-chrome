@@ -32,7 +32,7 @@ define(["properties"], function(properties) {
         "events": with_host("/api/events"),
         "systemSettings": with_host("/api/systemSettings"),
         "translations": with_host("/api/translations"),
-        "orgUnitGroups": with_host("/api/organisationUnitGroups.json"),
+        "orgUnitGroups": with_host("/api/organisationUnitGroups"),
         "orgUnits": with_host("/api/organisationUnits.json"),
         "users": with_host("/api/users"),
         "getProgramsAndStages": with_host("/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues,programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false"),

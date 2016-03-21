@@ -64,5 +64,29 @@ define(["orgUnitGroupService", "angularMocks", "properties"], function(OrgUnitGr
             httpBackend.expectGET(properties.dhis.url + "/api/organisationUnitGroups.json?fields=:all&paging=false&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z").respond(200, "ok");
             httpBackend.flush();
         });
+
+        it("should add orgUnit to orgUnit group", function () {
+            var orgUnitGroupId = 'ougid1';
+            var orgUnitId = 'ouid1';
+
+            orgUnitGroupService.addOrgUnit(orgUnitGroupId, orgUnitId);
+
+            httpBackend
+                .expectPOST(properties.dhis.url + "/api/organisationUnitGroups/" + orgUnitGroupId + "/organisationUnits/" + orgUnitId)
+                .respond(204, "ok");
+            httpBackend.flush();
+        });
+
+        it("should delete orgUnit from orgUnit group", function () {
+            var orgUnitGroupId = 'ougid1';
+            var orgUnitId = 'ouid1';
+
+            orgUnitGroupService.deleteOrgUnit(orgUnitGroupId, orgUnitId);
+
+            httpBackend
+                .expectDELETE(properties.dhis.url + "/api/organisationUnitGroups/" + orgUnitGroupId + "/organisationUnits/" + orgUnitId)
+                .respond(204, "ok");
+            httpBackend.flush();
+        });
     });
 });
