@@ -87,6 +87,22 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             }
         };
 
+        var getModulesInOpUnit = function(opUnit) {
+            return orgUnitRepository.getAllModulesInOrgUnits(opUnit.id, "Module").then(function(modules) {
+                return {
+                    'opUnitName': opUnit.name,
+                    'modules': modules
+                };
+            });
+        };
+
+        var loadReportOpunitAndModules = function() {
+             return orgUnitRepository.getAllOpUnitsInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(opUnits) {
+                 return $q.all(_.map(opUnits, getModulesInOpUnit)).then(function(allOpUnitsWithModules) {
+                     $scope.allOpUnitsWithModules = allOpUnitsWithModules;
+                 });
+            });
+        };
         $scope.logout = function() {
             sessionHelper.logout();
         };
@@ -101,7 +117,10 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         var deregisterUserPreferencesListener = $rootScope.$on('userPreferencesUpdated', function() {
             loadProjects();
-            loadUserLineListModules();
+            if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
+                loadUserLineListModules();
+                loadReportOpunitAndModules();
+            }
         });
 
         $scope.$on('$destroy', function() {

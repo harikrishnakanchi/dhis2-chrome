@@ -24,6 +24,7 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 spyOn(dhisMonitor, "hasPoorConnectivity").and.returnValue(false);
 
                 spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, "getAllOpUnitsInOrgUnits").and.returnValue(utils.getPromise(q, []));
 
                 spyOn(systemSettingRepository, "isProductKeySet").and.returnValue(utils.getPromise(q, true));
                 spyOn(systemSettingRepository, "isKeyGeneratedFromProd").and.returnValue(utils.getPromise(q, true));

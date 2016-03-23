@@ -103,12 +103,12 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu multi-level" role="menu">
-                        <li class="dropdown-submenu">
+                        <li class="dropdown-submenu" ng-repeat="opUnitWithModule in allOpUnitsWithModules">
                             <a class="dropdown-toggle">
-                                {{ resourceBundle.datasetReportsLabel }}
+                                {{ opUnitWithModule.opUnitName }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li ng-repeat="module in allUserModules | orderBy:'displayName'">
+                                <li ng-repeat="module in opUnitWithModule.modules | orderBy:'displayName'">
                                     <a class="submenu-item" ng-href="#/reports/{{ module.id }}" tabindex="-1">{{ module.displayName }}</a>
                                 </li>
                             </ul>
