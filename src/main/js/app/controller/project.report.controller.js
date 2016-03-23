@@ -45,13 +45,13 @@ define(["moment", "lodash"], function(moment, _) {
             });
         };
 
-        var getProjectBaselineReportTables = function(tables) {
-            var projectBaselineReportTable = [];
+        var getProjectReportTables = function(tables) {
+            var projectReportTable = [];
             tables.forEach(function(table) {
-               if(_.contains(table.name, "ProjectBaselineReport"))
-                   projectBaselineReportTable.push(table);
+               if(_.contains(table.name, "ProjectReport"))
+                   projectReportTable.push(table);
             });
-            return $q.when(projectBaselineReportTable);
+            return $q.when(projectReportTable);
         };
 
         var transformTables = function(tables) {
@@ -66,7 +66,7 @@ define(["moment", "lodash"], function(moment, _) {
         };
         var loadPivotTables = function() {
             return pivotTableRepository.getAll()
-                .then(getProjectBaselineReportTables)
+                .then(getProjectReportTables)
                 .then(transformTables)
                 .then(function(pivotTables) {
                     $scope.pivotTables = pivotTables;

@@ -78,7 +78,7 @@ define(["lodash", "moment"], function(_, moment) {
 
                     _.forEach(projectIds, function(projectId) {
                         _.forEach(pivotTables, function(pivotTable) {
-                            if(_.contains(pivotTable.name, "ProjectBaselineReport")) {
+                            if(_.contains(pivotTable.name, "ProjectReport")) {
                                 orgUnitsAndTables.push({
                                     orgUnitId: projectId,
                                     pivotTable: pivotTable

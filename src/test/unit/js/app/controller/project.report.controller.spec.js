@@ -1,6 +1,6 @@
-define(["orgUnitRepository", "angularMocks", "projectBaselineReportController", "utils", "pivotTableRepository"], function(OrgUnitRepository, mocks, ProjectBaselineReportController, utils, PivotTableRepository) {
-    describe("projectBaselineReportController", function() {
-        var scope, rootScope, projectBaselineReportController, orgUnitRepository, pivotTableRepository;
+define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository) {
+    describe("projectReportController", function() {
+        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -147,7 +147,7 @@ define(["orgUnitRepository", "angularMocks", "projectBaselineReportController", 
             spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, pivotTables));
             spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, data));
 
-            projectBaselineReportController = new ProjectBaselineReportController(rootScope, $q, scope, orgUnitRepository, pivotTableRepository);
+            projectReportController = new ProjectReportController(rootScope, $q, scope, orgUnitRepository, pivotTableRepository);
         }));
 
         it("should add the projectAttributes which lists all the project basic info into the scope", function() {
