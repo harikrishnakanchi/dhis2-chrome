@@ -32,7 +32,10 @@
             </div>
         </div>
 
-        <div class="exp-coll-group">
+        <div ng-show="!isReportAvailable">
+            <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+        </div>
+        <div ng-if="isReportAvailable" class="exp-coll-group">
             <div ng-repeat="table in pivotTables">
                 <accordion>
                     <accordion-group is-open="status.open">

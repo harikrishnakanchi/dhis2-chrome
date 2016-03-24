@@ -69,6 +69,11 @@ define(["moment", "lodash"], function(moment, _) {
                 .then(getProjectReportTables)
                 .then(transformTables)
                 .then(function(pivotTables) {
+                    $scope.isReportAvailable = _.any(pivotTables, function(table) {
+                        if (table.data && table.data.rows)
+                            return table.data.rows.length !== 0;
+                        return false;
+                    });
                     $scope.pivotTables = pivotTables;
                 });
         };
