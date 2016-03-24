@@ -2,7 +2,7 @@
     <button ng-if="showDownload" class="col-md-2 exportCSV-btn btn btn-xs btn-primary" ng-csv="getData()" csv-header="getHeaders()" filename="{{getCsvFileName()}}">
         {{resourceBundle.exportAsCsv}}
     </button>
-    <div class="m-top-30">
+    <div ng-class="{ 'm-top-30' : showDownload}">
         <ng-include ng-if="definition.sortable" src="'templates/pivot-table/_sortable.html'"></ng-include>
         <ng-include ng-if="!definition.sortable" src="'templates/pivot-table/_unsortable.html'"></ng-include>
     </div>
