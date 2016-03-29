@@ -125,7 +125,7 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var loadProjectBasicInfo = function() {
-            orgUnitRepository.get(selectedProject.id).then(function(projectInfo) {
+            return orgUnitRepository.get(selectedProject.id).then(function(projectInfo) {
                 $scope.projectAttributes = parseProjectAttributes(projectInfo);
             });
         };
@@ -164,8 +164,10 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var init = function() {
-          loadProjectBasicInfo();
-          loadPivotTables();
+            $scope.loading = true;
+            $q.all([loadProjectBasicInfo(), loadPivotTables()]).finally(function () {
+                $scope.loading = false;
+            });
         };
 
         init();

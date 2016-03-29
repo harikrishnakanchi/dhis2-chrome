@@ -305,7 +305,7 @@
     "exportAsCsv": "Download report",
     "invalidAccess": "User does not have access to this Praxis instance.",
     "connectedTo": "connected to",
-    "selectServiceNameLabel": "Select service name:",
+    "selectServiceNameLabel": "Select service",
     "toLabel": "to",
     "weeklyReports": "Weekly reports",
     "monthlyReports": "Monthly reports",

@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, $rootScope, $filter) {
+    return function($scope, $rootScope) {
         $scope.resourceBundle = $rootScope.resourceBundle;
         var DEFAULT_SORT_KEY = 'dataElementIndex';
 
@@ -166,12 +166,6 @@ define(["lodash", "moment"], function(_, moment) {
             }
             return mondays;
         };
-
-        $scope.$watch('orderBySortKeys', function (newVal) {
-            $scope.dataDimensionItems = _.map($filter('orderBy')($scope.viewMap, newVal), function (dataDimensionItem) {
-                return dataDimensionItem.dataElement;
-            });
-        });
 
         if ($scope.definition && $scope.data) {
 

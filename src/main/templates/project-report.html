@@ -3,7 +3,7 @@
 
         <div class="row">
             <div class="col-md-8">
-                <h4>{{resourceBundle.projectReportLabel}} - {{ projectName }}</h4>
+                <h4>{{resourceBundle.projectReportLabel}}: {{ projectName }}</h4>
             </div>
 
             <div class="col-md-4">
@@ -49,6 +49,9 @@
                     </accordion-group>
                 </accordion>
             </div>
+        </div>
+        <div class="loading" ng-show="loading">
+            <img src="img/ajax-loader.gif" class="spinner" />
         </div>
     </section>
 </div>

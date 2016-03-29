@@ -96,5 +96,6 @@
     "connectedTo": "connected to",
     "datasetReportsLabel": "Data Set Reports",
     "projectReportLabel": "Project Report",
-    "projectInformationLabel": "Project Information"
+    "projectInformationLabel": "Project Information",
+    "selectServiceNameLabel": "Select service"
 }
