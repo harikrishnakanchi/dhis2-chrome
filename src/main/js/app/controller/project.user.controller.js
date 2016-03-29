@@ -2,6 +2,7 @@ define(["dhisId", "properties"], function(dhisId, properties) {
     return function($scope, $hustle, $timeout, $modal, userRepository) {
 
         $scope.projectUser = {};
+        $scope.orgUnitUsers = [];
 
         var allRoles = {
             "Project": [{
