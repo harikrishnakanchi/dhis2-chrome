@@ -3,7 +3,7 @@
 
     "name": "PRAXIS",
     "description": "Médecins Sans Frontières",
-    "version": "4.1",
+    "version": "4.1.1",
     "icons": {
         "128": "img/icon.png"
     },
