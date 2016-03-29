@@ -97,5 +97,6 @@
     "datasetReportsLabel": "Data Set Reports",
     "projectReportLabel": "Project Report",
     "projectInformationLabel": "Project Information",
-    "selectServiceNameLabel": "Select service"
+    "selectServiceNameLabel": "Select service",
+    "pleaseWaitLabel": "Please wait..."
 }
