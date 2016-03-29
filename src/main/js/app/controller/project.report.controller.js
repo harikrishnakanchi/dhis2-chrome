@@ -4,6 +4,91 @@ define(["moment", "lodash"], function(moment, _) {
         var selectedProject = $rootScope.currentUser.selectedProject;
         $scope.projectName = selectedProject.name;
 
+        $scope.getCsvFileName = function() {
+          return $scope.projectName + "_ProjectReport_"+  moment().format("DD-MMM-YYYY") + ".csv";
+        };
+
+        var getNumberOfISOWeeksInMonth = function (period) {
+            var m = moment(period, 'YYYYMM');
+
+            var year = parseInt(m.format('YYYY'));
+            var month = parseInt(m.format('M')) - 1;
+            var day = 1,
+                mondays = 0;
+
+            var date = new Date(year, month, day);
+
+            while (date.getMonth() == month) {
+                if (date.getDay() === 1) {
+                    mondays += 1;
+                    day += 7;
+                } else {
+                    day++;
+                }
+                date = new Date(year, month, day);
+            }
+            return mondays;
+        };
+
+
+        $scope.getData = function() {
+            var data = [];
+
+            var addProjectBasicInfo = function() {
+                data.push([$scope.resourceBundle.projectInformationLabel]);
+
+                _.forEach($scope.projectAttributes, function(projectAttribute) {
+                    data.push([projectAttribute.name, projectAttribute.value]);
+                });
+            };
+
+            var addPivotTablesData = function() {
+                _.forEach($scope.pivotTables, function(pivotTable) {
+                    var headers = [];
+                    _.forEach(pivotTable.data.metaData.pe, function(period) {
+                        var month = pivotTable.data.metaData.names[period];
+                        var numberofWeeks = getNumberOfISOWeeksInMonth(period);
+                        headers.push([month + " (" + numberofWeeks + " weeks)"]);
+                    });
+
+                    data.push([$scope.getTableName(pivotTable.table.name)].concat(headers));
+
+                    var dataDimensionIndex = _.findIndex(pivotTable.data.headers, {
+                        "name": "dx"
+                    });
+                    var periodIndex = _.findIndex(pivotTable.data.headers, {
+                        "name": "pe"
+                    });
+                    var valueIndex = _.findIndex(pivotTable.data.headers, {
+                        "name": "value"
+                    });
+
+                    _.forEach(pivotTable.dataDimensionItems, function (itemId) {
+                        var values = [];
+                        _.forEach(pivotTable.data.metaData.pe, function(period) {
+                            var value = _.find(pivotTable.data.rows, function(row) {
+                                return itemId == row[dataDimensionIndex] && period == row[periodIndex];
+                            });
+
+                            if(!_.isUndefined(value))
+                                values.push(value[valueIndex]);
+                            else
+                                values.push(undefined);
+                        });
+                        data.push([pivotTable.data.metaData.names[itemId]].concat(values));
+                    });
+                    data.push([]);
+                });
+            };
+
+            addProjectBasicInfo();
+            data.push([]);
+            addPivotTablesData();
+
+            return data;
+
+        };
+
         $scope.getTableName = function(tableName) {
             var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
             var match = regex.exec(tableName);
