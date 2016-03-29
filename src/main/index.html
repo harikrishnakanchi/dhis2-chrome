@@ -88,7 +88,7 @@
                     <a class="dropdown-toggle" dropdown-toggle href="" role="button">
                         <i class="fa fa-pencil"></i>
                         {{ resourceBundle.lineListDataEntryMenuLabel }}
-                        <span class="caret"></span>
+                        <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu" role="menu">
                         <li ng-repeat="module in allUserModules | filter: {isLineListService:true} | orderBy:'displayName'">
@@ -100,7 +100,7 @@
                     <a class="dropdown-toggle" dropdown-toggle href="" role="button">
                         <i class="fa fa-bar-chart"></i>
                         {{ resourceBundle.reportsLabel }}
-                        <span class="caret"></span>
+                        <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu multi-level" role="menu">
                         <li class="dropdown-submenu" ng-repeat="opUnitWithModule in allOpUnitsWithModules">
