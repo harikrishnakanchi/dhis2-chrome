@@ -108,8 +108,8 @@
                                 {{ opUnitWithModule.opUnitName }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li ng-repeat="module in opUnitWithModule.modules | orderBy:'displayName'">
-                                    <a class="submenu-item" ng-href="#/reports/{{ module.id }}" tabindex="-1">{{ module.displayName }}</a>
+                                <li ng-repeat="module in opUnitWithModule.modules | orderBy:'name'">
+                                    <a class="submenu-item" ng-href="#/reports/{{ module.id }}" tabindex="-1">{{ module.name }}</a>
                                 </li>
                             </ul>
                         </li>
