@@ -13,11 +13,11 @@
                         <table class="table">
                             <tr>
                                 <th>
-                                    {{section.name}}
+                                    {{resourceBundle[section.id] || section.name}}
                                 </th>
                             </tr>
                             <tr ng-repeat="psde in section.programStageDataElements">
-                                <td ng-if="psde.dataElement.isIncluded">{{psde.dataElement.formName}}</td>
+                                <td ng-if="psde.dataElement.isIncluded">{{resourceBundle[psde.dataElement.id] || psde.dataElement.formName}}</td>
                             </tr>
                         </table>
                     </div>
