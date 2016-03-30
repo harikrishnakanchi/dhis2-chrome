@@ -38,7 +38,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
                         _.transform(translations, function(acc, translation) {
                             if (translation.className === "DataElement" && translation.property !== "formName")
                                 return;
-                            acc[translation.objectUid] = translation.value;
+                            acc[translation.objectId] = translation.value;
                         }, $rootScope.resourceBundle);
                     });
                 };

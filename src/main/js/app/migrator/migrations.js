@@ -236,6 +236,20 @@ define([], function() {
         db.deleteObjectStore("programStages");
     };
 
+    var update_translations_store = function(db, tx) {
+        var translationStore = tx.objectStore("translations");
+        translationStore.openCursor().onsuccess = function(e) {
+            var cursor = e.target.result;
+            if (cursor) {
+                var data = cursor.value;
+                data.objectId = data.objectUid;
+                delete data.objectUid;
+                cursor.update(data);
+                cursor.continue();
+            }
+        };
+    };
+
     return [add_object_stores,
         change_log_stores,
         create_datavalues_store,
@@ -268,6 +282,7 @@ define([], function() {
         clear_metadata_objectstores,
         recreate_translations_store,
         delete_program_stages_store,
-        delete_keys_from_changelog
+        delete_keys_from_changelog,
+        update_translations_store
     ];
 });
