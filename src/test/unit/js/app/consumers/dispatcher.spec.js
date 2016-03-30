@@ -340,8 +340,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
 
-            expect(downloadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(uploadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should call downloadOrgUnitGroupConsumer", function() {
