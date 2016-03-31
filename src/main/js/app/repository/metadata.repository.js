@@ -6,6 +6,7 @@ define(["properties", "lodash"], function(properties, _) {
                 var entities = data[type];
                 if(type === 'translations') {
                     _.each(entities, function (entity) {
+                        // Can be removed after DHIS migration to 2.22
                         if(entity.objectUid) {
                             entity.objectId = entity.objectUid;
                             delete entity.objectUid;
