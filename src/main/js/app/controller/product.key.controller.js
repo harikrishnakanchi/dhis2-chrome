@@ -26,5 +26,12 @@ define(["chromeUtils"], function(chromeUtils) {
             };
             systemSettingRepository.upsertProductKey(productKey).then(onSuccess, onFailure);
         };
+
+        var previousLocation = $location.search().prev;
+        $scope.showBackButton = !!previousLocation;
+
+        $scope.back = function () {
+            $location.path(previousLocation).search({});
+        };
     };
 });

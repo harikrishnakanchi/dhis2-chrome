@@ -134,6 +134,13 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             $timeout(checkConnectionQuality, 5000);
         };
 
+        $scope.gotoProductKeyPage = function () {
+            if($location.path() != '/productKeyPage') {
+                var currentLocation = $location.path();
+                $location.path("/productKeyPage").search({prev: currentLocation});
+            }
+        };
+
         var init = function() {
 
             var validateAndContinue = function(isProductKeySet) {
