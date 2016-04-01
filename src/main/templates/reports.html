@@ -24,6 +24,7 @@
                                 <span class="glyphicon glyphicon-download-alt"></span>
                             </a>
                         </div>
+                        {# ToDo - Remove chart type non-capitalized after dhis 2.22 upgrade#}
                         <p ng-if="chart.type === 'LINE' || chart.type === 'line'" class="lineChart-container">
                             <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
                         </p>
