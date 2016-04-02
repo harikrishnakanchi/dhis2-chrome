@@ -103,13 +103,8 @@ define(["lodash", "moment"],
                 };
 
                 $location.hash('top');
-                $scope.loading = true;
 
-                setAvailableModules()
-                    .then(setInitialModuleAndWeek)
-                    .finally(function() {
-                        $scope.loading = false;
-                    });
+                setAvailableModules().then(setInitialModuleAndWeek);
             };
 
             init();
