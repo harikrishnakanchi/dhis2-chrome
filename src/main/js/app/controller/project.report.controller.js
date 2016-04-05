@@ -106,14 +106,18 @@ define(["moment", "lodash"], function(moment, _) {
             var attributeNames = ["Project Code", "Project Type", "Context", "Type of population", "Reason For Intervention", "Mode Of Operation", "Model Of Management"];
             var attributeInfo, projectAttribute;
 
-            var projectAttributes = [{name: "Country", value: projectInfo.parent.name}];
-            projectAttributes.push({name: "Name", value: projectInfo.name});
-            attributeNames.forEach(function(attributeName) {
-                attributeInfo = _.find(projectInfo.attributeValues, {
+            var getAttributeInfo = function(attributeName) {
+                return _.find(projectInfo.attributeValues, {
                     "attribute": {
                         "name": attributeName
                     }
                 });
+            };
+
+            var projectAttributes = [{name: "Country", value: projectInfo.parent.name}];
+            projectAttributes.push({name: "Name", value: projectInfo.name});
+            attributeNames.forEach(function(attributeName) {
+                attributeInfo = getAttributeInfo(attributeName);
                 projectAttribute = {
                     name: attributeName,
                     value: attributeInfo && attributeInfo.value || ""
@@ -122,7 +126,7 @@ define(["moment", "lodash"], function(moment, _) {
             });
 
             projectAttributes.push({name: "Opening Date", value: moment(projectInfo.openingDate).format("MM/DD/YYYY")});
-            projectAttributes.push({name: "End Date", value: (projectInfo.endDate && moment(projectInfo.endDate).format("MM/DD/YYYY")) || ""});
+            projectAttributes.push({name: "End Date", value: getAttributeInfo("End date") ? moment(getAttributeInfo("End date").value).format("MM/DD/YYYY") : ""});
             return projectAttributes;
         };
 
