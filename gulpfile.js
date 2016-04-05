@@ -112,13 +112,13 @@ gulp.task('download-metadata', function() {
 });
 
 gulp.task('download-datasets', function() {
-    return download(baseIntUrl + "/api/dataSets.json?fields=:all&paging=false", auth)
+    return download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],organisationUnits[:identifiable]&paging=false", auth)
         .pipe(rename("dataSets.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/dataSets.json")));
 });
 
 gulp.task('download-programs', function() {
-    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues,programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", auth)
+    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", auth)
         .pipe(rename("programs.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/programs.json")));
 });
