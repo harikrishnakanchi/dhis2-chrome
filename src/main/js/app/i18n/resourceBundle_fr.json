@@ -310,8 +310,7 @@
     "dateRange": "Date Range in french",
     "search": "Search",
     "aggregateDataSyncError": "Impossible de soumettre des données pour approbation. S'il vous plaît soumettre à nouveau.",
-    "datasetReportsLabel": "Data Set Reports F",
-    "projectReportLabel": "Project Report F",
+    "projectReportLabel": "Project Report",
     "projectInformationLabel": "Project Information",
     "pleaseWaitLabel": "S'il vous plaît, attendez..."
 }
