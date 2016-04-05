@@ -207,8 +207,8 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 ['Opening Date', '12/31/2007'],
                 ['End Date', ''],
                 [],
-                ['Hospitalization', ['November 2015 (5 weeks)'],
-                    ['December 2015 (4 weeks)']
+                ['Hospitalization', ['November 2015'],
+                    ['December 2015']
                 ],
                 ['Average bed occupation rate (%) - Adult IPD Ward', '1.1', '1.2'],
                 ['Average length of bed use (days) - Adult IPD Ward', '2.1', '2.2'],
