@@ -43,10 +43,10 @@
                                 <span>{{resourceBundle.tabularReports}}</span>
                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
                             </accordion-heading>
-                            <div ng-show="!selectedDataset.isReportsAvailable || !selectedDataset.isPivotTablesAvailable">
+                                <div ng-show="!selectedDataset.isReportsAvailable || !selectedDataset.isWeeklyPivotTablesAvailable">
                                 <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                             </div>
-                            <div class="exp-coll-group"  ng-if="selectedDataset.isReportsAvailable &amp;&amp; selectedDataset.isPivotTablesAvailable">
+                            <div class="exp-coll-group" ng-if="selectedDataset.isReportsAvailable &amp;&amp; selectedDataset.isWeeklyPivotTablesAvailable">
                                 <div ng-if="!isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'name'" class="exportCSV-container">
                                     <accordion close-others="false">
                                         <accordion-group is-open="status.open">
@@ -66,10 +66,10 @@
                 </div>
             </tab>
             <tab heading="{{resourceBundle.monthlyReports}}">
-                <div ng-show="!selectedDataset.isReportsAvailable || !selectedDataset.isPivotTablesAvailable">
+                <div ng-show="!selectedDataset.isMonthlyPivotTablesAvailable">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
-                <div id="reports" class="margin-top" ng-if="selectedDataset.isReportsAvailable &amp;&amp; selectedDataset.isPivotTablesAvailable">
+                <div id="reports" class="margin-top" ng-if="selectedDataset.isMonthlyPivotTablesAvailable">
                     <accordion close-others="false">
                         <accordion-group is-open="isReportOpen">
                             <accordion-heading>
