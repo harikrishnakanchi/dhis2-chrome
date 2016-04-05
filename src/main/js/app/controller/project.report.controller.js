@@ -45,39 +45,41 @@ define(["moment", "lodash"], function(moment, _) {
             var addPivotTablesData = function() {
                 _.forEach($scope.pivotTables, function(pivotTable) {
                     var headers = [];
-                    _.forEach(pivotTable.data.metaData.pe, function(period) {
-                        var month = pivotTable.data.metaData.names[period];
-                        var numberofWeeks = getNumberOfISOWeeksInMonth(period);
-                        headers.push([month + " (" + numberofWeeks + " weeks)"]);
-                    });
-
-                    data.push([$scope.getTableName(pivotTable.table.name)].concat(headers));
-
-                    var dataDimensionIndex = _.findIndex(pivotTable.data.headers, {
-                        "name": "dx"
-                    });
-                    var periodIndex = _.findIndex(pivotTable.data.headers, {
-                        "name": "pe"
-                    });
-                    var valueIndex = _.findIndex(pivotTable.data.headers, {
-                        "name": "value"
-                    });
-
-                    _.forEach(pivotTable.dataDimensionItems, function (itemId) {
-                        var values = [];
-                        _.forEach(pivotTable.data.metaData.pe, function(period) {
-                            var value = _.find(pivotTable.data.rows, function(row) {
-                                return itemId == row[dataDimensionIndex] && period == row[periodIndex];
-                            });
-
-                            if(!_.isUndefined(value))
-                                values.push(value[valueIndex]);
-                            else
-                                values.push(undefined);
+                    if(pivotTable.isTableDataAvailable) {
+                        _.forEach(pivotTable.data.metaData.pe, function (period) {
+                            var month = pivotTable.data.metaData.names[period];
+                            var numberofWeeks = getNumberOfISOWeeksInMonth(period);
+                            headers.push([month + " (" + numberofWeeks + " weeks)"]);
                         });
-                        data.push([pivotTable.data.metaData.names[itemId]].concat(values));
-                    });
-                    data.push([]);
+
+                        data.push([$scope.getTableName(pivotTable.table.name)].concat(headers));
+
+                        var dataDimensionIndex = _.findIndex(pivotTable.data.headers, {
+                            "name": "dx"
+                        });
+                        var periodIndex = _.findIndex(pivotTable.data.headers, {
+                            "name": "pe"
+                        });
+                        var valueIndex = _.findIndex(pivotTable.data.headers, {
+                            "name": "value"
+                        });
+
+                        _.forEach(pivotTable.dataDimensionItems, function (itemId) {
+                            var values = [];
+                            _.forEach(pivotTable.data.metaData.pe, function (period) {
+                                var value = _.find(pivotTable.data.rows, function (row) {
+                                    return itemId == row[dataDimensionIndex] && period == row[periodIndex];
+                                });
+
+                                if (!_.isUndefined(value))
+                                    values.push(value[valueIndex]);
+                                else
+                                    values.push(undefined);
+                            });
+                            data.push([pivotTable.data.metaData.names[itemId]].concat(values));
+                        });
+                        data.push([]);
+                    }
                 });
             };
 
@@ -144,7 +146,8 @@ define(["moment", "lodash"], function(moment, _) {
                 return pivotTableRepository.getDataForPivotTable(table.name, selectedProject.id).then(function(data) {
                     return {
                         'table': table,
-                        'data': data
+                        'data': data,
+                        'isTableDataAvailable' : (data && data.rows.length !== 0) ? true : false
                     };
                 });
             }));
