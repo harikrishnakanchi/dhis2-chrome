@@ -214,7 +214,7 @@
     "noCasesLabel": "Il n'y a aucun cas",
     "addNewCaseLabel": "Ajouter un nouveau cas",
     "eventDateLabel": "Date du cas",
-    "openingDateInFutureError": "La collecte des données pour ce module commencera à partir de la semaine",
+    "openingDateInFutureError": "La collecte des données pour ce module commencera à partir de la semaine ",
     "confirmExport": "OUI, je veux exporter l'application",
     "confirmExportTitle": "Confirmation de l'exportation",
     "confirmImport": "OUI, je veux importer une copie de l'application",
