@@ -29,13 +29,13 @@ define(["moment"], function(moment) {
             });
         };
 
-        this.clearStatusFlag = function(orgUnitGroupId, orgUnitIds) {
+        this.clearStatusFlag = function(orgUnitGroupId, orgUnitId) {
             var store = db.objectStore("orgUnitGroups");
             return self.get(orgUnitGroupId).then(function(orgUnitGroup) {
                 orgUnitGroup.organisationUnits = _.transform(orgUnitGroup.organisationUnits, function(acc, orgUnit) {
-                    if (orgUnit.localStatus === "DELETED" && _.contains(orgUnitIds, orgUnit.id))
+                    if (orgUnit.localStatus === "DELETED" && orgUnitId  === orgUnit.id)
                         return;
-                    if (_.contains(orgUnitIds, orgUnit.id))
+                    if (orgUnitId === orgUnit.id)
                         acc.push(_.omit(orgUnit, "localStatus"));
                     else
                         acc.push(orgUnit);

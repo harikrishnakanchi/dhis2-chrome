@@ -10,9 +10,18 @@ define(["lodash"], function(_) {
                     if(_.contains(orgUnitIds, orgUnit.id)) {
                         return eachPromise.then(function () {
                             if (orgUnit.localStatus === "NEW")
-                                return orgUnitGroupService.addOrgUnit(orgUnitGroup.id, orgUnit.id);
+                                return orgUnitGroupService.addOrgUnit(orgUnitGroup.id, orgUnit.id)
+                                    .then(_.partial(clearLocalStatus, orgUnitGroup.id, orgUnit.id));
                             else if (orgUnit.localStatus === "DELETED")
-                                return orgUnitGroupService.deleteOrgUnit(orgUnitGroup.id, orgUnit.id);
+                                return orgUnitGroupService.deleteOrgUnit(orgUnitGroup.id, orgUnit.id)
+                                    .then(_.partial(clearLocalStatus, orgUnitGroup.id, orgUnit.id))
+                                    .catch(function(response) {
+                                        if(response.status === 404) {
+                                            return clearLocalStatus(orgUnitGroup.id, orgUnit.id);
+                                        } else {
+                                            return $q.reject(response);
+                                        }
+                                    });
                             else
                                 return eachPromise;
                         });
@@ -23,10 +32,8 @@ define(["lodash"], function(_) {
             }, $q.when());
         };
 
-        var clearLocalStatus = function(orgUnitGroupIds, orgUnitIds) {
-            return $q.all(_.map(orgUnitGroupIds, function(groupId) {
-                return orgUnitGroupRepository.clearStatusFlag(groupId, orgUnitIds);
-            }));
+        var clearLocalStatus = function(orgUnitGroupId, orgUnitId) {
+            return orgUnitGroupRepository.clearStatusFlag(orgUnitGroupId, orgUnitId);
         };
 
         this.run = function(message) {
@@ -34,8 +41,7 @@ define(["lodash"], function(_) {
             var orgUnitIds = message.data.data.orgUnitIds;
 
             return retrieveOrgUnitGroupsFromDb(orgUnitGroupIds)
-                .then(_.partial(updateOrgUnitGroupsInDHIS, _, orgUnitIds))
-                .then(_.partial(clearLocalStatus, orgUnitGroupIds, orgUnitIds));
+                .then(_.partial(updateOrgUnitGroupsInDHIS, _, orgUnitIds));
         };
     };
 });
