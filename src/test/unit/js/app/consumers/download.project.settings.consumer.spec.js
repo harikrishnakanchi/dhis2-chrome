@@ -149,6 +149,14 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                                 "isDisabled": false,
                                 "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                             }]
+                        }, {
+                            "orgUnit": "opUnit2",
+                            "origins": [{
+                                "id": "origin3",
+                                "name": "Origin 3",
+                                "isDisabled": false,
+                                "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                            }]
                         }]
                     }
                 };
@@ -163,7 +171,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                     }]
                 };
                 systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
-                patientOriginRepository.get.and.returnValue(utils.getPromise(q, patientDetailsFromLocalDb));
+                patientOriginRepository.get.and.returnValues(utils.getPromise(q, patientDetailsFromLocalDb), utils.getPromise(q, undefined));
 
                 consumer.run();
                 scope.$apply();
@@ -181,10 +189,19 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                         "isDisabled": false,
                         "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                     }]
+                }, {
+                    "orgUnit": "opUnit2",
+                    "origins": [{
+                        "id": "origin3",
+                        "name": "Origin 3",
+                        "isDisabled": false,
+                        "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                    }]
                 }];
 
                 expect(patientOriginRepository.upsert).toHaveBeenCalledWith(expectedPayload);
-                expect(patientOriginRepository.get).toHaveBeenCalledWith("opUnit1");
+                expect(patientOriginRepository.get.calls.argsFor(0)).toEqual(["opUnit1"]);
+                expect(patientOriginRepository.get.calls.argsFor(1)).toEqual(["opUnit2"]);
             });
 
             it("should download project settings and save excluded data element details", function() {

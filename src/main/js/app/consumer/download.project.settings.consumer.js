@@ -37,6 +37,7 @@ define(["lodash"], function(_) {
             var mergePatientOrigins = function(remoteOriginsAndOrgUnit) {
                 return patientOriginRepository.get(remoteOriginsAndOrgUnit.orgUnit)
                     .then(function(localOriginsAndOrgUnit) {
+                        localOriginsAndOrgUnit = localOriginsAndOrgUnit || {};
                         var mergedOrigins = mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated"}, remoteOriginsAndOrgUnit.origins, localOriginsAndOrgUnit.origins || []);
                         return $q.when(mergedOrigins);
                     });
