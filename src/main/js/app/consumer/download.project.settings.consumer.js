@@ -37,19 +37,20 @@ define(["lodash"], function(_) {
             var mergePatientOrigins = function(remoteOriginsAndOrgUnit) {
                 return patientOriginRepository.get(remoteOriginsAndOrgUnit.orgUnit)
                     .then(function(localOriginsAndOrgUnit) {
-                        var mergedOrigins = mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated"}, remoteOriginsAndOrgUnit.origins, localOriginsAndOrgUnit.origins);
+                        var mergedOrigins = mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated"}, remoteOriginsAndOrgUnit.origins, localOriginsAndOrgUnit.origins || []);
                         return $q.when(mergedOrigins);
                     });
             };
 
             var createMergedPatientOrigins = function(orgUnitAndOriginMap) {
-                return _.reduce(orgUnitAndOriginMap, function(patientOrigins, origins, orgUnit){
+                var patientOrigins = _.reduce(orgUnitAndOriginMap, function(patientOrigins, origins, orgUnit){
                     patientOrigins.push({
                         "orgUnit" : orgUnit,
                         "origins" : origins
                     });
                     return patientOrigins;
                 }, []);
+                return $q.when(patientOrigins);
             };
 
             var orgUnitAndOriginsMapper = _.reduce(allProjectSettings, function(orgUnitAndOrigins, projectSettings) {

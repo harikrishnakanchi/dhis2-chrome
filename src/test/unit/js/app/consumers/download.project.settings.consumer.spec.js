@@ -130,7 +130,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
             });
 
             it("should merge patient origin details with local patient origin details based on clientLastUpdated time", function() {
-                var userCurrentProjects = ['prj', 'prjWithNoPatientOriginDetails'];
+                var userCurrentProjects = ['prj'];
                 userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
 
                 var projectSettingsFromDhis = {
