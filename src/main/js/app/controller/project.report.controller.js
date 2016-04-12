@@ -120,13 +120,20 @@ define(["moment", "lodash"], function(moment, _) {
             return $q.when(projectReportTable);
         };
 
+        var isMonthlyReport = function(definition) {
+            return _.contains(_.findKey(definition.relativePeriods, function(obj) {
+                return obj;
+            }), "Month");
+        };
+
         var transformTables = function(tables) {
             return $q.all(_.map(tables, function(table) {
                 return pivotTableRepository.getDataForPivotTable(table.name, selectedProject.id).then(function(data) {
                     return {
                         'table': table,
                         'data': data,
-                        'isTableDataAvailable' : (data && data.rows.length !== 0) ? true : false
+                        'isTableDataAvailable' : (data && data.rows.length !== 0) ? true : false,
+                        'isMonthlyReport': isMonthlyReport(table)
                     };
                 });
             }));
