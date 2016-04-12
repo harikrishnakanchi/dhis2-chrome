@@ -100,8 +100,8 @@ define(["moment", "lodash"], function(moment, _) {
                 projectAttributes.push(projectAttribute);
             });
 
-            projectAttributes.push({name: "Opening Date", value: moment(projectInfo.openingDate).format("MM/DD/YYYY")});
-            projectAttributes.push({name: "End Date", value: getAttributeInfo("End date") ? moment(getAttributeInfo("End date").value).format("MM/DD/YYYY") : ""});
+            projectAttributes.push({name: "Opening Date", value: moment(projectInfo.openingDate).toDate().toLocaleDateString()});
+            projectAttributes.push({name: "End Date", value: getAttributeInfo("End date") ? moment(getAttributeInfo("End date").value).toDate().toLocaleDateString() : ""});
             return projectAttributes;
         };
 
