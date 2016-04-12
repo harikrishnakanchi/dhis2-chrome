@@ -315,5 +315,6 @@
     "aggregateDataSyncError": "Failed to submit data for approval. Please resubmit.",
     "projectReportLabel": "Project Report",
     "projectInformationLabel": "Project Information",
-    "pleaseWaitLabel": "Please wait..."
+    "pleaseWaitLabel": "Please wait...",
+    "selectBtnLabel": "Select"
 }

@@ -97,5 +97,6 @@
     "projectReportLabel": "Project Report",
     "projectInformationLabel": "Project Information",
     "selectServiceNameLabel": "Select service",
-    "pleaseWaitLabel": "Please wait..."
+    "pleaseWaitLabel": "Please wait...",
+    "selectBtnLabel": "Select"
 }

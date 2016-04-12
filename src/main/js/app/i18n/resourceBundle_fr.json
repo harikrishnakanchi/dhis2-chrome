@@ -312,5 +312,6 @@
     "aggregateDataSyncError": "Impossible de soumettre des données pour approbation. S'il vous plaît soumettre à nouveau.",
     "projectReportLabel": "Project Report",
     "projectInformationLabel": "Project Information",
-    "pleaseWaitLabel": "S'il vous plaît, attendez..."
+    "pleaseWaitLabel": "S'il vous plaît, attendez...",
+    "selectBtnLabel": "Sélectionner"
 }
