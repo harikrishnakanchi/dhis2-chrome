@@ -29,7 +29,7 @@
     "proportionChildrenLessThanOneYearLabel": "Est. population less than 1 year",
     "proportionWomenOfChildBearingAgeLabel": "Est. population of women of child bearing age",
     "endDateLabel": "End Date",
-    "autoApproveLabel": "Auto Approve?",
+    "autoApproveLabel": "Enable automatic data approval",
     "roleLabel": "Role",
     "userListLabel": "User List",
     "moduleDetailsLabel": "Module Details",
