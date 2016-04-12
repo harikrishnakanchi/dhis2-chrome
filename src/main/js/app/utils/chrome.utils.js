@@ -7,6 +7,10 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
         };
     };
 
+    var getPraxisVersion = function () {
+        return chrome.runtime.getManifest().version;
+    };
+
     var addListener = function(message, callback) {
         chrome.runtime.onMessage.addListener(registerMessageCallback(message, callback));
     };
@@ -54,6 +58,7 @@ define(["lodash", "properties", "appSettingsUtils"], function(_, properties, app
         "sendMessage": sendMessage,
         "setAuthHeader": setAuthHeader,
         "getAuthHeader": getAuthHeader,
-        "createNotification": createNotification
+        "createNotification": createNotification,
+        "getPraxisVersion": getPraxisVersion
     };
 });

@@ -14,7 +14,8 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
 
         var dhisConnectivityCheck = function() {
 
-            var pingUrl = properties.dhisPing.url + "?" + (new Date()).getTime();
+            var praxisVersion = chromeUtils.getPraxisVersion();
+            var pingUrl = properties.dhisPing.url + "?" + (new Date()).getTime() + "&pv=" + praxisVersion;
 
             return $http.head(pingUrl, {
                 "timeout": 1000 * properties.dhisPing.timeoutInSeconds
