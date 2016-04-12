@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="(moduleId, items) in itemsAwaitingApprovalAtUserLevel | orderBy:'moduleName' | groupBy: 'moduleId'">
+                <tr ng-repeat="(moduleId, items) in itemsAwaitingApprovalAtUserLevel | groupBy: 'moduleId' | toArray: true">
                     <td>{{items[0].moduleName}}</td>
                     <td>
                         <ul class="list-unstyled">
@@ -49,7 +49,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="(moduleId, items) in itemsAwaitingSubmission | orderBy:'moduleName' | groupBy: 'moduleId'">
+                <tr ng-repeat="(moduleId, items) in itemsAwaitingSubmission | groupBy: 'moduleId' | toArray: true">
                     <td>{{items[0].moduleName}}</td>
                     <td>
                         <ul class="list-unstyled">
@@ -73,7 +73,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="(moduleId, items) in itemsAwaitingApprovalAtOtherLevels | orderBy:'moduleName' | groupBy: 'moduleId'">
+                <tr ng-repeat="(moduleId, items) in itemsAwaitingApprovalAtOtherLevels | groupBy: 'moduleId' | toArray: true">
                     <td>{{items[0].moduleName}}</td>
                     <td>
                         <ul class="list-unstyled">

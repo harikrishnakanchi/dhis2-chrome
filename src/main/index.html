@@ -103,7 +103,7 @@
                         <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu multi-level" role="menu">
-                        <li class="dropdown-submenu" ng-repeat="opUnitWithModule in allOpUnitsWithModules">
+                        <li class="dropdown-submenu" ng-repeat="opUnitWithModule in allOpUnitsWithModules | orderBy: 'opUnitName' ">
                             <a class="dropdown-toggle">
                                 {{ opUnitWithModule.opUnitName }}
                             </a>
