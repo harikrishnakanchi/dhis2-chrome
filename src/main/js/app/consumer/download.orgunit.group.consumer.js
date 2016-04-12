@@ -1,13 +1,12 @@
 define(["moment", "lodash"], function(moment, _) {
-    return function(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, $q, mergeBy) {
+    return function(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository) {
         this.run = function(message) {
-            var orgUnitGroups = _.isArray(message.data.data) ? message.data.data : [message.data.data];
-            return download(orgUnitGroups)
+            return download()
                 .then(mergeAndSave)
                 .then(updateChangeLog);
         };
 
-        var download = function(locallyModifiedOrgUnitGroupIds) {
+        var download = function() {
             return changeLogRepository.get("orgUnitGroups").then(function(lastUpdatedTime) {
                 return orgUnitGroupService.getAll(lastUpdatedTime);
             });

@@ -15,26 +15,26 @@ define(["lodash", "moment"], function(_, moment) {
                 });
             };
 
-            var downloadRelevantPivotTableData = function(pivotTables, userModuleIds, changeLogKey) {
+            var downloadRelevantPivotTableData = function(pivotTables, projectIds, userModuleIds, changeLogKey) {
                 var downloadOfAtLeastOneReportFailed = false;
 
-                var recursivelyDownloadAndUpsertPivotTableData = function(modulesAndTables) {
+                var recursivelyDownloadAndUpsertPivotTableData = function(orgUnitsAndTables) {
                     var onSuccess = function(data) {
-                        return pivotTableRepository.upsertPivotTableData(datum.pivotTable.name, datum.moduleId, data).then(function() {
-                            return recursivelyDownloadAndUpsertPivotTableData(modulesAndTables);
+                        return pivotTableRepository.upsertPivotTableData(datum.pivotTable.name, datum.orgUnitId, data).then(function() {
+                            return recursivelyDownloadAndUpsertPivotTableData(orgUnitsAndTables);
                         });
                     };
 
                     var onFailure = function() {
                         downloadOfAtLeastOneReportFailed = true;
-                        return recursivelyDownloadAndUpsertPivotTableData(modulesAndTables);
+                        return recursivelyDownloadAndUpsertPivotTableData(orgUnitsAndTables);
                     };
 
-                    if (_.isEmpty(modulesAndTables))
+                    if (_.isEmpty(orgUnitsAndTables))
                         return $q.when({});
 
-                    var datum = modulesAndTables.pop();
-                    return reportService.getReportDataForOrgUnit(datum.pivotTable, datum.moduleId).then(onSuccess, onFailure);
+                    var datum = orgUnitsAndTables.pop();
+                    return reportService.getReportDataForOrgUnit(datum.pivotTable, datum.orgUnitId).then(onSuccess, onFailure);
                 };
 
                 var getDatasetsRelevantToEachModule = function() {
@@ -64,7 +64,7 @@ define(["lodash", "moment"], function(_, moment) {
                             _.forEach(dataSetCodesForModule, function(datasetCode) {
                                 if (_.contains(pivotTable.name, datasetCode)) {
                                     modulesAndPivotTables.push({
-                                        moduleId: userModuleId,
+                                        orgUnitId: userModuleId,
                                         pivotTable: pivotTable
                                     });
                                 }
@@ -74,8 +74,25 @@ define(["lodash", "moment"], function(_, moment) {
                     return $q.when(modulesAndPivotTables);
                 };
 
+                var addProjectLevelPivotTables = function(orgUnitsAndTables){
+
+                    _.forEach(projectIds, function(projectId) {
+                        _.forEach(pivotTables, function(pivotTable) {
+                            if(_.contains(pivotTable.name, "ProjectReport")) {
+                                orgUnitsAndTables.push({
+                                    orgUnitId: projectId,
+                                    pivotTable: pivotTable
+                                });
+                            }
+                        });
+                    });
+
+                    return $q.when(orgUnitsAndTables);
+                };
+
                 return getDatasetsRelevantToEachModule()
                     .then(filterPivotTablesForModules)
+                    .then(addProjectLevelPivotTables)
                     .then(recursivelyDownloadAndUpsertPivotTableData)
                     .then(function() {
                         if (!downloadOfAtLeastOneReportFailed) {
@@ -98,7 +115,7 @@ define(["lodash", "moment"], function(_, moment) {
                     }
 
                     return pivotTableRepository.getAll().then(function(pivotTables) {
-                        return downloadRelevantPivotTableData(pivotTables, moduleIds, changeLogKey);
+                        return downloadRelevantPivotTableData(pivotTables, projectIds, moduleIds, changeLogKey);
                     });
                 });
 

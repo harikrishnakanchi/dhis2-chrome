@@ -40,6 +40,10 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                         templateUrl: 'templates/reports.html',
                         controller: 'reportsController'
                     }).
+                    when('/projectReport/', {
+                        templateUrl: 'templates/project-report.html',
+                        controller: 'projectReportController'
+                    }).
                     when('/login', {
                         templateUrl: 'templates/login.html',
                         controller: 'loginController'
@@ -124,7 +128,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                     $hustle.registerInterceptor(queuePostProcessInterceptor);
 
                     $rootScope.$on('$locationChangeStart', function(e, newUrl, oldUrl) {
-                        if (authenticationUtils.shouldRedirectToLogin($rootScope, newUrl)) {
+                        if (authenticationUtils.shouldRedirectToLogin($rootScope, $location)) {
                             $location.path("/login");
                         }
                     });

@@ -255,13 +255,11 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
                         });
                     }
                     //TODO remove date, datetime and int checks after DHIS 2.21
-                    if (dv.type === "date" || dv.valueType === "DATE" || dv.type === "datetime" || dv.valueType === "DATETIME") {
+                    if (dv.type === "date" || dv.valueType === "DATE" || dv.type === "datetime" || dv.valueType === "DATETIME")
                         return new Date(dv.value);
-                    }
 
-                    if (dv.type === "int" || dv.type === 'NUMBER') {
+                    if (dv.type === "int" || dv.valueType === 'NUMBER')
                         return parseFloat(dv.value);
-                    }
 
                     return dv.value;
                 };

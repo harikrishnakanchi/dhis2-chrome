@@ -1,8 +1,18 @@
-define(["dhisUrl", "moment"], function(dhisUrl, moment) {
+define(["dhisUrl", "moment", "properties"], function(dhisUrl, moment, properties) {
     return function($http) {
         this.getMetadata = function(lastUpdatedTime) {
-            var url = dhisUrl.filteredMetadata + (lastUpdatedTime ? "&lastUpdated=" + lastUpdatedTime : "");
-            return $http.get(url).then(function(response) {
+            var config = {
+                params : {
+                    assumeTrue: false,
+                    lastUpdated: lastUpdatedTime || null
+                }
+            };
+
+            _.each(properties.metadata.types, function(type){
+               config.params[type] = true;
+            });
+
+            return $http.get(dhisUrl.filteredMetadata, config).then(function(response) {
                 return response.data;
             });
         };

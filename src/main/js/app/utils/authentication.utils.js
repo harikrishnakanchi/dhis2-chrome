@@ -1,9 +1,9 @@
 define(["lodash"], function(_) {
-    var shouldRedirectToLogin = function(rootScope, newUrl) {
-        var accessingProductKeyPage = newUrl.endsWith('#/productKeyPage');
+    var shouldRedirectToLogin = function(rootScope, location) {
+        var accessingProductKeyPage = location.path() == '/productKeyPage';
         if(_.isUndefined(rootScope.isLoggedIn))
             return false;
-        return (rootScope.isLoggedIn || accessingProductKeyPage) ? false : true;
+        return !(rootScope.isLoggedIn || accessingProductKeyPage);
     };
 
     return {

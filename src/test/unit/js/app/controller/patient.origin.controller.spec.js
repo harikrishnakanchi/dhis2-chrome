@@ -251,7 +251,7 @@ define(["patientOriginController", "angularMocks", "utils", "dhisId", "timecop",
             }, "dataValues"]);
 
             expect(hustle.publish.calls.argsFor(2)).toEqual([{
-                "data": ["ds1"],
+                "data": {"orgUnitIds":["ou1"], "dataSetIds":["ds1"]},
                 "type": "associateOrgUnitToDataset",
                 "locale": "en",
                 "desc": "associate selected services to origins of Op Unit o1"

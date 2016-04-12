@@ -4,24 +4,36 @@ define(["lodash"], function(_) {
             return orgUnitGroupRepository.findAll(orgUnitGroupIds);
         };
 
-        var generatePayload = function(orgUnitGroups, orgUnitIds) {
-            return _.map(orgUnitGroups, function(group) {
-                group.organisationUnits = _.transform(group.organisationUnits, function(acc, orgUnit) {
-                    if (orgUnit.localStatus === "NEW" && !_.contains(orgUnitIds, orgUnit.id))
-                        return;
-                    if (orgUnit.localStatus === "DELETED" && _.contains(orgUnitIds, orgUnit.id))
-                        return;
-                    orgUnit = _.omit(orgUnit, "localStatus");
-                    acc.push(orgUnit);
-                }, []);
-                return group;
-            });
+        var updateOrgUnitGroupsInDHIS = function(orgUnitGroups, orgUnitIds) {
+            return _.reduce(orgUnitGroups, function (wholePromise, orgUnitGroup) {
+                return _.reduce(orgUnitGroup.organisationUnits, function (eachPromise, orgUnit) {
+                    if(_.contains(orgUnitIds, orgUnit.id)) {
+                        return eachPromise.then(function () {
+                            if (orgUnit.localStatus === "NEW")
+                                return orgUnitGroupService.addOrgUnit(orgUnitGroup.id, orgUnit.id)
+                                    .then(_.partial(clearLocalStatus, orgUnitGroup.id, orgUnit.id));
+                            else if (orgUnit.localStatus === "DELETED")
+                                return orgUnitGroupService.deleteOrgUnit(orgUnitGroup.id, orgUnit.id)
+                                    .then(_.partial(clearLocalStatus, orgUnitGroup.id, orgUnit.id))
+                                    .catch(function(response) {
+                                        if(response.status === 404) {
+                                            return clearLocalStatus(orgUnitGroup.id, orgUnit.id);
+                                        } else {
+                                            return $q.reject(response);
+                                        }
+                                    });
+                            else
+                                return eachPromise;
+                        });
+                    } else {
+                        return eachPromise;
+                    }
+                }, wholePromise);
+            }, $q.when());
         };
 
-        var clearLocalStatus = function(orgUnitGroupIds, orgUnitIds) {
-            return $q.all(_.map(orgUnitGroupIds, function(groupId) {
-                return orgUnitGroupRepository.clearStatusFlag(groupId, orgUnitIds);
-            }));
+        var clearLocalStatus = function(orgUnitGroupId, orgUnitId) {
+            return orgUnitGroupRepository.clearStatusFlag(orgUnitGroupId, orgUnitId);
         };
 
         this.run = function(message) {
@@ -29,9 +41,7 @@ define(["lodash"], function(_) {
             var orgUnitIds = message.data.data.orgUnitIds;
 
             return retrieveOrgUnitGroupsFromDb(orgUnitGroupIds)
-                .then(_.curry(generatePayload)(_, orgUnitIds))
-                .then(orgUnitGroupService.upsert)
-                .then(_.partial(clearLocalStatus, orgUnitGroupIds, orgUnitIds));
+                .then(_.partial(updateOrgUnitGroupsInDHIS, _, orgUnitIds));
         };
     };
 });

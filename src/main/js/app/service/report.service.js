@@ -1,7 +1,5 @@
 define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
     return function($http, $q) {
-        var fieldAppReportRegex = /\[FieldApp - (.*)\]/;
-
         this.getReportDataForOrgUnit = function(report, orgUnit) {
             var buildDimension = function() {
                 var columnDimensions = _.map(report.columns, function(col) {
@@ -108,7 +106,7 @@ define(["dhisUrl", "lodash", "moment"], function(dhisUrl, _, moment) {
         };
 
         this.getUpdatedPivotTables = function(lastUpdatedTime) {
-            var requiredFields = 'id,name,title,type,sortOrder,categoryDimensions,dataElements,indicators,dataDimensionItems,relativePeriods,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
+            var requiredFields = 'id,name,title,type,sortOrder,categoryDimensions[dataElementCategory,categoryOptions[:identifiable]],dataElements,indicators,dataDimensionItems,relativePeriods,columns[dimension,filter,items[id,name]],rows[dimension,filter,items[id,name]],filters[dimension,filter,items[id,name]]';
             return getResourceIds(dhisUrl.pivotTables, 'reportTables', lastUpdatedTime).then(_.partial(getResourceDetails, dhisUrl.pivotTables, requiredFields));
         };
 

@@ -32,7 +32,6 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             orgUnitGroupRepository = new OrgUnitGroupRepository();
             mergeBy = new MergeBy($log);
 
-            spyOn(orgUnitGroupRepository, "upsert");
             spyOn(orgUnitGroupRepository, "upsertDhisDownloadedData");
 
             changeLogRepository = {
@@ -92,7 +91,6 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             }];
 
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
-            spyOn(orgUnitGroupService, 'upsert');
             spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
 
             downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
@@ -102,7 +100,6 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
 
             expect(orgUnitGroupService.getAll).toHaveBeenCalledWith("2014-10-24T09:01:12.020+0000");
             expect(orgUnitGroupRepository.findAll).toHaveBeenCalledWith(["a35778ed565"]);
-            expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
             expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(expectedOrgUnitGroups);
         });
 
@@ -143,7 +140,6 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             }];
 
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
-            spyOn(orgUnitGroupService, 'upsert');
             spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, [localCopy[0]]));
 
             downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
@@ -151,7 +147,6 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             downloadOrgUnitGroupConsumer.run(message);
             scope.$apply();
 
-            expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
             expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(expectedOrgUnitGroups);
         });
 
@@ -170,7 +165,6 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             };
 
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
-            spyOn(orgUnitGroupService, 'upsert');
             spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
             downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
@@ -207,7 +201,6 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             }];
 
             spyOn(orgUnitGroupService, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupsFromDHIS));
-            spyOn(orgUnitGroupService, 'upsert');
             spyOn(orgUnitGroupRepository, 'findAll').and.returnValue(utils.getPromise(q, []));
 
             downloadOrgUnitGroupConsumer = new DownloadOrgUnitGroupConsumer(orgUnitGroupService, orgUnitGroupRepository, changeLogRepository, q, mergeBy);
@@ -215,7 +208,6 @@ define(["downloadOrgUnitGroupConsumer", "utils", "angularMocks", "orgUnitGroupSe
             downloadOrgUnitGroupConsumer.run(message);
             scope.$apply();
 
-            expect(orgUnitGroupService.upsert).not.toHaveBeenCalled();
             expect(orgUnitGroupRepository.upsertDhisDownloadedData).toHaveBeenCalledWith(orgUnitGroupsFromDHIS);
         });
     });

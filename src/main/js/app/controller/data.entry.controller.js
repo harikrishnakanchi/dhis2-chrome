@@ -2,7 +2,7 @@ define(["lodash", "moment"],
     function(_, moment) {
         return function($scope, $routeParams, $q, $location, $rootScope, orgUnitRepository) {
 
-            var deregisterWeekModulerWatcher = $scope.$watchCollection('[week, currentModule]', function() {
+            var deregisterWeekModulerWatcher = $scope.$watchCollection('[week, currentModule, resourceBundle]', function() {
                 $scope.errorMessage = undefined;
                 if ($scope.week && $scope.currentModule) {
                     if (isOpeningDateInFuture()) {
@@ -103,13 +103,8 @@ define(["lodash", "moment"],
                 };
 
                 $location.hash('top');
-                $scope.loading = true;
 
-                setAvailableModules()
-                    .then(setInitialModuleAndWeek)
-                    .finally(function() {
-                        $scope.loading = false;
-                    });
+                setAvailableModules().then(setInitialModuleAndWeek);
             };
 
             init();

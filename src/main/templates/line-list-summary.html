@@ -7,17 +7,18 @@
     </div>
     <div ng-if="viewRegistrationBook">
         <section class="panel panel-default">
+            <span>{{ resourceBundle.patientOriginLabel }}</span>
             <div id="forPrinting" name="forPrinting" ng-repeat="programStage in program.programStages">
                 <div class="registrationBook" ng-repeat="section in programStage.programStageSections">
                     <div>
                         <table class="table">
                             <tr>
                                 <th>
-                                    {{section.name}}
+                                    {{resourceBundle[section.id] || section.name}}
                                 </th>
                             </tr>
                             <tr ng-repeat="psde in section.programStageDataElements">
-                                <td ng-if="psde.dataElement.isIncluded">{{psde.dataElement.formName}}</td>
+                                <td ng-if="psde.dataElement.isIncluded">{{resourceBundle[psde.dataElement.id] || psde.dataElement.formName}}</td>
                             </tr>
                         </table>
                     </div>

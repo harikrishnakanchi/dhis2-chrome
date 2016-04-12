@@ -38,7 +38,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
                         _.transform(translations, function(acc, translation) {
                             if (translation.className === "DataElement" && translation.property !== "formName")
                                 return;
-                            acc[translation.objectUid] = translation.value;
+                            acc[translation.objectId] = translation.value;
                         }, $rootScope.resourceBundle);
                     });
                 };
@@ -87,6 +87,22 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             }
         };
 
+        var getModulesInOpUnit = function(opUnit) {
+            return orgUnitRepository.getAllModulesInOrgUnits(opUnit.id, "Module").then(function(modules) {
+                return {
+                    'opUnitName': opUnit.name,
+                    'modules': modules
+                };
+            });
+        };
+
+        var loadReportOpunitAndModules = function() {
+             return orgUnitRepository.getAllOpUnitsInOrgUnits($rootScope.currentUser.selectedProject.id).then(function(opUnits) {
+                 return $q.all(_.map(opUnits, getModulesInOpUnit)).then(function(allOpUnitsWithModules) {
+                     $scope.allOpUnitsWithModules = allOpUnitsWithModules;
+                 });
+            });
+        };
         $scope.logout = function() {
             sessionHelper.logout();
         };
@@ -94,6 +110,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         $scope.setSelectedProject = function(selectedProject) {
             $rootScope.currentUser.selectedProject = selectedProject;
             loadUserLineListModules();
+            loadReportOpunitAndModules();
             $rootScope.$emit('selectedProjectUpdated');
             sessionHelper.saveSessionState();
             $location.path("/dashboard");
@@ -101,7 +118,10 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         var deregisterUserPreferencesListener = $rootScope.$on('userPreferencesUpdated', function() {
             loadProjects();
-            loadUserLineListModules();
+            if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
+                loadUserLineListModules();
+                loadReportOpunitAndModules();
+            }
         });
 
         $scope.$on('$destroy', function() {
@@ -112,6 +132,13 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
         var checkConnectionQuality = function() {
             $scope.poorConnection = dhisMonitor.hasPoorConnectivity();
             $timeout(checkConnectionQuality, 5000);
+        };
+
+        $scope.gotoProductKeyPage = function () {
+            if($location.path() != '/productKeyPage') {
+                var currentLocation = $location.path();
+                $location.path("/productKeyPage").search({prev: currentLocation});
+            }
         };
 
         var init = function() {

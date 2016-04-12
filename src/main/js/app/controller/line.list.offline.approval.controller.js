@@ -221,8 +221,10 @@ define(["lodash", "moment"], function(_, moment) {
 
         var getReferralLocations = function() {
             return referralLocationsRepository.get($scope.selectedModule.parent.id).then(function(locations) {
-                if (_.isUndefined(locations))
+                if (_.isUndefined(locations)) {
                     $scope.shouldShowReferrals = false;
+                    return;
+                }
 
                 $scope.shouldShowReferrals = true;
                 $scope.referralMap = _.omit(locations, ["orgUnit", "clientLastUpdated"]);

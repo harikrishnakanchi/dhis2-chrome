@@ -46,7 +46,7 @@ define(["programService", "angularMocks", "properties", "utils"], function(Progr
                 programs: programs
             };
 
-            httpBackend.expectGET(properties.dhis.url + '/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues,programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, payload);
+            httpBackend.expectGET(properties.dhis.url + '/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false&filter=lastUpdated:gte:2014-12-30T09:13:41.092Z').respond(200, payload);
             httpBackend.flush();
         });
 

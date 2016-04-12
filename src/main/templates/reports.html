@@ -7,7 +7,7 @@
         </div>
         <div class="row form-inline">
             <div class="col-md-4 form-group">
-                {{ resourceBundle.selectServiceNameLabel }}
+                {{ resourceBundle.selectServiceNameLabel }}&nbsp;
                 <select id="selectDataset" class="form-control" ng-model="selectedDataset" ng-options="dataset as dataset.displayName for dataset in datasets"></select>
             </div>
         </div>
@@ -24,6 +24,7 @@
                                 <span class="glyphicon glyphicon-download-alt"></span>
                             </a>
                         </div>
+                        <!-- ToDo - Remove chart type non-capitalized after dhis 2.22 upgrade -->
                         <p ng-if="chart.type === 'LINE' || chart.type === 'line'" class="lineChart-container">
                             <nvd3 options="lineChartOptions" data="chart.data"></nvd3>
                         </p>
@@ -35,23 +36,26 @@
                         </p>
                     </div>
                 </div>
-                <div ng-if="selectedDataset.isReportsAvailable">
+                <div>
                     <accordion is-open="true" close-others="false">
-                        <accordion-group>
+                        <accordion-group is-open="isReportOpen">
                             <accordion-heading>
                                 <span>{{resourceBundle.tabularReports}}</span>
-                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
                             </accordion-heading>
-                            <div class="exp-coll-group">
+                                <div ng-show="!selectedDataset.isReportsAvailable || !selectedDataset.isWeeklyPivotTablesAvailable">
+                                <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+                            </div>
+                            <div class="exp-coll-group" ng-if="selectedDataset.isReportsAvailable &amp;&amp; selectedDataset.isWeeklyPivotTablesAvailable">
                                 <div ng-if="!isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'name'" class="exportCSV-container">
                                     <accordion close-others="false">
-                                        <accordion-group>
+                                        <accordion-group is-open="status.open">
                                             <accordion-heading>
                                                 <span>{{getTableName(table.table.name)}}</span>
                                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                             </accordion-heading>
                                             <div>
-                                                <pivot-table definition="table.table" data="table.data" show-weeks="false"></pivot-table>
+                                                <pivot-table definition="table.table" data="table.data" show-weeks="false" resource-bundle="resourceBundle"></pivot-table>
                                             </div>
                                         </accordion-group>
                                     </accordion>
@@ -62,26 +66,26 @@
                 </div>
             </tab>
             <tab heading="{{resourceBundle.monthlyReports}}">
-                <div ng-show="!selectedDataset.isReportsAvailable || !selectedDataset.isPivotTablesAvailable">
+                <div ng-show="!selectedDataset.isMonthlyPivotTablesAvailable">
                     <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
                 </div>
-                <div class="margin-top" ng-if="selectedDataset.isReportsAvailable">
-                    <accordion is-open="true" close-others="false">
-                        <accordion-group>
+                <div id="reports" class="margin-top" ng-if="selectedDataset.isMonthlyPivotTablesAvailable">
+                    <accordion close-others="false">
+                        <accordion-group is-open="isReportOpen">
                             <accordion-heading>
                                 <span>{{resourceBundle.tabularReports}}</span>
-                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isReportOpen, 'glyphicon-chevron-right': !isReportOpen}"></i>
                             </accordion-heading>
                             <div class="exp-coll-group">
                                 <div ng-if="isMonthlyReport(table.table) &amp;&amp; showTable(table.data)" ng-repeat="table in pivotTables | filter: {dataSetCode: selectedDataset.code} | orderBy: 'name'" class="exportCSV-container">
                                     <accordion close-others="false">
-                                        <accordion-group>
+                                        <accordion-group is-open="status.open">
                                             <accordion-heading>
                                                 <span>{{getTableName(table.table.name)}}</span>
                                                 <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                             </accordion-heading>
                                             <div>
-                                                <pivot-table definition="table.table" data="table.data" show-weeks="true"></pivot-table>
+                                                <pivot-table definition="table.table" data="table.data" show-weeks="true" resource-bundle="resourceBundle"></pivot-table>
                                             </div>
                                         </accordion-group>
                                     </accordion>

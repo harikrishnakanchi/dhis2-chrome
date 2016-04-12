@@ -229,7 +229,11 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                         var datasetIds = _.flattenDeep([summaryDatasetId, originDatasetIds]);
 
                         return datasetRepository.associateOrgUnits(datasetIds, originOrgUnits).then(function() {
-                            return publishMessage(datasetIds, "associateOrgUnitToDataset",
+                            var orgunitIdsAndDatasetIds = {
+                                "orgUnitIds": _.pluck(originOrgUnits, "id"),
+                                "dataSetIds": datasetIds
+                            };
+                            return publishMessage(orgunitIdsAndDatasetIds, "associateOrgUnitToDataset",
                                 $scope.resourceBundle.associateOrgUnitToDatasetDesc + $scope.orgUnit.name);
                         });
                     });

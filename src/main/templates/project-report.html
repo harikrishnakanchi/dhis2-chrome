@@ -1,0 +1,57 @@
+<div class="report-table dataentrypage parent-margin report-container">
+    <section class="panel tab-panel">
+
+        <div class="row">
+            <div class="col-md-8">
+                <h4>{{resourceBundle.projectReportLabel}}: {{ projectName }}</h4>
+            </div>
+
+            <div class="col-md-4">
+                <button ng-disabled="!isReportAvailable" class="btn btn-sm btn-primary pull-right" ng-csv="getData()"  filename="{{getCsvFileName()}}">
+                    {{resourceBundle.exportAsCsv}}
+                </button>
+            </div>
+
+        </div>
+
+        <div class="row mb15">
+            <div class="col-md-12">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <h3><th colspan="2">{{ resourceBundle.projectInformationLabel }}</th></h3>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="projectBasicInfo in projectAttributes">
+                        <td> {{ projectBasicInfo.name }} </td>
+                        <td> {{ projectBasicInfo.value }} </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div ng-show="!isReportAvailable">
+            <h4 class="text-center">{{resourceBundle.noDataAvailable}}</h4>
+        </div>
+        <div ng-if="isReportAvailable" class="exp-coll-group">
+            <div ng-show="table.isTableDataAvailable" ng-repeat="table in pivotTables">
+                <accordion>
+                    <accordion-group is-open="status.open">
+                        <accordion-heading>
+                            <span>{{getTableName(table.table.name)}}</span>
+                            <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                        </accordion-heading>
+                        <div>
+                            <pivot-table definition="table.table" data="table.data" show-weeks="false" resource-bundle="resourceBundle" show-download="false" order-of-items="table.dataDimensionItems"></pivot-table>
+                        </div>
+                    </accordion-group>
+                </accordion>
+            </div>
+        </div>
+        <div class="loading" ng-show="loading">
+            <img src="img/ajax-loader.gif" class="spinner" />
+        </div>
+    </section>
+</div>

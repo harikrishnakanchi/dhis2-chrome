@@ -13,24 +13,6 @@ define(["datasetService", "angularMocks", "properties"], function(DatasetService
             httpBackend.verifyNoOutstandingRequest();
         });
 
-        it("should update dataset", function() {
-            var datasets = [{
-                "id": "DS_Physio",
-                "organisationUnits": [{
-                    "name": "Mod1",
-                    "id": "hvybNW8qEov"
-                }]
-            }];
-
-            var expectedPayload = {
-                dataSets: datasets
-            };
-
-            datasetService.associateDataSetsToOrgUnit(datasets);
-            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
-            httpBackend.flush();
-        });
-
         it("should download datasets", function() {
 
             var actualDataSets;
@@ -46,7 +28,7 @@ define(["datasetService", "angularMocks", "properties"], function(DatasetService
                 'dataSets': datasets
             };
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all&paging=false").respond(200, responsePayload);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],organisationUnits[:identifiable]&paging=false").respond(200, responsePayload);
             httpBackend.flush();
 
             expect(actualDataSets).toEqual(responsePayload.dataSets);
@@ -60,7 +42,7 @@ define(["datasetService", "angularMocks", "properties"], function(DatasetService
 
             datasetService.getAll(lastUpdatedTime);
 
-            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all&paging=false&filter=lastUpdated:gte:" + lastUpdatedTime).respond(200, responsePayload);
+            httpBackend.expectGET(properties.dhis.url + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],organisationUnits[:identifiable]&paging=false&filter=lastUpdated:gte:" + lastUpdatedTime).respond(200, responsePayload);
             httpBackend.flush();
         });
 
@@ -84,6 +66,16 @@ define(["datasetService", "angularMocks", "properties"], function(DatasetService
             }];
 
             expect(actualResult).toEqual(expectedDataSets);
+        });
+
+        it('should assign orgunit to dataset', function() {
+            var datasetId = 'datasetId';
+            var orgUnitId = 'orgUnitId';
+
+            datasetService.assignOrgUnitToDataset(datasetId, orgUnitId);
+
+            httpBackend.expectPOST(properties.dhis.url + '/api/dataSets/' + datasetId + '/organisationUnits/' + orgUnitId).respond(204);
+            httpBackend.flush();
         });
 
     });

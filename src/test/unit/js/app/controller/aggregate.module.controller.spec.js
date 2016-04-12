@@ -85,7 +85,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.resourceBundle = {
                     "disableOrgUnitDesc": "disable organisation unit: ",
                     "upsertOrgUnitDesc": "save organisation unit: ",
-                    "uploadSystemSettingDesc": "upload sys settings for "
+                    "uploadSystemSettingDesc": "upload sys settings for ",
+                    "associateOrgUnitToDatasetDesc": "associate selected services to origins of Op Unit "
                 };
 
                 scope.isNewMode = true;
@@ -242,6 +243,12 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 scope.$apply();
 
                 expect(dataSetRepo.associateOrgUnits).toHaveBeenCalledWith(["ds1"], [enrichedModule]);
+                expect(hustle.publish.calls.argsFor(1)).toEqual([{
+                    data: {"orgUnitIds":["mod1pid"], "dataSetIds":["ds1"]},
+                    type: "associateOrgUnitToDataset",
+                    locale: "en",
+                    desc: "associate selected services to origins of Op Unit SomeName"
+                }, "dataValues"]);
             });
 
             it("should save excluded data elements for the module", function() {

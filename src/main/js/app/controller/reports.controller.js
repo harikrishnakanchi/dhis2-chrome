@@ -6,6 +6,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             return isFraction(datum) ? '' : d3.format('.0f')(datum);
         };
 
+        $scope.isReportOpen = false;
+
         $scope.barChartOptions = {
             "chart": {
                 "type": "multiBarChart",
@@ -102,7 +104,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             }
         };
 
-        $scope.isPivotTablesAvailable = false;
+        $scope.isMonthlyPivotTablesAvailable = false;
+        $scope.isWeeklyPivotTablesAvailable = false;
 
         $scope.resizeCharts = function() {
             window.dispatchEvent(new Event('resize'));
@@ -323,13 +326,19 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     return chart.data && chart.data.length !== 0;
                 });
 
-                eachDataSet.isPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
+                eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
                     if (table.data && table.data.rows)
-                        return table.data.rows.length !== 0;
+                        return table.data.rows.length !== 0 && !$scope.isMonthlyReport(table.table);
                     return false;
                 });
 
-                eachDataSet.isReportsAvailable = eachDataSet.isChartsAvailable || eachDataSet.isPivotTablesAvailable;
+                eachDataSet.isMonthlyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
+                    if (table.data && table.data.rows)
+                        return table.data.rows.length !== 0 && $scope.isMonthlyReport(table.table);
+                    return false;
+                });
+
+                eachDataSet.isReportsAvailable = eachDataSet.isChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
             });
 
             $scope.datasets = _.sortBy($scope.datasets, "name").reverse();

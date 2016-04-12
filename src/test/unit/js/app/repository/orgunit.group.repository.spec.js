@@ -65,7 +65,7 @@ define(["orgUnitGroupRepository", "angularMocks", "utils", "timecop"], function(
             expect(mockStore.find).toHaveBeenCalledWith(id);
         });
 
-        it("should clear local status", function() {
+        it("should clear 'NEW' local status for one orgUnit in orgUnitGroup", function() {
             var ougInDb = {
                 "id": "oug1",
                 "organisationUnits": [{
@@ -88,7 +88,53 @@ define(["orgUnitGroupRepository", "angularMocks", "utils", "timecop"], function(
             };
 
             mockStore.find.and.returnValue(utils.getPromise(q, ougInDb));
-            orgUnitGroupRepository.clearStatusFlag("oug1", ["ou0", "ou1", "ou2", "ou3"]);
+            orgUnitGroupRepository.clearStatusFlag("oug1", "ou1");
+            scope.$apply();
+
+            expect(mockStore.upsert).toHaveBeenCalledWith({
+                "id": "oug1",
+                "organisationUnits": [{
+                    "id": "ou1"
+                }, {
+                    "id": "ou2",
+                    "localStatus": "DELETED"
+                }, {
+                    "id": "ou3"
+                }, {
+                    "id": "ou4",
+                    "localStatus": "NEW"
+                }, {
+                    "id": "ou5",
+                    "localStatus": "DELETED"
+                }, {
+                    "id": "ou6"
+                }]
+            });
+        });
+
+        it("should clear 'DELETE' local status for one orgUnit in orgUnitGroup", function() {
+            var ougInDb = {
+                "id": "oug1",
+                "organisationUnits": [{
+                    "id": "ou1"
+                }, {
+                    "id": "ou2",
+                    "localStatus": "DELETED"
+                }, {
+                    "id": "ou3"
+                }, {
+                    "id": "ou4",
+                    "localStatus": "NEW"
+                }, {
+                    "id": "ou5",
+                    "localStatus": "DELETED"
+                }, {
+                    "id": "ou6"
+                }]
+            };
+
+            mockStore.find.and.returnValue(utils.getPromise(q, ougInDb));
+            orgUnitGroupRepository.clearStatusFlag("oug1", "ou2");
             scope.$apply();
 
             expect(mockStore.upsert).toHaveBeenCalledWith({

@@ -46,7 +46,7 @@ define(["lodash"], function(_) {
             });
         };
 
-        this.getAll = function(pivotTables) {
+        this.getAll = function() {
             var store = db.objectStore(PIVOT_TABLE_STORE_NAME);
             return store.getAll().then(addSortVars).then(parseDataSetCodes);
         };

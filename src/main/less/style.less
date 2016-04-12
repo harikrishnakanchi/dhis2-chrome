@@ -70,19 +70,15 @@ body {
     }
     .dropdown-submenu>a:after {
         display: block;
-        content: " ";
+        font-family: FontAwesome;
+        content: "\f0da";
         float: right;
         width: 0;
         height: 0;
-        border-color: transparent;
-        border-style: solid;
-        border-width: 5px 0 5px 5px;
-        border-left-color: #cccccc;
-        margin-top: 5px;
-        margin-right: -10px;
+        margin-right: -7px;
     }
     .dropdown-submenu:hover>a:after {
-        border-left-color: #ffffff;
+        border-left-color: #000;
     }
     .dropdown-submenu.pull-left {
         float: none;
@@ -133,6 +129,35 @@ body {
                 border: 0px;
             }
         }
+    }
+    .nav .open > a,
+    .nav .open > a:hover,
+    .nav .open > a:focus {
+        border-color: #a0a0a0;
+    }
+    .nav-tabs > li.active > a,
+    .nav-tabs > li.active > a:hover,
+    .nav-tabs > li.active > a:focus {
+        cursor: pointer;
+    }
+    .nav-tabs > li.praxis-dropdown-menu,
+    .nav-tabs > li.praxis-dropdown-menu:hover {
+        ul li {
+            a {
+                background: #fff;
+                border: none;
+            }
+            a:hover {
+                background: #ddd;
+                border: none;
+            }
+        }
+    }
+    .dropdown-menu > li > a:hover,
+    .dropdown-menu > li > a:focus {
+        text-decoration: none;
+        color: #262626;
+        background-color: #ddd;
     }
     .filter {
         margin-top: 10px;
@@ -268,6 +293,13 @@ body {
             }
             .panel-body {
                 border-top: none!important;
+            }
+        }
+    }
+    .report-table {
+        .panel-title {
+            a {
+                color: #000 !important;
             }
         }
     }
@@ -904,6 +936,10 @@ input[type="checkbox"].dashboard-form-checkbox {
     margin-bottom: 5px;
 }
 
+.mb15 {
+    margin-bottom: 15px;
+};
+
 .mb50 {
     margin-bottom: 50px;
 }
@@ -916,7 +952,7 @@ input[type="checkbox"].dashboard-form-checkbox {
     padding-top: 20px;
 }
 
-#dataentry {
+#dataentry, #reports {
     .accordion-toggle {
         cursor: pointer;
         display: block;
@@ -924,7 +960,7 @@ input[type="checkbox"].dashboard-form-checkbox {
 }
 
 .printTallySheetBtn {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .dataentrypage .module-select {
@@ -991,6 +1027,12 @@ input[type="checkbox"].dashboard-form-checkbox {
 .exportCSV-btn {
     position: absolute;
     top: 50px;
+    right: 20px;
+}
+
+.exportCSV-btn-project-baseline {
+    position: absolute;
+    top: 10px;
     right: 20px;
 }
 

@@ -22,7 +22,12 @@
                             <img src="img/logo-test.png" alt="" title="DHIS" id="logoImg" class="navbar-brand" tabindex="-1" ng-if="showTestLogo()">
                         </div>
                         <div class="nav navbar-nav navbar-right">
-                            <p class="text-right login-message">&nbsp;<small ng-show="isLoggedIn">{{ resourceBundle.loggedInLabel }} {{currentUser.userCredentials.username}} <a ng-click="logout()" href="#/login" tabindex="-1">({{ resourceBundle.logoutLabel }})</a></small></p>
+                            <p class="text-right login-message">
+                                <span ng-show="isLoggedIn">
+                                    <strong>{{currentUser.userCredentials.username}}</strong> |
+                                    <a ng-click="logout()" href="#/login" tabindex="-1">{{ resourceBundle.logoutLabel }}</a>
+                                </span>
+                            </p>
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
                                     <span class="glyphicon dhis-status" ng-class="{'glyphicon-cloud':!msgInQueue, 'glyphicon-cloud-upload':msgInQueue, 'dhis-online':isDhisOnline &amp;&amp; !poorConnection, 'dhis-poor-connection': poorConnection, 'dhis-offline':!isDhisOnline}" ng-attr-title="{{isDhisOnline &amp;&amp; !msgInQueue &amp;&amp; resourceBundle.connectedNoPendingRequests || isDhisOnline &amp;&amp; msgInQueue &amp;&amp; resourceBundle.connectedWithPendingRequests
@@ -31,20 +36,19 @@
                                 <li>
                                     <div class="btn-group" dropdown>
                                         <button type="button" class="btn btn-link dropdown-toggle" dropdown-toggle ng-disabled="disabled">
-                                            <span class="glyphicon glyphicon-align-justify" ng-attr-title="{{resourceBundle.menu}}"></span>
+                                            <i class="fa fa-bars" ng-attr-title="{{resourceBundle.menu}}"></i>
                                         </button>
                                         <ul class="dropdown-menu" role="menu" ng-if="isLoggedIn">
                                             <li ng-include="'templates/partials/download-data.html'"> </li>
                                             <li><a href="#/selectProjectPreference" ng-if="hasRoles(['Superuser'])" tabindex="-1">{{resourceBundle.changeProject}}</a></li>
                                             <li class="divider"></li>
-                                            <li><a href="#/productKeyPage" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
+                                            <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
                                             <li class="dropdown-submenu pull-left" ng-include="'templates/partials/clone.html'"></li>
                                             <li class="dropdown-submenu pull-left" ng-include="'templates/partials/select-language.html'"></li>
                                             <li class="divider"></li>
-                                            <li><a ng-click="logout()" href="#/login" id="linkToLogout" tabindex="-1">{{ resourceBundle.logoutLabel }}</a></li>
                                         </ul>
                                         <ul class="dropdown-menu" role="menu" ng-if="!isLoggedIn">
-                                            <li><a href="#/productKeyPage" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
+                                            <li><a href="" ng-click="gotoProductKeyPage()" tabindex="-1">{{ resourceBundle.updateProductKeyMenuLabel }}</a></li>
                                         </ul>
                                     </div>
                                 </li>
@@ -57,30 +61,83 @@
         <div class="container hide-from-print" style="padding-top:10px;" ng-if="isLoggedIn">
             <ul class="nav nav-tabs">
                 <li role="presentation" ng-class="{ active: isActive('\/dashboard$')}" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user'])">
-                    <a href="#/dashboard">{{ resourceBundle.homeMenuLabel }}</a>
+                    <a href="#/dashboard">
+                        <i class="fa fa-home"></i>
+                        {{ resourceBundle.homeMenuLabel }}
+                    </a>
                 </li>
-                <li role="presentation" ng-class="{ active: isActive('\/aggregate-data-entry')}" ng-if="hasRoles(['Data entry user'])"><a href="#/aggregate-data-entry">{{ resourceBundle.dataEntryLabel }}</a></li>
-                <li role="presentation" ng-class="{ active: isActive('\/data-approval')}" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])"><a href="#/data-approval">{{ resourceBundle.approveDataLabel }}</a></li>
-                <li role="presentation" ng-class="{ active: isActive('\/data-approval')}" ng-if="hasRoles(['Observer'])"><a href="#/data-approval">{{resourceBundle.observerDataLabel}}</a></li>
-                <li role="presentation" ng-class="{ active: isActive('\/line-list')}" class="dropdown" ng-if="hasRoles(['Data entry user']) &amp;&amp; (allUserModules | filter: {isLineListService:true}).length > 0" dropdown>
-                    <a class="dropdown-toggle" dropdown-toggle href="" role="button">{{ resourceBundle.lineListDataEntryMenuLabel }} <span class="caret"></span></a>
+                <li role="presentation" ng-class="{ active: isActive('\/aggregate-data-entry')}" ng-if="hasRoles(['Data entry user'])">
+                    <a href="#/aggregate-data-entry">
+                        <i class="fa fa-pencil"></i>
+                        {{ resourceBundle.dataEntryLabel }}
+                    </a>
+                </li>
+                <li role="presentation" ng-class="{ active: isActive('\/data-approval')}" ng-if="hasRoles(['Project Level Approver', 'Coordination Level Approver'])">
+                    <a href="#/data-approval">
+                        <i class="fa fa-check-square-o"></i>
+                        {{ resourceBundle.approveDataLabel }}
+                    </a>
+                </li>
+                <li role="presentation" ng-class="{ active: isActive('\/data-approval')}" ng-if="hasRoles(['Observer'])">
+                    <a href="#/data-approval">
+                        <i class="fa fa-database"></i>
+                        {{resourceBundle.observerDataLabel}}
+                    </a>
+                </li>
+                <li role="presentation" ng-class="{ active: isActive('\/line-list')}" class="dropdown praxis-dropdown-menu" ng-if="hasRoles(['Data entry user']) &amp;&amp; (allUserModules | filter: {isLineListService:true}).length > 0" dropdown>
+                    <a class="dropdown-toggle" dropdown-toggle href="" role="button">
+                        <i class="fa fa-pencil"></i>
+                        {{ resourceBundle.lineListDataEntryMenuLabel }}
+                        <i class="fa fa-caret-down"></i>
+                    </a>
                     <ul class="dropdown-menu" role="menu">
                         <li ng-repeat="module in allUserModules | filter: {isLineListService:true} | orderBy:'displayName'">
                             <a class="submenu-item" ng-href="#/line-list-summary/{{module.id}}" tabindex="-1">{{module.displayName}}</a>
                         </li>
                     </ul>
                 </li>
-                <li role="presentation" ng-class="{ active: isActive('\/reports')}" class="dropdown" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) &amp;&amp; allUserModules.length > 0" dropdown>
-                    <a class="dropdown-toggle" dropdown-toggle href="" role="button">{{ resourceBundle.reportsLabel }} <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li ng-repeat="module in allUserModules | orderBy:'displayName'">
-                            <a class="submenu-item" ng-href="#/reports/{{module.id}}" tabindex="-1">{{module.displayName}}</a>
+                <li role="presentation" ng-class="{ active: isActive('\/reports') || isActive('\/projectReport')}" class="dropdown praxis-dropdown-menu" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user']) &amp;&amp; allUserModules.length > 0" dropdown>
+                    <a class="dropdown-toggle" dropdown-toggle href="" role="button">
+                        <i class="fa fa-bar-chart"></i>
+                        {{ resourceBundle.reportsLabel }}
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu multi-level" role="menu">
+                        <li class="dropdown-submenu" ng-repeat="opUnitWithModule in allOpUnitsWithModules">
+                            <a class="dropdown-toggle">
+                                {{ opUnitWithModule.opUnitName }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li ng-repeat="module in opUnitWithModule.modules | orderBy:'name'">
+                                    <a class="submenu-item" ng-href="#/reports/{{ module.id }}" tabindex="-1">{{ module.name }}</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="dropdown-toggle" href="#/projectReport">
+                                {{ resourceBundle.projectReportLabel }}
+                            </a>
                         </li>
                     </ul>
                 </li>
-                <li role="presentation" ng-class="{ active: isActive('\/notifications$')}" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user'])"><a href="#/notifications">{{ resourceBundle.notificationsLabel }}</a></li>
-                <li role="presentation" ng-class="{ active: isActive('\/orgUnits$')}" ng-if="hasRoles(['Superadmin'])"><a href="#/orgUnits">{{ resourceBundle.countryLabel }}</a></li>
-                <li role="presentation" ng-class="{ active: isActive('\/orgUnits$')}" ng-if="hasRoles(['Superuser'])"><a href="#/orgUnits">{{ resourceBundle.projectsLabel }}</a></li>
+                <li role="presentation" ng-class="{ active: isActive('\/notifications$')}" ng-if="hasRoles(['Coordination Level Approver', 'Observer', 'Project Level Approver', 'Data entry user'])">
+                    <a href="#/notifications"><i class="fa fa-bell-o"></i>
+                        {{ resourceBundle.notificationsLabel }}
+                    </a>
+                </li>
+                <li role="presentation" ng-class="{ active: isActive('\/orgUnits$')}" ng-if="hasRoles(['Superadmin'])">
+                    <a href="#/orgUnits">
+                        <i class="fa fa-globe"></i>
+                        {{ resourceBundle.countryLabel }}
+                    </a>
+                </li>
+                <li role="presentation" ng-class="{ active: isActive('\/orgUnits$')}" ng-if="hasRoles(['Superuser'])">
+                    <a href="#/orgUnits">
+                        <i class="fa fa-gear"></i>
+                        {{ resourceBundle.projectsLabel }}
+                    </a>
+                </li>
                 <li ng-show="canChangeProject(isLoggedIn, hasRoles(['Coordination Level Approver']))" style="float:right;">
                     <select name="project" class="select_project input-sm" ng-model="selectedProject" ng-options="p.name for p in projects | orderBy:'name'" ng-change="setSelectedProject(selectedProject)">
                     </select>
@@ -91,7 +148,7 @@
             <div class="loading" ng-show="cloning">
                 <div class="spinner">
                     <img src="img/ajax-loader.gif" />
-                    <span>Please wait...</span>
+                    <span>{{ resourceBundle.pleaseWaitLabel }}</span>
                 </div>
             </div>
             <div ng-view="ng-view">

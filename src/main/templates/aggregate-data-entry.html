@@ -18,7 +18,7 @@
 
             <form name="dataentryForm" id="dataentry" ng-if="hasRoles(['Data entry user', 'Observer'])">
                 <div class="text-right">
-                    <input type="button" class="printTallySheetBtn" ng-click="printWindow()" value="{{resourceBundle.printTallySheetBtnValue}}" ng-show="selectedModule"></input>
+                    <button class="btn btn-sm btn-primary printTallySheetBtn" ng-click="printWindow()" ng-show="selectedModule">{{resourceBundle.printTallySheetBtnValue}}</button>
                 </div>
                 <accordion close-others="false">
                     <div ng-class="'dataset-acc-wrapper'">

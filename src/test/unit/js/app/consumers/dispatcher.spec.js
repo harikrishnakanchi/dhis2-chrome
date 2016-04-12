@@ -2,7 +2,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
     describe("dispatcher", function() {
         var uploadCompletionDataConsumer, uploadDataConsumer, downloadDataConsumer, uploadApprovalDataConsumer, dispatcher, message, q, log, scope,
             createUserConsumer, updateUserConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
-            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, uploadDatasetConsumer,
+            deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, deleteApprovalConsumer, downloadDatasetConsumer, updateDatasetConsumer,
             downloadSystemSettingConsumer, uploadPatientOriginConsumer, uploadExcludedDataElementsConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
             uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer,
             uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadOrgUnitConsumer, downloadOrgUnitGroupConsumer, userPreferenceRepository;
@@ -35,8 +35,8 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadDatasetConsumer = {
                 'run': jasmine.createSpy("downloadDatasetConsumer")
             };
-            uploadDatasetConsumer = {
-                'run': jasmine.createSpy("uploadDatasetConsumer")
+            updateDatasetConsumer = {
+                'run': jasmine.createSpy("updateDatasetConsumer")
             };
             createUserConsumer = {
                 'run': jasmine.createSpy("createUserConsumer")
@@ -119,7 +119,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             downloadPivotTablesConsumer.run.and.returnValue(utils.getPromise(q, {}));
             userPreferenceRepository.getCurrentUsersUsername.and.returnValue(utils.getPromise(q, 'someUsername'));
 
-            dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, uploadDatasetConsumer, createUserConsumer, updateUserConsumer,
+            dispatcher = new Dispatcher(q, log, downloadOrgUnitConsumer, uploadOrgUnitConsumer, uploadOrgUnitGroupConsumer, downloadDatasetConsumer, updateDatasetConsumer, createUserConsumer, updateUserConsumer,
                 downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer, downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer,
                 deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer, downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer,
                 downloadChartDataConsumer, uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository);
@@ -240,8 +240,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             };
             dispatcher.run(message);
             scope.$apply();
-            expect(downloadDatasetConsumer.run).toHaveBeenCalled();
-            expect(uploadDatasetConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(updateDatasetConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should fail if no hanlder found of payload type", function() {
@@ -341,8 +340,7 @@ define(["dispatcher", "angularMocks", "utils"], function(Dispatcher, mocks, util
             dispatcher.run(message);
             scope.$apply();
 
-            expect(downloadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
-            expect(uploadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message, {});
+            expect(uploadOrgUnitGroupConsumer.run).toHaveBeenCalledWith(message);
         });
 
         it("should call downloadOrgUnitGroupConsumer", function() {

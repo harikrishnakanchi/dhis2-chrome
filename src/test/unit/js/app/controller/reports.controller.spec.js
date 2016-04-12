@@ -128,7 +128,8 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 "isPopulationDataset": false,
                 "isReferralDataset": false,
                 "isChartsAvailable": false,
-                "isPivotTablesAvailable": false,
+                "isWeeklyPivotTablesAvailable": false,
+                "isMonthlyPivotTablesAvailable": false,
                 "isReportsAvailable": false
             }];
 

@@ -106,19 +106,19 @@ gulp.task('watch', function() {
 });
 
 gulp.task('download-metadata', function() {
-    return download(baseIntUrl + "/api/metadata.json?attributes=false&dataApprovalLevels=false&userRoles=false&userGroups=false&options=false&dashboardItems=false&dashboards=false&dataElementGroupSets=false&indicators=false&indicatorTypes=false&sqlViews=false&charts=false&reportTables=false&dataSets=false&eventReports=false&eventCharts=false&programs=false&programStages=false&programStageSections=false&trackedEntities=false", auth)
+    return download(baseIntUrl + "/api/metadata.json?assumeTrue=false&categories=true&categoryCombos=true&categoryOptionCombos=true&categoryOptions=true&dataElementGroups=true&dataElements=true&optionSets=true&organisationUnitGroupSets=true&organisationUnitLevels=true&sections=true&translations=true&users=true&organisationUnits=true&organisationUnitGroups=true", auth)
         .pipe(rename("metadata.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/metadata.json")));
 });
 
 gulp.task('download-datasets', function() {
-    return download(baseIntUrl + "/api/dataSets.json?fields=:all&paging=false", auth)
+    return download(baseIntUrl + "/api/dataSets.json?fields=:all,attributeValues[:identifiable,value,attribute[:identifiable]],organisationUnits[:identifiable]&paging=false", auth)
         .pipe(rename("dataSets.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/dataSets.json")));
 });
 
 gulp.task('download-programs', function() {
-    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues,programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", auth)
+    return download(baseIntUrl + "/api/programs.json?fields=id,name,displayName,organisationUnits,attributeValues[:identifiable,value,attribute[:identifiable]],programType,programStages[id,name,programStageSections[id,name,programStageDataElements[id,compulsory,dataElement[id,name]]]]&paging=false", auth)
         .pipe(rename("programs.json"))
         .pipe(gulp.dest(path.dirname("src/main/data/programs.json")));
 });
