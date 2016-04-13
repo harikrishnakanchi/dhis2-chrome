@@ -1,5 +1,18 @@
 define(["dhisUrl"], function(dhisUrl) {
     return function($http) {
+        this.associateDataSetsToOrgUnit = function(payload) {
+            payload = {
+                'dataSets': payload
+            };
+
+            var saveToDhis = function(data) {
+                return $http.post(dhisUrl.metadata, payload).then(function() {
+                    return data;
+                });
+            };
+
+            return saveToDhis(payload);
+        };
 
         this.assignOrgUnitToDataset = function(datasetId, orgUnitId) {
             return $http.post(dhisUrl.dataSets + '/' + datasetId + '/organisationUnits/' + orgUnitId);
