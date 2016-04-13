@@ -19,13 +19,42 @@ define(["moment", "lodash"], function(moment, _) {
                 });
             };
 
+            var getNumberOfISOWeeksInMonth = function (period) {
+                var m = moment(period, 'YYYYMM');
+
+                var year = parseInt(m.format('YYYY'));
+                var month = parseInt(m.format('M')) - 1;
+                var day = 1,
+                    mondays = 0;
+
+                var date = new Date(year, month, day);
+
+                while (date.getMonth() == month) {
+                    if (date.getDay() === 1) {
+                        mondays += 1;
+                        day += 7;
+                    } else {
+                        day++;
+                    }
+                    date = new Date(year, month, day);
+                }
+                return mondays;
+            };
+
             var addPivotTablesData = function() {
                 _.forEach($scope.pivotTables, function(pivotTable) {
                     var headers = [];
                     if(pivotTable.isTableDataAvailable) {
-                        _.forEach(pivotTable.data.metaData.pe, function (period) {
-                            headers.push([pivotTable.data.metaData.names[period]]);
-                        });
+                        if(pivotTable.isMonthlyReport) {
+                            _.forEach(pivotTable.data.metaData.pe, function (period) {
+                                var numberofWeeks = getNumberOfISOWeeksInMonth(period);
+                                headers.push([pivotTable.data.metaData.names[period] + " (" + numberofWeeks + " weeks)"]);
+                            });
+                        } else {
+                            _.forEach(pivotTable.data.metaData.pe, function (period) {
+                                headers.push([pivotTable.data.metaData.names[period]]);
+                            });
+                        }
 
                         data.push([$scope.getTableName(pivotTable.table.name)].concat(headers));
 
