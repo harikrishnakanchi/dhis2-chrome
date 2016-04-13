@@ -79,7 +79,6 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             if ($scope.filterBy === "dateRange") {
                 var startDate = $location.search().startDate;
                 var endDate = $location.search().endDate;
-                $scope.filterBy = 'caseNumber';
                 $scope.filterParams.startDate = moment(startDate).startOf('day').toDate();
                 $scope.filterParams.endDate = moment(endDate).endOf('day').toDate();
 
@@ -89,12 +88,17 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
             }
 
             if ($scope.filterBy === "caseNumber") {
-                $scope.filterBy = 'dateRange';
                 $scope.filterParams.caseNumber = "";
                 $scope.events = undefined;
             }
 
         };
+
+        $scope.$watchGroup(['filterParams.startDate', 'filterParams.endDate'], function (newValues) {
+            var startDate = newValues[0],
+                endDate = newValues[1];
+            $scope.dateRangeError = startDate > endDate;
+        });
 
         var getSubmitableEvents = function() {
             return _.filter($scope.events, function(event) {

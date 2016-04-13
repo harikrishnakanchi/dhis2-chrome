@@ -316,5 +316,6 @@
     "projectReportLabel": "Project Report",
     "projectInformationLabel": "Project Information",
     "pleaseWaitLabel": "Please wait...",
-    "selectBtnLabel": "Select"
+    "selectBtnLabel": "Select",
+    "dateRangeError": "Start date cannot be greater than end date."
 }

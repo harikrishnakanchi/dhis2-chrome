@@ -98,5 +98,6 @@
     "projectInformationLabel": "Project Information",
     "selectServiceNameLabel": "Select service",
     "pleaseWaitLabel": "Please wait...",
-    "selectBtnLabel": "Select"
+    "selectBtnLabel": "Select",
+    "dateRangeError": "Start date cannot be greater than end date."
 }
