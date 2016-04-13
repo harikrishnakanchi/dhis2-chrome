@@ -13,8 +13,8 @@
                     <p ng-if="$parent.$index == 0 && showWeeks == 'true'" class="small weeks">{{ '[' + subHeader.numberOfISOWeeks + ' weeks]' }}</p>
                 </span>
                 <span class="icon" ng-class="{ 'text-danger' : selectedSortKey == subHeader.sortKey }" ng-if="$parent.$index == 0">
-                    <span ng-show="definition.sortAscending" class="icon-small">&#9650;</span>
-                    <span ng-show="definition.sortDescending" class="icon-small">&#9660;</span>
+                    <i class="fa fa-sort-desc" ng-show="definition.sortDescending"></i>
+                    <i class="fa fa-sort-asc" ng-show="definition.sortAscending"></i>
                 </span>
             </div>
         </th>
