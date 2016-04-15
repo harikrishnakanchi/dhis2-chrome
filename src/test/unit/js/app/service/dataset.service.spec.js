@@ -78,5 +78,23 @@ define(["datasetService", "angularMocks", "properties"], function(DatasetService
             httpBackend.flush();
         });
 
+        it("should update dataset with complete payload", function() {
+            var datasets = [{
+                "id": "DS_Physio",
+                "organisationUnits": [{
+                    "name": "Mod1",
+                    "id": "hvybNW8qEov"
+                }]
+            }];
+
+            var expectedPayload = {
+                dataSets: datasets
+            };
+
+            datasetService.associateDataSetsToOrgUnit(datasets);
+            httpBackend.expectPOST(properties.dhis.url + "/api/metadata", expectedPayload).respond(200, "ok");
+            httpBackend.flush();
+        });
+
     });
 });

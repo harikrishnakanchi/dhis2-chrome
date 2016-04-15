@@ -29,7 +29,7 @@
     "proportionChildrenLessThanOneYearLabel": "Estimation Population de moins d'1 an",
     "proportionWomenOfChildBearingAgeLabel": "Estimation Population de Femmes en age de procreer",
     "endDateLabel": "Date de fermeture",
-    "autoApproveLabel": "Processus d'Auto-Validation",
+    "autoApproveLabel": "Activer la validation automatique des données",
     "roleLabel": "Rôle",
     "userListLabel": "Liste des Utilisateurs",
     "moduleDetailsLabel": "Détails du Module",
@@ -313,5 +313,6 @@
     "projectReportLabel": "Project Report",
     "projectInformationLabel": "Project Information",
     "pleaseWaitLabel": "S'il vous plaît, attendez...",
-    "selectBtnLabel": "Sélectionner"
+    "selectBtnLabel": "Sélectionner",
+    "dateRangeError": "Date de début ne peut pas être supérieure à la date de fin."
 }

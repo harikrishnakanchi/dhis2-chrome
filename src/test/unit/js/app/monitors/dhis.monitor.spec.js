@@ -13,6 +13,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome"], fu
             mockChrome = new MockChrome();
             spyOn(chromeUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
             spyOn(chromeUtils, "addListener").and.callFake(mockChrome.addListener);
+            spyOn(chromeUtils, "getPraxisVersion");
         }));
 
         afterEach(function() {

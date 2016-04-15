@@ -68,7 +68,7 @@
                                                         <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.date"> {{resourceBundle.dateInvalid}}</span>
                                                         <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.datetimelocal"> {{resourceBundle.dateInvalid}}</span>
                                                         <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.min || eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.max"> {{resourceBundle.invalidDateRangeMessage}}</span>
-                                                        <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$invalid"> {{de.dataElement.formName}} {{resourceBundle.invalidPattern}}</span>
+                                                        <span class="errortxt" ng-show="eventDataEntryForm.eventValue_{{program.id}}_{{programStage.id}}_{{psde.dataElement.id}}.$error.pattern">{{resourceBundle.invalidPattern}}</span>
                                                     </div>
                                                 </div>
                                             </li>
