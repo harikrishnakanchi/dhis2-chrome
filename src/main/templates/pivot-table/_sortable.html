@@ -1,7 +1,7 @@
-<table class="table table-bordered table-hover sortable" locked-table-header bind-event="click">
+<table class="table table-bordered table-striped sortable" locked-table-header bind-event="click" freeze-column="true">
     <thead>
     <tr ng-repeat="header in headersForTable" ng-show="header.showHeader">
-        <th class="display-print" ng-click="sortByColumn()"></th>
+        <th class="display-print"></th>
         <th ng-repeat="subHeader in header.headers"
             ng-show="periodBasedValues[subHeader.period] !== undefined"
             ng-click="$parent.$index == 0 && sortByColumn(subHeader)"

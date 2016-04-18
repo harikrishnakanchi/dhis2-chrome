@@ -1,5 +1,5 @@
 /**
- * Usage: <table locked-table-header bind-event="click">
+ * Usage: <table locked-header freeze-first-column="true" bind-event="click">
  */
 
 define([], function () {
@@ -129,7 +129,38 @@ define([], function () {
                     setUpListeners();
                     if (eventOnFixedHeaderCells)
                         setUpFixedHeaderCellClickListeners();
+                    freezeFirstColumnOfTable(originalTable);
+                    freezeFirstColumnOfTable(fixedHeaderTable, {position: 'inherit'});
                 };
+
+                function freezeFirstColumnOfTable(table, styles) {
+                    // clone
+                    var freezedColumnTableEl = angular.element(table).clone();
+
+                    // add identifier
+                    freezedColumnTableEl[0].classList.add('freezed-column');
+                    freezedColumnTableEl[0].style.backgroundColor = 'white';
+                    freezedColumnTableEl[0].style.border = 'none';
+
+                    if(styles) _.each(styles, function (value, key) {
+                        freezedColumnTableEl[0].style[key] = value;
+                    });
+
+                    // insert freezed table after original table
+                    table.parentNode.insertBefore(freezedColumnTableEl[0], table);
+
+                    // remove other cells except first column
+                    var elems = freezedColumnTableEl[0].querySelectorAll('th:not(:first-child), td:not(:first-child)');
+                    Array.prototype.forEach.call(elems, function( node ) {
+                        node.parentNode.removeChild( node );
+                    });
+
+                    // fix heights
+                    var rows = freezedColumnTableEl[0].querySelectorAll('tr');
+                    for (var i = 0; i < rows.length; ++i) {
+                        rows[i].style.height = table.querySelectorAll('tr')[i].getBoundingClientRect().height + 'px';
+                    }
+                }
 
                 var unwatch = scope.$watch(function () {
                     return originalTable.getBoundingClientRect().height;
