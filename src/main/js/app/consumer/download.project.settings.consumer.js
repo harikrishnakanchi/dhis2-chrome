@@ -54,18 +54,18 @@ define(["lodash"], function(_) {
                 return $q.when(patientOrigins);
             };
 
+            var updatePatientOrigins = function(patientOrigins) {
+                if (_.isEmpty(patientOrigins))
+                    return $q.when({});
+                return patientOriginRepository.upsert(patientOrigins);
+            };
+
             var orgUnitAndOriginsMapper = _.reduce(allProjectSettings, function(orgUnitAndOrigins, projectSettings) {
                 _.each(projectSettings.patientOrigins, function(item) {
                     orgUnitAndOrigins[item.orgUnit] = mergePatientOrigins(item);
                 });
                 return orgUnitAndOrigins;
             }, {});
-
-            var updatePatientOrigins = function(patientOrigins) {
-                if (_.isEmpty(patientOrigins))
-                    return $q.when({});
-                return patientOriginRepository.upsert(patientOrigins);
-            };
 
             return $q.all(orgUnitAndOriginsMapper)
                 .then(createMergedPatientOrigins)
