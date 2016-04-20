@@ -20,16 +20,31 @@ define(["lodash"], function(_) {
         };
 
         var saveReferrals = function(projectSettings) {
-            var referrals = _.transform(projectSettings, function(result, settings) {
+            var allReferralLocations = _.transform(projectSettings, function(result, settings) {
                 _.each(settings.referralLocations, function(item) {
                     result.push(item);
                 });
             }, []);
 
-            if (_.isEmpty(referrals))
+            if (_.isEmpty(allReferralLocations))
                 return;
 
-            return referralLocationsRepository.upsert(referrals);
+            var getLocalReferralLocations = function (referralLocationsFromDHIS) {
+                var orgUnitIds = _.pluck(referralLocationsFromDHIS, "orgUnit");
+                return referralLocationsRepository.findAll(orgUnitIds);
+            };
+
+            var mergeAndSave = function (remoteLocations, localLocations) {
+                var equalPredicate = function(referralLocation1, referralLocation2) {
+                    return referralLocation1.orgUnit && referralLocation2 && referralLocation1.orgUnit === referralLocation2.orgUnit;
+                };
+
+                return $q.when(mergeBy.lastUpdated({"remoteTimeField": "clientLastUpdated", "localTimeField": "clientLastUpdated", "eq": equalPredicate}, remoteLocations, localLocations));
+            };
+
+            return getLocalReferralLocations(allReferralLocations)
+                .then(_.partial(mergeAndSave, allReferralLocations))
+                .then(referralLocationsRepository.upsert);
         };
 
         var mergeAndSavePatientOriginDetails = function(allProjectSettings) {
