@@ -29,7 +29,7 @@
                                 <div ng-repeat="programStage in program.programStages" ng-class="'dataset-acc-wrapper'">
                                     <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                                         <div ng-repeat="psde in section.programStageDataElements">
-                                            <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements)">
+                                            <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) &amp;&amp; psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
                                                         <span>{{resourceBundle[psde.dataElement.id] || psde.dataElement.formName}}</span>
@@ -81,7 +81,7 @@
                                 <div ng-repeat="programStage in program.programStages">
                                     <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                                         <div ng-repeat="psde in section.programStageDataElements">
-                                            <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements)">
+                                            <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) &amp;&amp; psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
                                                         <span>{{psde.dataElement.formName}}</span>
@@ -135,7 +135,7 @@
                                 <div ng-repeat="programStage in program.programStages">
                                     <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                                         <div ng-repeat="psde in section.programStageDataElements">
-                                            <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements)">
+                                            <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) &amp;&amp; psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
                                                         <span>{{psde.dataElement.formName}}</span>
@@ -195,7 +195,7 @@
                                 <div ng-repeat="programStage in program.programStages">
                                     <div ng-repeat="section in programStage.programStageSections | orderBy: 'sortOrder'">
                                         <div ng-repeat="psde in section.programStageDataElements">
-                                            <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements)">
+                                            <div class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) &amp;&amp; psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
                                                         <span>{{psde.dataElement.formName}}</span>

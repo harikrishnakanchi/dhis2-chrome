@@ -1,7 +1,7 @@
-define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository"],
-    function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository) {
+define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEventRepository", "orgUnitRepository", "programRepository", "optionSetRepository", "datasetRepository", "referralLocationsRepository", "excludedDataElementsRepository"],
+    function(LineListOfflineApprovalController, mocks, utils, ProgramEventRepository, OrgUnitRepository, ProgramRepository, OptionSetRepository, DatasetRepository, ReferralLocationsRepository, ExcludedDataElementsRepository) {
         describe("lineListOfflineApprovalController", function() {
-            var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, dataSetRepository, associatedDataSets;
+            var lineListOfflineApprovalController, scope, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, q, origins, program, optionSetMapping, events, origin1, origin2, origin3, origin4, dataSetRepository, associatedDataSets, referralLocationsRepository, excludedDataElementsRepository;
 
             beforeEach(mocks.inject(function($rootScope, $q) {
                 scope = $rootScope.$new();
@@ -158,6 +158,9 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
+                excludedDataElementsRepository = new ExcludedDataElementsRepository();
+                spyOn(excludedDataElementsRepository, "get").and.returnValue(utils.getPromise(q, []));
+
                 optionSetRepository = new OptionSetRepository();
                 spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, {
                     "optionSetMap": optionSetMapping
@@ -182,7 +185,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 };
                 scope.associatedProgramId = "Emergency Department";
 
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository);
                 scope.$apply();
             }));
 
@@ -337,7 +340,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
 
             it("should return set showFilters to false if there are no events", function() {
                 programEventRepository.getEventsForPeriod.and.returnValue(utils.getPromise(q, []));
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository);
                 scope.$apply();
 
                 expect(scope.showFilters).toEqual(false);
@@ -349,7 +352,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
 
             it("should return false if there are no procedure data values", function() {
                 programEventRepository.getEventsForPeriod.and.returnValue(utils.getPromise(q, []));
-                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository);
+                lineListOfflineApprovalController = new LineListOfflineApprovalController(scope, q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, dataSetRepository, referralLocationsRepository, excludedDataElementsRepository);
                 scope.$apply();
 
                 expect(scope.shouldShowProceduresInOfflineSummary()).toEqual(false);
@@ -454,6 +457,5 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
                 expect(scope.shouldShowInOfflineSummary("Triage Status", allDataElements)).toEqual(true);
                 expect(scope.shouldShowInOfflineSummary("Case Number", allDataElements)).toEqual(false);
             });
-
         });
     });

@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository) {
+    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository) {
 
         $scope.isGenderFilterApplied = false;
         $scope.isAgeFilterApplied = false;
@@ -148,9 +148,19 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var loadProgram = function() {
-            return programRepository.get($scope.associatedProgramId).then(function(program) {
-                $scope.program = program;
-            });
+            var getExcludedDataElementsForModule = function() {
+                return excludedDataElementsRepository.get($scope.selectedModule.id).then(function(data) {
+                    return data ? _.pluck(data.dataElements, "id") : [];
+                });
+            };
+
+            var getProgram = function(excludedDataElements) {
+                return programRepository.get($scope.associatedProgramId, excludedDataElements).then(function(program) {
+                    $scope.program = program;
+                });
+            };
+
+            return getExcludedDataElementsForModule().then(getProgram);
         };
 
         var getOptionSetMapping = function() {
