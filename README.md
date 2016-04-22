@@ -12,6 +12,7 @@ DHIS2-Chrome is a Chrome extension that is used in the field and synchronises wi
 - npm
 - bower
 - bower-installer
+- gulp
 
 ### Installing the application
 
@@ -23,6 +24,7 @@ DHIS2-Chrome is a Chrome extension that is used in the field and synchronises wi
   bower cache clean
   bower-installer
   gulp less
+  gulp test
   ```
 
 1. Open the Chrome browser, go to “chrome://extensions” and enable developer mode.
