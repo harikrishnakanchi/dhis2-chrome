@@ -131,6 +131,38 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
                 expect(userPreferenceRepository.save).toHaveBeenCalled();
             });
 
+            it("should login projectadmin user and load orgUnits from userpreferences as user's organisationUnits", function() {
+                user.organisationUnits = undefined;
+                user.userCredentials.username = "projectadmin";
+
+                var orgUnit = {
+                    "id": 123,
+                    "name": "Some Country"
+                };
+
+                var preferences = {
+                    "locale" : "en",
+                    "organisationUnits": [orgUnit],
+                    "selectedProject": orgUnit
+                };
+
+                var expectedUser = {
+                    "userCredentials": user.userCredentials,
+                    "locale": "en",
+                    "organisationUnits": preferences.organisationUnits,
+                    "selectedProject": orgUnit
+                };
+
+                rootScope.hasRoles.and.returnValues(false, true);
+                userPreferenceRepository.get.and.returnValue(utils.getPromise(q, preferences));
+
+                sessionHelper.login(user);
+                rootScope.$apply();
+
+                expect(rootScope.currentUser).toEqual(expectedUser);
+                expect(userPreferenceRepository.get).toHaveBeenCalled();
+            });
+
             it("should save session state", function() {
                 rootScope.currentUser = user;
                 rootScope.currentUser.locale = "en";

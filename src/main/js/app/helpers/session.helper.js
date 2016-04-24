@@ -33,10 +33,12 @@ define(["moment"], function(moment) {
                 $rootScope.currentUser.selectedProject = _.isEmpty($rootScope.currentUser.organisationUnits) ? undefined : $rootScope.currentUser.organisationUnits[0];
             };
 
-            var setUserOrgUnits = function() {
+            var setUserOrgUnits = function(userPreferences) {
                 var getUserOrgUnits = function() {
                     if ($rootScope.hasRoles(["Coordination Level Approver"])) {
                         return orgUnitRepository.findAllByParent(user.organisationUnits[0].id);
+                    } else if($rootScope.hasRoles(["Superuser"])) {
+                        return userPreferences ? $q.when(userPreferences.organisationUnits) : $q.when(undefined);
                     } else {
                         return $q.when(user.organisationUnits);
                     }
@@ -44,6 +46,7 @@ define(["moment"], function(moment) {
 
                 return getUserOrgUnits().then(function(data) {
                     $rootScope.currentUser.organisationUnits = data;
+                    return userPreferences;
                 });
             };
             var loadSession = function(userPreferences) {
@@ -64,7 +67,7 @@ define(["moment"], function(moment) {
                 return $rootScope.$broadcast('userPreferencesUpdated');
             };
 
-            return setUserOrgUnits().then(loadUserPreferences).then(loadSession).then(broadcast);
+            return loadUserPreferences().then(setUserOrgUnits).then(loadSession).then(broadcast);
         };
 
         return {
