@@ -116,6 +116,9 @@ require.config({
         "excludedDataElementsRepository": "app/repository/excluded.dataelements.repository",
         "pivotTableRepository": "app/repository/pivot.table.repository",
 
+        //Models
+        "pivotTable": "app/models/pivot.table",
+
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
         "dataValuesMapper": "app/transformers/datavalues.mapper",
