@@ -25,6 +25,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
 
                 referralLocationsRepository = new ReferralLocationsRepository();
                 spyOn(referralLocationsRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
+                spyOn(referralLocationsRepository, "findAll").and.returnValue(utils.getPromise(q, {}));
 
                 patientOriginRepository = new PatientOriginRepository();
                 spyOn(patientOriginRepository, "upsert").and.returnValue(utils.getPromise(q, {}));
@@ -58,7 +59,7 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                     "prj": {
                         "excludedDataElements": [],
                         "referralLocations": [{
-                            "id": "opUnit1",
+                            "orgUnit": "opUnit1",
                             "facility 1": {
                                 "value": "some alias",
                                 "isDisabled": true
@@ -70,13 +71,16 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                         }]
                     }
                 };
+                var refferalLocationFromLocalDb = [];
+
+                referralLocationsRepository.findAll.and.returnValue(utils.getPromise(q, refferalLocationFromLocalDb));
                 systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
 
                 consumer.run();
                 scope.$apply();
 
                 var expectedPayload = [{
-                    "id": "opUnit1",
+                    "orgUnit": "opUnit1",
                     "facility 1": {
                         "value": "some alias",
                         "isDisabled": true
@@ -87,6 +91,84 @@ define(["angularMocks", "utils", "systemSettingService", "userPreferenceReposito
                     "clientLastUpdated": "2015-07-17T07:00:00.000Z"
                 }];
 
+                expect(referralLocationsRepository.upsert).toHaveBeenCalledWith(expectedPayload);
+            });
+
+            it("should merge referral locations based on clientLastUpdated time", function() {
+                var userCurrentProjects = ['prj', 'prjWithNoReferralLocations'];
+                userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, userCurrentProjects));
+
+                var projectSettingsFromDhis = {
+                    "prjWithNoReferralLocations": {
+                        "excludedDataElements": []
+                    },
+                    "prj": {
+                        "excludedDataElements": [],
+                        "referralLocations": [{
+                            "orgUnit": "opUnit1",
+                            "facility 1": {
+                                "value": "some alias",
+                                "isDisabled": true
+                            },
+                            "facility 2": {
+                                "value": "some other alias"
+                            },
+                            "clientLastUpdated": "2015-07-17T07:00:00.000Z"
+                        }, {
+                            "orgUnit": "opUnit2",
+                            "facility 1": {
+                                "value": "some alias2",
+                                "isDisabled": false
+                            },
+                            "facility 2": {
+                                "value": "some other alias 2"
+                            },
+                            "clientLastUpdated": "2015-07-19T07:00:00.000Z"
+                        }]
+                    }
+                };
+
+                var refferalLocationFromLocalDb = [{
+                    "orgUnit": "opUnit1",
+                    "facility 1": {
+                        "value": "some alias",
+                        "isDisabled": true
+                    },
+                    "facility 2": {
+                        "value": "some other local alias"
+                    },
+                    "clientLastUpdated": "2015-07-17T08:00:00.000Z"
+                }];
+
+                referralLocationsRepository.findAll.and.returnValue(utils.getPromise(q, refferalLocationFromLocalDb));
+                systemSettingService.getProjectSettings.and.returnValue(utils.getPromise(q, projectSettingsFromDhis));
+
+                consumer.run();
+                scope.$apply();
+
+                var expectedPayload = [{
+                    "orgUnit": "opUnit1",
+                    "facility 1": {
+                        "value": "some alias",
+                        "isDisabled": true
+                    },
+                    "facility 2": {
+                        "value": "some other local alias"
+                    },
+                    "clientLastUpdated": "2015-07-17T08:00:00.000Z"
+                }, {
+                    "orgUnit": "opUnit2",
+                    "facility 1": {
+                        "value": "some alias2",
+                        "isDisabled": false
+                    },
+                    "facility 2": {
+                        "value": "some other alias 2"
+                    },
+                    "clientLastUpdated": "2015-07-19T07:00:00.000Z"
+                }];
+
+                expect(referralLocationsRepository.findAll).toHaveBeenCalledWith(["opUnit1", "opUnit2"]);
                 expect(referralLocationsRepository.upsert).toHaveBeenCalledWith(expectedPayload);
             });
 

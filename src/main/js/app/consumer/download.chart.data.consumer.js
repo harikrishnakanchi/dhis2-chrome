@@ -97,7 +97,7 @@ define(["lodash", "moment"], function(_, moment) {
                     }
 
                     return chartRepository.getAll().then(function(charts) {
-                        downloadRelevantChartData(charts, moduleIds, changeLogKey);
+                        return downloadRelevantChartData(charts, moduleIds, changeLogKey);
                     });
                 });
 

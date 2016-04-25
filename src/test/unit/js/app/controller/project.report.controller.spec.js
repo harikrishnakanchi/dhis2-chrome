@@ -204,7 +204,7 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 ['Reason For Intervention', 'Access to health care'],
                 ['Mode Of Operation', 'Direct operation'],
                 ['Model Of Management', 'Collaboration'],
-                ['Opening Date', '12/31/2007'],
+                ['Opening Date', new Date("12/31/2007").toLocaleDateString()],
                 ['End Date', ''],
                 [],
                 ['Hospitalization', ['November 2015'],
@@ -270,7 +270,7 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                     value: 'Collaboration'
                 },  {
                     name : "Opening Date",
-                    value: "12/31/2007"
+                    value: new Date("12/31/2007").toLocaleDateString()
                 },
                 {
                     name : "End Date",
