@@ -6,11 +6,17 @@ define(['pivotTable'], function(PivotTable) {
            it('should create an instance with required properties', function() {
                config = {
                    id: 'someId',
-                   name: 'someName'
+                   name: 'someName',
+                   columns: 'columnInfo',
+                   rows: 'rowInfo',
+                   filters: 'filterInfo'
                };
                pivotTable = new PivotTable(config);
                expect(pivotTable.id).toEqual(config.id);
                expect(pivotTable.name).toEqual(config.name);
+               expect(pivotTable.columns).toEqual(config.columns);
+               expect(pivotTable.rows).toEqual(config.rows);
+               expect(pivotTable.filters).toEqual(config.filters);
            });
        });
 
@@ -45,7 +51,42 @@ define(['pivotTable'], function(PivotTable) {
                pivotTable = new PivotTable({ name: 'some malformed pivot table name' });
                expect(pivotTable.dataSetCode).toBeNull();
            });
+       });
 
+       describe('projectReport', function() {
+           it('should return true if pivot table name contains ProjectReport', function() {
+               pivotTable = new PivotTable({ name: '[FieldApp - ProjectReport] # Name' });
+               expect(pivotTable.projectReport).toBeTruthy();
+           });
+
+           it('should return false if pivot table name does not contain ProjectReport', function() {
+               pivotTable = new PivotTable({ name: 'some malformed pivot table name' });
+               expect(pivotTable.projectReport).toBeFalsy();
+           });
+       });
+
+       describe('monthlyReport', function() {
+           it('should return true if relativePeriods contains Months', function () {
+               pivotTable = new PivotTable({ relativePeriods: { last12Months: true } });
+               expect(pivotTable.monthlyReport).toBeTruthy();
+           });
+
+           it('should return false if relativePeriods does not contain Months', function () {
+               pivotTable = new PivotTable({ relativePeriods: { anotherTimePeriod: true, last12Months: false } });
+               expect(pivotTable.monthlyReport).toBeFalsy();
+           });
+       });
+
+       describe('title', function() {
+           it('should parse the title from the pivot table name', function() {
+               pivotTable = new PivotTable({ name: '[FieldApp - someDataSetCode] 1 SomePivotTableTitle' });
+               expect(pivotTable.title).toEqual('SomePivotTableTitle');
+           });
+
+           it('should return an empty string if the pivot table name is malformed', function() {
+               pivotTable = new PivotTable({ name: 'some malformed pivot table name' });
+               expect(pivotTable.title).toEqual('');
+           });
        });
    });
 });
