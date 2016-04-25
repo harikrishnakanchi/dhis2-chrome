@@ -48,6 +48,9 @@ require.config({
         "referralLocationsRepository": "app/repository/referral.locations.repository",
         "pivotTableRepository": "app/repository/pivot.table.repository",
 
+        //Models
+        "pivotTable": "app/models/pivot.table",
+
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",
         "extractHeaders": "app/transformers/extract.headers",

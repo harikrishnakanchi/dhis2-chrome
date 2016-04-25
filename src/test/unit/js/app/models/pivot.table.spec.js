@@ -9,7 +9,11 @@ define(['pivotTable'], function(PivotTable) {
                    name: 'someName',
                    columns: 'columnInfo',
                    rows: 'rowInfo',
-                   filters: 'filterInfo'
+                   filters: 'filterInfo',
+                   categoryDimensions: 'categoryDimensionInfo',
+                   dataElements: 'dataElementInfo',
+                   indicators: 'indicatorInfo',
+                   dataDimensionItems: 'dataDimensionItemInfo'
                };
                pivotTable = PivotTable.create(config);
                expect(pivotTable.id).toEqual(config.id);
@@ -17,6 +21,11 @@ define(['pivotTable'], function(PivotTable) {
                expect(pivotTable.columns).toEqual(config.columns);
                expect(pivotTable.rows).toEqual(config.rows);
                expect(pivotTable.filters).toEqual(config.filters);
+
+               expect(pivotTable.categoryDimensions).toEqual(config.categoryDimensions);
+               expect(pivotTable.dataElements).toEqual(config.dataElements);
+               expect(pivotTable.indicators).toEqual(config.indicators);
+               expect(pivotTable.dataDimensionItems).toEqual(config.dataDimensionItems);
            });
        });
 
@@ -74,6 +83,18 @@ define(['pivotTable'], function(PivotTable) {
            it('should return false if relativePeriods does not contain Months', function () {
                pivotTable = PivotTable.create({ relativePeriods: { anotherTimePeriod: true, last12Months: false } });
                expect(pivotTable.monthlyReport).toBeFalsy();
+           });
+       });
+
+       describe('weeklyReport', function() {
+           it('should return true if relativePeriods does not contain Months', function () {
+               pivotTable = PivotTable.create({ relativePeriods: { anotherTimePeriod: true } });
+               expect(pivotTable.weeklyReport).toBeTruthy();
+           });
+
+           it('should return false if relativePeriods contains Months', function () {
+               pivotTable = PivotTable.create({ relativePeriods: { last12Months: true } });
+               expect(pivotTable.weeklyReport).toBeFalsy();
            });
        });
 

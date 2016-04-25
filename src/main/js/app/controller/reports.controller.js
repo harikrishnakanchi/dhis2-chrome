@@ -115,30 +115,6 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             saveSvgAsPng(event.currentTarget.parentElement.parentElement.getElementsByTagName("svg")[0], "chart.png");
         };
 
-        $scope.isMonthlyReport = function(definition) {
-            return _.contains(_.findKey(definition.relativePeriods, function(obj) {
-                return obj;
-            }), "Month");
-        };
-
-        $scope.getTableName = function(tableName) {
-            var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
-            var match = regex.exec(tableName);
-            if (match) {
-                var parsedTableName = match[3];
-                return parsedTableName;
-            } else {
-                return "";
-            }
-        };
-
-        $scope.showTable = function(data) {
-            if (_.isUndefined(data))
-                return false;
-            var showTable = data.rows.length === 0 ? false : true;
-            return showTable;
-        };
-
         var loadChartData = function() {
 
             var insertMissingPeriods = function(chartData, periodsForXAxis) {
@@ -297,7 +273,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                     return {
                         'table': table,
                         'data': data,
-                        'dataSetCode': table.dataSetCode
+                        'dataSetCode': table.dataSetCode,
+                        'isTableDataAvailable': !!(data && data.rows && data.rows.length > 0)
                     };
                 });
             }));
@@ -323,19 +300,15 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 });
 
                 eachDataSet.isChartsAvailable = _.any(filteredCharts, function(chart) {
-                    return chart.data && chart.data.length !== 0;
+                    return chart.data && chart.data.length > 0;
                 });
 
                 eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    if (table.data && table.data.rows)
-                        return table.data.rows.length !== 0 && !$scope.isMonthlyReport(table.table);
-                    return false;
+                    return table.table.weeklyReport && table.data && table.data.rows && table.data.rows.length > 0;
                 });
 
                 eachDataSet.isMonthlyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    if (table.data && table.data.rows)
-                        return table.data.rows.length !== 0 && $scope.isMonthlyReport(table.table);
-                    return false;
+                    return table.table.monthlyReport && table.data && table.data.rows && table.data.rows.length > 0;
                 });
 
                 eachDataSet.isReportsAvailable = eachDataSet.isChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;

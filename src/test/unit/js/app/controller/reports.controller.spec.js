@@ -470,11 +470,13 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             var expectedPivotTableData = [{
                 "table": pivotTables[0],
                 "dataSetCode": "dataSetCode1",
-                "data": pivotTableData1
+                "data": pivotTableData1,
+                "isTableDataAvailable": false
             }, {
                 "table": pivotTables[1],
                 "dataSetCode": "dataSetCode2",
-                "data": pivotTableData2
+                "data": pivotTableData2,
+                "isTableDataAvailable": false
             }];
             reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository);
             scope.$apply();

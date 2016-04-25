@@ -8,6 +8,10 @@ define(['lodash'], function (_) {
         this.columns = config.columns;
         this.rows = config.rows;
         this.filters = config.filters;
+        this.categoryDimensions = config.categoryDimensions;
+        this.dataElements = config.dataElements;
+        this.indicators = config.indicators;
+        this.dataDimensionItems = config.dataDimensionItems;
 
         this.sortAscending = config.sortOrder == 1;
         this.sortDescending = config.sortOrder == 2;
@@ -16,6 +20,7 @@ define(['lodash'], function (_) {
         this.dataSetCode = parseDatasetCode(this.name);
         this.projectReport = this.dataSetCode == 'ProjectReport';
         this.monthlyReport = isMonthlyReport(config.relativePeriods);
+        this.weeklyReport = !this.monthlyReport;
 
         this.title = parseTitle(this.name);
     };
