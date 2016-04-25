@@ -35,5 +35,9 @@ define(['lodash'], function (_) {
         return matches && matches[1];
     };
 
+    PivotTable.create = function (config) {
+        return new PivotTable(config);
+    };
+
     return PivotTable;
 });
