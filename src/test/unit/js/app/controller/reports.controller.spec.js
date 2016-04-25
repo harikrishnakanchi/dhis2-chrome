@@ -468,12 +468,12 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                     return utils.getPromise(q, pivotTableData2);
             });
             var expectedPivotTableData = [{
-                "table": pivotTables[0],
+                "definition": pivotTables[0],
                 "dataSetCode": "dataSetCode1",
                 "data": pivotTableData1,
                 "isTableDataAvailable": false
             }, {
-                "table": pivotTables[1],
+                "definition": pivotTables[1],
                 "dataSetCode": "dataSetCode2",
                 "data": pivotTableData2,
                 "isTableDataAvailable": false

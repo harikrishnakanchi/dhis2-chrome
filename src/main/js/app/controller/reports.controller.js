@@ -263,17 +263,13 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             });
         };
 
-        var getDataForTableForOrgUnit = function(table, orgunit) {
-            return pivotTableRepository.getDataForPivotTable(table.name, orgunit);
-        };
-
         var transformTables = function(tables) {
-            return $q.all(_.map(tables, function(table) {
-                return getDataForTableForOrgUnit(table, $routeParams.orgUnit).then(function(data) {
+            return $q.all(_.map(tables, function(tableDefinition) {
+                return pivotTableRepository.getDataForPivotTable(tableDefinition.name, $routeParams.orgUnit).then(function(data) {
                     return {
-                        'table': table,
+                        'definition': tableDefinition,
                         'data': data,
-                        'dataSetCode': table.dataSetCode,
+                        'dataSetCode': tableDefinition.dataSetCode,
                         'isTableDataAvailable': !!(data && data.rows && data.rows.length > 0)
                     };
                 });
@@ -304,11 +300,11 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 });
 
                 eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    return table.table.weeklyReport && table.data && table.data.rows && table.data.rows.length > 0;
+                    return table.definition.weeklyReport && table.data && table.data.rows && table.data.rows.length > 0;
                 });
 
                 eachDataSet.isMonthlyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    return table.table.monthlyReport && table.data && table.data.rows && table.data.rows.length > 0;
+                    return table.definition.monthlyReport && table.data && table.data.rows && table.data.rows.length > 0;
                 });
 
                 eachDataSet.isReportsAvailable = eachDataSet.isChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
