@@ -159,7 +159,7 @@ require.config({
 
         //Directives
         "directives": "app/directives/directives",
-        "pivotTable": "app/directives/pivot.table",
+        "pivotTableDirective": "app/directives/pivot.table",
         "lockedTableHeader": "app/directives/locked.table.header"
     },
     shim: {

@@ -1,4 +1,4 @@
-define(["pivotTable", "angularMocks", "utils", "pivotTableController"], function(PivotTable, mocks, utils, PivotTableController) {
+define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController"], function(PivotTable, mocks, utils, PivotTableController) {
     describe("Pivot Table Directive", function() {
         var pivotTableController, tableData, tableDefinition;
         beforeEach(function() {
