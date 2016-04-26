@@ -4,7 +4,6 @@ define([], function() {
             scope: {
                 data: "=",
                 definition: "=",
-                showWeeks: "@",
                 resourceBundle:"=",
                 showDownload: "=?",
                 dataDimensionItems:"=?orderOfItems"

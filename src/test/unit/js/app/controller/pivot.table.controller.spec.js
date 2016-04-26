@@ -11,7 +11,6 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             Timecop.install();
             Timecop.freeze(new Date("2015-10-29T12:43:54.972Z"));
 
-            scope.showWeeks = "true";
             scope.data = {
                 "headers": [{
                     "name": "a1948a9c6f4",
@@ -66,26 +65,27 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             };
 
             scope.definition = {
-                "name": "[FieldApp - NewConsultations] Consultations",
-                "sortOrder": 0,
-                "sortAscending": false,
-                "sortDescending": false,
-                "sortable": false,
-                "categoryDimensions": [{
-                    "categoryOptions": [{
-                        "id": "ab3a614eed1",
-                        "name": "1-23 months"
+                name: "[FieldApp - NewConsultations] Consultations",
+                sortOrder: 0,
+                sortAscending: false,
+                sortDescending: false,
+                sortable: false,
+                monthlyReport: true,
+                categoryDimensions: [{
+                    categoryOptions: [{
+                        id: "ab3a614eed1",
+                        name: "1-23 months"
                     }, {
-                        "id": "abf819dca06",
-                        "name": "24-59 months"
+                        id: "abf819dca06",
+                        name: "24-59 months"
                     }]
                 }],
-                "dataElements": [{
-                    "id": "a0e7d3973e3",
-                    "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
+                dataElements: [{
+                    id: "a0e7d3973e3",
+                    name: "New Consultations - Consultations - Out Patient Department - Pediatric"
                 }, {
-                    "id": "a67aa742313",
-                    "name": "Follow-up Consultations - Consultations - Out Patient Department - Pediatric"
+                    id: "a67aa742313",
+                    name: "Follow-up Consultations - Consultations - Out Patient Department - Pediatric"
                 }]
             };
 
