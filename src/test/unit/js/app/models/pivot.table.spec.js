@@ -2,8 +2,8 @@ define(['pivotTable'], function(PivotTable) {
    describe('PivotTable', function() {
        var pivotTable, config;
 
-       describe('constructor', function() {
-           it('should create an instance with required properties', function() {
+       describe('create()', function() {
+           it('should return an instance with required properties', function() {
                config = {
                    id: 'someId',
                    name: 'someName',
