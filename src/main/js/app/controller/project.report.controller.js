@@ -6,7 +6,7 @@ define(["moment", "lodash"], function(moment, _) {
           return $scope.selectedProject.name + "_ProjectReport_"+  moment().format("DD-MMM-YYYY") + ".csv";
         };
 
-        $scope.getData = function() {
+        $scope.getCsvFileData = function() {
             var data = [];
 
             var addProjectBasicInfo = function() {
