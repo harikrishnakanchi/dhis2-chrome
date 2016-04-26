@@ -315,5 +315,5 @@
     "pleaseWaitLabel": "S'il vous plaît, attendez...",
     "selectBtnLabel": "Sélectionner",
     "dateRangeError": "Date de début ne peut pas être supérieure à la date de fin.",
-    "duplicateReferralLocation": "Referral Location is already exists."
+    "duplicateReferralLocation": "Saisine L'emplacement est existe déjà"
 }
