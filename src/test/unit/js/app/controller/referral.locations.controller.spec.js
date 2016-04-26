@@ -75,6 +75,42 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                 expect(scope.referralLocations[0]).toEqual(expectedReferralLocation);
             });
 
+            it("should return false if there is duplicate referral locations aliases", function() {
+                var existingReferralLocations = {
+                    "orgUnit": scope.orgUnit.id,
+                    "MSF Facility 1": {
+                        "name": "Some alias 2",
+                        "isDisabled": false
+                    },
+                    "MSF Facility 2": {
+                        "name": "Some alias",
+                        "isDisabled": false
+                    }
+                };
+
+                scope.referralLocations = {
+                    "orgUnit": scope.orgUnit.id,
+                    "MSF Facility 1": {
+                        "name": "Some alias 2",
+                        "isDisabled": false
+                    },
+                    "MSF Facility 2": {
+                        "name": "Some alias",
+                        "isDisabled": false
+                    },
+                    "MSF Facility 3": {
+                        "name": "Some alias 2",
+                        "isDisabled": false
+                    }
+                };
+                spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, existingReferralLocations));
+
+                referralLocationsController = new ReferralLocationsController(scope, hustle, fakeModal, referralLocationsRepository);
+                scope.$apply();
+
+                expect(scope.hasDuplicateReferralLocations).toBeTruthy();
+            });
+
             it("should initialize referral locations when there are no existing referral locations", function() {
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, undefined));
 
