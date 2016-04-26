@@ -267,10 +267,10 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             return $q.all(_.map(tables, function(tableDefinition) {
                 return pivotTableRepository.getDataForPivotTable(tableDefinition.name, $routeParams.orgUnit).then(function(data) {
                     return {
-                        'definition': tableDefinition,
-                        'data': data,
-                        'dataSetCode': tableDefinition.dataSetCode,
-                        'isTableDataAvailable': !!(data && data.rows && data.rows.length > 0)
+                        definition: tableDefinition,
+                        data: data,
+                        dataSetCode: tableDefinition.dataSetCode,
+                        isTableDataAvailable: !!(data && data.rows && data.rows.length > 0)
                     };
                 });
             }));
@@ -288,11 +288,11 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             _.each($scope.datasets, function(eachDataSet) {
 
                 var filteredCharts = _.filter($scope.chartData, {
-                    "dataSetCode": eachDataSet.code
+                    dataSetCode: eachDataSet.code
                 });
 
                 var filteredPivotTables = _.filter($scope.pivotTables, {
-                    "dataSetCode": eachDataSet.code
+                    dataSetCode: eachDataSet.code
                 });
 
                 eachDataSet.isChartsAvailable = _.any(filteredCharts, function(chart) {
@@ -300,11 +300,11 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 });
 
                 eachDataSet.isWeeklyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    return table.definition.weeklyReport && table.data && table.data.rows && table.data.rows.length > 0;
+                    return table.definition.weeklyReport && table.isTableDataAvailable;
                 });
 
                 eachDataSet.isMonthlyPivotTablesAvailable = _.any(filteredPivotTables, function(table) {
-                    return table.definition.monthlyReport && table.data && table.data.rows && table.data.rows.length > 0;
+                    return table.definition.monthlyReport && table.isTableDataAvailable;
                 });
 
                 eachDataSet.isReportsAvailable = eachDataSet.isChartsAvailable || eachDataSet.isMonthlyPivotTablesAvailable || eachDataSet.isWeeklyPivotTablesAvailable;
