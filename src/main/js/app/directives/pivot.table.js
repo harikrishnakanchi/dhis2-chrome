@@ -5,7 +5,7 @@ define([], function() {
                 data: "=",
                 definition: "=",
                 resourceBundle:"=",
-                showDownload: "=?",
+                disableDownload: "@?",
                 orderOfItems:"=?"
             },
             link: function(scope, element, attrs) {

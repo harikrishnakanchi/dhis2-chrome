@@ -430,5 +430,20 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             expect(scope.selectedSortKey).toEqual('dataElementIndex');
         });
 
+        it("should not display the download button if download is disabled", function() {
+            scope.disableDownload = 'true';
+            pivotTableController = new PivotTableController(scope, rootScope);
+            scope.$apply();
+
+            expect(scope.showDownloadButton).toEqual(false);
+        });
+
+        it("should display the download button if download is not disabled", function() {
+            scope.disableDownload = undefined;
+            pivotTableController = new PivotTableController(scope, rootScope);
+            scope.$apply();
+
+            expect(scope.showDownloadButton).toEqual(true);
+        });
     });
 });
