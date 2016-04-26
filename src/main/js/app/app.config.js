@@ -118,6 +118,7 @@ require.config({
 
         //Models
         "pivotTable": "app/models/pivot.table",
+        "moduleDataBlock": "app/models/module.data.block",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
