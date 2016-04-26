@@ -315,5 +315,5 @@
     "pleaseWaitLabel": "S'il vous plaît, attendez...",
     "selectBtnLabel": "Sélectionner",
     "dateRangeError": "Date de début ne peut pas être supérieure à la date de fin.",
-    "duplicateReferralLocation": "Saisine L'emplacement est existe déjà"
+    "duplicateReferralLocation": "noms de lieux d'orientation doivent être uniques."
 }

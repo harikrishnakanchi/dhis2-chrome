@@ -100,5 +100,5 @@
     "pleaseWaitLabel": "Please wait...",
     "selectBtnLabel": "Select",
     "dateRangeError": "Start date cannot be greater than end date.",
-    "duplicateReferralLocation": "Referral location already exists."
+    "duplicateReferralLocation": "Referral Location names should be unique."
 }
