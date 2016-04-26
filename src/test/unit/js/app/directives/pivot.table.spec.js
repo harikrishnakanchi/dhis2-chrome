@@ -155,13 +155,12 @@ define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController"],
             };
         });
 
-        it("should transform the data to the correct form", mocks.inject(function($rootScope, $filter) {
+        it("should transform the data to the correct form", mocks.inject(function($rootScope) {
             rootScope = $rootScope;
             scope = $rootScope.$new();
-            filter = $filter;
             scope.data = tableData;
             scope.definition = tableDefinition;
-            pivotTableController = PivotTableController(scope, rootScope, filter);
+            pivotTableController = PivotTableController(scope, rootScope);
             scope.$apply();
 
             expect(scope.dataMap).toEqual([{
@@ -261,13 +260,12 @@ define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController"],
             }]);
         }));
 
-        it("should get the correct value to be displayed", mocks.inject(function($rootScope, $filter) {
+        it("should get the correct value to be displayed", mocks.inject(function($rootScope) {
             rootScope = $rootScope;
             scope = $rootScope.$new();
-            filter = $filter;
             scope.data = tableData;
             scope.definition = tableDefinition;
-            pivotTableController = PivotTableController(scope, rootScope, filter);
+            pivotTableController = PivotTableController(scope, rootScope);
             scope.$apply();
 
             expect(scope.getValue('abf819dca06', 'a67aa742313', '201507')).toEqual(6433);

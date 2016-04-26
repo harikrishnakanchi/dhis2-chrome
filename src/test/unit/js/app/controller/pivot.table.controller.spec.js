@@ -1,12 +1,11 @@
 define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], function(mocks, lodash, moment, PivotTableController, timecop) {
     describe("pivotTableControllerSpec", function() {
 
-        var scope, rootScope, filter, pivotTableController;
+        var scope, rootScope, pivotTableController;
 
-        beforeEach(mocks.inject(function($rootScope, $filter) {
+        beforeEach(mocks.inject(function($rootScope) {
             scope = $rootScope.$new();
             rootScope = $rootScope;
-            filter = $filter;
 
             Timecop.install();
             Timecop.freeze(new Date("2015-10-29T12:43:54.972Z"));
@@ -89,7 +88,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 }]
             };
 
-            pivotTableController = new PivotTableController(scope, rootScope, filter);
+            pivotTableController = new PivotTableController(scope, rootScope);
             scope.$apply();
         }));
 
@@ -189,7 +188,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                         "name": "New Consultations - Consultations - Out Patient Department - Pediatric"
                     }]
                 };
-                pivotTableController = new PivotTableController(scope, rootScope, filter);
+                pivotTableController = new PivotTableController(scope, rootScope);
                 scope.$apply();
                 var expectedDataValues = [{
                     "Data Element": 'New Consultations',
@@ -313,7 +312,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 }]
             };
 
-            pivotTableController = new PivotTableController(scope, rootScope, filter);
+            pivotTableController = new PivotTableController(scope, rootScope);
             scope.$apply();
 
             var expectedViewMap = [{
@@ -390,7 +389,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 }]
             };
 
-            pivotTableController = new PivotTableController(scope, rootScope, filter);
+            pivotTableController = new PivotTableController(scope, rootScope);
             scope.$apply();
 
             var expectedViewMap = [{
@@ -412,7 +411,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             scope.definition.sortDescending = true;
             scope.definition.sortable = true;
 
-            pivotTableController = new PivotTableController(scope, rootScope, filter);
+            pivotTableController = new PivotTableController(scope, rootScope);
 
             scope.sortByColumn({sortKey: 'sortKey_2015W02'});
             expect(scope.selectedSortKey).toEqual('sortKey_2015W02');
