@@ -87,54 +87,12 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 }
             };
             pivotTables = [{
-                "name": "[FieldApp - ProjectReport] 2 Hospitalization",
-                "id": "prEqldr6Juk",
-                "sortOrder": 0,
-                "columns": [
-                {
-                    "dimension": "pe",
-                    "items": [
-                        {
-                            "name": "LAST_12_MONTHS",
-                            "id": "LAST_12_MONTHS"
-                        }
-                    ]
-                }
-            ],
-                "filters": [
-                {
-                    "dimension": "ou",
-                    "items": [
-                        {
-                            "name": "Aweil - SS153",
-                            "id": "a3f1fcbc237"
-                        }
-                    ]
-                }
-            ],
-                "rows": [
-                {
-                    "dimension": "dx",
-                    "items": [
-                        {
-                            "name": "Average bed occupation rate (%) - Adult IPD Ward",
-                            "id": "adf6cf9405c"
-                        },
-                        {
-                            "name": "Average length of bed use (days) - Adult IPD Ward",
-                            "id": "ae70aadc5cf"
-                        }
-                    ]
-                }
-            ],
-                "categoryDimensions": [],
-                "sortAscending": false,
-                "sortDescending": false,
-                "sortable": false,
-                "dataSetCode": "ProjectReport"
-        }, {
-                    id: "xVYnmknNChg",
-                    name: "[FieldApp - AdultIPDWard] Previous 12 weeks of all cases"
+                id: 'pivotTable1',
+                projectReport: true,
+                title: 'Hospitalization'
+            }, {
+                id: 'pivotTable2',
+                projectReport: false
             }];
             data = {
                 "headers": [{
@@ -219,19 +177,9 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
             expect(scope.getData()).toEqual(expectedData);
         });
 
-        it('should get table name if it is present', function() {
-            var tableName = '[FieldApp - ProjectReport] 1 Consultations';
-            expect(scope.getTableName(tableName)).toEqual("Consultations");
-        });
-
-        it('should get empty string if table name is not present', function() {
-            var tableName = '[FieldApp - ProjectReport]';
-            expect(scope.getTableName(tableName)).toEqual("");
-        });
-
         it('should filter out project report tables from pivot tables', function() {
             scope.$apply();
-            expect(scope.pivotTables[0].table).toEqual(pivotTables[0]);
+            expect(scope.pivotTables[0].definition).toEqual(pivotTables[0]);
             expect(scope.pivotTables[0].data).toEqual(data);
         });
 

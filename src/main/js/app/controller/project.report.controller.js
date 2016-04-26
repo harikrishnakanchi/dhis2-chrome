@@ -1,11 +1,9 @@
 define(["moment", "lodash"], function(moment, _) {
-
     return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository) {
-        var selectedProject = $rootScope.currentUser.selectedProject;
-        $scope.projectName = selectedProject.name;
+        $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
         $scope.getCsvFileName = function() {
-          return $scope.projectName + "_ProjectReport_"+  moment().format("DD-MMM-YYYY") + ".csv";
+          return $scope.selectedProject.name + "_ProjectReport_"+  moment().format("DD-MMM-YYYY") + ".csv";
         };
 
         $scope.getData = function() {
@@ -45,7 +43,7 @@ define(["moment", "lodash"], function(moment, _) {
                 _.forEach($scope.pivotTables, function(pivotTable) {
                     var headers = [];
                     if(pivotTable.isTableDataAvailable) {
-                        if(pivotTable.isMonthlyReport) {
+                        if(pivotTable.definition.monthlyReport) {
                             _.forEach(pivotTable.data.metaData.pe, function (period) {
                                 var numberofWeeks = getNumberOfISOWeeksInMonth(period);
                                 headers.push([pivotTable.data.metaData.names[period] + " (" + numberofWeeks + " weeks)"]);
@@ -56,7 +54,7 @@ define(["moment", "lodash"], function(moment, _) {
                             });
                         }
 
-                        data.push([$scope.getTableName(pivotTable.table.name)].concat(headers));
+                        data.push([pivotTable.definition.title].concat(headers));
 
                         var dataDimensionIndex = _.findIndex(pivotTable.data.headers, {
                             "name": "dx"
@@ -95,17 +93,6 @@ define(["moment", "lodash"], function(moment, _) {
 
         };
 
-        $scope.getTableName = function(tableName) {
-            var regex = /^\[FieldApp - ([a-zA-Z0-9()><]+)\]([0-9\s]*)([a-zA-Z0-9-\s]+)/;
-            var match = regex.exec(tableName);
-            if (match) {
-                var parsedTableName = match[3];
-                return parsedTableName;
-            } else {
-                return "";
-            }
-        };
-
         var parseProjectAttributes = function(projectInfo) {
             var attributeNames = ["Project Code", "Project Type", "Context", "Type of population", "Reason For Intervention", "Mode Of Operation", "Model Of Management"];
             var attributeInfo, projectAttribute;
@@ -135,49 +122,33 @@ define(["moment", "lodash"], function(moment, _) {
         };
 
         var loadProjectBasicInfo = function() {
-            return orgUnitRepository.get(selectedProject.id).then(function(projectInfo) {
+            return orgUnitRepository.get($scope.selectedProject.id).then(function(projectInfo) {
                 $scope.projectAttributes = parseProjectAttributes(projectInfo);
             });
         };
 
-        var getProjectReportTables = function(tables) {
-            var projectReportTable = [];
-            tables.forEach(function(table) {
-               if(_.contains(table.name, "ProjectReport"))
-                   projectReportTable.push(table);
-            });
-            return $q.when(projectReportTable);
+        var filterProjectReportTables = function(tables) {
+            return _.filter(tables, { 'projectReport': true });
         };
 
-        var isMonthlyReport = function(definition) {
-            return _.contains(_.findKey(definition.relativePeriods, function(obj) {
-                return obj;
-            }), "Month");
-        };
-
-        var transformTables = function(tables) {
-            return $q.all(_.map(tables, function(table) {
-                return pivotTableRepository.getDataForPivotTable(table.name, selectedProject.id).then(function(data) {
+        var getDataForPivotTables = function(tables) {
+            return $q.all(_.map(tables, function(tableDefinition) {
+                return pivotTableRepository.getDataForPivotTable(tableDefinition.name, $scope.selectedProject.id).then(function(data) {
                     return {
-                        'table': table,
-                        'data': data,
-                        'isTableDataAvailable' : (data && data.rows.length !== 0) ? true : false,
-                        'isMonthlyReport': isMonthlyReport(table)
+                        definition: tableDefinition,
+                        data: data,
+                        isTableDataAvailable: !!(data && data.rows && data.rows.length > 0)
                     };
                 });
             }));
         };
         var loadPivotTables = function() {
             return pivotTableRepository.getAll()
-                .then(getProjectReportTables)
-                .then(transformTables)
+                .then(filterProjectReportTables)
+                .then(getDataForPivotTables)
                 .then(function(pivotTables) {
-                    $scope.isReportAvailable = _.any(pivotTables, function(table) {
-                        if (table.data && table.data.rows)
-                            return table.data.rows.length !== 0;
-                        return false;
-                    });
                     $scope.pivotTables = pivotTables;
+                    $scope.isReportAvailable = _.any(pivotTables, { isTableDataAvailable: true });
                 });
         };
 

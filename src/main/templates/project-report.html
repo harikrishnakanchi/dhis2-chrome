@@ -3,7 +3,7 @@
 
         <div class="row">
             <div class="col-md-8">
-                <h4>{{resourceBundle.projectReportLabel}}: {{ projectName }}</h4>
+                <h4>{{resourceBundle.projectReportLabel}}: {{ selectedProject.name }}</h4>
             </div>
 
             <div class="col-md-4">
@@ -40,11 +40,11 @@
                 <accordion>
                     <accordion-group is-open="status.open">
                         <accordion-heading>
-                            <span>{{getTableName(table.table.name)}}</span>
+                            <span>{{ table.definition.title }}</span>
                             <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                         </accordion-heading>
                         <div>
-                            <pivot-table definition="table.table" data="table.data" show-weeks="{{table.isMonthlyReport}}" resource-bundle="resourceBundle" show-download="false" order-of-items="table.dataDimensionItems"></pivot-table>
+                            <pivot-table definition="table.definition" data="table.data" show-weeks="{{ table.definition.monthlyReport }}" resource-bundle="resourceBundle" show-download="false" order-of-items="table.dataDimensionItems"></pivot-table>
                         </div>
                     </accordion-group>
                 </accordion>
