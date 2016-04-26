@@ -6,12 +6,12 @@ define([], function() {
                 definition: "=",
                 resourceBundle:"=",
                 showDownload: "=?",
-                dataDimensionItems:"=?orderOfItems"
+                orderOfItems:"=?"
             },
             link: function(scope, element, attrs) {
                 if(attrs.orderOfItems) {
                     scope.$watch('orderBySortKeys', function (newVal) {
-                        scope.dataDimensionItems = _.map($filter('orderBy')(scope.viewMap, newVal), function (dataDimensionItem) {
+                        scope.orderOfItems = _.map($filter('orderBy')(scope.viewMap, newVal), function (dataDimensionItem) {
                             return dataDimensionItem.dataElement;
                         });
                     });

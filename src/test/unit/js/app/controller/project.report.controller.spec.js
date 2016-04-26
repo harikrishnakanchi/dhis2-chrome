@@ -173,7 +173,7 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 []
             ];
             scope.$apply();
-            scope.pivotTables[0].dataDimensionItems = ["adf6cf9405c", "ae70aadc5cf"];
+            scope.pivotTables[0].currentOrderOfItems = ["adf6cf9405c", "ae70aadc5cf"];
             expect(scope.getData()).toEqual(expectedData);
         });
 

@@ -66,7 +66,7 @@ define(["moment", "lodash"], function(moment, _) {
                             "name": "value"
                         });
 
-                        _.forEach(pivotTable.dataDimensionItems, function (itemId) {
+                        _.forEach(pivotTable.currentOrderOfItems, function (itemId) {
                             var values = [];
                             _.forEach(pivotTable.data.metaData.pe, function (period) {
                                 var value = _.find(pivotTable.data.rows, function (row) {
