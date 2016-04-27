@@ -5,6 +5,8 @@ define(['lodash', 'customAttributes'], function (_, CustomAttributes) {
         this.moduleName = parseModuleName(orgUnit);
         this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
         this.submitted = isSubmitted(aggregateDataValues, lineListEvents, this.lineListService);
+        this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
+        this.approvedAtCoordinationLevel = !!(approvalData && approvalData.isApproved);
     };
 
     var isSubmitted = function (aggregateDataValues, lineListEvents, lineListService) {
