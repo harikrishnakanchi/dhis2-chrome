@@ -43,6 +43,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
 
             userPreferenceRepository = new UserPreferenceRepository();
             spyOn(userPreferenceRepository, "getCurrentUsersProjectIds").and.returnValue(utils.getPromise(q, []));
+            spyOn(userPreferenceRepository, "getCurrentUsersUsername").and.returnValue(utils.getPromise(q, {}));
 
             systemSettingRepository = new SystemSettingRepository();
             spyOn(systemSettingRepository, "getAllowedOrgUnits").and.returnValue([]);
@@ -266,6 +267,56 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                     "name": "Superuser"
                 }]
             }));
+            scope.login();
+            scope.$apply();
+
+            expect(hustle.publish).toHaveBeenCalledWith({
+                "type": "downloadProjectData",
+                "data": []
+            }, "dataValues");
+        });
+
+        it("should start sync project data if the currentUser and previousUsers are admin and non-admin users", function () {
+            userPreferenceRepository.getCurrentUsersProjectIds.and.returnValue(utils.getPromise(q, ['id5']));
+
+            scope.username = "ss153";
+            scope.password = "password";
+
+            userRepository.getUserCredentials.and.returnValue(utils.getPromise(q, {
+                "username": "ss153",
+                "password": "5f4dcc3b5aa765d61d8327deb882cf99",
+                "userRoles": [{
+                    "name": "Project Level Approver"
+                }]
+            }));
+
+            var previousUser = {
+                "id": "xYRvx4y7Gm9",
+                "userCredentials": {
+                    "username": "superadmin",
+                    "userRoles": [{
+                        "name": "Superadmin"
+                    }]
+                },
+                "organisationUnits": [{
+                    "id": 123
+                }]
+            };
+
+            var currentUser = {
+                "id": "xYRvx4y7Gm8",
+                "userCredentials": {
+                    "username": "ss153",
+                    "userRoles": [{
+                        "name": "Project Level Approver"
+                    }]
+                },
+                "organisationUnits": [{
+                    "id": 123
+                }]
+            };
+
+            userRepository.getUser.and.returnValues(previousUser, currentUser);
             scope.login();
             scope.$apply();
 
