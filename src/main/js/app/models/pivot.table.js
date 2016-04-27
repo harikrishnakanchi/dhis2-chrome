@@ -40,8 +40,10 @@ define(['lodash'], function (_) {
         return matches && matches[1];
     };
 
-    PivotTable.create = function (config) {
-        return new PivotTable(config);
+    PivotTable.create = function () {
+        var pivotTable = Object.create(PivotTable.prototype);
+        PivotTable.apply(pivotTable, arguments);
+        return pivotTable;
     };
 
     return PivotTable;

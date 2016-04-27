@@ -30,8 +30,10 @@ define(['lodash'], function (_) {
         }
     };
 
-    ModuleDataBlock.create = function (orgUnit, period, aggregateDataValues, lineListDataValues, approvalData) {
-        return new ModuleDataBlock(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
+    ModuleDataBlock.create = function () {
+        var moduleDataBlock = Object.create(ModuleDataBlock.prototype);
+        ModuleDataBlock.apply(moduleDataBlock, arguments);
+        return moduleDataBlock;
     };
 
     return ModuleDataBlock;
