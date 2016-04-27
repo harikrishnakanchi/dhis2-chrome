@@ -1,25 +1,14 @@
-define(['lodash'], function (_) {
-    var LINE_LIST_ATTRIBUTE_CODE = 'isLineListService';
-
+define(['lodash', 'customAttributes'], function (_, CustomAttributes) {
     var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListDataValues, approvalData) {
         this.moduleId = orgUnit.id;
         this.period = period;
         this.moduleName = parseModuleName(orgUnit);
-        this.lineListService = parseLineListAttribute(orgUnit);
+        this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
         this.submitted = isSubmitted(aggregateDataValues);
     };
 
     var isSubmitted = function (aggregateDataValues) {
         return !!(aggregateDataValues && aggregateDataValues.dataValues && aggregateDataValues.dataValues.length > 0 && !_.some(aggregateDataValues.dataValues, { isDraft: true }));
-    };
-
-    var parseLineListAttribute = function(module) {
-        var lineListAttribute = _.find(module.attributeValues, {
-            "attribute": {
-                "code": LINE_LIST_ATTRIBUTE_CODE
-            }
-        });
-        return !!(lineListAttribute && lineListAttribute.value == "true");
     };
 
     var parseModuleName = function (orgUnit) {

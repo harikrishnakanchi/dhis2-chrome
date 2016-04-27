@@ -1,6 +1,10 @@
-define(['moduleDataBlock'], function(ModuleDataBlock) {
+define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, CustomAttributes) {
     describe('ModuleDataBlock', function () {
         var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListDataValues, approvalData;
+
+        beforeEach(function() {
+            spyOn(CustomAttributes, 'parseAttribute');
+        });
 
         describe('create()', function () {
             it('should return an instance with required properties', function () {
@@ -36,25 +40,16 @@ define(['moduleDataBlock'], function(ModuleDataBlock) {
         });
 
         describe('lineListService', function () {
-            it('should be true if attribute islineListService is true', function () {
+            it('should parse the lineListService attribute', function () {
                 orgUnit = {
-                    attributeValues: [{
-                        attribute: {
-                            code: 'isLineListService'
-                        },
-                        value: 'true'
-                    }]
+                    attributeValues: 'someAttributeValue'
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
-                expect(moduleDataBlock.lineListService).toEqual(true);
-            });
+                CustomAttributes.parseAttribute.and.returnValue('lineListServiceAttributeValue');
 
-            it('should be false if attribute islineListService is not present', function () {
-                orgUnit = {
-                    attributeValues: []
-                };
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
-                expect(moduleDataBlock.lineListService).toEqual(false);
+
+                expect(CustomAttributes.parseAttribute).toHaveBeenCalledWith(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+                expect(moduleDataBlock.lineListService).toEqual('lineListServiceAttributeValue');
             });
         });
 
