@@ -53,54 +53,56 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
             });
         });
 
-        describe('submitted for aggregate module', function() {
-            beforeEach(function() {
-                orgUnit = {
-                    attributeValues: []
-                };
-            });
+        describe('submitted', function() {
+            describe('for an aggregate module', function() {
+                beforeEach(function() {
+                    orgUnit = {
+                        attributeValues: []
+                    };
+                });
 
-            it('should be true if there are dataValues and none of them are draft', function () {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    }]
-                };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
-                expect(moduleDataBlock.submitted).toEqual(true);
-            });
+                it('should be true if there are dataValues and none of them are draft', function () {
+                    aggregateDataValues = {
+                        dataValues: [{
+                            value: 'someValue'
+                        }]
+                    };
+                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
+                    expect(moduleDataBlock.submitted).toEqual(true);
+                });
 
-            it('should be false if aggregateDataValues is not present', function () {
-                aggregateDataValues = undefined;
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
-                expect(moduleDataBlock.submitted).toEqual(false);
-            });
+                it('should be false if aggregateDataValues is not present', function () {
+                    aggregateDataValues = undefined;
+                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
+                    expect(moduleDataBlock.submitted).toEqual(false);
+                });
 
-            it('should be false if aggregateDataValues has no dataValues collection', function () {
-                aggregateDataValues = {};
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
-                expect(moduleDataBlock.submitted).toEqual(false);
-            });
+                it('should be false if aggregateDataValues has no dataValues collection', function () {
+                    aggregateDataValues = {};
+                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
+                    expect(moduleDataBlock.submitted).toEqual(false);
+                });
 
-            it('should be false if aggregateDataValues has no empty dataValues collection', function () {
-                aggregateDataValues = {
-                    dataValues: []
-                };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
-                expect(moduleDataBlock.submitted).toEqual(false);
-            });
+                it('should be false if aggregateDataValues has no empty dataValues collection', function () {
+                    aggregateDataValues = {
+                        dataValues: []
+                    };
+                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
+                    expect(moduleDataBlock.submitted).toEqual(false);
+                });
 
-            it('should be false if there are dataValues and some of them are draft', function () {
-                aggregateDataValues = {
-                    dataValues: [{
-                        value: 'someValue'
-                    },{
-                        value: 'anotherValue',
-                        isDraft: true
-                    }]
-                };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
-                expect(moduleDataBlock.submitted).toEqual(false);
+                it('should be false if there are dataValues and some of them are draft', function () {
+                    aggregateDataValues = {
+                        dataValues: [{
+                            value: 'someValue'
+                        },{
+                            value: 'anotherValue',
+                            isDraft: true
+                        }]
+                    };
+                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListDataValues, approvalData);
+                    expect(moduleDataBlock.submitted).toEqual(false);
+                });
             });
         });
     });
