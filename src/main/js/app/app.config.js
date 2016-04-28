@@ -121,6 +121,9 @@ require.config({
         "moduleDataBlock": "app/models/module.data.block",
         "customAttributes": "app/models/custom.attributes",
 
+        //Factories
+        "moduleDataBlockFactory": "app/factories/module.data.block.factory",
+
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
         "dataValuesMapper": "app/transformers/datavalues.mapper",
