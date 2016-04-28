@@ -80,11 +80,13 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
                 Timecop.uninstall();
             });
 
-            it("should format periods to be shown on dashboard", function() {
-                dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+            describe('formatPeriods', function() {
+                it("should format periods to be shown on dashboard", function() {
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
 
-                var expectedPeriod = "W42 - " + moment('10-13-2014', 'MM-DD-YYYY').startOf("isoWeek").toDate().toLocaleDateString() + " - " + moment('10-19-2014', 'MM-DD-YYYY').endOf("isoWeek").toDate().toLocaleDateString();
-                expect(scope.formatPeriods("2014W42")).toEqual(expectedPeriod);
+                    var expectedPeriod = "W42 - " + moment('10-13-2014', 'MM-DD-YYYY').startOf("isoWeek").toDate().toLocaleDateString() + " - " + moment('10-19-2014', 'MM-DD-YYYY').endOf("isoWeek").toDate().toLocaleDateString();
+                    expect(scope.formatPeriods("2014W42")).toEqual(expectedPeriod);
+                });
             });
 
             it("should include list of items in 'items awaiting submission' when items are not synced to dhis for data entry user", function(){
@@ -1016,112 +1018,111 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
 
             });
 
+            describe('getTemplateUrl', function() {
+                it("should return the aggregate data entry template url by default", function() {
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+                    rootScope.hasRoles.and.callFake(function(roles) {
+                        if (_.contains(roles, 'Data entry user'))
+                            return true;
+                        return false;
+                    });
+                    rootScope.currentUser.userCredentials = {
+                        "username": "dataentryuser",
+                        "userRoles": [{
+                            "id": "hxNB8lleCsl",
+                            "name": 'Data entry user'
+                        }]
+                    };
+                    var item = {
+                        "moduleId": "mod1",
+                        "period": "2014W01",
+                        'isSubmitted': true,
+                        'isComplete': false,
+                        'isLineListService': false
+                    };
 
-            it("should return the aggregate data entry template url by default", function() {
-
-                dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
-                rootScope.hasRoles.and.callFake(function(roles) {
-                    if (_.contains(roles, 'Data entry user'))
-                        return true;
-                    return false;
+                    var result = scope.getTemplateUrl(item);
+                    expect(result).toEqual("#/aggregate-data-entry/mod1/2014W01");
                 });
-                rootScope.currentUser.userCredentials = {
-                    "username": "dataentryuser",
-                    "userRoles": [{
-                        "id": "hxNB8lleCsl",
-                        "name": 'Data entry user'
-                    }]
-                };
-                var item = {
-                    "moduleId": "mod1",
-                    "period": "2014W01",
-                    'isSubmitted': true,
-                    'isComplete': false,
-                    'isLineListService': false
-                };
 
-                var result = scope.getTemplateUrl(item);
-                expect(result).toEqual("#/aggregate-data-entry/mod1/2014W01");
-            });
+                it("should return the list-list entry template url for a data entry user if current module contains line list programs", function() {
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+                    rootScope.hasRoles.and.callFake(function(roles) {
+                        if (_.contains(roles, 'Data entry user'))
+                            return true;
+                        return false;
+                    });
+                    rootScope.currentUser.userCredentials = {
+                        "username": "dataentryuser",
+                        "userRoles": [{
+                            "id": "hxNB8lleCsl",
+                            "name": 'Data entry user'
+                        }]
+                    };
+                    rootScope.$apply();
+                    var item = {
+                        "moduleId": "mod1",
+                        "period": "2014W01",
+                        'isSubmitted': true,
+                        'isComplete': false,
+                        'isLineListService': true
+                    };
 
-            it("should return the list-list entry template url for a data entry user if current module contains line list programs", function() {
-                dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
-                rootScope.hasRoles.and.callFake(function(roles) {
-                    if (_.contains(roles, 'Data entry user'))
-                        return true;
-                    return false;
+                    var result = scope.getTemplateUrl(item);
+                    expect(result).toEqual("#/line-list-summary/mod1/?filterBy=dateRange&startDate=2013-12-30&endDate=2014-01-05");
                 });
-                rootScope.currentUser.userCredentials = {
-                    "username": "dataentryuser",
-                    "userRoles": [{
-                        "id": "hxNB8lleCsl",
-                        "name": 'Data entry user'
-                    }]
-                };
-                rootScope.$apply();
-                var item = {
-                    "moduleId": "mod1",
-                    "period": "2014W01",
-                    'isSubmitted': true,
-                    'isComplete': false,
-                    'isLineListService': true
-                };
 
-                var result = scope.getTemplateUrl(item);
-                expect(result).toEqual("#/line-list-summary/mod1/?filterBy=dateRange&startDate=2013-12-30&endDate=2014-01-05");
-            });
+                it("should return the approval template if user is a project level approver", function() {
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+                    rootScope.hasRoles.and.callFake(function(roles) {
+                        if (_.contains(roles, 'Project Level Approver'))
+                            return true;
+                        return false;
+                    });
+                    rootScope.currentUser.userCredentials = {
+                        "username": "projectLevelApprover",
+                        "userRoles": [{
+                            "id": "hxNB8lleCsl",
+                            "name": 'Project Level Approver'
+                        }]
+                    };
+                    var item = {
+                        "moduleId": "mod1",
+                        "period": "2014W01",
+                        'isSubmitted': true,
+                        'isComplete': false,
+                        'isLineListService': true
+                    };
 
-            it("should return the approval template if user is a project level approver", function() {
-                dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
-                rootScope.hasRoles.and.callFake(function(roles) {
-                    if (_.contains(roles, 'Project Level Approver'))
-                        return true;
-                    return false;
+                    var result = scope.getTemplateUrl(item);
+                    expect(result).toEqual("#/data-approval/mod1/2014W01");
                 });
-                rootScope.currentUser.userCredentials = {
-                    "username": "projectLevelApprover",
-                    "userRoles": [{
-                        "id": "hxNB8lleCsl",
-                        "name": 'Project Level Approver'
-                    }]
-                };
-                var item = {
-                    "moduleId": "mod1",
-                    "period": "2014W01",
-                    'isSubmitted': true,
-                    'isComplete': false,
-                    'isLineListService': true
-                };
 
-                var result = scope.getTemplateUrl(item);
-                expect(result).toEqual("#/data-approval/mod1/2014W01");
-            });
+                it("should return the approval template if user is a coordination level approver", function() {
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
+                    rootScope.hasRoles.and.callFake(function(roles) {
+                        if (_.contains(roles, 'Coordination Level Approver'))
+                            return true;
+                        return false;
+                    });
+                    rootScope.currentUser.userCredentials = {
+                        "username": "projectLevelApprover",
+                        "userRoles": [{
+                            "id": "hxNB8lleCsl",
+                            "name": 'Coordination Level Approver'
+                        }]
+                    };
+                    var item = {
+                        "moduleId": "mod1",
+                        "period": "2014W01",
+                        'isSubmitted': true,
+                        'isComplete': false,
+                        'isLineListService': true
+                    };
 
-            it("should return the approval template if user is a coordination level approver", function() {
-                dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository);
-                rootScope.hasRoles.and.callFake(function(roles) {
-                    if (_.contains(roles, 'Coordination Level Approver'))
-                        return true;
-                    return false;
+                    var result = scope.getTemplateUrl(item);
+                    expect(result).toEqual("#/data-approval/mod1/2014W01");
                 });
-                rootScope.currentUser.userCredentials = {
-                    "username": "projectLevelApprover",
-                    "userRoles": [{
-                        "id": "hxNB8lleCsl",
-                        "name": 'Coordination Level Approver'
-                    }]
-                };
-                var item = {
-                    "moduleId": "mod1",
-                    "period": "2014W01",
-                    'isSubmitted': true,
-                    'isComplete': false,
-                    'isLineListService': true
-                };
-
-                var result = scope.getTemplateUrl(item);
-                expect(result).toEqual("#/data-approval/mod1/2014W01");
             });
         });
-
     });
