@@ -1,13 +1,13 @@
 define(['moduleDataBlockFactory', 'orgUnitRepository', 'moduleDataBlock', 'utils', 'angularMocks'],
     function (ModuleDataBlockFactory, OrgUnitRepository, ModuleDataBlock, utils, mocks) {
         var q, scope, moduleDataBlockFactory, orgUnitRepository;
-        var projectId, startPeriod, endPeriod;
+        var projectId, periodRange, defaultPeriodForTesting;
 
         describe('ModuleDataBlockFactory', function() {
             describe('createForProject', function() {
                 var createModuleDataBlocksFromFactory = function() {
                     var returnedObjects = null;
-                    moduleDataBlockFactory.createForProject(projectId, startPeriod, endPeriod).then(function (data) {
+                    moduleDataBlockFactory.createForProject(projectId, periodRange).then(function (data) {
                         returnedObjects = data;
                     });
                     scope.$apply();
@@ -24,13 +24,13 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'moduleDataBlock', 'utils
                     spyOn(ModuleDataBlock, 'create').and.returnValue('mockModuleDataBlock');
 
                     projectId = 'myProjectId';
-                    startPeriod = '2016W20';
-                    endPeriod = '2016W20';
+                    defaultPeriodForTesting = '2016W20';
+                    periodRange = [defaultPeriodForTesting];
 
                     moduleDataBlockFactory = new ModuleDataBlockFactory(orgUnitRepository);
                 }));
 
-                it('should create module data block for module in project for one period', function() {
+                it('should create module data block for one module in project', function() {
                     var moduleOrgUnit = {};
                     orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [moduleOrgUnit]));
 
@@ -40,19 +40,33 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'moduleDataBlock', 'utils
                     var returnedObjects = createModuleDataBlocksFromFactory();
 
                     expect(orgUnitRepository.getAllModulesInOrgUnits).toHaveBeenCalledWith(projectId);
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, startPeriod, {}, {}, {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, {}, {}, {});
                     expect(returnedObjects).toEqual([mockModuleDataBlock]);
                 });
 
-                it('should create module data block for multiple modules in project for one period', function() {
+                it('should create module data blocks for multiple modules in project', function() {
                     var moduleOrgUnitA = {}, moduleOrgUnitB = {};
                     orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [moduleOrgUnitA, moduleOrgUnitB]));
 
                     var returnedObjects = createModuleDataBlocksFromFactory();
 
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnitA, startPeriod, {}, {}, {});
-                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnitB, startPeriod, {}, {}, {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnitA, defaultPeriodForTesting, {}, {}, {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnitB, defaultPeriodForTesting, {}, {}, {});
                     expect(returnedObjects.length).toEqual(2);
+                });
+
+                it('should create module data block for multiple periods', function() {
+                    var moduleOrgUnit = {};
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [moduleOrgUnit]));
+
+                    periodRange = ['2016W20', '2016W21', '2016W22'];
+
+                    var returnedObjects = createModuleDataBlocksFromFactory();
+
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', {}, {}, {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W21', {}, {}, {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W22', {}, {}, {});
+                    expect(returnedObjects.length).toEqual(3);
                 });
             });
         });
