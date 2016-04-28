@@ -114,7 +114,6 @@ define([], function () {
 
                     var addListenersToOriginalCellWithIndex = function (index) {
                         angular.element(originalHeaderCells[index]).bind(eventOnFixedHeaderCells, function (event) {
-                            console.log(freezedColumnTable);
                             freezedColumnTable.remove();
                             freezedColumnTable = freezeFirstColumnOfTable(originalTable);
                         });
