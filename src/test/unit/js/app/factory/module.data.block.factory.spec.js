@@ -3,7 +3,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'moduleDataBlock', 'utils
         var q, scope, moduleDataBlockFactory, orgUnitRepository;
         var projectId, startPeriod, endPeriod;
 
-        fdescribe('ModuleDataBlockFactory', function() {
+        describe('ModuleDataBlockFactory', function() {
             describe('createForProject', function() {
                 var createModuleDataBlocksFromFactory = function() {
                     var returnedObjects = null;
