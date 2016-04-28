@@ -7,8 +7,8 @@ define(['lodash', 'customAttributes'], function (_, CustomAttributes) {
         this.submitted = isSubmitted(aggregateDataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
         this.approvedAtCoordinationLevel = !!(approvalData && approvalData.isApproved);
-        this.awaitingActionAtDataEntryLevel = !this.submitted;
-        this.awaitingActionAtProjectLevelApprover = this.submitted && !this.approvedAtProjectLevel;
+        this.awaitingActionAtDataEntryLevel = !this.submitted && !this.approvedAtCoordinationLevel;
+        this.awaitingActionAtProjectLevelApprover = this.submitted && !this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
         this.awaitingActionAtCoordinationLevelApprover = this.submitted && this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
     };
 

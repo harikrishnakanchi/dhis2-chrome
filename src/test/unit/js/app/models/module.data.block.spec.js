@@ -4,6 +4,9 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
 
         beforeEach(function() {
             spyOn(CustomAttributes, 'parseAttribute');
+            aggregateDataValues = null;
+            lineListEvents = null;
+            approvalData = null;
         });
 
         describe('create()', function () {
@@ -219,9 +222,22 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
             });
+
+            it('should be false if data has not been submitted but has been approved at coordination level by auto-approve job', function() {
+                aggregateDataValues = null;
+                approvalData = {
+                    isApproved: true
+                };
+                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
+            });
         });
 
         describe('awaitingActionAtProjectLevelApprover', function() {
+            beforeEach(function() {
+                CustomAttributes.parseAttribute.and.returnValue(false);
+            });
+
             it('should be true if data has been submitted', function() {
                 aggregateDataValues = {
                     dataValues: [{
@@ -238,15 +254,28 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
             });
 
-            it('should be false if data is approved at project level', function() {
+            it('should be false if data is submitted but approved at project level', function() {
                 aggregateDataValues = {
                     dataValues: [{
                         value: 'someValue'
                     }]
                 };
-
                 approvalData = {
                     isComplete: true
+                };
+                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
+            });
+
+            it('should be false if data has been submitted, not approved at project level, but approved at coordination level by auto-approve job', function() {
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue'
+                    }]
+                };
+                approvalData = {
+                    isComplete: false,
+                    isApproved: true
                 };
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
@@ -254,6 +283,10 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
         });
 
         describe('awaitingActionAtCoordinationLevelApprover', function() {
+            beforeEach(function() {
+                CustomAttributes.parseAttribute.and.returnValue(false);
+            });
+
             it('should be false if data has not been submitted ', function() {
                 aggregateDataValues = null;
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
