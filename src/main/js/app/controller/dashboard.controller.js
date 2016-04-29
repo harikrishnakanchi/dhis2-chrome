@@ -1,5 +1,5 @@
 define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
-    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository) {
+    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory) {
 
         var deregisterSelectedProjectListener = $rootScope.$on('selectedProjectUpdated', function() {
             init();

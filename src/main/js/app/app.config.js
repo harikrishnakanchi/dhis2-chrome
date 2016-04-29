@@ -122,6 +122,7 @@ require.config({
         "customAttributes": "app/models/custom.attributes",
 
         //Factories
+        "factories": "app/factories/factories",
         "moduleDataBlockFactory": "app/factories/module.data.block.factory",
 
         //Transformers
