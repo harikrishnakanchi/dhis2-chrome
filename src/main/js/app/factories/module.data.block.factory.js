@@ -52,7 +52,7 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
                     var allModuleDataBlocks = _.map(moduleOrgUnits, function (moduleOrgUnit) {
                         return _.map(periodRange, function (period) {
                             var aggregateDataValues = indexedAggregateData[period + moduleOrgUnit.id] || {};
-                            var lineListData = indexedLineListData[period + moduleOrgUnit.id] || {};
+                            var lineListData = indexedLineListData[period + moduleOrgUnit.id] || [];
                             var approvalData = indexedApprovalData[period + moduleOrgUnit.id] || {};
 
                             return ModuleDataBlock.create(moduleOrgUnit, period, aggregateDataValues, lineListData, approvalData);
