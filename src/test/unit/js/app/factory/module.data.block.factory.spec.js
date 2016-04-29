@@ -1,6 +1,6 @@
-define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'moduleDataBlock', 'utils', 'angularMocks'],
-    function (ModuleDataBlockFactory, OrgUnitRepository, DataRepository, ModuleDataBlock, utils, mocks) {
-        var q, scope, moduleDataBlockFactory, orgUnitRepository, dataRepository;
+define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'programEventRepository', 'moduleDataBlock', 'utils', 'angularMocks'],
+    function (ModuleDataBlockFactory, OrgUnitRepository, DataRepository, ProgramEventRepository, ModuleDataBlock, utils, mocks) {
+        var q, scope, moduleDataBlockFactory, orgUnitRepository, dataRepository, programEventRepository;
         var projectId, periodRange, defaultPeriodForTesting;
 
         describe('ModuleDataBlockFactory', function() {
@@ -25,13 +25,16 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'module
                     dataRepository = new DataRepository();
                     spyOn(dataRepository, 'getDataValuesForOrgUnitsAndPeriods').and.returnValue(utils.getPromise(q, {}));
 
+                    programEventRepository = new ProgramEventRepository();
+                    spyOn(programEventRepository, 'getEventsFromPeriod').and.returnValue(utils.getPromise(q, {}));
+
                     spyOn(ModuleDataBlock, 'create').and.returnValue('mockModuleDataBlock');
 
                     projectId = 'myProjectId';
                     defaultPeriodForTesting = '2016W20';
                     periodRange = [defaultPeriodForTesting];
 
-                    moduleDataBlockFactory = new ModuleDataBlockFactory(q, orgUnitRepository, dataRepository);
+                    moduleDataBlockFactory = new ModuleDataBlockFactory(q, orgUnitRepository, dataRepository, programEventRepository);
                 }));
 
                 it('should create module data block for one module in project', function() {
@@ -88,6 +91,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'module
                     dataRepository.getDataValuesForOrgUnitsAndPeriods.and.returnValue(utils.getPromise(q, [aggregateDataValue]));
                     var returnedObjects = createModuleDataBlocksFromFactory();
 
+                    expect(dataRepository.getDataValuesForOrgUnitsAndPeriods).toHaveBeenCalledWith(['ou1'], [defaultPeriodForTesting]);
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, aggregateDataValue, {}, {});
                     expect(returnedObjects.length).toEqual(1);
                 });
@@ -126,6 +130,63 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'module
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W02', aggregateDataValueB, {}, {});
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W01', {}, {}, {});
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', aggregateDataValueC, {}, {});
+                    expect(returnedObjects.length).toEqual(4);
+                });
+
+                it('should create module data block with line list events for origins', function() {
+                    var lineListEvents = [{
+                        someEventInfo: 'someEventDetails',
+                        orgUnit: 'origin1',
+                        period: '2016W20'
+                    }];
+                    programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, lineListEvents));
+
+                    var moduleOrgUnit = { id: 'ou1' };
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [moduleOrgUnit]));
+
+                    var originOrgUnit = { id: 'origin1', parent: moduleOrgUnit };
+                    orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [originOrgUnit]));
+
+                    var returnedObjects = createModuleDataBlocksFromFactory();
+
+                    expect(orgUnitRepository.findAllByParent).toHaveBeenCalledWith(['ou1']);
+                    expect(programEventRepository.getEventsFromPeriod).toHaveBeenCalledWith(defaultPeriodForTesting, ['origin1']);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, {}, lineListEvents, {});
+                    expect(returnedObjects.length).toEqual(1);
+                });
+
+                it('should create module data blocks with line list events for multiple periods', function() {
+                    var lineListEventA = {
+                        someEventInfo: 'someEventDetails',
+                        orgUnit: 'origin1',
+                        period: '2016W01'
+                    }, lineListEventB = {
+                        someEventInfo: 'someEventDetails',
+                        orgUnit: 'origin1',
+                        period: '2016W02'
+                    }, lineListEventC = {
+                        someEventInfo: 'someEventDetails',
+                        orgUnit: 'origin2',
+                        period: '2016W01'
+                    };
+                    programEventRepository.getEventsFromPeriod.and.returnValue(utils.getPromise(q, [lineListEventA, lineListEventB, lineListEventC]));
+
+                    periodRange = ['2016W01', '2016W02'];
+
+                    var moduleOrgUnit1 = { id: 'ou1' };
+                    var moduleOrgUnit2 = { id: 'ou2' };
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [moduleOrgUnit1, moduleOrgUnit2]));
+
+                    var originOrgUnitA = { id: 'origin1', parent: moduleOrgUnit1 };
+                    var originOrgUnitB = { id: 'origin2', parent: moduleOrgUnit2 };
+                    orgUnitRepository.findAllByParent.and.returnValue(utils.getPromise(q, [originOrgUnitA, originOrgUnitB]));
+
+                    var returnedObjects = createModuleDataBlocksFromFactory();
+
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W01', {}, [lineListEventA], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W02', {}, [lineListEventB], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W01', {}, [lineListEventC], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', {}, {}, {});
                     expect(returnedObjects.length).toEqual(4);
                 });
             });
