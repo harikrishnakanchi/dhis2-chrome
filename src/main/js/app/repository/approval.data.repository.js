@@ -2,14 +2,6 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
     return function(db, $q) {
         var self = this;
 
-        var modifiedPayload = function(payload) {
-            payload = _.isArray(payload) ? payload : [payload];
-            return _.map(payload, function(datum) {
-                datum.period = moment(datum.period, "GGGG[W]W").format("GGGG[W]WW");
-                return datum;
-            });
-        };
-
         this.getApprovalData = function(periodsAndOrgUnits) {
             var store = db.objectStore('approvals');
 
