@@ -1,5 +1,5 @@
 define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
-    return function ($q, orgUnitRepository, dataRepository, programEventRepository) {
+    return function ($q, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository) {
 
         var createForProject = function (projectId, periodRange) {
             return orgUnitRepository.getAllModulesInOrgUnits(projectId).then(function (moduleOrgUnits) {
@@ -13,7 +13,7 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
                     });
                 };
 
-                var getLineListData = function() {
+                var getIndexedLineListData = function() {
                     return orgUnitRepository.findAllByParent(moduleIds).then(function (originOrgUnits) {
                         var startPeriod = periodRange[0],
                             originOrgUnitIds = _.pluck(originOrgUnits, 'id');
@@ -30,19 +30,32 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
                     });
                 };
 
+                var getIndexedApprovalData = function() {
+                    var startPeriod = periodRange[0],
+                        endPeriod = _.last(periodRange);
+                    return approvalDataRepository.getApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function (allApprovalData) {
+                       return _.indexBy(allApprovalData, function (approvalData) {
+                           return approvalData.period + approvalData.orgUnit;
+                       });
+                    });
+                };
+
                 return $q.all({
                     indexedAggregateData: getIndexedAggregateData(),
-                    lineListData: getLineListData()
+                    indexedLineListData: getIndexedLineListData(),
+                    indexedApprovalData: getIndexedApprovalData()
                 }).then(function (data) {
                     var indexedAggregateData = data.indexedAggregateData;
-                    var lineListData = data.lineListData;
+                    var indexedLineListData = data.indexedLineListData;
+                    var indexedApprovalData = data.indexedApprovalData;
 
                     var allModuleDataBlocks = _.map(moduleOrgUnits, function (moduleOrgUnit) {
                         return _.map(periodRange, function (period) {
                             var aggregateDataValues = indexedAggregateData[period + moduleOrgUnit.id] || {};
-                            var lineListEvents = lineListData[period + moduleOrgUnit.id] || {};
+                            var lineListData = indexedLineListData[period + moduleOrgUnit.id] || {};
+                            var approvalData = indexedApprovalData[period + moduleOrgUnit.id] || {};
 
-                            return ModuleDataBlock.create(moduleOrgUnit, period, aggregateDataValues, lineListEvents, {});
+                            return ModuleDataBlock.create(moduleOrgUnit, period, aggregateDataValues, lineListData, approvalData);
                         });
                     });
                     return _.flatten(allModuleDataBlocks);

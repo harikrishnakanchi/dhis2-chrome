@@ -1,6 +1,6 @@
-define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'programEventRepository', 'moduleDataBlock', 'utils', 'angularMocks'],
-    function (ModuleDataBlockFactory, OrgUnitRepository, DataRepository, ProgramEventRepository, ModuleDataBlock, utils, mocks) {
-        var q, scope, moduleDataBlockFactory, orgUnitRepository, dataRepository, programEventRepository;
+define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'programEventRepository', 'approvalDataRepository', 'moduleDataBlock', 'utils', 'angularMocks'],
+    function (ModuleDataBlockFactory, OrgUnitRepository, DataRepository, ProgramEventRepository, ApprovalDataRepository, ModuleDataBlock, utils, mocks) {
+        var q, scope, moduleDataBlockFactory, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository;
         var projectId, periodRange, defaultPeriodForTesting;
 
         describe('ModuleDataBlockFactory', function() {
@@ -30,11 +30,14 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
 
                     spyOn(ModuleDataBlock, 'create').and.returnValue('mockModuleDataBlock');
 
+                    approvalDataRepository = new ApprovalDataRepository();
+                    spyOn(approvalDataRepository, 'getApprovalDataForPeriodsOrgUnits').and.returnValue(utils.getPromise(q, {}));
+
                     projectId = 'myProjectId';
                     defaultPeriodForTesting = '2016W20';
                     periodRange = [defaultPeriodForTesting];
 
-                    moduleDataBlockFactory = new ModuleDataBlockFactory(q, orgUnitRepository, dataRepository, programEventRepository);
+                    moduleDataBlockFactory = new ModuleDataBlockFactory(q, orgUnitRepository, dataRepository, programEventRepository, approvalDataRepository);
                 }));
 
                 it('should create module data block for one module in project', function() {
@@ -187,6 +190,56 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W02', {}, [lineListEventB], {});
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W01', {}, [lineListEventC], {});
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', {}, {}, {});
+                    expect(returnedObjects.length).toEqual(4);
+                });
+
+                it('should create module data block with approval data', function() {
+                    var approvalData = [{
+                        someApprovalInfo: 'someApprovalDetails',
+                        orgUnit: 'ou1',
+                        period: '2016W20'
+                    }];
+                    approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, approvalData));
+
+                    var moduleOrgUnit = { id: 'ou1' };
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [moduleOrgUnit]));
+
+                    var returnedObjects = createModuleDataBlocksFromFactory();
+
+                    expect(approvalDataRepository.getApprovalDataForPeriodsOrgUnits).toHaveBeenCalledWith(defaultPeriodForTesting, defaultPeriodForTesting, ['ou1']);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, defaultPeriodForTesting, {}, {}, approvalData[0]);
+                    expect(returnedObjects.length).toEqual(1);
+                });
+
+                it('should create module data block with approval data for multiple periods', function() {
+                    var approvalDataA = {
+                        someApprovalInfo: 'someApprovalDetails',
+                        orgUnit: 'ou1',
+                        period: '2016W01'
+                    }, approvalDataB = {
+                        someApprovalInfo: 'someApprovalDetails',
+                        orgUnit: 'ou2',
+                        period: '2016W01'
+                    }, approvalDataC = {
+                        someApprovalInfo: 'someApprovalDetails',
+                        orgUnit: 'ou2',
+                        period: '2016W02'
+                    };
+                    approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, [approvalDataA, approvalDataB, approvalDataC]));
+
+                    periodRange = ['2016W01', '2016W02'];
+
+                    var moduleOrgUnit1 = { id: 'ou1' };
+                    var moduleOrgUnit2 = { id: 'ou2' };
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [moduleOrgUnit1, moduleOrgUnit2]));
+
+                    var returnedObjects = createModuleDataBlocksFromFactory();
+
+                    expect(approvalDataRepository.getApprovalDataForPeriodsOrgUnits).toHaveBeenCalledWith(periodRange[0], periodRange[1], ['ou1', 'ou2']);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W01', {}, {}, approvalDataA);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit1, '2016W02', {}, {}, {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W01', {}, {}, approvalDataB);
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', {}, {}, approvalDataC);
                     expect(returnedObjects.length).toEqual(4);
                 });
             });
