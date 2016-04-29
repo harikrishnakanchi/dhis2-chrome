@@ -459,5 +459,39 @@ define(["dataRepository", "angularMocks", "utils", "timecop"], function(DataRepo
 
         });
 
+        it("should get all dataValues for orgUnits within two periods", function () {
+            var dataValues = [{
+                "orgUnit": "ou1",
+                "period": "2016W01",
+                "dataValues": []
+            }, {
+                "orgUnit": "ou2",
+                "period": "2016W02",
+                "dataValues": []
+            }, {
+                "orgUnit": "ou3",
+                "period": "2016W02",
+                "dataValues": []
+            }];
+
+            mockStore.each.and.returnValue(utils.getPromise(q, dataValues));
+
+            var actual;
+            dataRepository.getDataValuesForOrgUnitsAndPeriods(["ou1","ou2"], ["2016W01","2016W02"]).then(function(data) {
+                actual = data;
+            });
+
+            scope.$apply();
+
+            expect(actual).toEqual([{
+                "orgUnit": "ou1",
+                "period": "2016W01",
+                "dataValues": []
+            },{
+                "orgUnit": "ou2",
+                "period": "2016W02",
+                "dataValues": []
+            }]);
+        });
     });
 });

@@ -75,6 +75,17 @@ define(["lodash", "moment"], function(_, moment) {
             });
         };
 
+        this.getDataValuesForOrgUnitsAndPeriods = function(orgUnits, periods) {
+            var store = db.objectStore("dataValues");
+            var query = db.queryBuilder().$index("by_period").$in(periods).compile();
+            return store.each(query).then(function(dataValues) {
+                var filteredDataValues = _.filter(dataValues, function(dv) {
+                    return _.contains(orgUnits, dv.orgUnit);
+                });
+                return filteredDataValues;
+            });
+        };
+
         this.getDataValuesForOrgUnitsPeriods = function(orgUnits, periods) {
             var store = db.objectStore("dataValues");
             var query = db.queryBuilder().$index("by_period").$in(periods).compile();
