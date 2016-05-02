@@ -57,7 +57,8 @@ define(["lodash"], function(_) {
             'getCurrentUsersUsername': getCurrentUsersUsername,
             'getCurrentUsersProjectIds': getCurrentUsersProjectIds,
             'getCurrentUsersModules': getCurrentUsersModules,
-            'getCurrentUsersOriginOrgUnitIds': getCurrentUsersOriginOrgUnitIds
+            'getCurrentUsersOriginOrgUnitIds': getCurrentUsersOriginOrgUnitIds,
+            'getCurrentUsersPreferences': getCurrentUsersPreferences
         };
     };
 });

@@ -1,5 +1,5 @@
 define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils, _) {
-    return function($http, $log, $timeout, $rootScope) {
+    return function($http, $log, $timeout, $rootScope, userPreferenceRepository) {
         var onlineEventHandlers = [];
         var offlineEventHandlers = [];
         var isDhisOnline;
@@ -14,21 +14,60 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
 
         var dhisConnectivityCheck = function() {
 
-            var praxisVersion = chromeUtils.getPraxisVersion();
-            var pingUrl = properties.dhisPing.url + "?" + (new Date()).getTime() + "&pv=" + praxisVersion;
+            var hasRoles = function(allowedRoles, userRoles) {
+                if (userRoles === undefined)
+                    return false;
 
-            return $http.head(pingUrl, {
-                "timeout": 1000 * properties.dhisPing.timeoutInSeconds
-            }).then(function(response) {
-                $log.info("DHIS is accessible");
-                isDhisOnline = true;
-                chromeUtils.sendMessage("dhisOnline");
-            }).
-            catch(function(response) {
-                $log.info("DHIS is not accessible");
-                isDhisOnline = false;
-                chromeUtils.sendMessage("dhisOffline");
-            });
+                return _.any(userRoles, function(userAuth) {
+                    return _.contains(allowedRoles, userAuth.name);
+                });
+            };
+
+            var getAttributeValue = function (attributeValues, attributeCode) {
+                var attr = _.find(attributeValues, {
+                    "attribute": {
+                        "code": attributeCode
+                    }
+                });
+                return attr ? attr.value : "";
+            };
+
+            var sendHeadRequest = function (url) {
+                return $http.head(url, {
+                    "timeout": 1000 * properties.dhisPing.timeoutInSeconds
+                }).then(function(response) {
+                    $log.info("DHIS is accessible");
+                    isDhisOnline = true;
+                    chromeUtils.sendMessage("dhisOnline");
+                }).
+                catch(function(response) {
+                    $log.info("DHIS is not accessible");
+                    isDhisOnline = false;
+                    chromeUtils.sendMessage("dhisOffline");
+                });
+            };
+
+            var buildUrl = function (userPreferences) {
+                var getRequestParams = "";
+                if (userPreferences && userPreferences.selectedProject) {
+                    if (hasRoles(['Coordination Level Approver'], userPreferences.userRoles)) {
+                        var countryName;
+                        if(userPreferences.selectedProject.parent)
+                            countryName = userPreferences.selectedProject.parent.name;
+                        getRequestParams = "&country=" + countryName;
+                    }
+                    else {
+                        var attributeValues = userPreferences.selectedProject.attributeValues;
+                        getRequestParams = "&prj=" + getAttributeValue(attributeValues, "projCode");
+                    }
+                }
+                var praxisVersion = chromeUtils.getPraxisVersion();
+                return properties.dhisPing.url + "?" + (new Date()).getTime() + "&pv=" + praxisVersion + getRequestParams;
+            };
+
+            return userPreferenceRepository.getCurrentUsersPreferences()
+                .then(buildUrl)
+                .then(sendHeadRequest);
         };
 
         var onDhisOnline = function() {

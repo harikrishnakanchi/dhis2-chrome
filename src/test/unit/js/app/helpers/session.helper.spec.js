@@ -178,7 +178,8 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
                         "name": "Some Country"
                     }],
                     "selectedProject": undefined,
-                    "lastUpdated": currentTime
+                    "lastUpdated": currentTime,
+                    "userRoles": [{ name: 'Coordination Level Approver' }]
                 };
 
                 expect(userPreferenceRepository.save).toHaveBeenCalledWith(expectedState);
