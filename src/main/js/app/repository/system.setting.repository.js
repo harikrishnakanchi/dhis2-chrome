@@ -48,7 +48,7 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
         var get = function(key) {
             var store = db.objectStore("systemSettings");
             return store.find(key).then(function(setting) {
-                return setting ? setting.value : setting;
+                return setting ? setting.value : $q.reject();
             });
         };
 
@@ -105,10 +105,11 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
                     });
             };
 
-            return get(praxisUidKey)
-                .then(function (uId) {
-                    return uId || createPraxisUid();
-                });
+            var returnPraxisUid = function (uId) {
+                return uId;
+            };
+
+            return get(praxisUidKey).then(returnPraxisUid, createPraxisUid);
         };
 
         return {
