@@ -23,10 +23,12 @@ define(["lodash", "migrations", "dateUtils", "properties", "moment"], function(_
         var backupByPeriodStores = ["dataValues", "programEvents"];
 
         var backupStores = function(dbName, storeNames) {
+            var skipStores = ["systemSettings"];
             var backupPromises = _.map(storeNames, function(name) {
-                var callback = (_.contains(backupByPeriodStores, name)) && (dbName === MSF) ? backupByPeriod : backupAll;
-                return callback(name);
-
+                if (!_.contains(skipStores, name)) {
+                    var callback = (_.contains(backupByPeriodStores, name)) && (dbName === MSF) ? backupByPeriod : backupAll;
+                    return callback(name);
+                }
             });
             return $q.all(backupPromises).then(function(data) {
                 return _.zipObject(storeNames, data);
