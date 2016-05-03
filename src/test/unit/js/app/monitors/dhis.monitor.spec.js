@@ -1,6 +1,6 @@
 define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "userPreferenceRepository", "properties", "timecop"], function(DhisMonitor, utils, mocks, chromeUtils, MockChrome, UserPreferenceRepository, properties, timecop) {
     describe("dhis.monitor", function() {
-        var q, log, http, httpBackend, rootScope, timeout, userPreferenceRepository, dhisMonitor, currentTime;
+        var q, log, http, httpBackend, rootScope, timeout, userPreferenceRepository, dhisMonitor, currentTime, favIconUrl;
         var callbacks = {};
 
         beforeEach(mocks.inject(function($injector, $q, $log, $timeout, $rootScope) {
@@ -14,6 +14,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             spyOn(chromeUtils, "sendMessage").and.callFake(mockChrome.sendMessage);
             spyOn(chromeUtils, "addListener").and.callFake(mockChrome.addListener);
             spyOn(chromeUtils, "getPraxisVersion").and.returnValue("5.1");
+            rootScope.praxisUid = "ade3fab1ab0";
             userPreferenceRepository = new UserPreferenceRepository();
             var userPreferences = {
                 "locale": "en",
@@ -32,6 +33,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             currentTime = (new Date()).getTime();
             Timecop.install();
             Timecop.freeze(currentTime);
+            favIconUrl = properties.dhisPing.url + "?" + currentTime + "&pv=5.1&pid=ade3fab1ab0";
             dhisMonitor = new DhisMonitor(http, log, timeout, rootScope, userPreferenceRepository);
         }));
 
@@ -134,7 +136,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             dhisMonitor.start();
 
             expect(userPreferenceRepository.getCurrentUsersPreferences).toHaveBeenCalled();
-            httpBackend.expectHEAD(properties.dhisPing.url + "?" + currentTime + "&pv=5.1&prj=ss153").respond(200, "ok");
+            httpBackend.expectHEAD(favIconUrl + "&prj=ss153").respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -142,7 +144,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
 
             dhisMonitor.start();
 
-            httpBackend.expectHEAD(properties.dhisPing.url + "?" + currentTime + "&pv=5.1&prj=ss153").respond(200, "ok");
+            httpBackend.expectHEAD(favIconUrl + "&prj=ss153").respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -150,7 +152,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             userPreferenceRepository.getCurrentUsersPreferences.and.returnValue(utils.getPromise(q, undefined));
             dhisMonitor.start();
 
-            httpBackend.expectHEAD(properties.dhisPing.url + "?" + currentTime + "&pv=5.1").respond(200, "ok");
+            httpBackend.expectHEAD(favIconUrl).respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -164,7 +166,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             userPreferenceRepository.getCurrentUsersPreferences.and.returnValue(utils.getPromise(q, userPreference));
             dhisMonitor.start();
 
-            httpBackend.expectHEAD(properties.dhisPing.url + "?" + currentTime + "&pv=5.1").respond(200, "ok");
+            httpBackend.expectHEAD(favIconUrl).respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -184,7 +186,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             userPreferenceRepository.getCurrentUsersPreferences.and.returnValue(utils.getPromise(q, userPreference));
             dhisMonitor.start();
 
-            httpBackend.expectHEAD(properties.dhisPing.url + "?" + currentTime + "&pv=5.1&prj=").respond(200, "ok");
+            httpBackend.expectHEAD(favIconUrl + "&prj=").respond(200, "ok");
             httpBackend.flush();
         });
 
@@ -205,7 +207,7 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
 
             dhisMonitor.start();
 
-            httpBackend.expectHEAD(properties.dhisPing.url + "?" + currentTime + "&pv=5.1&country=Country").respond(200, "ok");
+            httpBackend.expectHEAD(favIconUrl + "&ctry=Country").respond(200, "ok");
             httpBackend.flush();
         });
 

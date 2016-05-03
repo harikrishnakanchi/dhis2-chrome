@@ -54,7 +54,7 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
                         var countryName;
                         if(userPreferences.selectedProject.parent)
                             countryName = userPreferences.selectedProject.parent.name;
-                        getRequestParams = "&country=" + countryName;
+                        getRequestParams = "&ctry=" + countryName;
                     }
                     else {
                         var attributeValues = userPreferences.selectedProject.attributeValues;
@@ -62,7 +62,8 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
                     }
                 }
                 var praxisVersion = chromeUtils.getPraxisVersion();
-                return properties.dhisPing.url + "?" + (new Date()).getTime() + "&pv=" + praxisVersion + getRequestParams;
+                return properties.dhisPing.url + "?" + (new Date()).getTime() + "&pv=" + praxisVersion +
+                    "&pid=" + $rootScope.praxisUid + getRequestParams ;
             };
 
             return userPreferenceRepository.getCurrentUsersPreferences()

@@ -1,4 +1,4 @@
-define(["systemSettingRepository", "angularMocks", "utils"], function(SystemSettingRepository, mocks, utils) {
+define(["systemSettingRepository", "angularMocks", "utils", "dhisId"], function(SystemSettingRepository, mocks, utils, dhisId) {
     describe("systemSettingRepository", function() {
         var repo, scope, q;
 
@@ -7,7 +7,8 @@ define(["systemSettingRepository", "angularMocks", "utils"], function(SystemSett
             q = $q;
             var mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
-            repo = new SystemSettingRepository(mockDB.db);
+            repo = new SystemSettingRepository(mockDB.db, q);
+            spyOn(dhisId, "get").and.returnValue("ade3fab1ab0");
         }));
 
         it("should upsert system settings", function() {
@@ -45,6 +46,43 @@ define(["systemSettingRepository", "angularMocks", "utils"], function(SystemSett
             expect(actualResult).toEqual({
                 "ds1": {}
             });
+        });
+
+        it("should get praxisUid from Object store", function() {
+
+            mockStore.find.and.returnValue(utils.getPromise(q, {
+                "key": "praxisUid",
+                "value": "ade3fab1ab0"
+            }));
+
+            var actualResult;
+            repo.getPraxisUid().then(function(data) {
+                actualResult = data;
+            });
+            scope.$apply();
+
+            expect(mockStore.find).toHaveBeenCalledWith("praxisUid");
+            expect(actualResult).toEqual("ade3fab1ab0");
+        });
+
+        it("should insert praxisUid if it's not there in Object store", function() {
+            mockStore.find.and.returnValue(utils.getPromise(q, undefined));
+            spyOn(repo, "upsert").and.returnValue(utils.getPromise(q, {
+                "key": "praxisUid",
+                "value": "ade3fab1ab0"
+            }));
+
+            var actualResult;
+            repo.getPraxisUid().then(function(data) {
+                actualResult = data;
+            });
+            scope.$apply();
+
+            expect(mockStore.upsert).toHaveBeenCalledWith({
+                "key": "praxisUid",
+                "value": "ade3fab1ab0"
+            });
+            expect(actualResult).toEqual("ade3fab1ab0");
         });
 
     });

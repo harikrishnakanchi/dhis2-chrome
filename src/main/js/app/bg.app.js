@@ -130,6 +130,11 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
                                 .then(consumerRegistry.register)
                                 .then(checkOnlineStatusAndSync);
                         });
+
+                    systemSettingRepository.getPraxisUid()
+                        .then(function (uid) {
+                            $rootScope.praxisUid = uid;
+                        });
                 }
             ]);
 
