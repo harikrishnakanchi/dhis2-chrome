@@ -1,4 +1,4 @@
-define(['lodash', 'customAttributes', 'moment'], function (_, CustomAttributes, moment) {
+define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, CustomAttributes, moment, properties) {
     var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData) {
         this.moduleId = orgUnit.id;
         this.period = period;
@@ -13,8 +13,15 @@ define(['lodash', 'customAttributes', 'moment'], function (_, CustomAttributes, 
         this.awaitingActionAtProjectLevelApprover = this.submitted && !this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
         this.awaitingActionAtCoordinationLevelApprover = this.submitted && this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
 
-        this.active = moment(this.period, "GGGG[W]W").isoWeek() >= moment(orgUnit.openingDate).isoWeek();
         this.notSynced = !this.lineListService ? !!(aggregateDataValues && aggregateDataValues.localStatus && aggregateDataValues.localStatus == 'FAILED_TO_SYNC') : false;
+        this.active = isActive(this.period, orgUnit.openingDate);
+    };
+
+    var isActive = function (period, openingDate) {
+        var date12WeeksEarlier = moment().subtract(properties.weeksToDisplayStatusInDashboard, 'weeks');
+        openingDate = moment(openingDate, 'YYYY-MM-DD');
+        var dateToCompare = openingDate <= date12WeeksEarlier ? date12WeeksEarlier : openingDate;
+        return moment(period, "GGGG[W]W").isoWeek() >= dateToCompare.isoWeek();
     };
 
     var isSubmitted = function (aggregateDataValues, lineListEvents, lineListService) {

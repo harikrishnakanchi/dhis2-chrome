@@ -1,4 +1,4 @@
-define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, CustomAttributes) {
+define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBlock, CustomAttributes, timecop) {
     describe('ModuleDataBlock', function () {
         var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData;
 
@@ -376,9 +376,19 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
         });
 
         describe('active', function() {
+
+            beforeEach(function () {
+                Timecop.install();
+                Timecop.freeze(new Date("2016-05-04T10:46:29.382Z"));
+            });
+
+            afterEach(function() {
+                Timecop.returnToPresent();
+                Timecop.uninstall();
+            });
+
             it('should be true if period is after opening date', function() {
                 orgUnit = {
-                    id: 'orgUnitId',
                     openingDate: '2016-03-19'
                 };
                 period = '2016W18';
@@ -388,7 +398,6 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
 
             it('should be false if period is before opening date', function() {
                 orgUnit = {
-                    id: 'orgUnitId',
                     openingDate: '2016-04-03'
                 };
                 period = '2016W12';
@@ -398,7 +407,6 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
 
             it('should be true if opening date is within the same week as period', function() {
                 orgUnit = {
-                    id: 'orgUnitId',
                     openingDate: '2016-03-12'
                 };
                 period = '2016W10';
