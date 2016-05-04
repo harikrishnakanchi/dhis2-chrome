@@ -333,7 +333,7 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
             });
         });
 
-        describe('isNotSynced', function() {
+        describe('notSynced', function() {
             beforeEach(function() {
                 CustomAttributes.parseAttribute.and.returnValue(false);
             });
@@ -341,7 +341,7 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
             it('should be false if it is lineListService', function() {
                 CustomAttributes.parseAttribute.and.returnValue(true);
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
-                expect(moduleDataBlock.isNotSynced).toEqual(false);
+                expect(moduleDataBlock.notSynced).toEqual(false);
             });
 
             it('should be false if localStatus is not "FAILED_TO_SYNC" ', function() {
@@ -356,7 +356,7 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
                 };
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
 
-                expect(moduleDataBlock.isNotSynced).toEqual(false);
+                expect(moduleDataBlock.notSynced).toEqual(false);
             });
 
             it('should be true if localStatus is "FAILED_TO_SYNC" ', function() {
@@ -371,7 +371,7 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
                 };
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
 
-                expect(moduleDataBlock.isNotSynced).toEqual(true);
+                expect(moduleDataBlock.notSynced).toEqual(true);
             });
         });
 

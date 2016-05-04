@@ -108,22 +108,22 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
 
                 $scope.itemsAwaitingSubmission = _.sortBy(_.union(
                     _.filter(moduleDataBlocks, { awaitingActionAtDataEntryLevel: true }),
-                    _.filter(moduleDataBlocks, { isNotSynced: true })
+                    _.filter(moduleDataBlocks, { notSynced: true })
                 ), 'moduleName');
                 $scope.itemsAwaitingApprovalAtUserLevel = [];
                 $scope.itemsAwaitingApprovalAtOtherLevels = _.sortBy(_.union(
-                    _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true, isNotSynced: false }),
-                    _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true, isNotSynced: false })
+                    _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true, notSynced: false }),
+                    _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true, notSynced: false })
                 ), 'moduleName');
 
                 if ($rootScope.hasRoles(['Project Level Approver'])) {
-                    $scope.itemsAwaitingApprovalAtUserLevel = _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true, isNotSynced: false });
-                    $scope.itemsAwaitingApprovalAtOtherLevels = _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true, isNotSynced: false });
+                    $scope.itemsAwaitingApprovalAtUserLevel = _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true, notSynced: false });
+                    $scope.itemsAwaitingApprovalAtOtherLevels = _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true, notSynced: false });
                 }
 
                 if ($rootScope.hasRoles(['Coordination Level Approver'])) {
-                    $scope.itemsAwaitingApprovalAtUserLevel = _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true, isNotSynced: false });
-                    $scope.itemsAwaitingApprovalAtOtherLevels = _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true, isNotSynced: false });
+                    $scope.itemsAwaitingApprovalAtUserLevel = _.filter(moduleDataBlocks, { awaitingActionAtCoordinationLevelApprover: true, notSynced: false });
+                    $scope.itemsAwaitingApprovalAtOtherLevels = _.filter(moduleDataBlocks, { awaitingActionAtProjectLevelApprover: true, notSynced: false });
                 }
             });
         };

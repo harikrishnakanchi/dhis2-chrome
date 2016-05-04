@@ -230,11 +230,11 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                     var expectedModuleDataBlocks = [{
                         "moduleId": "a0560fac722",
                         "awaitingActionAtDataEntryLevel": true,
-                        "isNotSynced": true
+                        "notSynced": true
                     },{
                         "moduleId": "a0560fac723",
                         "awaitingActionAtDataEntryLevel": false,
-                        "isNotSynced": false
+                        "notSynced": false
                     }];
 
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, expectedModuleDataBlocks));
@@ -249,11 +249,11 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                     var expectedModuleDataBlocks = [{
                         "moduleId": "a0560fac722",
                         awaitingActionAtProjectLevelApprover: false,
-                        "isNotSynced": false
+                        "notSynced": false
                     },{
                         "moduleId": "a0560fac723",
                         "awaitingActionAtProjectLevelApprover": true,
-                        "isNotSynced": false
+                        "notSynced": false
                     }];
 
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, expectedModuleDataBlocks));
@@ -268,11 +268,11 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                     var expectedModuleDataBlocks = [{
                         "moduleId": "a0560fac722",
                         awaitingActionAtCoordinationLevelApprover: false,
-                        "isNotSynced": false
+                        "notSynced": false
                     },{
                         "moduleId": "a0560fac723",
                         "awaitingActionAtCoordinationLevelApprover": true,
-                        "isNotSynced": false
+                        "notSynced": false
                     }];
 
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, expectedModuleDataBlocks));

@@ -13,8 +13,8 @@ define(['lodash', 'customAttributes', 'moment'], function (_, CustomAttributes, 
         this.awaitingActionAtProjectLevelApprover = this.submitted && !this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
         this.awaitingActionAtCoordinationLevelApprover = this.submitted && this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
 
-        this.isNotSynced = !this.lineListService ? !!(aggregateDataValues && aggregateDataValues.localStatus && aggregateDataValues.localStatus == 'FAILED_TO_SYNC') : false;
         this.active = moment(this.period, "GGGG[W]W").isoWeek() >= moment(orgUnit.openingDate).isoWeek();
+        this.notSynced = !this.lineListService ? !!(aggregateDataValues && aggregateDataValues.localStatus && aggregateDataValues.localStatus == 'FAILED_TO_SYNC') : false;
     };
 
     var isSubmitted = function (aggregateDataValues, lineListEvents, lineListService) {
