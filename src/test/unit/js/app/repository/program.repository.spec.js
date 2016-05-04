@@ -81,6 +81,8 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                 'id': 'p1',
                 'name': 'ER - Presenting Line List',
                 'displayName': 'ER - Presenting Line List',
+                'shortName': 'ER - Presenting Line List',
+                'programType': 'WITHOUT_REGISTRATION',
                 'programStages': [{
                     'id': 'p1s1',
                     'name': 'ER - Presenting Line List Stage 1',
@@ -173,6 +175,8 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                 'id': 'p1',
                 'name': 'ER - Presenting Line List',
                 'displayName': 'ER - Presenting Line List',
+                'shortName': 'ER - Presenting Line List',
+                'programType': 'WITHOUT_REGISTRATION',
                 'programStages': [{
                     'id': 'p1s1',
                     'name': 'ER - Presenting Line List Stage 1',
@@ -245,6 +249,8 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                 'id': 'p1',
                 'name': 'ER - Presenting Line List',
                 'displayName': 'ER - Presenting Line List',
+                'shortName': 'ER - Presenting Line List',
+                'programType': 'WITHOUT_REGISTRATION',
                 'programStages': [{
                     'id': 'p1s1',
                     'name': 'ER - Presenting Line List Stage 1',
@@ -323,6 +329,8 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                 'id': 'p1',
                 'name': 'ER - Presenting Line List',
                 'displayName': 'ER - Presenting Line List',
+                'shortName': 'ER - Presenting Line List',
+                'programType': 'WITHOUT_REGISTRATION',
                 'programStages': [{
                     'id': 'p1s1',
                     'name': 'ER - Presenting Line List Stage 1',
@@ -424,6 +432,31 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
             programRepository.associateOrgUnits(program, orgUnits);
 
             expect(mockStore.upsert).toHaveBeenCalledWith(expectedProgramsUpsert);
+
+        });
+
+        it("should add missing mandatory fields to programs", function() {
+            var program = {
+                "id": "Prg",
+                "name": "Program"
+            };
+
+            var expectedProgramUpsert = {
+                "id": "Prg",
+                "name": "Program",
+                "shortName": "Program",
+                "programType": "WITHOUT_REGISTRATION"
+            };
+            mockStore.find.and.returnValue(utils.getPromise(q, program));
+
+            var actualValue;
+            programRepository.get("Prg").then(function (data) {
+                actualValue = data;
+            });
+
+            scope.$apply();
+
+            expect(actualValue).toEqual(expectedProgramUpsert);
 
         });
     });
