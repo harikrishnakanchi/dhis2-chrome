@@ -136,13 +136,13 @@ define(["indexeddbUtils", "angularMocks", "utils", "lodash"], function(Indexeddb
             };
 
             indexeddbUtils.restore(backupData).then(function() {
-                expect(objectStore1.insert).toHaveBeenCalledWith([{
+                expect(objectStore1.upsert).toHaveBeenCalledWith([{
                     "id": "identity"
                 }]);
-                expect(objectStore2.insert).toHaveBeenCalledWith([{
+                expect(objectStore2.upsert).toHaveBeenCalledWith([{
                     "id": "identity"
                 }]);
-                expect(hustleStore1.insert).toHaveBeenCalledWith([{
+                expect(hustleStore1.upsert).toHaveBeenCalledWith([{
                     "id": "identity"
                 }]);
             });
