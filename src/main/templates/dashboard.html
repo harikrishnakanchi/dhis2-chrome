@@ -66,7 +66,7 @@
                     <td>{{items[0].moduleName}}</td>
                     <td>
                         <ul class="list-unstyled">
-                            <li ng-repeat="item in items | orderBy: 'period'">
+                            <li ng-repeat="item in items | orderBy: 'period'" ng-if="item.active">
                                 <a ng-href="{{getTemplateUrl(item)}}" ng-if="hasRoles(['Data entry user'])"
                                    ng-class="{ 'errorHref': item.isNotSynced }">{{formatPeriods(item.period)}}</a>
                                 <span ng-if="!hasRoles(['Data entry user'])"
@@ -105,8 +105,8 @@
                     <td>
                         <ul class="list-unstyled">
                             <li ng-repeat="item in items | orderBy: 'period'">
-                                <span ng-if="!item.isComplete">{{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
-                                <span ng-if="item.isComplete">{{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
+                                <span ng-if="!item.approvedAtProjectLevel">{{ resourceBundle.itemsAwaitingApprovalAtProjectLevel }}</span>
+                                <span ng-if="item.approvedAtProjectLevel">{{ resourceBundle.itemsAwaitingApprovalAtCoordinationLevel }}</span>
                             </li>
                         </ul>
                     </td>
