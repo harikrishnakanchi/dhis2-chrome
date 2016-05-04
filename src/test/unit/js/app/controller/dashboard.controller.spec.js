@@ -1,7 +1,7 @@
-define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUnitRepository", "dataRepository", "programEventRepository", "moduleDataBlockFactory", "utils", "moment", "timecop", "properties", "lodash", "dateUtils"],
-    function(DashboardController, mocks, ApprovalDataRepository, OrgUnitRepository, DataRepository, ProgramEventRepository, ModuleDataBlockFactory, utils, moment, timecop, properties, _, dateUtils) {
+define(["dashboardController", "angularMocks", "approvalDataRepository", "moduleDataBlockFactory", "utils", "moment", "timecop", "properties", "lodash", "dateUtils"],
+    function(DashboardController, mocks, ApprovalDataRepository, ModuleDataBlockFactory, utils, moment, timecop, properties, _, dateUtils) {
         describe("dashboardController", function() {
-            var q, rootScope, db, hustle, scope, location, timeout, fakeModal, approvalDataRepository, orgUnitRepository, dataRepository, moduleDataBlockFactory;
+            var q, rootScope, hustle, scope, location, timeout, fakeModal, approvalDataRepository, moduleDataBlockFactory;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $timeout, $location) {
@@ -36,16 +36,6 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
                 spyOn(approvalDataRepository, "getApprovalDataForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, []));
                 spyOn(approvalDataRepository, "markAsComplete").and.returnValue(utils.getPromise(q, {}));
                 spyOn(approvalDataRepository, "markAsApproved").and.returnValue(utils.getPromise(q, {}));
-
-                orgUnitRepository = new OrgUnitRepository();
-                spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
-                spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
-
-                dataRepository = new DataRepository();
-                spyOn(dataRepository, "getSubmittedDataValuesForPeriodsOrgUnits").and.returnValue(utils.getPromise(q, []));
-
-                programEventRepository = new ProgramEventRepository();
-                spyOn(programEventRepository, "getEventsFromPeriod").and.returnValue(utils.getPromise(q, []));
 
                 moduleDataBlockFactory = new ModuleDataBlockFactory();
                 spyOn(moduleDataBlockFactory, "createForProject").and.returnValue(utils.getPromise(q, []));
@@ -87,7 +77,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
 
             describe('formatPeriods', function() {
                 it("should format periods to be shown on dashboard", function() {
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
 
                     var expectedPeriod = "W42 - " + moment('10-13-2014', 'MM-DD-YYYY').startOf("isoWeek").toDate().toLocaleDateString() + " - " + moment('10-19-2014', 'MM-DD-YYYY').endOf("isoWeek").toDate().toLocaleDateString();
                     expect(scope.formatPeriods("2014W42")).toEqual(expectedPeriod);
@@ -128,7 +118,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
                     }];
 
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, moduleDataBlocks));
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
 
                     scope.bulkApprove();
                     scope.$apply();
@@ -189,7 +179,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
                     }];
 
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, moduleDataBlocks));
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
 
                     scope.bulkApprove();
                     scope.$apply();
@@ -227,7 +217,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
                     dateUtils.getPeriodRange.and.returnValue(["2014W01", "2014W02", "2014W03"]);
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, []));
 
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
                     scope.$apply();
 
                     expect(moduleDataBlockFactory.createForProject).toHaveBeenCalledWith(
@@ -249,7 +239,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
 
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, expectedModuleDataBlocks));
 
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
                     scope.$apply();
 
                     expect(scope.itemsAwaitingSubmission).toEqual([expectedModuleDataBlocks[0]]);
@@ -268,7 +258,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
 
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, expectedModuleDataBlocks));
 
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
                     scope.$apply();
 
                     expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual([expectedModuleDataBlocks[1]]);
@@ -287,7 +277,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
 
                     moduleDataBlockFactory.createForProject.and.returnValue(utils.getPromise(q, expectedModuleDataBlocks));
 
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
                     scope.$apply();
 
                     expect(scope.itemsAwaitingApprovalAtOtherLevels).toEqual([expectedModuleDataBlocks[1]]);
@@ -296,7 +286,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
 
             describe('getTemplateUrl', function() {
                 it("should return the aggregate data entry template url by default", function() {
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
                     rootScope.hasRoles.and.callFake(function(roles) {
                         if (_.contains(roles, 'Data entry user'))
                             return true;
@@ -322,7 +312,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
                 });
 
                 it("should return the list-list entry template url for a data entry user if current module contains line list programs", function() {
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
                     rootScope.hasRoles.and.callFake(function(roles) {
                         if (_.contains(roles, 'Data entry user'))
                             return true;
@@ -349,7 +339,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
                 });
 
                 it("should return the approval template if user is a project level approver", function() {
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
                     rootScope.hasRoles.and.callFake(function(roles) {
                         if (_.contains(roles, 'Project Level Approver'))
                             return true;
@@ -375,7 +365,7 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "orgUni
                 });
 
                 it("should return the approval template if user is a coordination level approver", function() {
-                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, orgUnitRepository, approvalDataRepository, dataRepository, programEventRepository, moduleDataBlockFactory);
+                    dashboardController = new DashboardController(scope, hustle, q, rootScope, fakeModal, timeout, location, approvalDataRepository, moduleDataBlockFactory);
                     rootScope.hasRoles.and.callFake(function(roles) {
                         if (_.contains(roles, 'Coordination Level Approver'))
                             return true;
