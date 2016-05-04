@@ -1,15 +1,20 @@
-define(['lodash', 'customAttributes'], function (_, CustomAttributes) {
+define(['lodash', 'customAttributes', 'moment'], function (_, CustomAttributes, moment) {
     var ModuleDataBlock = function (orgUnit, period, aggregateDataValues, lineListEvents, approvalData) {
         this.moduleId = orgUnit.id;
         this.period = period;
         this.moduleName = parseModuleName(orgUnit);
         this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
+
         this.submitted = isSubmitted(aggregateDataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
         this.approvedAtCoordinationLevel = !!(approvalData && approvalData.isApproved);
+
         this.awaitingActionAtDataEntryLevel = !this.submitted && !this.approvedAtCoordinationLevel;
         this.awaitingActionAtProjectLevelApprover = this.submitted && !this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
         this.awaitingActionAtCoordinationLevelApprover = this.submitted && this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
+
+        this.isNotSynced = !this.lineListService ? !!(aggregateDataValues && aggregateDataValues.localStatus && aggregateDataValues.localStatus == 'FAILED_TO_SYNC') : false;
+        this.active = moment(this.period, "GGGG[W]W").isoWeek() >= moment(orgUnit.openingDate).isoWeek();
     };
 
     var isSubmitted = function (aggregateDataValues, lineListEvents, lineListService) {

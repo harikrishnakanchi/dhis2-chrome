@@ -99,7 +99,8 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
                         },{
                             value: 'anotherValue',
                             isDraft: true
-                        }]
+                        }],
+                        localStatus: "random status"
                     };
                     moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
                     expect(moduleDataBlock.submitted).toEqual(false);
@@ -329,6 +330,80 @@ define(['moduleDataBlock', 'customAttributes'], function(ModuleDataBlock, Custom
                 };
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
+            });
+        });
+
+        describe('isNotSynced', function() {
+            beforeEach(function() {
+                CustomAttributes.parseAttribute.and.returnValue(false);
+            });
+
+            it('should be false if it is lineListService', function() {
+                CustomAttributes.parseAttribute.and.returnValue(true);
+                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                expect(moduleDataBlock.isNotSynced).toEqual(false);
+            });
+
+            it('should be false if localStatus is not "FAILED_TO_SYNC" ', function() {
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue'
+                    },{
+                        value: 'anotherValue',
+                        isDraft: true
+                    }],
+                    localStatus: 'random status'
+                };
+                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+
+                expect(moduleDataBlock.isNotSynced).toEqual(false);
+            });
+
+            it('should be true if localStatus is "FAILED_TO_SYNC" ', function() {
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue'
+                    },{
+                        value: 'anotherValue',
+                        isDraft: true
+                    }],
+                    localStatus: 'FAILED_TO_SYNC'
+                };
+                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+
+                expect(moduleDataBlock.isNotSynced).toEqual(true);
+            });
+        });
+
+        describe('active', function() {
+            it('should be true if period is after opening date', function() {
+                orgUnit = {
+                    id: 'orgUnitId',
+                    openingDate: '2016-03-19'
+                };
+                period = '2016W18';
+                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                expect(moduleDataBlock.active).toEqual(true);
+            });
+
+            it('should be false if period is before opening date', function() {
+                orgUnit = {
+                    id: 'orgUnitId',
+                    openingDate: '2016-04-03'
+                };
+                period = '2016W12';
+                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                expect(moduleDataBlock.active).toEqual(false);
+            });
+
+            it('should be true if opening date is within the same week as period', function() {
+                orgUnit = {
+                    id: 'orgUnitId',
+                    openingDate: '2016-03-12'
+                };
+                period = '2016W10';
+                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                expect(moduleDataBlock.active).toEqual(true);
             });
         });
     });
