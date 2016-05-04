@@ -242,6 +242,28 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit2, '2016W02', {}, [], approvalDataC);
                     expect(returnedObjects.length).toEqual(4);
                 });
+
+                it('should create module data block with approval data after rejecting approvals with "DELETED" status', function() {
+                    var approvalDataA = {
+                        someApprovalInfo: 'someApprovalDetails1',
+                        orgUnit: 'ou1',
+                        period: '2016W20'
+                    }, approvalDataB = {
+                        someApprovalInfo: 'someApprovalDetails2',
+                        status: 'DELETED',
+                        orgUnit: 'ou1',
+                        period: '2016W20'
+                    };
+                    approvalDataRepository.getApprovalDataForPeriodsOrgUnits.and.returnValue(utils.getPromise(q, [approvalDataA, approvalDataB]));
+
+                    var moduleOrgUnit = { id: 'ou1' };
+                    orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [moduleOrgUnit]));
+
+                    var returnedObjects = createModuleDataBlocksFromFactory();
+
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', {}, [], approvalDataA);
+                    expect(returnedObjects.length).toEqual(1);
+                });
             });
         });
 });

@@ -34,6 +34,7 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
                     var startPeriod = periodRange[0],
                         endPeriod = _.last(periodRange);
                     return approvalDataRepository.getApprovalDataForPeriodsOrgUnits(startPeriod, endPeriod, moduleIds).then(function (allApprovalData) {
+                       allApprovalData = _.reject(allApprovalData, 'status', 'DELETED');
                        return _.indexBy(allApprovalData, function (approvalData) {
                            return approvalData.period + approvalData.orgUnit;
                        });
