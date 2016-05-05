@@ -69,6 +69,7 @@ define(["lodash", "moment"], function(_, moment) {
                 return programsStore.find(programId);
             };
 
+            // This method can be removed after release > 6.0
             var addMandatoryFields = function (program) {
                 program.shortName = program.shortName || program.name;
                 program.programType = program.programType || "WITHOUT_REGISTRATION";

@@ -441,7 +441,7 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
                 "name": "Program"
             };
 
-            var expectedProgramUpsert = {
+            var expectedProgram = {
                 "id": "Prg",
                 "name": "Program",
                 "shortName": "Program",
@@ -456,7 +456,7 @@ define(["programRepository", "angularMocks", "utils", "timecop"], function(Progr
 
             scope.$apply();
 
-            expect(actualValue).toEqual(expectedProgramUpsert);
+            expect(actualValue).toEqual(expectedProgram);
 
         });
     });
