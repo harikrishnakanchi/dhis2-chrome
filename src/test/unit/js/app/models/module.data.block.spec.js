@@ -376,7 +376,6 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
         });
 
         describe('active', function() {
-
             beforeEach(function () {
                 Timecop.install();
                 Timecop.freeze(new Date("2016-05-04T10:46:29.382Z"));
@@ -387,31 +386,22 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 Timecop.uninstall();
             });
 
-            it('should be true if period is after opening date', function() {
+            it('should be true if period is after opening date or date12WeeksEarlier which ever is most recent', function() {
                 orgUnit = {
-                    openingDate: '2016-03-19'
+                    openingDate: '2016-02-25'
                 };
-                period = '2016W18';
+                period = '2016W8';
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
                 expect(moduleDataBlock.active).toEqual(true);
             });
 
-            it('should be false if period is before opening date', function() {
+            it('should be false if period is before opening date or date12WeeksEarlier which ever is most recent', function() {
                 orgUnit = {
-                    openingDate: '2016-04-03'
+                    openingDate: '2016-02-01'
                 };
-                period = '2016W12';
+                period = '2016W3';
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
                 expect(moduleDataBlock.active).toEqual(false);
-            });
-
-            it('should be true if opening date is within the same week as period', function() {
-                orgUnit = {
-                    openingDate: '2016-03-12'
-                };
-                period = '2016W10';
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
-                expect(moduleDataBlock.active).toEqual(true);
             });
         });
     });
