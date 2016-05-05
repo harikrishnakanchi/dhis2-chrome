@@ -55,10 +55,9 @@ define(["properties", "chromeUtils", "lodash"], function(properties, chromeUtils
                         if(userPreferences.selectedProject.parent)
                             countryName = userPreferences.selectedProject.parent.name;
                         getRequestParams = "&ctry=" + countryName;
-                    }
-                    else {
-                        var attributeValues = userPreferences.selectedProject.attributeValues;
-                        getRequestParams = "&prj=" + getAttributeValue(attributeValues, "projCode");
+                    } else {
+                        var projCode = _.last(userPreferences.selectedProject.name.split(' - '));
+                        getRequestParams = "&prj=" + projCode;
                     }
                 }
                 var praxisVersion = chromeUtils.getPraxisVersion();

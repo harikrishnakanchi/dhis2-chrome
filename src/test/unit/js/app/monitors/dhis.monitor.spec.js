@@ -17,17 +17,15 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             rootScope.praxisUid = "ade3fab1ab0";
             userPreferenceRepository = new UserPreferenceRepository();
             var userPreferences = {
-                "locale": "en",
-                "orgunits": [],
-                "selectedProject": {
-                    "id": "1",
-                    "attributeValues": [{
-                        "value": "ss153",
-                        "attribute": {
-                            "code": "projCode"
-                        }
-                    }]
-                }
+                locale: "en",
+                orgunits: [],
+                selectedProject: {
+                    id: "1",
+                    name: "randomName - ss153"
+                },
+                userRoles:[{
+                    name: "Data entry user"
+                }]
             };
             spyOn(userPreferenceRepository, "getCurrentUsersPreferences").and.returnValue(utils.getPromise(q, userPreferences));
             currentTime = (new Date()).getTime();
@@ -170,23 +168,20 @@ define(["dhisMonitor", "utils", "angularMocks", "chromeUtils", "mockChrome", "us
             httpBackend.flush();
         });
 
-        it("should not include projectCode in favicon call when user is logged in and selected project with no attribute code", function() {
+        it("should include projectCode from project name in favicon call when user is logged in as project admin", function() {
             userPreference = {
                 selectedProject: {
-                    attributeValues: [{
-                        "value": "ss153",
-                        "attribute": {
-                            "code": "notProjCode"
-                        }
-                    }]
-                }
-
+                    name: 'somename - projectCode'
+                },
+                userRoles:[{
+                    name: "Superuser"
+                }]
             };
 
             userPreferenceRepository.getCurrentUsersPreferences.and.returnValue(utils.getPromise(q, userPreference));
             dhisMonitor.start();
 
-            httpBackend.expectHEAD(favIconUrl + "&prj=").respond(200, "ok");
+            httpBackend.expectHEAD(favIconUrl + "&prj=projectCode").respond(200, "ok");
             httpBackend.flush();
         });
 
