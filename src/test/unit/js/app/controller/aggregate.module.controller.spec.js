@@ -78,9 +78,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     }
                 };
 
-                scope.currentUser = {
-                    "locale": "en"
-                };
+                scope.locale = "en";
 
                 scope.resourceBundle = {
                     "disableOrgUnitDesc": "disable organisation unit: ",

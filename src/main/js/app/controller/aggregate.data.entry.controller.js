@@ -209,7 +209,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     return $hustle.publish({
                         "data": currentPeriodAndOrgUnit,
                         "type": "deleteApprovals",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.deleteApprovalsDesc + currentPeriod + ", " + $scope.selectedModule.name
                     }, "dataValues");
                 };
@@ -218,7 +218,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     return $hustle.publish({
                         "data": periodsAndOrgUnits,
                         "type": "uploadDataValues",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadDataValuesDesc + currentPeriod + ", " + $scope.selectedModule.name
                     }, "dataValues");
                 };
@@ -302,7 +302,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     return $hustle.publish({
                         "data": [currentPeriodAndOrgUnit],
                         "type": "uploadCompletionData",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriod + ", " + $scope.selectedModule.name
                     }, "dataValues");
                 };
@@ -311,7 +311,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                     return $hustle.publish({
                         "data": [currentPeriodAndOrgUnit],
                         "type": "uploadApprovalData",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriod + ", " + $scope.selectedModule.name
                     }, "dataValues");
                 };

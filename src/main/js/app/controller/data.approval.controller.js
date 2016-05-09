@@ -139,7 +139,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 return $hustle.publish({
                     "data": [currentPeriodAndOrgUnit],
                     "type": "uploadCompletionData",
-                    "locale": $scope.currentUser.locale,
+                    "locale": $scope.locale,
                     "desc": $scope.resourceBundle.uploadCompletionDataDesc + currentPeriodAndOrgUnit.period + ", " + $scope.selectedModule.name
                 }, "dataValues");
             };
@@ -178,7 +178,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                 return $hustle.publish({
                     "data": [currentPeriodAndOrgUnit],
                     "type": "uploadApprovalData",
-                    "locale": $scope.currentUser.locale,
+                    "locale": $scope.locale,
                     "desc": $scope.resourceBundle.uploadApprovalDataDesc + currentPeriodAndOrgUnit.period + ", " + $scope.selectedModule.name
                 }, "dataValues");
             };

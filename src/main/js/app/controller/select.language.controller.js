@@ -4,7 +4,7 @@ define(["lodash"], function(_) {
             var getResourceBundle = function(locale, shouldFetchTranslations) {
                 var fetchResourceBundleFromDb = function() {
                     var store = db.objectStore('translations');
-                    var query = db.queryBuilder().$index('by_locale').$eq($rootScope.currentUser.locale).compile();
+                    var query = db.queryBuilder().$index('by_locale').$eq($rootScope.locale).compile();
                     return store.each(query).then(function(translations) {
                         _.transform(translations, function(acc, translation) {
                             if (translation.className === "DataElement" && translation.property !== "formName")
@@ -15,7 +15,7 @@ define(["lodash"], function(_) {
                 };
 
                 var getTranslationsForCurrentLocale = function() {
-                    if (!$rootScope.currentUser.locale) $rootScope.currentUser.locale = "en";
+                    if (!$rootScope.locale) $rootScope.locale = "en";
                     fetchResourceBundleFromDb();
                 };
 
@@ -27,9 +27,9 @@ define(["lodash"], function(_) {
                 });
             };
 
-            $rootScope.currentUser.locale = language;
+            $rootScope.locale = language;
 
-            return $rootScope.currentUser ? getResourceBundle($rootScope.currentUser.locale, true) : getResourceBundle("en", false);
+            return $rootScope ? getResourceBundle($rootScope.locale, true) : getResourceBundle("en", false);
         };
     };
 });

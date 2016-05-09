@@ -15,9 +15,8 @@ define(["orgUnitGroupHelper", "angularMocks", "utils", "moment", "lodash", "orgU
                     "upsert": function() {}
                 };
 
-                scope.currentUser = {
-                    "locale": "en"
-                };
+                scope.locale = "en";
+
                 scope.resourceBundle = {
                     "upsertOrgUnitGroupsDesc": "upsertOrgUnitGroupsDesc"
                 };

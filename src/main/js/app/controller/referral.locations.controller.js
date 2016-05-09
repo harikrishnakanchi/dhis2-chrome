@@ -87,7 +87,7 @@ define(["moment"], function(moment) {
             return $hustle.publish({
                 "data": $scope.orgUnit.id,
                 "type": "uploadReferralLocations",
-                "locale": $scope.currentUser.locale,
+                "locale": $scope.locale,
                 "desc": $scope.resourceBundle.uploadReferralLocationsDesc + " " + $scope.orgUnit.name
             }, "dataValues");
         };

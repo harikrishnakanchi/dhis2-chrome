@@ -55,10 +55,10 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
                     "dataApprovalConfirmationMessage": ""
                 };
 
+                rootScope.locale = "en";
                 rootScope.currentUser = {
                     "firstName": "test1",
                     "lastName": "test1last",
-                    "locale": "en",
                     "userCredentials": {
                         "username": "dataentryuser",
                         "userRoles": [{

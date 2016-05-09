@@ -22,9 +22,8 @@ define(["referralLocationsController", "angularMocks", "utils", "lodash", "refer
                         "id": "some_parent_id"
                     }
                 };
-                scope.currentUser = {
-                    "locale": "en"
-                };
+                scope.locale = "en";
+
                 scope.resourceBundle = {
                     "uploadReferralLocationsDesc": "upsert referral Locations for op unit",
                 };

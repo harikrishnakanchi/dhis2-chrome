@@ -56,11 +56,11 @@ define(["lineListSummaryController", "angularMocks", "utils", "moment", "timecop
                     'eventSubmitSuccess': ' Event submitted succesfully'
                 };
 
+                scope.locale = "en";
 
                 scope.currentUser = {
                     "firstName": "foo",
                     "lastName": "bar",
-                    "locale": "en",
                     "userCredentials": {
                         "username": "dataentryuser",
                         "userRoles": [{

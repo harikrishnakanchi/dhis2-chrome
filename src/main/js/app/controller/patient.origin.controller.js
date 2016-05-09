@@ -7,7 +7,7 @@ define(["lodash", "moment", "dhisId", "orgUnitMapper"], function(_, moment, dhis
             return $hustle.publish({
                 "data": data,
                 "type": action,
-                "locale": $scope.currentUser.locale,
+                "locale": $scope.locale,
                 "desc": desc
             }, "dataValues");
         };

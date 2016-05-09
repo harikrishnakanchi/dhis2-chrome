@@ -84,7 +84,7 @@ define([], function() {
                             "orgUnitIds": _.pluck(orgUnits, "id")
                         },
                         "type": "upsertOrgUnitGroups",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.upsertOrgUnitGroupsDesc
                     }, "dataValues");
                 });

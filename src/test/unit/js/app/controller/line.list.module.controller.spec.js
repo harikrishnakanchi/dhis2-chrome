@@ -98,9 +98,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                     }
                 };
 
-                scope.currentUser = {
-                    "locale": "en"
-                };
+                scope.locale = "en";
 
                 scope.resourceBundle = {
                     "disableOrgUnitDesc": "disable organisation unit: ",

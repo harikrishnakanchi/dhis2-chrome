@@ -47,10 +47,10 @@ define(["dashboardController", "angularMocks", "approvalDataRepository", "module
                 Timecop.install();
                 Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
 
+                rootScope.locale = "en";
                 rootScope.currentUser = {
                     "firstName": "test1",
                     "lastName": "test1last",
-                    "locale": "en",
                     "userCredentials": {
                         "username": "dataentryuser",
                         "userRoles": [{

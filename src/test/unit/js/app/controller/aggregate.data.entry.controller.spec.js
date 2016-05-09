@@ -62,10 +62,10 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                     "dataApprovalConfirmationMessage": ""
                 };
 
+                rootScope.locale = "en";
                 rootScope.currentUser = {
                     "firstName": "test1",
                     "lastName": "test1last",
-                    "locale": "en",
                     "userCredentials": {
                         "username": "dataentryuser",
                         "userRoles": [{

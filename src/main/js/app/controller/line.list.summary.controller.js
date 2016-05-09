@@ -169,7 +169,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "type": "uploadProgramEvents",
                         "data": _.pluck(submitableEvents, 'event'),
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -178,7 +178,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "data": periodsAndOrgUnits,
                         "type": "deleteApprovals",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -218,7 +218,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "data": periodsAndOrgUnits,
                         "type": "deleteApprovals",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.deleteApprovalsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -227,7 +227,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "type": "uploadProgramEvents",
                         "data": _.pluck(submitableEvents, "event"),
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadProgramEventsDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -236,7 +236,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "data": periodsAndOrgUnits,
                         "type": "uploadCompletionData",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadCompletionDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -245,7 +245,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return $hustle.publish({
                         "data": periodsAndOrgUnits,
                         "type": "uploadApprovalData",
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": $scope.resourceBundle.uploadApprovalDataDesc + _.pluck(periodsAndOrgUnits, "period") + ", Module: " + $scope.selectedModuleName
                     }, "dataValues");
                 };
@@ -284,14 +284,14 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var deleteEventPromise = $hustle.publish({
                     "data": eventId,
                     "type": "deleteEvent",
-                    "locale": $scope.currentUser.locale,
+                    "locale": $scope.locale,
                     "desc": $scope.resourceBundle.deleteEventDesc
                 }, "dataValues");
 
                 var deleteApprovalsPromise = $hustle.publish({
                     "data": periodAndOrgUnit,
                     "type": "deleteApprovals",
-                    "locale": $scope.currentUser.locale,
+                    "locale": $scope.locale,
                     "desc": $scope.resourceBundle.deleteApprovalsDesc + periodAndOrgUnit.period + ", Module: " + $scope.selectedModuleName
                 }, "dataValues");
 

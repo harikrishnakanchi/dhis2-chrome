@@ -25,9 +25,7 @@ define(["countryController", "angularMocks", "utils", "moment", "timecop", "dhis
                 id: "blah"
             };
 
-            scope.currentUser = {
-                "locale": "en"
-            };
+            scope.locale = "en";
 
             scope.resourceBundle = {
                 "upsertOrgUnitDesc": "create organisation unit: ",

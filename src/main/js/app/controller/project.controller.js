@@ -32,7 +32,7 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
             return $hustle.publish({
                 "data": data,
                 "type": action,
-                "locale": $scope.currentUser.locale,
+                "locale": $scope.locale,
                 "desc": desc
             }, "dataValues").then(function() {
                 return data;

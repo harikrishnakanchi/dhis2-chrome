@@ -195,7 +195,7 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                 return $hustle.publish({
                     "data": data,
                     "type": action,
-                    "locale": $scope.currentUser.locale,
+                    "locale": $scope.locale,
                     "desc": desc
                 }, "dataValues");
             };

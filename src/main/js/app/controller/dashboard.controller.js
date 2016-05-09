@@ -66,7 +66,7 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
                     return $hustle.publish({
                         "data": periodsAndOrgUnitsToBeApproved,
                         "type": messageType,
-                        "locale": $scope.currentUser.locale,
+                        "locale": $scope.locale,
                         "desc": desc
                     }, "dataValues");
                 };

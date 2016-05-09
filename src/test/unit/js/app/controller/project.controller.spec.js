@@ -44,9 +44,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 "uploadCompletionDataDesc": "approve data at project level for "
             };
 
-            scope.currentUser = {
-                "locale": "en"
-            };
+            scope.locale = "en";
 
             Timecop.install();
             Timecop.freeze(new Date("2014-05-30T12:43:54.972Z"));
