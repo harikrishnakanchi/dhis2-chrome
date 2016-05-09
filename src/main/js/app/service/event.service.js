@@ -11,8 +11,7 @@ define(["moment", "dhisUrl"], function(moment, dhisUrl) {
                     "endDate": moment().add(1, 'days').format("YYYY-MM-DD"),
                     "skipPaging": true,
                     "orgUnit": orgUnitId,
-                    "ouMode": "DESCENDANTS",
-                    "fields": ":all,dataValues[value,dataElement,providedElsewhere,storedBy]"
+                    "ouMode": "DESCENDANTS"
                 }
             }).then(onSuccess);
 
