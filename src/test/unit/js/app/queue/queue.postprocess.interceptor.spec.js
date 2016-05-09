@@ -1,7 +1,7 @@
-define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository"], function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository) {
+define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtils", "utils", "dataRepository", "approvalDataRepository"], function(QueuePostProcessInterceptor, mocks, properties, chromeUtils, utils, DataRepository, ApprovalDataRepository) {
     describe('queuePostProcessInterceptor', function() {
 
-        var hustle, queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository;
+        var hustle, queuePostProcessInterceptor, q, rootScope, ngI18nResourceBundle, scope, dataRepository, approvalDataRepository;
 
         beforeEach(mocks.inject(function($q, $rootScope, $log) {
             q = $q;
@@ -9,6 +9,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             scope = $rootScope.$new();
 
             dataRepository = new DataRepository();
+            approvalDataRepository = new ApprovalDataRepository();
 
             spyOn(chromeUtils, "sendMessage");
             spyOn(chromeUtils, "createNotification");
@@ -19,7 +20,7 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
                 }))
             };
 
-            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository);
+            queuePostProcessInterceptor = new QueuePostProcessInterceptor($log, ngI18nResourceBundle, dataRepository, approvalDataRepository);
         }));
 
         it('should return true for retry if number of releases is less than max retries', function() {
@@ -193,6 +194,42 @@ define(["queuePostProcessInterceptor", "angularMocks", "properties", "chromeUtil
             scope.$apply();
 
             expect(dataRepository.setLocalStatus).not.toHaveBeenCalled();
+        });
+
+        it("should change completion data status to 'FAILED_TO_SYNC' after maxretries", function() {
+            var job = {
+                "id": 1,
+                "data": {
+                    "type": "uploadCompletionData",
+                    "data": "someData"
+                },
+                "releases": 6
+            };
+
+            spyOn(approvalDataRepository, "setLocalStatus");
+            queuePostProcessInterceptor.shouldRetry(job, {});
+
+            scope.$apply();
+
+            expect(approvalDataRepository.setLocalStatus).toHaveBeenCalledWith("someData", "FAILED_TO_SYNC");
+        });
+
+        it("should change approval data status for to 'FAILED_TO_SYNC' after maxretries", function() {
+            var job = {
+                "id": 1,
+                "data": {
+                    "type": "uploadApprovalData",
+                    "data": "someData"
+                },
+                "releases": 6
+            };
+
+            spyOn(approvalDataRepository, "setLocalStatus");
+            queuePostProcessInterceptor.shouldRetry(job, {});
+
+            scope.$apply();
+
+            expect(approvalDataRepository.setLocalStatus).toHaveBeenCalledWith("someData", "FAILED_TO_SYNC");
         });
     });
 });

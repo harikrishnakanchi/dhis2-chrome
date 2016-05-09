@@ -11,7 +11,7 @@ define(["angular", "Q", "services", "repositories", "consumers", "hustleModule",
             app.factory('cleanupPayloadInterceptor', [cleanupPayloadInterceptor]);
             app.factory('handleTimeoutInterceptor', ['$q', '$injector', '$timeout', handleTimeoutInterceptor]);
             app.factory('logRequestReponseInterceptor', ['$log', '$q', logRequestReponseInterceptor]);
-            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository', queuePostProcessInterceptor]);
+            app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', 'dataRepository', 'approvalDataRepository', queuePostProcessInterceptor]);
 
             app.config(['$indexedDBProvider', '$httpProvider', '$hustleProvider', '$provide',
                 function($indexedDBProvider, $httpProvider, $hustleProvider, $provide) {

@@ -37,7 +37,8 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                     "completedOn": moment().toISOString(),
                     "isComplete": true,
                     "isApproved": false,
-                    "status": "NEW"
+                    "status": "NEW",
+                    "localStatus": "WAITING_TO_SYNC"
                 };
             });
 
@@ -82,6 +83,7 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
                     approval.approvedBy = approvedBy;
                     approval.approvedOn = moment().toISOString();
                     approval.status = "NEW";
+                    approval.localStatus = 'WAITING_TO_SYNC';
                     return approval;
                 });
             };
@@ -118,8 +120,23 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
         };
 
         this.saveApprovalsFromDhis = function(approvalsFromDhis) {
-            var store = db.objectStore("approvals");
-            return store.upsert(approvalsFromDhis);
+            var updateLocalStatus = function (approvalsFromDhis, status) {
+                if(_.isArray(approvalsFromDhis)) {
+                    _.each(approvalsFromDhis, function(approval) {
+                        approval.localStatus = status;
+                    });
+                } else {
+                    approvalsFromDhis.localStatus = status;
+                }
+            };
+
+            var saveApprovals = function (approvals){
+                var store = db.objectStore("approvals");
+                return store.upsert(approvals);
+            };
+
+            updateLocalStatus(approvalsFromDhis, 'DATA_FROM_DHIS');
+            return saveApprovals(approvalsFromDhis);
         };
 
         this.clearStatusFlag = function(period, orgUnit) {
@@ -130,6 +147,19 @@ define(["moment", "lodash", "dateUtils"], function(moment, _, dateUtils) {
             var store = db.objectStore("approvals");
             return self.getApprovalData(periodAndOrgUnit).then(function(approvalFromDb) {
                 return store.upsert(_.omit(approvalFromDb, "status"));
+            });
+        };
+
+        this.setLocalStatus = function(periodsAndOrgUnits, localStatus) {
+            periodsAndOrgUnits = _.map(periodsAndOrgUnits, function(periodAndOrgUnit) {
+                return [periodAndOrgUnit.period, periodAndOrgUnit.orgUnit];
+            });
+            var approvals = db.objectStore("approvals");
+            _.each(periodsAndOrgUnits, function(tuple) {
+                approvals.find(tuple).then(function (data) {
+                    data.localStatus = localStatus;
+                    return approvals.upsert(data);
+                });
             });
         };
     };

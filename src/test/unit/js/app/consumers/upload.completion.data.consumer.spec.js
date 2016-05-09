@@ -10,6 +10,7 @@ define(["uploadCompletionDataConsumer", "angularMocks", "approvalService", "appr
 
                 approvalDataRepository = new ApprovalDataRepository();
                 spyOn(approvalDataRepository, "clearStatusFlag").and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalDataRepository, "setLocalStatus");
 
                 approvalService = new ApprovalService();
                 spyOn(approvalService, "markAsComplete").and.returnValue(utils.getPromise(q, {}));
@@ -122,6 +123,62 @@ define(["uploadCompletionDataConsumer", "angularMocks", "approvalService", "appr
 
                 expect(approvalDataRepository.clearStatusFlag).not.toHaveBeenCalledWith(approval.period, approval.orgUnit);
                 expect(approvalDataRepository.clearStatusFlag).toHaveBeenCalledWith(approvalThatIsMarkedAsCompleteOnly.period, approvalThatIsMarkedAsCompleteOnly.orgUnit);
+            });
+
+            it("should set localStatus to SYNCED_TO_DHIS after uploading approval data to DHIS", function() {
+                var approval = {
+                    "period": "2014W01",
+                    "orgUnit": "ou1",
+                    "completedBy": "user1",
+                    "completedOn": "2014-01-05T00:00:00.000+0000",
+                    "approvedBy": "approver1",
+                    "approvedOn": "2014-01-10T00:00:00.000+0000",
+                    "isComplete": true,
+                    "isApproved": true,
+                    "status": "NEW"
+                };
+
+                var approvalThatIsMarkedAsCompleteOnly = {
+                    "period": "2014W01",
+                    "orgUnit": "ou2",
+                    "completedBy": "user1",
+                    "completedOn": "2014-01-05T00:00:00.000+0000",
+                    "approvedBy": "approver1",
+                    "approvedOn": "2014-01-10T00:00:00.000+0000",
+                    "isComplete": true,
+                    "isApproved": false,
+                    "status": "NEW"
+                };
+
+                var approvalData = [approval, approvalThatIsMarkedAsCompleteOnly];
+
+                spyOn(datasetRepository, "getAll").and.returnValue(utils.getPromise(q, [{
+                    'id': 'd1'
+                }, {
+                    'id': 'd2'
+                }]));
+                spyOn(approvalDataRepository, "getApprovalData").and.returnValue(utils.getPromise(q, approvalData));
+
+                message = {
+                    "data": {
+                        "data": [{
+                            "period": "2014W01",
+                            "orgUnit": "ou1"
+                        }, {
+                            "period": "2014W01",
+                            "orgUnit": "ou2"
+                        }, {
+                            "period": "2014W02",
+                            "orgUnit": "ou1"
+                        }],
+                        "type": "uploadCompletionData"
+                    }
+                };
+
+                uploadCompletionDataConsumer.run(message);
+                scope.$apply();
+
+                expect(approvalDataRepository.setLocalStatus).toHaveBeenCalledWith(approvalData, 'SYNCED_TO_DHIS');
             });
         });
     });
