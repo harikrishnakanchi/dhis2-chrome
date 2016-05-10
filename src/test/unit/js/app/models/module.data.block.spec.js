@@ -232,6 +232,17 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
             });
+
+            it('should be true if data has been submitted but not synced to DHIS', function() {
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue'
+                    }],
+                    localStatus: "FAILED_TO_SYNC"
+                };
+                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toBeTruthy();
+            });
         });
 
         describe('awaitingActionAtProjectLevelApprover', function() {
@@ -277,6 +288,17 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 approvalData = {
                     isComplete: false,
                     isApproved: true
+                };
+                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
+            });
+
+            it('should be false if data has been submitted, not synced to DHIS', function() {
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue'
+                    }],
+                    localStatus: "FAILED_TO_SYNC"
                 };
                 moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);

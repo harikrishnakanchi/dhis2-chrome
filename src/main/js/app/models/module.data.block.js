@@ -9,12 +9,17 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
         this.approvedAtCoordinationLevel = !!(approvalData && approvalData.isApproved);
 
-        this.awaitingActionAtDataEntryLevel = !this.submitted && !this.approvedAtCoordinationLevel;
-        this.awaitingActionAtProjectLevelApprover = this.submitted && !this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
+        var dataValuesNotSynced = dataValuesFailedToSync(this.lineListService, aggregateDataValues);
+        this.awaitingActionAtDataEntryLevel = !(this.submitted || this.approvedAtCoordinationLevel) || dataValuesNotSynced;
+        this.awaitingActionAtProjectLevelApprover = (this.submitted && !this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel)  && !dataValuesNotSynced;
         this.awaitingActionAtCoordinationLevelApprover = this.submitted && this.approvedAtProjectLevel && !this.approvedAtCoordinationLevel;
 
-        this.notSynced = !this.lineListService ? !!(aggregateDataValues && aggregateDataValues.localStatus && aggregateDataValues.localStatus == 'FAILED_TO_SYNC') : false;
+        this.notSynced = dataValuesNotSynced;
         this.active = isActive(this.period, orgUnit.openingDate);
+    };
+
+    var dataValuesFailedToSync = function (isLineListService, aggregateDataValues) {
+        return isLineListService ? false : !!(aggregateDataValues && aggregateDataValues.localStatus && aggregateDataValues.localStatus == 'FAILED_TO_SYNC');
     };
 
     var isActive = function (period, openingDate) {
@@ -26,7 +31,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
 
     var isSubmitted = function (aggregateDataValues, lineListEvents, lineListService) {
         if(lineListService) {
-            return !!(lineListEvents && lineListEvents.length > 0 &&_.all(lineListEvents, eventIsSubmitted));
+            return !!(lineListEvents && lineListEvents.length > 0 && _.all(lineListEvents, eventIsSubmitted));
         } else {
             return !!(aggregateDataValues && aggregateDataValues.dataValues && aggregateDataValues.dataValues.length > 0 && !_.some(aggregateDataValues.dataValues, { isDraft: true }));
         }
@@ -35,6 +40,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
     var eventIsSubmitted = function(event) {
         return _.isUndefined(event.localStatus) || event.localStatus == 'READY_FOR_DHIS';
     };
+
     var parseModuleName = function (orgUnit) {
         if(orgUnit.parent) {
             return [orgUnit.parent.name, orgUnit.name].join(' - ');
