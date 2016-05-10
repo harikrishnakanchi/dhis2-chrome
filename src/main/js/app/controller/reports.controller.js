@@ -36,6 +36,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 },
                 "yAxis": {
                     "tickFormat": formatYAxisTicks
+                },
+                "legend": {
+                    "maxKeyLength": 50
                 }
             }
         };
@@ -68,6 +71,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 },
                 "yAxis": {
                     "tickFormat": formatYAxisTicks
+                },
+                "legend": {
+                    "maxKeyLength": 50
                 }
             }
         };
@@ -100,6 +106,9 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 },
                 "yAxis": {
                     "tickFormat": formatYAxisTicks
+                },
+                "legend": {
+                    "maxKeyLength": 50
                 }
             }
         };
@@ -156,6 +165,13 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                         var dimensionIndex = _.findIndex(chartData.headers, {
                             "name": "dx"
                         });
+
+                        var dataElementsIds = chartData.metaData.dx;
+                        _.each(dataElementsIds, function (id) {
+                            var legendName = chartData.metaData.names[id];
+                            chartData.metaData.names[id] = legendName.split(" - ")[0];
+                        });
+
                         var categoryIndex = _.findIndex(chartData.headers, function(item) {
                             return item.name !== "dx" && item.name !== "pe" && item.name !== "value";
                         });

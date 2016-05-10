@@ -275,9 +275,10 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                     "meta": false
                 }],
                 "metaData": {
-                    "pe": ["2015W21", "2015W22", "2015W23", "2015W24", "2015W25", "2015W26", "2015W27"],
+                    "pe": ["2015W21", "2015W22", "2015W23", "2015W24", "2015W25", "2015W26", "2015W27", "2015W17"],
                     "co": [],
-                    "ou": ["a510de00b66"],
+                    "ou": ["a510de00b66", "KHUdZOGzsHr"],
+                    "dx": ["KHUdZOGzsHr"],
                     "names": {
                         "LjYh00yjwxn": "Total Consultations 1-23 months Pediatric OPD",
                         "2015W18": "2015W18",
@@ -291,18 +292,21 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                         "2015W22": "2015W22",
                         "2015W23": "2015W23",
                         "2015W24": "2015W24",
+                        "2015W17": "2015W17",
                         "in": null,
                         "KHUdZOGzsH5": "Total Consultations <1 month Pediatric OPD",
                         "2015W20": "2015W20",
                         "a510de00b66": "Agg1",
-                        "pe": "Period"
+                        "pe": "Period",
+                        "KHUdZOGzsHr": "Total Consultations - Pediatric IPD"
                     }
                 },
                 "rows": [
                     ["LjYh00yjwxn", "2015W23", "260.0"],
                     ["LjYh00yjwxn", "2015W24", "168.0"],
                     ["LjYh00yjwxn", "2015W25", "168.0"],
-                    ["LjYh00yjwxn", "2015W26", "200.0"]
+                    ["LjYh00yjwxn", "2015W26", "200.0"],
+                    ["KHUdZOGzsHr", "2015W17", "400.0"]
                 ],
                 "height": 22,
                 "width": 3
@@ -389,6 +393,9 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 "data": [{
                     "key": "Total Consultations 1-23 months Pediatric OPD",
                     "values": [{
+                        "label": unixTimestamp('2015W17'),
+                        "value": 0
+                    },{
                         "label": unixTimestamp('2015W21'),
                         "value": 0
                     }, {
@@ -406,6 +413,33 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                     }, {
                         "label": unixTimestamp('2015W26'),
                         "value": 200
+                    }, {
+                        "label": unixTimestamp('2015W27'),
+                        "value": 0
+                    }]
+                },{
+                    "key": "Total Consultations",
+                    "values": [{
+                        "label": unixTimestamp('2015W17'),
+                        "value": 400
+                    },{
+                        "label": unixTimestamp('2015W21'),
+                        "value": 0
+                    }, {
+                        "label": unixTimestamp('2015W22'),
+                        "value": 0
+                    }, {
+                        "label": unixTimestamp('2015W23'),
+                        "value": 0
+                    }, {
+                        "label": unixTimestamp('2015W24'),
+                        "value": 0
+                    }, {
+                        "label": unixTimestamp('2015W25'),
+                        "value": 0
+                    }, {
+                        "label": unixTimestamp('2015W26'),
+                        "value": 0
                     }, {
                         "label": unixTimestamp('2015W27'),
                         "value": 0
