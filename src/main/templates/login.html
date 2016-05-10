@@ -21,6 +21,8 @@
                     <input type="submit" ng-disabled="loginForm.$invalid" value="{{ resourceBundle.loginBtn }}" class="btn btn-primary" id="loginButton">
                 </div>
             </li>
+
+            <li ng-include="'templates/partials/select-language.html'"></li>
         </ul>
     </form>
 </div>

@@ -1,12 +1,5 @@
-<a href="" tabindex="-1">{{resourceBundle.selectLanguageLabel}}</a>
-<ul ng-controller="selectLanguageController" class="dropdown-menu" role="menu">
-    <li>
-        <a href="" ng-click="changeLanguagePreference('en')"> <span ng-class="{'glyphicon glyphicon-ok': locale=='en','glyphicon glyphicon-ok hide-tick': locale !='en' }"></span> English</a>
-    </li>
-    <li>
-        <a href="" ng-click="changeLanguagePreference('fr')"> <span ng-class="{'glyphicon glyphicon-ok': locale=='fr','glyphicon glyphicon-ok hide-tick': locale !='fr' }"></span> Français</a>
-    </li>
-    <li>
-        <a href="" ng-click="changeLanguagePreference('ar')"> <span ng-class="{'glyphicon glyphicon-ok': locale=='ar','glyphicon glyphicon-ok hide-tick': locale !='ar' }"></span> العَرَبِيةُ</a>
-    </li>
-</ul>
+<div class="selectLanguage col-sm-8 col-md-8" ng-controller="selectLanguageController">
+    <a href="" ng-click="changeLanguagePreference('en')" ng-class="{'underline': locale=='en','': locale !='en' }"> English</a>
+    <a href="" ng-click="changeLanguagePreference('fr')" ng-class="{'underline': locale=='fr','': locale !='en' }">  Français</a>
+    <a href="" ng-click="changeLanguagePreference('ar')" ng-class="{'underline': locale=='ar','': locale !='en' }"> العَرَبِيةُ</a>
+</div>
