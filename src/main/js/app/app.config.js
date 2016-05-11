@@ -134,6 +134,8 @@ require.config({
         "systemSettingsTransformer": "app/transformers/system.settings.transformer",
         "datasetTransformer": "app/transformers/dataset.transformer",
         "programTransformer": "app/transformers/program.transformer",
+        "translationsService": "app/transformers/translations.service",
+        "transformers": "app/transformers/transformers",
 
         //Database Utilities
         "dbutils": "app/dbutils/dbutils",

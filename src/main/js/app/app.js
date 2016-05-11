@@ -1,10 +1,10 @@
-define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "factories", "migrator", "migrations", "properties", "queuePostProcessInterceptor", "monitors", "helpers", "indexedDBLogger", "authenticationUtils",
+define(["angular", "Q", "services", "directives", "dbutils", "controllers", "repositories", "factories", "migrator", "migrations", "properties", "queuePostProcessInterceptor", "monitors", "helpers", "indexedDBLogger", "authenticationUtils", "transformers",
         "angular-route", "ng-i18n", "angular-indexedDB", "hustleModule", "angular-ui-tabs", "angular-ui-accordion", "angular-ui-collapse", "angular-ui-transition", "angular-ui-weekselector",
         "angular-treeview", "angular-ui-modal", "angular-multiselect", "angular-ui-notin", "angular-ui-equals", "angular-ui-dropdown", "angular-filter", "angucomplete-alt", "angular-nvd3", "angular-ui-tooltip",
         "angular-ui-bindHtml", "angular-ui-position", "angular-sanitize", "ng-csv"
 
     ],
-    function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers, indexedDBLogger, authenticationUtils) {
+    function(angular, Q, services, directives, dbutils, controllers, repositories, factories, migrator, migrations, properties, queuePostProcessInterceptor, monitors, helpers, indexedDBLogger, authenticationUtils, transformers) {
         var init = function() {
             var app = angular.module('DHIS2', ["ngI18n", "ngRoute", "xc.indexedDB", "ui.bootstrap.tabs", "ui.bootstrap.transition", "ui.bootstrap.collapse",
                 "ui.bootstrap.accordion", "ui.weekselector", "angularTreeview", "ui.bootstrap.modal", "ui.bootstrap.dropdown",
@@ -20,6 +20,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
             dbutils.init(app);
             controllers.init(app);
             directives.init(app);
+            transformers.init(app);
 
             app.factory('queuePostProcessInterceptor', ['$log', 'ngI18nResourceBundle', queuePostProcessInterceptor]);
 
