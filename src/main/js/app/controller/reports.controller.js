@@ -39,7 +39,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 },
                 "legend": {
                     "maxKeyLength": 50
-                }
+                },
+                "reduceXTicks": false
             }
         };
 
@@ -74,7 +75,8 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
                 },
                 "legend": {
                     "maxKeyLength": 50
-                }
+                },
+                "reduceXTicks": false
             }
         };
 
