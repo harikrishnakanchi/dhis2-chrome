@@ -29,7 +29,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
             return !systemSettingRepository.isKeyGeneratedFromProd();
         };
 
-        var deregisterCurrentUserLocaleWatcher = $rootScope.$watch("locale", function() {
+        var buildResourceBundle = $rootScope.$watch("locale", function() {
             var getResourceBundle = function(locale, shouldFetchTranslations) {
                 var fetchResourceBundleFromDb = function() {
                     var store = db.objectStore('translations');
@@ -126,7 +126,7 @@ define(["chromeUtils", "lodash"], function(chromeUtils, _) {
 
         $scope.$on('$destroy', function() {
             deregisterUserPreferencesListener();
-            deregisterCurrentUserLocaleWatcher();
+            buildResourceBundle();
         });
 
         var checkConnectionQuality = function() {

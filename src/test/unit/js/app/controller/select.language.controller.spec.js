@@ -1,7 +1,7 @@
-define(["selectLanguageController", "angularMocks", "utils"],
-    function(SelectLanguageController, mocks, utils) {
+define(["selectLanguageController","systemSettingRepository", "angularMocks", "utils"],
+    function(SelectLanguageController, SystemSettingRepository, mocks, utils) {
         describe("selectLanguageController", function() {
-            var rootScope, selectLanguageController, scope, i18nResourceBundle, getResourceBundleSpy, db, frenchResourceBundle,
+            var rootScope, selectLanguageController, systemSettingRepository, scope, i18nResourceBundle, getResourceBundleSpy, db, frenchResourceBundle,
                 translationStore;
 
             beforeEach(mocks.inject(function($rootScope, $q, $location) {
@@ -47,6 +47,9 @@ define(["selectLanguageController", "angularMocks", "utils"],
                     "data": {}
                 }));
 
+                systemSettingRepository = new SystemSettingRepository();
+                spyOn(systemSettingRepository, 'upsertLocale').and.returnValue(utils.getPromise(q, {}));
+
                 translationStore = getMockStore("translations");
 
                 spyOn(translationStore, "each").and.returnValue(utils.getPromise(q, {}));
@@ -54,22 +57,11 @@ define(["selectLanguageController", "angularMocks", "utils"],
                     return translationStore;
                 });
 
-                selectLanguageController = new SelectLanguageController(scope, rootScope, db, i18nResourceBundle);
+                selectLanguageController = new SelectLanguageController(scope, rootScope, q, db, i18nResourceBundle, systemSettingRepository);
             }));
 
             it("should change resourceBundle if locale changes", function() {
-                rootScope.currentUser = {
-                    "userCredentials": {
-                        "username": "1"
-                    },
-                    "organisationUnits": [{
-                        "id": "123"
-                    }],
-                    "selectedProject": {
-                        "id": "prj1"
-                    }
-                };
-
+                rootScope.locale = 'fr';
                 frenchResourceBundle = {
                     "data": {
                         "login": "french"

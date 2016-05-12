@@ -3,7 +3,6 @@ define(["moment"], function(moment) {
         var saveSessionState = function() {
             var userPreferences = {
                 "username": $rootScope.currentUser.userCredentials.username,
-                "locale": $rootScope.locale,
                 "organisationUnits": $rootScope.currentUser.organisationUnits,
                 "selectedProject": $rootScope.currentUser.selectedProject,
                 "lastUpdated": moment().toISOString()
@@ -24,12 +23,10 @@ define(["moment"], function(moment) {
             };
 
             var setUserPreferences = function(userPreferences) {
-                $rootScope.locale = userPreferences.locale;
                 $rootScope.currentUser.selectedProject = userPreferences.selectedProject;
             };
 
             var setDefaultPreferences = function() {
-                $rootScope.locale = "en";
                 $rootScope.currentUser.selectedProject = _.isEmpty($rootScope.currentUser.organisationUnits) ? undefined : $rootScope.currentUser.organisationUnits[0];
             };
 

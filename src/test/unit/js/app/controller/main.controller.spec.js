@@ -115,12 +115,6 @@ define(["mainController", "angularMocks", "utils", "packagedDataImporter", "sess
                 expect(result).toEqual(true);
             });
 
-            it("should default locale to en", function() {
-                scope.$apply();
-
-                expect(rootScope.resourceBundle).toEqual({});
-            });
-
             it("should redirect to login page", function() {
                 spyOn(location, "path");
 

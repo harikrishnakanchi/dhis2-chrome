@@ -168,7 +168,6 @@ define(["sessionHelper", "angularMocks", "utils", "userPreferenceRepository", "o
 
                 var expectedState = {
                     "username": "coordination@approver.level",
-                    "locale": "en",
                     "organisationUnits": [{
                         "id": 123,
                         "name": "Some Country"
