@@ -310,7 +310,7 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 expect(scope.incompatibleVersion).not.toBeTruthy();
             });
 
-            it("should set newerVersionAvailable to true if there is a newer version in the object store", function() {
+            it("should set newerVersionAvailable to false if there is no newer version available in the object store", function() {
                 chromeUtils.getPraxisVersion.and.returnValue("6.0");
 
                 scope.$apply();
