@@ -1,5 +1,6 @@
-<div class="selectLanguage col-sm-8 col-md-8" ng-controller="selectLanguageController">
-    <a href="" ng-click="changeLanguagePreference('en')" ng-class="{'underline': locale=='en','': locale !='en' }"> English</a>
-    <a href="" ng-click="changeLanguagePreference('fr')" ng-class="{'underline': locale=='fr','': locale !='en' }">  Français</a>
-    <a href="" ng-click="changeLanguagePreference('ar')" ng-class="{'underline': locale=='ar','': locale !='en' }"> العَرَبِيةُ</a>
+<div class="selectLanguage text-center" ng-controller="selectLanguageController">
+    <i class="fa fa-globe"></i>&nbsp;&nbsp;
+    <a href="" ng-click="changeLanguagePreference('en')" ng-class="{'underline': locale=='en' }"> English</a>
+    <a href="" ng-click="changeLanguagePreference('fr')" ng-class="{'underline': locale=='fr' }">  Français</a>
+    <a href="" ng-click="changeLanguagePreference('ar')" ng-class="{'underline': locale=='ar' }"> العَرَبِيةُ</a>
 </div>
