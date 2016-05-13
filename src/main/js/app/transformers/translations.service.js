@@ -1,7 +1,7 @@
 define([],function(){
     return function($q, db) {
-        var translatableTypes = ["sections", "dataElements", "headers"];
-        var translatableProperties = ["name", "description", "formName", "shortName"];
+        var translatableTypes = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options"];
+        var translatableProperties = ["name", "description", "formName", "shortName", "displayName"];
         var translations;
 
         var setLocale = function(locale){
@@ -31,6 +31,17 @@ define([],function(){
             return $q.when(result);
         };
 
+        var translateOptionMap = function (optionMap) {
+            if(this.locale == 'en') {
+                return optionMap;
+            }
+            
+            _.mapValues(optionMap, function(value) {
+                return translate(value);
+            });
+            return optionMap;
+        };
+
         var translate = function(objectsToBeTranslated){
             if(this.locale == 'en') {
                 return objectsToBeTranslated;
@@ -47,11 +58,11 @@ define([],function(){
 
                 _.each(objectToBeTranslated, function (value, key) {
                     if(_.isArray(value) && _.contains(translatableTypes, key)){
-                        return _.each(value,function(object){
-                            return translate(_.flatten([object]));
+                        _.each(value,function(object){
+                            translate(_.flatten([object]));
                         });
                     } else if(_.isObject(value) && _.contains(translatableTypes, key)){
-                        return translate([value]);
+                        translate([value]);
                     }
                 });
             });
@@ -62,7 +73,8 @@ define([],function(){
         return {
             setLocale: setLocale,
             translate: translate,
-            translateReports: translateReports
+            translateReports: translateReports,
+            translateOptionMap: translateOptionMap
         };
     };
 });

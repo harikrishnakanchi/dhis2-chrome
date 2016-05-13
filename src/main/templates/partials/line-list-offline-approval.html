@@ -10,7 +10,7 @@
                 <div ng-class="'dataset-acc-wrapper'">
                     <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: false }" is-open="true">
                         <accordion-heading>
-                            <span>{{ resourceBundle[dataSet.id] || dataSet.name}}</span>
+                            <span>{{dataSet.name}}</span>
                             <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
                         </accordion-heading>
                         <div class="filter">
@@ -32,7 +32,7 @@
                                             <div class="spacing-div-accordian" class="spacing-div-accordian" ng-if="shouldShowInOfflineSummary(psde.dataElement.id, section.programStageDataElements) && psde.dataElement.isIncluded">
                                                 <accordion-group is-open="status.open">
                                                     <accordion-heading>
-                                                        <span>{{resourceBundle[psde.dataElement.id] || psde.dataElement.formName}}</span>
+                                                        <span>{{psde.dataElement.formName}}</span>
                                                         <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                                     </accordion-heading>
                                                     <table locked-table-header class="table table-bordered">
@@ -43,7 +43,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
-                                                            <td>{{option.displayName}}</td>
+                                                            <td>{{option.name}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id)}}</td>
                                                         </tr>
                                                     </table>
@@ -96,7 +96,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
-                                                            <td>{{option.displayName}}</td>
+                                                            <td>{{option.name}}</td>
                                                             <td ng-repeat="genderOption in genderOptions">{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.id, genderOption.id)}}</td>
                                                         </tr>
                                                     </table>
@@ -151,7 +151,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
-                                                            <td>{{option.displayName}}</td>
+                                                            <td>{{option.name}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [0,5])}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [4,15])}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code, undefined, [14, 9999])}}</td>
@@ -221,7 +221,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="option in optionSetMapping[psde.dataElement.optionSet.id]">
-                                                            <td>{{option.displayName}}</td>
+                                                            <td>{{option.name}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [0,5])}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [4,15])}}</td>
                                                             <td>{{getCount(psde.dataElement.id,isGenderFilterApplied,isAgeFilterApplied, option.code,genderOptions[0].id, [14, 9999])}}</td>
@@ -287,7 +287,7 @@
                 <div ng-class="'dataset-acc-wrapper'">
                     <accordion-group ng-repeat="dataSet in associatedDataSets | filter:{ isOriginDataset: true }" is-open="true">
                         <accordion-heading>
-                            <span>{{ resourceBundle[dataSet.id] || dataSet.name}}</span>
+                            <span>{{ dataSet.name}}</span>
                             <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isDatasetOpen[dataSet.id], 'glyphicon-chevron-right': !isDatasetOpen[dataSet.id]}"></i>
                         </accordion-heading>
                         <div class="exp-coll-group">

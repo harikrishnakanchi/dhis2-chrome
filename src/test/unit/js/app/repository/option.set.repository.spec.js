@@ -65,10 +65,8 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
 
 
             var optionSetMap, optionMap;
-            var resourceBundle = {
-                'os2o1': 'os2o1 translated name'
-            };
-            optionSetRepository.getOptionSetMapping(resourceBundle).then(function(data) {
+
+            optionSetRepository.getOptionSetMapping().then(function(data) {
                 optionSetMap = data.optionSetMap;
                 optionMap = data.optionMap;
             });
@@ -77,13 +75,11 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
             expect(optionSetMap).toEqual({
                 "os1": [{
                     "id": 'os1o1',
-                    "name": 'os1o1 name',
-                    "displayName": 'os1o1 name',
+                    "name": 'os1o1 name'
                 }],
                 "os2": [{
                     "id": 'os2o1',
-                    "name": 'os2o1 name',
-                    "displayName": 'os2o1 translated name'
+                    "name": 'os2o1 name'
                 }],
                 "os3": [{
                     "id": 'os3o1',
@@ -94,7 +90,7 @@ define(["optionSetRepository", "angularMocks", "utils", "referralLocationsReposi
             });
             expect(optionMap).toEqual({
                 "os1o1": "os1o1 name",
-                "os2o1": "os2o1 translated name",
+                "os2o1": "os2o1 name",
                 "os3o1": "Referral 1"
             });
 

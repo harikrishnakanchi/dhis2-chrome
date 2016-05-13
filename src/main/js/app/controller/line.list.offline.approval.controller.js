@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository) {
+    return function($scope, $q, programEventRepository, orgUnitRepository, programRepository, optionSetRepository, datasetRepository, referralLocationsRepository, excludedDataElementsRepository, translationsService) {
 
         $scope.isGenderFilterApplied = false;
         $scope.isAgeFilterApplied = false;
@@ -156,7 +156,8 @@ define(["lodash", "moment"], function(_, moment) {
 
             var getProgram = function(excludedDataElements) {
                 return programRepository.get($scope.associatedProgramId, excludedDataElements).then(function(program) {
-                    $scope.program = program;
+                    var translatedProgram = translationsService.translate([program]);
+                    $scope.program = translatedProgram[0];
                 });
             };
 
@@ -164,8 +165,9 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         var getOptionSetMapping = function() {
-            return optionSetRepository.getOptionSetMapping($scope.resourceBundle, $scope.selectedModule.parent.id).then(function(data) {
-                $scope.optionSetMapping = data.optionSetMap;
+            return optionSetRepository.getOptionSetMapping($scope.selectedModule.parent.id).then(function(data) {
+                var translatedOptions = translationsService.translateOptionMap(data.optionSetMap);
+                $scope.optionSetMapping = translatedOptions;
                 $scope.optionMapping = data.optionMap;
             });
         };
@@ -225,7 +227,8 @@ define(["lodash", "moment"], function(_, moment) {
 
         var getAssociatedDataSets = function() {
             return datasetRepository.findAllForOrgUnits([$scope.originOrgUnits[0].id]).then(function(data) {
-                $scope.associatedDataSets = data;
+                var translatedDataset = translationsService.translate(data);
+                $scope.associatedDataSets = translatedDataset;
             });
         };
 
