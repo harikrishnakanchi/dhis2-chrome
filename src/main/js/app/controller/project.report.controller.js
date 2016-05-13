@@ -1,5 +1,5 @@
 define(["moment", "lodash"], function(moment, _) {
-    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository) {
+    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, translationsService) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
         $scope.getCsvFileName = function() {
@@ -142,10 +142,16 @@ define(["moment", "lodash"], function(moment, _) {
                 });
             }));
         };
+
+        var translatePivotTables = function (pivotTables) {
+            return $q.when(translationsService.translateReports(pivotTables));
+        };
+
         var loadPivotTables = function() {
             return pivotTableRepository.getAll()
                 .then(filterProjectReportTables)
                 .then(getDataForPivotTables)
+                .then(translatePivotTables)
                 .then(function(pivotTables) {
                     $scope.pivotTables = pivotTables;
                     $scope.isReportAvailable = _.any(pivotTables, { isTableDataAvailable: true });

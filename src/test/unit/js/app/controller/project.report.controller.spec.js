@@ -1,6 +1,6 @@
-define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "timecop"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, timecop) {
+define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop) {
     describe("projectReportController", function() {
-        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, pivotTables, data, q;
+        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, translationsService, pivotTables, data, q;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -138,12 +138,41 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
             };
 
             orgUnitRepository = new OrgUnitRepository();
-            pivotTableRepository = new PivotTableRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise($q, projectBasicInfo));
+
+            pivotTableRepository = new PivotTableRepository();
             spyOn(pivotTableRepository, "getAll").and.returnValue(utils.getPromise($q, pivotTables));
             spyOn(pivotTableRepository, "getDataForPivotTable").and.returnValue(utils.getPromise($q, data));
 
-            projectReportController = new ProjectReportController(rootScope, $q, scope, orgUnitRepository, pivotTableRepository);
+            var translatedReport = [
+                {"definition": {
+                    "id":"pivotTable1",
+                    "projectReport":true,
+                    "title":"Hospitalization"},
+                    "data":{
+                        "headers":[{"name":"dx","column":"Data"},{"name":"pe","column":"Period"},{"name":"value","column":"Value"}],
+                        "metaData":{
+                            "names":{"201511":"November 2015",
+                                "201512":"December 2015",
+                                "adf6cf9405c":"Average bed occupation rate (%) - Adult IPD Ward",
+                                "ae70aadc5cf":"Average length of bed use (days) - Adult IPD Ward",
+                                "dx":"Data","pe":"Period"},
+                            "dx":["adf6cf9405c","ae70aadc5cf"],
+                            "pe":["201511","201512"]},
+                        "rows":[
+                            ["adf6cf9405c","201511","1.1"],
+                            ["adf6cf9405c","201512","1.2"],
+                            ["ae70aadc5cf","201511","2.1"],
+                            ["ae70aadc5cf","201512","2.2"]],
+                        "height":132,
+                        "width":3},
+                    "isTableDataAvailable":true
+                }];
+
+            translationsService = new TranslationsService();
+            spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, translatedReport));
+
+            projectReportController = new ProjectReportController(rootScope, $q, scope, orgUnitRepository, pivotTableRepository, translationsService);
         }));
 
         it("should get csv file name in expected format", function() {
