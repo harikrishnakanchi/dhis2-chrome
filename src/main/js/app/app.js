@@ -120,8 +120,8 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
                 basePath: "/js/app/i18n"
             });
 
-            app.run(['dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document', 'systemSettingRepository',
-                function(dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document, systemSettingRepository) {
+            app.run(['dhisMonitor', 'hustleMonitor', 'queuePostProcessInterceptor', '$rootScope', '$location', '$hustle', '$document', 'systemSettingRepository', 'translationsService',
+                function(dhisMonitor, hustleMonitor, queuePostProcessInterceptor, $rootScope, $location, $hustle, $document, systemSettingRepository, translationsService) {
 
                     $document.on('keydown', function(e) {
                         disableBackspaceKey(e);
@@ -165,6 +165,7 @@ define(["angular", "Q", "services", "directives", "dbutils", "controllers", "rep
 
                     systemSettingRepository.getLocale().then(function (locale) {
                          $rootScope.locale = locale;
+                         translationsService.setLocale(locale);
                     });
 
                     $rootScope.hasRoles = function(allowedRoles) {

@@ -1,5 +1,5 @@
 define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
-    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository) {
+    return function($scope, $q, $routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService) {
 
         var formatYAxisTicks = function(datum) {
             var isFraction = function(x) { return x % 1 !== 0; };
@@ -294,9 +294,14 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
             }));
         };
 
+        var translatePivotTables = function (pivotTables) {
+            return $q.when(translationsService.translateReports(pivotTables));
+        };
+
         var loadPivotTables = function() {
             return pivotTableRepository.getAll()
                 .then(transformTables)
+                .then(translatePivotTables)
                 .then(function(pivotTables) {
                     $scope.pivotTables = pivotTables;
                 });

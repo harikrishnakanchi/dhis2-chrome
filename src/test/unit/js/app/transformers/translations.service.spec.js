@@ -53,6 +53,8 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
 
+            scope.$apply();
+
             var actual;
             translationsService.translate(obj).then(function (data) {
                 actual = data;
@@ -75,6 +77,8 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
+
+            scope.$apply();
 
             var actual;
             translationsService.translate(obj).then(function (data) {
@@ -114,6 +118,8 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
 
+            scope.$apply();
+
             var actual;
             translationsService.translate(obj).then(function (data) {
                 actual = data;
@@ -152,6 +158,8 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
 
+            scope.$apply();
+
             var actual;
             translationsService.translate(obj).then(function (data) {
                 actual = data;
@@ -174,6 +182,8 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
+
+            scope.$apply();
 
             var actual;
             translationsService.translate(obj).then(function (data) {
@@ -198,6 +208,8 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
+
+            scope.$apply();
 
             var actual;
             translationsService.translate(obj).then(function (data) {
@@ -238,6 +250,8 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
 
+            scope.$apply();
+
             var actual;
             translationsService.translate(obj).then(function (data) {
                 actual = data;
@@ -265,6 +279,5 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                 }]
             });
         });
-
     });
 });

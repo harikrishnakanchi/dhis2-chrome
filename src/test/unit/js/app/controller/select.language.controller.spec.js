@@ -1,7 +1,7 @@
-define(["selectLanguageController","systemSettingRepository", "angularMocks", "utils"],
-    function(SelectLanguageController, SystemSettingRepository, mocks, utils) {
+define(["selectLanguageController","systemSettingRepository", "translationsService", "angularMocks", "utils"],
+    function(SelectLanguageController, SystemSettingRepository, TranslationsService, mocks, utils) {
         describe("selectLanguageController", function() {
-            var rootScope, selectLanguageController, systemSettingRepository, scope, i18nResourceBundle, getResourceBundleSpy, db, frenchResourceBundle,
+            var rootScope, selectLanguageController, systemSettingRepository, translationsService, scope, i18nResourceBundle, getResourceBundleSpy, db, frenchResourceBundle,
                 translationStore;
 
             beforeEach(mocks.inject(function($rootScope, $q, $location) {
@@ -50,6 +50,9 @@ define(["selectLanguageController","systemSettingRepository", "angularMocks", "u
                 systemSettingRepository = new SystemSettingRepository();
                 spyOn(systemSettingRepository, 'upsertLocale').and.returnValue(utils.getPromise(q, {}));
 
+                translationsService = new TranslationsService();
+                spyOn(translationsService, 'setLocale').and.returnValue(utils.getPromise(q, {}));
+
                 translationStore = getMockStore("translations");
 
                 spyOn(translationStore, "each").and.returnValue(utils.getPromise(q, {}));
@@ -57,7 +60,7 @@ define(["selectLanguageController","systemSettingRepository", "angularMocks", "u
                     return translationStore;
                 });
 
-                selectLanguageController = new SelectLanguageController(scope, rootScope, q, db, i18nResourceBundle, systemSettingRepository);
+                selectLanguageController = new SelectLanguageController(scope, rootScope, q, db, i18nResourceBundle, systemSettingRepository, translationsService);
             }));
 
             it("should change resourceBundle if locale changes", function() {

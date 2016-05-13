@@ -11,7 +11,7 @@ define(['reportsController', 'dataEntryController', 'mainController', 'orgUnitCo
         referralLocationsController, notificationsController, selectProjectPreferenceController, projectReportController) {
 
         var init = function(app) {
-            app.controller('reportsController', ['$scope', '$q', '$routeParams', 'datasetRepository', 'orgUnitRepository', 'chartRepository', 'pivotTableRepository', reportsController]);
+            app.controller('reportsController', ['$scope', '$q', '$routeParams', 'datasetRepository', 'orgUnitRepository', 'chartRepository', 'pivotTableRepository', 'translationsService', reportsController]);
             app.controller('dashboardController', ['$scope', '$hustle', '$q', '$rootScope', '$modal', '$timeout', '$location', 'approvalDataRepository', 'moduleDataBlockFactory', dashboardController]);
             app.controller('dataEntryController', ['$scope', '$routeParams', '$q', '$location', '$rootScope', 'orgUnitRepository', dataEntryController]);
             app.controller('aggregateDataEntryController', ['$scope', '$routeParams', '$q', '$hustle', '$anchorScroll', '$location', '$modal', '$rootScope', '$window', '$timeout', 'dataRepository', 'excludedDataElementsRepository', 'approvalDataRepository', 'orgUnitRepository', 'datasetRepository', 'programRepository', 'referralLocationsRepository', aggregateDataEntryController]);
@@ -34,7 +34,7 @@ define(['reportsController', 'dataEntryController', 'mainController', 'orgUnitCo
             app.controller('lineListOfflineApprovalController', ['$scope', '$q', 'programEventRepository', 'orgUnitRepository', 'programRepository', 'optionSetRepository', 'datasetRepository', 'referralLocationsRepository', 'excludedDataElementsRepository',lineListOfflineApprovalController]);
             app.controller('appCloneController', ['$scope', '$modal', '$timeout', 'indexeddbUtils', 'filesystemService', 'sessionHelper', '$location', '$rootScope', appCloneController]);
             app.controller('downloadDataController', ['$scope', '$hustle', '$q', '$rootScope', '$timeout', downloadDataController]);
-            app.controller('selectLanguageController', ['$scope', '$rootScope', '$q', '$indexedDB', 'ngI18nResourceBundle', 'systemSettingRepository', selectLanguageController]);
+            app.controller('selectLanguageController', ['$scope', '$rootScope', '$q', '$indexedDB', 'ngI18nResourceBundle', 'systemSettingRepository', 'translationsService', selectLanguageController]);
             app.controller('referralLocationsController', ['$scope', '$hustle', '$modal', 'referralLocationsRepository', referralLocationsController]);
             app.controller('notificationsController', ['$scope', '$q', '$rootScope', 'userPreferenceRepository', 'chartRepository', 'orgUnitRepository', notificationsController]);
             app.controller('selectProjectPreferenceController', ['$rootScope', '$scope', '$hustle', '$location', 'orgUnitRepository', 'userPreferenceRepository', 'systemSettingRepository', selectProjectPreferenceController]);

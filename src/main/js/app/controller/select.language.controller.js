@@ -1,5 +1,5 @@
 define(["lodash"], function(_) {
-    return function($scope, $rootScope, $q, db, ngI18nResourceBundle, systemSettingRepository) {
+    return function($scope, $rootScope, $q, db, ngI18nResourceBundle, systemSettingRepository, translationsService) {
         $scope.changeLanguagePreference = function(language) {
             var getResourceBundle = function(locale, shouldFetchTranslations) {
                 var fetchResourceBundleFromDb = function() {
@@ -33,6 +33,7 @@ define(["lodash"], function(_) {
             };
 
             $rootScope.locale = language;
+            translationsService.setLocale($rootScope.locale);
 
             return $rootScope ? getResourceBundle($rootScope.locale, true) : getResourceBundle("en", false);
         };
