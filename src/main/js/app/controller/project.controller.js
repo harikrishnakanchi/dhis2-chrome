@@ -1,6 +1,6 @@
 define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, orgUnitMapper, properties, _) {
 
-    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository) {
+    return function($scope, $rootScope, $hustle, orgUnitRepository, $q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService) {
 
         $scope.openOpeningDate = function($event) {
             $event.preventDefault();
@@ -154,13 +154,19 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
         };
 
         var init = function() {
+
             orgUnitGroupSetRepository.getAll().then(function(data) {
-                $scope.allContexts = _.sortBy(_.find(data, "code", "context").organisationUnitGroups, "name");
-                $scope.allPopTypes = _.sortBy(_.find(data, "code", "type_of_population").organisationUnitGroups, "name");
-                $scope.reasonForIntervention = _.sortBy(_.find(data, "code", "reason_for_intervention").organisationUnitGroups, "name");
-                $scope.modeOfOperation = _.sortBy(_.find(data, "code", "mode_of_operation").organisationUnitGroups, "name");
-                $scope.modelOfManagement = _.sortBy(_.find(data, "code", "model_of_management").organisationUnitGroups, "name");
-                $scope.allProjectTypes = _.sortBy(_.find(data, "code", "project_type").organisationUnitGroups, "name");
+
+                var getTranslations = function (projectFields) {
+                    return _.sortBy(translationsService.translate(_.find(data, "code", projectFields).organisationUnitGroups), "name");
+                };
+
+                $scope.allContexts = getTranslations("context");
+                $scope.allPopTypes = getTranslations("type_of_population");
+                $scope.reasonForIntervention = getTranslations("reason_for_intervention");
+                $scope.modeOfOperation = getTranslations("mode_of_operation");
+                $scope.modelOfManagement = getTranslations("model_of_management");
+                $scope.allProjectTypes = getTranslations("project_type");
 
                 if ($scope.isNewMode)
                     prepareNewForm();

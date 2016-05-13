@@ -1,6 +1,6 @@
-define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository", "orgUnitGroupSetRepository"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository, OrgUnitGroupSetRepository) {
+define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUnitMapper", "timecop", "orgUnitGroupHelper", "properties", "approvalDataRepository", "orgUnitGroupSetRepository", "translationsService"], function(ProjectController, mocks, utils, _, moment, orgUnitMapper, timecop, OrgUnitGroupHelper, properties, ApprovalDataRepository, OrgUnitGroupSetRepository, TranslationsService) {
     describe("project controller tests", function() {
-        var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository, orgUnitGroupSetRepository, orgUnitGroupSets;
+        var scope, q, userRepository, parent, fakeModal, orgUnitRepo, hustle, rootScope, approvalDataRepository, orgUnitGroupSetRepository, orgUnitGroupSets, translationsService;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
@@ -17,6 +17,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             approvalDataRepository = new ApprovalDataRepository();
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
+            translationsService = new TranslationsService();
 
             userRepository = {
                 "upsert": function() {
@@ -103,7 +104,50 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 }]
             }];
             spyOn(orgUnitGroupSetRepository, "getAll").and.returnValue(utils.getPromise(q, orgUnitGroupSets));
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            spyOn(translationsService, "translate").and.callFake(function(projectFields) {
+                if(projectFields[0].name == "Post-conflict") {
+                    return [{
+                        "id": "a16b4a97ce4",
+                        "name": "Post-conflict"
+                    }];
+                }
+                if(projectFields[0].name == "Most-at-risk Population") {
+                    return [{
+                        "id": "a35778ed565",
+                        "name": "Most-at-risk Population"
+                    }, {
+                        "id": "a48f665185e",
+                        "name": "Refugee"
+                    }];
+                }
+                if(projectFields[0].name == "Natural Disaster") {
+                    return [{
+                        "id": "a8014cfca5c",
+                        "name": "Natural Disaster"
+                    }];
+                }
+                if(projectFields[0].name == "Direct operation") {
+                    return [{
+                        "id": "a560238bc90",
+                        "name": "Direct operation"
+                    }, {
+                        "id": "a92cee050b0",
+                        "name": "Remote operation"
+                    }];
+                }
+                if(projectFields[0].name == "Collaboration") {
+                    return [{
+                        "id": "a11a7a5d55a",
+                        "name": "Collaboration"
+                    }];
+                }
+                if(projectFields[0].name == "Some Type") {
+                    return [{
+                        'name': 'Some Type'
+                    }];
+                }
+            });
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
         }));
 
         afterEach(function() {
@@ -391,7 +435,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
             scope.orgUnit.parent = {
                 "id": "parentId"
             };
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
             scope.$apply();
 
             expect(scope.newOrgUnit).toEqual(expectedNewOrgUnit);
@@ -411,7 +455,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             orgUnitRepo.getAllProjects.and.returnValue(utils.getPromise(q, [project1]));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
             scope.$apply();
 
             expect(scope.existingProjectCodes).toEqual(["AF101"]);
@@ -431,7 +475,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
 
             orgUnitRepo.findAllByParent.and.returnValue(utils.getPromise(q, [project1]));
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
             scope.$apply();
 
             expect(scope.peerProjects).toEqual(["Kabul-AF101"]);
@@ -451,7 +495,7 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 return;
             });
 
-            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository);
+            projectController = new ProjectController(scope, rootScope, hustle, orgUnitRepo, q, orgUnitGroupHelper, approvalDataRepository, orgUnitGroupSetRepository, translationsService);
 
             scope.closeForm(parentOrgUnit);
 

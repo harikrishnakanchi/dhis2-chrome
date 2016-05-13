@@ -33,7 +33,7 @@ define([],function(){
 
         var translate = function(objectsToBeTranslated){
             if(this.locale == 'en') {
-                return $q.when(objectsToBeTranslated);
+                return objectsToBeTranslated;
             }
 
             _.each(objectsToBeTranslated, function (objectToBeTranslated) {
@@ -56,7 +56,7 @@ define([],function(){
                 });
             });
 
-            return $q.when(objectsToBeTranslated);
+            return objectsToBeTranslated;
         };
 
         return {

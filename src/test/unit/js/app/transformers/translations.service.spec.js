@@ -61,12 +61,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            var actual;
-            translationsService.translate(obj).then(function (data) {
-                actual = data;
-            });
-
-            scope.$apply();
+            var actual = translationsService.translate(obj);
 
             expect(actual).toEqual([{
                 id: 'id1',
@@ -86,12 +81,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            var actual;
-            translationsService.translate(obj).then(function (data) {
-                actual = data;
-            });
-
-            scope.$apply();
+            var actual = translationsService.translate(obj);
 
             expect(actual).toEqual([{
                 id: 'id1',
@@ -126,12 +116,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            var actual;
-            translationsService.translate(obj).then(function (data) {
-                actual = data;
-            });
-
-            scope.$apply();
+            var actual = translationsService.translate(obj);
 
             expect(actual).toEqual([{
                 id: 'id1',
@@ -166,12 +151,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            var actual;
-            translationsService.translate(obj).then(function (data) {
-                actual = data;
-            });
-
-            scope.$apply();
+            var actual = translationsService.translate(obj);
 
             expect(actual).toEqual([{
                 id: 'dhi',
@@ -191,12 +171,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            var actual;
-            translationsService.translate(obj).then(function (data) {
-                actual = data;
-            });
-
-            scope.$apply();
+            var actual = translationsService.translate(obj);
 
             expect(actual).toEqual([{
                 id: 'id4',
@@ -217,12 +192,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            var actual;
-            translationsService.translate(obj).then(function (data) {
-                actual = data;
-            });
-
-            scope.$apply();
+            var actual = translationsService.translate(obj);
 
             expect(actual).toEqual([{
                 id: 'id4',
@@ -263,12 +233,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            var actual;
-            translationsService.translate(obj).then(function (data) {
-                actual = data;
-            });
-
-            scope.$apply();
+            var actual = translationsService.translate(obj);
 
             expect(actual).toEqual([{
                 id: 'id1',
