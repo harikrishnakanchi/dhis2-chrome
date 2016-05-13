@@ -38,17 +38,23 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                     value: 'french name',
                     locale: 'fr',
                     property: 'name'
-                }];
+                }, {
+                    objectId: 'id6',
+                    value: 'frenchHeader',
+                    locale: 'fr',
+                    property: 'name'
+                }
+                ];
                 return utils.getPromise(q, result);
             });
         }));
 
         it('should translate name to french if locale is french', function () {
             var locale = 'fr';
-            var obj = {
+            var obj = [{
                 id: 'id1',
                 name: 'testName'
-            };
+            }];
 
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
@@ -62,18 +68,18 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            expect(actual).toEqual({
+            expect(actual).toEqual([{
                 id: 'id1',
                 name: 'frenchName'
-            });
+            }]);
         });
 
         it('should not translate if locale is english', function () {
             var locale = 'en';
-            var obj = {
+            var obj = [{
                 id: 'id1',
                 name: 'testName'
-            };
+            }];
 
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
@@ -87,15 +93,15 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            expect(actual).toEqual({
+            expect(actual).toEqual([{
                 id: 'id1',
                 name: 'testName'
-            });
+            }]);
         });
 
         it('should translate the name in the nested object structure if locale is anything other than english', function () {
             var locale = 'fr';
-            var obj = {
+            var obj = [{
                 id: 'id1',
                 name: 'testName',
                 sections: [{
@@ -113,7 +119,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                         name: 'testDataElement'
                     }
                 }]
-            };
+            }];
 
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
@@ -127,7 +133,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            expect(actual).toEqual({
+            expect(actual).toEqual([{
                 id: 'id1',
                 name: 'frenchName',
                 sections: [{
@@ -145,15 +151,15 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                         name: 'frenchDataElement'
                     }
                 }]
-            });
+            }]);
         });
 
         it('should set the default english name if there was no translation with the selected locale', function () {
             var locale = 'fr';
-            var obj = {
+            var obj = [{
                 id: 'dhi',
                 name: 'testName'
-            };
+            }];
 
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
@@ -167,18 +173,18 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            expect(actual).toEqual({
+            expect(actual).toEqual([{
                 id: 'dhi',
                 name: 'testName'
-            });
+            }]);
         });
 
         it('should translate description property in the object with the selected locale', function () {
             var locale = 'fr';
-            var obj = {
+            var obj = [{
                 id: 'id4',
                 description: 'english description'
-            };
+            }];
 
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
@@ -192,19 +198,19 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            expect(actual).toEqual({
+            expect(actual).toEqual([{
                 id: 'id4',
                 description: 'french description'
-            });
+            }]);
         });
 
         it('should translate name and description properties in the object with the selected locale', function () {
             var locale = 'fr';
-            var obj = {
+            var obj = [{
                 id: 'id4',
                 name: 'english name',
                 description: 'english description'
-            };
+            }];
 
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
@@ -218,16 +224,16 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            expect(actual).toEqual({
+            expect(actual).toEqual([{
                 id: 'id4',
                 name: 'french name',
                 description: 'french description'
-            });
+            }]);
         });
 
         it('should translate the description in the nested object structure if locale is anything other than english', function () {
             var locale = 'fr';
-            var obj = {
+            var obj = [{
                 id: 'id1',
                 name: 'testName',
                 sections: [{
@@ -236,7 +242,12 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                     dataElements: {
                         id: 'id3',
                         name: 'testDataElement'
-                    }
+                    },
+                    headers: [{
+                        id: "id6",
+                        name: "testHeader"
+                    }]
+
                 }, {
                     id: 'id4',
                     name: 'testSection',
@@ -245,7 +256,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                         description: 'testDataElementDescription'
                     }
                 }]
-            };
+            }];
 
             translationsService = new TranslationsService(q, mockDB.db);
             translationsService.setLocale(locale);
@@ -259,7 +270,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
 
             scope.$apply();
 
-            expect(actual).toEqual({
+            expect(actual).toEqual([{
                 id: 'id1',
                 name: 'frenchName',
                 sections: [{
@@ -268,7 +279,12 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                     dataElements: {
                         id: 'id3',
                         name: 'frenchDataElement'
-                    }
+                    },
+                    headers: [{
+                        id: "id6",
+                        name: "frenchHeader"
+                    }]
+
                 }, {
                     id: 'id4',
                     name: 'french name',
@@ -277,7 +293,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                         description: 'frenchDataElementDescription'
                     }
                 }]
-            });
+            }]);
         });
     });
 });
