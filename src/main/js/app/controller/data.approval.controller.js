@@ -1,6 +1,6 @@
 define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransformer", "properties"], function(_, dataValuesMapper, orgUnitMapper, moment, datasetTransformer, properties) {
     return function($scope, $routeParams, $q, $hustle, dataRepository, excludedDataElementsRepository, $anchorScroll, $location, $modal, $rootScope, $window, approvalDataRepository,
-        $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository) {
+        $timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService) {
 
         $scope.rowTotal = {};
         var currentPeriod, currentPeriodAndOrgUnit;
@@ -263,12 +263,13 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                             });
                         });
                         return $q.all(dataSetPromises).then(function(datasets) {
+                            var translatedDatasets = translationsService.translate(datasets);
                             if (removeReferral)
-                                $scope.dataSets = _.filter(datasets, {
+                                $scope.dataSets = _.filter(translatedDatasets, {
                                     "isReferralDataset": false
                                 });
                             else
-                                $scope.dataSets = datasets;
+                                $scope.dataSets = translatedDatasets;
                         });
                     });
 
