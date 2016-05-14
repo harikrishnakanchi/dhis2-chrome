@@ -85,10 +85,6 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 "orgUnit": "prj1"
             };
 
-            scope.resourceBundle = {
-                "ds1": "Localised_ds1"
-            };
-
             var prj1 = {
                 "id": "prj1"
             };
@@ -126,7 +122,6 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             var expectedDatasets = [{
                 "id": "ds1",
                 "name": "ds1",
-                "displayName": "Localised_ds1",
                 "isOriginDataset": false,
                 "isPopulationDataset": false,
                 "isReferralDataset": false,

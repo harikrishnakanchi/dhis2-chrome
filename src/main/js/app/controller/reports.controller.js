@@ -245,9 +245,12 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
             var loadDatasetsForModules = function(orgUnits) {
                 return datasetRepository.findAllForOrgUnits(_.pluck(orgUnits, "id")).then(function(dataSets) {
-                    $scope.datasets = _.filter(dataSets, function(ds) {
+                    var filteredDataSets = _.filter(dataSets, function(ds) {
                         return !(ds.isOriginDataset || ds.isPopulationDataset || ds.isReferralDataset);
                     });
+                    
+                    var translatedDataSets = translationsService.translate(filteredDataSets);
+                    $scope.datasets = translatedDataSets;
                 });
             };
 
@@ -335,10 +338,6 @@ define(["d3", "lodash", "moment", "saveSvgAsPng"], function(d3, _, moment) {
 
             $scope.datasets = _.sortBy($scope.datasets, "name").reverse();
             $scope.datasets = _.sortBy($scope.datasets, "isReportsAvailable").reverse();
-
-            _.each($scope.datasets, function(ds) {
-                ds.displayName = $scope.resourceBundle[ds.id] ? $scope.resourceBundle[ds.id] : ds.name;
-            });
 
             if (!_.isEmpty($scope.datasets))
                 $scope.selectedDataset = $scope.datasets[0];
