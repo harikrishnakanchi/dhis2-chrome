@@ -130,9 +130,10 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getDatasets = function() {
                     return getAllAggregateDatasets().then(getEnrichedDataSets).then(function(datasets) {
-                        $scope.originalDatasets = datasets;
 
-                        var partitionedDatasets = _.partition(datasets, function(ds) {
+                        var translatedDatasets = translationsService.translate(datasets);
+
+                        var partitionedDatasets = _.partition(translatedDatasets, function(ds) {
                             if ($scope.module.id)
                                 return _.any(ds.organisationUnits, "id", $scope.module.id);
                             return false;
