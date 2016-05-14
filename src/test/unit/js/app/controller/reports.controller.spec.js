@@ -24,9 +24,6 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
 
             translationsService = new TranslationsService();
             spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, []));
-
-            scope.resourceBundle = {};
-
         }));
 
         it("should set the orgunit display name for modules", function() {

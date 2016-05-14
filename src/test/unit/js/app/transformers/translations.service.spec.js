@@ -1,11 +1,31 @@
-define(['translationsService', 'angularMocks', 'utils'], function (TranslationsService, mocks, utils) {
+define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository'], function (TranslationsService, mocks, utils, SystemSettingRepository) {
     describe('Translation Service', function () {
-        var q, translationsService, mockDB, scope, mockStore;
+        var q, rootScope, translationsService, mockDB, scope, mockStore, i18nResourceBundle, systemSettingRepository, getResourceBundleSpy;
         beforeEach(mocks.inject(function ($q, $rootScope) {
             q = $q;
             scope = $rootScope.$new();
+            rootScope = $rootScope;
             mockDB = utils.getMockDB($q);
             mockStore = mockDB.objectStore;
+
+            i18nResourceBundle = {
+                get: function() {}
+            };
+
+            getResourceBundleSpy = spyOn(i18nResourceBundle, "get");
+
+            var frenchResourceBundle = {
+                "data": {
+                    "login": "french"
+                }
+            };
+            getResourceBundleSpy.and.returnValue(utils.getPromise(q, frenchResourceBundle));
+
+            rootScope.locale = 'fr';
+            rootScope.$digest();
+
+            systemSettingRepository = new SystemSettingRepository();
+            spyOn(systemSettingRepository, 'upsertLocale').and.returnValue(utils.getPromise(q, {}));
 
             mockStore.each.and.callFake(function (query) {
                 var result = [{
@@ -56,7 +76,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                 name: 'testName'
             }];
 
-            translationsService = new TranslationsService(q, mockDB.db);
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
             translationsService.setLocale(locale);
 
             scope.$apply();
@@ -76,7 +96,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                 name: 'testName'
             }];
 
-            translationsService = new TranslationsService(q, mockDB.db);
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
             translationsService.setLocale(locale);
 
             scope.$apply();
@@ -111,7 +131,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                 }]
             }];
 
-            translationsService = new TranslationsService(q, mockDB.db);
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
             translationsService.setLocale(locale);
 
             scope.$apply();
@@ -146,7 +166,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                 name: 'testName'
             }];
 
-            translationsService = new TranslationsService(q, mockDB.db);
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
             translationsService.setLocale(locale);
 
             scope.$apply();
@@ -166,7 +186,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                 description: 'english description'
             }];
 
-            translationsService = new TranslationsService(q, mockDB.db);
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
             translationsService.setLocale(locale);
 
             scope.$apply();
@@ -187,7 +207,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                 description: 'english description'
             }];
 
-            translationsService = new TranslationsService(q, mockDB.db);
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
             translationsService.setLocale(locale);
 
             scope.$apply();
@@ -228,7 +248,7 @@ define(['translationsService', 'angularMocks', 'utils'], function (TranslationsS
                 }]
             }];
 
-            translationsService = new TranslationsService(q, mockDB.db);
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
             translationsService.setLocale(locale);
 
             scope.$apply();

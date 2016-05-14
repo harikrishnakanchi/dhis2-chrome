@@ -1,13 +1,28 @@
 define([],function(){
-    return function($q, db) {
+    return function($q, db, $rootScope, ngI18nResourceBundle, systemSettingRepository) {
         var translatableTypes = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues"];
         var translatableProperties = ["name", "description", "formName", "shortName", "displayName"];
         var translations;
 
+        var setResourceBundleLocale = function (locale) {
+            var updateLocaleInSystemSettings = function () {
+                return $q.when(systemSettingRepository.upsertLocale($rootScope.locale));
+            };
+
+            ngI18nResourceBundle.get({
+                "locale": locale
+            }).then(function (data) {
+                $rootScope.resourceBundle = data.data;
+                updateLocaleInSystemSettings();
+            });
+        };
+            
         var setLocale = function(locale){
             this.locale = locale;
+            setResourceBundleLocale(locale);
+            
             var store = db.objectStore('translations');
-            var query = db.queryBuilder().$index('by_locale').$eq(this.locale).compile();
+            var query = db.queryBuilder().$index('by_locale').$eq(locale).compile();
             return store.each(query).then(function(data) {
                 translations = data;
             });
