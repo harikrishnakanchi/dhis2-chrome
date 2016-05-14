@@ -1,6 +1,6 @@
 define([],function(){
     return function($q, db) {
-        var translatableTypes = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options"];
+        var translatableTypes = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues"];
         var translatableProperties = ["name", "description", "formName", "shortName", "displayName"];
         var translations;
 
@@ -48,7 +48,11 @@ define([],function(){
             }
 
             _.each(objectsToBeTranslated, function (objectToBeTranslated) {
-                var translationObject = _.filter(translations, {objectId: objectToBeTranslated.id});
+
+                var translationObject = _.filter(translations, function(translation) {
+                    return translation.objectId == objectToBeTranslated.id || translation.objectId == objectToBeTranslated.dataElement;
+                });
+                
                 _.each(translatableProperties, function (property) {
                     if(objectToBeTranslated[property]) {
                         var translationsByProperty = _.filter(translationObject, {property: property});
