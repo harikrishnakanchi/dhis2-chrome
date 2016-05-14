@@ -148,7 +148,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                     return o.code === dataValue.value;
                 });
 
-                return $scope.resourceBundle[option.id] || option.name;
+                return option.name;
             } else {
                 return dataValue.value;
             }
