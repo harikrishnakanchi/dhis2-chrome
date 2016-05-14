@@ -104,21 +104,27 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     $scope.updateDisabled = $scope.isDisabled;
                 };
 
-                var setPrograms = function(data) {
-                    $scope.allPrograms = _.sortBy(data[0], function(program) {
+                var setPrograms = function(programs) {
+                    $scope.allPrograms = _.sortBy(programs, function(program) {
                         return program.name;
                     });
                 };
 
                 var translatePrograms = function (allPrograms) {
-                    return $q.when(translationsService.translate(allPrograms));
+                    return translationsService.translate(allPrograms[0]);
                 };
 
                 var getPrograms = function() {
                     return $q.all([programRepository.getAll()]);
                 };
 
-                initModule().then(getPrograms).then(translatePrograms).then(setPrograms).then(getAllModules).then(getExcludedDataElements).then(getAssociatedProgram).then(setUpModule);
+                initModule().then(getPrograms)
+                    .then(translatePrograms)
+                    .then(setPrograms)
+                    .then(getAllModules)
+                    .then(getExcludedDataElements)
+                    .then(getAssociatedProgram)
+                    .then(setUpModule);
             };
 
             $scope.changeCollapsed = function(sectionId) {

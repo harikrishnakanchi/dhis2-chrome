@@ -133,7 +133,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 programRepository.getAll.and.returnValue([program1, program2]);
                 translationsService.translate.and.returnValue([program1, program2]);
                 scope.$apply();
-                expect(scope.allPrograms).toEqual(['prog1', 'ER Linelist']);
+                expect(scope.allPrograms).toEqual([program2, program1]);
 
             });
 
