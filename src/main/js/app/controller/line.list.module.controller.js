@@ -1,7 +1,7 @@
 define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
     function(_, orgUnitMapper, moment, systemSettingsTransformer) {
         return function($scope, $hustle, orgUnitRepository, excludedDataElementsRepository, $q, $modal,
-            programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator) {
+            programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService) {
 
             $scope.module = {};
             $scope.isExpanded = {};
@@ -77,7 +77,8 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
 
                 var getEnrichedProgram = function(progId) {
                     return programRepository.get(progId, $scope.excludedDataElements).then(function(data) {
-                        $scope.enrichedProgram = data;
+                        var translatedEnrichedProgram = translationsService.translate([data]);
+                        $scope.enrichedProgram = translatedEnrichedProgram[0];
                         resetCollapse();
                     });
                 };
@@ -107,18 +108,17 @@ define(["lodash", "orgUnitMapper", "moment", "systemSettingsTransformer"],
                     $scope.allPrograms = _.sortBy(data[0], function(program) {
                         return program.name;
                     });
+                };
 
-                    $scope.allPrograms = _.map($scope.allPrograms, function(program) {
-                        program.name = $scope.resourceBundle[program.id] || program.name;
-                        return program;
-                    });
+                var translatePrograms = function (allPrograms) {
+                    return $q.when(translationsService.translate(allPrograms));
                 };
 
                 var getPrograms = function() {
                     return $q.all([programRepository.getAll()]);
                 };
 
-                initModule().then(getPrograms).then(setPrograms).then(getAllModules).then(getExcludedDataElements).then(getAssociatedProgram).then(setUpModule);
+                initModule().then(getPrograms).then(translatePrograms).then(setPrograms).then(getAllModules).then(getExcludedDataElements).then(getAssociatedProgram).then(setUpModule);
             };
 
             $scope.changeCollapsed = function(sectionId) {

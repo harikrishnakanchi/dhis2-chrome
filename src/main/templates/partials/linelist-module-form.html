@@ -46,13 +46,13 @@
                                     <div ng-repeat="programStage in enrichedProgram.programStages" ng-if="enrichedProgram !== undefined">
                                         <div ng-repeat="section in programStage.programStageSections">
                                             <div class="collapse-head">
-                                                <h5 ng-click="changeCollapsed(section.id)">{{resourceBundle[section.id] || section.name}}</h5>
+                                                <h5 ng-click="changeCollapsed(section.id)">{{section.name}}</h5>
                                             </div>
                                             <div collapse="getCollapsed(section.id)" class="collapse-body">
                                                 <ul>
                                                     <li ng-repeat="de in section.programStageDataElements">
                                                         <label>
-                                                            <input type="checkbox" ng-disabled="de.compulsory || isDisabled==true" ng-model="de.dataElement.isIncluded">{{resourceBundle[de.dataElement.id] || de.dataElement.formName}}
+                                                            <input type="checkbox" ng-disabled="de.compulsory || isDisabled==true" ng-model="de.dataElement.isIncluded">{{de.dataElement.formName}}
                                                         </label>
                                                     </li>
                                                 </ul>

@@ -1,14 +1,14 @@
 /*global Date:true*/
 define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId",
-        "orgUnitRepository", "datasetRepository", "originOrgunitCreator", "excludedDataElementsRepository", "programRepository"
+        "orgUnitRepository", "datasetRepository", "originOrgunitCreator", "excludedDataElementsRepository", "programRepository", "translationsService"
     ],
     function(LineListModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId,
-        OrgUnitRepository, DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository) {
+        OrgUnitRepository, DatasetRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, ProgramRepository, TranslationsService) {
 
         describe("line list module controller", function() {
             var scope, lineListModuleController, mockOrgStore, db, q, datasets, sections,
                 dataElements, sectionsdata, dataElementsdata, orgUnitRepository, hustle, excludedDataElementsRepository,
-                fakeModal, allPrograms, programRepository, datasetRepository, originOrgunitCreator;
+                fakeModal, allPrograms, programRepository, datasetRepository, originOrgunitCreator, translationsService;
 
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle) {
@@ -51,6 +51,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, [{
                     "id": "originOrgUnit"
                 }]));
+
+                translationsService = new TranslationsService();
+                spyOn(translationsService, "translate").and.returnValue([]);
 
                 var allDatasets = [{
                     "id": "Ds1",
@@ -109,7 +112,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 };
 
                 scope.isNewMode = true;
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
             }));
 
             afterEach(function() {
@@ -120,16 +123,17 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
             it("should save sorted list of all programs", function() {
                 var program1 = {
                     'id': 'prog1',
-                    'name': 'ER Linelist',
+                    'name': 'ER Linelist'
                 };
                 var program2 = {
                     'id': 'prog1',
-                    'name': 'Burn Unit',
+                    'name': 'Burn Unit'
                 };
 
                 programRepository.getAll.and.returnValue([program1, program2]);
+                translationsService.translate.and.returnValue([program1, program2]);
                 scope.$apply();
-                expect(scope.allPrograms).toEqual([program2, program1]);
+                expect(scope.allPrograms).toEqual(['prog1', 'ER Linelist']);
 
             });
 
@@ -336,8 +340,9 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.isNewMode = false;
                 programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
+                translationsService.translate.and.returnValue([program]);
 
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
 
                 scope.$apply();
                 expect(scope.isDisabled).toBeTruthy();
@@ -347,7 +352,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 scope.$apply();
 
                 scope.isNewMode = false;
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
                 var parent = {
                     "id": "par1",
                     "name": "Par1"
@@ -457,7 +462,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                 scope.isNewMode = false;
 
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
                 scope.update(module);
                 scope.$apply();
 
@@ -535,7 +540,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
                 });
                 scope.isNewMode = false;
 
-                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator);
+                lineListModuleController = new LineListModuleController(scope, hustle, orgUnitRepository, excludedDataElementsRepository, q, fakeModal, programRepository, orgUnitGroupHelper, datasetRepository, originOrgunitCreator, translationsService);
                 scope.disable(module);
                 scope.$apply();
 
@@ -573,6 +578,7 @@ define(["lineListModuleController", "angularMocks", "utils", "testData", "orgUni
 
                 programRepository.getProgramForOrgUnit.and.returnValue(utils.getPromise(q, program));
                 programRepository.get.and.returnValue(utils.getPromise(q, program));
+                translationsService.translate.and.returnValue([program]);
 
                 scope.onProgramSelect(selectedObject).then(function(data) {
                     expect(scope.enrichedProgram).toEqual(program);
