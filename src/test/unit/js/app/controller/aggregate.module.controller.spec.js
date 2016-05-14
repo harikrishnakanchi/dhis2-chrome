@@ -1,14 +1,14 @@
 /*global Date:true*/
 define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUnitGroupHelper", "moment", "timecop", "dhisId", "datasetRepository",
-        "orgUnitRepository", "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository"
+        "orgUnitRepository", "originOrgunitCreator", "excludedDataElementsRepository", "systemSettingRepository", "translationsService"
     ],
     function(AggregateModuleController, mocks, utils, testData, OrgUnitGroupHelper, moment, timecop, dhisId, DatasetRepository,
-        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository) {
+        OrgUnitRepository, OriginOrgunitCreator, ExcludedDataElementsRepository, SystemSettingRepository, TranslationsService) {
+
+        var scope, aggregateModuleController, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
+            dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, allPrograms, originOrgunitCreator, translationsService, orgUnitGroupHelper;
 
         describe("aggregate module controller", function() {
-            var scope, aggregateModuleController, mockOrgStore, db, q, location, orgUnitRepo, orgunitGroupRepo, hustle,
-                dataSetRepo, systemSettingRepository, excludedDataElementsRepository, fakeModal, allPrograms, originOrgunitCreator;
-
             beforeEach(module('hustle'));
             beforeEach(mocks.inject(function($rootScope, $q, $hustle, $location) {
                 scope = $rootScope.$new();
@@ -44,6 +44,9 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 orgUnitGroupHelper = new OrgUnitGroupHelper(hustle, q, scope, orgUnitRepo, orgunitGroupRepo);
                 spyOn(orgUnitGroupHelper, "createOrgUnitGroups");
+
+                translationsService = new TranslationsService();
+                spyOn(translationsService, "translate").and.returnValue([]);
 
                 mockOrgStore = {
                     upsert: function() {},
@@ -92,7 +95,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 Timecop.install();
                 Timecop.freeze(new Date("2014-04-01T00:00:00.000Z"));
 
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
             }));
 
             afterEach(function() {
@@ -419,7 +422,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
                 dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
                 dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, datasets));
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, translationsService);
                 scope.$apply();
 
                 expect(scope.isDisabled).toBeFalsy();
@@ -541,7 +544,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 };
 
                 scope.isNewMode = false;
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, translationsService);
                 scope.$apply();
 
                 scope.module = updatedModule;
@@ -768,6 +771,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     }]
                 };
                 dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, [dataset]));
+                translationsService.translate.and.returnValue([dataset]);
 
                 scope.$apply();
                 scope.selectDataSet(dataset);
@@ -1224,7 +1228,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
             });
 
-            describe('enrich sections of the data sets', function() {
+            xdescribe('enrich sections of the data sets', function() {
                 var datasets;
                 beforeEach(function() {
                     datasets = [{
@@ -1264,7 +1268,10 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
                     dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
                     dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, datasets));
+                    translationsService.translate.and.returnValue(datasets);
+
                     aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
+
                     scope.$apply();
                     scope.selectDataSet(datasets[0]);
                     scope.$apply();
