@@ -1,10 +1,11 @@
-define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController"], function(PivotTable, mocks, utils, PivotTableController) {
+define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController", "translationsService"], function(PivotTable, mocks, utils, PivotTableController, TranslationsService) {
+
     describe("Pivot Table Directive", function() {
-        var pivotTableController, tableData, tableDefinition;
+        var pivotTableController, tableData, tableDefinition, translationsService;
         beforeEach(function() {
             var app = angular.module("cc", []);
             app.directive("pivotTable", PivotTable);
-            app.controller("pivotTableController", ['$scope', PivotTableController]);
+            app.controller("pivotTableController", ['$scope',  '$rootScope', 'translationsService', PivotTableController]);
             module("cc");
             module("templates/pivot-table/pivot.table.html");
 
@@ -153,6 +154,8 @@ define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController"],
                 ],
                 "width": 4
             };
+            translationsService = new TranslationsService();
+            spyOn(translationsService, "translate").and.returnValue([]);
         });
 
         it("should transform the data to the correct form", mocks.inject(function($rootScope) {
@@ -174,7 +177,9 @@ define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController"],
             };
             scope.data = tableData;
             scope.definition = tableDefinition;
-            pivotTableController = PivotTableController(scope, rootScope);
+            translationsService.translate.and.returnValue(scope.definition.categoryDimensions[0].categoryOptions);
+
+            pivotTableController = PivotTableController(scope, rootScope, translationsService);
             scope.$apply();
 
             expect(scope.dataMap).toEqual([{
@@ -293,7 +298,10 @@ define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController"],
             };
             scope.data = tableData;
             scope.definition = tableDefinition;
-            pivotTableController = PivotTableController(scope, rootScope);
+
+            translationsService.translate.and.returnValue(scope.definition.categoryDimensions[0].categoryOptions);
+
+            pivotTableController = PivotTableController(scope, rootScope, translationsService);
             scope.$apply();
 
             expect(scope.getValue('abf819dca06', 'a67aa742313', '201507')).toEqual(6433);

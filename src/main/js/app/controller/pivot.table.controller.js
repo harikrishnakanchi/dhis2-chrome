@@ -1,5 +1,5 @@
 define(["lodash", "moment"], function(_, moment) {
-    return function($scope, $rootScope) {
+    return function($scope, $rootScope, translationsService) {
         $scope.resourceBundle = $rootScope.resourceBundle;
         var DEFAULT_SORT_KEY = 'dataElementIndex';
 
@@ -35,7 +35,7 @@ define(["lodash", "moment"], function(_, moment) {
                     _.each(getSortedCategories(), function(category) {
                         var value = {};
                         value["Data Element"] = $scope.getDataElementName($scope.data.metaData.names[datum.dataElement]);
-                        value.Category = $scope.data.metaData.names[category.id];
+                        value.Category = category.name;
                         _.each($scope.periods, function(period) {
                             value[$scope.data.metaData.names[period]] = $scope.getValue(category.id, datum.dataElement, period);
                         });
@@ -196,7 +196,8 @@ define(["lodash", "moment"], function(_, moment) {
             }];
 
             var getSortedCategories = function() {
-                return _.map($scope.definition.categoryDimensions[0].categoryOptions, function(categoryOption, index) {
+                var translatedCategoryOptions = translationsService.translate($scope.definition.categoryDimensions[0].categoryOptions);
+                return _.map(translatedCategoryOptions, function(categoryOption, index) {
                     return {
                         "name": categoryOption.name,
                         "sortOrder": index + 1,

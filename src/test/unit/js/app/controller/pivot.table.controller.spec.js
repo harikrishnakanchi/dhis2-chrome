@@ -1,7 +1,7 @@
-define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], function(mocks, lodash, moment, PivotTableController, timecop) {
+define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "translationsService"], function(mocks, lodash, moment, PivotTableController, timecop, TranslationsService) {
     describe("pivotTableControllerSpec", function() {
 
-        var scope, rootScope, pivotTableController;
+        var scope, rootScope, pivotTableController, translationsService;
 
         beforeEach(mocks.inject(function($rootScope) {
             rootScope = $rootScope;
@@ -97,7 +97,10 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 September: "September"
             };
 
-            pivotTableController = new PivotTableController(scope, rootScope);
+            translationsService = new TranslationsService();
+            spyOn(translationsService, "translate").and.returnValue(scope.definition.categoryDimensions[0].categoryOptions);
+
+            pivotTableController = new PivotTableController(scope, rootScope, translationsService);
             scope.$apply();
         }));
 
@@ -342,7 +345,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 }]
             };
 
-            pivotTableController = new PivotTableController(scope, rootScope);
+            pivotTableController = new PivotTableController(scope, rootScope, translationsService);
             scope.$apply();
 
             var expectedViewMap = [{
@@ -417,7 +420,8 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 }]
             };
 
-            pivotTableController = new PivotTableController(scope, rootScope);
+            translationsService.translate.and.returnValue(scope.definition.categoryDimensions[0].categoryOptions);
+            pivotTableController = new PivotTableController(scope, rootScope, translationsService);
             scope.$apply();
 
             var expectedViewMap = [{
@@ -437,7 +441,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             scope.definition.sortDescending = true;
             scope.definition.sortable = true;
 
-            pivotTableController = new PivotTableController(scope, rootScope);
+            pivotTableController = new PivotTableController(scope, rootScope, translationsService);
 
             scope.sortByColumn({sortKey: 'sortKey_2015W02'});
             expect(scope.selectedSortKey).toEqual('sortKey_2015W02');
@@ -457,7 +461,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
 
         it("should not display the download button if download is disabled", function() {
             scope.disableDownload = 'true';
-            pivotTableController = new PivotTableController(scope, rootScope);
+            pivotTableController = new PivotTableController(scope, rootScope, translationsService);
             scope.$apply();
 
             expect(scope.showDownloadButton).toEqual(false);
@@ -465,7 +469,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
 
         it("should display the download button if download is not disabled", function() {
             scope.disableDownload = undefined;
-            pivotTableController = new PivotTableController(scope, rootScope);
+            pivotTableController = new PivotTableController(scope, rootScope, translationsService);
             scope.$apply();
 
             expect(scope.showDownloadButton).toEqual(true);
