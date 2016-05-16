@@ -10,7 +10,7 @@
             <div ng-class="{ 'header-cell-with-weeks' : showWeeks }">
                 <span class="name">
                     {{ subHeader.name }}
-                    <p ng-if="$parent.$index == 0 && showWeeks" class="small weeks">{{ '[' + subHeader.numberOfISOWeeks + ' weeks]' }}</p>
+                    <p ng-if="$parent.$index == 0 && showWeeks" class="small weeks">[{{ subHeader.numberOfISOWeeks + ' ' + resourceBundle.weeksLabel}}]</p>
                 </span>
                 <span class="icon" ng-class="{ 'text-danger' : selectedSortKey == subHeader.sortKey }" ng-if="$parent.$index == 0">
                     <i class="fa fa-sort-desc" ng-show="definition.sortDescending"></i>

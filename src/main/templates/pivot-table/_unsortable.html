@@ -6,7 +6,7 @@
             colspan="{{ maxColumnsHeader.headers.length / header.headers.length}}">
             <div ng-class="{ 'header-cell-with-weeks' : showWeeks }">
                 <span>{{ item.name }}</span>
-                <p ng-if="$parent.$index == 0 && showWeeks" class="small weeks">{{ '[' + item.numberOfISOWeeks + ' weeks]' }}</p>
+                <p ng-if="$parent.$index == 0 && showWeeks" class="small weeks">[{{ item.numberOfISOWeeks + ' ' + resourceBundle.weeksLabel}}]</p>
             </div>
         </th>
     </tr>

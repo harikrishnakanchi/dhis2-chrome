@@ -88,6 +88,10 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 }]
             };
 
+            scope.resourceBundle = {
+                "weeksLabel": "weeks"
+            };
+
             pivotTableController = new PivotTableController(scope, rootScope);
             scope.$apply();
         }));
@@ -104,11 +108,17 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             });
 
             it("should get headers if category is present", function() {
+                scope.resourceBundle = {
+                    "weeksLabel": "weeks"
+                };
                 var expected = ['Data Element', 'Category', 'July 2015 (4 weeks)', 'August 2015 (5 weeks)'];
                 expect(scope.getHeaders()).toEqual(expected);
             });
 
             it("should get headers if category not present", function() {
+                scope.resourceBundle = {
+                    "weeksLabel": "weeks"
+                };
                 scope.isCategoryPresent = false;
                 scope.$apply();
                 var expected = ['Data Element', 'July 2015 (4 weeks)', 'August 2015 (5 weeks)'];

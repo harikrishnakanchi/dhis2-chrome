@@ -62,7 +62,7 @@ define(["lodash", "moment"], function(_, moment) {
                 var month = $scope.data.metaData.names[period];
                 if ($scope.showWeeks) {
                     var numberofWeeks = getNumberOfISOWeeksInMonth(period);
-                    headers.push(month + " (" + numberofWeeks + " weeks)");
+                    headers.push(month + " (" + numberofWeeks + " " + $scope.resourceBundle.weeksLabel + ")");
                 } else {
                     headers.push(month);
                 }
