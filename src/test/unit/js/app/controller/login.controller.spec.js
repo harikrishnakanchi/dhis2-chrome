@@ -375,6 +375,13 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 expect(scope.newerVersionAvailable).toBeTruthy();
                 expect(scope.newerVersionNumber).toEqual("6.0");
             });
+
+            it("should set incompatibleVersion to false if current version is greater than available praxis versions", function() {
+                chromeUtils.getPraxisVersion.and.returnValue("7.0");
+                scope.$apply();
+
+                expect(scope.incompatibleVersion).toBeFalsy();
+            });
         });
     });
 });
