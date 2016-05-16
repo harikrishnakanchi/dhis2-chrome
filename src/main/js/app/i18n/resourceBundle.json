@@ -338,5 +338,6 @@
     "September": "September",
     "October": "October",
     "November": "November",
-    "December": "December"
+    "December": "December",
+    "weekSelector": "A week is counted in the month the week starts"
 }
