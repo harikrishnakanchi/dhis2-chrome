@@ -319,6 +319,8 @@
     "incompatiblePraxisVersion": "Current version of Praxis is not compatible with DHIS.",
     "praxis": "Praxis",
     "newUpgradeAvailable": "is available.",
+    "continueUsingMsg": "To continue using, please click ",
+    "toUpgradeMsg": "to upgrade.",
     "clickToUpgrade": "To upgrade click ",
     "here": "here",
     "weeksLabel": "semaines"

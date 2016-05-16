@@ -5,8 +5,9 @@
         <p class='alert alert-danger' ng-show='disabledCredentials' id="userDisabledMsg">{{ resourceBundle.disabledCredentials }}</p>
         <p class='alert alert-danger' ng-show='incompatibleVersion'>
             {{ resourceBundle.incompatiblePraxisVersion }}<br>
-            {{ resourceBundle.clickToUpgrade }}
-            <a href="https://chrome.google.com/webstore/detail/praxis/{{extension_id}}" class="underline" target="_blank">{{ resourceBundle.here }}</a>.
+            {{ resourceBundle.continueUsingMsg }}
+            <a href="https://chrome.google.com/webstore/detail/praxis/{{extension_id}}" class="underline" target="_blank">{{ resourceBundle.here }}</a>
+            {{ resourceBundle.toUpgradeMsg }}
         </p>
         <p class='alert alert-info' ng-show="newerVersionAvailable">
             {{ resourceBundle.praxis + ' v' + newerVersionNumber + ' ' + resourceBundle.newUpgradeAvailable }}
@@ -16,11 +17,11 @@
         <div class="well">
             <div class="form-group">
                 <label for="username">{{ resourceBundle.usernameLabel }}</label>
-                <input type="text" class="form-control" id="username" ng-model="username" placeholder="{{ resourceBundle.usernameLabel }}" autofocus required>
+                <input type="text" class="form-control" id="username" ng-model="username" placeholder="{{ resourceBundle.usernameLabel }}" autofocus required ng-disabled="incompatibleVersion">
             </div>
             <div class="form-group">
                 <label for="password">{{ resourceBundle.passwordLabel }}</label>
-                <input type="password" class="form-control" id="password" ng-model="password" placeholder="{{ resourceBundle.passwordLabel }}" required>
+                <input type="password" class="form-control" id="password" ng-model="password" placeholder="{{ resourceBundle.passwordLabel }}" required ng-disabled="incompatibleVersion">
             </div>
             <div class="form-group">
                 <button type="submit" id="loginButton" ng-disabled="loginForm.$invalid || incompatibleVersion" class="btn btn-block btn-primary">
