@@ -55,18 +55,19 @@ define(["lodash", "moment"], function(_, moment) {
         };
 
         $scope.getHeaders = function() {
-            var headers = ["Data Element"];
+            var headers = [$scope.resourceBundle.dataElement];
             if ($scope.isCategoryPresent)
-                headers.push("Category");
+                headers.push($scope.resourceBundle.category);
             _.each($scope.periods, function (period) {
                 var month = $scope.resourceBundle[$scope.data.metaData.names[period].split(' ')[0]];
                 var year = $scope.data.metaData.names[period].split(' ')[1];
+                var name = _.isUndefined(month) ? $scope.data.metaData.names[period] : month + ' ' + year;
 
                 if ($scope.showWeeks) {
                     var numberofWeeks = getNumberOfISOWeeksInMonth(period);
-                    headers.push(month + " " + year + " (" + numberofWeeks + " " + $scope.resourceBundle.weeksLabel + ")");
+                    headers.push(name + " (" + numberofWeeks + " " + $scope.resourceBundle.weeksLabel + ")");
                 } else {
-                    headers.push(month);
+                    headers.push(name);
                 }
             });
             return headers;
@@ -182,10 +183,10 @@ define(["lodash", "moment"], function(_, moment) {
             var periodsForHeader = _.map($scope.periods, function(pe) {
                 var month = $scope.resourceBundle[$scope.data.metaData.names[pe].split(' ')[0]];
                 var year = $scope.data.metaData.names[pe].split(' ')[1];
-
+                var name = _.isUndefined(month) ? $scope.data.metaData.names[pe] : month + ' ' + year;
                 return {
                     "period": pe,
-                    "name": month + " " + year,
+                    "name": name,
                     "sortKey": "sortKey_" + pe,
                     "numberOfISOWeeks": $scope.showWeeks ? getNumberOfISOWeeksInMonth(pe) : ''
                 };

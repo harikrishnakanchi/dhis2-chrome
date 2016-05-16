@@ -120,7 +120,9 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                     July: "July",
                     August: "August",
                     October: "October",
-                    September: "September"
+                    September: "September",
+                    dataElement: "Data Element",
+                    category: "Category"
                 };
                 var expected = ['Data Element', 'Category', 'July 2015 (4 weeks)', 'August 2015 (5 weeks)'];
                 expect(scope.getHeaders()).toEqual(expected);
@@ -132,7 +134,9 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop", "
                     July: "July",
                     August: "August",
                     October: "October",
-                    September: "September"
+                    September: "September",
+                    dataElement: "Data Element",
+                    category: "Category"
                 };
                 scope.isCategoryPresent = false;
                 scope.$apply();
