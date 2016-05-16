@@ -4,8 +4,8 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
         var scope, rootScope, pivotTableController;
 
         beforeEach(mocks.inject(function($rootScope) {
-            scope = $rootScope.$new();
             rootScope = $rootScope;
+            scope = $rootScope.$new();
 
             Timecop.install();
             Timecop.freeze(new Date("2015-10-29T12:43:54.972Z"));
@@ -88,8 +88,13 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 }]
             };
 
-            scope.resourceBundle = {
-                "weeksLabel": "weeks"
+            scope.locale = "en";
+
+            rootScope.resourceBundle = {
+                weeksLabel: "weeks",
+                July: "July",
+                August: "August",
+                September: "September"
             };
 
             pivotTableController = new PivotTableController(scope, rootScope);
@@ -101,7 +106,6 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             Timecop.uninstall();
         });
 
-
         describe("Export as csv", function() {
             it("should get csv file name in expected format", function() {
                 expect(scope.getCsvFileName()).toEqual("NewConsultations_Consultations_29-Oct-2015.csv");
@@ -109,7 +113,11 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
 
             it("should get headers if category is present", function() {
                 scope.resourceBundle = {
-                    "weeksLabel": "weeks"
+                    weeksLabel: "weeks",
+                    July: "July",
+                    August: "August",
+                    October: "October",
+                    September: "September"
                 };
                 var expected = ['Data Element', 'Category', 'July 2015 (4 weeks)', 'August 2015 (5 weeks)'];
                 expect(scope.getHeaders()).toEqual(expected);
@@ -117,7 +125,11 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
 
             it("should get headers if category not present", function() {
                 scope.resourceBundle = {
-                    "weeksLabel": "weeks"
+                    weeksLabel: "weeks",
+                    July: "July",
+                    August: "August",
+                    October: "October",
+                    September: "September"
                 };
                 scope.isCategoryPresent = false;
                 scope.$apply();
@@ -153,6 +165,13 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             });
 
             it("should get data for csv file when categories are not present", function() {
+                scope.resourceBundle = {
+                    weeksLabel: "weeks",
+                    July: "July",
+                    August: "August",
+                    October: "October",
+                    September: "September"
+                };
                 scope.data = {
                     "headers": [{
                         "name": "dx",
@@ -208,13 +227,6 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
 
                 expect(scope.getData()).toEqual(expectedDataValues);
             });
-        });
-
-        it("should get data element name", function() {
-            var dataElementName = "FieldApp - test";
-            var actualdataelementName = scope.getDataElementName(dataElementName);
-
-            expect("FieldApp").toEqual(actualdataelementName);
         });
 
         it("should populate viewmap and other scope variables on load when categories are present", function() {
@@ -276,6 +288,13 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
             expect(scope.headersForTable).toEqual(expectedHeaders);
         });
 
+        it("should get data element name", function() {
+            var dataElementName = "FieldApp - test";
+            var actualdataelementName = scope.getDataElementName(dataElementName);
+
+            expect("FieldApp").toEqual(actualdataelementName);
+        });
+
         it("should populate viewmap and other scope variables on load when categories are not present", function() {
             scope.data = {
                 "headers": [{
@@ -303,6 +322,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                         "dx": "Data",
                         "a2cf79e8f13": "MSF",
                         "201508": "August 2015",
+                        "201509": "September 2015",
                         "a0e7d3973e3": "New Consultations - Consultations - Out Patient Department - Pediatric",
                         "pe": "Period"
                     }
@@ -365,7 +385,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                     "meta": false
                 }],
                 "metaData": {
-                    "pe": ["201410", "201411", "201412"],
+                    "pe": ["201508"],
                     "names": {
                         "dx": "Data",
                         "a2cf79e8f13": "MSF",
@@ -378,9 +398,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                     }
                 },
                 "rows": [
-                    ["a0e7d3973e3", "201410", "ab3a614eed1", "215.0"],
-                    ["a0e7d3973e3", "201411", "ab3a614eed1", "22.0"],
-                    ["a0e7d3973e3", "201412", "ab3a614eed1", "25.0"]
+                    ["a0e7d3973e3", "201508", "ab3a614eed1", "25.0"]
                 ],
                 "width": 4
             };
@@ -406,9 +424,7 @@ define(["angularMocks", "lodash", "moment", "pivotTableController", "timecop"], 
                 dataElement: 'a0e7d3973e3',
                 dataElementName: 'New Consultations - Consultations - Out Patient Department - Pediatric',
                 dataElementIndex: 1,
-                sortKey_201410: 215,
-                sortKey_201411: 22,
-                sortKey_201412: 25
+                sortKey_201508: 25
             }];
 
             expect(scope.viewMap).toEqual(expectedViewMap);

@@ -158,6 +158,20 @@ define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController"],
         it("should transform the data to the correct form", mocks.inject(function($rootScope) {
             rootScope = $rootScope;
             scope = $rootScope.$new();
+            rootScope.resourceBundle = {
+                "January": "January",
+                "February": "February",
+                "March": "March",
+                "April": "April",
+                "May": "May",
+                "June": "June",
+                "July": "July",
+                "August": "August",
+                "September": "September",
+                "October": "October",
+                "November": "November",
+                "December": "December"
+            };
             scope.data = tableData;
             scope.definition = tableDefinition;
             pivotTableController = PivotTableController(scope, rootScope);
@@ -263,6 +277,20 @@ define(["pivotTableDirective", "angularMocks", "utils", "pivotTableController"],
         it("should get the correct value to be displayed", mocks.inject(function($rootScope) {
             rootScope = $rootScope;
             scope = $rootScope.$new();
+            rootScope.resourceBundle = {
+                "January": "January",
+                "February": "February",
+                "March": "March",
+                "April": "April",
+                "May": "May",
+                "June": "June",
+                "July": "July",
+                "August": "August",
+                "September": "September",
+                "October": "October",
+                "November": "November",
+                "December": "December"
+            };
             scope.data = tableData;
             scope.definition = tableDefinition;
             pivotTableController = PivotTableController(scope, rootScope);

@@ -59,10 +59,12 @@ define(["lodash", "moment"], function(_, moment) {
             if ($scope.isCategoryPresent)
                 headers.push("Category");
             _.each($scope.periods, function (period) {
-                var month = $scope.data.metaData.names[period];
+                var month = $scope.resourceBundle[$scope.data.metaData.names[period].split(' ')[0]];
+                var year = $scope.data.metaData.names[period].split(' ')[1];
+
                 if ($scope.showWeeks) {
                     var numberofWeeks = getNumberOfISOWeeksInMonth(period);
-                    headers.push(month + " (" + numberofWeeks + " " + $scope.resourceBundle.weeksLabel + ")");
+                    headers.push(month + " " + year + " (" + numberofWeeks + " " + $scope.resourceBundle.weeksLabel + ")");
                 } else {
                     headers.push(month);
                 }
@@ -178,9 +180,12 @@ define(["lodash", "moment"], function(_, moment) {
             var dataElements;
 
             var periodsForHeader = _.map($scope.periods, function(pe) {
+                var month = $scope.resourceBundle[$scope.data.metaData.names[pe].split(' ')[0]];
+                var year = $scope.data.metaData.names[pe].split(' ')[1];
+
                 return {
                     "period": pe,
-                    "name": $scope.data.metaData.names[pe],
+                    "name": month + " " + year,
                     "sortKey": "sortKey_" + pe,
                     "numberOfISOWeeks": $scope.showWeeks ? getNumberOfISOWeeksInMonth(pe) : ''
                 };
