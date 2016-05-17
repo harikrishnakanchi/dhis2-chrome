@@ -422,25 +422,36 @@ define(["projectController", "angularMocks", "utils", "lodash", "moment", "orgUn
                 'name': scope.orgUnit.name,
                 'openingDate': moment("2010-01-01").toDate(),
                 'context': {
-                    "name": "Post-conflict"
+                    "id": "a16b4a97ce4",
+                    "name": "Post-conflict",
+                    "englishName": "Post-conflict"
                 },
                 'location': "val3",
                 'endDate': moment("2011-01-01").toDate(),
                 'populationType': {
-                    "name": "Most-at-risk Population"
+                    "id": "a35778ed565",
+                    "name": "Most-at-risk Population",
+                    "englishName": "Most-at-risk Population"
                 },
                 'projectCode': 'RU118',
                 'reasonForIntervention': {
-                    "name": "Natural Disaster"
+                    "id": "a8014cfca5c",
+                    "name": "Natural Disaster",
+                    "englishName": "Natural Disaster"
                 },
                 'modeOfOperation': {
-                    "name": 'Direct operation'
+                    "id": "a560238bc90",
+                    "name": 'Direct operation',
+                    "englishName": 'Direct operation'
                 },
                 'modelOfManagement': {
-                    "name": 'Collaboration'
+                    "id": "a11a7a5d55a",
+                    "name": 'Collaboration',
+                    "englishName": 'Collaboration'
                 },
                 'projectType': {
-                    'name': 'Some Type'
+                    'name': 'Some Type',
+                    'englishName': 'Some Type'
                 },
                 "estimatedTargetPopulation": 1000,
                 "estPopulationLessThan1Year": 11,

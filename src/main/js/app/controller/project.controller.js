@@ -155,24 +155,31 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
 
         var init = function() {
 
-            orgUnitGroupSetRepository.getAll().then(function(data) {
+            orgUnitGroupSetRepository.getAll().then(function(orgUnitGroupSets) {
 
-                var getTranslations = function (code) {
-                    var orgUnitGroups = _.find(data, "code", code).organisationUnitGroups;
+                var addDefaultNameToAttribute = function (orgUnitGroups) {
+                    return _.map(orgUnitGroups, function (orgUnitGroup) {
+                        var defaultName = {
+                            englishName : orgUnitGroup.name
+                        };
 
-                    orgUnitGroups = _.map(orgUnitGroups, function (orgUnitGroup) {
-                        var defaultName = { englishName : orgUnitGroup.name };
                         return _.assign(orgUnitGroup, defaultName);
                     });
-                    return _.sortBy(translationsService.translate(orgUnitGroups), "name");
                 };
 
-                $scope.allContexts = getTranslations("context");
-                $scope.allPopTypes = getTranslations("type_of_population");
-                $scope.reasonForIntervention = getTranslations("reason_for_intervention");
-                $scope.modeOfOperation = getTranslations("mode_of_operation");
-                $scope.modelOfManagement = getTranslations("model_of_management");
-                $scope.allProjectTypes = getTranslations("project_type");
+                var getTranslations = function (code) {
+                    var orgUnitGroups = _.find(orgUnitGroupSets, "code", code).organisationUnitGroups;
+                    orgUnitGroups = addDefaultNameToAttribute(orgUnitGroups);
+
+                    return translationsService.translate(orgUnitGroups);
+                };
+
+                $scope.allContexts = _.sortBy(getTranslations("context"), "name");
+                $scope.allPopTypes = _.sortBy(getTranslations("type_of_population"), "name");
+                $scope.reasonForIntervention = _.sortBy(getTranslations("reason_for_intervention"), "name");
+                $scope.modeOfOperation = _.sortBy(getTranslations("mode_of_operation"), "name");
+                $scope.modelOfManagement = _.sortBy(getTranslations("model_of_management"), "name");
+                $scope.allProjectTypes = _.sortBy(getTranslations("project_type"), "name");
 
                 if ($scope.isNewMode)
                     prepareNewForm();
