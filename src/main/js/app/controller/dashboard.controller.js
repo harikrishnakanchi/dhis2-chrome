@@ -1,5 +1,5 @@
 define(["properties", "moment", "dateUtils", "lodash"], function(properties, moment, dateUtils, _) {
-    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, approvalDataRepository, moduleDataBlockFactory) {
+    return function($scope, $hustle, $q, $rootScope, $modal, $timeout, $location, approvalDataRepository, moduleDataBlockFactory, checkVersionCompatibility) {
 
         var deregisterSelectedProjectListener = $rootScope.$on('selectedProjectUpdated', function() {
             init();
@@ -136,6 +136,10 @@ define(["properties", "moment", "dateUtils", "lodash"], function(properties, mom
         };
 
         var init = function() {
+
+            $scope.compatibilityInfo = {};
+            checkVersionCompatibility($scope.compatibilityInfo);
+
             if ($rootScope.currentUser && $rootScope.currentUser.selectedProject) {
                 $scope.loading = true;
                 return loadDashboard().finally(function() {

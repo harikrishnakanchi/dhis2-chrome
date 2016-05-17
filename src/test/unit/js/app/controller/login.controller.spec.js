@@ -1,7 +1,7 @@
-define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "chromeUtils"],
-    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, chromeUtils) {
+define(["loginController", "angularMocks", "utils", "sessionHelper", "userPreferenceRepository", "orgUnitRepository", "systemSettingRepository", "userRepository", "chromeUtils", "checkVersionCompatibility"],
+    function (LoginController, mocks, utils, SessionHelper, UserPreferenceRepository, OrgUnitRepository, SystemSettingRepository, UserRepository, chromeUtils, CheckVersionCompatibility) {
     describe("login controller", function () {
-        var rootScope, loginController, scope, location, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository;
+        var rootScope, loginController, scope, location, q, fakeUserStore, fakeUserCredentialsStore, fakeUserStoreSpy, sessionHelper, hustle, userPreferenceRepository, systemSettingRepository, userRepository, orgUnitRepository, checkVersionCompatibility;
 
         beforeEach(module('hustle'));
         beforeEach(mocks.inject(function ($rootScope, $location, $q, $hustle) {
@@ -51,14 +51,15 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
             spyOn(systemSettingRepository, "getProductKeyLevel").and.returnValue("");
             spyOn(systemSettingRepository, "get").and.returnValue(utils.getPromise(q, ["5.1", "6.0"]));
 
-            spyOn(chromeUtils, "getPraxisVersion").and.returnValue("5.0");
+            spyOn(chromeUtils, "getPraxisVersion").and.returnValue("5.1");
 
             orgUnitRepository = new OrgUnitRepository();
             spyOn(orgUnitRepository, "get").and.returnValue(utils.getPromise(q, {}));
 
             spyOn(hustle, "publish").and.returnValue(utils.getPromise(q, {}));
 
-            loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository);
+            checkVersionCompatibility = CheckVersionCompatibility(systemSettingRepository);
+            loginController = new LoginController(rootScope, scope, location, q, sessionHelper, hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility);
         }));
 
         it("should set invalid access as true when their is project level product key and there is no common org unit", function () {
@@ -328,60 +329,6 @@ define(["loginController", "angularMocks", "utils", "sessionHelper", "userPrefer
                 "type": "downloadProjectData",
                 "data": []
             }, "dataValues");
-        });
-
-        describe("Praxis version compatibility", function() {
-            beforeEach(function() {
-                systemSettingRepository.get.and.callFake(function(key) {
-                    if(key == "compatiblePraxisVersions")
-                        return utils.getPromise(q, ["5.1", "6.0"]);
-                    else
-                        return utils.getRejectedPromise(q, null);
-                });
-                chromeUtils.getPraxisVersion.and.returnValue("5.0");
-            });
-
-            it("should set incompatibleVersion to true if praxis version does not match the compatible versions in system settings", function () {
-                scope.$apply();
-                expect(scope.incompatibleVersion).toBeTruthy();
-            });
-
-            it("should set newerVersionAvailable to true if there is a newer version of praxis available", function() {
-                chromeUtils.getPraxisVersion.and.returnValue("5.1");
-                scope.$apply();
-
-                expect(scope.newerVersionAvailable).toBeTruthy();
-            });
-
-            it("should not set incompatibleVersion to true if the system settings do not contain the compatiblePraxisVersions entry in the object store", function () {
-                chromeUtils.getPraxisVersion.and.returnValue("5.1");
-                scope.$apply();
-
-                expect(systemSettingRepository.get).toHaveBeenCalledWith("compatiblePraxisVersions");
-                expect(scope.incompatibleVersion).not.toBeTruthy();
-            });
-
-            it("should set newerVersionAvailable to false if there is no newer version available in the object store", function() {
-                chromeUtils.getPraxisVersion.and.returnValue("6.0");
-
-                scope.$apply();
-                expect(scope.newerVersionAvailable).toBeFalsy();
-            });
-
-            it("should set newerVersionAvailable to true if there is a newer version in the object store", function() {
-                chromeUtils.getPraxisVersion.and.returnValue("5.1");
-
-                scope.$apply();
-                expect(scope.newerVersionAvailable).toBeTruthy();
-                expect(scope.newerVersionNumber).toEqual("6.0");
-            });
-
-            it("should set incompatibleVersion to false if current version is greater than available praxis versions", function() {
-                chromeUtils.getPraxisVersion.and.returnValue("7.0");
-                scope.$apply();
-
-                expect(scope.incompatibleVersion).toBeFalsy();
-            });
         });
     });
 });

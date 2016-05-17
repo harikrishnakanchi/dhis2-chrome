@@ -1,5 +1,5 @@
-define(["md5", "properties", "lodash", "chromeUtils"], function(md5, properties, _, chromeUtils) {
-    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository) {
+define(["md5", "properties", "lodash"], function(md5, properties, _) {
+    return function($rootScope, $scope, $location, $q, sessionHelper, $hustle, userPreferenceRepository, orgUnitRepository, systemSettingRepository, userRepository, checkVersionCompatibility) {
         var loadUserData = function(loginUsername) {
             var existingUserProjects = userPreferenceRepository.getCurrentUsersProjectIds();
             var previousUser = userPreferenceRepository.getCurrentUsersUsername().then(function (username) {
@@ -135,58 +135,13 @@ define(["md5", "properties", "lodash", "chromeUtils"], function(md5, properties,
                 .then(redirect);
         };
 
-        var checkPraxisCompatibility = function () {
-
-            var versionStringComparator = function (v1, v2) {
-                v1 = v1.split(".");
-                v2 = v2.split(".");
-                var l = Math.min(v1.length, v2.length);
-                for (var i = 0; i < l; i++) {
-                    var a = parseInt(v1[i]);
-                    var b = parseInt(v2[i]);
-                    if (a < b) {
-                        return -1;
-                    } else if (a > b) {
-                        return 1;
-                    }
-                }
-                return 0;
-            };
-
-            var checkCompatibility = function(compatiblePraxisVersions) {
-                var praxisVersion = chromeUtils.getPraxisVersion();
-
-                $scope.incompatibleVersion = !_.contains(compatiblePraxisVersions, praxisVersion);
-
-                if($scope.incompatibleVersion) {
-                    var alreadyOnLatestVersion = _.last(compatiblePraxisVersions.concat(praxisVersion).sort(versionStringComparator)) == praxisVersion;
-                    if(alreadyOnLatestVersion) {
-                        $scope.incompatibleVersion = false;
-                        $scope.newerVersionAvailable = false;
-                    }
-                } else {
-                    var latestVersion = _.max(compatiblePraxisVersions, function (version) {
-                        return parseFloat(version);
-                    });
-                    if (praxisVersion != latestVersion) {
-                        $scope.newerVersionAvailable = true;
-                        $scope.newerVersionNumber = latestVersion;
-                    }
-                }
-            };
-
-            var objectStoreNotFound = function() {
-                $scope.incompatibleVersion = false;
-                $scope.newerVersionAvailable = false;
-            };
-
-            return systemSettingRepository.get("compatiblePraxisVersions")
-                .then(checkCompatibility, objectStoreNotFound);
+        var init = function() {
+            $scope.extension_id = properties.extension_id;
+            $scope.compatibilityInfo = {};
+            checkVersionCompatibility($scope.compatibilityInfo);
         };
 
-        $scope.extension_id = properties.extension_id;
-        checkPraxisCompatibility();
-
+        init();
 
     };
 });

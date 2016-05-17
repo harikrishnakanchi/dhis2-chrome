@@ -124,6 +124,7 @@ require.config({
         //Factories
         "factories": "app/factories/factories",
         "moduleDataBlockFactory": "app/factories/module.data.block.factory",
+        "checkVersionCompatibility": "app/factories/check.version.compatibility",
 
         //Transformers
         "extractHeaders": "app/transformers/extract.headers",
