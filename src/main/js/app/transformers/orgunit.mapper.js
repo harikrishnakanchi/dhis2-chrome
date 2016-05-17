@@ -16,7 +16,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "code": "prjCon",
                 "name": "Context"
             },
-            "value": orgUnit.context ? orgUnit.context.title || orgUnit.context.name : orgUnit.context
+            "value": orgUnit.context ? (orgUnit.context.originalObject ? orgUnit.context.originalObject.englishName : orgUnit.context.name) : orgUnit.context
         }, {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
@@ -32,7 +32,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "code": "prjPopType",
                 "name": "Type of population"
             },
-            "value": orgUnit.populationType ? orgUnit.populationType.title || orgUnit.populationType.name : orgUnit.populationType
+            "value": orgUnit.populationType ? (orgUnit.populationType.originalObject ? orgUnit.populationType.originalObject.englishName : orgUnit.populationType.name) : orgUnit.populationType
         }, {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
@@ -48,7 +48,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "code": "reasonForIntervention",
                 "name": "Reason For Intervention"
             },
-            "value": orgUnit.reasonForIntervention ? orgUnit.reasonForIntervention.title || orgUnit.reasonForIntervention.name : orgUnit.reasonForIntervention
+            "value": orgUnit.reasonForIntervention ? (orgUnit.reasonForIntervention.originalObject ? orgUnit.reasonForIntervention.originalObject.englishName : orgUnit.reasonForIntervention.name) : orgUnit.reasonForIntervention
         }, {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
@@ -56,7 +56,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "code": "modeOfOperation",
                 "name": "Mode Of Operation"
             },
-            "value": orgUnit.modeOfOperation ? orgUnit.modeOfOperation.title || orgUnit.modeOfOperation.name : orgUnit.modeOfOperation
+            "value": orgUnit.modeOfOperation ? (orgUnit.modeOfOperation.originalObject ? orgUnit.modeOfOperation.originalObject.englishName : orgUnit.modeOfOperation.name) : orgUnit.modeOfOperation
         }, {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
@@ -64,7 +64,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "code": "modelOfManagement",
                 "name": "Model Of Management"
             },
-            "value": orgUnit.modelOfManagement ? orgUnit.modelOfManagement.title || orgUnit.modelOfManagement.name : orgUnit.modelOfManagement
+            "value": orgUnit.modelOfManagement ? (orgUnit.modelOfManagement.originalObject ? orgUnit.modelOfManagement.originalObject.englishName : orgUnit.modelOfManagement.name) : orgUnit.modelOfManagement
         }, {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
@@ -88,7 +88,7 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
                 "code": "projectType",
                 "name": "Project Type"
             },
-            "value": orgUnit.projectType ? orgUnit.projectType.title || orgUnit.projectType.name : orgUnit.projectType
+            "value": orgUnit.projectType ? (orgUnit.projectType.originalObject ? orgUnit.projectType.originalObject.englishName : orgUnit.projectType.name) : orgUnit.projectType
         }, {
             "created": moment().toISOString(),
             "lastUpdated": moment().toISOString(),
@@ -192,33 +192,41 @@ define(["lodash", "dhisId", "moment"], function(_, dhisId, moment) {
         return attribute ? attribute.value : undefined;
     };
 
+
     this.mapToProject = function(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes) {
+
+        var getTranslatedName = function (allOptions, code) {
+            var value = self.getAttributeValue(dhisProject, code);
+            var result = _.filter(allOptions, { englishName: value});
+            return result[0] ? result[0].name : "";
+        };
+
         var endDate = self.getAttributeValue(dhisProject, "prjEndDate");
         var autoApprove = self.getAttributeValue(dhisProject, "autoApprove");
         return {
             'name': dhisProject.name,
             'openingDate': moment(dhisProject.openingDate).toDate(),
-            'context': _.find(allContexts, {
-                "name": self.getAttributeValue(dhisProject, "prjCon")
-            }),
+            'context': {
+              "name": getTranslatedName(allContexts, "prjCon")
+            },
             'location': self.getAttributeValue(dhisProject, "prjLoc"),
-            'populationType': _.find(allPopTypes, {
-                "name": self.getAttributeValue(dhisProject, "prjPopType")
-            }),
+            'populationType': {
+                "name": getTranslatedName(allPopTypes, "prjPopType")
+            },
             'endDate': endDate ? moment(endDate).toDate() : undefined,
             'projectCode': self.getAttributeValue(dhisProject, "projCode"),
-            'projectType': _.find(allProjectTypes, {
-                "name": self.getAttributeValue(dhisProject, "projectType")
-            }),
-            'reasonForIntervention': _.find(reasonForIntervention, {
-                "name": self.getAttributeValue(dhisProject, "reasonForIntervention")
-            }),
-            'modeOfOperation': _.find(modeOfOperation, {
-                "name": self.getAttributeValue(dhisProject, "modeOfOperation")
-            }),
-            'modelOfManagement': _.find(modelOfManagement, {
-                "name": self.getAttributeValue(dhisProject, "modelOfManagement")
-            }),
+            'projectType': {
+                "name": getTranslatedName(allProjectTypes, "projectType")
+            },
+            'reasonForIntervention': {
+                "name": getTranslatedName(reasonForIntervention, "reasonForIntervention")
+            },
+            'modeOfOperation': {
+                "name": getTranslatedName(modeOfOperation, "modeOfOperation")
+            },
+            'modelOfManagement': {
+                "name": getTranslatedName(modelOfManagement, "modelOfManagement")
+            },
             'estimatedTargetPopulation': parseInt(self.getAttributeValue(dhisProject, "estimatedTargetPopulation")),
             'estPopulationLessThan1Year': parseInt(self.getAttributeValue(dhisProject, "estPopulationLessThan1Year")),
             'estPopulationBetween1And5Years': parseInt(self.getAttributeValue(dhisProject, "estPopulationBetween1And5Years")),

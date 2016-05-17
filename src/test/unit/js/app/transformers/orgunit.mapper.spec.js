@@ -110,30 +110,37 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
 
             var allContexts = [{
                 "id": "a16b4a97ce4",
-                "name": "val2"
+                "name": "val2",
+                "englishName": "val2"
             }];
             var allPopTypes = [{
                 "id": "a35778ed565",
-                "name": "val5"
+                "name": "val5",
+                "englishName": "val5"
             }, {
                 "id": "a48f665185e",
-                "name": "val6"
+                "name": "val6",
+                "englishName": "val6",
             }];
             var reasonForIntervention = [{
                 "id": "a8014cfca5c",
-                "name": "Armed Conflict"
+                "name": "Armed Conflict",
+                "englishName": "Armed Conflict"
             }];
             var modeOfOperation = [{
                 "id": "a560238bc90",
-                "name": "Direct Operation"
+                "name": "Direct Operation",
+                "englishName": "Direct Operation"
             }];
             var modelOfManagement = [{
                 "id": "a11a7a5d55a",
-                "name": "Collaboration"
+                "name": "Collaboration",
+                "englishName": "Collaboration"
             }];
             var allProjectTypes = [{
                 "id": "a11a7aty65a",
-                "name": "Some Type"
+                "name": "Some Type",
+                "englishName": "Some Type"
             }];
 
             var result = orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
@@ -142,30 +149,24 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "name": dhisProject.name,
                 "openingDate": moment(dhisProject.openingDate).toDate(),
                 "context": {
-                    "id": "a16b4a97ce4",
                     "name": "val2"
                 },
                 "location": "val3",
                 "populationType": {
-                    "id": "a35778ed565",
                     "name": "val5"
                 },
                 "endDate": moment("2011-01-01").toDate(),
                 "projectCode": "RU118",
                 "projectType": {
-                    "id": "a11a7aty65a",
                     "name": "Some Type"
                 },
                 "reasonForIntervention": {
-                    "id": "a8014cfca5c",
                     "name": "Armed Conflict"
                 },
                 "modeOfOperation": {
-                    "id": "a560238bc90",
                     "name": "Direct Operation"
                 },
                 "modelOfManagement": {
-                    "id": "a11a7a5d55a",
                     "name": "Collaboration"
                 },
                 "estimatedTargetPopulation": 1000,
@@ -203,15 +204,15 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
             var expectedResult = {
                 "name": dhisProject.name,
                 "openingDate": moment(dhisProject.openingDate).toDate(),
-                "context": undefined,
+                "context": {name: ''},
                 "location": undefined,
-                "populationType": undefined,
+                "populationType": {name: ''},
                 "endDate": undefined,
                 "projectCode": "RU118",
-                "projectType": undefined,
-                "reasonForIntervention": undefined,
-                "modeOfOperation": undefined,
-                "modelOfManagement": undefined,
+                "projectType": {name: ''},
+                "reasonForIntervention": {name: ''},
+                "modeOfOperation": {name: ''},
+                "modelOfManagement": {name: ''},
                 "estimatedTargetPopulation": NaN,
                 "estPopulationLessThan1Year": NaN,
                 "estPopulationBetween1And5Years": NaN,
@@ -227,25 +228,25 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "name": "Org1",
                 "openingDate": moment("2010-01-01").toDate(),
                 "context": {
-                    "title": "val2"
+                    "name": "val2"
                 },
                 "location": "val3",
                 "endDate": moment("2011-01-01").toDate(),
                 "populationType": {
-                    "title": "val6"
+                    "name": "val6"
                 },
                 "projectCode": "AB001",
                 "projectType": {
                     "name": "Some Type"
                 },
                 "reasonForIntervention": {
-                    "title": "Armed Conflict"
+                    "name": "Armed Conflict"
                 },
                 "modeOfOperation": {
-                    "title": "Direct Operation"
+                    "name": "Direct Operation"
                 },
                 "modelOfManagement": {
-                    "title": "Collaboration"
+                    "name": "Collaboration"
                 },
                 "estimatedTargetPopulation": "1000",
                 "estPopulationLessThan1Year": 11,
@@ -687,7 +688,7 @@ define(["orgUnitMapper", "angularMocks", "moment", "timecop", "dhisId"], functio
                 "name": "Org1",
                 "openingDate": moment("2010-01-01").toDate(),
                 "context": {
-                    "title": "val2"
+                    "name": "val2"
                 },
                 "location": "val3",
                 "endDate": moment("2011-01-01").toDate(),

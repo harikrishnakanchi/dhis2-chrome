@@ -157,8 +157,14 @@ define(["moment", "orgUnitMapper", "properties", "lodash"], function(moment, org
 
             orgUnitGroupSetRepository.getAll().then(function(data) {
 
-                var getTranslations = function (projectFields) {
-                    return _.sortBy(translationsService.translate(_.find(data, "code", projectFields).organisationUnitGroups), "name");
+                var getTranslations = function (code) {
+                    var orgUnitGroups = _.find(data, "code", code).organisationUnitGroups;
+
+                    orgUnitGroups = _.map(orgUnitGroups, function (orgUnitGroup) {
+                        var defaultName = { englishName : orgUnitGroup.name };
+                        return _.assign(orgUnitGroup, defaultName);
+                    });
+                    return _.sortBy(translationsService.translate(orgUnitGroups), "name");
                 };
 
                 $scope.allContexts = getTranslations("context");
