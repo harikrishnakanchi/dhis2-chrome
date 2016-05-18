@@ -109,7 +109,7 @@ define(["lodash", "moment"], function(_, moment) {
                 return 0;
 
             var optionId = _.find($scope.referralOptions, {
-                "name": locationName
+                "displayName": locationName
             }).id;
             return _.filter($scope.dataValues._referralLocations, {
                 "value": optionId
@@ -168,7 +168,9 @@ define(["lodash", "moment"], function(_, moment) {
             return optionSetRepository.getOptionSetMapping($scope.selectedModule.parent.id).then(function(data) {
                 var translatedOptionSetMap = translationsService.translateOptionSetMap(data.optionSetMap);
                 $scope.optionSetMapping = translatedOptionSetMap;
-                $scope.optionMapping = data.optionMap;
+
+                var translatedOptionMap = translationsService.translateOptionMap(data.optionMap);
+                $scope.optionMapping = translatedOptionMap;
             });
         };
 

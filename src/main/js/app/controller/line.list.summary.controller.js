@@ -147,8 +147,7 @@ define(["lodash", "moment", "properties", "orgUnitMapper"], function(_, moment, 
                 var option = _.find(dataValue.optionSet.options, function(o) {
                     return o.code === dataValue.value;
                 });
-
-                return option.name;
+                return option ? option.name : "";
             } else {
                 return dataValue.value;
             }

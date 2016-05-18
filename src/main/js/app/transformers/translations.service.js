@@ -57,6 +57,20 @@ define([],function(){
             return optionSetMap;
         };
 
+        var translateOptionMap = function (optionMap) {
+            if(this.locale == 'en') {
+                return optionMap;
+            }
+
+            _.each(optionMap, function(value, key) {
+                var translationObject = _.find(translations, function(translation) {
+                    return translation.objectId == key;
+                });
+                optionMap[key] = translationObject ? translationObject.value : value;
+            });
+
+            return optionMap;
+        };
         var translate = function(objectsToBeTranslated){
             if(this.locale == 'en') {
                 return objectsToBeTranslated;
@@ -93,6 +107,7 @@ define([],function(){
             setLocale: setLocale,
             translate: translate,
             translateReports: translateReports,
+            translateOptionMap: translateOptionMap,
             translateOptionSetMap: translateOptionSetMap
         };
     };
