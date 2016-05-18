@@ -426,19 +426,5 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 expect(moduleDataBlock.active).toEqual(false);
             });
         });
-
-        describe('approvals setter', function() {
-            it('should set datavalues, approvals and completion data to module data block', function () {
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
-                var dataValues = 'some data values',
-                    completionData = 'completionData',
-                    approvalData = 'approvalData';
-                moduleDataBlock.setRemoteData(dataValues, completionData, approvalData);
-
-                expect(moduleDataBlock.remoteDataValues).toEqual('some data values');
-                expect(moduleDataBlock.remoteCompletions).toEqual('completionData');
-                expect(moduleDataBlock.remoteApprovals).toEqual('approvalData');
-            });
-        });
     });
 });

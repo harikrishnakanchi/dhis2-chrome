@@ -49,12 +49,6 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         }
     };
 
-    ModuleDataBlock.prototype.setRemoteData = function(dhisDataValues, dhisCompletions, dhisApprovals) {
-        this.remoteDataValues = dhisDataValues;
-        this.remoteApprovals = dhisApprovals;
-        this.remoteCompletions = dhisCompletions;
-    };
-
     ModuleDataBlock.create = function () {
         var moduleDataBlock = Object.create(ModuleDataBlock.prototype);
         ModuleDataBlock.apply(moduleDataBlock, arguments);
