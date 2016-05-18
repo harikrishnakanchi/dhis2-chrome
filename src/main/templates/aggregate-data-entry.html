@@ -50,7 +50,7 @@
                                                     </th>
                                                     <th ng-if="!$last" class="last-column">
                                                     </th>
-                                                    <th ng-if="$last && section.categoryOptionComboIds.length > 1" class="last-column">
+                                                    <th ng-if="$last && section.categoryOptionComboIds.length > 1 && !(section.shouldHideTotals)" class="last-column">
                                                         {{ resourceBundle.totalLabel }}
                                                     </th>
                                                 </tr>
@@ -76,16 +76,16 @@
                                                                    ng-disabled="!hasRoles(['Data entry user']) || !isDataEntryAllowed" />
                                                         </ng-form>
                                                     </td>
-                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1">{{sum(dataValues[selectedModule.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1 && !(section.shouldHideTotals)">{{sum(dataValues[selectedModule.id][dataElement.id], dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                 </tr>
-                                                <tr class="hide-from-print" ng-if="(section.dataElements | filter:{ isIncluded: true }).length > 1">
+                                                <tr class="hide-from-print" ng-if="(section.dataElements | filter:{ isIncluded: true }).length > 1 && !(section.shouldHideTotals)">
                                                     <td>
                                                         <span> {{ resourceBundle.totalLabel }}</span>
                                                     </td>
                                                     <td ng-repeat="option in section.categoryOptionComboIds track by $id(option)">
                                                         {{columnSum(dataValues[selectedModule.id], section , option, dataSet.isReferralDataset)}}
                                                     </td>
-                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1"> {{totalSum(section)}}
+                                                    <td class="last-column" ng-if="section.categoryOptionComboIds.length > 1 "> {{totalSum(section)}}
                                                     </td>
                                                 </tr>
                                             </tbody>

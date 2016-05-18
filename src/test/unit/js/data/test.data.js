@@ -181,6 +181,12 @@ define(["lodash"], function(_) {
                 "id": "HjaBYio5UFK",
                 "code": "mandatory"
             }
+        },{
+            "value": "true",
+            "attribute": {
+                "id": "HjaBYio5SDK",
+                "code": "hideTotals"
+            }
         }]
     }, {
         "id": "DE2",
@@ -205,6 +211,7 @@ define(["lodash"], function(_) {
         "code": "DE3_code",
         "name": "DE3 - ITFC",
         "shortName": "DE3 - ITFC",
+        "hideTotals": true,
         "formName": "DE3",
         "description": "some desc3",
         "categoryCombo": {

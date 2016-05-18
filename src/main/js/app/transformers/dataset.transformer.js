@@ -46,6 +46,9 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 enrichedSection.isIncluded = !_.every(enrichedSection.dataElements, {
                     "isIncluded": false
                 });
+                enrichedSection.shouldHideTotals = _.any(enrichedSection.dataElements,{
+                    "shouldHideTotals": true
+                });
                 return enrichedSection;
             });
         };
@@ -69,6 +72,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 var subSection = getSubSection(enrichedDataElement)[0] || {
                     "name": "Default"
                 };
+                enrichedDataElement.shouldHideTotals = getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, "hideTotals");
                 enrichedDataElement.subSection = subSection.name.replace("module_creation", "").trim();
                 return enrichedDataElement;
             });

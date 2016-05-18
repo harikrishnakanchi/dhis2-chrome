@@ -49,7 +49,7 @@
                                                         </th>
                                                         <th ng-if="!$last" class="last-column">
                                                         </th>
-                                                        <th ng-if="$last && section.categoryOptionComboIds.length > 1" class="last-column">
+                                                        <th ng-if="$last && section.categoryOptionComboIds.length > 1 && !(section.shouldHideTotals)" class="last-column">
                                                             {{ resourceBundle.totalLabel }}
                                                         </th>
                                                     </tr>
@@ -70,9 +70,9 @@
                                                                 <input type="text" class="input-sm" name="datavalue" id="datafield_{{$index}}" ng-value="getValue(dataValues, dataElement.id, option, dataSet.organisationUnits)" ng-disabled="true" />
                                                             </ng-form>
                                                         </td>
-                                                        <td ng-if="section.categoryOptionComboIds.length > 1" class="last-column">{{sum(dataValues, dataSet.organisationUnits, dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
+                                                        <td ng-if="section.categoryOptionComboIds.length > 1 && !(section.shouldHideTotals)" class="last-column">{{sum(dataValues, dataSet.organisationUnits, dataElement.id, section.categoryOptionComboIdsForTotals)}}</td>
                                                     </tr>
-                                                    <tr ng-if="(section.dataElements | filter:{ isIncluded: true }).length > 1">
+                                                    <tr ng-if="(section.dataElements | filter:{ isIncluded: true }).length > 1 && !(section.shouldHideTotals)">
                                                         <td>
                                                             <span> {{ resourceBundle.totalLabel }}</span>
                                                         </td>
