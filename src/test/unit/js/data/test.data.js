@@ -185,7 +185,7 @@ define(["lodash"], function(_) {
             "value": "true",
             "attribute": {
                 "id": "HjaBYio5SDK",
-                "code": "hideTotals"
+                "code": "hideAggregateDataSetSectionTotals"
             }
         }]
     }, {
@@ -211,7 +211,6 @@ define(["lodash"], function(_) {
         "code": "DE3_code",
         "name": "DE3 - ITFC",
         "shortName": "DE3 - ITFC",
-        "hideTotals": true,
         "formName": "DE3",
         "description": "some desc3",
         "categoryCombo": {

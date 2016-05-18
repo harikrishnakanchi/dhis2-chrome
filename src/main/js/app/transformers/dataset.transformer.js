@@ -72,7 +72,7 @@ define(["extractHeaders", "lodash"], function(extractHeaders, _) {
                 var subSection = getSubSection(enrichedDataElement)[0] || {
                     "name": "Default"
                 };
-                enrichedDataElement.shouldHideTotals = getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, "hideTotals");
+                enrichedDataElement.shouldHideTotals = getBooleanAttributeValue(indexedDataElements[dataElement.id].attributeValues, "hideAggregateDataSetSectionTotals");
                 enrichedDataElement.subSection = subSection.name.replace("module_creation", "").trim();
                 return enrichedDataElement;
             });
