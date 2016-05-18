@@ -45,11 +45,17 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
                     if(pivotTable.isTableDataAvailable) {
                         if(pivotTable.definition.monthlyReport) {
                             _.forEach(pivotTable.data.metaData.pe, function (period) {
+                                var month = $scope.resourceBundle[pivotTable.data.metaData.names[period].split(' ')[0]];
+                                var year = pivotTable.data.metaData.names[period].split(' ')[1];
+                                var name = _.isUndefined(month) ? pivotTable.data.metaData.names[period] : month + ' ' + year;
+
                                 var numberofWeeks = getNumberOfISOWeeksInMonth(period);
-                                headers.push([pivotTable.data.metaData.names[period] + " (" + numberofWeeks + " weeks)"]);
+
+                                headers.push([name + " (" + numberofWeeks + $scope.resourceBundle.weeksLabel + ")"]);
                             });
                         } else {
                             _.forEach(pivotTable.data.metaData.pe, function (period) {
+
                                 headers.push([pivotTable.data.metaData.names[period]]);
                             });
                         }
