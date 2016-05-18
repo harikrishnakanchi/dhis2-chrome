@@ -1,4 +1,4 @@
-define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBlock, CustomAttributes, timecop) {
+define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(ModuleDataBlock, CustomAttributes, moment, timecop) {
     describe('ModuleDataBlock', function () {
         var moduleDataBlock, orgUnit, period, aggregateDataValues, lineListEvents, approvalData;
 
@@ -428,6 +428,57 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.active).toEqual(false);
             });
+        });
+
+        describe('dataValuesLastUpdated', function() {
+            it('should be null if aggregateDataValues are not present', function () {
+                aggregateDataValues = undefined;
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValuesLastUpdated).toBeNull();
+            });
+
+            it('should be null if aggregateDataValues has no data values collection', function () {
+                aggregateDataValues = {};
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValuesLastUpdated).toBeNull();
+            });
+
+            it('should be null if aggregateDataValues has no data values', function () {
+                aggregateDataValues = {
+                    dataValues: []
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValuesLastUpdated).toBeNull();
+            });
+
+            it('should return the most recent lastUpdated timestamp', function () {
+                var someMomentInTime = moment('2016-05-18T00:00:00.000Z');
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue',
+                        lastUpdated: someMomentInTime.toISOString()
+                    }, {
+                        value: 'someOtherValue',
+                        lastUpdated: moment(someMomentInTime).subtract(1, 'hour').toISOString()
+                    }]
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValuesLastUpdated).toEqual(someMomentInTime);
+            });
+
+            it('should return the most recent lastUpdated or clientLastUpdated timestamp', function () {
+                var someMomentInTime = moment('2016-05-18T00:00:00.000Z');
+                aggregateDataValues = {
+                    dataValues: [{
+                        value: 'someValue',
+                        clientLastUpdated: someMomentInTime.toISOString(),
+                        lastUpdated: moment(someMomentInTime).subtract(1, 'hour').toISOString()
+                    }]
+                };
+                moduleDataBlock = createModuleDataBlock();
+                expect(moduleDataBlock.dataValuesLastUpdated).toEqual(someMomentInTime);
+            });
+
         });
     });
 });

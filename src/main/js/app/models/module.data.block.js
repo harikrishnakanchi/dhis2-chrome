@@ -5,6 +5,8 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         this.moduleName = parseModuleName(orgUnit);
         this.lineListService = CustomAttributes.parseAttribute(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
 
+        this.dataValuesLastUpdated = getMostRecentDataValueTimestamp(aggregateDataValues);
+
         this.submitted = isSubmitted(aggregateDataValues, lineListEvents, this.lineListService);
         this.approvedAtProjectLevel = !!(approvalData && approvalData.isComplete);
         this.approvedAtCoordinationLevel = !!(approvalData && approvalData.isApproved);
@@ -47,6 +49,23 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         } else {
             return orgUnit.name;
         }
+    };
+
+    var getMostRecentDataValueTimestamp = function(aggregateDataValues) {
+        var getMostRecentTimestamp = function(dataValues) {
+            var timestamps = _.flatten(_.map(dataValues, function(dataValue) {
+                return [
+                    moment(dataValue.lastUpdated),
+                    moment(dataValue.clientLastUpdated || null)
+                ];
+            }));
+            return moment.max(timestamps);
+        };
+
+        return (aggregateDataValues &&
+            aggregateDataValues.dataValues &&
+            aggregateDataValues.dataValues.length > 0 &&
+            getMostRecentTimestamp(aggregateDataValues.dataValues)) || null;
     };
 
     ModuleDataBlock.create = function () {
