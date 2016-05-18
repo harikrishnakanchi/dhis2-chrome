@@ -143,6 +143,8 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
             };
 
             scope.resourceBundle = {
+                country: 'Country',
+                nameLabel: 'Name',
                 projectInformationLabel: 'Project Information',
                 projectCodeLabel: 'Project Code',
                 projectTypeLabel: 'Project Type',
@@ -150,7 +152,9 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 typeOfPopulationLabel: 'Type of population',
                 reasonForInterventionLabel: 'Reason For Intervention',
                 modeOfOperationLabel: 'Mode Of Operation',
-                modelOfManagementLabel: 'Model Of Management'
+                modelOfManagementLabel: 'Model Of Management',
+                openingDateLabel: 'Opening Date',
+                endDateLabel: 'End Date'
             };
 
             orgUnitRepository = new OrgUnitRepository();
@@ -188,7 +192,8 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
             translationsService = new TranslationsService();
             spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, translatedReport));
 
-            var orgUnitGroupSets = [{
+            var orgUnitGroupSets = [
+                {
                 "code": "project_type",
                 "id": "D6yNgLkqIKR",
                 "name": "Project Type",
@@ -276,6 +281,7 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                     "name": "Direct operation"
                 }]
             }];
+
             orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
             spyOn(orgUnitGroupSetRepository, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupSets));
 
