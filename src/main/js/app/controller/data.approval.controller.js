@@ -262,15 +262,34 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                                 return dataset;
                             });
                         });
-                        return $q.all(dataSetPromises).then(function(datasets) {
-                            var translatedDatasets = translationsService.translate(datasets);
+
+                        var translateDataSets = function(datasets) {
+                            return translationsService.translate(datasets);
+                        };
+
+                        var setDatasets = function (datasets) {
                             if (removeReferral)
-                                $scope.dataSets = _.filter(translatedDatasets, {
+                                $scope.dataSets = _.filter(datasets, {
                                     "isReferralDataset": false
                                 });
                             else
-                                $scope.dataSets = translatedDatasets;
-                        });
+                                $scope.dataSets = datasets;
+                            return $scope.dataSets;
+                        };
+
+                        var setTotalsDisplayPreferencesforDataSetSections = function (dataSets) {
+                            _.each(dataSets, function(dataSet){
+                                _.each(dataSet.sections, function(dataSetSection){
+                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.categoryOptionComboIds.length > 1;
+                                    dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
+                                });
+                            });
+                        };
+
+                        return $q.all(dataSetPromises)
+                            .then(translateDataSets)
+                            .then(setDatasets)
+                            .then(setTotalsDisplayPreferencesforDataSetSections);
                     });
 
                 var loadDataValuesPromise = dataRepository.getDataValues(currentPeriod, $scope.moduleAndOriginOrgUnitIds).then(function(dataValues) {

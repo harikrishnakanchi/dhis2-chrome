@@ -421,7 +421,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                         });
 
                         var translateDatasets = function (dataSets) {
-                            return $q.when(translationsService.translate(dataSets));
+                            return translationsService.translate(dataSets);
                         };
 
                         var setDatasets = function (datasets) {
@@ -431,11 +431,22 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                                 });
                             else
                                 $scope.dataSets = datasets;
+                            return $scope.dataSets;
+                        };
+
+                        var setTotalsDisplayPreferencesforDataSetSections = function (dataSets) {
+                            _.each(dataSets, function(dataSet){
+                                _.each(dataSet.sections, function(dataSetSection){
+                                    dataSetSection.shouldDisplayRowTotals = dataSetSection.categoryOptionComboIds.length > 1;
+                                    dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
+                                });
+                            });
                         };
 
                         return $q.all(dataSetPromises)
                             .then(translateDatasets)
-                            .then(setDatasets);
+                            .then(setDatasets)
+                            .then(setTotalsDisplayPreferencesforDataSetSections);
                     });
 
                 var loadDataValuesPromise = dataRepository.getDataValues(currentPeriod, $scope.moduleAndOriginOrgUnitIds).then(function(dataValues) {
