@@ -100,6 +100,7 @@ require.config({
         "mergeBy": "app/consumer/mergestrategies/merge.by",
         "mergeByUnion": "app/consumer/mergestrategies/merge.by.union",
         "mergeByLastUpdated": "app/consumer/mergestrategies/merge.by.lastupdated",
+        "moduleDataBlockMerger": "app/consumer/mergestrategies/module.data.block.merger",
 
         "angular-indexedDB": "lib/angular-indexedDB/indexeddb",
 
