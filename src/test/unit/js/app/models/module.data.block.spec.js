@@ -473,12 +473,14 @@ define(['moduleDataBlock', 'customAttributes', 'moment', 'timecop'], function(Mo
                         value: 'someValue',
                         clientLastUpdated: someMomentInTime.toISOString(),
                         lastUpdated: moment(someMomentInTime).subtract(1, 'hour').toISOString()
+                    }, {
+                        value: 'someOtherValue',
+                        clientLastUpdated: someMomentInTime.toISOString()
                     }]
                 };
                 moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.dataValuesLastUpdated).toEqual(someMomentInTime);
             });
-
         });
     });
 });

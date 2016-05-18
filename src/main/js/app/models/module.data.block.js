@@ -55,7 +55,7 @@ define(['lodash', 'customAttributes', 'moment', 'properties'], function (_, Cust
         var getMostRecentTimestamp = function(dataValues) {
             var timestamps = _.flatten(_.map(dataValues, function(dataValue) {
                 return [
-                    moment(dataValue.lastUpdated),
+                    moment(dataValue.lastUpdated || null),
                     moment(dataValue.clientLastUpdated || null)
                 ];
             }));
