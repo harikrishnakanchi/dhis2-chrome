@@ -166,8 +166,8 @@ define(["lodash", "moment"], function(_, moment) {
 
         var getOptionSetMapping = function() {
             return optionSetRepository.getOptionSetMapping($scope.selectedModule.parent.id).then(function(data) {
-                var translatedOptions = translationsService.translateOptionMap(data.optionSetMap);
-                $scope.optionSetMapping = translatedOptions;
+                var translatedOptionSetMap = translationsService.translateOptionSetMap(data.optionSetMap);
+                $scope.optionSetMapping = translatedOptionSetMap;
                 $scope.optionMapping = data.optionMap;
             });
         };

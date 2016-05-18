@@ -163,7 +163,7 @@ define(["lineListOfflineApprovalController", "angularMocks", "utils", "programEv
 
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue([program]);
-                spyOn(translationsService, "translateOptionMap").and.returnValue(optionSetMapping);
+                spyOn(translationsService, "translateOptionSetMap").and.returnValue(optionSetMapping);
 
                 optionSetRepository = new OptionSetRepository();
                 spyOn(optionSetRepository, "getOptionSetMapping").and.returnValue(utils.getPromise(q, {

@@ -231,8 +231,8 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             var loadOptionSets = function() {
                 var isNewCase = $routeParams.eventId ? false : true;
                 return optionSetRepository.getOptionSetMapping($scope.opUnitId, isNewCase).then(function(data) {
-                    var translatedOptionsetMap = translationsService.translateOptionMap(data.optionSetMap);
-                    $scope.optionSetMapping = translatedOptionsetMap;
+                    var translatedOptionSetMap = translationsService.translateOptionSetMap(data.optionSetMap);
+                    $scope.optionSetMapping = translatedOptionSetMap;
                 });
             };
 

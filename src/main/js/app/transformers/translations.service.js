@@ -46,15 +46,15 @@ define([],function(){
             return $q.when(result);
         };
 
-        var translateOptionMap = function (optionMap) {
+        var translateOptionSetMap = function (optionSetMap) {
             if(this.locale == 'en') {
-                return optionMap;
+                return optionSetMap;
             }
             
-            _.mapValues(optionMap, function(value) {
+            _.each(optionSetMap, function(value) {
                 return translate(value);
             });
-            return optionMap;
+            return optionSetMap;
         };
 
         var translate = function(objectsToBeTranslated){
@@ -93,7 +93,7 @@ define([],function(){
             setLocale: setLocale,
             translate: translate,
             translateReports: translateReports,
-            translateOptionMap: translateOptionMap
+            translateOptionSetMap: translateOptionSetMap
         };
     };
 });

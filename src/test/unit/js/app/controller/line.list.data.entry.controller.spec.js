@@ -126,7 +126,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
 
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue([program]);
-                spyOn(translationsService, "translateOptionMap").and.returnValue(optionSetMapping.optionSetMap);
+                spyOn(translationsService, "translateOptionSetMap").and.returnValue(optionSetMapping.optionSetMap);
 
                 Timecop.install();
                 Timecop.freeze(new Date("2014-10-29T12:43:54.972Z"));
@@ -194,7 +194,7 @@ define(["lineListDataEntryController", "angularMocks", "utils", "moment", "timec
                     }
                 };
                 optionSetRepository.getOptionSetMapping.and.returnValue(utils.getPromise(q, optionSetMapping));
-                translationsService.translateOptionMap.and.returnValue(optionSetMapping.optionSetMap);
+                translationsService.translateOptionSetMap.and.returnValue(optionSetMapping.optionSetMap);
 
                 var lineListDataEntryController = new LineListDataEntryController(scope, rootScope, routeParams, location, anchorScroll, programEventRepository, optionSetRepository, orgUnitRepository, excludedDataElementsRepository, programRepository, translationsService);
                 scope.$apply();
