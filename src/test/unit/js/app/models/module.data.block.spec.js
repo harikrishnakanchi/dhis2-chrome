@@ -9,13 +9,16 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
             approvalData = null;
         });
 
+        var createModuleDataBlock = function() {
+            return ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+        };
         describe('create()', function () {
             it('should return an instance with required properties', function () {
                 orgUnit = {
                     id: 'orgUnitId'
                 };
                 period = '2016W06';
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.moduleId).toEqual(orgUnit.id);
                 expect(moduleDataBlock.period).toEqual('2016W06');
             });
@@ -29,7 +32,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                         name: 'parentName'
                     }
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.moduleName).toEqual('parentName - orgUnitName');
             });
 
@@ -37,7 +40,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 orgUnit = {
                     name: 'orgUnitName'
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.moduleName).toEqual('orgUnitName');
             });
         });
@@ -49,7 +52,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 };
                 CustomAttributes.parseAttribute.and.returnValue('lineListServiceAttributeValue');
 
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
 
                 expect(CustomAttributes.parseAttribute).toHaveBeenCalledWith(orgUnit.attributeValues, CustomAttributes.LINE_LIST_ATTRIBUTE_CODE);
                 expect(moduleDataBlock.lineListService).toEqual('lineListServiceAttributeValue');
@@ -68,19 +71,19 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                             value: 'someValue'
                         }]
                     };
-                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(true);
                 });
 
                 it('should be false if aggregateDataValues are not present', function () {
                     aggregateDataValues = undefined;
-                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
 
                 it('should be false if aggregateDataValues has no dataValues collection', function () {
                     aggregateDataValues = {};
-                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
 
@@ -88,7 +91,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     aggregateDataValues = {
                         dataValues: []
                     };
-                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
 
@@ -102,7 +105,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                         }],
                         localStatus: "random status"
                     };
-                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
             });
@@ -116,19 +119,19 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     lineListEvents = [{
                         someEventInfo: 'someEventDetails'
                     }];
-                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(true);
                 });
 
                 it('should be false if lineListEvents are not present', function() {
                     lineListEvents = undefined;
-                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
 
                 it('should be false if lineListEvents is an empty array', function() {
                     lineListEvents = [];
-                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
 
@@ -137,7 +140,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                         someEventInfo: 'someEventDetails',
                         localStatus: 'SOME_OTHER_STATUS'
                     }];
-                    moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                    moduleDataBlock = createModuleDataBlock();
                     expect(moduleDataBlock.submitted).toEqual(false);
                 });
             });
@@ -148,7 +151,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 approvalData = {
                     isComplete: true
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.approvedAtProjectLevel).toEqual(true);
             });
 
@@ -156,19 +159,19 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 approvalData = {
                     isComplete: false
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.approvedAtProjectLevel).toEqual(false);
             });
 
             it('should be false if approvalData is not present', function() {
                 approvalData = undefined;
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.approvedAtProjectLevel).toEqual(false);
             });
 
             it('should be false if approvalData has no completed status', function() {
                 approvalData = {};
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.approvedAtProjectLevel).toEqual(false);
             });
         });
@@ -178,7 +181,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 approvalData = {
                     isApproved: true
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.approvedAtCoordinationLevel).toEqual(true);
             });
 
@@ -186,19 +189,19 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 approvalData = {
                     isApproved: false
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.approvedAtCoordinationLevel).toEqual(false);
             });
 
             it('should be false if approvalData is not present', function() {
                approvalData = undefined;
-               moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+               moduleDataBlock = createModuleDataBlock();
                expect(moduleDataBlock.approvedAtCoordinationLevel).toEqual(false);
             });
 
             it('should be false if approvalData has no approval status', function() {
                 approvalData = {};
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.approvedAtCoordinationLevel).toEqual(false);
             });
         });
@@ -210,7 +213,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
 
             it('should be true if data has not been submitted', function() {
                 aggregateDataValues = null;
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(true);
             });
 
@@ -220,7 +223,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                         value: 'someValue'
                     }]
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
             });
 
@@ -229,7 +232,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 approvalData = {
                     isApproved: true
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toEqual(false);
             });
 
@@ -240,7 +243,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     }],
                     localStatus: "FAILED_TO_SYNC"
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtDataEntryLevel).toBeTruthy();
             });
         });
@@ -256,13 +259,13 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                         value: 'someValue'
                     }]
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toBeTruthy();
             });
 
             it('should be false if data is not submitted', function() {
                 aggregateDataValues = null;
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
             });
 
@@ -275,7 +278,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 approvalData = {
                     isComplete: true
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
             });
 
@@ -289,7 +292,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     isComplete: false,
                     isApproved: true
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
             });
 
@@ -300,7 +303,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     }],
                     localStatus: "FAILED_TO_SYNC"
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtProjectLevelApprover).toEqual(false);
             });
         });
@@ -312,7 +315,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
 
             it('should be false if data has not been submitted ', function() {
                 aggregateDataValues = null;
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
             });
 
@@ -325,7 +328,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                 approvalData = {
                     isComplete: true
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(true);
             });
 
@@ -336,7 +339,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     }]
                 };
                 approvalData = null;
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
             });
 
@@ -350,7 +353,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     isComplete: true,
                     isApproved: true
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.awaitingActionAtCoordinationLevelApprover).toEqual(false);
             });
         });
@@ -362,7 +365,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
 
             it('should be false if it is lineListService', function() {
                 CustomAttributes.parseAttribute.and.returnValue(true);
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.notSynced).toEqual(false);
             });
 
@@ -376,7 +379,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     }],
                     localStatus: 'random status'
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
 
                 expect(moduleDataBlock.notSynced).toEqual(false);
             });
@@ -391,7 +394,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     }],
                     localStatus: 'FAILED_TO_SYNC'
                 };
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
 
                 expect(moduleDataBlock.notSynced).toEqual(true);
             });
@@ -413,7 +416,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     openingDate: '2016-02-25'
                 };
                 period = '2016W8';
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.active).toEqual(true);
             });
 
@@ -422,7 +425,7 @@ define(['moduleDataBlock', 'customAttributes', 'timecop'], function(ModuleDataBl
                     openingDate: '2016-02-01'
                 };
                 period = '2016W3';
-                moduleDataBlock = ModuleDataBlock.create(orgUnit, period, aggregateDataValues, lineListEvents, approvalData);
+                moduleDataBlock = createModuleDataBlock();
                 expect(moduleDataBlock.active).toEqual(false);
             });
         });
