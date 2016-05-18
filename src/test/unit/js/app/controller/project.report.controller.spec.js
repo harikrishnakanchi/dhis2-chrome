@@ -1,6 +1,6 @@
-define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop) {
+define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository) {
     describe("projectReportController", function() {
-        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, translationsService, pivotTables, data, q;
+        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, translationsService, pivotTables, data, q, orgUnitGroupSetRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -25,55 +25,64 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 "attributeValues": [
                     {
                         "attribute": {
-                            "name": "Context"
+                            "name": "Context",
+                            "code" : "prjCon"
                         },
                         "value": "Cross-border instability"
                     },
                     {
                         "attribute": {
-                            "name": "Project Code"
+                            "name": "Project Code",
+                            "code": "projCode"
                         },
                         "value": "SS153"
                     },
                     {
                         "attribute": {
-                            "name": "Mode Of Operation"
+                            "name": "Mode Of Operation",
+                            "code": "modeOfOperation"
                         },
                         "value": "Direct operation"
                     },
                     {
                         "attribute": {
-                            "name": "Project Type"
+                            "name": "Project Type",
+                            "code": "projectType"
                         },
                         "value": "Regular Project"
                     },
                     {
                         "attribute": {
-                            "name": "Model Of Management"
+                            "name": "Model Of Management",
+                            "code": "modelOfManagement"
                         },
                         "value": "Collaboration"
                     },
                     {
                         "attribute": {
-                            "name": "Type"
+                            "name": "Type",
+                            "code": "Type"
                         },
                         "value": "Project"
                     },
                     {
                         "attribute": {
-                            "name": "Type of population"
+                            "name": "Type of population",
+                            "code": "prjPopType"
                         },
                         "value": "General Population"
                     },
                     {
                         "attribute": {
-                            "name": "Reason For Intervention"
+                            "name": "Reason For Intervention",
+                            "code": "reasonForIntervention"
                         },
                         "value": "Access to health care"
                     },
                     {
                         "attribute": {
-                            "name": "Location"
+                            "name": "Location",
+                            "code": "prjLoc"
                         },
                         "value": "Northern Bar El Ghazal"
                     }
@@ -134,7 +143,14 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
             };
 
             scope.resourceBundle = {
-                projectInformationLabel: "Project Information"
+                projectInformationLabel: 'Project Information',
+                projectCodeLabel: 'Project Code',
+                projectTypeLabel: 'Project Type',
+                contextLabel: 'Context',
+                typeOfPopulationLabel: 'Type of population',
+                reasonForInterventionLabel: 'Reason For Intervention',
+                modeOfOperationLabel: 'Mode Of Operation',
+                modelOfManagementLabel: 'Model Of Management'
             };
 
             orgUnitRepository = new OrgUnitRepository();
@@ -172,7 +188,98 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
             translationsService = new TranslationsService();
             spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, translatedReport));
 
-            projectReportController = new ProjectReportController(rootScope, $q, scope, orgUnitRepository, pivotTableRepository, translationsService);
+            var orgUnitGroupSets = [{
+                "code": "project_type",
+                "id": "D6yNgLkqIKR",
+                "name": "Project Type",
+                "organisationUnitGroups": [{
+                    "id": "koFDuOVZsoU",
+                    "name": "Regular Project"
+                }, {
+                    "id": "vxKtTBwL2S2",
+                    "name": "Emergency Project"
+                }, {
+                    "id": "I97gskdFUWe",
+                    "name": "Vaccination Campaign"
+                }]
+            }, {
+                "code": "model_of_management",
+                "id": "a2d4a1dee27",
+                "name": "Model Of Management",
+                "organisationUnitGroups": [{
+                    "id": "aa9a24c9126",
+                    "name": "MSF Management"
+                }, {
+                    "id": "a11a7a5d55a",
+                    "name": "Collaboration"
+                }]
+            }, {
+                "code": "context",
+                "id": "a5c18ef7277",
+                "name": "Context",
+                "organisationUnitGroups": [{
+                    "id": "a16b4a97ce4",
+                    "name": "Post-conflict"
+                }, {
+                    "id": "ac606ebc28f",
+                    "name": "Internal Instability"
+                }, {
+                    "id": "abfef86a4b6",
+                    "name": "Cross-border instability"
+                }, {
+                    "id": "af40faf6384",
+                    "name": "Stable"
+                }]
+            }, {
+                "code": "reason_for_intervention",
+                "id": "a86f66f29d4",
+                "name": "Reason For Intervention",
+                "organisationUnitGroups": [{
+                    "id": "ab4b1006371",
+                    "name": "Armed Conflict"
+                }, {
+                    "id": "a9e29c075cc",
+                    "name": "Epidemic"
+                }, {
+                    "id": "a8014cfca5c",
+                    "name": "Natural Disaster"
+                }, {
+                    "id": "a559915efe5",
+                    "name": "Access to health care"
+                }]
+            }, {
+                "code": "type_of_population",
+                "id": "a8a579d5fab",
+                "name": "Type of Population",
+                "organisationUnitGroups": [{
+                    "id": "a35778ed565",
+                    "name": "Most-at-risk Population"
+                }, {
+                    "id": "afbdf5ffe08",
+                    "name": "General Population"
+                }, {
+                    "id": "a48f665185e",
+                    "name": "Refugee"
+                }, {
+                    "id": "a969403a997",
+                    "name": "Internally Displaced People"
+                }]
+            }, {
+                "code": "mode_of_operation",
+                "id": "a9ca3d1ed93",
+                "name": "Mode Of Operation",
+                "organisationUnitGroups": [{
+                    "id": "a92cee050b0",
+                    "name": "Remote operation"
+                }, {
+                    "id": "a560238bc90",
+                    "name": "Direct operation"
+                }]
+            }];
+            orgUnitGroupSetRepository = new OrgUnitGroupSetRepository();
+            spyOn(orgUnitGroupSetRepository, 'getAll').and.returnValue(utils.getPromise(q, orgUnitGroupSets));
+
+            projectReportController = new ProjectReportController(rootScope, $q, scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository);
         }));
 
         it("should get csv file name in expected format", function() {
@@ -256,7 +363,7 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
             ];
             scope.$apply();
             expect(orgUnitRepository.get).toHaveBeenCalledWith("xyz");
-            expect(_.isEqual(scope.projectAttributes, expectedProjectAttributes)).toBe(true);
+            expect(scope.projectAttributes).toEqual(expectedProjectAttributes);
         });
     });
 });

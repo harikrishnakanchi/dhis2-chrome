@@ -1,6 +1,6 @@
 define([],function(){
     return function($q, db, $rootScope, ngI18nResourceBundle, systemSettingRepository) {
-        var translatableTypes = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues"];
+        var translatableTypes = ["sections", "dataElements", "headers", "programStages", "programStageSections", "programStageDataElements", "dataElement", "optionSet", "options", "dataValues", "attribute"];
         var translatableProperties = ["name", "description", "formName", "shortName", "displayName"];
         var translations;
 

@@ -1,5 +1,5 @@
-define(["moment", "lodash"], function(moment, _) {
-    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, translationsService) {
+define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper) {
+    return function($rootScope, $q, $scope, orgUnitRepository, pivotTableRepository, translationsService, orgUnitGroupSetRepository) {
         $scope.selectedProject = $rootScope.currentUser.selectedProject;
 
         $scope.getCsvFileName = function() {
@@ -93,9 +93,18 @@ define(["moment", "lodash"], function(moment, _) {
 
         };
 
-        var parseProjectAttributes = function(projectInfo) {
-            var attributeNames = ["Project Code", "Project Type", "Context", "Type of population", "Reason For Intervention", "Mode Of Operation", "Model Of Management"];
-            var attributeInfo, projectAttribute;
+        var getProjectAttributes = function (att, projectInfo) {
+
+            var addDefaultNameToAttribute = function (orgUnitGroups) {
+                return _.map(orgUnitGroups, function (orgUnitGroup) {
+                    var defaultName = {
+                        englishName: orgUnitGroup.name
+                    };
+
+                    return _.assign(orgUnitGroup, defaultName);
+                });
+            };
+
 
             var getAttributeInfo = function(attributeName) {
                 return _.find(projectInfo.attributeValues, {
@@ -105,20 +114,54 @@ define(["moment", "lodash"], function(moment, _) {
                 });
             };
 
-            var projectAttributes = [{name: "Country", value: projectInfo.parent.name}];
-            projectAttributes.push({name: "Name", value: projectInfo.name});
-            attributeNames.forEach(function(attributeName) {
-                attributeInfo = getAttributeInfo(attributeName);
-                projectAttribute = {
-                    name: attributeName,
-                    value: attributeInfo && attributeInfo.value || ""
-                };
-                projectAttributes.push(projectAttribute);
-            });
+            orgUnitGroupSetRepository.getAll()
+                .then(function(orgUnitGroupSets) {
+                    var getTranslations = function (code) {
+                        var orgUnitGroups = _.find(orgUnitGroupSets, "code", code).organisationUnitGroups;
+                        orgUnitGroups = addDefaultNameToAttribute(orgUnitGroups);
+                        return translationsService.translate(orgUnitGroups);
+                    };
 
-            projectAttributes.push({name: "Opening Date", value: moment(projectInfo.openingDate).toDate().toLocaleDateString()});
-            projectAttributes.push({name: "End Date", value: getAttributeInfo("End date") ? moment(getAttributeInfo("End date").value).toDate().toLocaleDateString() : ""});
-            return projectAttributes;
+                    var allContexts = _.sortBy(getTranslations("context"), "name");
+                    var allPopTypes = _.sortBy(getTranslations("type_of_population"), "name");
+                    var reasonForIntervention = _.sortBy(getTranslations("reason_for_intervention"), "name");
+                    var modeOfOperation = _.sortBy(getTranslations("mode_of_operation"), "name");
+                    var modelOfManagement = _.sortBy(getTranslations("model_of_management"), "name");
+                    var allProjectTypes = _.sortBy(getTranslations("project_type"), "name");
+
+                    var result = orgUnitMapper.mapToProject(projectInfo, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
+
+                    var projectAttributes = [{name: "Country", value: projectInfo.parent.name}]; //projectInfo.parent.name
+                    projectAttributes.push({name: "Name", value: projectInfo.name});
+
+
+                    _.each(att, function (value, key) {
+                        var projectAttribute = {
+                            name: value,
+                            value: result[key].name ? result[key].name : result[key]
+                        };
+                        projectAttributes.push(projectAttribute);
+                    });
+
+                    projectAttributes.push({name: "Opening Date", value: moment(projectInfo.openingDate).toDate().toLocaleDateString()});
+                    projectAttributes.push({name: "End Date", value: getAttributeInfo("End date") ? moment(getAttributeInfo("End date").value).toDate().toLocaleDateString() : ""});
+                    $scope.projectAttributes = projectAttributes;
+                    return projectAttributes;
+            });
+        };
+
+        var parseProjectAttributes = function(projectInfo) {
+            var att = {
+                projectCode: $scope.resourceBundle.projectCodeLabel,
+                projectType: $scope.resourceBundle.projectTypeLabel,
+                context: $scope.resourceBundle.contextLabel,
+                populationType: $scope.resourceBundle.typeOfPopulationLabel,
+                reasonForIntervention: $scope.resourceBundle.reasonForInterventionLabel,
+                modeOfOperation: $scope.resourceBundle.modeOfOperationLabel,
+                modelOfManagement: $scope.resourceBundle.modelOfManagementLabel
+            };
+
+            return getProjectAttributes(att, projectInfo);
         };
 
         var loadProjectBasicInfo = function() {
