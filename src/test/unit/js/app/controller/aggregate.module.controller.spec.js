@@ -392,7 +392,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(orgUnitGroupHelper.createOrgUnitGroups).toHaveBeenCalledWith([enrichedModule], false);
             });
 
-            xit("should set datasets associated with module for edit", function() {
+            it("should set datasets associated with module for edit", function() {
                 var datasets = [{
                     "id": "ds1",
                     "organisationUnits": [{
@@ -421,7 +421,8 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 dataSetRepo.getAll.and.returnValue(utils.getPromise(q, datasets));
                 dataSetRepo.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
                 dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, datasets));
-                translationsService.translate.and.returnValue(utils.getPromise(q, datasets));
+                translationsService.translate.and.returnValue(datasets);
+
                 aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
                 scope.$apply();
 
@@ -431,7 +432,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(scope.selectedDataset).toEqual(datasets[1]);
             });
 
-            xit("should disable update button", function() {
+            it("should disable update button", function() {
                 scope.orgUnit = {
                     "id": "mod2",
                     "parent": {
@@ -456,14 +457,14 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 };
                 scope.isNewMode = false;
 
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
 
                 scope.$apply();
 
                 expect(scope.isDisabled).toBeTruthy();
             });
 
-            xit("should update system setting while updating module", function() {
+            it("should update system setting while updating module", function() {
                 var oldid = "oldid";
                 scope.orgUnit = {
                     "id": oldid,
@@ -473,7 +474,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
 
                 scope.isNewMode = false;
 
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
                 scope.$apply();
 
                 scope.associatedDatasets = [{
@@ -523,7 +524,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 }, "dataValues");
             });
 
-            xit("should update module name", function() {
+            it("should update module name", function() {
                 var oldid = "oldid";
                 var parent = {
                     "id": "par1",
@@ -544,7 +545,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 };
 
                 scope.isNewMode = false;
-                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, translationsService);
+                aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
                 scope.$apply();
 
                 scope.module = updatedModule;
@@ -989,7 +990,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 }, "dataValues"]);
             });
 
-            xit("should associate geographic origin dataset to patient origin org unit", function() {
+            it("should associate geographic origin dataset to patient origin org unit", function() {
                 scope.module = {
                     "id": "mod1",
                     "name": "mod1",
@@ -1228,7 +1229,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                 expect(scope.$parent.closeNewForm).toHaveBeenCalledWith(scope.orgUnit);
             });
 
-            xdescribe('enrich sections of the data sets', function() {
+            describe('enrich sections of the data sets', function() {
                 var datasets;
                 beforeEach(function() {
                     datasets = [{
@@ -1270,7 +1271,7 @@ define(["aggregateModuleController", "angularMocks", "utils", "testData", "orgUn
                     dataSetRepo.includeDataElements.and.returnValue(utils.getPromise(q, datasets));
                     translationsService.translate.and.returnValue(datasets);
 
-                    aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal);
+                    aggregateModuleController = new AggregateModuleController(scope, hustle, orgUnitRepo, dataSetRepo, systemSettingRepository, excludedDataElementsRepository, db, location, q, fakeModal, orgUnitGroupHelper, originOrgunitCreator, translationsService);
 
                     scope.$apply();
                     scope.selectDataSet(datasets[0]);
