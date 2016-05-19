@@ -1,11 +1,11 @@
-define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'dataRepository', 'approvalDataRepository'],
-    function(ModuleDataBlockMerger, mocks, utils, moment, _, DataRepository, ApprovalDataRepository) {
+define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'dataRepository', 'approvalDataRepository', 'mergeBy'],
+    function(ModuleDataBlockMerger, mocks, utils, moment, _, DataRepository, ApprovalDataRepository, MergeBy) {
         describe('moduleDataBlockMerger', function() {
             var q, scope, moduleDataBlockMerger,
-                dataRepository, approvalRepository,
+                dataRepository, approvalRepository, mergeBy,
                 dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime;
 
-            beforeEach(mocks.inject(function($q, $rootScope) {
+            beforeEach(mocks.inject(function($q, $rootScope, $log) {
                 q = $q;
                 scope = $rootScope.$new();
 
@@ -15,7 +15,9 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                 approvalRepository = new ApprovalDataRepository();
                 spyOn(approvalRepository, 'saveApprovalsFromDhis').and.returnValue(utils.getPromise(q, {}));
 
-                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, q);
+                mergeBy = new MergeBy($log);
+
+                moduleDataBlockMerger = new ModuleDataBlockMerger(dataRepository, approvalRepository, mergeBy, q);
 
                 moduleDataBlock = {};
                 dhisDataValues = [];
@@ -123,33 +125,21 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                 });
             });
 
-            describe('data on DHIS is more recent than Praxis', function () {
-                it('should save DHIS data values to database', function() {
-                    dhisDataValues = [
-                        createMockDataValue({ lastUpdated: someMomentInTime })
-                    ];
+            describe('data is present on DHIS and Praxis', function () {
+                it('should merge and save DHIS data values to database', function() {
+                    var dhisDataValueA = createMockDataValue({ dataElement: 'dataElementA', lastUpdated: someMomentInTime }),
+                        dhisDataValueB = createMockDataValue({ dataElement: 'dataElementB', lastUpdated: moment(someMomentInTime).subtract(1, 'hour') }),
+                        localDataValueA = createMockDataValue({ dataElement: 'dataElementA', clientLastUpdated: moment(someMomentInTime).subtract(1, 'hour') }),
+                        localDataValueB = createMockDataValue({ dataElement: 'dataElementB', clientLastUpdated: someMomentInTime });
+
+                    dhisDataValues = [dhisDataValueA, dhisDataValueB];
                     moduleDataBlock = {
-                        dataValuesLastUpdated: moment(someMomentInTime).subtract(1, 'hour')
+                        dataValues: [localDataValueA, localDataValueB]
                     };
 
                     performMerge();
 
-                    expect(dataRepository.saveDhisData).toHaveBeenCalledWith(dhisDataValues);
-                });
-            });
-
-            describe('data on Praxis is more recent than DHIS', function () {
-                it('should not save any data values to database', function() {
-                    dhisDataValues = [
-                        createMockDataValue({ lastUpdated: someMomentInTime })
-                    ];
-                    moduleDataBlock = {
-                        dataValuesLastUpdated: moment(someMomentInTime).add(1, 'hour')
-                    };
-
-                    performMerge();
-
-                    expect(dataRepository.saveDhisData).not.toHaveBeenCalledWith(dhisDataValues);
+                    expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dhisDataValueA, localDataValueB]);
                 });
             });
         });
