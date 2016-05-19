@@ -16,6 +16,13 @@ define(['moment', 'lodash'],
                     }, dhisDataValues, localDataValues);
                 };
 
+                var mostRecentDhisDataValueTimestamp = function() {
+                    var timestamps = _.map(dhisDataValues, function(dataValue) {
+                        return moment(dataValue.lastUpdated);
+                    });
+                    return moment.max(timestamps);
+                };
+
                 var mergeAndSaveDataValues = function() {
                     var dhisDataValuesExist = dhisDataValues.length > 0;
 
@@ -28,11 +35,18 @@ define(['moment', 'lodash'],
                 };
 
                 var mergeAndSaveCompletionAndApproval = function() {
-                    var mergedApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval);
-                    if(!_.isEmpty(mergedApprovalAndCompletion)) {
-                        return approvalDataRepository.saveApprovalsFromDhis(mergedApprovalAndCompletion);
-                    } else {
-                        return $q.when([]);
+                    var localDataValuesDoNotExist = !moduleDataBlock.dataValuesLastUpdated,
+                        dhisDataValuesAreMoreRecentThanLocal = mostRecentDhisDataValueTimestamp().isAfter(moduleDataBlock.dataValuesLastUpdated),
+                        mergedDhisApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval),
+                        dhisApprovalOrCompletionExists = !_.isEmpty(mergedDhisApprovalAndCompletion),
+                        localApprovalsExist = (moduleDataBlock.approvedAtProjectLevel || moduleDataBlock.approvedAtCoordinationLevel);
+
+                    if(localDataValuesDoNotExist || dhisDataValuesAreMoreRecentThanLocal) {
+                        if(dhisApprovalOrCompletionExists) {
+                            return approvalDataRepository.saveApprovalsFromDhis(mergedDhisApprovalAndCompletion);
+                        } else if(localApprovalsExist) {
+                            return approvalDataRepository.invalidateApproval(moduleDataBlock.period, moduleDataBlock.orgUnit);
+                        }
                     }
                 };
 

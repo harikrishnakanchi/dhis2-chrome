@@ -14,6 +14,7 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
 
                 approvalRepository = new ApprovalDataRepository();
                 spyOn(approvalRepository, 'saveApprovalsFromDhis').and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalRepository, 'invalidateApproval').and.returnValue(utils.getPromise(q, {}));
 
                 mergeBy = new MergeBy($log);
 
@@ -140,6 +141,66 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                     performMerge();
 
                     expect(dataRepository.saveDhisData).toHaveBeenCalledWith([dhisDataValueA, localDataValueB]);
+                });
+
+                describe('data on DHIS is more recent than approved data in Praxis', function() {
+                    it('should invalidate the approvals in Praxis', function() {
+                        dhisDataValues = [
+                            createMockDataValue({ lastUpdated: someMomentInTime })
+                        ];
+                        moduleDataBlock = {
+                            period: 'somePeriod',
+                            orgUnit: 'someOrgUnit',
+                            dataValuesLastUpdated: moment(someMomentInTime).subtract(1, 'hour'),
+                            approvedAtProjectLevel: true,
+                            approvedAtCoordinationLevel: true
+                        };
+
+                        performMerge();
+
+                        expect(approvalRepository.invalidateApproval).toHaveBeenCalledWith(moduleDataBlock.period, moduleDataBlock.orgUnit);
+                    });
+                });
+
+                describe('data exists in DHIS, no data exists in Praxis, but Praxis module was previously auto-approved', function() {
+                    it('should invalidate the approvals in Praxis', function() {
+                        dhisDataValues = [
+                            createMockDataValue({ lastUpdated: someMomentInTime })
+                        ];
+                        moduleDataBlock = {
+                            period: 'somePeriod',
+                            orgUnit: 'someOrgUnit',
+                            dataValuesLastUpdated: null,
+                            approvedAtProjectLevel: true,
+                            approvedAtCoordinationLevel: true
+                        };
+
+                        performMerge();
+
+                        expect(approvalRepository.invalidateApproval).toHaveBeenCalledWith(moduleDataBlock.period, moduleDataBlock.orgUnit);
+                    });
+                });
+
+                describe('data on Praxis is more recent than approved data in DHIS', function() {
+                    it('should not save DHIS completion or approval data to database', function() {
+                        dhisDataValues = [
+                            createMockDataValue({ lastUpdated: moment(someMomentInTime).subtract(1, 'hour') })
+                        ];
+                        dhisCompletion = createMockDhisCompletion();
+                        dhisApproval = createMockDhisApproval();
+                        moduleDataBlock = {
+                            period: 'somePeriod',
+                            orgUnit: 'someOrgUnit',
+                            dataValuesLastUpdated: someMomentInTime,
+                            approvedAtProjectLevel: true,
+                            approvedAtCoordinationLevel: true
+                        };
+
+                        performMerge();
+
+                        expect(approvalRepository.saveApprovalsFromDhis).not.toHaveBeenCalled();
+                        expect(approvalRepository.invalidateApproval).not.toHaveBeenCalled();
+                    });
                 });
             });
         });
