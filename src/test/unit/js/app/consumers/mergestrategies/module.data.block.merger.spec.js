@@ -3,7 +3,7 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
         describe('moduleDataBlockMerger', function() {
             var q, scope, moduleDataBlockMerger,
                 dataRepository, approvalRepository,
-                dhisDataValues, dhisCompletion, moduleDataBlock, someMomentInTime;
+                dhisDataValues, dhisCompletion, dhisApproval, moduleDataBlock, someMomentInTime;
 
             beforeEach(mocks.inject(function($q, $rootScope) {
                 q = $q;
@@ -20,6 +20,7 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                 moduleDataBlock = {};
                 dhisDataValues = [];
                 dhisCompletion = undefined;
+                dhisApproval = undefined;
                 someMomentInTime = moment('2016-05-18T13:00:00.000Z');
             }));
 
@@ -47,8 +48,18 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                 };
             };
 
+            var createMockDhisApproval = function() {
+                return {
+                    period: 'somePeriod',
+                    orgUnit: 'someOrgUnit',
+                    approvedBy: 'some_l2_approver',
+                    approvedOn: '2016-05-06T09:00:00.000Z',
+                    isApproved: true
+                };
+            };
+
             var performMerge = function() {
-                moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion);
+                moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval);
                 scope.$apply();
             };
 
@@ -63,12 +74,30 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                     expect(dataRepository.saveDhisData).toHaveBeenCalledWith(dhisDataValues);
                 });
 
-                it('should save DHIS completions to database', function() {
+                it('should save DHIS completion to database', function() {
                     dhisCompletion = createMockDhisCompletion();
 
                     performMerge();
 
                     expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisCompletion);
+                });
+
+                it('should save DHIS approval to database', function() {
+                    dhisApproval = createMockDhisApproval();
+
+                    performMerge();
+
+                    expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(dhisApproval);
+                });
+
+                it('should merge and save DHIS completion and approval to database', function() {
+                    dhisCompletion = createMockDhisCompletion();
+                    dhisApproval = createMockDhisApproval();
+
+                    performMerge();
+
+                    var expectedPayload = _.merge({}, dhisCompletion, dhisApproval);
+                    expect(approvalRepository.saveApprovalsFromDhis).toHaveBeenCalledWith(expectedPayload);
                 });
             });
 
@@ -76,15 +105,17 @@ define(['moduleDataBlockMerger', 'angularMocks', 'utils', 'moment', 'lodash', 'd
                 it('should not save any data values to database', function() {
                     dhisDataValues = [];
                     dhisCompletion = undefined;
+                    dhisApproval = undefined;
 
                     performMerge();
 
                     expect(dataRepository.saveDhisData).not.toHaveBeenCalled();
                 });
 
-                it('should not save any DHIS completions to database', function() {
+                it('should not save any DHIS completions or approvals to database', function() {
                     dhisDataValues = [];
                     dhisCompletion = undefined;
+                    dhisApproval = undefined;
 
                     performMerge();
 

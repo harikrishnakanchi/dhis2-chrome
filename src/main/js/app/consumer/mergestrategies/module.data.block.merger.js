@@ -2,7 +2,7 @@ define(['moment', 'lodash'],
     function(moment, _) {
         return function(dataRepository, approvalDataRepository, $q) {
 
-            var mergeAndSaveToLocalDatabase = function(moduleDataBlock, dhisDataValues, dhisCompletion) {
+            var mergeAndSaveToLocalDatabase = function(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval) {
                 var mergeAndSaveDataValues = function() {
                     var mostRecentDhisDataValueTimestamp = function() {
                         var timestamps = _.map(dhisDataValues, function(dataValue) {
@@ -23,8 +23,9 @@ define(['moment', 'lodash'],
                 };
 
                 var mergeAndSaveCompletionAndApproval = function() {
-                    if(dhisCompletion) {
-                        return approvalDataRepository.saveApprovalsFromDhis(dhisCompletion);
+                    var mergedApprovalAndCompletion = _.merge({}, dhisCompletion, dhisApproval);
+                    if(!_.isEmpty(mergedApprovalAndCompletion)) {
+                        return approvalDataRepository.saveApprovalsFromDhis(mergedApprovalAndCompletion);
                     } else {
                         return $q.when([]);
                     }
