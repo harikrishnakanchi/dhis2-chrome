@@ -204,7 +204,7 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 get: jasmine.createSpy("get").and.returnValue(utils.getPromise(q, {}))
             };
 
-            systemSettingRepository = SystemSettingRepository();
+            systemSettingRepository = new SystemSettingRepository();
             spyOn(systemSettingRepository, 'upsertLocale');
             translationsService = new TranslationsService(q, mockDB.db, rootScope, ngI18nResourceBundle, systemSettingRepository);
             mockStore.each.and.returnValue(utils.getPromise(q, translationResponse));
