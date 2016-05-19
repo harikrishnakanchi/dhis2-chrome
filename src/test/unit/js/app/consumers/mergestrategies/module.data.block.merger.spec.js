@@ -24,12 +24,12 @@ define(['moduleDataBlockMerger', 'angularMocks', 'moment', 'lodash', 'dataReposi
                     options.lastUpdated = options.lastUpdated.toISOString();
                 }
                 return _.merge({
-                    dataElement: "someDataElementId",
-                    period: "somePeriod",
-                    orgUnit: "someOrgUnit",
-                    categoryOptionCombo: "someCategoryOptionComboId",
-                    lastUpdated: "2016-05-04T09:00:00.000Z",
-                    value: "someValue"
+                    dataElement: 'someDataElementId',
+                    period: 'somePeriod',
+                    orgUnit: 'someOrgUnit',
+                    categoryOptionCombo: 'someCategoryOptionComboId',
+                    lastUpdated: '2016-05-04T09:00:00.000Z',
+                    value: 'someValue'
                 }, options);
             };
 
