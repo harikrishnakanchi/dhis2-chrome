@@ -1,7 +1,7 @@
-define(["angularMocks", "utils", "moment", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService"], function(mocks, utils, moment, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService) {
+define(["angularMocks", "utils", "moment", "reportsController", "datasetRepository", "orgUnitRepository", "chartRepository", "pivotTableRepository", "translationsService", "systemSettingRepository"], function(mocks, utils, moment, ReportsController, DatasetRepository, OrgUnitRepository, ChartRepository, PivotTableRepository, TranslationsService, SystemSettingRepository) {
     describe("reportsControllerspec", function() {
 
-        var scope, reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService;
+        var scope, reportsController, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService, systemSettingRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             scope = $rootScope.$new();
@@ -22,7 +22,25 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             spyOn(orgUnitRepository, "getAllModulesInOrgUnits").and.returnValue(utils.getPromise(q, []));
             spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
 
-            translationsService = new TranslationsService();
+            var mockDB = utils.getMockDB($q);
+            mockStore = mockDB.objectStore;
+
+            var translationResponse = [{
+                objectId: 'a16b4a97ce4',
+                name:'hello'
+            }, {
+                objectId: 'ac606ebc28f'
+            }];
+
+
+            var ngI18nResourceBundle = {
+                get: jasmine.createSpy("get").and.returnValue(utils.getPromise(q, {}))
+            };
+
+            systemSettingRepository = SystemSettingRepository();
+            spyOn(systemSettingRepository, 'upsertLocale');
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, ngI18nResourceBundle, systemSettingRepository);
+            mockStore.each.and.returnValue(utils.getPromise(q, translationResponse));
             spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, []));
         }));
 
@@ -132,6 +150,7 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
             orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mod1]));
             datasetRepository.findAllForOrgUnits.and.returnValue(utils.getPromise(q, datasets));
 
+            translationsService.setLocale('en');
             reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService);
             scope.$apply();
 
@@ -318,6 +337,7 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                     return utils.getPromise(q, chartData2);
             });
 
+            translationsService.setLocale('en');
             reportsController = new ReportsController(scope, q, routeParams, datasetRepository, orgUnitRepository, chartRepository, pivotTableRepository, translationsService);
             scope.$apply();
 
@@ -512,6 +532,7 @@ define(["angularMocks", "utils", "moment", "reportsController", "datasetReposito
                 }];
 
             translationsService.translateReports.and.returnValue(utils.getPromise(q, translatedData));
+            translationsService.setLocale('en');
 
             var expectedPivotTableData = [{
                 "definition": pivotTables[0],

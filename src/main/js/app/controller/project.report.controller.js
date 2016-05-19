@@ -137,8 +137,7 @@ define(["moment", "lodash", "orgUnitMapper"], function(moment, _, orgUnitMapper)
                 var modelOfManagement = _.sortBy(getTranslations("model_of_management"), "name");
                 var allProjectTypes = _.sortBy(getTranslations("project_type"), "name");
 
-                var projectMapping = orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
-                return projectMapping;
+                return orgUnitMapper.mapToProject(dhisProject, allContexts, allPopTypes, reasonForIntervention, modeOfOperation, modelOfManagement, allProjectTypes);
             };
 
             var getProjectAttributes = function(projectMapping) {

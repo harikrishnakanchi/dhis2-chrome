@@ -1,6 +1,6 @@
-define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository) {
+define(["orgUnitRepository", "angularMocks", "projectReportController", "utils", "pivotTableRepository", "translationsService", "timecop", "orgUnitGroupSetRepository", "systemSettingRepository"], function(OrgUnitRepository, mocks, ProjectReportController, utils, PivotTableRepository, TranslationsService, timecop, OrgUnitGroupSetRepository, SystemSettingRepository) {
     describe("projectReportController", function() {
-        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, translationsService, pivotTables, data, q, orgUnitGroupSetRepository;
+        var scope, rootScope, projectReportController, orgUnitRepository, pivotTableRepository, translationsService, pivotTables, data, q, orgUnitGroupSetRepository, systemSettingRepository;
 
         beforeEach(mocks.inject(function($rootScope, $q) {
             rootScope = $rootScope;
@@ -189,11 +189,29 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                     "isTableDataAvailable":true
                 }];
 
-            translationsService = new TranslationsService();
+            var mockDB = utils.getMockDB($q);
+            mockStore = mockDB.objectStore;
+
+            var translationResponse = [{
+                objectId: 'a16b4a97ce4',
+                name:'hello'
+            }, {
+                objectId: 'ac606ebc28f'
+            }];
+
+
+            var ngI18nResourceBundle = {
+                get: jasmine.createSpy("get").and.returnValue(utils.getPromise(q, {}))
+            };
+
+            systemSettingRepository = SystemSettingRepository();
+            spyOn(systemSettingRepository, 'upsertLocale');
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, ngI18nResourceBundle, systemSettingRepository);
+            mockStore.each.and.returnValue(utils.getPromise(q, translationResponse));
+
             spyOn(translationsService, "translateReports").and.returnValue(utils.getPromise(q, translatedReport));
 
-            var orgUnitGroupSets = [
-                {
+            var orgUnitGroupSets = [{
                 "code": "project_type",
                 "id": "D6yNgLkqIKR",
                 "name": "Project Type",
@@ -314,12 +332,16 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                 ['Average length of bed use (days) - Adult IPD Ward', '2.1', '2.2'],
                 []
             ];
+
+            translationsService.setLocale('fr');
             scope.$apply();
             scope.pivotTables[0].currentOrderOfItems = ["adf6cf9405c", "ae70aadc5cf"];
             expect(scope.getCsvFileData()).toEqual(expectedData);
         });
 
         it('should filter out project report tables from pivot tables', function() {
+
+            translationsService.setLocale('fr');
             scope.$apply();
             expect(scope.pivotTables[0].definition).toEqual(pivotTables[0]);
             expect(scope.pivotTables[0].data).toEqual(data);
@@ -367,6 +389,8 @@ define(["orgUnitRepository", "angularMocks", "projectReportController", "utils",
                     value: ""
                 }
             ];
+
+            translationsService.setLocale('fr');
             scope.$apply();
             expect(orgUnitRepository.get).toHaveBeenCalledWith("xyz");
             expect(scope.projectAttributes).toEqual(expectedProjectAttributes);
