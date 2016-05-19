@@ -421,29 +421,35 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                         });
 
                         var translateDatasets = function (dataSets) {
-                            return translationsService.translate(dataSets);
+                            var partitionDatasets = _.partition(dataSets, {
+                                "isReferralDataset": false
+                            });
+
+                            var translatedOtherDatasets = translationsService.translate(partitionDatasets[0]);
+                            var translatedReferralDatasets = translationsService.translateReferralLocations(partitionDatasets[1]);
+                            return translatedOtherDatasets.concat(translatedReferralDatasets);
                         };
 
-                        var setDatasets = function (datasets) {
+                        var filterDatasets = function (datasets) {
                             if (removeReferral)
-                                $scope.dataSets = _.filter(datasets, {
-                                    "isReferralDataset": false
-                                });
-                            else
-                                $scope.dataSets = datasets;
-                            return $scope.dataSets;
+                                return _.filter(datasets, { "isReferralDataset": false });
+                            return datasets;
                         };
 
                         var setTotalsDisplayPreferencesforDataSetSections = function (dataSets) {
-                            _.each(dataSets, function(dataSet){
-                                _.each(dataSet.sections, function(dataSetSection){
+                            _.each(dataSets, function (dataSet) {
+                                _.each(dataSet.sections, function (dataSetSection) {
                                     dataSetSection.shouldDisplayRowTotals = dataSetSection.categoryOptionComboIds.length > 1;
                                     dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
                                 });
                             });
                         };
+                        var setDatasets = function (datasets) {
+                            $scope.dataSets = datasets;
+                        };
 
                         return $q.all(dataSetPromises)
+                            .then(filterDatasets)
                             .then(translateDatasets)
                             .then(setDatasets)
                             .then(setTotalsDisplayPreferencesforDataSetSections);

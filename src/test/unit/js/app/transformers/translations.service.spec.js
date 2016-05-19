@@ -280,5 +280,55 @@ define(['translationsService', 'angularMocks', 'utils', 'systemSettingRepository
                 }]
             }]);
         });
+
+        it('should not translate dataElements for referral datasets if locale is anything other than english', function () {
+            var locale = 'fr';
+            var obj = [{
+                id: 'id1',
+                name: 'testName',
+                sections: [{
+                    id: 'id2',
+                    name: 'testSection',
+                    dataElements: {
+                        id: 'id3',
+                        name: 'testDataElement'
+                    }
+                }, {
+                    id: 'id4',
+                    name: 'testSection',
+                    dataElements: {
+                        id: 'id5',
+                        description: 'testDataElementDescription'
+                    }
+                }]
+            }];
+
+            translationsService = new TranslationsService(q, mockDB.db, rootScope, i18nResourceBundle, systemSettingRepository);
+            translationsService.setLocale(locale);
+
+            scope.$apply();
+
+            var actual = translationsService.translateReferralLocations(obj);
+
+            expect(actual).toEqual([{
+                id: 'id1',
+                name: 'frenchName',
+                sections: [{
+                    id: 'id2',
+                    name: 'frenchSection',
+                    dataElements: {
+                        id: 'id3',
+                        name: 'testDataElement'
+                    }
+                }, {
+                    id: 'id4',
+                    name: 'french name',
+                    dataElements: {
+                        id: 'id5',
+                        description: 'testDataElementDescription'
+                    }
+                }]
+            }]);
+        });
     });
 });

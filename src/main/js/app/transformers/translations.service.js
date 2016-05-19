@@ -46,6 +46,31 @@ define([],function(){
             return $q.when(result);
         };
 
+        var translateReferralLocations = function(arrayOfObjectsToBeTranslated) {
+            if(this.locale == 'en' && !_.isUndefined(arrayOfObjectsToBeTranslated)) {
+                return $q.when(arrayOfObjectsToBeTranslated);
+            }
+            return _.map(arrayOfObjectsToBeTranslated, function (objectToBeTranslate) {
+                var translationObject = _.filter(translations, {objectId: objectToBeTranslate.id});
+
+                _.each(translatableProperties, function (property) {
+                    if(objectToBeTranslate[property]) {
+                        var translationsByProperty = _.filter(translationObject, {property: property});
+                        objectToBeTranslate[property] = translationsByProperty[0] ? translationsByProperty[0].value : objectToBeTranslate[property];
+                    }
+                });
+
+                _.each(objectToBeTranslate, function(value, key) {
+                    if(_.isArray(value) && _.contains("sections", key)){
+                        _.each(value,function(object){
+                            translateReferralLocations([object]);
+                        });
+                    }
+                });
+                return objectToBeTranslate;
+            });
+        };
+
         var translateOptionSetMap = function (optionSetMap) {
             if(this.locale == 'en') {
                 return optionSetMap;
@@ -108,7 +133,8 @@ define([],function(){
             translate: translate,
             translateReports: translateReports,
             translateOptionMap: translateOptionMap,
-            translateOptionSetMap: translateOptionSetMap
+            translateOptionSetMap: translateOptionSetMap,
+            translateReferralLocations: translateReferralLocations
         };
     };
 });

@@ -155,6 +155,7 @@ define(["dataApprovalController", "testData", "angularMocks", "lodash", "utils",
 
                 translationsService = new TranslationsService();
                 spyOn(translationsService, "translate").and.returnValue([]);
+                spyOn(translationsService, "translateReferralLocations").and.returnValue([]);
 
                 spyOn(hustle, "publish");
                 dataApprovalController = new DataApprovalController(scope, routeParams, q, hustle, dataRepository, excludedDataElementsRepository, anchorScroll, location, fakeModal, rootScope, window, approvalDataRepository, timeout, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService);

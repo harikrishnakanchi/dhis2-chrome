@@ -99,7 +99,7 @@
                                         </div>
 
                                         <div angucomplete-alt=""
-                                             ng-if="programStageDE.dataElement.optionSet && (optionSetMapping[programStageDE.dataElement.optionSet.id] !== undefined)"
+                                             ng-if="programStageDE.dataElement.optionSet && (optionSetMapping[programStageDE.dataElement.optionSet.id] !== undefined) && !isReferralLocationOptionSet(programStageDE.dataElement.optionSet)"
                                              name="{{programStageDE.dataElement.id}}"
                                              placeholder="{{ resourceBundle.startTypingLabel }}"
                                              pause="100"
@@ -108,6 +108,22 @@
                                              search-fields="name"
                                              title-field="name"
                                              initial-value="{{dataValues[programStageDE.dataElement.id].name}}"
+                                             minlength="0"
+                                             input-class="form-control form-control-small"
+                                             match-class="highlight"
+                                             class="ng-isolate-scope">
+                                        </div>
+
+                                        <div angucomplete-alt=""
+                                             ng-if="programStageDE.dataElement.optionSet && (optionSetMapping[programStageDE.dataElement.optionSet.id] !== undefined) && isReferralLocationOptionSet(programStageDE.dataElement.optionSet)"
+                                             name="{{programStageDE.dataElement.id}}"
+                                             placeholder="{{ resourceBundle.startTypingLabel }}"
+                                             pause="100"
+                                             selected-object="dataValues[programStageDE.dataElement.id]"
+                                             local-data="optionSetMapping[programStageDE.dataElement.optionSet.id]"
+                                             search-fields="displayName"
+                                             title-field="displayName"
+                                             initial-value="{{dataValues[programStageDE.dataElement.id].displayName}}"
                                              minlength="0"
                                              input-class="form-control form-control-small"
                                              match-class="highlight"

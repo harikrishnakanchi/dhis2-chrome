@@ -150,7 +150,8 @@ define(["aggregateDataEntryController", "testData", "angularMocks", "lodash", "u
                 spyOn(referralLocationsRepository, "get").and.returnValue(utils.getPromise(q, []));
 
                 translationsService = new TranslationsService();
-                spyOn(translationsService, "translate").and.returnValue(utils.getPromise(q, []));
+                spyOn(translationsService, "translate").and.returnValue([]);
+                spyOn(translationsService, "translateReferralLocations").and.returnValue([]);
 
                 aggregateDataEntryController = new AggregateDataEntryController(scope, routeParams, q, hustle, anchorScroll, location, fakeModal, rootScope, window, timeout, dataRepository, excludedDataElementsRepository, approvalDataRepository, orgUnitRepository, datasetRepository, programRepository, referralLocationsRepository, translationsService);
 

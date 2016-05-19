@@ -256,30 +256,36 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "datasetTransfo
                     .then(_.curryRight(datasetRepository.includeDataElements)($scope.excludedDataElements))
                     .then(datasetRepository.includeCategoryOptionCombinations)
                     .then(function(datasets) {
-                        var dataSetPromises = _.map(datasets, function(dataset) {
-                            return findallOrgUnits(dataset.organisationUnits).then(function(orgunits) {
+                        var dataSetPromises = _.map(datasets, function (dataset) {
+                            return findallOrgUnits(dataset.organisationUnits).then(function (orgunits) {
                                 dataset.organisationUnits = orgunits;
                                 return dataset;
                             });
                         });
 
-                        var translateDataSets = function(datasets) {
-                            return translationsService.translate(datasets);
+                        var translateDataSets = function (datasets) {
+                            var partitionDatasets = _.partition(datasets, {
+                                "isReferralDataset": false
+                            });
+
+                            var translatedOtherDatasets = translationsService.translate(partitionDatasets[0]);
+                            var translatedReferralDatasets = translationsService.translateReferralLocations(partitionDatasets[1]);
+                            return translatedOtherDatasets.concat(translatedReferralDatasets);
                         };
 
-                        var setDatasets = function (datasets) {
+                        var setDatasets = function (translatedDatasets) {
                             if (removeReferral)
-                                $scope.dataSets = _.filter(datasets, {
+                                $scope.dataSets = _.filter(translatedDatasets, {
                                     "isReferralDataset": false
                                 });
                             else
-                                $scope.dataSets = datasets;
+                                $scope.dataSets = translatedDatasets;
                             return $scope.dataSets;
                         };
 
                         var setTotalsDisplayPreferencesforDataSetSections = function (dataSets) {
-                            _.each(dataSets, function(dataSet){
-                                _.each(dataSet.sections, function(dataSetSection){
+                            _.each(dataSets, function (dataSet) {
+                                _.each(dataSet.sections, function (dataSetSection) {
                                     dataSetSection.shouldDisplayRowTotals = dataSetSection.categoryOptionComboIds.length > 1;
                                     dataSetSection.shouldDisplayColumnTotals = (_.filter(dataSetSection.dataElements, {isIncluded: true}).length > 1 && !(dataSetSection.shouldHideTotals));
                                 });

@@ -101,6 +101,10 @@ define(["lodash", "moment", "dhisId", "dateUtils", "properties"], function(_, mo
             $scope.dataValues[dataElementId] = moment().set('millisecond', 0).set('second', 0).toDate();
         };
 
+        $scope.isReferralLocationOptionSet = function(optionSet) {
+          return _.endsWith(optionSet.code, '_referralLocations');
+        };
+
         $scope.loadEventsView = function() {
             $location.path($routeParams.returnTo);
         };
