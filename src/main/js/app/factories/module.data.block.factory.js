@@ -5,6 +5,10 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
             return orgUnitRepository.getAllModulesInOrgUnits(projectId).then(_.partial(createForModules, _, periodRange));
         };
 
+        var createForModule = function (moduleId, periodRange) {
+            return orgUnitRepository.findAll(moduleId).then(_.partial(createForModules, _, periodRange));
+        };
+
         var createForModules = function (moduleOrgUnits, periodRange) {
             var moduleIds = _.pluck(moduleOrgUnits, 'id');
 
@@ -67,7 +71,8 @@ define(['moduleDataBlock', 'lodash'], function (ModuleDataBlock, _) {
         };
 
         return {
-            createForProject: createForProject
+            createForProject: createForProject,
+            createForModule: createForModule
         };
     };
 });

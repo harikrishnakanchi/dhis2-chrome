@@ -11,6 +11,7 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, []));
                 spyOn(orgUnitRepository, "findAllByParent").and.returnValue(utils.getPromise(q, []));
+                spyOn(orgUnitRepository, "findAll").and.returnValue(utils.getPromise(q, []));
 
                 dataRepository = new DataRepository();
                 spyOn(dataRepository, 'getDataValuesForOrgUnitsAndPeriods').and.returnValue(utils.getPromise(q, {}));
@@ -263,6 +264,28 @@ define(['moduleDataBlockFactory', 'orgUnitRepository', 'dataRepository', 'progra
 
                     expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', {}, [], approvalDataA);
                     expect(returnedObjects.length).toEqual(1);
+                });
+            });
+
+            describe('createForModule', function() {
+                it('should create module data blocks for specified module and period range', function() {
+                    var moduleId = 'someModuleId',
+                        moduleOrgUnit = {},
+                        returnedObjects = null;
+
+                    orgUnitRepository.findAll.and.returnValue(utils.getPromise(q, [moduleOrgUnit]));
+
+                    periodRange = ['2016W20', '2016W21', '2016W22'];
+
+                    moduleDataBlockFactory.createForModule(moduleId, periodRange).then(function (data) {
+                        returnedObjects = data;
+                    });
+                    scope.$apply();
+
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W20', {}, [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W21', {}, [], {});
+                    expect(ModuleDataBlock.create).toHaveBeenCalledWith(moduleOrgUnit, '2016W22', {}, [], {});
+                    expect(returnedObjects.length).toEqual(3);
                 });
             });
         });
