@@ -446,6 +446,7 @@ define(["lodash", "dataValuesMapper", "orgUnitMapper", "moment", "properties"], 
                         };
                         var setDatasets = function (datasets) {
                             $scope.dataSets = datasets;
+                            return $scope.dataSets;
                         };
 
                         return $q.all(dataSetPromises)

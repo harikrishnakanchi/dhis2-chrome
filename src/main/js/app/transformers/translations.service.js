@@ -44,7 +44,7 @@ define(['lodash'], function(_){
 
         this.translateReferralLocations = function(arrayOfObjectsToBeTranslated) {
             if(_locale == 'en' && !_.isUndefined(arrayOfObjectsToBeTranslated)) {
-                return $q.when(arrayOfObjectsToBeTranslated);
+                return arrayOfObjectsToBeTranslated;
             }
             return _.map(arrayOfObjectsToBeTranslated, function (objectToBeTranslated) {
                 var translationObject = translations[objectToBeTranslated.id];
