@@ -81,9 +81,11 @@ define(["lodash", "cipherUtils", "properties", "dhisId"], function(_, cipherUtil
         };
 
         var getLocale = function () {
-            return get("locale").then(function(locale) {
-                return locale;
-            });
+            var returnLocale = function(locale) {
+                return locale || 'en';
+            };
+            var catchBlock = returnLocale;
+            return get("locale").then(returnLocale, catchBlock);
         };
 
         var getAllowedOrgUnits = function() {
