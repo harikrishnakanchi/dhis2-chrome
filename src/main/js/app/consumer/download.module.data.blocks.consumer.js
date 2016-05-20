@@ -44,12 +44,16 @@ define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils
         var getIndexedCompletionsFromDhis = function (data) {
             return orgUnitRepository.findAllByParent([data.moduleId]).then(function (originOrgUnits) {
                 var originOrgUnitsIds = _.pluck(originOrgUnits, 'id');
-                return approvalService.getCompletionData(data.moduleId, originOrgUnitsIds, data.dataSetIds);
+                return approvalService.getCompletionData(data.moduleId, originOrgUnitsIds, data.dataSetIds).then(function(completedData) {
+                    return data;
+                });
             });
         };
 
-        var getIndexedApprovalsFromDhis = function () {
-
+        var getIndexedApprovalsFromDhis = function (data) {
+            return approvalService.getApprovalData(data.moduleId, data.dataSetIds, data.periodRange).then(function (approvalData) {
+                return approvalData;
+            });
         };
 
         var mergeAndSaveModuleDataBlocks = function () {

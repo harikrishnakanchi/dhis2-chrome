@@ -131,7 +131,7 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
             }).then(transform);
         };
 
-        this.getApprovalData = function(orgUnit, dataSets) {
+        this.getApprovalData = function(orgUnit, dataSets, periodRange) {
 
             var transform = function(response) {
                 if (!response.data.dataApprovalStateResponses)
@@ -174,8 +174,15 @@ define(["properties", "moment", "dhisUrl", "lodash", "dateUtils"], function(prop
                 }, []);
             };
 
-            var endDate = moment().format("YYYY-MM-DD");
-            var startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
+            var startDate, endDate;
+
+            if(periodRange) {
+                endDate = moment(_.last(periodRange), 'YYYY[W]WW').format("YYYY-MM-DD");
+                startDate = moment(periodRange[0], 'YYYY[W]WW').format("YYYY-MM-DD");
+            } else {
+                endDate = moment().format("YYYY-MM-DD");
+                startDate = moment(endDate).subtract(properties.projectDataSync.numWeeksToSync, "week").format("YYYY-MM-DD");
+            }
 
             return $http.get(dhisUrl.approvalStatus, {
                 "params": {

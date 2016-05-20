@@ -1,4 +1,5 @@
-define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'datasetRepository', 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory', 'angularMocks', 'dateUtils', 'utils'],
+define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'datasetRepository', 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
+        'angularMocks', 'dateUtils', 'utils'],
     function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, DataSetRepository, UserPreferenceRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
              mocks, dateUtils, utils) {
         
@@ -29,6 +30,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
 
                 approvalService = new ApprovalService();
                 spyOn(approvalService, 'getCompletionData').and.returnValue(utils.getPromise(q, {}));
+                spyOn(approvalService, 'getApprovalData').and.returnValue(utils.getPromise(q, {}));
 
                 orgUnitRepository = new OrgUnitRepository();
                 spyOn(orgUnitRepository, 'getAllModulesInOrgUnits').and.returnValue(utils.getPromise(q, [mockModule]));
@@ -63,6 +65,13 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 scope.$apply();
 
                 expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnitIds, [dataSetId]);
+            });
+
+            it('should download approval data from DHIS for one module', function () {
+                downloadModuleDataBlocksConsumer.run();
+                scope.$apply();
+
+                expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [dataSetId], periodRange);
             });
         });
     });

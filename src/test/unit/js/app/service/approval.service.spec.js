@@ -462,6 +462,19 @@ define(["approvalService", "angularMocks", "properties", "utils", "moment", "lod
             expect(actualApprovalData).toEqual(expectedApprovalData);
         });
 
+        it("should get approval data for specified period range", function() {
+            var periodRange = ["2014W01", "2014W02", "2014W05"],
+                expectedStartDate = moment(periodRange[0], 'YYYY[W]WW').format('YYYY-MM-DD'),
+                expectedEndDate = moment(periodRange[2], 'YYYY[W]WW').format('YYYY-MM-DD');
+
+            httpBackend.expectGET(properties.dhis.url + "/api/dataApprovals/status?ds=d1&ds=d2&endDate=" + expectedEndDate + "&ou=ou1&ou=ou2&pe=Weekly&startDate=" + expectedStartDate).respond(200, {});
+
+            approvalService = new ApprovalService(http, db, q);
+            approvalService.getApprovalData(orgUnits, dataSets, periodRange);
+
+            httpBackend.flush();
+        });
+
         it("should return a failure http promise if download approval data fails", function() {
             httpBackend.expectGET().respond(500, {});
             approvalService = new ApprovalService(http, db, q);
