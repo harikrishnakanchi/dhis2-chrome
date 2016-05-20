@@ -95,6 +95,7 @@ require.config({
         "downloadChartsConsumer": "app/consumer/download.charts.consumer",
         "downloadChartDataConsumer": "app/consumer/download.chart.data.consumer",
         "uploadReferralLocationsConsumer": "app/consumer/upload.referral.locations.consumer",
+        "downloadModuleDataBlocksConsumer": "app/consumer/download.module.data.blocks.consumer",
 
         //merge strategies
         "mergeBy": "app/consumer/mergestrategies/merge.by",
