@@ -1,9 +1,11 @@
 define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'datasetRepository', 'userPreferenceRepository', 'changeLogRepository', 'orgUnitRepository', 'moduleDataBlockFactory',
-        'angularMocks', 'dateUtils', 'utils'],
+        'moduleDataBlockMerger', 'angularMocks', 'dateUtils', 'utils'],
     function(DownloadModuleDataBlocksConsumer, DataService, ApprovalService, DataSetRepository, UserPreferenceRepository, ChangeLogRepository, OrgUnitRepository, ModuleDataBlockFactory,
-             mocks, dateUtils, utils) {
+             ModuleDataBlockMerger, mocks, dateUtils, utils) {
         
-        var downloadModuleDataBlocksConsumer, dataService, approvalService, userPreferenceRepository, datasetRepository, moduleDataBlockFactory, changeLogRepository, orgUnitRepository,
+        var downloadModuleDataBlocksConsumer, dataService, approvalService,
+            userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
+            moduleDataBlockFactory, moduleDataBlockMerger,
             q, scope, dataSetId, periodRange, projectIds, mockModule, mockOriginOrgUnits, mockOriginOrgUnitIds, someMomentInTime;
 
         describe('downloadModuleDataBlocksConsumer', function() {
@@ -49,8 +51,11 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 moduleDataBlockFactory = new ModuleDataBlockFactory();
                 spyOn(moduleDataBlockFactory, 'createForModule').and.returnValue(utils.getPromise(q, []));
 
+                moduleDataBlockMerger = new ModuleDataBlockMerger();
+                spyOn(moduleDataBlockMerger, 'mergeAndSaveToLocalDatabase').and.returnValue(utils.getPromise(q, {}));
+
                 downloadModuleDataBlocksConsumer = new DownloadModuleDataBlocksConsumer(dataService, approvalService, datasetRepository,
-                    userPreferenceRepository, moduleDataBlockFactory, changeLogRepository, orgUnitRepository);
+                    userPreferenceRepository, changeLogRepository, orgUnitRepository, moduleDataBlockFactory, moduleDataBlockMerger, q);
             }));
 
             var runConsumer = function() {
@@ -76,6 +81,28 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
             it('should instantiate module data blocks for each module', function() {
                 runConsumer();
                 expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockModule.id, periodRange);
+            });
+
+            it('should merge and save each module data block', function() {
+                var periodA = '2016W20',
+                    periodB = '2016W21',
+                    mockModuleDataBlockA = { orgUnit: mockModule.id, period: periodA, moduleName: 'someModuleName' },
+                    mockModuleDataBlockB = { orgUnit: mockModule.id, period: periodB, moduleName: 'someModuleName' },
+                    mockDhisDataValueA   = { orgUnit: mockModule.id, period: periodA, value: 'someValue' },
+                    mockDhisDataValueB   = { orgUnit: mockModule.id, period: periodB, value: 'someValue' },
+                    mockDhisCompletionA  = { orgUnit: mockModule.id, period: periodA, isComplete: true },
+                    mockDhisCompletionB  = { orgUnit: mockModule.id, period: periodB, isComplete: true },
+                    mockDhisApprovalA    = { orgUnit: mockModule.id, period: periodA, isApproved: true },
+                    mockDhisApprovalB    = { orgUnit: mockModule.id, period: periodB, isApproved: true };
+
+                moduleDataBlockFactory.createForModule.and.returnValue(utils.getPromise(q, [mockModuleDataBlockA, mockModuleDataBlockB]));
+                dataService.downloadData.and.returnValue(utils.getPromise(q, [mockDhisDataValueA, mockDhisDataValueB]));
+                approvalService.getCompletionData.and.returnValue(utils.getPromise(q, [mockDhisCompletionA, mockDhisCompletionB]));
+                approvalService.getApprovalData.and.returnValue(utils.getPromise(q, [mockDhisApprovalA, mockDhisApprovalB]));
+
+                runConsumer();
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, [mockDhisDataValueA], mockDhisCompletionA, mockDhisApprovalA);
+                expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockB, [mockDhisDataValueB], mockDhisCompletionB, mockDhisApprovalB);
             });
         });
     });
