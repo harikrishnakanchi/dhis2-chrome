@@ -104,5 +104,16 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockA, [mockDhisDataValueA], mockDhisCompletionA, mockDhisApprovalA);
                 expect(moduleDataBlockMerger.mergeAndSaveToLocalDatabase).toHaveBeenCalledWith(mockModuleDataBlockB, [mockDhisDataValueB], mockDhisCompletionB, mockDhisApprovalB);
             });
+
+            it('should merge and save multiple modules', function() {
+                var mockModuleA = { id: 'mockModuleIdA' },
+                    mockModuleB = { id: 'mockModuleIdB' };
+
+                orgUnitRepository.getAllModulesInOrgUnits.and.returnValue(utils.getPromise(q, [mockModuleA, mockModuleB]));
+
+                runConsumer();
+                expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockModuleA.id, periodRange);
+                expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockModuleB.id, periodRange);
+            });
         });
     });

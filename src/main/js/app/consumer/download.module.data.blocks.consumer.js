@@ -15,7 +15,7 @@ define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils
                 return $q.when();
 
             var continueRecursion = function() {
-                return recursivelyDownloadMergeAndSaveModules(modules);
+                return recursivelyDownloadMergeAndSaveModules(modules, dataSetIds, periodRange, lastUpdatedTimestamp);
             };
 
             return getModuleDataBlocks({
