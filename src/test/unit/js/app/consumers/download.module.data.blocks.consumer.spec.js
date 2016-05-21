@@ -53,24 +53,23 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                     userPreferenceRepository, moduleDataBlockFactory, changeLogRepository, orgUnitRepository);
             }));
 
-            it('should download data values from DHIS for one module', function() {
+            var runConsumer = function() {
                 downloadModuleDataBlocksConsumer.run();
                 scope.$apply();
+            };
 
+            it('should download data values from DHIS for each module', function() {
+                runConsumer();
                 expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [dataSetId], periodRange, someMomentInTime);
             });
 
-            it('should download completion data from DHIS for one module', function () {
-                downloadModuleDataBlocksConsumer.run();
-                scope.$apply();
-
+            it('should download completion data from DHIS for each module', function () {
+                runConsumer();
                 expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnitIds, [dataSetId]);
             });
 
-            it('should download approval data from DHIS for one module', function () {
-                downloadModuleDataBlocksConsumer.run();
-                scope.$apply();
-
+            it('should download approval data from DHIS for each module', function () {
+                runConsumer();
                 expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [dataSetId], periodRange);
             });
         });
