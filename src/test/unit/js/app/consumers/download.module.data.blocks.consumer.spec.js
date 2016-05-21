@@ -6,7 +6,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
         var downloadModuleDataBlocksConsumer, dataService, approvalService,
             userPreferenceRepository, datasetRepository, changeLogRepository, orgUnitRepository,
             moduleDataBlockFactory, moduleDataBlockMerger,
-            q, scope, dataSetId, periodRange, projectIds, mockModule, mockOriginOrgUnits, mockOriginOrgUnitIds, someMomentInTime;
+            q, scope, dataSet, periodRange, projectIds, mockModule, mockOriginOrgUnits, mockOriginOrgUnitIds, someMomentInTime;
 
         describe('downloadModuleDataBlocksConsumer', function() {
             beforeEach(mocks.inject(function($rootScope, $q) {
@@ -21,7 +21,9 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 }];
                 mockOriginOrgUnitIds = _.pluck(mockOriginOrgUnits, 'id');
                 projectIds = ['projectId'];
-                dataSetId = 'someDataSetId';
+                dataSet = {
+                    id: 'someDataSetId'
+                };
                 periodRange = ['2016W20', '2016W21'];
                 someMomentInTime = '2016-05-20T15:48:00.888Z';
 
@@ -40,7 +42,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
 
 
                 datasetRepository = new DataSetRepository();
-                spyOn(datasetRepository, 'getAll').and.returnValue(utils.getPromise(q, [{ id: dataSetId }]));
+                spyOn(datasetRepository, 'getAll').and.returnValue(utils.getPromise(q, [dataSet]));
 
                 userPreferenceRepository = new UserPreferenceRepository();
                 spyOn(userPreferenceRepository, 'getCurrentUsersProjectIds').and.returnValue(utils.getPromise(q, projectIds));
@@ -65,17 +67,17 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
 
             it('should download data values from DHIS for each module', function() {
                 runConsumer();
-                expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [dataSetId], periodRange, someMomentInTime);
+                expect(dataService.downloadData).toHaveBeenCalledWith(mockModule.id, [dataSet.id], periodRange, someMomentInTime);
             });
 
             it('should download completion data from DHIS for each module', function () {
                 runConsumer();
-                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnitIds, [dataSetId]);
+                expect(approvalService.getCompletionData).toHaveBeenCalledWith(mockModule.id, mockOriginOrgUnitIds, [dataSet.id]);
             });
 
             it('should download approval data from DHIS for each module', function () {
                 runConsumer();
-                expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [dataSetId], periodRange);
+                expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [dataSet.id], periodRange);
             });
 
             it('should instantiate module data blocks for each module', function() {
