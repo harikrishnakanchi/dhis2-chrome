@@ -47,7 +47,7 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
                 spyOn(changeLogRepository, 'get').and.returnValue(utils.getPromise(q, someMomentInTime));
 
                 moduleDataBlockFactory = new ModuleDataBlockFactory();
-                spyOn(moduleDataBlockFactory, 'createForProject').and.returnValue(utils.getPromise(q, []));
+                spyOn(moduleDataBlockFactory, 'createForModule').and.returnValue(utils.getPromise(q, []));
 
                 downloadModuleDataBlocksConsumer = new DownloadModuleDataBlocksConsumer(dataService, approvalService, datasetRepository,
                     userPreferenceRepository, moduleDataBlockFactory, changeLogRepository, orgUnitRepository);
@@ -71,6 +71,11 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
             it('should download approval data from DHIS for each module', function () {
                 runConsumer();
                 expect(approvalService.getApprovalData).toHaveBeenCalledWith(mockModule.id, [dataSetId], periodRange);
+            });
+
+            it('should instantiate module data blocks for each module', function() {
+                runConsumer();
+                expect(moduleDataBlockFactory.createForModule).toHaveBeenCalledWith(mockModule.id, periodRange);
             });
         });
     });

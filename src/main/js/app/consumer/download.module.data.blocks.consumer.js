@@ -29,7 +29,7 @@ define(['properties', 'lodash', 'dateUtils'], function (properties, _, dateUtils
         };
 
         var getIndexedModuleDataBlocks = function(data) {
-            return moduleDataBlockFactory.createForProject(data.moduleId, data.periodRange).then(function() {
+            return moduleDataBlockFactory.createForModule(data.moduleId, data.periodRange).then(function() {
                 return data;
             });
         };
