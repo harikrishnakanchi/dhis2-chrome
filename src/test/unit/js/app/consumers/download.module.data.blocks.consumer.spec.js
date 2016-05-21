@@ -100,8 +100,8 @@ define(['downloadModuleDataBlocksConsumer', 'dataService', 'approvalService', 'd
             it('should merge and save each module data block', function() {
                 var periodA = '2016W20',
                     periodB = '2016W21',
-                    mockModuleDataBlockA = { orgUnit: mockModule.id, period: periodA, moduleName: 'someModuleName' },
-                    mockModuleDataBlockB = { orgUnit: mockModule.id, period: periodB, moduleName: 'someModuleName' },
+                    mockModuleDataBlockA = { moduleId: mockModule.id, period: periodA, moduleName: 'someModuleName' },
+                    mockModuleDataBlockB = { moduleId: mockModule.id, period: periodB, moduleName: 'someModuleName' },
                     mockDhisDataValueA   = { orgUnit: mockModule.id, period: periodA, value: 'someValue' },
                     mockDhisDataValueB   = { orgUnit: mockModule.id, period: periodB, value: 'someValue' },
                     mockDhisCompletionA  = { orgUnit: mockModule.id, period: periodA, isComplete: true },

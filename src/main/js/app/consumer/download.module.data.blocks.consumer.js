@@ -80,9 +80,9 @@ define(['properties', 'lodash', 'dateUtils', 'moment'], function (properties, _,
 
         var mergeAndSaveModuleDataBlocks = function (data) {
             var mergePromises = _.map(data.moduleDataBlocks, function(moduleDataBlock) {
-                var dhisDataValues = data.indexedDhisDataValues[moduleDataBlock.period + moduleDataBlock.orgUnit],
-                    dhisCompletion = data.indexedDhisCompletions[moduleDataBlock.period + moduleDataBlock.orgUnit],
-                    dhisApproval = data.indexedDhisApprovals[moduleDataBlock.period + moduleDataBlock.orgUnit];
+                var dhisDataValues = data.indexedDhisDataValues[moduleDataBlock.period + moduleDataBlock.moduleId],
+                    dhisCompletion = data.indexedDhisCompletions[moduleDataBlock.period + moduleDataBlock.moduleId],
+                    dhisApproval = data.indexedDhisApprovals[moduleDataBlock.period + moduleDataBlock.moduleId];
 
                 return moduleDataBlockMerger.mergeAndSaveToLocalDatabase(moduleDataBlock, dhisDataValues, dhisCompletion, dhisApproval);
             });
