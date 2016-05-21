@@ -50,6 +50,13 @@ require.config({
 
         //Models
         "pivotTable": "app/models/pivot.table",
+        "moduleDataBlock": "app/models/module.data.block",
+        "customAttributes": "app/models/custom.attributes",
+
+        //Factories
+        "factories":"app/factories/factories",
+        "moduleDataBlockFactory": "app/factories/module.data.block.factory",
+        "checkVersionCompatibility": "app/factories/check.version.compatibility",
 
         //Transformers
         "datasetTransformer": "app/transformers/dataset.transformer",

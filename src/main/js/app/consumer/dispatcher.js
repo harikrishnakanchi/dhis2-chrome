@@ -3,7 +3,8 @@ define(["lodash"], function(_) {
         createUserConsumer, updateUserConsumer, downloadDataConsumer, uploadDataConsumer, uploadCompletionDataConsumer, uploadApprovalDataConsumer, uploadProgramConsumer,
         downloadProgramConsumer, downloadEventDataConsumer, uploadEventDataConsumer, deleteEventConsumer, downloadApprovalConsumer, downloadMetadataConsumer,
         downloadOrgUnitGroupConsumer, deleteApprovalConsumer, downloadSystemSettingConsumer, uploadPatientOriginConsumer, downloadPivotTableDataConsumer, downloadChartDataConsumer,
-        uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository) {
+        uploadReferralLocationsConsumer, downloadProjectSettingsConsumer, uploadExcludedDataElementsConsumer, downloadChartsConsumer, downloadPivotTablesConsumer, userPreferenceRepository,
+        downloadModuleDataBlocksConsumer) {
 
         this.run = function(message) {
             $log.info("Processing message: " + message.data.type, message.data);
@@ -27,8 +28,7 @@ define(["lodash"], function(_) {
                                 $log.info('Project data sync complete');
                                 return;
                             }
-                            return downloadDataConsumer.run(message)
-                                .then(_.partial(downloadApprovalConsumer.run, message))
+                            return downloadModuleDataBlocksConsumer.run()
                                 .then(_.partial(downloadEventDataConsumer.run, message))
                                 .then(_.partial(downloadChartsConsumer.run, message))
                                 .then(_.partial(downloadChartDataConsumer.run, message))
